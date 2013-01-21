@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -74,12 +76,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -113,6 +118,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
   private TableMouseMoveSelectionSupport m_mouseMoveSelectionSupport;
   private ISwtScoutDndSupport m_dndSupport;
+  private P_MultilineTooltipListener m_multiLineTooltipListener = null;
+  private static SwtScoutTable s_activeMultlineTooltipTable = null;
 
   public SwtScoutTable() {
   }
@@ -128,7 +135,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       style = SWT.SINGLE;
     }
     style |= SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.BORDER;
-    TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject().isMultilineText());
+    TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject());
     table.setLinesVisible(false);
     table.setHeaderVisible(true);
     new TableRolloverSupport(table);
@@ -212,6 +219,19 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
     });
+    // Multiline tooltip
+    checkTooltipListener();
+  }
+
+  private synchronized void checkTooltipListener() {
+    getSwtTableViewer().getTable().setToolTipText("");
+    if (m_multiLineTooltipListener == null) {
+      m_multiLineTooltipListener = new P_MultilineTooltipListener();
+      getSwtTableViewer().getTable().addListener(SWT.Dispose, m_multiLineTooltipListener);
+      getSwtTableViewer().getTable().addListener(SWT.KeyDown, m_multiLineTooltipListener);
+      getSwtTableViewer().getTable().addListener(SWT.MouseMove, m_multiLineTooltipListener);
+      getSwtTableViewer().getTable().addListener(SWT.MouseHover, m_multiLineTooltipListener);
+    }
   }
 
   @Override
@@ -1328,6 +1348,204 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       setSelectionFromSwt(selection);
     }
 
+  }
+
+  protected class P_MultilineTooltipListener implements Listener {
+
+    private Shell m_tooltip = null;
+    private Label m_tooltipLabel = null;
+    private Listener m_tooltipShellListener = null;
+
+    @Override
+    public void handleEvent(Event event) {
+
+      disposeTooltip();
+      switch (event.type) {
+        case SWT.KeyDown:
+        case SWT.MouseMove:
+        case SWT.MouseHover: {
+          // If any editor is active tooltip is not repainted.
+          for (CellEditor editor : getSwtTableViewer().getCellEditors()) {
+            if (editor != null && editor.isActivated()) {
+              return;
+            }
+          }
+
+          Point eventMousePoint = getSwtTableViewer().getTable().toControl(getEnvironment().getDisplay().getCursorLocation());
+          TableItem item = getSwtTableViewer().getTable().getItem(eventMousePoint);
+          if (item != null) {
+            int columnIdx = 0;
+            int columnCount = getSwtTableViewer().getTable().getColumnCount();
+            Rectangle cellBounds;
+            do {
+              cellBounds = item.getBounds(columnIdx);
+              if (new Rectangle(cellBounds.x, cellBounds.y + 2, cellBounds.width, cellBounds.height - 4).contains(eventMousePoint.x, eventMousePoint.y)) {
+                break;
+              }
+              columnIdx++;
+            }
+            while (columnIdx < columnCount);
+
+            // no cell found in the columns
+            if (columnIdx >= columnCount) {
+              break;
+            }
+
+            final ITableRow row = (ITableRow) item.getData();
+            IColumn<?>[] modelColumns = row.getTable().getColumns();
+            int invisibleColumnsBefore = 0;
+            for (int i = 0; i < columnIdx + invisibleColumnsBefore; i++) {
+              if (!modelColumns[i].isVisible()) {
+                invisibleColumnsBefore++;
+              }
+            }
+            // SWT index of colums starts at 1
+            final ICell modelCell = row.getCell(columnIdx - 1 + invisibleColumnsBefore);
+            String tooltipText = modelCell.getTooltipText();
+            if (StringUtility.isNullOrEmpty(tooltipText)) {
+              tooltipText = modelCell.getText();
+            }
+
+            // cell has no text to display in tooltip
+            if (!StringUtility.hasText(tooltipText)) {
+              break;
+            }
+
+            // "Disable" native tooltip
+            getSwtTableViewer().getTable().setToolTipText("");
+
+            m_tooltip = new Shell(getSwtTableViewer().getTable().getShell(), SWT.TOOL);
+            m_tooltip.setBackground(getSwtTableViewer().getTable().getParent().getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+            m_tooltip.setFont(getSwtTableViewer().getTable().getFont());
+            FillLayout layout = new FillLayout();
+            layout.marginWidth = 6;
+            m_tooltip.setLayout(layout);
+            m_tooltipLabel = new Label(m_tooltip, SWT.WRAP);
+            m_tooltipLabel.setForeground(getSwtTableViewer().getTable().getParent().getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+            m_tooltipLabel.setBackground(getSwtTableViewer().getTable().getParent().getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+            m_tooltipLabel.setData("_TABLEITEM", item);
+            m_tooltipLabel.setFont(item.getFont());
+            m_tooltipLabel.setText(tooltipText);
+
+            /**
+             * Instead of listening to the mouse exit event on the label, which is not always fired we register a filter
+             * on the display. To ensure we get informed
+             * when mouse cursor leaves the tooltip.
+             **/
+            m_tooltipShellListener = new Listener() {
+
+              @Override
+              public void handleEvent(Event tooltipEvent) {
+                if ((m_tooltip != null) && (tooltipEvent.widget instanceof Control) && !m_tooltip.isDisposed()) {
+                  Point mousePoint = ((Control) tooltipEvent.widget).toDisplay(tooltipEvent.x, tooltipEvent.y);
+                  if (!m_tooltip.getBounds().contains(mousePoint)) {
+                    disposeTooltip();
+                  }
+                }
+              }
+            };
+            getSwtTableViewer().getTable().getDisplay().addFilter(SWT.MouseMove, m_tooltipShellListener);
+            getSwtTableViewer().getTable().getDisplay().addFilter(SWT.MouseExit, m_tooltipShellListener);
+
+            Listener tooltipLabelListener = new Listener() {
+
+              @Override
+              public void handleEvent(final Event tooltipLabelEvent) {
+
+                switch (tooltipLabelEvent.type) {
+
+                  case SWT.MouseDown: {
+                    getSwtTableViewer().getTable().setFocus();
+                    int button = tooltipLabelEvent.button;
+                    if (button == 3 || modelCell.isEditable()) {
+                      disposeTooltip();
+                      if (s_activeMultlineTooltipTable != null && s_activeMultlineTooltipTable != SwtScoutTable.this) {
+                        s_activeMultlineTooltipTable.m_multiLineTooltipListener.disposeTooltip();
+                      }
+                    }
+
+                    if (modelCell.isEditable()) {
+                      Table table = getSwtTableViewer().getTable();
+                      tooltipLabelEvent.widget = table;
+                      Point tooltipEventMousePoint = table.toControl(getEnvironment().getDisplay().getCursorLocation());
+                      tooltipLabelEvent.x = tooltipEventMousePoint.x;
+                      tooltipLabelEvent.y = tooltipEventMousePoint.y;
+                      getSwtTableViewer().setSelection(new StructuredSelection(row), true);
+                      getSwtTableViewer().getTable().notifyListeners(SWT.MouseDown, tooltipLabelEvent);
+                    }
+
+                    if (!modelCell.isEditable() || button == 3) {
+                      Runnable scoutRun = new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                          getScoutObject().selectRow(row);
+
+                        }
+
+                      };
+                      getEnvironment().invokeScoutLater(scoutRun, 0);
+                    }
+                    break;
+                  }
+
+                  case SWT.MouseExit: {
+                    disposeTooltip();
+                    break;
+                  }
+
+                }
+
+              }
+
+            };
+            m_tooltipLabel.addListener(SWT.MouseDown, tooltipLabelListener);
+            m_tooltipLabel.addListener(SWT.MouseExit, tooltipLabelListener);
+
+            Point size = m_tooltip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+            //Show only if Text is longer than cell bounds.
+            if (cellBounds.width < size.x || cellBounds.height < size.y) {
+              Point pt = getSwtTableViewer().getTable().toDisplay(cellBounds.x - 1, cellBounds.y + 1);
+
+              // Max width is monitor...
+              Rectangle monitorBounds = m_tooltip.getMonitor().getBounds();
+              if (pt.x + size.x > monitorBounds.width) {
+                size = m_tooltip.computeSize(monitorBounds.width - pt.x, SWT.DEFAULT);
+              }
+
+              m_tooltip.setBounds(pt.x, pt.y, size.x, size.y);
+              if (s_activeMultlineTooltipTable != null && s_activeMultlineTooltipTable != SwtScoutTable.this) {
+                s_activeMultlineTooltipTable.m_multiLineTooltipListener.disposeTooltip();
+              }
+              s_activeMultlineTooltipTable = SwtScoutTable.this;
+              m_tooltip.setVisible(true);
+              getSwtTableViewer().getTable().forceFocus();
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     *
+     */
+    private synchronized void disposeTooltip() {
+      if (m_tooltipShellListener != null) {
+        getSwtTableViewer().getTable().getDisplay().removeFilter(SWT.MouseMove, m_tooltipShellListener);
+        getSwtTableViewer().getTable().getDisplay().removeFilter(SWT.MouseExit, m_tooltipShellListener);
+        m_tooltipShellListener = null;
+      }
+      if (m_tooltipLabel != null && !m_tooltipLabel.isDisposed()) {
+        m_tooltipLabel.dispose();
+      }
+      m_tooltipLabel = null;
+      if (m_tooltip != null && !m_tooltip.isDisposed()) {
+        m_tooltip.dispose();
+      }
+      m_tooltip = null;
+    }
   }
 
 }

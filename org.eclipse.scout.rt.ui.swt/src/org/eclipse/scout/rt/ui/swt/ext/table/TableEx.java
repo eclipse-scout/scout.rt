@@ -10,17 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext.table;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.ui.swt.ext.table.internal.TableMultilineListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -31,21 +36,33 @@ public class TableEx extends Table {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableEx.class);
   private static final int TEXT_MARGIN_Y = 1;
   private static final int TEXT_MARGIN_X = 6;
-  private static final int IMAGE_TEXT_PADDING = 1;
+
   private P_MouseHoverListener m_mouseHoverListener = new P_MouseHoverListener();
   private boolean m_readOnly;
-  private boolean m_multiline;
 
-  public TableEx(Composite parent, int style, boolean multiline) {
+  public TableEx(Composite parent, int style, ITable table) {
     super(parent, style);
-
-    m_multiline = multiline;
-    if (multiline) {
-      Listener multilineListener = new P_MultilineListener();
-      addListener(SWT.MeasureItem, multilineListener);
-      addListener(SWT.EraseItem, multilineListener);
-      addListener(SWT.PaintItem, multilineListener);
+    if (table != null) {
+      int rowHeight = table.getRowHeightHint() - 2 * TEXT_MARGIN_Y;
+      boolean multiline = table.isMultilineText();
+      Set<Integer> m_wrapTextColumns = getWrapTextColumnIdxs(table);
+      if (multiline || m_wrapTextColumns.size() > 0) {
+        Listener multilineListener = new TableMultilineListener(multiline, rowHeight, m_wrapTextColumns, TEXT_MARGIN_X, TEXT_MARGIN_Y);
+        addListener(SWT.MeasureItem, multilineListener);
+        addListener(SWT.EraseItem, multilineListener);
+        addListener(SWT.PaintItem, multilineListener);
+      }
     }
+  }
+
+  private Set<Integer> getWrapTextColumnIdxs(ITable table) {
+    Set<Integer> res = new HashSet<Integer>();
+    for (IColumn column : table.getColumns()) {
+      if (column instanceof IStringColumn && ((IStringColumn) column).isTextWrap()) {
+        res.add(column.getColumnIndex());
+      }
+    }
+    return res;
   }
 
   @Override
@@ -174,88 +191,4 @@ public class TableEx extends Table {
     }
   } // end class P_MouseHoverListener
 
-  private class P_MultilineListener implements Listener {
-
-    @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case SWT.MeasureItem:
-          Point mSize = new Point(0, 0);
-          TableItem mitem = (TableItem) event.item;
-          Image img = mitem.getImage(event.index);
-          if (img != null) {
-            Rectangle imgBounds = img.getBounds();
-            mSize.x += imgBounds.width + 2;
-            mSize.y = Math.max(mSize.y, imgBounds.height + 2 * TEXT_MARGIN_Y);
-          }
-          String mtext = mitem.getText(event.index);
-          Point textSize = m_multiline ? event.gc.textExtent(mtext) : event.gc.stringExtent(mtext);
-          mSize.x += textSize.x + 2 * TEXT_MARGIN_X;
-          mSize.y = Math.max(mSize.y, textSize.y + 2 * TEXT_MARGIN_Y);
-          event.width = mSize.x;
-          event.height = Math.max(event.height, mSize.y);
-          break;
-        case SWT.PaintItem:
-          TableItem pitem = (TableItem) event.item;
-          String ptext = pitem.getText(event.index);
-          int align = SWT.LEFT;
-          TableColumn tc = getColumn(event.index);
-          if (tc != null) {
-            align = (tc.getStyle() & (SWT.CENTER | SWT.LEFT | SWT.RIGHT));
-          }
-          /* center column 1 vertically */
-          Rectangle itemBounds = pitem.getBounds(event.index);
-          int xImageOffset = itemBounds.x;
-          int xTextOffset = xImageOffset + TEXT_MARGIN_X;
-          int yOffset = itemBounds.y + TEXT_MARGIN_Y;
-          Point textExtent = event.gc.stringExtent(ptext);
-
-          Image pImg = pitem.getImage(event.index);
-          Rectangle contentBounds = null;
-          if (pImg != null) {
-            contentBounds = pImg.getBounds();
-            if (textExtent.x > 0) {
-              //Add padding between image and text
-              contentBounds.width = contentBounds.width + IMAGE_TEXT_PADDING;
-              xTextOffset += contentBounds.width;
-            }
-          }
-          else {
-            contentBounds = new Rectangle(0, 0, 0, 0);
-          }
-
-          contentBounds.width += textExtent.x;
-          contentBounds.height += textExtent.y;
-          if (align == SWT.RIGHT) {
-            int dx = Math.max(TEXT_MARGIN_X, (itemBounds.x + itemBounds.width - xImageOffset - contentBounds.width - TEXT_MARGIN_X));
-            xTextOffset += dx;
-
-            //Aligning the image leads to an ugly space when row gets selected...
-//            xImageOffset += dx;
-          }
-          else if (align == SWT.CENTER) {
-            int dx = Math.max(TEXT_MARGIN_X, (itemBounds.x + itemBounds.width - xImageOffset - contentBounds.width - TEXT_MARGIN_X) / 2);
-            xTextOffset += dx;
-
-            //Aligning the image leads to an ugly space when row gets selected...
-//            xImageOffset += dx;
-          }
-
-          if (pImg != null) {
-            event.gc.drawImage(pImg, xImageOffset, yOffset);
-          }
-          event.gc.drawText(ptext, xTextOffset, yOffset, true);
-          event.gc.setForeground(event.gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
-          break;
-        case SWT.EraseItem:
-          //Focus rectangle looks ugly in Windows XP if there is a column with an image so we just remove the rectangle
-          //In Windows Vista it would look well.
-          event.detail &= ~SWT.FOCUSED;
-
-          //Foreground should not be painted because this is done by ourself with the SWT.PaintItem-Event.
-          event.detail &= ~SWT.FOREGROUND;
-          break;
-      }
-    }
-  }
 }
