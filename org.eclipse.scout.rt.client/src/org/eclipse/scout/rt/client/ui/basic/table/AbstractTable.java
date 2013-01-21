@@ -331,11 +331,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Configures the row height hint. This is a hint for the UI if and only if it is not capable of having variable table
-   * row height based on cell contents (such as rap/rwt).
+   * row height based on cell contents (such as rap/rwt or swt).
    * <p>
+   * This property is interpreted in different manner for each GUI port:
+   * <ul>
+   * <li>Swing: The property is ignored.
+   * <li>SWT: Used as the maximal row height.
+   * <li>rap/rwt: Used as the fixed row height in multiline tables.
+   * </ul>
    * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
    * table.
-   * <p>
+   * </p>
    * Subclasses can override this method. Default is {@code -1}.
    * 
    * @return Table row height hint in pixels.
