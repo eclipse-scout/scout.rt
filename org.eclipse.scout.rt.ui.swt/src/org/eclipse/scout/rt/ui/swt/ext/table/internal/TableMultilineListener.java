@@ -25,11 +25,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- *
+ * A table listener for multiline and wrapped tables.
  */
 public class TableMultilineListener implements Listener {
   private final int m_text_margin_y;
@@ -44,11 +45,15 @@ public class TableMultilineListener implements Listener {
 
   /**
    * @param multiline
+   *          true, if the table is multiline
    * @param rowHeight
    *          row height of the table (in pixel)
    * @param wrapTextColumns
+   *          the wrapped column indexes
    * @param textMarginX
+   *          horizontal text margin
    * @param textMarginY
+   *          vertical text margin
    */
   public TableMultilineListener(boolean multiline, int rowHeight, Set<Integer> wrapTextColumns, int textMarginX, int textMarginY) {
     m_multiline = multiline;
@@ -65,6 +70,17 @@ public class TableMultilineListener implements Listener {
     return m_rowHeight;
   }
 
+  /**
+   * Wraps the text to fit the bounds. Line breaks are inserted at word breaks.
+   * 
+   * @param gc
+   *          the graphics context
+   * @param text
+   *          the text to wrap, may be <code>null</code>
+   * @param bounds
+   *          the text bounds
+   * @return the wrapped text
+   */
   protected String softWrapText(GC gc, String text, Rectangle bounds) {
     if (StringUtility.isNullOrEmpty(text)) {
       return text;
@@ -79,9 +95,9 @@ public class TableMultilineListener implements Listener {
 
     for (int loc = wb.first(); loc != BreakIterator.DONE; loc = wb.next()) {
       String line = text.substring(saved, loc);
-      Point extent = gc.textExtent(line);
+      int textWidth = getTextWidth(gc, line);
 
-      if (extent.x > width) {
+      if (textWidth > width) {
         // overflow
         String prevLine = text.substring(saved, last);
         wrappedText += prevLine.trim();
@@ -96,6 +112,20 @@ public class TableMultilineListener implements Listener {
     return wrappedText;
   }
 
+  /**
+   * @param gc
+   *          the graphics context
+   * @param line
+   *          the line to be displayed
+   * @return width of the area the line covers
+   */
+  protected int getTextWidth(GC gc, String line) {
+    return gc.textExtent(line).x;
+  }
+
+  /**
+   * Handles the table event. Calculates width and height and draws the wrapped and trimmed text accordingly.
+   */
   @Override
   public void handleEvent(Event event) {
     switch (event.type) {
@@ -180,16 +210,16 @@ public class TableMultilineListener implements Listener {
 
   /**
    * @param event
-   * @param mitem
-   * @param mBounds
-   * @return
+   *          the table event
+   * @param item
+   *          the cell item
+   * @return the wrapped and trimmed cell display text, if necessary
    */
   protected String getCelldisplayText(Event event, TableItem item) {
     Rectangle itemBounds = item.getBounds(event.index);
     String text = item.getText(event.index);
     if (StringUtility.hasText(text)) {
-      int columnIndex = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN)).getColumnIndex();
-      if (ListUtility.containsAny(m_wrapTextColumns, columnIndex)) {
+      if (isWrapped(event.index, item.getParent())) {
         text = softWrapText(event.gc, text, new Rectangle(itemBounds.x, itemBounds.y, itemBounds.width - m_text_margin_x * 2, itemBounds.height - m_text_margin_y * 2));
       }
       FontMetrics fm = event.gc.getFontMetrics();
@@ -199,6 +229,18 @@ public class TableMultilineListener implements Listener {
       }
     }
     return text;
+  }
+
+  /**
+   * @param uiColumnIndex
+   *          the column index in the table (UI not scout model)
+   * @param table
+   *          the table
+   * @return true, if the column is wrapped, false otherwise
+   */
+  private boolean isWrapped(int uiColumnIndex, Table table) {
+    int columnIndex = ((IColumn<?>) table.getColumn(uiColumnIndex).getData(ISwtScoutTable.KEY_SCOUT_COLUMN)).getColumnIndex();
+    return ListUtility.containsAny(m_wrapTextColumns, columnIndex);
   }
 
   /**
