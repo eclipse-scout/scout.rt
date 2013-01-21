@@ -35,17 +35,34 @@ public class TableMultilineListener implements Listener {
   private final int m_text_margin_y;
   private final int m_text_margin_x;
   private static final int IMAGE_TEXT_PADDING = 1;
+  private static final String LINE_SEPARATOR = "\n";
 
   private final boolean m_multiline;
   private final int m_rowHeight;
+
   private final Set<Integer> m_wrapTextColumns;
 
+  /**
+   * @param multiline
+   * @param rowHeight
+   *          row height of the table (in pixel)
+   * @param wrapTextColumns
+   * @param textMarginX
+   * @param textMarginY
+   */
   public TableMultilineListener(boolean multiline, int rowHeight, Set<Integer> wrapTextColumns, int textMarginX, int textMarginY) {
     m_multiline = multiline;
     m_rowHeight = rowHeight;
     m_wrapTextColumns = wrapTextColumns;
     m_text_margin_y = textMarginY;
     m_text_margin_x = textMarginX;
+  }
+
+  /**
+   * @return row height of the table (in pixel)
+   */
+  public int getRowHeight() {
+    return m_rowHeight;
   }
 
   protected String softWrapText(GC gc, String text, Rectangle bounds) {
@@ -68,7 +85,7 @@ public class TableMultilineListener implements Listener {
         // overflow
         String prevLine = text.substring(saved, last);
         wrappedText += prevLine.trim();
-        wrappedText += "\n";
+        wrappedText += LINE_SEPARATOR;
         saved = last;
       }
       last = loc;
@@ -176,28 +193,38 @@ public class TableMultilineListener implements Listener {
         text = softWrapText(event.gc, text, new Rectangle(itemBounds.x, itemBounds.y, itemBounds.width - m_text_margin_x * 2, itemBounds.height - m_text_margin_y * 2));
       }
       FontMetrics fm = event.gc.getFontMetrics();
-      text = trimToRowHeight(text, fm);
+      if (fm != null) {
+        int fontHeight = fm.getHeight();
+        text = trimToRowHeight(text, fontHeight);
+      }
     }
     return text;
   }
 
   /**
-   * @param ptext
-   * @param fm
-   * @return
+   * Trims a given text to the maximum row height of the table. If the row height is <=0 or the line height is <=0, the
+   * complete text is returned.
+   * 
+   * @param text
+   *          the text to trim
+   * @param lineHeight
+   *          the height of a line in pixel
+   * @return the trimmed String
    */
-  protected String trimToRowHeight(String ptext, FontMetrics fm) {
-    if (m_rowHeight > 0 && fm != null && fm.getHeight() > 0) {
-      int maxLineCount = m_rowHeight / fm.getHeight();
+  protected String trimToRowHeight(String text, int lineHeight) {
+    if (getRowHeight() > 0 && lineHeight > 0) {
+      int maxLineCount = getRowHeight() / lineHeight;
+      int lineCount = Math.min(StringUtility.getLineCount(text), maxLineCount);
+
+      String[] lines = StringUtility.getLines(text);
+
       StringBuilder sb = new StringBuilder();
-      String[] lines = StringUtility.split(ptext, "\n");
-      int stopCount = Math.min(lines.length - 1, maxLineCount);
-      for (int i = 0; i < stopCount; i++) {
-        sb.append(lines[i]).append("\n");
+      for (int i = 0; i < lineCount - 1; i++) {
+        sb.append(lines[i]).append(LINE_SEPARATOR);
       }
-      sb.append(lines[stopCount]);
-      ptext = sb.toString();
+      sb.append(lines[lineCount - 1]);
+      text = sb.toString();
     }
-    return ptext;
+    return text;
   }
 }
