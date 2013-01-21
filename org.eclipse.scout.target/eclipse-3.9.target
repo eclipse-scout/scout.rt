@@ -76,5 +76,11 @@
       <unit id="org.eclipse.rap.runtime.requirements.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.rap.runtime.feature.group" version="0.0.0"/>
     </location>
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+
+      <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.feature.group" version="0.0.0"/>
+    </location>
   </locations>
 </target>
