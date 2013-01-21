@@ -219,3 +219,14 @@ Its runBusy method uses the factory BusyJobStrategy to create a handler (simple 
 The simple handler just shows a wait cursor and can be configured as to allow cancel.
 The workbench handler shows a wait cursor for 3 seconds and then blocks the views/dialog of the same IClientSession.
 It can be configured to block the whole workbench if no dialog is open.
+
+21.01.2013 jgu/osc
+Bugzilla: 396845
+Problem: SWT table did not consider text wrap and max. row height property.
+Solution:
+- The property rowHeightHint on AbstractTable (configured with getConfiguredRowHeightHint) is now also interpreted in SWT as the maximum row height.
+- The property textWrap on StringColumn (configured with getConfiguredTextWrap) is now also interpreted in SWT.
+- Multiline tooltip can be used in SWT tables now
+Migration: None
+
+
