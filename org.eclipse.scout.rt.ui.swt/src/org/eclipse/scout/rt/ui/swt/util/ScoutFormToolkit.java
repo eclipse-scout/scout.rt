@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.util;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
@@ -80,11 +81,11 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
   @Override
   public TableEx createTable(Composite parent, int style) {
-    return createTable(parent, style, false);
+    return createTable(parent, style, null);
   }
 
-  public TableEx createTable(Composite parent, int style, boolean multilineText) {
-    TableEx table = new TableEx(parent, style, multilineText);
+  public TableEx createTable(Composite parent, int style, ITable scoutTable) {
+    TableEx table = new TableEx(parent, style, scoutTable);
     adapt(table, false, false);
     return table;
 
