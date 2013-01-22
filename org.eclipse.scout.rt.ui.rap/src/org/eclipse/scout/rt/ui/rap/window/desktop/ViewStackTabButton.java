@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.swt.SWT;
@@ -47,7 +47,7 @@ public class ViewStackTabButton extends Composite {
     super(parent, SWT.NONE);
     m_eventListeners = new EventListenerList();
     createContent(this);
-    setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TAB);
+    setData(RWT.CUSTOM_VARIANT, VARIANT_TAB);
   }
 
   private IRwtEnvironment getUiEnvironment() {
@@ -56,7 +56,7 @@ public class ViewStackTabButton extends Composite {
 
   protected void createContent(Composite parent) {
     m_activateButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.PUSH);
-    m_activateButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON_ACTIVE);
+    m_activateButton.setData(RWT.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON_ACTIVE);
     m_activateButton.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,7 @@ public class ViewStackTabButton extends Composite {
       }
     });
     m_closeButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.PUSH);
-    m_closeButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM_CLOSE_BUTTON);
+    m_closeButton.setData(RWT.CUSTOM_VARIANT, VARIANT_FORM_CLOSE_BUTTON);
     m_closeButton.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -101,12 +101,12 @@ public class ViewStackTabButton extends Composite {
 
   private void updateStylesAndButtons() {
     if (m_active) {
-      setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TAB_ACTIVE);
-      m_activateButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON_ACTIVE);
+      setData(RWT.CUSTOM_VARIANT, VARIANT_TAB_ACTIVE);
+      m_activateButton.setData(RWT.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON_ACTIVE);
     }
     else {
-      setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TAB);
-      m_activateButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON);
+      setData(RWT.CUSTOM_VARIANT, VARIANT_TAB);
+      m_activateButton.setData(RWT.CUSTOM_VARIANT, VARIANT_ACIVATE_BUTTON);
     }
     GridData closeButtonData = (GridData) m_closeButton.getLayoutData();
     if (m_active && m_closable) {

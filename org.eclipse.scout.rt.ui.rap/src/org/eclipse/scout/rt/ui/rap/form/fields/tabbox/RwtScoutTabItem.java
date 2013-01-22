@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.tabbox;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -63,7 +63,7 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
   protected void initializeUi(Composite parent) {
     m_tabButton = getUiEnvironment().getFormToolkit().createButton(m_tabboxButtonbar, "", SWT.NONE);
 
-    m_tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+    m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     m_tabButton.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -82,7 +82,7 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     m_tabButton.setLayoutData(rowData);
 
     m_tabItem = getUiEnvironment().getFormToolkit().createComposite(m_tabboxContainer, SWT.NONE);
-    m_tabItem.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+    m_tabItem.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     m_tabItem.setLayout(new FillLayout());
 
     super.initializeUi(m_tabItem);
@@ -145,12 +145,12 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     if (!isValidWidget(tabButton)) {
       return;
     }
-    Object oldVariant = tabButton.getData(WidgetUtil.CUSTOM_VARIANT);
+    Object oldVariant = tabButton.getData(RWT.CUSTOM_VARIANT);
     if (oldVariant == m_variantActiveMarked || oldVariant == m_variantInActiveMarked) {
-      tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActiveMarked);
+      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActiveMarked);
     }
     else {
-      tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     }
   }
 
@@ -158,12 +158,12 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     if (!isValidWidget(tabButton)) {
       return;
     }
-    Object oldVariant = tabButton.getData(WidgetUtil.CUSTOM_VARIANT);
+    Object oldVariant = tabButton.getData(RWT.CUSTOM_VARIANT);
     if (oldVariant == m_variantActiveMarked || oldVariant == m_variantInActiveMarked) {
-      tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActiveMarked);
+      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActiveMarked);
     }
     else {
-      tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActive);
+      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActive);
     }
   }
 
@@ -171,13 +171,13 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     if (!isValidWidget(tabButton)) {
       return;
     }
-    Object oldVariant = tabButton.getData(WidgetUtil.CUSTOM_VARIANT);
+    Object oldVariant = tabButton.getData(RWT.CUSTOM_VARIANT);
     if (marked) {
       if (oldVariant == m_variantActive) {
-        tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActiveMarked);
+        tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActiveMarked);
       }
       else if (oldVariant == m_variantInActive) {
-        tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActiveMarked);
+        tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActiveMarked);
       }
       else {
         // already marked
@@ -185,10 +185,10 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     }
     else {
       if (oldVariant == m_variantActiveMarked) {
-        tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActive);
+        tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActive);
       }
       else if (oldVariant == m_variantInActiveMarked) {
-        tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+        tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
       }
       else {
         // already non-marked
@@ -296,7 +296,9 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     }
 
     private void handleKeyPressed(RwtScoutTabItem tabItem) {
-      if (tabItem == null) return;
+      if (tabItem == null) {
+        return;
+      }
       tabItem.getTabButton().setFocus();
       tabItem.handleUiSelectionChanged();
     }

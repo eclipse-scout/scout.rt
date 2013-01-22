@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.labelfield;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -46,7 +46,7 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
     //LabelContainer is only necessary because labels don't support margins -> see css for container padding
     final Composite labelContainer = getUiEnvironment().getFormToolkit().createComposite(container);
     labelContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
-    labelContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_LABELFIELD);
+    labelContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_LABELFIELD);
     labelContainer.setLayout(new FillLayout());
 
     Label text = getUiEnvironment().getFormToolkit().createLabel(labelContainer, "", style);

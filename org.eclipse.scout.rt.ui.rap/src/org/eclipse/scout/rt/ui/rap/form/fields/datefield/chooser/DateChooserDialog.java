@@ -17,7 +17,6 @@ import java.util.Date;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -129,10 +128,10 @@ public class DateChooserDialog extends Dialog {
 
   @Override
   protected Control createContents(Composite parent) {
-    parent.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    parent.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
 
     Composite rootArea = new Composite(parent, SWT.NO_FOCUS);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    rootArea.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true);
     rootArea.setLayoutData(gridData);
 
@@ -162,7 +161,7 @@ public class DateChooserDialog extends Dialog {
 
   private Control createPickDateArea(Composite parent) {
     final Table table = new Table(parent, SWT.SINGLE | SWT.NO_SCROLL | SWT.HIDE_SELECTION);
-    table.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    table.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     if (getDateCellHeight() != SWT.DEFAULT) {
       table.setData(RWT.CUSTOM_ITEM_HEIGHT, getDateCellHeight());
     }
@@ -181,7 +180,7 @@ public class DateChooserDialog extends Dialog {
             TableColumn columnAt = RwtUtility.getRwtColumnAt(table, new Point(event.x, event.y));
             TableItem item = table.getItem(new Point(event.x, event.y));
             if (item != null) {
-              item.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+              item.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
               if (columnAt != null) {
                 Date date = ((DateRow) item.getData()).getDate(table.indexOf(columnAt) - 1);
                 m_returnDate = date;
@@ -200,7 +199,7 @@ public class DateChooserDialog extends Dialog {
     });
 
     TableColumn dummyColumn = new TableColumn(table, SWT.RIGHT);
-    dummyColumn.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    dummyColumn.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     dummyColumn.setWidth(0);
     dummyColumn.setResizable(false);
     dummyColumn.setMoveable(false);
@@ -209,7 +208,7 @@ public class DateChooserDialog extends Dialog {
     // create the m_columns from monday to saturday
     for (int i = 2; i < 8; i++) {
       TableColumn col = new TableColumn(table, SWT.CENTER);
-      col.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+      col.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
       col.setWidth(getDateCellWidth());
       col.setResizable(false);
       col.setMoveable(false);
@@ -217,7 +216,7 @@ public class DateChooserDialog extends Dialog {
     }
     // sunday
     TableColumn col = new TableColumn(table, SWT.CENTER);
-    col.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    col.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     col.setWidth(getDateCellWidth());
     col.setResizable(false);
     col.setMoveable(false);
@@ -242,12 +241,12 @@ public class DateChooserDialog extends Dialog {
 
   private Control createControlArea(Composite parent) {
     Composite rootArea = RwtUtility.getUiEnvironment(parent.getDisplay()).getFormToolkit().createComposite(parent, SWT.NO_FOCUS);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    rootArea.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     createButton(rootArea, TYPE_BACK_YEAR);
     createButton(rootArea, TYPE_BACK_MONTH);
     m_monthLabel = new Label(rootArea, SWT.CENTER);
     m_monthLabel.setText(m_model.getMonthYearLabel());
-    m_monthLabel.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    m_monthLabel.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     createButton(rootArea, TYPE_FOREWARD_MONTH);
     createButton(rootArea, TYPE_FOREWARD_YEAR);
     // layout
@@ -263,7 +262,7 @@ public class DateChooserDialog extends Dialog {
     String variant = getControlButtonVariant(type);
 
     Button b = new Button(parent, SWT.PUSH);
-    b.setData(WidgetUtil.CUSTOM_VARIANT, variant);
+    b.setData(RWT.CUSTOM_VARIANT, variant);
     b.addMouseListener(new P_NavigationMouseListener(type));
     GridData data = new GridData(getControlButtonWidth(), getControlButtonHeight());
     data.horizontalAlignment = GridData.FILL;

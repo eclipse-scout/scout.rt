@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -170,7 +170,7 @@ public class ActionButtonBar extends Composite {
 
   private Composite createButtonBar(Composite parent, List<IMenu> actions) {
     Composite buttonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    buttonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_ACTION_BAR);
+    buttonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_ACTION_BAR);
     initButtonBarLayout(buttonBar);
 
     createButtons(buttonBar, actions);

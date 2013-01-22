@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -130,7 +129,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     style |= SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION;
     TableEx table = getUiEnvironment().getFormToolkit().createTable(parent, style);
     if (StringUtility.hasText(m_variant)) {
-      table.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
+      table.setData(RWT.CUSTOM_VARIANT, m_variant);
     }
     table.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     table.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
@@ -639,7 +638,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     // we apply a custom variant to all header cells. Otherwise
     // the "normal" style would be used for disabled cells.
     for (TableColumn column : getUiField().getColumns()) {
-      column.setData(WidgetUtil.CUSTOM_VARIANT, (enabledFromScout ? null : VARIANT_TABLE_COLUMN_DISABLED));
+      column.setData(RWT.CUSTOM_VARIANT, (enabledFromScout ? null : VARIANT_TABLE_COLUMN_DISABLED));
     }
     // </Workaround>
   }

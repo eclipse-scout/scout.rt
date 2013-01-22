@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.groupbox;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -242,13 +242,13 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       }
       else if (IGroupBox.BORDER_DECORATION_LINE.equals(m_borderDecoration.decoration)) {
         Composite groupComp = getUiEnvironment().getFormToolkit().createComposite(parent, SWT.NONE);
-        groupComp.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER);
+        groupComp.setData(RWT.CUSTOM_VARIANT, VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER);
         m_label = getUiEnvironment().getFormToolkit().createLabel(groupComp, "", SWT.NONE);
-        m_label.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_LABEL);
+        m_label.setData(RWT.CUSTOM_VARIANT, VARIANT_LABEL);
         m_line = getUiEnvironment().getFormToolkit().createLabel(groupComp, "", SWT.NONE);
-        m_line.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_LINE);
+        m_line.setData(RWT.CUSTOM_VARIANT, VARIANT_LINE);
         rootPane = getUiEnvironment().getFormToolkit().createComposite(groupComp, SWT.NONE);
-        rootPane.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_GROUP_BOX_WITH_LINE_FRAME);
+        rootPane.setData(RWT.CUSTOM_VARIANT, VARIANT_GROUP_BOX_WITH_LINE_FRAME);
         setUiContainer(groupComp);
         //
         GridLayout groupCompLayout = new GridLayout(1, false);
@@ -280,7 +280,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
         // empty
         Group emptyGroup = getUiEnvironment().getFormToolkit().createGroup(parent, 0/* SWT.SHADOW_ETCHED_IN*/);
         rootPane = emptyGroup;
-        rootPane.setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_EMPTY);
+        rootPane.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_EMPTY);
         setUiContainer(rootPane);
         //
         layout.horizontalSpacing = 0;

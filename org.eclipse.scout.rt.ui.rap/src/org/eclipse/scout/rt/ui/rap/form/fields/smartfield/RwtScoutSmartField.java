@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -109,12 +109,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+    m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
     StyledText textField = new StyledTextEx(m_smartContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+    textField.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
     m_browseButton = getUiEnvironment().getFormToolkit().createDropDownButton(m_smartContainer, SWT.DROP_DOWN | SWT.NO_FOCUS);
 
@@ -223,10 +223,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setButtonEnabled(b);
     getUiField().setEnabled(b);
     if (b) {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
     }
     else {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
     }
   }
 
@@ -239,7 +239,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   }
 
   protected void setIconIdFromScout(String s) {
-    m_browseButton.setData(WidgetUtil.CUSTOM_VARIANT, s);
+    m_browseButton.setData(RWT.CUSTOM_VARIANT, s);
   }
 
   @Override

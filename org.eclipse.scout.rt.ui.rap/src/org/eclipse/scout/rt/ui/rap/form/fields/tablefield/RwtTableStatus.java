@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.tablefield;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -51,15 +51,15 @@ public class RwtTableStatus implements IRwtTableStatus {
     m_statusVariant = getVariant(model);
 
     m_labelContainer = getUiEnvironment().getFormToolkit().createComposite(m_parent);
-    m_labelContainer.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
+    m_labelContainer.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
     //Label 1
     m_populateLabel = getUiEnvironment().getFormToolkit().createLabel(m_labelContainer, "", SWT.NONE);
-    m_populateLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
+    m_populateLabel.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
     m_populateLabel.setVisible(false);
 
     //Label 2
     m_selectionLabel = getUiEnvironment().getFormToolkit().createLabel(m_labelContainer, "", SWT.NONE);
-    m_selectionLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
+    m_selectionLabel.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
     m_selectionLabel.setVisible(false);
 
     //Layout
@@ -179,16 +179,16 @@ public class RwtTableStatus implements IRwtTableStatus {
     switch (status.getSeverity()) {
       case IProcessingStatus.ERROR:
       case IProcessingStatus.FATAL: {
-        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_ERROR);
+        field.setData(RWT.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_ERROR);
         break;
       }
       case IProcessingStatus.WARNING:
       case IProcessingStatus.CANCEL: {
-        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_WARNING);
+        field.setData(RWT.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_WARNING);
         break;
       }
       default: {
-        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
+        field.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
       }
     }
   }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -69,7 +69,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     addListener(SWT.Resize, new P_ResizeListener());
     m_desktopListener = new P_DesktopListner();
     getUiEnvironment().getScoutDesktop().addDesktopListener(m_desktopListener);
-    setData(WidgetUtil.CUSTOM_VARIANT, getVariant());
+    setData(RWT.CUSTOM_VARIANT, getVariant());
     createContent(this);
     addDisposeListener(new P_DisposeListener());
   }
@@ -87,7 +87,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   protected void createContent(Composite parent) {
     if (isTabBarCreationEnabled()) {
       m_tabBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-      m_tabBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
+      m_tabBar.setData(RWT.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
     }
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
 

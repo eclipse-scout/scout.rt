@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.ext.table;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerRow;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
@@ -48,8 +48,8 @@ public class TableViewerEx extends TableViewer {
   @Override
   protected ViewerRow internalCreateNewRowPart(int style, int rowIndex) {
     ViewerRow viewerRow = super.internalCreateNewRowPart(style, rowIndex);
-    if (getTable().getData(WidgetUtil.CUSTOM_VARIANT) != null) {
-      viewerRow.getItem().setData(WidgetUtil.CUSTOM_VARIANT, getTable().getData(WidgetUtil.CUSTOM_VARIANT));
+    if (getTable().getData(RWT.CUSTOM_VARIANT) != null) {
+      viewerRow.getItem().setData(RWT.CUSTOM_VARIANT, getTable().getData(RWT.CUSTOM_VARIANT));
     }
     return viewerRow;
   }

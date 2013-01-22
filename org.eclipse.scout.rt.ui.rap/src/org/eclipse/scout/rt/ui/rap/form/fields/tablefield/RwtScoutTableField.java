@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.tablefield;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
@@ -100,7 +100,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       //XXX somehow the tableContainer does absorb the mouse-clicks when used in the outline
       else {
         Composite tableContainer = new Composite(getUiContainer(), SWT.NONE);
-        tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TABLE_CONTAINER);
+        tableContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TABLE_CONTAINER);
         tableContainer.setLayout(new LogicalGridLayout(1, 0));
         m_tableComposite.createUiField(tableContainer, table, getUiEnvironment());
         tableContainer.setLayoutData(tableGridData);
@@ -171,7 +171,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
     super.setEnabledFromScout(b);
     // Workaround, because ":disabled" state seems to be ignored by RAP
     if (m_tableContainer != null) {
-      m_tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, (b ? VARIANT_TABLE_CONTAINER : VARIANT_TABLE_CONTAINER_DISABLED));
+      m_tableContainer.setData(RWT.CUSTOM_VARIANT, (b ? VARIANT_TABLE_CONTAINER : VARIANT_TABLE_CONTAINER_DISABLED));
     }
   }
 

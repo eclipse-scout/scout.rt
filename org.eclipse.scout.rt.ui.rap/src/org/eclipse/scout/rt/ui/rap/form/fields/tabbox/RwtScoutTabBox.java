@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -55,7 +55,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent, SWT.TOP);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TABBOX_CONTAINER);
+    container.setData(RWT.CUSTOM_VARIANT, VARIANT_TABBOX_CONTAINER);
 
     m_tabboxButtonbar = createTabboxButtonBar(container);
     m_tabboxContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.NONE);
@@ -87,7 +87,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
 
   protected Composite createTabboxButtonBar(Composite parent) {
     Composite tabboxButtonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    tabboxButtonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TABBOX_CONTAINER);
+    tabboxButtonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_TABBOX_CONTAINER);
     //layout
     RowLayout layout = new RowLayout(SWT.HORIZONTAL);
     layout.marginBottom = 0;
@@ -139,7 +139,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
           previousItem = curItem;
         }
 
-        /* the previous item of the first one is linked to the last one 
+        /* the previous item of the first one is linked to the last one
          * the next item of the last one is linked to the first one.
          */
         RwtScoutTabItem firstItem = tabList.getFirst();
@@ -147,7 +147,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
         firstItem.setPreviousTabItem(lastItem);
         lastItem.setNextTabItem(firstItem);
       }
-      
+
       setSelectedTabFromScout();
     }
     finally {

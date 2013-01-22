@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.form;
 import java.io.File;
 import java.util.WeakHashMap;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -49,7 +49,7 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM);
+    container.setData(RWT.CUSTOM_VARIANT, VARIANT_FORM);
 
     IRwtScoutFormField group = getUiEnvironment().createFormField(container, getScoutObject().getRootGroupBox());
     Composite field = group.getUiContainer();
@@ -67,7 +67,7 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   protected void attachScout() {
     super.attachScout();
     if (getScoutObject() instanceof ISmartFieldProposalForm) {
-      getUiContainer().setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_PROPOSAL_FORM);
+      getUiContainer().setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_PROPOSAL_FORM);
     }
     if (m_scoutFormListener == null) {
       m_scoutFormListener = new P_ScoutFormListener();

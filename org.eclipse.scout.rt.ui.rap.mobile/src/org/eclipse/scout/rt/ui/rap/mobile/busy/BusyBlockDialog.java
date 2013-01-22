@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.busy;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -62,11 +62,11 @@ public class BusyBlockDialog extends Dialog {
 
   @Override
   protected Control createDialogArea(Composite parent) {
-    getShell().setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    getShell().setData(RWT.CUSTOM_VARIANT, getDialogVariant());
 
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    container.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    container.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
 
     GridLayout dialogAreaLayout = RwtLayoutUtility.createGridLayoutNoSpacing(1, false);
     dialogAreaLayout.marginTop = 12;
@@ -77,7 +77,7 @@ public class BusyBlockDialog extends Dialog {
     m_messageLabel = getUiEnvironment().getFormToolkit().createLabel(container, RwtUtility.getNlsText(Display.getCurrent(), "MobileBusyBlockingMessage"), SWT.WRAP | SWT.CENTER);
     GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
     m_messageLabel.setLayoutData(gridData);
-    m_messageLabel.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    m_messageLabel.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
     return container;
   }
 

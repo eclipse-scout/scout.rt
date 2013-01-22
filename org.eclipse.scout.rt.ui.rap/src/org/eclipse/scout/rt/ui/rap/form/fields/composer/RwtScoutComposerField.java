@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.composer;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -43,7 +43,7 @@ public class RwtScoutComposerField extends RwtScoutFieldComposite<IComposerField
     treeContainer.setLayout(new LogicalGridLayout(1, 0));
     IForm form = (getScoutObject() != null) ? getScoutObject().getForm() : null;
     if (form != null && !IForm.VIEW_ID_PAGE_TABLE.equals(form.getDisplayViewId())) {
-      treeContainer.setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
+      treeContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
     }
     m_UiTreeComposite.createUiField(treeContainer, getScoutObject().getTree(), getUiEnvironment());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());

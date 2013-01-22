@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -56,14 +56,14 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+    m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     Text textField = new Text(m_dateContainer, SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+    textField.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     m_iconContainer = getUiEnvironment().getFormToolkit().createComposite(m_dateContainer);
-    m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON);
+    m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON);
 
     setUiContainer(container);
     setUiLabel(label);
@@ -134,12 +134,12 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
     getUiField().setEditable(false);
 
     if (b) {
-      m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
-      m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+      m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON);
     }
     else {
-      m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_DISABLED);
-      m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON_DISABLED);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_DISABLED);
+      m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON_DISABLED);
     }
   }
 

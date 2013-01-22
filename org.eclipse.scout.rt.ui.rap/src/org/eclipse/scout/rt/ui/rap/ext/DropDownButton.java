@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -140,10 +140,10 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     if (!StringUtility.hasText(m_originalVariant)) {
-      m_originalVariant = (String) getData(WidgetUtil.CUSTOM_VARIANT);
+      m_originalVariant = (String) getData(RWT.CUSTOM_VARIANT);
     }
     String customVariant = m_dropdownEnabled ? m_originalVariant + "_menu" : m_originalVariant;
-    setData(WidgetUtil.CUSTOM_VARIANT, customVariant);
+    setData(RWT.CUSTOM_VARIANT, customVariant);
     super.setEnabled(isButtonEnabled());
   }
 

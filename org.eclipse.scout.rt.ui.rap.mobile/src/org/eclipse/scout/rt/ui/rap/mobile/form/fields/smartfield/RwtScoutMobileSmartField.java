@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -48,13 +48,13 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+    m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
     Text textField = new Text(m_smartContainer, SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
 
     // correction to look like a normal text
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+    textField.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
     m_browseIconContainer = getUiEnvironment().getFormToolkit().createComposite(m_smartContainer);
 
@@ -127,10 +127,10 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
     getUiField().setEditable(false);
 
     if (b) {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
     }
     else {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
     }
 
     updateBrowseIconVariant(b, getScoutObject().getIconId());
@@ -151,7 +151,7 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
       variant = iconId + "-disabled";
     }
     //Unfortunately, composites don't know :disabled states so we have to create our own
-    m_browseIconContainer.setData(WidgetUtil.CUSTOM_VARIANT, variant);
+    m_browseIconContainer.setData(RWT.CUSTOM_VARIANT, variant);
   }
 
   protected void setIconIdFromScout(String s) {
