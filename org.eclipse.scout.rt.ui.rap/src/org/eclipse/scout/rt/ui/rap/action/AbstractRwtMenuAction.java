@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.action;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.rwt.internal.lifecycle.UITestUtil;
+import org.eclipse.rap.rwt.internal.lifecycle.UITestUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;

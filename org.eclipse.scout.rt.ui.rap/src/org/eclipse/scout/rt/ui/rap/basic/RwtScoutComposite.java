@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.rwt.internal.lifecycle.UITestUtil;
+import org.eclipse.rap.rwt.internal.lifecycle.UITestUtil;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;

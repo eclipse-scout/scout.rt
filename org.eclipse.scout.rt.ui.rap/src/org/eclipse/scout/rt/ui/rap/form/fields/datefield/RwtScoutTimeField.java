@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -50,8 +50,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 //TODO RAP 2.0 Migration
-//check shell listener removel
-
+//check shell listener removal
 public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
 
   private Button m_dropDownButton;
@@ -101,14 +100,14 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_timeContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+    m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     StyledText textField = new StyledTextEx(m_timeContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+    textField.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     ButtonEx timeChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_timeContainer, SWT.PUSH | SWT.NO_FOCUS);
-    timeChooserButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+    timeChooserButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     m_timeContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_timeContainer});
@@ -236,10 +235,10 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     m_dropDownButton.setEnabled(b);
     getUiField().setEnabled(b);
     if (b) {
-      m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
     }
     else {
-      m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD_DISABLED);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_DISABLED);
     }
   }
 
@@ -342,15 +341,8 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     makeSureTimeChooserIsClosed();
     m_timeChooserDialog = createTimeChooserDialog(getUiField().getShell(), oldTime);
     if (m_timeChooserDialog != null) {
-      m_timeChooserDialog.getShell().addDisposeListener(new DisposeListener() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetDisposed(DisposeEvent event) {
-          getTimeFromClosedDateChooserDialog();
-          m_timeChooserDialog = null;
-        }
-      });
+      m_disposeListener = new P_TimeChooserDisposeListener();
+      m_timeChooserDialog.getShell().addDisposeListener(m_disposeListener);
 
       m_timeChooserDialog.openTimeChooser(getUiField());
       installFocusListenerOnTextField();
@@ -365,6 +357,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     if (m_disposeListener != null) {
       m_timeChooserDialog.getShell().removeDisposeListener(m_disposeListener);
     }
+//    removeListenersFromTimeChooserDialog();
     boolean setFocusToUiField = false;
     try {
       final Date newDate = m_timeChooserDialog.getReturnTime();
@@ -391,22 +384,23 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     }
   }
 
-  private void removeListenersFromTimeChooserDialog() {
-    Object[] shellListeners = ShellEvent.getListeners(m_timeChooserDialog.getShell());
-    for (Object object : shellListeners) {
-      if (object.getClass().isInstance(this)
-          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-        m_timeChooserDialog.getShell().removeShellListener((ShellListener) object);
-      }
-    }
-    Object[] disposeListeners = DisposeEvent.getListeners(m_timeChooserDialog.getShell());
-    for (Object object : disposeListeners) {
-      if (object.getClass().isInstance(this)
-          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-        m_timeChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
-      }
-    }
-  }
+  // TODO RAP 2.0 migration - check shell listeners
+//  private void removeListenersFromTimeChooserDialog() {
+//    Object[] shellListeners = ShellEvent.getListeners(m_timeChooserDialog.getShell());
+//    for (Object object : shellListeners) {
+//      if (object.getClass().isInstance(this)
+//          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+//        m_timeChooserDialog.getShell().removeShellListener((ShellListener) object);
+//      }
+//    }
+//    Object[] disposeListeners = DisposeEvent.getListeners(m_timeChooserDialog.getShell());
+//    for (Object object : disposeListeners) {
+//      if (object.getClass().isInstance(this)
+//          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+//        m_timeChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
+//      }
+//    }
+//  }
 
   private void notifyPopupEventListeners(int eventType) {
     IPopupSupportListener[] listeners;
@@ -432,15 +426,13 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     }
   }
 
-  /**
-   *
-   */
   private final class P_TimeChooserDisposeListener implements DisposeListener {
     private static final long serialVersionUID = 1L;
 
     @Override
     public void widgetDisposed(DisposeEvent event) {
       getTimeFromClosedDateChooserDialog();
+      m_timeChooserDialog = null;
     }
   }
 

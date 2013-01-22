@@ -51,8 +51,11 @@ public class RwtScoutNavigationSupport {
 
   public void install() {
     if (m_uiHistory == null) {
-      m_uiHistory = RWT.getBrowserHistory();
-      m_uiHistory.addBrowserHistoryListener(m_uiListener);
+      // TODO RAP 2.0 migration - check
+// old code    m_uiHistory = RWT.getBrowserHistory();
+// olde code   m_uiHistory.addBrowserHistoryListener(m_uiListener);
+      m_uiHistory = RWT.getClient().getService(BrowserNavigation.class);
+      m_uiHistory.addBrowserNavigationListener(m_uiListener);
     }
 
     m_uiEnvironment.invokeScoutLater(new Runnable() {
@@ -83,7 +86,9 @@ public class RwtScoutNavigationSupport {
       //RunNow should be save here because the job just removes a listener
     }.runNow(new NullProgressMonitor());
     if (m_uiHistory != null) {
-      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
+      // TODO RAP 2.0 migration - check
+//      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
+      m_uiHistory.removeBrowserNavigationListener(m_uiListener);
     }
   }
 
@@ -115,7 +120,11 @@ public class RwtScoutNavigationSupport {
   protected void handleBookmarkAddedFromScout(Bookmark bookmark) {
     String id = getId(bookmark);
     //Title is set to null because it doesn't work properly, see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=396400
-    m_uiHistory.createEntry(id, null);
+    // TODO RAP 2.0 migration - check
+//    old code m_uiHistory.createEntry(id, null);
+    StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
+    textBuilder.append(cleanNl(bookmark.getText()));
+    m_uiHistory.pushState(id, textBuilder.toString());
   }
 
   private String cleanNl(String s) {

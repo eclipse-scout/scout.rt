@@ -32,13 +32,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.internal.widgets.JSExecutor;
-import org.eclipse.rwt.lifecycle.PhaseEvent;
-import org.eclipse.rwt.lifecycle.PhaseId;
-import org.eclipse.rwt.lifecycle.PhaseListener;
-import org.eclipse.rwt.lifecycle.PhaseListenerUtil;
-import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
+import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
+import org.eclipse.rap.rwt.lifecycle.PhaseId;
+import org.eclipse.rap.rwt.lifecycle.PhaseListener;
+import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
@@ -310,7 +309,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     HttpServletResponse response = RWT.getResponse();
     String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
     String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
-    JSExecutor.executeJS(browserText);
+    JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
+    if (executor != null) {
+      executor.execute(browserText);
+    }
   }
 
   @Override
@@ -1421,7 +1423,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
     @Override
     public void beforePhase(PhaseEvent event) {
-      if (!PhaseListenerUtil.isPrepareUIRoot(event)) {
+      if (event.getPhaseId() != PhaseId.PREPARE_UI_ROOT) {
         return;
       }
 
@@ -1430,7 +1432,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
     @Override
     public void afterPhase(PhaseEvent event) {
-      if (!PhaseListenerUtil.isRender(event)) {
+      if (event.getPhaseId() != PhaseId.RENDER) {
         return;
       }
 
