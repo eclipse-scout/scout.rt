@@ -15,6 +15,9 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
+/**
+ * Interface for user fields with date values.
+ */
 public interface IDateField extends IValueField<Date> {
   String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";

@@ -33,9 +33,10 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * A Value field for date and time values.
+ * A Value field for date (and time) values.
  * <p>
- * <strong>Note:</strong> By default, all {@link java.util.Date} objects are converted to
+ * <strong>Note:</strong> By default, all objects of type {@link java.util.Date} - except
+ * {@link org.eclipse.scout.commons.UTCDate UTCDate} - are converted to
  * {@link org.eclipse.scout.rt.shared.servicetunnel.StaticDate StaticDate} during serialization and converted back to
  * <code>Date</code> objects during de-serialization in order to be independent of time zone and daylight saving time.
  * I.e. the string representation of a date stays the same when it is sent through the service tunnel, but not the date
@@ -78,6 +79,7 @@ import org.eclipse.scout.service.SERVICES;
  * </p>
  * 
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
+ * @see org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractUTCDateField AbstractUTCDateField
  */
 public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
