@@ -254,7 +254,7 @@ public class TableMultilineListener implements Listener {
    * @return the trimmed String
    */
   protected String trimToRowHeight(String text, int lineHeight) {
-    if (getRowHeight() > 0 && lineHeight > 0) {
+    if (getRowHeight() > 0 && lineHeight > 0 && text != null) {
       int maxLineCount = getRowHeight() / lineHeight;
       int lineCount = Math.min(StringUtility.getLineCount(text), maxLineCount);
 
@@ -264,7 +264,9 @@ public class TableMultilineListener implements Listener {
       for (int i = 0; i < lineCount - 1; i++) {
         sb.append(lines[i]).append(LINE_SEPARATOR);
       }
-      sb.append(lines[lineCount - 1]);
+      if (lineCount > 0) {
+        sb.append(lines[lineCount - 1]);
+      }
       text = sb.toString();
     }
     return text;
