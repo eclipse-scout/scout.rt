@@ -265,6 +265,8 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  // TODO AWE (swingAppExt) : ist es gewollt, dass diese Methode im Swing thread aufgerufen wird?
+
   @ConfigOperation
   @Order(10)
   protected void execLoadSession() throws ProcessingException {
