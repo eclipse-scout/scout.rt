@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fragment
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.swing.test.fragment;singleton:=true
+Bundle-Version: 3.9.0.qualifier
+Bundle-Vendor: Eclipse Scout Project
+Fragment-Host: org.eclipse.scout.rt.ui.swing
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.easymock,
+ org.junit,
+ org.eclipse.scout.rt.testing.client,
+ org.eclipse.scout.rt.testing.shared
