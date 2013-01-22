@@ -33,7 +33,51 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Default hasDate=true and hasTime=false
+ * A Value field for date and time values.
+ * <p>
+ * <strong>Note:</strong> By default, all {@link java.util.Date} objects are converted to
+ * {@link org.eclipse.scout.rt.shared.servicetunnel.StaticDate StaticDate} during serialization and converted back to
+ * <code>Date</code> objects during de-serialization in order to be independent of time zone and daylight saving time.
+ * I.e. the string representation of a date stays the same when it is sent through the service tunnel, but not the date
+ * itself. {@link org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractUTCDateField AbstractUTCDateField} can be
+ * used instead, if this is not the desired behavior.
+ * <p>
+ * <strong>Example:</strong>
+ * </p>
+ * <blockquote>
+ * 
+ * <pre>
+ * //Consider a form containing a date field:
+ * ...
+ * public class MyDateField extends AbstractDateField {
+ * }
+ * 
+ * //Use SimpleDateFormat to get a String representation of the date.
+ * Date d = formData.getMyDate().getValue();
+ * DateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd - HH:mm:ss&quot;, Locale.ENGLISH);
+ * String formattedDate = dateFormat.format(d);
+ * System.out.println(formattedDate);
+ * 
+ * //Send the formData to the server using a service:
+ * SERVICES.getService(IMyService.class).load(MyFormData formData)
+ * 
+ * //Use SimpleDateFormat to get a String representation of the date in the service implementation.
+ * public MyFormData load(MyFormData formData) {
+ *     Date d = formData.getMyDate().getValue();
+ *     DateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd - HH:mm:ss&quot;, Locale.ENGLISH);
+ *     String formattedDate = dateFormat.format(d);
+ *     System.out.println(formattedDate);
+ * }
+ * //The two println statements result in the same value on server and client independent of the timezone of the client and server.
+ * </pre>
+ * 
+ * </blockquote>
+ * </p>
+ * <p>
+ * <strong>Default values:</strong> Default hasDate=true and hasTime=false
+ * </p>
+ * 
+ * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
