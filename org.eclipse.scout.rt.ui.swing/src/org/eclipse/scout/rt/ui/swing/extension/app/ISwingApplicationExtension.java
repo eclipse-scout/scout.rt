@@ -23,9 +23,7 @@ import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 public interface ISwingApplicationExtension {
 
   /**
-   * Returns the unique ID of this swing application extension.
-   * 
-   * @return
+   * @return the unique ID of this swing application extension.
    */
   String getExtensionId();
 
@@ -35,23 +33,17 @@ public interface ISwingApplicationExtension {
   void start();
 
   /**
-   * Returns the client session instance.
-   * 
-   * @return
+   * @return the client session instance.
    */
   IClientSession getClientSession();
 
   /**
-   * Returns the desktop instance.
-   * 
-   * @return
+   * @return the desktop instance.
    */
   IDesktop getDesktop();
 
   /**
-   * Returns the swing environment instance.
-   * 
-   * @return
+   * @return the swing environment instance.
    */
   ISwingEnvironment getEnvironment();
 
