@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
-import org.eclipse.rap.rwt.widgets.ExternalBrowser;
+import org.eclipse.rap.rwt.client.service.UrlLauncher;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler
 /**
  * @since 3.8.0
  */
-@SuppressWarnings("restriction")
 public class BrowserWindowHandler {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
@@ -78,8 +77,13 @@ public class BrowserWindowHandler {
       return;
     }
 
-    String nextId = UUID.randomUUID().toString();
-    ExternalBrowser.open(nextId, link, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
+    // TODO RAP 2.0 migration - check
+    // old code String nextId = UUID.randomUUID().toString();
+    // old code ExternalBrowser.open(nextId, link, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
+    UrlLauncher launcher = RWT.getClient().getService(UrlLauncher.class);
+    if (launcher != null) {
+      launcher.openURL(link);
+    }
   }
 
   public void openLinkInSameBrowserWindow(String link) {

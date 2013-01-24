@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.internal.serverpush.ServerPushSession;
 import org.eclipse.rap.rwt.service.ResourceManager;
 import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -53,6 +53,7 @@ public class BrowserExtension {
   private final HashMap<String, String> m_hyperlinkMap;
   private final String m_serviceHandlerId;
   private ServiceHandler m_serviceHandler;
+  private ServerPushSession m_pushSession;
   //
   private HashSet<String> m_tempFileNames = new HashSet<String>();
 
@@ -69,18 +70,21 @@ public class BrowserExtension {
     return m_serviceHandlerId;
   }
 
-  private String getUiCallbackId() {
-    return getClass().getName() + "" + hashCode();
-  }
+  // TODO RAP 2.0 migration - old code
+//  private String getUiCallbackId() {
+//    return getClass().getName() + "" + hashCode();
+//  }
 
   public void attach() {
     if (m_serviceHandler == null) {
-      UICallBack.activate(getUiCallbackId());
+      // TODO RAP 2.0 migration - old code
+// old code       UICallBack.activate(getUiCallbackId());
+      m_pushSession = new ServerPushSession();
+      m_pushSession.start();
       m_serviceHandler = new ServiceHandler() {
-
         @Override
         public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-          String localUrl = m_hyperlinkMap.get(RWT.getRequest().getParameter("p"));
+          String localUrl = m_hyperlinkMap.get(request.getParameter("p"));
           if (localUrl == null) {
             return;
           }
@@ -92,7 +96,9 @@ public class BrowserExtension {
   }
 
   public void detach() {
-    UICallBack.deactivate(getUiCallbackId());
+    // TODO RAP 2.0 migration - old code
+// old code   UICallBack.deactivate(getUiCallbackId());
+    m_pushSession.stop();
     clearLocalHyperlinkCache();
     clearResourceCache();
     if (m_serviceHandler != null) {

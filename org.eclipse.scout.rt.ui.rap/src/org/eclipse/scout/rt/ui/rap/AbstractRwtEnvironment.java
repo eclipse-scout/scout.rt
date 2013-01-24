@@ -34,10 +34,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
+import org.eclipse.rap.rwt.internal.serverpush.ServerPushSession;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
-import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
@@ -121,7 +121,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-@SuppressWarnings("restriction")
 public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
@@ -166,6 +165,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
   private P_RequestInterceptor m_requestInterceptor;
+  private ServerPushSession m_serverPushSession;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
@@ -423,7 +423,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
       // notify ui available
       // notify desktop that it is loaded
-      UICallBack.activate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+
+      // TODO RAP 2.0 Migration - check
+      // old code UICallBack.activate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+      m_serverPushSession = new ServerPushSession();
+      m_serverPushSession.start();
       new ClientSyncJob("Desktop opened", getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -457,7 +461,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
    * If there already is one attached, the attached session will be returned.
    */
   protected IClientSession initClientSession(UserAgent userAgent) {
-    HttpSession httpSession = RWT.getSessionStore().getHttpSession();
+    HttpSession httpSession = RWT.getUISession().getHttpSession();
     IClientSession clientSession = (IClientSession) httpSession.getAttribute(IClientSession.class.getName());
     if (clientSession != null) {
       if (!userAgent.equals(clientSession.getUserAgent())) {
@@ -1120,7 +1124,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
               getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                  UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+                  // TODO RAP 2.0 Migration - check
+                  // old code UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+                  m_serverPushSession.stop();
                 }
               });
             }
@@ -1146,7 +1152,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
               getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                  UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+                  // TODO RAP 2.0 Migration - check
+// old code          UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
+                  m_serverPushSession.stop();
                 }
               });
             }

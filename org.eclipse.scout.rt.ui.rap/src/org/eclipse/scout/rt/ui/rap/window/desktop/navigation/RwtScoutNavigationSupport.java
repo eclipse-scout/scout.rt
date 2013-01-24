@@ -33,10 +33,10 @@ import org.eclipse.scout.service.SERVICES;
 public class RwtScoutNavigationSupport {
 
   private final IRwtEnvironment m_uiEnvironment;
-  private BrowserNavigation m_uiHistory;
+  private BrowserNavigation m_uiNavigation;
   private INavigationHistoryService m_historyService;
   private P_NavigationHistoryListener m_scoutListener;
-  private BrowserNavigationListener m_uiListener = new BrowserNavigationListener() {
+  private BrowserNavigationListener m_uiNavigationListener = new BrowserNavigationListener() {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -50,12 +50,14 @@ public class RwtScoutNavigationSupport {
   }
 
   public void install() {
-    if (m_uiHistory == null) {
+    if (m_uiNavigation == null) {
       // TODO RAP 2.0 migration - check
 // old code    m_uiHistory = RWT.getBrowserHistory();
-// olde code   m_uiHistory.addBrowserHistoryListener(m_uiListener);
-      m_uiHistory = RWT.getClient().getService(BrowserNavigation.class);
-      m_uiHistory.addBrowserNavigationListener(m_uiListener);
+// old code   m_uiHistory.addBrowserHistoryListener(m_uiListener);
+      m_uiNavigation = RWT.getClient().getService(BrowserNavigation.class);
+      if (m_uiNavigation != null) {
+        m_uiNavigation.addBrowserNavigationListener(m_uiNavigationListener);
+      }
     }
 
     m_uiEnvironment.invokeScoutLater(new Runnable() {
@@ -85,20 +87,20 @@ public class RwtScoutNavigationSupport {
       //It seems that jobs aren't reliably executed on shutdown, explicitly calling Job.getJobManager().resume() doesn't work either.
       //RunNow should be save here because the job just removes a listener
     }.runNow(new NullProgressMonitor());
-    if (m_uiHistory != null) {
+    if (m_uiNavigation != null) {
       // TODO RAP 2.0 migration - check
 //      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
-      m_uiHistory.removeBrowserNavigationListener(m_uiListener);
+      m_uiNavigation.removeBrowserNavigationListener(m_uiNavigationListener);
     }
   }
 
-  protected void handleNavigationFromUi(final String entryId) {
+  protected void handleNavigationFromUi(final String state) {
     Runnable t = new Runnable() {
       @Override
       public void run() {
         try {
           for (Bookmark b : m_historyService.getBookmarks()) {
-            if (getId(b).equals(entryId)) {
+            if (getId(b).equals(state)) {
               m_historyService.stepTo(b);
               break;
             }
@@ -124,7 +126,7 @@ public class RwtScoutNavigationSupport {
 //    old code m_uiHistory.createEntry(id, null);
     StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
     textBuilder.append(cleanNl(bookmark.getText()));
-    m_uiHistory.pushState(id, textBuilder.toString());
+    m_uiNavigation.pushState(id, textBuilder.toString());
   }
 
   private String cleanNl(String s) {

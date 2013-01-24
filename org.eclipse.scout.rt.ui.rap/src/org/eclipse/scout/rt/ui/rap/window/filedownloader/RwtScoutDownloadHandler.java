@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.service.IServiceHandler;
+import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.widgets.Display;
 
-public class RwtScoutDownloadHandler implements IServiceHandler {
+public class RwtScoutDownloadHandler implements ServiceHandler {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDownloadHandler.class);
 
   private File m_file;
@@ -66,25 +66,15 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     m_sdd.open();
   }
 
-  public String getURL() {
-//TODO Check RAP 2.0 Migration
-//    old code
-//    StringBuffer url = new StringBuffer();
-//    url.append("?");
-//    url.append(IServiceHandler.REQUEST_PARAM);
-//    url.append("=");
-//    url.append(m_requestId);
-
+  protected String getURL() {
     String url = RWT.getServiceManager().getServiceHandlerUrl(m_requestId);
     String encodedURL = RWT.getResponse().encodeURL(url);
     return encodedURL;
   }
 
-  // TODO RAP 2.0 Migration
   @Override
   public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     try {
-// old code - HttpServletResponse response = RWT.getResponse();
       writeResponse(response);
     }
     finally {

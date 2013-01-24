@@ -1,23 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.6"?><target name="scout-3.9.target" sequenceNumber="25">
+<?pde version="3.6"?><target name="scout-3.9.target" sequenceNumber="12">
 <locations>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
-<unit id="org.eclipse.scout.rt.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/scout/nightly"/>
+<unit id="org.eclipse.birt.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.birt.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.connectivity.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.doc.user.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.enablement.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.modelbase.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.sqldevtools.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.datatools.sqldevtools.sqlbuilder.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.emf.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.gef.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.wst.common_ui.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="0.0.0"/>
+<unit id="org.apache.log4j" version="0.0.0"/>
+<repository location="http://download.eclipse.org/releases/kepler/"/>
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.rap.equinox.target.feature.feature.group" version="2.0.0.20121217-1928"/>
-<unit id="org.eclipse.rap.feature.feature.group" version="2.0.0.20130116-1245"/>
+<unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.scout.sdk.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.scout.sdk.rap.source.feature.group" version="0.0.0"/>
+<repository location="https://scout.bsiag.com/artifactory/eclipse-scout-snapshot-repo/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.rap.equinox.target.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
 <repository location="http://download.eclipse.org/rt/rap/2.0"/>
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
-<unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
-<unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
-<unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
-<unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/releases/kepler/"/>
+<unit id="org.eclipse.swt.win32.extension.source.feature.group" version="1.0.4.z3"/>
+<unit id="org.eclipse.swt.win32.extension.feature.group" version="1.0.4.z3"/>
+<repository location="https://scout.bsiag.com/artifactory/libs-snapshot/com/bsiag/tools/rt/com.bsiag.tools.eclipse.patch-repository/3.9.0-SNAPSHOT/com.bsiag.tools.eclipse.patch-repository-3.9.0-SNAPSHOT.zip!/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.apache.commons.io" version="2.0.1.v201105210651"/>
+<unit id="ch.qos.logback.slf4j" version="1.0.7.v20121108-1250"/>
+<unit id="org.slf4j.api" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.ext" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.jul" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.nop" version="1.7.2.v201212060727"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20121207152029/repository/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group" version="1.5.0.20120220-1720"/>
+<repository location="http://download.eclipse.org/rt/rap/1.5/incubator/"/>
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
@@ -76,6 +107,19 @@
 <unit id="com.google.guava" version="12.0.0.v201209270621"/>
 <unit id="com.google.guava.source" version="12.0.0.v201209270621"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20121207152029/repository/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
+<repository location="http://download.eclipse.org/releases/kepler/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.scout.rt.feature.group" version="0.0.0"/>
+<repository location="http://download.eclipse.org/scout/nightly"/>
 </location>
 </locations>
 </target>
