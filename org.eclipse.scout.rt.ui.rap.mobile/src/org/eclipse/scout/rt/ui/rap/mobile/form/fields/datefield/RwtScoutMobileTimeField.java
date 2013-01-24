@@ -230,7 +230,7 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
   private class P_FieldSelectionListener extends MouseAdapter {
     private static final long serialVersionUID = 1L;
 
-    @Override
+  @Override
     public void mouseUp(MouseEvent e) {
       if (!getScoutObject().isEnabled()) {
         return;

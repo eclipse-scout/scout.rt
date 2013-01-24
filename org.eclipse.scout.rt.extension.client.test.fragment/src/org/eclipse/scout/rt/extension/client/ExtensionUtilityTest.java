@@ -263,7 +263,7 @@ public class ExtensionUtilityTest {
   private static class P_D {
   }
 
-  private static abstract class AbstractE {
+  private abstract static class AbstractE {
   }
 
   private static class P_E1 extends AbstractE {

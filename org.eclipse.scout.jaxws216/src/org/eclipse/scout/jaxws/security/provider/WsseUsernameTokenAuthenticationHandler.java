@@ -49,6 +49,7 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  * Layer (SSL) encryption and Transport Layer Security (TLS).
  * </p>
  */
+@SuppressWarnings("restriction")
 @ScoutTransaction
 public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(WsseUsernameTokenAuthenticationHandler.class);

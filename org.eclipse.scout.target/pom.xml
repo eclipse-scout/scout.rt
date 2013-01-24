@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2012 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+     Stephan Leicht Vogt - initial implementation
+-->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt.parent</artifactId>
+    <version>3.9.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.rt.parent</relativePath>
+  </parent>
+
+  <groupId>org.eclipse.scout</groupId>
+  <artifactId>org.eclipse.scout.target</artifactId>
+  <packaging>pom</packaging>
+  <name>Eclipse Scout Target Platform Definition</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>eclipse-3.4.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.4</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-3.5.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.5</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-3.6.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.6</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-3.7.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.7</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-3.8.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.8</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-3.9.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-3.9</classifier>
+                </artifact>
+                <artifact>
+                  <file>eclipse-staging.target</file>
+                  <type>target</type>
+                  <classifier>eclipse-staging</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>target-platform-validation-plugin</artifactId>
+        <version>${tycho-extras.version}</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>validate-target-platform</goal>
+            </goals>
+            <configuration>
+              <targetFiles>
+                <param>eclipse-3.4.target</param>
+                <param>eclipse-3.5.target</param>
+                <param>eclipse-3.6.target</param>
+                <param>eclipse-3.7.target</param>
+                <param>eclipse-3.8.target</param>
+                <param>eclipse-3.9.target</param>
+                <param>eclipse-staging.target</param>
+              </targetFiles>
+              <failOnError>true</failOnError>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -62,18 +62,17 @@ public class LenientPermissionWrapper implements Serializable {
     out.writeFields();
   }
 
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject
     try {
       ObjectInputStream.GetField gfields = in.readFields();
       m_className = (String) gfields.get("m_className", (String) null);
       byte[] data = (byte[]) gfields.get("m_permission", (byte[]) null);
-      //
-      final BundleObjectInputStream bundleIn = (in instanceof BundleObjectInputStream ? (BundleObjectInputStream) in : null);
+
       ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data)) {
         @Override
         protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-          return bundleIn != null ? bundleIn.resolveClass(desc) : Class.forName(desc.getName());
+          return (in instanceof BundleObjectInputStream) ? ((BundleObjectInputStream) in).resolveClass(desc) : Class.forName(desc.getName());
         }
       };
       try {
@@ -87,5 +86,4 @@ public class LenientPermissionWrapper implements Serializable {
       LOG.warn("cannot deserialize permission", t);
     }
   }
-
 }

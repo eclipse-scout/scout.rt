@@ -6,13 +6,12 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.shared.runner.AbstractRunAftersInSeparateScoutSession;
-import org.junit.AfterClass;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
- * Invokes all methods of a test class annotated with {@link AfterClass} in a separate Scout server session and
- * therefore in a separate Scout transaction.
+ * Invokes all methods of a test class annotated with {@link org.junit.AfterClass} in a separate Scout server session
+ * and therefore in a separate Scout transaction.
  */
 public class RunAftersInSeparateScoutServerSession extends AbstractRunAftersInSeparateScoutSession {
   private final ScoutServerJobWrapperStatement m_aftersStatement;

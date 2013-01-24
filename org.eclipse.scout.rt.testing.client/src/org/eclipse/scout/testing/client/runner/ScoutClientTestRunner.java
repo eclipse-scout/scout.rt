@@ -43,20 +43,20 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
   @Target({ElementType.TYPE, ElementType.METHOD})
   public @interface ClientTest {
 
-    public Class<? extends IClientSession> clientSessionClass() default IClientSession.class;
+    Class<? extends IClientSession> clientSessionClass() default IClientSession.class;
 
-    public Class<? extends ITestClientSessionProvider> sessionProvider() default NullTestClientSessionProvider.class;
+    Class<? extends ITestClientSessionProvider> sessionProvider() default NullTestClientSessionProvider.class;
 
-    public String runAs() default "";
+    String runAs() default "";
 
-    public boolean forceNewSession() default false;
+    boolean forceNewSession() default false;
   }
 
   /**
    * Null-provider used as default value in the {@link ClientTest} annotation (since annotation values must not be
    * <code>null</code>).
    */
-  public static interface NullTestClientSessionProvider extends ITestClientSessionProvider {
+  public interface NullTestClientSessionProvider extends ITestClientSessionProvider {
   }
 
   /**

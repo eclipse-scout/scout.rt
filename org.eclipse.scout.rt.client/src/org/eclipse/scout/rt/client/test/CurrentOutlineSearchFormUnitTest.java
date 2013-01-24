@@ -14,6 +14,12 @@ import org.eclipse.scout.rt.client.services.common.test.ClientTestUtility;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class CurrentOutlineSearchFormUnitTest extends DrilldownOutlineUnitTest {
 
   @Override

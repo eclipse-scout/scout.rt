@@ -1,0 +1,5 @@
+analyseLocally=false
+eclipse.preferences.version=1
+projectKey=org.eclipse.scout.rt\:org.eclipse.scout.rt.testing.ui.rap\:master
+serverUrl=https\://scout.bsiag.com/sonar
+version=2

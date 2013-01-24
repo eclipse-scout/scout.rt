@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,6 +35,7 @@ import java.util.zip.ZipEntry;
  * @since 1.0
  */
 public final class FileUtility {
+  static final int KILO_BYTE = 1024;
 
   private FileUtility() {
   }
@@ -337,7 +340,7 @@ public final class FileUtility {
           output = new FileOutputStream(dest).getChannel();
 
           try {
-            int maxCount = (mbCount * 1024 * 1024) - (32 * 1024);
+            int maxCount = (mbCount * KILO_BYTE * KILO_BYTE) - (32 * KILO_BYTE);
             long size = input.size();
             long position = 0;
             while (position < size) {
@@ -498,12 +501,15 @@ public final class FileUtility {
     }
     name = name.substring(prefix.length() + 1);
     name = name.replace('\\', '/');
+    long timestamp = src.lastModified();
     byte[] data = readFile(src);
-    addFileToJar(name, data, zOut);
+    addFileToJar(name, data, timestamp, zOut);
   }
 
-  private static void addFileToJar(String name, byte[] data, JarOutputStream zOut) throws IOException {
-    zOut.putNextEntry(new ZipEntry(name));
+  private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
+    ZipEntry entry = new ZipEntry(name);
+    entry.setTime(timestamp);
+    zOut.putNextEntry(entry);
     zOut.write(data);
     zOut.closeEntry();
   }
@@ -520,6 +526,35 @@ public final class FileUtility {
     }
     ext = ext.toLowerCase();
     return EXT_TO_MIME_TYPE_MAP.get(ext);
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given file is a zip file.
+   */
+  public static boolean isZipFile(File file) {
+    if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
+      return false;
+    }
+    DataInputStream in = null;
+    try {
+      in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+      int test = in.readInt();
+      return test == 0x504b0304; // magic number of a zip file
+    }
+    catch (Throwable e) {
+      return false;
+    }
+    finally {
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (Throwable t) {
+          // nop
+        }
+        in = null;
+      }
+    }
   }
 
 }

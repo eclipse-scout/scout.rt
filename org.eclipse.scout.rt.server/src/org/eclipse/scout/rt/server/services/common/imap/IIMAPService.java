@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.scout.service.IService;
  * This service is normally registered as a scout server service extension, so
  * it exists per session
  */
+@SuppressWarnings("restriction")
 public interface IIMAPService extends IService {
 
   Message[] getUnreadMessages() throws ProcessingException;

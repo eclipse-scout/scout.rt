@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.rt.rap.testing"
+      label="%featureName"
+      version="3.9.0.qualifier"
+      provider-name="%providerName">
+
+   <description url="http://www.eclipse.org/scout/">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
+   </url>
+
+   <includes
+         id="org.eclipse.scout.rt"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.scout.rt.testing"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="com.google.guava" version="12.0.0" match="greaterOrEqual"/>
+      <import plugin="com.thoughtworks.selenium" version="2.25.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.httpcomponents.httpcore" version="4.1.4" match="greaterOrEqual"/>
+      <import plugin="org.apache.httpcomponents.httpclient" version="4.1.3" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.codec" version="1.1.4" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.exec" version="1.1.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.ui.rap"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.guava"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.thoughtworks.selenium"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpclient"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpcore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.codec"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.exec"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

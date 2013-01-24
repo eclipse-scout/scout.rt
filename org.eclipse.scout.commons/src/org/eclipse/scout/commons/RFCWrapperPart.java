@@ -20,6 +20,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
+@SuppressWarnings("restriction")
 public class RFCWrapperPart implements Part {
   private final Part m_rfcPart;
   private final String m_fileName;

@@ -16,6 +16,7 @@ import org.osgi.framework.BundleContext;
 
 import com.sun.xml.internal.ws.fault.SOAPFaultBuilder;
 
+@SuppressWarnings("restriction")
 public class Activator extends Plugin {
 
   public static final String PROP_STACKTRACE = "org.eclipse.scout.jaxws.stacktrace";

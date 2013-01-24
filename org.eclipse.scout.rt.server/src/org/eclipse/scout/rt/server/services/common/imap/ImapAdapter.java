@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
+@SuppressWarnings("restriction")
 public class ImapAdapter {
 
   public static final String TRASH_FOLDER_NAME = "Trash";

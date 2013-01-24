@@ -111,6 +111,7 @@ import com.sun.tools.internal.ws.wsdl.parser.WSDLInternalizationLogic;
  * <li>Please note, that you manually have to refresh the output Eclipse folders</li>
  * </ol>
  */
+@SuppressWarnings("restriction")
 public class JaxWsStubGenerator {
 
   private static final int ARG_OUT_DIR = 0;

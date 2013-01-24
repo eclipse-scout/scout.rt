@@ -1673,10 +1673,8 @@ public class ScoutXmlDocument implements Serializable {
      */
     public boolean hasAttributeExact(String name) {
       if (this.hasAttributes()) {
-        Iterator<P_Attribute> iterator = m_attributes.iterator();
-
-        for (int i = 0; iterator.hasNext(); i++) {
-          if (iterator.next().getNamePrefixed().equals(name)) {
+        for (Iterator iterator = m_attributes.iterator(); iterator.hasNext();) {
+          if (((P_AbstractNode) iterator.next()).getNamePrefixed().equals(name)) {
             return true;
           }
         }

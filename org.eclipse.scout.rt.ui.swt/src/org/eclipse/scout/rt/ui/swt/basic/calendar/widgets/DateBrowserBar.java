@@ -68,7 +68,7 @@ public class DateBrowserBar extends Composite {
 
     // button 1a
     m_fastbackward = new Button(this, SWT.FLAT);
-    m_fastbackward.setText("\u00AB" /*"«"*/);
+    m_fastbackward.setText("\u00AB" /*"Â«"*/);
     m_fastbackward.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.BEGINNING;
@@ -78,7 +78,7 @@ public class DateBrowserBar extends Composite {
 
     // button 1b
     m_backward = new Button(this, SWT.FLAT);
-    m_backward.setText("\u2039" /*"‹"*/);
+    m_backward.setText("\u2039" /*"â€¹"*/);
     m_backward.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.BEGINNING;
@@ -96,7 +96,7 @@ public class DateBrowserBar extends Composite {
 
     // button 2a
     m_forward = new Button(this, SWT.FLAT);
-    m_forward.setText("\u203A" /*"›"*/);
+    m_forward.setText("\u203A" /*"â€º"*/);
     m_forward.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.END;
@@ -106,7 +106,7 @@ public class DateBrowserBar extends Composite {
 
     // button 2b
     m_fastforward = new Button(this, SWT.FLAT);
-    m_fastforward.setText("\u00BB" /*"»"*/);
+    m_fastforward.setText("\u00BB" /*"Â»"*/);
     m_fastforward.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.END;

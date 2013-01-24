@@ -30,14 +30,13 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.prefs.UserScope;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
 
 /**
  * Runner for JUnit Plug-in tests.
  * <p>
  * <b>Note:</b>This class is similar to Eclipse's test framework. It is however built on top of JUnit4 and runs with
  * Eclipse version 3.5 and above. Additionally it does not require a test suite that lists all tests to be executed but
- * collects them using Scout's {@link BundleBrowser}.
+ * collects them using Scout's {@link org.eclipse.scout.commons.runtime.BundleBrowser}.
  */
 public class ScoutJUnitPluginTestExecutor {
   private static final String DUMMY_TESTSUITE_NAME = "FRAMEWORK.INIT";

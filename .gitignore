@@ -1,0 +1,22 @@
+# Backupfiles from mergetools #
+*.orig
+
+# Java Class Files #
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+
+# Eclipse #
+bin/
+classes/
+
+# Maven #
+target/
+
+# settings files are handled in rt-feature project and settings files should not be changed (can be enforecd with 'git add .settings -f')
+.settings
+.project

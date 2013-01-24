@@ -188,6 +188,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   public void refreshPages(final Class... pageTypes) {
     final ArrayList<IPage> candidates = new ArrayList<IPage>();
     ITreeVisitor v = new ITreeVisitor() {
+      @SuppressWarnings("unchecked")
       @Override
       public boolean visit(ITreeNode node) {
         IPage page = (IPage) node;

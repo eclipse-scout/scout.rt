@@ -14,6 +14,11 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.service.IService;
 
 /**
+ *
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
+ *
  * <h1>Integration test service</h1> A test gets a test context {@link #setTestContext(ITestContext)} and is
  * launched by calling {@link #run()}
  * <p>
@@ -24,6 +29,8 @@ import org.eclipse.scout.service.IService;
  * <code>Marco Polo . ProcessServices . PersonProcess.load</code>
  */
 @Priority(-3)
+@Deprecated
+@SuppressWarnings("deprecation")
 public interface ITest extends IService {
 
   String getProduct();

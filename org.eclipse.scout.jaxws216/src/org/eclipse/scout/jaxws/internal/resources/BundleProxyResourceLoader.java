@@ -23,6 +23,7 @@ import org.osgi.framework.Bundle;
 
 import com.sun.xml.internal.ws.transport.http.ResourceLoader;
 
+@SuppressWarnings("restriction")
 public class BundleProxyResourceLoader implements ResourceLoader {
 
   private static final Logger LOG = Logger.getLogger("com.sun.xml.ws.server.http");

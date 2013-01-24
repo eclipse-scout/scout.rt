@@ -554,9 +554,9 @@ Migration SWT:
   - AbstractSwtEnvironment#createHtmlDocument(String, String)
 
 22.07.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
-bsi ticket #105’126
+bsi ticket #105126
 Problem:
-When using ‘yyyy’ in the format of an AbstractDateField, there is no interpretation of the century. Entering 11 for the year results in 0011 CE instead of 2011 CE
+When using yyyy in the format of an AbstractDateField, there is no interpretation of the century. Entering 11 for the year results in 0011 CE instead of 2011 CE
 Resources changed: AbstractDateField
 Migration: None
 
@@ -848,9 +848,9 @@ Migration: none
 Bugzilla: 361985
 Bug following the discussion here:
 http://www.eclipse.org/forums/index.php/t/210744/
-  •  Naming consistency:
+    Naming consistency:
 clearDeletedRows() => discardAllDeletedRows()
-  •  Add the possibility to discard a specific deleted row
+    Add the possibility to discard a specific deleted row
 discardDeleteRow(TableRow deletedRow)
 discardDeleteRows(TableRow deletedRow)
 discarding a DeletedRow by index (or array of indexes) makes no sense, because if the row is deleted, the row do not have an index anymore.

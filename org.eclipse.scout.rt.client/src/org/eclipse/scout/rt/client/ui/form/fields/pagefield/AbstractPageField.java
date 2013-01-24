@@ -105,16 +105,19 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public IWrappedFormField<IForm> getDetailFormField() {
     return getFieldByClass(DetailFormField.class);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public ITableField<ITable> getTableField() {
     return getFieldByClass(TableField.class);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public IWrappedFormField<IForm> getSearchFormField() {
     return getFieldByClass(SearchFormField.class);

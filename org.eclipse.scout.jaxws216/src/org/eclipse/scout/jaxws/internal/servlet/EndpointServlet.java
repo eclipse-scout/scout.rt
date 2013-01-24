@@ -33,6 +33,7 @@ import org.eclipse.scout.service.SERVICES;
 
 import com.sun.xml.internal.ws.transport.http.HttpAdapter;
 
+@SuppressWarnings("restriction")
 public abstract class EndpointServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;

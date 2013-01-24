@@ -342,6 +342,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     m_fields = fieldList.toArray(new IFormField[0]);
   }
 
+  @SuppressWarnings("unchecked")
   public ListBoxFilterBox getListBoxFilterBox() {
     return getFieldByClass(ListBoxFilterBox.class);
   }
@@ -957,14 +958,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
       return true;
     }
 
+    @SuppressWarnings("unchecked")
     public KeyColumn getKeyColumn() {
       return getColumnSet().getColumnByClass(KeyColumn.class);
     }
 
+    @SuppressWarnings("unchecked")
     public TextColumn getTextColumn() {
       return getColumnSet().getColumnByClass(TextColumn.class);
     }
 
+    @SuppressWarnings("unchecked")
     public ActiveColumn getActiveColumn() {
       return getColumnSet().getColumnByClass(ActiveColumn.class);
     }

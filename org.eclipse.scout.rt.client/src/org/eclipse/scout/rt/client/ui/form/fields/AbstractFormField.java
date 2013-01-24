@@ -1532,7 +1532,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (isMandatory()) {
       //nop
     }
-     */
+    */
     return true;
   }
 

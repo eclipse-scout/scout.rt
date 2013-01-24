@@ -166,7 +166,7 @@ public final class SwingLayoutUtility {
         getSize(c, MIN),
         getSize(c, PREF),
         getSize(c, MAX)
-        };
+    };
     // validation
     if (d[MIN].width > d[PREF].width) {
       d[MIN].width = d[PREF].width;

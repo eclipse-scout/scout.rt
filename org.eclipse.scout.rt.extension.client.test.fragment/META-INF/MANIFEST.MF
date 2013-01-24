@@ -3,8 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Extension Client Test Fragment
 Bundle-SymbolicName: org.eclipse.scout.rt.extension.client.test.fragment;singleton:=true
 Bundle-Version: 3.9.0.qualifier
-Fragment-Host: org.eclipse.scout.rt.extension.client
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.rt.testing.client,
- org.eclipse.scout.rt.testing.shared
+Fragment-Host: org.eclipse.scout.rt.extension.client;bundle-version="[3.9.0,3.10.0)"
+Require-Bundle: org.eclipse.scout.rt.testing.client;bundle-version="[3.8.0,4.0.0)",
+ org.eclipse.scout.rt.testing.shared;bundle-version="[3.8.0,4.0.0)"
+Import-Package: org.easymock;version="[2.0.0,3.0.0)",
+ org.junit;version="4.8.1",
+ org.junit.runner;version="4.8.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

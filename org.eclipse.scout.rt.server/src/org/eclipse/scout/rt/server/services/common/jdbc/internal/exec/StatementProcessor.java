@@ -275,7 +275,6 @@ public class StatementProcessor implements IStatementProcessor {
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
-      int rowCount = 0;
       while (hasNextInputBatch()) {
         nextInputBatch();
         prepareInputStatementAndBinds();
@@ -288,7 +287,6 @@ public class StatementProcessor implements IStatementProcessor {
           for (Object[] row : processResultRows(rs, m_maxRowCount)) {
             nextOutputBatch();
             consumeSelectIntoRow(row);
-            rowCount++;
           }
         }
         finally {

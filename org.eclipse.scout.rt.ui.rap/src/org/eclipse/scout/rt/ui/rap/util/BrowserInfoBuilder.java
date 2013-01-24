@@ -73,15 +73,15 @@ public class BrowserInfoBuilder {
       info.setSystem(BrowserInfo.System.OSX);
     }
     else if (userAgent.indexOf("Android") != -1) {
-      info.setSystem(BrowserInfo.System.ANDROID);
-      info.setSystemVersion(parseAndroidVersion(userAgent));
-      initAndroidMobileFlags(info);
-    }
+        info.setSystem(BrowserInfo.System.ANDROID);
+        info.setSystemVersion(parseAndroidVersion(userAgent));
+        initAndroidMobileFlags(info);
+      }
     else if (userAgent.indexOf("X11") != -1
         || userAgent.indexOf("Linux") != -1
         || userAgent.indexOf("BSD") != -1) {//FIXME
-      info.setSystem(BrowserInfo.System.UNIX);
-    }
+        info.setSystem(BrowserInfo.System.UNIX);
+      }
     else if (userAgent.indexOf("iPad") != -1) {
       info.setSystem(BrowserInfo.System.IOS);
       info.setSystemVersion(parseIosVersion(userAgent));

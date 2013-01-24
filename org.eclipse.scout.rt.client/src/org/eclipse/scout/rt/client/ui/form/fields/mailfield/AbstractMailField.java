@@ -28,6 +28,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * @version 3.x
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractMailField extends AbstractValueField<MimeMessage> implements IMailField {
   private IMailFieldUIFacade m_uiFacade;
   private boolean m_mailEditor;

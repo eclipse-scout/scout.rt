@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 /**
  * @version 3.x
  */
+@SuppressWarnings("restriction")
 public interface IMailField extends IValueField<MimeMessage> {
   String PROP_LABEL_FROM = "labelFrom";
   String PROP_LABEL_TO = "labelTo";

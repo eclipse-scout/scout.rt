@@ -18,6 +18,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.test.BasicTestContext;
 import org.eclipse.scout.rt.shared.services.common.test.TestStatus;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class FormBasedTestContext extends BasicTestContext {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormBasedTestContext.class);
   private final DefaultClientTestForm m_form;

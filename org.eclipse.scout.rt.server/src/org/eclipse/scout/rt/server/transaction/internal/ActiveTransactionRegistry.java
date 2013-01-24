@@ -35,10 +35,10 @@ public class ActiveTransactionRegistry {
       return null;
     }
     synchronized (session) {
-      SessionState state = (SessionState) session.getAttribute(SESSION_STATE_KEY);
+      SessionState state = (SessionState) session.getData(SESSION_STATE_KEY);
       if (state == null && autoCreate) {
         state = new SessionState();
-        session.setAttribute(SESSION_STATE_KEY, state);
+        session.setData(SESSION_STATE_KEY, state);
       }
       return state;
     }

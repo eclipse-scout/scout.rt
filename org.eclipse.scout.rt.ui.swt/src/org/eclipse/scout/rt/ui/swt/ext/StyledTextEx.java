@@ -91,7 +91,7 @@ public class StyledTextEx extends StyledText {
           copy();
         }
         else {
-          //Ticket 86'427: Kopieren - Einfügen
+          //Ticket 86'427: Kopieren - EinfÃ¼gen
           boolean hasSelection = StringUtility.hasText(getSelectionText());
           if (hasSelection) {
             copy();

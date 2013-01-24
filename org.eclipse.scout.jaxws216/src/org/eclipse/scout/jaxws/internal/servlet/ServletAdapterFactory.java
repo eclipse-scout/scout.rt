@@ -13,6 +13,7 @@ package org.eclipse.scout.jaxws.internal.servlet;
 import com.sun.xml.internal.ws.api.server.WSEndpoint;
 import com.sun.xml.internal.ws.transport.http.HttpAdapterList;
 
+@SuppressWarnings("restriction")
 public class ServletAdapterFactory extends HttpAdapterList<ServletAdapter> {
 
   /**

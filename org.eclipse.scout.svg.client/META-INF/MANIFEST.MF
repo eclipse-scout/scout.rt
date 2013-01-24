@@ -2,26 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Client SVG Field
 Bundle-SymbolicName: org.eclipse.scout.svg.client;singleton:=true
-Bundle-Version: 3.8.2.qualifier
+Bundle-Version: 3.9.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.commons;bundle-version="3.7.0";visibility:=reexport,
- org.eclipse.scout.rt.client;bundle-version="3.7.0";visibility:=reexport,
- org.w3c.dom.svg;bundle-version="1.1.0";visibility:=reexport,
- org.apache.batik.bridge;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.css;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.dom;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.dom.svg;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.ext.awt;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.parser;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.svggen;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.swing;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.transcoder;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.util;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.util.gui;bundle-version="1.6.0";visibility:=reexport,
- org.apache.batik.xml;bundle-version="1.6.0";visibility:=reexport
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
+ org.eclipse.scout.commons;bundle-version="[3.7.0,4.0.0)";visibility:=reexport,
+ org.eclipse.scout.rt.client;bundle-version="[3.7.0,4.0.0)";visibility:=reexport
 Export-Package: org.eclipse.scout.svg.client,
  org.eclipse.scout.svg.client.svgfield
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: org.apache.batik.bridge;version="[1.6.0,2.0.0)",
+ org.apache.batik.css.engine;version="[1.6.0,2.0.0)",
+ org.apache.batik.dom.svg;version="[1.6.0,2.0.0)",
+ org.apache.batik.dom.util;version="[1.6.0,2.0.0)",
+ org.apache.batik.swing;version="[1.6.0,2.0.0)",
+ org.apache.batik.swing.svg;version="[1.6.0,2.0.0)",
+ org.apache.batik.util;version="[1.6.0,2.0.0)",
+ org.w3c.dom.svg;version="[1.1.0,2.0.0)"

@@ -24,8 +24,10 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
@@ -224,14 +226,57 @@ public interface IForm extends IPropertyObserver {
 
   /**
    * apply FormData to this form
+   * 
+   * @param source
+   *          the FormData to import
+   * @throws ProcessingException
    */
   void importFormData(AbstractFormData source) throws ProcessingException;
 
   /**
-   * apply FormData to this form<br>
-   * value triggers can be deactivated if necessary
+   * apply FormData to this form
+   * 
+   * @param source
+   *          the FormData to import
+   * @param valueChangeTriggersEnabled
+   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *          caused by this import.
+   * @throws ProcessingException
+   */
+  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled) throws ProcessingException;
+
+  /**
+   * apply FormData to this form
+   * 
+   * @param source
+   *          the FormData to import
+   * @param valueChangeTriggersEnabled
+   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *          caused by this import.
+   * @param filter
+   *          a filter that can be used to specify which form properties should be imported
+   * @throws ProcessingException
+   * @see {@link IPropertyFilter}
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException;
+
+  /**
+   * apply FormData to this form
+   * 
+   * @param source
+   *          the FormData to import
+   * @param valueChangeTriggersEnabledspecifies
+   *          if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *          caused by this import.
+   * @param filter
+   *          a filter that can be used to specify which form properties should be imported
+   * @param formFieldFilter
+   *          a filter that can be used to specify which form fields should be imported
+   * @throws ProcessingException
+   * @see {@link IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)}
+   * @see {@link IFormFieldFilter#accept(IFormField)}
+   */
+  void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) throws ProcessingException;
 
   /**
    * @return the {@link IFormField} that owns the focus AND is inside this form.<br>

@@ -140,7 +140,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * 
    * @return the border decoration of the group box
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.BORDER_DECORATION)
   @Order(233)
   @ConfigPropertyValue("BORDER_DECORATION_AUTO")
   protected String getConfiguredBorderDecoration() {
@@ -155,7 +155,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * @return the ID (name) of the image
    * @see IIconProviderService
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(240)
   @ConfigPropertyValue("null")
   protected String getConfiguredBackgroundImageName() {

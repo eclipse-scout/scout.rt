@@ -105,7 +105,9 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
 
   @Override
   protected void locationChangedFromUi(LocationEvent event) {
-    if (event == null || event.location == null || event.location.length() < 1) return;
+    if (event == null || event.location == null || event.location.length() < 1) {
+      return;
+    }
 
     // forward the hyperlink event to the document
     getDocBuilder().hyperlinkActivated(event.location);

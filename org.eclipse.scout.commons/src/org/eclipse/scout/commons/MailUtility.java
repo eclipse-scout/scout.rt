@@ -749,7 +749,7 @@ public final class MailUtility {
   }
 
   /**
-   * jax-ws in jre 1.6.0 and priopr to 1.2.7 breaks support for "Umlaute" ä, ö, ü due to a bug in
+   * jax-ws in jre 1.6.0 and priopr to 1.2.7 breaks support for "Umlaute" Ã¤, Ã¶, Ã¼ due to a bug in
    * StringDataContentHandler.writeTo
    * <p>
    * This patch uses reflection to eliminate this buggy mapping from the command map and adds the default text_plain

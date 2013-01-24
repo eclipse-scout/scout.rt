@@ -14,6 +14,11 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 
 /**
+ *
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
+ *
  * {@link IProcessingStatus} object with additional properties "product" and
  * "subTitle" and "duration". <br>
  * The property "subTitle" is the test optional sub title. <br>
@@ -22,6 +27,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
  * <p>
  * see {@link ITest} for details
  */
+@Deprecated
 public class TestStatus extends ProcessingStatus {
   private static final long serialVersionUID = 1L;
 

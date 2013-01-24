@@ -34,7 +34,7 @@ public class SwtScoutAction {
   private boolean m_handleActionPending;
 
   public SwtScoutAction(IAction scoutAction, ISwtEnvironment environment) {
-    this(scoutAction, environment, SWT.PUSH);
+    this(scoutAction, environment, Action.AS_PUSH_BUTTON);
   }
 
   public SwtScoutAction(IAction scoutAction, ISwtEnvironment environment, int style) {

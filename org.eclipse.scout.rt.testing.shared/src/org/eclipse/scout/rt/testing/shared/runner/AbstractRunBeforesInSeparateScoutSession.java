@@ -12,13 +12,12 @@ package org.eclipse.scout.rt.testing.shared.runner;
 
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
- * Invokes all methods of a test class annotated with {@link BeforeClass} in a separate Scout session and therefore in
- * a separate Scout transaction.
+ * Invokes all methods of a test class annotated with {@link org.junit.BeforeClass} in a separate Scout session and
+ * therefore in a separate Scout transaction.
  */
 public abstract class AbstractRunBeforesInSeparateScoutSession extends Statement {
   private final Statement m_statement;
@@ -45,7 +44,7 @@ public abstract class AbstractRunBeforesInSeparateScoutSession extends Statement
   protected abstract void evaluateBeforesInScoutSession() throws Throwable;
 
   /**
-   * Invokes every method annotated with {@link BeforeClass} being part of a particular test class.
+   * Invokes every method annotated with {@link org.junit.BeforeClass} being part of a particular test class.
    * 
    * @throws Throwable
    */

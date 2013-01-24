@@ -15,6 +15,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class BasicTestContext implements ITestContext {
   private ArrayList<TestStatus> m_list;
   private int[] m_severityCount;

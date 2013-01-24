@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientRule;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
@@ -59,7 +58,7 @@ public abstract class AbstractTestWithGuiScript {
   /**
    * Override this method
    * <p>
-   * This method runs as the model "thread" using sync {@link ClientRule}s
+   * This method runs as the model "thread" using sync {@link org.eclipse.scout.rt.client.ClientRule}s
    */
   protected void runModel() throws Throwable {
   }
@@ -67,7 +66,7 @@ public abstract class AbstractTestWithGuiScript {
   /**
    * Override this method
    * <p>
-   * This method runs as the model "thread" using sync {@link ClientRule}s
+   * This method runs as the model "thread" using sync {@link org.eclipse.scout.rt.client.ClientRule}s
    */
   protected void disposeModel() throws Throwable {
   }

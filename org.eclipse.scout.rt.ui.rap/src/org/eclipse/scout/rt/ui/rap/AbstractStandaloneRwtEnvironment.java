@@ -158,7 +158,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   protected boolean needsClientNotificationUICallBack() {
     IServiceTunnel serviceTunnel = getClientSession().getServiceTunnel();
     if (serviceTunnel != null) {
-      // necessary if client notification polling is enabled
+    // necessary if client notification polling is enabled
       return serviceTunnel.getClientNotificationPollInterval() > -1;
     }
     return false;

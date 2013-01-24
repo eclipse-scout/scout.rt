@@ -1343,7 +1343,7 @@ public final class SwingUtility {
             m_comp.copy();
           }
           else {
-            //Ticket 86'427: Kopieren - Einfügen
+            //Ticket 86'427: Kopieren - EinfÃ¼gen
             boolean hasSelection = StringUtility.hasText(m_comp.getSelectedText());
             if (hasSelection) {
               m_comp.copy();

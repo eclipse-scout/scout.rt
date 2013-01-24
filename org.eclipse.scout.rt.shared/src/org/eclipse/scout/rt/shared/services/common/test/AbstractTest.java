@@ -17,6 +17,10 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.service.AbstractService;
 
 /**
+ * 
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
  * Abstract test implementation. <br>
  * Implements the abstract methods and add a test status (or even multiple ones)
  * using one of the create..Status(String) methods and {@link #addStatus(TestStatus)} <br>
@@ -41,6 +45,8 @@ import org.eclipse.scout.service.AbstractService;
  * per status <br>
  * {@link #setSubTitle(String)} </pre>
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractTest extends AbstractService implements ITest {
   private ITestContext m_ctx;
   private String m_product;

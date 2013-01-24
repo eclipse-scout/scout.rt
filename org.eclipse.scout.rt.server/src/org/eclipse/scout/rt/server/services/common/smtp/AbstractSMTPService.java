@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.AbstractService;
 
+@SuppressWarnings("restriction")
 public abstract class AbstractSMTPService extends AbstractService implements ISMTPService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSMTPService.class);
 

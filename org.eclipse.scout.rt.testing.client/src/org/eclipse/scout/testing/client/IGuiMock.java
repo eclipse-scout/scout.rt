@@ -94,7 +94,7 @@ public interface IGuiMock {
     DropdownButton,
   }
 
-  public class WindowState {
+  class WindowState {
     /**
      * coordinates on screen
      */
@@ -107,7 +107,7 @@ public interface IGuiMock {
     public int height;
   }
 
-  public class FieldState {
+  class FieldState {
     public FieldType type;
     public String scoutName;
     /**
@@ -218,7 +218,7 @@ public interface IGuiMock {
   /**
    * Release left mouse button (must be called after {@link IGuiMock#pressLeft()}
    */
-  public void releaseLeft();
+  void releaseLeft();
 
   /**
    * Drag the mouse
