@@ -388,20 +388,39 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Ensures that the search form is initialized but not started, if one is defined for this table at all. This allows
-   * lazy
-   * initialization of search forms.
+   * Ensures that the search form is initialized but not started, if one is defined for this table.
+   * This allows lazy initialization of search forms.
    */
   protected void ensureSearchFormCreated() {
-    if (m_searchForm == null && getConfiguredSearchForm() != null) {
-      // there is no search form, but should be
+    if (m_searchForm == null) {
       try {
-        setSearchForm(getConfiguredSearchForm().newInstance());
+        setSearchForm(execCreateSearchForm());
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        LOG.warn("unable to setSearchForm", e);
       }
     }
+  }
+
+  /**
+   * creates the search form, but doesn't start it
+   * called by {@link #ensureSearchFormCreated()}
+   * 
+   * @return {@link ISearchForm}
+   * @throws ProcessingException
+   * @since 3.8.2
+   */
+  protected ISearchForm execCreateSearchForm() throws ProcessingException {
+    if (getConfiguredSearchForm() == null) {
+      return null;
+    }
+    try {
+      return getConfiguredSearchForm().newInstance();
+    }
+    catch (Exception e) {
+      LOG.warn("creation of searchForm " + getConfiguredSearchForm() + " failed", e);
+    }
+    return null;
   }
 
   /**
