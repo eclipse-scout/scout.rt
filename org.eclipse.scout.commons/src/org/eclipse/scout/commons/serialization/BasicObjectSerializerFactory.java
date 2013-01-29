@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.serialization;
 
-
 /**
  * Factory for creating {@link BasicObjectSerializer} instances.
  * 
@@ -21,5 +20,10 @@ public class BasicObjectSerializerFactory implements IObjectSerializerFactory {
   @Override
   public IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer) {
     return new BasicObjectSerializer(objectReplacer);
+  }
+
+  @Override
+  public ClassLoader getClassLoader() {
+    return BasicObjectSerializer.class.getClassLoader();
   }
 }
