@@ -15,8 +15,8 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.rap.ui;bundle-version="[1.5.0,2.0.0)";visibility:=reexport,
  org.eclipse.scout.rt.client.mobile;bundle-version="3.9.0",
  org.eclipse.scout.rt.ui.rap;bundle-version="3.9.0"
-Import-Package: javax.servlet;version="[2.5.0,2.9.0)",
- javax.servlet.http;version="[2.5.0,2.9.0)"
+Import-Package: javax.servlet;version="[2.5.0,4.0.0)",
+ javax.servlet.http;version="[2.5.0,4.0.0)"
 Export-Package: org.eclipse.scout.rt.ui.rap.mobile,
  org.eclipse.scout.rt.ui.rap.mobile.action,
  org.eclipse.scout.rt.ui.rap.mobile.form,
