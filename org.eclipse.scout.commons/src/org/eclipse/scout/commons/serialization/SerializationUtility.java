@@ -150,4 +150,12 @@ public final class SerializationUtility {
   public static IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer) {
     return FACTORY.createObjectSerializer(objectReplacer);
   }
+
+  /**
+   * @return Returns an environment-dependent {@link ClassLoader} that is able to load all classes that are available in
+   *         the running environment.
+   */
+  public static ClassLoader getClassLoader() {
+    return FACTORY.getClassLoader();
+  }
 }

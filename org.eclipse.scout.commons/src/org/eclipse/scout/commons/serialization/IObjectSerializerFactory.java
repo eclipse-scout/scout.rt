@@ -26,4 +26,11 @@ public interface IObjectSerializerFactory {
    * @return
    */
   IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer);
+
+  /**
+   * @return Returns an environment-dependent ClassLoader that is able to load all classes that are available in the
+   *         running environment. The class loader should also be used by {@link IObjectSerializer}s returned by
+   *         {@link #createObjectSerializer(IObjectReplacer)}. At least it has to support the same set of classes.
+   */
+  ClassLoader getClassLoader();
 }
