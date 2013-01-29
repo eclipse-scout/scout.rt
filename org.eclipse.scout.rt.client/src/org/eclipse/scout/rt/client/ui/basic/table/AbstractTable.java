@@ -79,6 +79,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -95,7 +97,7 @@ import org.eclipse.scout.service.SERVICES;
  * for every inner column class there is a generated getXYColumn method directly
  * on the table
  */
-public abstract class AbstractTable extends AbstractPropertyObserver implements ITable {
+public abstract class AbstractTable extends AbstractPropertyObserver implements ITable2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTable.class);
 
   private boolean m_initialized;
@@ -1452,6 +1454,77 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void requestFocusInCell(IColumn<?> column, ITableRow row) {
     if (isCellEditable(row, column)) {
       fireRequestFocusInCell(column, row);
+    }
+  }
+
+  /**
+   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given {@link AbstractTableRowData}
+   * type.
+   * 
+   * @param rowType
+   * @return
+   * @throws ProcessingException
+   * @since 3.8.2
+   */
+  @ConfigOperation
+  @Order(130)
+  protected TableRowDataMapper execCreateTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+    return new TableRowDataMapper(rowType, getColumnSet());
+  }
+
+  @Override
+  public void exportToTableBeanData(AbstractTableFieldBeanData target) throws ProcessingException {
+    TableRowDataMapper rowMapper = execCreateTableRowDataMapper(target.getRowType());
+    for (int i = 0, ni = getRowCount(); i < ni; i++) {
+      ITableRow row = getRow(i);
+      AbstractTableRowData rowData = target.addRow();
+      rowMapper.exportTableRowData(row, rowData);
+    }
+    ITableRow[] deletedRows = getDeletedRows();
+    for (int i = 0, ni = deletedRows.length; i < ni; i++) {
+      ITableRow row = deletedRows[i];
+      AbstractTableRowData rowData = target.addRow();
+      rowMapper.exportTableRowData(row, rowData);
+      rowData.setRowState(AbstractTableRowData.STATUS_DELETED);
+    }
+  }
+
+  @Override
+  public void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException {
+    clearDeletedRows();
+    int deleteCount = 0;
+    ArrayList<ITableRow> newRows = new ArrayList<ITableRow>();
+    TableRowDataMapper mapper = execCreateTableRowDataMapper(source.getRowType());
+    for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
+      AbstractTableRowData rowData = source.rowAt(i);
+      if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED) {
+        ITableRow newTableRow = new TableRow(getColumnSet());
+        mapper.importTableRowData(newTableRow, rowData);
+        newRows.add(newTableRow);
+      }
+      else {
+        deleteCount++;
+      }
+    }
+    replaceRows(newRows.toArray(new ITableRow[newRows.size()]));
+    if (deleteCount > 0) {
+      try {
+        setTableChanging(true);
+        //
+        for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
+          AbstractTableRowData rowData = source.rowAt(i);
+          if (rowData.getRowState() == AbstractTableFieldData.STATUS_DELETED) {
+            ITableRow newTableRow = new TableRow(getColumnSet());
+            mapper.importTableRowData(newTableRow, rowData);
+            newTableRow.setStatus(ITableRow.STATUS_NON_CHANGED);
+            ITableRow addedRow = addRow(newTableRow);
+            deleteRow(addedRow);
+          }
+        }
+      }
+      finally {
+        setTableChanging(false);
+      }
     }
   }
 
