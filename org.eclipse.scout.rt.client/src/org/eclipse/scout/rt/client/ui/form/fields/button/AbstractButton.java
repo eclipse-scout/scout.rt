@@ -210,7 +210,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @Override

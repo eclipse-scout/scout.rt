@@ -373,7 +373,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
 
   private Class<? extends IAction>[] getConfiguredActions() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IAction.class);
+    Class<IAction>[] fca = ConfigurationUtility.filterClasses(dca, IAction.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
 }

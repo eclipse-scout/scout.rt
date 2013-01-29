@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -272,7 +273,11 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public String getActionId() {
-    String s = getClass().getName();
+    Class<?> c = getClass();
+    while (c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    String s = c.getName();
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
     s = s.substring(i + 1);
     return s;

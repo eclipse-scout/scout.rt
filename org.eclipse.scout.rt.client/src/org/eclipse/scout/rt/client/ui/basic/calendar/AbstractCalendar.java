@@ -94,12 +94,14 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   private Class<? extends ICalendarItemProvider>[] getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, ICalendarItemProvider.class);
+    Class<ICalendarItemProvider>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, ICalendarItemProvider.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @ConfigOperation
@@ -452,7 +454,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link ICalendar}
+   * do not use this internal method unless you are implementing a container that holds and controls an
+   * {@link ICalendar}
    */
   public void setContainerInternal(Object container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
