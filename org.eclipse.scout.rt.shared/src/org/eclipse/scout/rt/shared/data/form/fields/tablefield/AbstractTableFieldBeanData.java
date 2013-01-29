@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.shared.data.form.fields.tablefield;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+
+/**
+ * Form field data for table fields. This class uses {@link AbstractTableRowData} beans for storing the table's
+ * contents.
+ * 
+ * @since 3.8.2
+ */
+public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
+  private static final long serialVersionUID = 1L;
+
+  private List<AbstractTableRowData> m_rowList = new ArrayList<AbstractTableRowData>();
+
+  public AbstractTableFieldBeanData() {
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+  }
+
+  /**
+   * @return Returns the number of available table row data.
+   */
+  public int getRowCount() {
+    return m_rowList.size();
+  }
+
+  /**
+   * @return Returns all rows.
+   */
+  public AbstractTableRowData[] getRows() {
+    return m_rowList.toArray((AbstractTableRowData[]) Array.newInstance(getRowType(), m_rowList.size()));
+  }
+
+  /**
+   * Replaces the rows with the given array.
+   * 
+   * @param rows
+   */
+  public void setRows(AbstractTableRowData[] rows) {
+    m_rowList.clear();
+    Class<? extends AbstractTableRowData> rowType = getRowType();
+    if (rowType == null) {
+      throw new IllegalStateException("row type is not initialized");
+    }
+    for (AbstractTableRowData row : rows) {
+      if (row == null) {
+        continue;
+      }
+      if (!rowType.isInstance(row)) {
+        throw new IllegalArgumentException("wrong row type. Expected [" + rowType.getName() + "], actual: [" + row.getClass().getName() + "]");
+      }
+      m_rowList.add(row);
+    }
+    setValueSet(true);
+  }
+
+  /**
+   * Returns the row at the given index.
+   * 
+   * @param index
+   * @return
+   */
+  public AbstractTableRowData rowAt(int index) {
+    return m_rowList.get(index);
+  }
+
+  /**
+   * @return Creates, adds and returns a new {@link AbstractTableRowData}. Its row state is initialized with
+   *         {@link AbstractTableRowData#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
+   */
+  public AbstractTableRowData addRow() {
+    return addRow(AbstractTableRowData.STATUS_NON_CHANGED);
+  }
+
+  /**
+   * Create, adds and returns a new {@link AbstractTableRowData} which row state is initialized with the given value.
+   * 
+   * @param rowState
+   * @return
+   */
+  public AbstractTableRowData addRow(int rowState) {
+    AbstractTableRowData row = createRow();
+    row.setRowState(rowState);
+    m_rowList.add(row);
+    setValueSet(true);
+    return row;
+  }
+
+  /**
+   * @return Creates a new {@link AbstractTableRowData} without adding it to this {@link AbstractTableFieldData}. Its
+   *         actual type is the one returned by {@link #getRowType()}.
+   */
+  public abstract AbstractTableRowData createRow();
+
+  /**
+   * @return Returns the type of the rows managed by this {@link AbstractTableFieldData}.
+   */
+  public abstract Class<? extends AbstractTableRowData> getRowType();
+
+  /**
+   * Removes the row at the given index.
+   * 
+   * @param index
+   */
+  public void removeRow(int index) {
+    m_rowList.remove(index);
+    setValueSet(true);
+  }
+
+  /**
+   * Removes all rows.
+   */
+  public void clearRows() {
+    m_rowList.clear();
+    setValueSet(true);
+  }
+}

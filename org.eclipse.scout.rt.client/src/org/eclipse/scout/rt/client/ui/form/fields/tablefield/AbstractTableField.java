@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable2;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -55,6 +56,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidateFormFieldDescriptor;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 @FormData(value = AbstractTableFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
@@ -374,23 +376,35 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
-    AbstractTableFieldData tableFieldData = (AbstractTableFieldData) target;
     if (m_table != null) {
-      m_table.extractTableData(tableFieldData);
+      if (target instanceof AbstractTableFieldData) {
+        AbstractTableFieldData tableFieldData = (AbstractTableFieldData) target;
+        m_table.extractTableData(tableFieldData);
+      }
+      else if (m_table instanceof ITable2 && target instanceof AbstractTableFieldBeanData) {
+        AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
+        ((ITable2) m_table).exportToTableBeanData(tableBeanData);
+        target.setValueSet(true);
+      }
     }
   }
 
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException {
-    AbstractTableFieldData tableFieldData = (AbstractTableFieldData) source;
-    if (tableFieldData.isValueSet()) {
+    if (source.isValueSet()) {
       if (m_table != null) {
         try {
           if (!valueChangeTriggersEnabled) {
             setValueChangeTriggerEnabled(false);
           }
-          //
-          m_table.updateTable(tableFieldData);
+          if (source instanceof AbstractTableFieldData) {
+            AbstractTableFieldData tableFieldData = (AbstractTableFieldData) source;
+            m_table.updateTable(tableFieldData);
+          }
+          else if (m_table instanceof ITable2 && source instanceof AbstractTableFieldBeanData) {
+            AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
+            ((ITable2) m_table).importFromTableBeanData(tableBeanData);
+          }
           if (m_table.isCheckable()
               && m_table.getCheckableColumn() != null) {
             for (ITableRow row : m_table.getRows()) {
