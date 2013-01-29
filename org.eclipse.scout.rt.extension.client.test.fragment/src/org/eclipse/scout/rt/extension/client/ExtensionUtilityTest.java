@@ -34,6 +34,7 @@ import org.junit.Test;
 /**
  * @since 3.9.0
  */
+@SuppressWarnings("deprecation")
 public class ExtensionUtilityTest {
 
   private List<Object> m_instanceList;

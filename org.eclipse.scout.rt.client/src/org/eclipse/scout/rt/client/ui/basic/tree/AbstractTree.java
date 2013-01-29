@@ -235,12 +235,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    Class<IKeyStroke>[] fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @ConfigOperation
@@ -491,6 +493,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
+    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), menuType);
   }
 

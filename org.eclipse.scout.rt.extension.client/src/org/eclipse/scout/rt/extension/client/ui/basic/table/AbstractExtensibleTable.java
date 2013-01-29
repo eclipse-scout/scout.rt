@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractExtensibleTable extends AbstractTable implements IExtensibleScoutObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractExtensibleTable.class);
 

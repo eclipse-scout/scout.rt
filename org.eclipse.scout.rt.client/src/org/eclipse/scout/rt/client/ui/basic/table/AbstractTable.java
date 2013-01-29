@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -109,6 +110,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final HashMap<CompositeObject, ITableRow> m_deletedRows;
   private TreeSet<ITableRow/* ordered by rowIndex */> m_selectedRows = new TreeSet<ITableRow>(new RowIndexComparator());
   private IMenu[] m_menus;
+  private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
   private final ArrayList<ITableRowFilter> m_rowFilters;
   private String m_userPreferenceContext;
@@ -702,17 +704,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   private Class<? extends IColumn>[] getConfiguredColumns() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IColumn.class);
+    Class<IColumn>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IColumn.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    Class<IKeyStroke>[] fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   protected void initConfig() {
@@ -742,6 +747,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
+    Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
+    if (!replacements.isEmpty()) {
+      m_menuReplacementMapping = replacements;
+    }
     for (int i = 0; i < ma.length; i++) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, ma[i]);
@@ -1531,13 +1540,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
+    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), menuType);
   }
 
   @Override
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
+    Class<? extends IMenu> c = getReplacingMenuClass(menuType);
     for (IMenu m : getMenus()) {
-      if (m.getClass() == menuType) {
+      if (m.getClass() == c) {
         if (!m.isEnabledProcessingAction()) {
           return false;
         }
@@ -1554,6 +1565,26 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     return false;
+  }
+
+  /**
+   * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing
+   * menu's class is returned. Otherwise the given class itself.
+   * 
+   * @param c
+   * @return Returns the possibly available replacing menu class for the given class.
+   * @see Replace
+   * @since 3.8.2
+   */
+  private <T extends IMenu> Class<? extends T> getReplacingMenuClass(Class<T> c) {
+    if (m_menuReplacementMapping != null) {
+      @SuppressWarnings("unchecked")
+      Class<? extends T> replacingMenuClass = (Class<? extends T>) m_menuReplacementMapping.get(c);
+      if (replacingMenuClass != null) {
+        return replacingMenuClass;
+      }
+    }
+    return c;
   }
 
   /**
