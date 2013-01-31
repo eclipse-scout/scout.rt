@@ -21,6 +21,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -28,6 +29,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 
 public class DropDownFileUpload extends FileUpload implements IDropDownFileUploadForPatch {
   private static final long serialVersionUID = 1L;
@@ -50,7 +52,7 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
       @Override
       public void handleEvent(Event e) {
         switch (e.detail) {
-          /* Do tab group traversal */
+        /* Do tab group traversal */
           case SWT.TRAVERSE_ESCAPE:
           case SWT.TRAVERSE_RETURN:
           case SWT.TRAVERSE_TAB_NEXT:
@@ -123,6 +125,22 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
 //        getMenu().setVisible(true);
 //      }
 //    }
+
+    // Lazy creation of the menu. The menu is created after a file has been selected.
+    createMenu();
+  }
+
+  protected Menu createMenu() {
+    Menu contextMenu = getMenu();
+    if (getMenu() == null) {
+      contextMenu = new Menu(getShell(), SWT.POP_UP);
+      for (MenuListener listener : m_eventListeners.getListeners(MenuListener.class)) {
+        contextMenu.addMenuListener(listener);
+      }
+      setMenu(contextMenu);
+    }
+
+    return contextMenu;
   }
 
   @Override
@@ -142,6 +160,16 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   @Override
   public void removeSelectionListener(SelectionListener listener) {
     m_eventListeners.remove(SelectionListener.class, listener);
+  }
+
+  @Override
+  public void addMenuListener(MenuListener listener) {
+    m_eventListeners.add(MenuListener.class, listener);
+  }
+
+  @Override
+  public void removeMenuListener(MenuListener listener) {
+    m_eventListeners.remove(MenuListener.class, listener);
   }
 
   @Override
