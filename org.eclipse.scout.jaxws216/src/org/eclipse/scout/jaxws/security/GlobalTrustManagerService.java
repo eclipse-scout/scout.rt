@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -225,7 +225,7 @@ public class GlobalTrustManagerService extends AbstractService {
       // ask default truststore (e.g. cacerts) for trusted certificates. Depending on the authType, different managers are possible.
       for (TrustManager trustManager : m_installedTrustManagers) {
         if (trustManager instanceof X509TrustManager) {
-          X509Certificate[] certs = getAcceptedIssuers();
+          X509Certificate[] certs = ((X509TrustManager) trustManager).getAcceptedIssuers();
           if (certs != null && certs.length > 0) {
             trustedCertsAll.addAll(Arrays.asList(certs));
           }
