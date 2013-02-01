@@ -106,10 +106,24 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
+   * Defines if the enabled state of the radio button group box should be broadcasted to all
+   * child fields during initialization {@link initConfig()}.
+   * If this property is set to {@code true}, the enabled state of the children will all be
+   * overwritten with the enabled state configured {@link getConfiguredEnabled(boolean)} in the group box.
+   * By default the enabled state will not be broadcasted initially.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(260)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredBroadcastEnabled() {
+    return false;
+  }
+
+  /**
    * Called before any lookup is performed
    */
   @ConfigOperation
-  @Order(260)
+  @Order(270)
   protected void execPrepareLookup(LookupCall call) {
   }
 
@@ -121,7 +135,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    *          and clear of entries in this list is supported
    */
   @ConfigOperation
-  @Order(270)
+  @Order(280)
   protected void execFilterLookupResult(LookupCall call, List<LookupRow> result) throws ProcessingException {
   }
 
@@ -182,6 +196,10 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       b.addPropertyChangeListener(new P_ButtonPropertyChangeListener());
     }
     handleFieldVisibilityChanged();
+
+    if (getConfiguredBroadcastEnabled()) {
+      setEnabled(getConfiguredEnabled());
+    }
   }
 
   private IButton findFirstButtonInFieldTree(IFormField f) {
