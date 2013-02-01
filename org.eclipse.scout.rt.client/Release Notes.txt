@@ -865,3 +865,12 @@ The width may be stored in the user preferences. In this case the stored width i
 
 Migration: None
 
+01.02.2013 bme
+Bugzilla: 384051
+Problem:
+When adding an additional column of another entity to a table page (with more than one attribute), one can choose to display the column as a table (in the Add column dialog). There can be several entries for one row.
+When opening the column filter dialog for this column, the cell to display the value of the column is too small, the values that have more than one entry seem to be garbled.
+Solution:
+Although in the table page, the table in the column is displayed as a table, in the column filter dialog, the rows are displayed without table, therefore fitting into one cell. The display in the column filter dialog is the same as if it is not chosen to be displayed as table (in the add column dialog).
+Migration:
+None
