@@ -27,12 +27,12 @@ import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -651,7 +650,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    Class<IKeyStroke>[] fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   @ConfigOperation
@@ -805,24 +805,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       return getForm().getFieldByClass(c);
     }
 
-    final Holder<T> found = new Holder<T>(c);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getClass() == c) {
-          found.setValue((T) field);
-        }
-        return found.getValue() == null;
-      }
-    };
-
     // search requested field within critical parent field
     Collections.reverse(enclosingFields);
     for (ICompositeField parentField : enclosingFields) {
-      parentField.visitFields(v, 0);
-      if (found.getValue() != null) {
-        return found.getValue();
+      T field = parentField.getFieldByClass(c);
+      if (field != null) {
+        return field;
       }
     }
 
@@ -1033,7 +1021,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public String getFieldId() {
-    return getClass().getSimpleName();
+    Class<?> c = getClass();
+    while (c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    return c.getSimpleName();
   }
 
   /*
@@ -1736,7 +1728,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + shortcutArray[i].getName(), t));
       }
     }
-    return ksMap.values().toArray(new IKeyStroke[ksMap.size()]);
+    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksMap.values());
+    return ksList.toArray(new IKeyStroke[ksList.size()]);
   }
 
   @Override

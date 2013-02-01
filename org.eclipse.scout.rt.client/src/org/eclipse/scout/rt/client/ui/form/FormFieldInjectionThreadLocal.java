@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * Thread local used to inject form fields using the {@link InjectFieldTo} annotation
+ * Thread local used to inject form fields using the {@link InjectFieldTo} and {@link Replace} annotations.
  * <p>
  * This thread local is used by {@link AbstractForm} and {@link AbstractFormField} to put its contributions.
  * <p>
@@ -48,6 +49,17 @@ public final class FormFieldInjectionThreadLocal {
    */
   public static void pop(IFormFieldInjection injection) {
     THREAD_LOCAL.get().popInternal(injection);
+  }
+
+  /**
+   * @param container
+   *          is the container field the given field classes are created for
+   * @param fieldList
+   *          live and mutable list of configured field classes (i.e. yet not instantiated)
+   * @since 3.8.2
+   */
+  public static void filterFields(IFormField container, List<Class<? extends IFormField>> fieldList) {
+    THREAD_LOCAL.get().filterFieldsInternal(container, fieldList);
   }
 
   /**
@@ -92,6 +104,17 @@ public final class FormFieldInjectionThreadLocal {
     }
     for (IFormFieldInjection i : m_stack) {
       i.injectFields(container, fieldList);
+    }
+  }
+
+  private void filterFieldsInternal(IFormField container, List<Class<? extends IFormField>> fieldList) {
+    if (m_stack.isEmpty()) {
+      return;
+    }
+    for (IFormFieldInjection i : m_stack) {
+      if (i instanceof IFormFieldInjection2) {
+        ((IFormFieldInjection2) i).filterFields(container, fieldList);
+      }
     }
   }
 }

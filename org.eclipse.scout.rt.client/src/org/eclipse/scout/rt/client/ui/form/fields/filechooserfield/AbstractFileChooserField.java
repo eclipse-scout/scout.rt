@@ -128,7 +128,8 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @Override

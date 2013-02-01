@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.swt.ext.table;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
@@ -33,7 +31,6 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class TableEx extends Table {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableEx.class);
   private static final int TEXT_MARGIN_Y = 1;
   private static final int TEXT_MARGIN_X = 6;
 
@@ -45,9 +42,9 @@ public class TableEx extends Table {
     if (table != null) {
       int rowHeight = table.getRowHeightHint() - 2 * TEXT_MARGIN_Y;
       boolean multiline = table.isMultilineText();
-      Set<Integer> m_wrapTextColumns = getWrapTextColumnIdxs(table);
-      if (multiline || m_wrapTextColumns.size() > 0) {
-        Listener multilineListener = new TableMultilineListener(multiline, rowHeight, m_wrapTextColumns, TEXT_MARGIN_X, TEXT_MARGIN_Y);
+      Set<Integer> wrapTextColumns = getWrapTextColumnIdxs(table);
+      if (multiline || wrapTextColumns.size() > 0) {
+        Listener multilineListener = new TableMultilineListener(multiline, rowHeight, wrapTextColumns, TEXT_MARGIN_X, TEXT_MARGIN_Y);
         addListener(SWT.MeasureItem, multilineListener);
         addListener(SWT.EraseItem, multilineListener);
         addListener(SWT.PaintItem, multilineListener);

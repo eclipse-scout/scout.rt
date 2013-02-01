@@ -21,8 +21,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,6 +137,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private String m_iconId;
   private DataChangeListener m_internalDataChangeListener;
   private IEventHistory<FormEvent> m_eventHistory;
+
+  // field replacement support
+  private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
 
   public AbstractForm() throws ProcessingException {
     this(true);
@@ -453,27 +454,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private Class<? extends IFormField>[] getConfiguredInjectedFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IFormField>[] filteredClasses = ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
-    // sort injected fields by enclosing class so that sub classes are before parent classes
-    // this order is required so that sub classes may inject fields to other injected fields defined in a super class
-    // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=392972
-    Comparator<Class<?>> comparator = new Comparator<Class<?>>() {
-      @Override
-      public int compare(Class<?> c1, Class<?> c2) {
-        Class<?> ec1 = c1.getEnclosingClass();
-        Class<?> ec2 = c2.getEnclosingClass();
-
-        if (ec1 == ec2) {
-          return 0;
-        }
-        if (ec2 != null && ec2.getSuperclass() == ec1) {
-          return 1;
-        }
-        return -1;
-      }
-    };
-    Arrays.sort(filteredClasses, comparator);
-    return filteredClasses;
+    return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
   }
 
   protected void initConfig() throws ProcessingException {
@@ -483,25 +464,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // prepare injected fields
     Class<? extends IFormField>[] fieldArray = getConfiguredInjectedFields();
     DefaultFormFieldInjection injectedFields = null;
-    if (fieldArray.length > 0) {
-      injectedFields = new DefaultFormFieldInjection();
-    }
     IGroupBox rootBox = getRootGroupBox();
     try {
-      if (injectedFields != null) {
+      if (fieldArray.length > 0) {
+        injectedFields = new DefaultFormFieldInjection(this);
+        injectedFields.addFields(fieldArray);
         FormFieldInjectionThreadLocal.push(injectedFields);
-        // create instances of injected fields
-        for (Class<? extends IFormField> clazz : fieldArray) {
-          try {
-            IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
-            if (f != null) {
-              injectedFields.addField(f);
-            }
-          }// end try
-          catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
-          }
-        }
       }
       //
       // add mainbox if getter returns null
@@ -518,6 +486,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     finally {
       if (injectedFields != null) {
+        m_fieldReplacements = injectedFields.getReplacementMapping();
         FormFieldInjectionThreadLocal.pop(injectedFields);
       }
     }
@@ -2130,7 +2099,33 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Model Observer .
+   * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code> is
+   *         returned if no form fields are replaced. Do not use this internal method.
+   * @since 3.8.2
+   */
+  public Map<Class<?>, Class<? extends IFormField>> getFormFieldReplacementsInternal() {
+    return m_fieldReplacements;
+  }
+
+  /**
+   * Registers the given form field replacements on this form. Do not use this internal method.
+   * 
+   * @param replacements
+   *          Map having old field classes as key and replacing field classes as values.
+   * @since 3.8.2
+   */
+  public void registerFormFieldReplacementsInternal(Map<Class<?>, Class<? extends IFormField>> replacements) {
+    if (replacements == null || replacements.isEmpty()) {
+      return;
+    }
+    if (m_fieldReplacements == null) {
+      m_fieldReplacements = new HashMap<Class<?>, Class<? extends IFormField>>();
+    }
+    m_fieldReplacements.putAll(replacements);
+  }
+
+  /**
+   * Model Observer.
    */
   @Override
   public void addFormListener(FormListener listener) {

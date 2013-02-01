@@ -20,9 +20,12 @@ import java.lang.annotation.Target;
  * the first object is removed which type is the annotated class's super class.
  * 
  * @since 3.9.0
+ * @deprecated Do not use this class any more. It has been replaced by
+ *             {@link org.eclipse.scout.commons.annotations.Replace}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated
 public @interface Replace {
 
   /**

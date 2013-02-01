@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
@@ -24,6 +25,7 @@ public abstract class AbstractFormFieldData implements Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormFieldData.class);
   private static final long serialVersionUID = 1L;
 
+  private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;
   private Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> m_propertyMap;
   private Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> m_fieldMap;
   private boolean m_valueSet;
@@ -39,7 +41,8 @@ public abstract class AbstractFormFieldData implements Serializable {
 
   private Class<? extends AbstractFormFieldData>[] getConfiguredFieldDatas() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, AbstractFormFieldData.class);
+    Class<AbstractFormFieldData>[] fca = ConfigurationUtility.filterClasses(dca, AbstractFormFieldData.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   protected void initConfig() {
@@ -71,6 +74,10 @@ public abstract class AbstractFormFieldData implements Serializable {
     }// end for
     if (map.size() > 0) {
       m_fieldMap = map;
+      Map<Class<?>, Class<? extends AbstractFormFieldData>> replacements = ConfigurationUtility.getReplacementMapping(fieldArray);
+      if (!replacements.isEmpty()) {
+        m_fieldDataReplacements = replacements;
+      }
     }
   }
 
@@ -84,7 +91,11 @@ public abstract class AbstractFormFieldData implements Serializable {
   }
 
   public String getFieldId() {
-    String s = getClass().getName();
+    Class<?> c = getClass();
+    while (c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    String s = c.getName();
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
     s = s.substring(i + 1);
     return s;
@@ -126,10 +137,10 @@ public abstract class AbstractFormFieldData implements Serializable {
   }
 
   public AbstractFormFieldData getFieldById(String id) {
-    String fieldDataId = FormDataUtility.getFieldDataId(id);
     if (m_fieldMap == null) {
       return null;
     }
+    String fieldDataId = FormDataUtility.getFieldDataId(id);
     for (AbstractFormFieldData f : m_fieldMap.values()) {
       if (f.getFieldId().equals(fieldDataId)) {
         return f;
@@ -143,21 +154,43 @@ public abstract class AbstractFormFieldData implements Serializable {
     if (m_fieldMap == null) {
       return null;
     }
-    return (T) m_fieldMap.get(c);
+    Class<? extends T> clazz = getReplacingFieldDataClass(c);
+    return (T) m_fieldMap.get(clazz);
   }
 
   public <T extends AbstractFormFieldData> void setFieldByClass(Class<T> c, T v) {
+    Class<? extends T> clazz = getReplacingFieldDataClass(c);
     if (v == null) {
       if (m_fieldMap != null) {
-        m_fieldMap.remove(c);
+        m_fieldMap.remove(clazz);
       }
     }
     else {
       if (m_fieldMap == null) {
         m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
       }
-      m_fieldMap.put(c, v);
+      m_fieldMap.put(clazz, v);
     }
+  }
+
+  /**
+   * Checks whether the form field data with the given class has been replaced by another field. If so, the replacing
+   * form field data's class is returned. Otherwise the given class itself.
+   * 
+   * @param c
+   * @return Returns the possibly available replacing field data class for the given class.
+   * @see Replace
+   * @since 3.8.2
+   */
+  private <T> Class<? extends T> getReplacingFieldDataClass(Class<T> c) {
+    if (m_fieldDataReplacements != null) {
+      @SuppressWarnings("unchecked")
+      Class<? extends T> replacingFieldClass = (Class<? extends T>) m_fieldDataReplacements.get(c);
+      if (replacingFieldClass != null) {
+        return replacingFieldClass;
+      }
+    }
+    return c;
   }
 
   public AbstractFormFieldData[] getFields() {

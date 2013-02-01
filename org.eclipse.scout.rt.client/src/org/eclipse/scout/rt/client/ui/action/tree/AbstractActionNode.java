@@ -38,7 +38,8 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    */
   private Class<? extends IActionNode>[] getConfiguredChildActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IActionNode.class);
+    Class<IActionNode>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IActionNode.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @Override
@@ -65,7 +66,6 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute action nodes.", e);
     }
-
     setChildActions(nodeList);
   }
 
