@@ -14,11 +14,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionThreadLocal;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -31,6 +34,7 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
 
   private IFormField[] m_fields;
+  private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
 
   public AbstractCompositeField() {
     this(true);
@@ -66,21 +70,16 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     Class<? extends IFormField>[] fieldArray = getConfiguredFields();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
+    List<Class<? extends IFormField>> configuredFields = new ArrayList<Class<? extends IFormField>>();
     for (Class<? extends IFormField> clazz : fieldArray) {
-      if (!clazz.isAnnotationPresent(InjectFieldTo.class)) {
-        continue;
-      }
-      try {
-        IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
-        if (f != null) {
-          if (injectedFields == null) {
-            injectedFields = new DefaultFormFieldInjection();
-          }
-          injectedFields.addField(f);
+      if (ConfigurationUtility.isInjectFieldAnnotationPresent(clazz)) {
+        if (injectedFields == null) {
+          injectedFields = new DefaultFormFieldInjection(this);
         }
-      }// end try
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
+        injectedFields.addField(clazz);
+      }
+      else {
+        configuredFields.add(clazz);
       }
     }
     ArrayList<IFormField> fieldList = new ArrayList<IFormField>();
@@ -89,10 +88,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         FormFieldInjectionThreadLocal.push(injectedFields);
       }
       //
-      for (Class<? extends IFormField> clazz : fieldArray) {
-        if (clazz.isAnnotationPresent(InjectFieldTo.class)) {
-          continue;
-        }
+      filterFieldsInternal(configuredFields);
+      for (Class<? extends IFormField> clazz : configuredFields) {
         try {
           IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
           fieldList.add(f);
@@ -105,6 +102,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
     finally {
       if (injectedFields != null) {
+        m_formFieldReplacements = injectedFields.getReplacementMapping();
         FormFieldInjectionThreadLocal.pop(injectedFields);
       }
     }
@@ -117,6 +115,19 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
     }
     handleFieldVisibilityChanged();
+  }
+
+  /**
+   * Filter list of configured fields before they are instantiated.
+   * <p/>
+   * The default implementation removes fields replaced by another field annotated with {@link Replace}.
+   * 
+   * @param fieldList
+   *          live and mutable list of configured field classes (i.e. yet not instantiated)
+   * @since 3.8.2
+   */
+  protected void filterFieldsInternal(List<Class<? extends IFormField>> fieldList) {
+    FormFieldInjectionThreadLocal.filterFields(this, fieldList);
   }
 
   /**
@@ -136,6 +147,9 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void setFormInternal(IForm form) {
     super.setFormInternal(form);
+    if (form instanceof AbstractForm) {
+      ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
+    }
     IFormField[] a = m_fields;
     for (int i = 0; i < a.length; i++) {
       IFormField f = a[i];
@@ -192,13 +206,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public <T extends IFormField> T getFieldByClass(final Class<T> c) {
+  public <T extends IFormField> T getFieldByClass(Class<T> c) {
+    final Class<? extends T> formFieldClass = getReplacingFieldClass(c);
     final Holder<T> found = new Holder<T>(c);
     IFormFieldVisitor v = new IFormFieldVisitor() {
       @Override
       @SuppressWarnings("unchecked")
       public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getClass() == c) {
+        if (field.getClass() == formFieldClass) {
           found.setValue((T) field);
         }
         return found.getValue() == null;
@@ -206,6 +221,30 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     };
     visitFields(v, 0);
     return found.getValue();
+  }
+
+  /**
+   * Checks whether the form field with the given class has been replaced by another form field. If so, the replacing
+   * form field's class is returned. Otherwise the given class itself.
+   * 
+   * @param c
+   * @return Returns the possibly available replacing field class for the given class.
+   * @see Replace
+   * @since 3.8.2
+   */
+  private <T extends IFormField> Class<? extends T> getReplacingFieldClass(Class<T> c) {
+    IForm form = getForm();
+    if (form instanceof AbstractForm) {
+      Map<Class<?>, Class<? extends IFormField>> mapping = ((AbstractForm) form).getFormFieldReplacementsInternal();
+      if (mapping != null) {
+        @SuppressWarnings("unchecked")
+        Class<? extends T> replacementFieldClass = (Class<? extends T>) mapping.get(c);
+        if (replacementFieldClass != null) {
+          return replacementFieldClass;
+        }
+      }
+    }
+    return c;
   }
 
   @Override

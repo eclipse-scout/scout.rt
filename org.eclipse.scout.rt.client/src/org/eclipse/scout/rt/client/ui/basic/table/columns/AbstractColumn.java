@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -828,7 +829,11 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public String getColumnId() {
-    String s = getClass().getSimpleName();
+    Class<?> c = getClass();
+    while (c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    String s = c.getSimpleName();
     if (s.endsWith("Column")) {
       s = s.replaceAll("Column$", "");
     }

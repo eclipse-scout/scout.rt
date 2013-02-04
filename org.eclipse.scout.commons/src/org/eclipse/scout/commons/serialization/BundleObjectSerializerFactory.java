@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.serialization;
 
-import org.eclipse.scout.commons.osgi.BundleListClassLoader;
 import org.eclipse.scout.commons.osgi.BundleInspector;
+import org.eclipse.scout.commons.osgi.BundleListClassLoader;
 import org.osgi.framework.Bundle;
 
 /**
@@ -33,5 +33,10 @@ public class BundleObjectSerializerFactory implements IObjectSerializerFactory {
   @Override
   public IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer) {
     return new BundleObjectSerializer(objectReplacer, m_bundleBasedClassLoader);
+  }
+
+  @Override
+  public ClassLoader getClassLoader() {
+    return m_bundleBasedClassLoader;
   }
 }

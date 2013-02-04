@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -63,7 +64,15 @@ public final class ExtensionUtility {
   /**
    * Removes those objects of the given list that match any {@link Replace} annotation on other elements being part of
    * the same list.
+   * 
+   * @deprecated The {@link Replace} annotation this method works for has been replaced by
+   *             {@link org.eclipse.scout.commons.annotations.Replace}. The corresponding methods for this one are
+   *             {@link ConfigurationUtility#removeReplacedClasses(Class[])},
+   *             {@link ConfigurationUtility#getReplacementMapping(Class[])} and
+   *             {@link ConfigurationUtility#getReplacingLeafClasses(Class[])}.
    */
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public static <T> Map<T, T> processReplaceAnnotations(List<T> list) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyMap();

@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.CloneUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -29,6 +30,7 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormData.class);
   private static final long serialVersionUID = 1L;
 
+  private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;
   private Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> m_propertyMap;
   private Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> m_fieldMap;
 
@@ -43,7 +45,8 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
 
   private Class<? extends AbstractFormFieldData>[] getConfiguredFieldDatas() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, AbstractFormFieldData.class);
+    Class<AbstractFormFieldData>[] fca = ConfigurationUtility.filterClasses(dca, AbstractFormFieldData.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   protected void initConfig() {
@@ -63,6 +66,10 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
      // add fields
     m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
     Class<? extends AbstractFormFieldData>[] fieldArray = getConfiguredFieldDatas();
+    Map<Class<?>, Class<? extends AbstractFormFieldData>> replacements = ConfigurationUtility.getReplacementMapping(fieldArray);
+    if (!replacements.isEmpty()) {
+      m_fieldDataReplacements = replacements;
+    }
     for (int i = 0; i < fieldArray.length; i++) {
       AbstractFormFieldData f;
       try {
@@ -114,16 +121,38 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
 
   @SuppressWarnings("unchecked")
   public <T extends AbstractFormFieldData> T getFieldByClass(Class<T> c) {
-    return (T) m_fieldMap.get(c);
+    Class<? extends T> clazz = getReplacingFieldDataClass(c);
+    return (T) m_fieldMap.get(clazz);
   }
 
   public <T extends AbstractFormFieldData> void setFieldByClass(Class<T> c, T v) {
+    Class<? extends T> clazz = getReplacingFieldDataClass(c);
     if (v == null) {
-      m_fieldMap.remove(c);
+      m_fieldMap.remove(clazz);
     }
     else {
-      m_fieldMap.put(c, v);
+      m_fieldMap.put(clazz, v);
     }
+  }
+
+  /**
+   * Checks whether the form field data with the given class has been replaced by another field. If so, the replacing
+   * form field data's class is returned. Otherwise the given class itself.
+   * 
+   * @param c
+   * @return Returns the possibly available replacing field data class for the given class.
+   * @see Replace
+   * @since 3.8.2
+   */
+  private <T extends AbstractFormFieldData> Class<? extends T> getReplacingFieldDataClass(Class<T> c) {
+    if (m_fieldDataReplacements != null) {
+      @SuppressWarnings("unchecked")
+      Class<T> replacingFieldDataClass = (Class<T>) m_fieldDataReplacements.get(c);
+      if (replacingFieldDataClass != null) {
+        return replacingFieldDataClass;
+      }
+    }
+    return c;
   }
 
   /**

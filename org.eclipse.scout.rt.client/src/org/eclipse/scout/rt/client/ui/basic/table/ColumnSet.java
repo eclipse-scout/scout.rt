@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -60,7 +61,23 @@ public class ColumnSet {
    */
   private final HashMap<String, IColumn> m_idIndexes = new HashMap<String, IColumn>();
 
+  private final Map<Class<?>, Class<? extends IColumn>> m_columnReplacements;
+
   public ColumnSet(AbstractTable table, Collection<IColumn> columns) {
+    // process @Replace annotations
+    @SuppressWarnings("unchecked")
+    Class<? extends IColumn>[] columnArray = new Class[columns.size()];
+    int i = 0;
+    for (IColumn c : columns) {
+      columnArray[i] = c.getClass();
+      i++;
+    }
+    Map<Class<?>, Class<? extends IColumn>> replacements = ConfigurationUtility.getReplacementMapping(columnArray);
+    if (replacements.isEmpty()) {
+      replacements = null;
+    }
+    m_columnReplacements = replacements;
+    //
     m_table = table;
     m_columns = new IColumn[columns.size()];
     m_userSortColumns = new ArrayList<IColumn>();
@@ -282,13 +299,34 @@ public class ColumnSet {
 
   @SuppressWarnings("unchecked")
   public <T extends IColumn> T getColumnByClass(Class<T> c) {
-    T col = (T) m_classIndexes.get(c);
+    Class<? extends T> columnClass = getReplacingColumnClass(c);
+    T col = (T) m_classIndexes.get(columnClass);
     return col;
   }
 
   @SuppressWarnings("unchecked")
   public <T extends IColumn> T getColumnById(String id) {
     return (T) m_idIndexes.get(id);
+  }
+
+  /**
+   * Checks whether the column with the given class has been replaced by another column. If so, the replacing
+   * column's class is returned. Otherwise the given class itself.
+   * 
+   * @param c
+   * @return Returns the possibly available replacing column class for the given class.
+   * @see Replace
+   * @since 3.8.2
+   */
+  private <T extends IColumn> Class<? extends T> getReplacingColumnClass(Class<T> c) {
+    if (m_columnReplacements != null) {
+      @SuppressWarnings("unchecked")
+      Class<? extends T> replacingColumnClass = (Class<? extends T>) m_columnReplacements.get(c);
+      if (replacingColumnClass != null) {
+        return replacingColumnClass;
+      }
+    }
+    return c;
   }
 
   public IColumn getDisplayableColumn(int index) {

@@ -199,7 +199,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private Class<? extends IAction>[] getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IAction.class);
+    Class<IAction>[] fca = ConfigurationUtility.filterClasses(dca, IAction.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   /**
@@ -619,6 +620,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
+    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), searchType);
   }
 
@@ -921,8 +923,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void setOutline(Class<? extends IOutline> outlineType) {
+    if (outlineType == null) {
+      return;
+    }
     for (IOutline o : getAvailableOutlines()) {
-      if (o.getClass() == outlineType) {
+      if (outlineType.isInstance(o)) {
         setOutline(o);
         return;
       }
