@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.event.HyperlinkListener;
-
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -43,13 +41,14 @@ import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.HyperlinkEvent;
+import org.eclipse.swt.events.HyperlinkListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 
 /**
  * List with basic functionalities which processes a {@link ITable} but only the first column.<br/>

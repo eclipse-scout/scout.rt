@@ -17,7 +17,7 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.rap.rwt.internal.serverpush.ServerPushSession;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
