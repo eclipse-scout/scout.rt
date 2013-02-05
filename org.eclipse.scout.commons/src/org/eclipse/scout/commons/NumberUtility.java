@@ -166,7 +166,7 @@ public final class NumberUtility {
     return RANDOMIZER.nextInt();
   }
 
-  public static long randomInt(int size) {
+  public static int randomInt(int size) {
     return RANDOMIZER.nextInt(size);
   }
 
