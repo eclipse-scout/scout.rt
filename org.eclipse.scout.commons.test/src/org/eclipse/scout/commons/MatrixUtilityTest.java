@@ -16,6 +16,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * JUnit tests for {@link MatrixUtility}
+ */
 public class MatrixUtilityTest {
 
   private static final Object[] E1 = new Object[]{1L, "a", 30L, null};

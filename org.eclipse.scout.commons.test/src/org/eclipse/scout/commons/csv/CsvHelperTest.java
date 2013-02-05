@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010,21012 BSI Business Systems Integration AG.
+ * Copyright (c) 2010, 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.commons.csv;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,12 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.commons.csv.CsvHelper;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * JUnit tests for {@link CsvHelper}
+ */
 public class CsvHelperTest {
 
   /**

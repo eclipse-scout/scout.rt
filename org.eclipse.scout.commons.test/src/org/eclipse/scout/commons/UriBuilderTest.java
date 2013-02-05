@@ -21,6 +21,8 @@ import java.net.URI;
 import org.junit.Test;
 
 /**
+ * JUnit test for {@link UriBuilder}
+ * 
  * @since 3.8.1
  */
 public class UriBuilderTest {

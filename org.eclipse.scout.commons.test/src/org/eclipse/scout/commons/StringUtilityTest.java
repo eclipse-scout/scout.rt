@@ -16,7 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- *
+ * JUnit tests for {@link StringUtility}
  */
 public class StringUtilityTest extends Assert {
 

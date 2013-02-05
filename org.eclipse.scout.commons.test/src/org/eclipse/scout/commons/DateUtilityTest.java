@@ -16,6 +16,9 @@ import java.util.Date;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * JUnit tests for {@link DateUtility}
+ */
 public class DateUtilityTest {
   static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01_00:00:00.000";
   static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01_00:30:00.000";

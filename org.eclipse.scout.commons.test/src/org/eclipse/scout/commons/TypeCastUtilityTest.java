@@ -15,6 +15,9 @@ import org.eclipse.scout.commons.holders.LongArrayHolder;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * JUnit tests for {@link TypeCastUtility}
+ */
 public class TypeCastUtilityTest extends Assert {
 
   @Test

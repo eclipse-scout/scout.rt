@@ -19,6 +19,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * JUnit tests for {@link FileUtility}
+ * 
  * @since 3.9.0
  */
 public class FileUtilityTest extends Assert {

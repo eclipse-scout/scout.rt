@@ -23,6 +23,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 /**
+ * JUnit tests for {@link BeanUtility}
+ * 
  * @since 3.8.1
  */
 public class BeanUtilityTest {

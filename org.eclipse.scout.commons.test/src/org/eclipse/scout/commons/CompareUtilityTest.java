@@ -21,7 +21,7 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * Tests for {@link org.eclipse.scout.commons.CompareUtility CompareUtility}
+ * Tests for {@link CompareUtility}
  * 
  * @since 3.8.1
  */

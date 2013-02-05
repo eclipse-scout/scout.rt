@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- *
+ * JUnit tests for {@link MailUtility}
  */
 @SuppressWarnings("restriction")
 public class MailUtilityTest {
