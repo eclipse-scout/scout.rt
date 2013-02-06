@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.eclipse.scout.service.services">
+    <service class="org.eclipse.scout.jaxws.security.GlobalTrustManagerService" createImmediately="false" />
+    <service class="org.eclipse.scout.jaxws.internal.JaxWsEndpointService" createImmediately="true" ranking="-1" />
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.adapters">
+     <factory
+           adaptableType="com.sun.xml.internal.ws.transport.http.ResourceLoader"
+           class="org.eclipse.scout.jaxws.internal.adapter.ResourceLoaderAdapterFactory">
+        <adapter
+              type="com.sun.xml.internal.ws.api.ResourceLoader">
+        </adapter>
+     </factory>
+  </extension>
+</plugin>

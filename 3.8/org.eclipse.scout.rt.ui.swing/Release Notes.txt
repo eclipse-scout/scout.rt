@@ -1,0 +1,554 @@
+06.09.2010 imo
+Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JTimeChooser to org.eclipse.scout.rt.ui.swing.ext.calendar.TimeChooser
+Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JCalendar to org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser
+Migration (occurs only in rare cases): Rename *.java files
+
+15.12.2010 imo
+Refactored the date time fields in order to use two fields when entering date and time.
+Migration: None
+
+15.12.2010 imo
+Changed fields with dropdownbutton to single field with integrated drop down button
+Migration: None
+
+24.01.2011 dwi
+Ticket 95'946
+Visual markup for editable cells
+Migration: None
+
+27.01.2011 dwi
+Problem:
+In SwingScoutTable#prepareRenderer, evaluation of cell's editable state to draw respective marker icon caused loops and UI freeze.
+So far, the only way to determine cell's editable state was to call AbstractColumn#isCellEditable(ITableRow). This required synchronization with model thread which affected performance badly. Even worse, if model thread was busy, the enqueued request did not succeed at all (timeout).
+Solution:
+- Property added to hold result of AbstractColumn#isCellEditable(ITableRow) which can be evaluated in UI thread without need of model thread synchronization.
+- Population of property: Property is populated when AbstractColumn#decorateCellInternal is called.
+- Change of ICellSpecialization and implementing classes: added ICellSpecialization$isEditable(), added ICellSpecialization#setEditable(boolean)
+- Change of ICell and implementing classes: added ICell#isEditable()) -> default value is false
+- Change of Cell: added Cell#isEditable(), added Cell#setEditableInternal(boolean). Accessor setEditableInternal(boolean) is internal by intention as not intended for public use as various checks in AbstractColumn#execIsEditable are bypassed otherwise (JavaDoc added). E.g., do not use in execDecorateCell.
+- Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
+- Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
+Migration: None
+
+10.02.2011 sle
+see Release Notes in org.eclipse.scout.rt.client
+
+02.03.2011 pba
+#97045 removed the NOP-Switch in SwingScoutTable:handleKeyboardNavigationFromSwing. if the keyboardnavigation is undesired, do it via SwingScoutTable:setKeyboardNavigationFromScout
+
+02.03.2011 pba
+#98515 horizontal scrollbar is no longer missing for group boxes, if the getConfiguredScrollable is enabled
+
+10.03.2011 imo
+bsi ticket 99212
+added support for the config.ini/eclipse.ini property "app.zone" in AbstractSwingEnvironment.decorateAppZone(Window w).
+app.zone=prod | production (paints no special border around all dialogs and frames, this is the default)
+app.zone=int | integration (paints a yellow border around all dialogs and frames)
+app.zone=test (paints an orange border around all dialogs and frames)
+app.zone=dev | development (paints a red border around all dialogs and frames)
+
+11.03.2011 bsh
+- ColorUtility: Added a method to "multiply" two colors (instead of merging them). See JavaDoc for details.
+- ColorUtility: All methods are now null-safe.
+- SwingScoutTable: Fixed calculation of resulting foreground and background color when a row is selected (merge -> multiply).
+Migration: None
+
+03.05.2011 dwi
+fixed ticket #92911
+Problem: Fixed that LABEL_POSITION_ON_FIELD has no effect on multiline string fields
+Migration: None
+
+04.05.2011 imo
+Added async loading of backend smartfield lookup calls for better performance on slow lookup services
+
+10.05.2011 jgu
+Moved the methods in org.eclipse.scout.rt.ui.swing.ext.LookAndFeelUtility provided under LGPL to org.eclipse.scout.rt.ui.swing.laf.rayo.painters.RayoLookAndFeelUtility:
+public static Color darker(Color color, double ratio);
+public static Color lighter(Color color, double ratio);
+public static Color blend(Color color1, Color color2);
+public static Color blend(Color color1, Color color2, double ratio);
+
+Migration:
+If you use any of the above methods, use the RayoLookAndFeelUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
+
+11.05.2011 jgu
+bsi ticket 102027
+RayoLookAndFeelUtility removed again and added lighter/darker to org.eclipse.scout.rt.ui.swing.basic.ColorUtility to avoid duplicate code (suggested by bsh).
+public static Color lighter(Color color, float ratio);
+public static Color darker(Color color, float ratio)
+
+Migration:
+If you use any of the deleted methods in LookAndFeelUtility, use the ColorUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
+
+16.05.2011 sle
+bsi ticket 101'225
+When the value of an checkbox is changed in the ui and the model throws an VetoException, the exclamation mark and the error status is set on the checkbox. The Checkbox
+is also set back to its original state. Problem: The user cannot unset/correct the error status.
+
+Change: The value on the ui is kept on its state set from the user, so the user can correct it according to its error status/exclamation mark.
+
+17.05.2011 imo
+bsi ticket 102'175
+When a user double-clicks on a row in a TablePage, the tree is automatically expanded, the corresponding node is selected, and the tree is scrolled, such that the selected node and as many as possible of its sub nodes are visible.
+This behaviour is confusing when browsing trees with nodes that have long labels. The current implementation tries to move as much as possible of the target nodes rectangle to the visible area. For nodes that are on deeper levels, this means, that the tree is scrolled horizontally and the node is drawn on the left side of the tree border (Figures 1, 2). When the user wants to get back to the parent node, it might not be recognizable anymore.
+The same applies, when getConfiguredScrollToSelection() is true, or the method scrollToSelection() is called manually.
+The tree should only automatically scroll horizontally when the node would be completely off the right side of the tree's border. To prevent the tree from "jumping" too much around, only a small part of the node's label should be guaranteed to be drawn. The proposed patch (currently only for Swing, there might be better approaches...) uses a maximum of 30 pixels or 25% of the node's width. The result is more like what the user would expect.
+Change: as proposer
+Migration: None
+
+18.05.2011 dwi
+bsi ticket 100'036 / 100'037
+When a user double-clicks on an entry on the time chooser popup field, the table cell switches into edit mode and the user cannot select the same entry again.
+Solution:
+- Swing table model of popup table changed to be not editable anymore and to have a typed date column
+- changed behavior of time entry selection (in popup) to be the same as date entry selection on DateField.
+  That implies that popup does not close, if user still holds the left mouse button pressed. Scout model is only updated and popup closed after releasing the mouse button.
+  By holding the mouse button pressed, the user can now scroll across the time entry list for ease of usability.
+Migration: None
+
+06.06.211 sle
+bugzilla 348678
+bsi ticket 102'728
+Smartfield Warn-Text: When a Smartfield-Proposal opens with more than the aloud rows a Warning apears. This is to close to the left border and the color is not styleable.
+Solution: The SmartTableForm had a Label under the table. This label was removed and instead we use the existing TableStatus.
+Migration: None
+
+11.07.2011 aho
+Ticket: 102'194 is about taking screen shots of forms. The problem is since the form is opened async the print event does not get to the form.
+Solution:
+Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
+Migration:
+none
+
+18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:
+There is no distinct separation among the different Look And Feels. In practice, if using a L&F other than Rayo or Orson, some widgets (e.g. the header panel) partly look like Rayo, but not like the installed L&F.
+Solution:
+Scout should completely adhere the installed L&F.
+To solve this ticket, some major changes where necessary to the SwingScoutRootFrame, SwingScoutToolBar and its attached controls. Also, all Scout specific icons are moved from the org.eclipse.scout.rt.client Plug-In to the respective UI / L&F Plug-Ins to conform the UI.
+Changes:
+  - Generally, icons in Scout are strongly referenced by their icon identifier defined in SwingIcons#XX, SwtIcons#XX, RwtIcons#XX or AbtractIcons#XX.
+  - Icons are moved from org.eclipse.scout.rt.client to the respective UI Plug-Ins. The Swing and SWT Plug-In only contain OpenSource specific icons whereas L&F fragments L&F specific ones.
+  - org.eclipse.scout.rt.ui.swing does not contain any Rayo / Orson specific UI definitions anymore. Those are outsourced to the respective L&F Plugins.
+  - ISwingEnvironment is extended to install a custom NavigationWidgetPanel, ViewTabsBar and ToolTabsBar specific to the L&F. The default implementation does not draw these elements anymore, but uses native controls instead.
+  - Added extension point *.scouticons to every UI Plug-in to easily replace Scout default icons like window, tray or navigation icons.
+  - Scout icons which cannot be configured in application (by respective getConfigured method) are fetched by the UI Activator, not the environemnt anymore. Now, Swing and SWT behave the same way. Those icons can be replaced by the *.scouticons extension point.
+  - Rayo and Orson have a different JTextWithFieldTransparentIcon to meet L&F specific requirements.
+  - Rayo and Orson have a different DateField / TimeField to meet L&F specific requirements.
+  - Rayo and Orson have a different ActionInjection / UIDefaultsInjector to meet L&F specific requirements.
+  - Moved and renamed legacy UI classes to org.eclipse.scout.rt.ui.swing.orson as they only belong to Orson L&F.
+  - removed icons from org.eclipse.scout.rt.ui.swing.bsi.fragment. The icons are contained in the respective L&F fragment.
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.orson.fragment
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.rayo.fragment
+  - created Plug-In org.eclipse.scout.rt.ui.swing.orson to meet Orson specific requirements such as actions, formfields and Swing environment.
+  - moved BSI specific Icons for SWT into org.eclipse.scout.rt.ui.swt.bsi.fragment
+  - removed Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as not required anymore
+Migration:
+- Icons as CheckboxYes and CheckboxNo were removed from AbstractIcons. If required, add them to your project specific icons in your client Plug-In.
+- Product specific icons were removed from Scout UI Plug-Ins and must be installed in project yourself. Thereto, copy icons attached to this mail (window16.png, window32.png, window48.png, window256.png, tray.gif) into your Swing Plugin, e.g. /resources/icons. If folder does not exist yet, create it and register it in build.properties to be exported for production. Open plugin.xml of Swing Plug-In and register those icons in extension org.eclipse.scout.rt.ui.swing.scouticons.
+- Names of some icons in AbstractIcons were changed to gain consistency in naming: e.g. AbstractIcons.TimeFieldTime -> AbstractIcons.DateFieldTime, AbstractIcons.File -> AbstractIcons.FileChooserFieldFile
+- Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment if used as those icons are located in respective L&F Plug-Ins.
+If using Orson L&F:
+  - create dependency to org.eclipse.scout.rt.ui.swing.orson from your Swing-Plug-In. Also include that Plug-In in the product file.
+  - In SwingApplication, change LegacySwingEnvironment to OrsonSwingEnvironment.
+  - Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as those icons are contained in com.bsiag.scout.rt.client.bsi.icons.fragment.
+
+25.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074
+Problem:
+- Support for toolbuttons in OpenSource Swing UI
+- Tool button views may not only be positioned on East position, but also on South position. Therefore, remove collapse button on tool button panel and width synchronization. Move synchronization code into Rayo UI Plug-In.
+- Tool buttons (not FormToolButtons) are not represented by Rayo L&F. Therefore, skip tool buttons which are not instanceof AbstractFormToolButton
+- Factory methods for creating header detail panels are SwingScoutHeaderPanel specific and not of global interest in SwingEnvironment. The same applies to color and panel height settings. Move them to SwingScoutHeaderPanel.
+- Height of Header panel should automatically be calculated based on installed L&F
+Migration:
+NONE
+
+26.07.2011 dwi
+bugzilla 353000
+bsi ticket 104'381
+Problem:
+In UIDefaultsInjector, there are configured some NLS texts to overwrite JRE default texts and to register Scout texts to be referenced in UI components.
+As injection of UI defaults is done while instantiating SwingApplication, but Locale is only set in Activator's start method, those text cannot be resolved in the proper language.
+Solution:
+- Moved call of execInitLocale() prior to creating SwingEnvironment
+- Removed most of the Scout text registrations in UIDefaultsInjector and put NLS resolution directly into Scout UI components itself (legacy). This has the advantage, that projects can overwrite those texts by a global NLS provider registered in ClientSession.
+- Added registration of a few texts in UIDefaultsInjectins that cannot be overwritten by global NLS provider. This is true for all texts resolved prior to ClientSession creation completet, e.g. login dialog.
+Migration:
+NONE
+
+29.07.2011 dwi
+bugzilla 352420
+bsi ticket 104'189
+Problem:
+The height of the message box is too small if text of either intro or content is wider than the initial message box width and therefore needs to be wrapped.
+Solution:
+Preceding Swing size calculation, the span of the labels is constrained to the maximal display width of the message box. Thus, Swing is able to calculate the height correctly in respect to the wrapping text height.
+In order to make the text reflow when being resized to a width greater than the initial size, the span is reset just after being enlarged the first time.
+Migration:
+None
+
+12.08.2011 dwi
+bsi ticket #100'300
+Problem:
+If having an editable column of the type boolean, values are rendered as checkboxes. When changing the value of that checkbox, the checkbox jumps from center position to the left edge. Furthermore, not the same checkbox widget is displayed as in non-edit mode.
+Solution:
+- Changed representation of checkbox to look the same in edit and non-edit mode.
+- Fixed layout problems when changing from non-edit to edit-mode (checkbox positioning)
+- Added VerticalAlignment on IBoolean column to align the checkbox in both directions, vertical and horizontal
+- Fixed problems in LogicalGridLayout manager to round resulting floating numbers (center position caluculations) the same way as Java layout managers do. Otherwise, the checkbox is positioned differently in between of the layout managers which causes the checkbox to jump around.
+- Fixed problems in inset calculation to look the same on the different L&F providers
+Migration:
+None
+
+17.08.2011 dwi
+bsi ticket #104'549
+Problem:
+If having Drag & Drop support configured on a table, the copy-paste (CTRL-C) functionality is broken.
+Analysis:
+- If no DND is configured, default Swing mechanism exports the content of the table to the clipboard.
+- In case of having DND configured, a custom tranfer handler is installed which exports the content of the AbstractTable#execDrag to the clipboard.
+  If only having drop functionality configured, nothing is exported to the clipboard at all.
+Solution:
+- To always have the very same output to the clipboard regardless of DND configured or not, a tranfer handler is installed permanently.
+  Thereby, the export to the clipboard is changed to always consider the content of the table and not the output of the drag support.
+  That is exactely as Swing default implementation works.
+Migration:
+None
+
+17.08.2011 dwi [contributed by Kohler Silvio, BSI Business Systems Integration AG]
+bsi ticket #104'228
+Problem:
+FileChooser looks different in folder and file-mode. That is because in folder-mode, always the Swing FileChooser is is used.
+However, when opening a FileChooser in file-mode, there can be distinguished between using AWT or Swing FileChooser. That can be
+configured in SwingEnvironment. By default, SwingEnvironment is configured to use an AWT dialog. That is why the FileChooser looks
+different in folder and file-mode, respectively. That should be changed to look the same.
+Solution:
+SwingEnvironment changed to use Swing FileChooser by default.
+Migration:
+None
+
+17.08.2011 dwi [contributed by Kohler Silvio, BSI Business Systems Integration AG]
+bsi ticket #104'231
+Problem:
+When using the FileChooser with folder-mode and save-mode set to true, a message is prompted in case the selected folder does already exist.
+The message asks the user whether to really overwrite the file.
+In folder mode, this message makes no sense and should be removed.
+Solution:
+Fixed
+Migration:
+None
+
+22.08.2011 dwi
+BSI ticket #105'026, #104'976
+Problem:
+- Failed to display corrupt HTML pages (e.g. if missing closing quote in style definition)
+- In HTML editor, no cleanup (auto-correction) should be applied to the given HTML. That is because if the user did some modifications in the HTML source and reloads the HTML in the editor anew, unwanted auto-corrections would be applied.
+Solution:
+- Accomplish consistency concerning HTML styling (cleanup) in between of Swing and SWT in regard of ScoutHtmlField and ScoutHmtEditor.
+  In more detail, this entails the following:
+  - Before passing the HTML to the respective widget (ScoutHtmlEditor, ScoutHtmlField), Abstract[Swing|Swt]Environment#styleHtmlText() is called to cleanup the given HTML.
+  - In case of HTML editor mode, no modifications are applied to the given HTML in both, Swing and SWT, respectively.
+  - However, in non-editor mode, some intelligence is applied to the HTML to ensure proper display of the HTML document.
+    - In Swing, cleanup of HTML structure and CSS definitions is done. That is crucial as Swing HTML viewer has some problems with some CSS constructs.
+    - In SWT, OS default browser is used. That is why cleanup of CSS is not necessary as done by browser itself.
+      But, because the HTML is provided as file to the browser, proper encoding and charset must be set.
+- Failsafe: if HTML text cannot be parsed for cleanup, the raw HTML text is used instead of an exception thrown.
+- Consolidation of HTML cleanup functionality in HTMLUtility for plain and simple use that is applicable for both, SWT and Swing, respectively. That is why various methods in HtmlUtility are removed.
+Plug-Ins affected:
+- org.eclipse.scout.commons (HTMLUtility
+- org.eclipse.scout.rt.client (AbstractHtmlField)
+- org.eclipse.scout.rt.ui.swing (AbstractSwingEnvironment, SwingScoutHtmlField, SwingScoutMailField)
+- org.eclipse.scout.rt.ui.swing.bsi.fragment (SwingScoutHtmlEditor)
+- org.eclipse.scout.rt.ui.swt (AbstractSwtEnvironment, SwtScoutHtmlField)
+- org.eclipse.scout.rt.ui.swt.bsi.fragment (SwtScoutHtmlEditor)
+Migration Swing / SWT:
+- In HTMLUtility, the following methods are removed.
+  - HTMLUtility#parseDocument(String) to be replaced by HTMLUtility.toHtmlDocument(String)
+  - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(HTMLDocument)
+  - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+  - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+Migration SWT:
+- In AbstractSwtEnvironment, the following methods are removed as not required anymore because logic is encapsulated in HTMLUtility.
+  - AbstractSwtEnvironment#styleHtmlText(Control, String)
+  - AbstractSwtEnvironment#createCSS(Control)
+  - AbstractSwtEnvironment#createHtmlDocument(String, String)
+
+24.08.2011 imo
+bsi ticket 102089, bug 355669
+Problem:
+When a listbox or treebox is checkable=true then it shows checkmarks as icons.
+However if the listbox also has an icon defined either directly on the listbox
+or via its data provider (codetype/lookupcall), then this icon is not shown.
+Solution:
+In this (rare) case both icons are displayed as a composite icon.
+Migration:
+None
+
+25.08.2011 dwi
+BSI ticket #105'026
+Problem:
+Default font specific issues in HTML cleanup which is applied to the HTML text prior being provided to AbstractHtmlField:
+ - Application specific default font settings should always be applied to body style definition if not specified yet
+ - default font size unit on SWT should be pt instead of px
+ - precedence of font-families should be supported in default font settings
+Solution:
+- Changed HTMLUtility#cleanupHtml(..) to ensure default font settings to be contained in CSS style definition
+- changed default font size unit in AbstractSwtEnvironment#createDefaultFontSettings(Control) to pt
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.ui.rap
+Migration:
+None
+
+07.09.2011 rar
+BSI ticket #99'210
+Problem:
+The foreground color of JLabels which are disabled and contain HTML are not correclty greyed out. See: http://stackoverflow.com/questions/2242542/jlabel-not-greyed-out-when-disabled-when-html-text-displayed/
+Solution:
+Set the foreground color direclty using the color declared in the UIDefaults "TextField.inactiveForeground"
+Migration: None
+
+21.09.2011 dwi
+BSI ticket #106'282
+Bugzilla ticket #358365
+Problem:
+If special characters represented by 'AltGr' + 'z' or 'AltGr' + 'y' are inserted into a textfield, the undo or redo action
+is perfomred instead of simply insert this special character.
+Solution:
+To properly intercept Ctrl-Z/Ctrl-Y keystrokes, it is not sufficient to only test for the 'Ctrl'-key being pressed.
+Additionally, it must be checked that the 'Alt' key is not pressed. Otherwise, if heading for a special character
+represented by 'Alt-Gr' + 'Z', that would result in an unwanted undo event.
+That is because on Windows systems, the key 'Alt Gr' is composed of both of the keys, 'Ctrl' and 'Alt', respectively.
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [UndoableEditObserver.class]
+Migration:
+None
+
+28.09.2011 dwi
+BSI ticket #106'563
+Bugzilla ticket #359225
+Problem:
+The logo in header panel is always positioned in center position.
+Instead, that should be configurable. Supported values would be:
+horizontal position: center, east
+vertical position: top, center, bottom
+Solution:
+Logo alignment can be controlled by setting according UI defaults in ISwingEnvironment#interceptUIDefaults(UIDefaults defaults).
+Supported values for horizontal alignment are (HeaderPanel.logoHorizontalAlignment):
+0=center, 1=right
+Supported values for vertical alignment are (HeaderPanel.logoVerticalAlignment):
+-1=top, 0=center, 1=bottom
+By default, the logo is aligned as follows: horizontal=center, vertical=top
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [SwingScoutHeaderPanel.class, UIDefaultsInjector.class]
+Migration:
+None
+
+28.09.2011 dwi
+BSI ticket #105'253
+Bugzilla ticket #359429
+Problem:
+When dragging an object into a Scout table, the behavior is different depending
+on whether the target object is a node or an empty space area. If being a node,
+the source object is always copied regardless of the user gesture applied. On
+the other hand, if dropping at an empty space location, the user gesture is
+considered, meaning that the object is effectively being moved unless the Ctrl
+key is held down.
+That should be changed to ignore the user gesture and always perform the copy
+drop action.
+Solution:
+The behavior is not the same as different drop targets are associated with the table and its viewport.
+The drop target of the viewport considers the user gesture whereas the table itself does not.
+Instrumented drop target of the viewport to ignore the user gesture and always use copy as drop action.
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [TransferHandlerEx.class]
+Migration:
+None
+
+04.10.2011 dwi
+BSI ticket #106'222, #99'582, #105'229
+Bugzilla ticket #358064, #359811, #359812
+Problem:
+All the tickets mentioned belong to the editable cell topic:
+a) If properties like visiblity or editability are changed on IColumn, the accessiblity of editable cells within that column is not calculated anew.
+   As consequence, the UI representation of such cells does not correspond to the values on the model.
+b) If a value of an editable boolean column is changed by inline editing, other values of that column are toggled/untoggled as well.
+   Even though holding the correct value on model, their UI representation differs. For instance, if forcing the UI to refresh by resizing a column, the checked state in UI gets corrected.
+c) If toggling three times the very same cell of an editable boolean column, the value is not stored in the model anymore.
+d) If toggling a cell of an editable boolean column, it's value is immediately written back to the model which is good.
+   This has the effect, that if there is an implict or explicit sort installed on that column, toggled rows are scampering.
+   This is especially absurd, if the column is part of an implicit sort, meaning that no CTRL-key was held while determing
+   the sort columns. Due to lack of the visual representation of such an implicit sort column, the user gets really confused
+   as rows are reorganized for no reason. This problem is also applicable to other types of editable columns.
+e) If clicking on a cell of an editable boolean column, the cell transitions into modification state, meaning that the associated cell editor is activated.
+   Even though the toggled value is already written back to model, the editor remains open which is confusing to the user.
+   This should be changed to immediately close the cell editor if the value is toggled.
+f) If an editable colum is moved, the column is not editable anymore. Only if the column is moved back to its origin location, the column becomes editable anymore.
+g) If having a checkable table and a cell editor of an editable column does not fill the whole cell space,
+   clicking on that empty space toggles the checked state of the row. This is confusing and moreover error-prone as not the row is intended to be checked/unchecked but rather the cell editor activated / toggled.
+h) If having a checkable table and moving an editable column to the very first position, a click on that column correctly activates the inline editor.
+   Thus, the checked state of that row cannot be changed by clicking on the presented checkbox.
+   This should be changed to not allow an editable column to be moved to the first position. Moreorver, the first column should also be freezed if the succeeding column is an editable one.
+Solution:
+a) Apply row decoration on property change
+b) This was because the active cell editor remained active after toggling the value.
+   Fixed that a still active cell editor gets closed prior to update the model state.
+c) solved by e)
+d) Changed that if the value of a cell editor is written back to model, the sort (if applicable) is suspended.
+   Thus, even though the column represents an implict or explicit sort column, its values are not sorted anymore which in turn is the expected behavior.
+   In consequence, to get the column's values sorted again, the user has to sort the column anew.
+e) Instead of creating an ICheckBox as cell editor which stays active until the focus get lost, an empty cell editor (null) is created.
+   As the toggled value is immediately written back to the model, this editor gets closed shortly after (see b).
+f) Fixed
+g) Mouseclicks that are targetted to cell editors are not interpereted as row-check nor row-uncheck clicks anymore.
+h) Fixed
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing, org.eclipse.scout.rt.client
+Migration:
+None
+
+17.10.2011 bsh
+Bugzilla ticket #361116
+Problem:
+The splash screen does not support different text colors for status text and version text. Also, texts are always left aligned.
+To allow more creative and flexible splash screen designs, those properties should be customizable.
+Solution:
+Added the following UI properties, which can be customized by setting the UI defaults in the SwingEnvironment:
+- Splash.versionColor and Splash.statusTextColor (a java.awt.Color object; if not specified, the value of Splash.text is used)
+- Splash.versionAlignment and Splash.statusTextAlignment ("left", "center", "right"; default is left)
+- Splash.versionFont and Splash.statusTextFont (a Scout FontSpec string, see org.eclipse.scout.rt.shared.data.basic.FontSpec)
+Migration:
+None
+
+25.10.2011 dwi
+BSI ticket #99'518
+Bugzilla 347726
+Problem:
+In a table with multi-line text support, the String cell-editor should overflow the cell's dimension to enhance usability.
+It should be implemented a similar way as in Excel.
+Solution:
+When editing such a cell, a smartfield-like popup comes up to enter text. If the row already spanned multiple textlines, the popup merges with the cell-editor's dimension so you do not realize it is about a popup.
+It is further possible to resize that popup. The default size of that popup can be changed by setting 'WidthInPixel' and 'HeightInPixel' on the String field. That would be done in the 'prepareEditInternal' method of the string column.
+Migration:
+None
+
+28.11.2011 dwi
+Bugzilla: 364019
+Problem:
+There has to be a possibility to disable the behaviour of Ctrl+C on tables. A use case for this would be an application
+with sensitive information (e.g. address data) that should not be allowed to be exported, only to be displayed to the user.
+Solution:
+> Added the method 'AbstractTable#execCopy(ITableRow[])' to return a transfer object to be put into the clipboard
+> By default, a TextTransferObject is returned with a text/plain and text/html representation of the selected rows.
+  That means that if the target understands HTML, the HTML representation is used over the plain-text representation.
+> In SWT, added copy support on tables (not implemented yet)
+> Added permission 'CopyToClipboardPermission' to enable / disable the copy functionality
+Migration Swing:
+> So far, the copy functionality was enabled by default. Because protected by a permission, it is disabled by default as of now.
+  To enable the CTRL-C behavior on tables, add the permission 'CopyToClipboardPermission' to the permission-set in AbstractAccessControlService#execLoadPermissions
+  or directly grant it to specific user roles in your database script.
+Migration SWT:
+> None because not supported yet. To enable the copy functionality, see migration notes for Swing.
+
+23.12.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364473
+Problem:
+Content of HTML field does not show up anymore after UI relayout happens
+E.g. if having a detail form (that contains a HTML field) on a table page and the user clicks on another view tab and back again, the HTML content does not show up anymore.
+Solution:
+Because the preferred height of the JTextPane is only calculated when rendering for the first time, it will keep the value 0 and never show up again.
+The proposed patch includes a refresh of the preferred height every time the field's content changes. Thus the layout can dynamically change when setting a new content for the HTML field.
+Migration: None
+
+23.12.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364121
+Problem:
+If disabling / enabling a table, it sometimes happens not to look like being in disabled / enabled state. This is only a UI refresh problem, meaning that the table effectively is enabled / disabled.
+Solution:
+The proposed patch triggers an explicit repaint of the table and its header whenever the Scout table is disabled / enabled.
+Migration: None
+
+23.12.2011 dwi
+Bugzilla: 367507
+Problem:
+If pasting a text containg multiple lines from within the clipboard into a single-line textfield (getConfiguredMultilineText=false), the newlines are only removed if leaving the field.
+The same applies for a field that allows to only contain uppercase/lowercase characters (getConfiguredFormat = IStringField#FORMAT_LOWER / IStringField#FORMAT_UPPER).
+Again, the characters are only converted if leaving the field.
+Solution:
+The configured format is applied immediately to the entered text.
+Plug-In changed: org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter]
+Migration: None
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+When having a single line textfield (getConfiguredMultilineText=false), leading and trailing newlines should not be replaced by spaces but omitted insted.
+Solution:
+Leading and trailing newlines are trimmed prior to replacing them by spaces.
+Plug-Ins changed:
+org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
+Migration: None
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+The text format is lost when loading the initial text of an editiable cell. That is because of ticket 367507 where newlines for single-line text fields are removed.
+However, this is not about a bug of ticket 367507 but rather due to wrong initialization sequence in SwingScoutTextFieldComposite#attachScout.
+The bug occurs because the display text is set prior to the model properties be read which in turn are used by the Document filter to ensure proper text format.
+Solution:
+Changed initialization sequence to first read model properties before setting the display text.
+Plug-Ins changed:
+org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#attachScout]
+Migration: None
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default swing implementation SwingBusyHandler is attached in AbstractSwingEnvironment.attachBusyHandler
+It uses the glass pane concept and shows a wait cursor for 3 seconds, then blocks the screen allowing to cancel with the mouse.
+
+12.01.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364473
+Problem:
+The previous fix for Bugzilla 364473 led to a new problem. Long text which did not contain an explicit line wrap were not automatically wrapped anymore.
+Solution:
+The proposed patch includes a refresh of the absolute size every time the field's content changes.
+As a result the preferred height is not locked on the value 0 once it has been layouted with an empty string. The preferred height will be properly recalculated.
+Migration: None
+
+06.03.2012 abr
+Bugzilla: 373358
+composer field: select parent node when a node is deleted
+Problem:
+The keyboard navigation in a Swing tree does not work correctly if the selection is changed in the model and the node selected before is deleted.
+Solution:
+Check the last segment of the lead and anchor paths. Both paths are retained if the corresponding ITreeNode is still valid (not null,
+attached to a tree, visible and filter-accepted). Otherwise the paths are omitted so that they are recomputed by Swing.
+Migration: none
+
+16.03.2012 kle
+Bugzilla: 372222
+Problem:
+Automatic resizing of forms should be made customizable to enable overriding of the default behavior of forms exceeding the screen size if too many fields are added.
+Solution:
+Introduced two new methods in ISwingEnvironment. Customization can be done by overriding these methods and returning subtypes of JDialogEx.
+Migration:
+None if ISwingEnvironment is not implemented by any classes.
+Otherwise use the implementation in AbstractSwingEnvironment if the default behavior is sufficient.
+
+public JDialogEx createJDialogEx(Dialog swingParent) {
+  return new JDialogEx(swingParent);
+}
+
+public JDialogEx createJDialogEx(Frame swingParent) {
+  return new JDialogEx(swingParent);
+}

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout UI Swing Testing
+Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.swing;singleton:=true
+Bundle-Version: 3.8.2.qualifier
+Bundle-Activator: org.eclipse.scout.rt.testing.ui.swing.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.testing.client,
+ org.eclipse.scout.rt.ui.swing,
+ org.eclipse.scout.rt.testing.shared
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project
+Export-Package: org.eclipse.scout.rt.testing.ui.swing

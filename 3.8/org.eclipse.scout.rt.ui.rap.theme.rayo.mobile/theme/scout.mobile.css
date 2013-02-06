@@ -1,0 +1,2268 @@
+/* Widget - Default for all widgets */
+* {
+  color: #000000;
+  background-color: #ffffff;
+  background-image: none;
+  font: 14px Arial, Helvetica, sans-serif;
+}
+*:disabled {
+  color: #cfcfcf;
+}
+Group-Label,
+CCombo,
+Combo,
+DateTime {
+  font: bold 12px Arial, Helvetica, sans-serif;
+}
+DateTime-Calendar-Navbar,
+ToolTip-Text {
+  font: bold 14px Arial, Helvetica, sans-serif;
+}
+Widget-ToolTip {
+  padding: 1px 3px 2px 3px;
+  background-color: #dae9f7;
+  border: 1px solid #00589f;
+  border-radius: 2px 2px 2px 2px;
+  color: #4a4a4a;
+  opacity: 1;
+  animation: fadeIn 200ms linear, fadeOut 600ms ease-out;
+}
+Display {
+  rwt-shadow-color: #a7a6aa;
+  rwt-highlight-color: #ffffff;
+  rwt-darkshadow-color: #85878c;
+  rwt-lightshadow-color: #dcdfe4;
+  rwt-thinborder-color: #aca899;
+  rwt-selectionmarker-color: #fec83c;
+  rwt-infobackground-color: #ffffff;
+  /* Rayo no icons in messageboxes */
+
+  /*   rwt-error-image: url( theme/img/dialog/error.png ); */
+
+  /*   rwt-information-image: url( theme/img/dialog/information.png ); */
+
+  /*   rwt-question-image: url( theme/img/dialog/question.png ); */
+
+  /*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
+
+  /*   rwt-working-image: url( theme/img/dialog/information.png ); */
+
+  rwt-fontlist: 12px Arial, Helvetica, sans-serif;
+  /*
+ background-image: url( theme/img/display/browser_bg.png );
+ */
+
+}
+/* Control - Default for all controls */
+* {
+  border: none;
+  padding: 0px;
+}
+*[BORDER] {
+  border: 1px solid #a4a4a4;
+}
+/* Composite - Default for all composites */
+Composite {
+  padding: 0px;
+  opacity: 1;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+}
+Composite[BORDER] {
+  background-color: #ffffff;
+  background-image: none;
+}
+/* Browser */
+Browser {
+  border: none;
+}
+Browser[BORDER] {
+  border: 1px solid #a4a4a4;
+}
+Button[CHECK],
+Button[RADIO] {
+  color: #000000;
+  font: 14px Arial, Helvetica, sans-serif;
+}
+Button[CHECK]:disabled,
+Button[RADIO]:disabled {
+  color: #2a5a76;
+}
+Button[CHECK][BORDER],
+Button[RADIO][BORDER] {
+  background-image: none;
+}
+Button-CheckIcon {
+  background-image: url(theme/img/button/check_box.png);
+}
+Button-CheckIcon:disabled {
+  background-image: url(theme/img/button/check_box_disabled.png);
+}
+Button-CheckIcon:selected {
+  background-image: url(theme/img/button/check_box_selected.png);
+}
+Button-CheckIcon:selected:disabled {
+  background-image: url(theme/img/button/check_box_disabled_selected.png);
+}
+Button-RadioIcon {
+  background-image: url(theme/img/button/radio_button.png);
+}
+Button-RadioIcon:disabled {
+  background-image: url(theme/img/button/radio_button_disabled.png);
+}
+Button-RadioIcon:selected {
+  background-image: url(theme/img/button/radio_button_selected.png);
+}
+Button-FocusIndicator[CHECK] {
+  /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
+   we need to fix this when bug 346501 is fixed.
+  background-image: url( theme/img/button/check_box_focused.png );
+ */
+
+  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+
+  background-color: transparent;
+  border: 1px dotted #b0cce3;
+  margin: 3px;
+  padding: 0px;
+  opacity: 1;
+}
+Button-FocusIndicator[RADIO] {
+  /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
+   we need to fix this when bug 346501 is fixed.
+  background-image: url( theme/img/button/check_box_focused.png );
+ */
+
+  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+
+  background-color: transparent;
+  border: 1px dotted #b0cce3;
+  margin: 3px;
+  padding: 0px;
+  opacity: 1;
+}
+/* CCombo */
+CCombo {
+  border: none;
+  background-color: #fcfcfc;
+  color: #464a4e;
+  border-radius: 2px;
+}
+CCombo[BORDER] {
+  border: 1px solid #c1c1c1;
+  border-radius: 2px;
+}
+CCombo-Button {
+  cursor: default;
+  background-color: transparent;
+  border: none;
+  border-radius: 0px 2px 2px 0px;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+  width: 18px;
+}
+CCombo-Button:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+CCombo-Button-Icon {
+  background-image: url(theme/img/ccombo/down.png);
+}
+CCombo-Button-Icon:hover {
+  background-image: url(theme/img/ccombo/down-hover.png);
+}
+CCombo-Button[FLAT] {
+  border: none;
+}
+CCombo-Button[FLAT]:hover {
+  border: 1px outset;
+}
+CCombo-List {
+  border: 1px solid #c1c1c1;
+  border-radius: 0px 0px 2px 2px;
+}
+CCombo-Field {
+  padding: 2px 3px;
+}
+CCombo-FocusIndicator {
+  background-color: transparent;
+  border: 1px dotted #b8b8b8;
+  margin: 1px 19px 1px 1px;
+  opacity: 1;
+}
+/* Combo */
+Combo {
+  border: 1px solid #c1c1c1;
+  background-color: #fcfcfc;
+  color: #464a4e;
+  border-radius: 2px;
+}
+Combo[BORDER] {
+  border: 1px solid #c1c1c1;
+  border-radius: 2px;
+}
+Combo-Button {
+  cursor: default;
+  background-color: transparent;
+  border: none;
+  border-radius: 0px 2px 2px 0px;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+  width: 18px;
+}
+Combo-Button:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+Combo-Button-Icon {
+  background-image: url(theme/img/ccombo/down.png);
+}
+Combo-Button-Icon:hover {
+  background-image: url(theme/img/ccombo/down-hover.png);
+}
+Combo-List {
+  border: 1px solid #c1c1c1;
+  border-radius: 0px 0px 2px 2px;
+}
+Combo-Field {
+  padding: 2px 3px;
+}
+Combo-FocusIndicator {
+  background-color: transparent;
+  border: 1px dotted #b8b8b8;
+  margin: 1px 19px 1px 1px;
+  opacity: 1;
+}
+/* CoolBar */
+CoolBar {
+  background-image: none;
+}
+CoolItem-Handle {
+  border: 1px outset;
+  width: 4px;
+}
+/* CTabFolder */
+CTabFolder {
+  border-color: #bbcddb;
+  border-radius: 8px 8px 0px 0px;
+}
+CTabItem {
+  color: #000000;
+  background-color: #ffffff;
+  background-image: none;
+  padding: 2px 4px;
+  spacing: 4px;
+}
+CTabItem:selected {
+  color: #ffffff;
+  background-color: #ffffff;
+}
+/* Do not gray out disabled CTabItems, this is SWT behavior */
+CTabItem:disabled {
+  color: black;
+}
+CTabFolder-DropDownButton-Icon {
+  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown.png);
+}
+CTabFolder-DropDownButton-Icon:hover {
+  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown-hover.png);
+}
+/* DateTime */
+DateTime {
+  color: #464a4e;
+  background-color: #fcfcfc;
+  border: none;
+  padding: 1px 2px;
+}
+DateTime-Field {
+  padding: 2px 3px;
+}
+DateTime[BORDER] {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px 2px 2px 2px;
+}
+DateTime-Field:selected,
+DateTime-Calendar-Day:selected {
+  background-color: #d2d2d2;
+  color: #4a4a4a;
+}
+DateTime-Calendar-Day:selected:hover {
+  background-color: #00569c;
+  color: #ffffff;
+}
+DateTime-Calendar-Day:selected:unfocused {
+  background-color: #c0c0c0;
+}
+DateTime-Calendar-Day:otherMonth {
+  background-color: transparent;
+  color: #808080;
+}
+DateTime-Calendar-Day:hover {
+  background-color: #d9e3f3;
+}
+DateTime-Calendar-Navbar {
+  border: none;
+  background-color: #00569c;
+  color: #ffffff;
+}
+DateTime-Calendar-PreviousMonthButton {
+  background-image: url(theme/img/datetime/left-month.png);
+  cursor: default;
+}
+DateTime-Calendar-PreviousMonthButton:hover {
+  background-image: url(theme/img/datetime/left-month-hover.png);
+}
+DateTime-Calendar-NextMonthButton {
+  background-image: url(theme/img/calendar/nextMonth.png);
+  cursor: default;
+}
+DateTime-Calendar-NextMonthButton:hover {
+  background-image: url(theme/img/calendar/nextMonth-hover.png);
+}
+DateTime-Calendar-PreviousYearButton {
+  background-image: url(theme/img/calendar/lastYear.png);
+  cursor: default;
+}
+DateTime-Calendar-PreviousYearButton:hover {
+  background-image: url(theme/img/calendar/lastYear-hover.png);
+}
+DateTime-Calendar-NextYearButton {
+  background-image: url(theme/img/calendar/nextYear.png);
+  cursor: default;
+}
+DateTime-Calendar-NextYearButton:hover {
+  background-image: url(theme/img/calendar/nextYear-hover.png);
+}
+DateTime-UpButton {
+  background-color: transparent;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), to(#e0e0e0));
+  width: 18px;
+  border: none;
+  border-radius: 0px 2px 0px 0px;
+  cursor: default;
+}
+DateTime-UpButton:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+DateTime-UpButton-Icon {
+  background-image: url(theme/img/spinner/up.png);
+}
+DateTime-UpButton-Icon:hover {
+  background-image: url(theme/img/spinner/up-hover.png);
+}
+DateTime-DownButton {
+  background-color: transparent;
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), to(#ffffff));
+  width: 18px;
+  border: none;
+  border-radius: 0px 0px 2px 0px;
+  cursor: default;
+}
+DateTime-DownButton:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#b0b0b0), color-stop(52%, #e0e0e0), to(#ffffff));
+}
+DateTime-DropDownButton {
+  cursor: default;
+  background-color: transparent;
+  border: none;
+  border-radius: 0px 2px 2px 0px;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+  width: 18px;
+}
+DateTime-DropDownButton-Icon {
+  background-image: url(theme/img/spinner/down.png);
+}
+DateTime-DropDownButton-Icon:hover {
+  background-image: url(theme/img/spinner/down-hover.png);
+}
+DateTime-DownButton-Icon {
+  background-image: url(theme/img/spinner/down.png);
+}
+DateTime-DownButton-Icon:hover {
+  background-image: url(theme/img/spinner/down-hover.png);
+}
+DateTime-DropDownCalendar {
+  border: 1px #a7a6aa;
+}
+/* ExpandBar */
+ExpandBar {
+  color: #4a4a4a;
+  background-color: #ffffff;
+}
+ExpandBar[BORDER] {
+  border: 1px solid #c1c1c1;
+}
+ExpandItem {
+  border: 1px solid #c1c1c1;
+}
+ExpandItem-Header {
+  border: none;
+  cursor: pointer;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(55%, #e0e0e0), to(#f0f0f0));
+}
+ExpandItem-Header:disabled {
+  cursor: default;
+}
+ExpandItem-Button {
+  background-image: url(theme/img/expanditem/expanditem-expand.png);
+}
+ExpandItem-Button:hover {
+  background-image: url(theme/img/expanditem/expanditem-expand-hover.png);
+}
+ExpandItem-Button:expanded {
+  background-image: url(theme/img/expanditem/expanditem-collapse.png);
+}
+ExpandItem-Button:expanded:hover {
+  background-image: url(theme/img/expanditem/expanditem-collapse-hover.png);
+}
+/* List */
+List {
+  background-color: #ffffff;
+  border: none;
+  color: #4a4a4a;
+}
+List[BORDER] {
+  border: 1px solid #a4a4a4;
+}
+List-Item {
+  background-color: transparent;
+  color: #4a4a4a;
+  background-image: none;
+}
+List-Item:hover {
+  background-color: #f1f8fe;
+}
+List-Item:selected {
+  color: #4a4a4a;
+  background-color: #e5f3fe;
+}
+List-Item:selected:unfocused {
+  color: #4a4a4a;
+  background-color: #e5f3fe;
+}
+/* Menu */
+Menu {
+  background-image: none;
+  padding: 4px 0px 4px 0px;
+  opacity: 1;
+  animation: none;
+  color: #000000;
+  background-color: #fafdff;
+  border: 1px solid #bbcddb;
+  border-radius: 0px;
+}
+MenuItem {
+  background-image: none;
+  color: black;
+  background-color: transparent;
+  opacity: 1;
+  padding: 7px 6px 7px 6px;
+}
+MenuItem[SEPARATOR] {
+  color: #eaf1f6;
+  padding: 2px 0px;
+}
+MenuItem:hover {
+  background-color: #e5f3fe;
+  color: #000000;
+}
+MenuItem-CheckIcon {
+  background-image: url(theme/img/menu/checkbox.gif);
+}
+MenuItem-RadioIcon {
+  background-image: url(theme/img/menu/radiobutton.gif);
+}
+MenuItem-CascadeIcon {
+  background-image: url(theme/img/menu/arrow.gif);
+}
+/* ProgressBar */
+ProgressBar {
+  background-color: #ffffff;
+  background-image: none;
+  border: none;
+  padding: 0px 0px;
+  border-radius: 5px;
+}
+ProgressBar-Indicator {
+  background-color: #67a8ce;
+  background-image: none;
+  border: none;
+  opacity: 1;
+}
+ProgressBar-Indicator:paused {
+  background-color: #ebebeb;
+}
+ProgressBar-Indicator:error {
+  background-color: #cb2020;
+}
+/* Sash */
+Sash {
+  border: none;
+  background-image: none;
+  background-color: transparent;
+}
+Sash[BORDER] {
+  /* XXX hstaudacher we need to set the border-radius when bug 346620 is fixed */
+
+  border: 1px solid #bbcddb;
+}
+Sash-Handle {
+  background-image: none;
+}
+/* Scale */
+Scale {
+  background-color: #ffffff;
+}
+Scale-Thumb {
+  background-color: #00589f;
+}
+/* Slider */
+Slider {
+  border: none;
+  background-color: #f3f3f4;
+}
+/* Thumb */
+Slider-Thumb {
+  background-color: transparent;
+  border: 1px solid #a4a4a4;
+  border-radius: 2px 2px 2px 2px;
+  background-image: none;
+}
+Slider-Thumb[HORIZONTAL] {
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+}
+Slider-Thumb[HORIZONTAL]:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+Slider-Thumb[VERTICAL] {
+  background-image: gradient(linear, left top, right top, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+}
+Slider-Thumb[VERTICAL]:pressed {
+  background-image: gradient(linear, left top, right top, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+/* Buttons */
+Slider-UpButton,
+Slider-DownButton {
+  background-color: transparent;
+  border: 1px solid #a4a4a4;
+  cursor: default;
+}
+Slider-UpButton[HORIZONTAL],
+Slider-DownButton[HORIZONTAL] {
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+}
+Slider-UpButton[VERTICAL],
+Slider-DownButton[VERTICAL] {
+  background-image: gradient(linear, left top, right top, from(#ffffff), color-stop(48%, #f0f0f0), color-stop(52%, #e0e0e0), to(#cccccc));
+}
+Slider-UpButton[HORIZONTAL]:pressed,
+Slider-DownButton[HORIZONTAL]:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+Slider-UpButton[VERTICAL]:pressed,
+Slider-DownButton[VERTICAL]:pressed {
+  background-image: gradient(linear, left top, right top, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+/* Rounded Borders */
+Slider-UpButton[HORIZONTAL] {
+  border-radius: 0px 2px 2px 0px;
+}
+Slider-UpButton[VERTICAL] {
+  border-radius: 0px 0px 2px 2px;
+}
+Slider-DownButton[HORIZONTAL] {
+  border-radius: 2px 0px 0px 2px;
+}
+Slider-DownButton[VERTICAL] {
+  border-radius: 2px 2px 0px 0px;
+}
+/* Button Icons */
+Slider-UpButton-Icon[HORIZONTAL] {
+  background-image: url(theme/img/slider/right.png);
+}
+Slider-UpButton-Icon[HORIZONTAL]:hover {
+  background-image: url(theme/img/slider/right-hover.png);
+}
+Slider-UpButton-Icon[VERTICAL] {
+  background-image: url(theme/img/spinner/down.png);
+}
+Slider-UpButton-Icon[VERTICAL]:hover {
+  background-image: url(theme/img/spinner/down-hover.png);
+}
+Slider-DownButton-Icon[HORIZONTAL] {
+  background-image: url(theme/img/slider/left.png);
+}
+Slider-DownButton-Icon[HORIZONTAL]:hover {
+  background-image: url(theme/img/slider/left-hover.png);
+}
+Slider-DownButton-Icon[VERTICAL] {
+  background-image: url(theme/img/spinner/up.png);
+}
+Slider-DownButton-Icon[VERTICAL]:hover {
+  background-image: url(theme/img/spinner/up-hover.png);
+}
+/* Spinner */
+Spinner {
+  border: none;
+  padding: 1px 2px;
+  color: #464a4e;
+  background-color: #fcfcfc;
+}
+Spinner-Field {
+  padding: 2px 3px;
+}
+Spinner[BORDER] {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px 2px 2px 2px;
+}
+Spinner-UpButton {
+  background-color: transparent;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), to(#e0e0e0));
+  width: 18px;
+  border: none;
+  border-radius: 0px 2px 0px 0px;
+  cursor: default;
+}
+Spinner-UpButton:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(52%, #e0e0e0), to(#b0b0b0));
+}
+Spinner-UpButton-Icon {
+  background-image: url(theme/img/spinner/up.png);
+}
+Spinner-UpButton-Icon:hover {
+  background-image: url(theme/img/spinner/up-hover.png);
+}
+Spinner-DownButton {
+  background-color: transparent;
+  background-image: gradient(linear, left top, left bottom, from(#e0e0e0), to(#ffffff));
+  width: 18px;
+  border: none;
+  border-radius: 0px 0px 2px 0px;
+  cursor: default;
+}
+Spinner-DownButton:pressed {
+  background-image: gradient(linear, left top, left bottom, from(#b0b0b0), color-stop(52%, #e0e0e0), to(#ffffff));
+}
+Spinner-DownButton-Icon {
+  background-image: url(theme/img/spinner/down.png);
+}
+Spinner-DownButton-Icon:hover {
+  background-image: url(theme/img/spinner/down-hover.png);
+}
+/* TabFolder */
+TabItem {
+  background-color: #ffffff;
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+  background-image: none;
+}
+TabItem:selected {
+  background-color: #ffffff;
+  border-top-color: #00589f;
+  border-bottom-color: #00589f;
+  background-image: none;
+}
+TabItem:hover {
+  background-color: #dae9f7;
+  background-image: none;
+}
+/* ToolBar */
+ToolBar {
+  color: black;
+  padding: 0px;
+  spacing: 0px;
+  background-color: #ffffff;
+  background-image: none;
+  border: none;
+  opacity: 1;
+}
+ToolBar[BORDER] {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px;
+}
+ToolItem {
+  color: inherit;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-radius: 0px;
+  padding: 2px 3px;
+  spacing: 4px;
+  opacity: 1;
+  animation: none;
+}
+ToolItem[FLAT] {
+  border: none;
+  padding: 3px 4px;
+}
+ToolItem:hover {
+  background-color: #ffffff;
+  border: 1px solid #a4a4a4;
+  border-radius: 2px 2px 2px 2px;
+  padding: 2px 3px;
+}
+ToolItem:pressed,
+ToolItem:selected {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px;
+  padding: 3px 2px 1px 4px;
+  background-image: url(theme/img/dotted_white.gif);
+}
+ToolItem-DropDownIcon {
+  background-image: url(theme/img/arrows/down.gif);
+  border: none;
+}
+ToolItem-DropDownIcon:hover {
+  border: 1px inset;
+}
+ToolItem-Separator {
+  width: 4px;
+}
+Composite.viewsArea {
+  background-color: #ffffff;
+  padding: 3px 3px 3px 3px;
+}
+Composite.viewPart {
+  background-color: transparent;
+  border: 1px solid #bbcddb;
+  border-radius: 8px 8px 0px 0px;
+}
+Composite.viewPartNoRadius {
+  background-color: transparent;
+  border: 1px solid #bbcddb;
+  border-radius: 0px 0px 0px 0px;
+}
+Composite.form {
+  background-color: transparent;
+}
+Composite.listbox {
+  background-color: #ffffff;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  padding: 2px;
+}
+Composite.listboxDisabled {
+  background-color: #ffffff;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+  padding: 2px;
+}
+Composite.formbarContainer {
+  background-color: #ddebf4;
+}
+Button.formButton {
+  background-image: none;
+  color: #000000;
+  padding: 6px 15px;
+}
+Button.formButton:selected,
+Button.formButton:selected:hover,
+Button.formButton:pressed,
+Button.formButton:hover {
+  background-image: none;
+}
+Button.formButton-active {
+  background-image: none;
+  background-color: #f1f7fb;
+  border-radius: 0px 0px 5px 5px;
+  color: #000000;
+  padding: 0px 15px;
+}
+Button-FocusIndicator.formButton-active {
+  border: none;
+}
+Button.formButton-active:pressed,
+Button.formButton-active:selected,
+Button.formButton-active:selected:hover,
+Button.formButton-active:hover {
+  background-image: none;
+}
+/* generated at http://www.ajaxload.info */
+Composite.busyIndicator {
+  padding: 8px;
+  background-image: url(theme/img/busy/busy.gif);
+}
+/* Button */
+Button {
+  cursor: default;
+  color: #ffffff;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  background-color: transparent;
+}
+Button[PUSH],
+Button[TOGGLE],
+Button[BORDER] {
+  background-image: gradient(linear, left top, left bottom, from(#7ab9dd), to(#67a8ce));
+  color: #ffffff;
+  animation: hoverOut 500ms ease-out;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 4px 5px;
+}
+Button[PUSH]:disabled,
+Button[TOGGLE]:disabled {
+  background-image: gradient(linear, left top, left bottom, from(#dee1e7), to(#c2d4de));
+  cursor: default;
+  color: #6B7B84;
+  background-color: transparent;
+}
+Button[PUSH]:hover,
+Button[TOGGLE]:hover {
+  background-image: gradient(linear, left top, left bottom, from(#55aedb), to(#489aca));
+}
+Button[PUSH]:pressed,
+Button[TOGGLE]:pressed {
+  animation: none;
+}
+Button-FocusIndicator[PUSH],
+Button-FocusIndicator[TOGGLE] {
+  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+
+  background-color: transparent;
+  border: 1px solid #b0cce3;
+  margin: 1px;
+  padding: 0px;
+  opacity: 1;
+}
+Button[TOGGLE]:selected {
+  background-image: gradient(linear, left top, left bottom, from(#4b8cbd), color-stop(35%, #65a5cf), color-stop(75%, #6bacd1), to(#67a8ce));
+}
+Button[TOGGLE]:selected:disabled {
+  background-image: gradient(linear, left top, left bottom, from(#9ebcd1), color-stop(35%, #c4d6e0), color-stop(75%, #c8d9e1), to(#c2d4de));
+  cursor: default;
+  color: #ffffff;
+  background-color: transparent;
+}
+Button[TOGGLE]:selected:hover {
+  background-image: gradient(linear, left top, left bottom, from(#347ab8), color-stop(35%, #4797cc), color-stop(75%, #4b9fce), to(#489aca));
+}
+/* Link */
+Link-Hyperlink {
+  /* XXX hstaudacher Theme text decorator when bug 346438 is fixed */
+
+  color: red;
+}
+Link-Hyperlink:disabled {
+  color: #2a5a76;
+}
+/*Datefield*/
+Composite.datefield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.datefield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+Text.datefield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Text.datefield:disabled {
+  background-color: #f4f8fc;
+}
+Text.datefield[BORDER]:disabled {
+  background-color: #f4f8fc;
+}
+Button.datefield {
+  background-image: url(theme/img/button/datefield_date.png);
+  border-radius: 5px;
+  border: none;
+}
+Button.datefield:selected {
+  background-image: url(theme/img/button/datefield_date_selected.png);
+  border: none;
+}
+Button.datefield:disabled {
+  background-image: url(theme/img/button/datefield_date_disabled.png);
+  border: none;
+}
+Button.datefield:hover {
+  background-image: url(theme/img/button/datefield_date_mouse_over.png);
+  border: none;
+}
+Button-FocusIndicator.datefield {
+  background-color: transparent;
+  border: none;
+}
+/* DateChooserDialog */
+Shell.datechooser-dialog {
+  border: 2px solid #67a8ce;
+  border-radius: 0px;
+  background-color: #f4f8fc;
+}
+Composite.datechooser-dialog {
+  background-color: transparent;
+}
+Label.datechooser-dialog {
+  background-color: #f4f8fc;
+  font: bold 14px Arial, Helvetica, sans-serif;
+}
+Table.datechooser-dialog {
+  background-color: #f4f8fc;
+}
+Table-GridLine.datechooser-dialog:vertical {
+  /* XXX hstaudacher: This comment can be removed when bug 347755 is fixed.
+   At the moment the Gridline styling does not work and the datechooser has
+   white vertical gridlines instead of none
+ */
+
+  color: #f4f8fc;
+}
+TableColumn.datechooser-dialog {
+  background-image: none;
+  background-color: transparent;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  color: #000000;
+}
+Button.datechooser-dialog-last-year,
+Button.datechooser-dialog-last-year:hover {
+  background-image: url(theme/img/datetime/last-year.png);
+  border-radius: 5px;
+  border: none;
+}
+Button.datechooser-dialog-last-month,
+Button.datechooser-dialog-last-month:hover {
+  background-image: url(theme/img/datetime/last-month.png);
+  border-radius: 5px;
+  border: none;
+}
+Button.datechooser-dialog-next-year,
+Button.datechooser-dialog-next-year:hover {
+  background-image: url(theme/img/datetime/next-year.png);
+  border-radius: 5px;
+  border: none;
+}
+Button.datechooser-dialog-next-month,
+Button.datechooser-dialog-next-month:hover {
+  background-image: url(theme/img/datetime/next-month.png);
+  border-radius: 5px;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-last-year {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-last-month {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-next-year {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-next-month {
+  background-color: transparent;
+  border: none;
+}
+/*Filechooser*/
+Composite.filechooserfield_file {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.filechooserfield_file-disabled {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+Text.filechooserfield_file {
+  background-color: transparent;
+  border-radius: 5px;
+}
+Text.filechooserfield_file:disabled {
+  background-color: #f4f8fc;
+}
+Text.filechooserfield_file[BORDER]:disabled {
+  background-color: #f4f8fc;
+}
+FileUpload.filechooserfield_file {
+  background-image: url(theme/img/button/filechooserfield_file.png);
+  border-radius: 5px;
+  padding: 20px 10px;
+  /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
+
+  cursor: pointer;
+}
+FileUpload.filechooserfield_file:hover {
+  background-image: url(theme/img/button/filechooserfield_file.png);
+}
+FileUpload.filechooserfield_file:disabled {
+  background-image: url(theme/img/button/filechooserfield_file_disabled.png);
+  cursor: default;
+}
+FileUpload-FocusIndicator.filechooserfield_file {
+  background-color: transparent;
+  border: none;
+}
+FileUpload.filechooserfield_file_menu {
+  background-image: url(theme/img/button/filechooserfield_file_menu.png);
+  border-radius: 5px;
+  padding: 20px 10px;
+  /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
+
+  cursor: pointer;
+}
+FileUpload.filechooserfield_file_menu:hover {
+  background-image: url(theme/img/button/filechooserfield_file_menu.png);
+}
+FileUpload.filechooserfield_file_menu:disabled {
+  background-image: url(theme/img/button/filechooserfield_file_menu_disabled.png);
+  cursor: default;
+}
+FileUpload-FocusIndicator.filechooserfield_file_menu {
+  background-color: transparent;
+  border: none;
+}
+/* Group */
+Group {
+  color: #4a4a4a;
+  background-color: transparent;
+  /* XXX hstaudacher we need to fix the border and set the border top when bug 346630 is fixed */
+
+  border: none;
+  border-radius: 2px 2px 2px 2px;
+  font: bold 14px Arial, Helvetica, sans-serif;
+}
+Group-Frame {
+  margin: 8px 0px 0px 0px;
+  padding: 18px 11px 6px 11px;
+}
+Group-Label {
+  padding: 0px 3px 0px 3px;
+  background-color: transparent;
+  border: none;
+  color: #2a5a76;
+  margin: 1px 10px;
+}
+/* GroupBox with empty border */
+Group.empty {
+  color: #4a4a4a;
+}
+Group-Frame.empty {
+  padding: 6px 12px 6px 12px;
+  border: none;
+}
+/* Group box with line */
+Composite.groupBoxWithLineFrame {
+  padding: 6px 12px 6px 12px;
+  border: none;
+}
+Composite.groupBoxWithLineFrameContainer {
+  /* Little padding above the label */
+
+  padding: 6px 0px 0px 0px;
+}
+Label.GroupBoxLine {
+  background-color: #9cc1da;
+}
+Label.GroupBoxLabel {
+  background-color: transparent;
+  color: #2a5a76;
+  font: bold 14px Arial, Helvetica, sans-serif;
+}
+Composite.groupBoxButtonBar {
+  padding: 0px 12px 6px 12px;
+}
+/* CLabel start */
+CLabel {
+  color: #000000;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  padding: 3px;
+  cursor: default;
+  opacity: 1;
+}
+CLabel:disabled {
+  color: #2a5a76;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  cursor: default;
+  opacity: 1;
+}
+CLabel[BORDER] {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px;
+}
+/* CLabel end */
+/* Label start */
+Label {
+  color: #000000;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  text-decoration: none;
+  cursor: default;
+  opacity: 1;
+}
+Label:disabled {
+  color: #2a5a76;
+}
+Label[BORDER] {
+  border: 1px solid #a4a4a4;
+  border-radius: 2px;
+}
+Label-SeparatorLine {
+  background-image: none;
+  background-color: transparent;
+  border: 1px solid #a4a4a4;
+  border-radius: 0px;
+  width: 2px;
+}
+Label-SeparatorLine[SHADOW_IN] {
+  border: 1px inset;
+}
+Label-SeparatorLine[SHADOW_OUT] {
+  border: 1px outset;
+}
+Composite.labelfield {
+  /* a little padding to make sure the label is on the same line as the field's label */
+
+  padding: 4px 0px 0px 0px;
+}
+/* Label end */
+Button.menuButton {
+  background-image: url(theme/img/button/icon_menu.png);
+  background-color: #ffffff;
+  border-radius: 5px 5px 0px 0px;
+  color: #fe9a23;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 8px 15px;
+}
+Button.menuButton:selected,
+Button.menuButton:selected:hover,
+Button.menuButton:pressed,
+Button.menuButton:hover {
+  background-image: url(theme/img/button/icon_menu_mouse_over.png);
+}
+/* ScrollBar */
+ScrollBar {
+  background-color: transparent;
+  background-image: gradient(linear, left top, right top, from(#d4e1e7), to(#c6d6df));
+  border: none;
+  border-radius: 0px;
+  width: 15px;
+}
+ScrollBar-Thumb {
+  background-color: transparent;
+  border: none;
+  border-radius: 0px;
+}
+/* Gradients */
+ScrollBar[VERTICAL] {
+  background-image: gradient(linear, left top, right top, from(#d4e1e7), to(#c6d6df));
+}
+ScrollBar[HORIZONTAL] {
+  background-image: gradient(linear, left top, left bottom, from(#d4e1e7), to(#c6d6df));
+}
+ScrollBar-Thumb[VERTICAL] {
+  background-image: gradient(linear, left top, right top, from(#a9c7d8), to(#7cb2d1));
+}
+ScrollBar-Thumb[HORIZONTAL] {
+  background-image: gradient(linear, left top, left bottom, from(#a9c7d8), to(#7cb2d1));
+}
+ScrollBar-UpButton,
+ScrollBar-DownButton {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 0px;
+  cursor: default;
+}
+/* Icons */
+ScrollBar-Thumb-Icon[VERTICAL] {
+  background-image: none;
+}
+ScrollBar-Thumb-Icon[HORIZONTAL] {
+  background-image: none;
+}
+ScrollBar-UpButton-Icon[VERTICAL] {
+  /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+
+  background-image: url(theme/img/scrollbar/scrollbar-down-button.png);
+}
+ScrollBar-UpButton-Icon[VERTICAL]:hover {
+  /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+
+  background-image: url(theme/img/scrollbar/scrollbar-down-button.png);
+}
+ScrollBar-UpButton-Icon[HORIZONTAL] {
+  background-image: url(theme/img/scrollbar/scrollbar-right.png);
+}
+ScrollBar-UpButton-Icon[HORIZONTAL]:hover {
+  background-image: url(theme/img/scrollbar/scrollbar-right.png);
+}
+ScrollBar-DownButton-Icon[VERTICAL] {
+  /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+
+  background-image: url(theme/img/scrollbar/scrollbar-up-button.png);
+}
+ScrollBar-DownButton-Icon[VERTICAL]:hover {
+  /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+
+  background-image: url(theme/img/scrollbar/scrollbar-up-button.png);
+}
+ScrollBar-DownButton-Icon[HORIZONTAL] {
+  background-image: url(theme/img/scrollbar/scrollbar-left.png);
+}
+ScrollBar-DownButton-Icon[HORIZONTAL]:hover {
+  background-image: url(theme/img/scrollbar/scrollbar-left.png);
+}
+/* Shell */
+Shell {
+  border: none;
+  padding: 0px;
+  background-image: none;
+  opacity: 1;
+}
+Shell[TITLE],
+Shell[BORDER] {
+  background-color: #ffffff;
+  border: 2px solid #67a8ce;
+  border-radius: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+Shell[BORDER]:inactive,
+Shell[TITLE]:inactive {
+  border: 2px solid #91b8cf;
+}
+Shell:maximized,
+Shell:maximized:inactive {
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: transparent;
+}
+/* Shell titlebar */
+Shell-Titlebar {
+  font: bold 14px Arial, Helvetica, sans-serif;
+  background-color: #67a8ce;
+  color: #ffffff;
+  padding: 2px 0px 2px 13px;
+  margin: 0px;
+  height: 18px;
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-Titlebar:inactive {
+  background-color: #91b8cf;
+}
+Shell-MinButton,
+Shell-MaxButton,
+Shell-CloseButton {
+  margin: 0px;
+}
+/* Shell buttons */
+/* Minimize button */
+Shell-MinButton {
+  background-image: url(theme/img/window/shell-min.png);
+}
+Shell-MinButton:hover {
+  background-image: url(theme/img/window/shell-min-hover.png);
+}
+Shell-MinButton:inactive {
+  background-image: url(theme/img/window/shell-min.png);
+}
+Shell-MinButton:inactive:hover {
+  background-image: url(theme/img/window/shell-min-hover.png);
+}
+/* Maximize button */
+Shell-MaxButton {
+  background-image: url(theme/img/window/shell-max.png);
+}
+Shell-MaxButton:hover {
+  background-image: url(theme/img/window/shell-max-hover.png);
+}
+Shell-MaxButton:inactive {
+  background-image: url(theme/img/window/shell-max.png);
+}
+Shell-MaxButton:inactive:hover {
+  background-image: url(theme/img/window/shell-max-hover.png);
+}
+/* Restore button */
+Shell-MaxButton:maximized {
+  background-image: url(theme/img/window/shell-restore.png);
+}
+Shell-MaxButton:maximized:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png);
+}
+Shell-MaxButton:maximized:inactive {
+  background-image: url(theme/img/window/shell-restore.png);
+}
+Shell-MaxButton:maximized:inactive:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png);
+}
+/* Close button */
+Shell-CloseButton {
+  background-image: url(theme/img/window/shell-close.png);
+}
+Shell-CloseButton:hover {
+  background-image: url(theme/img/window/shell-close-hover.png);
+}
+Shell-CloseButton:inactive {
+  background-image: url(theme/img/window/shell-close.png);
+}
+Shell-CloseButton:inactive:hover {
+  background-image: url(theme/img/window/shell-close-hover.png);
+}
+Composite.smartfield {
+  /* 2px on the right side to move the button a little bit away from the border */
+
+  padding: 0px 2px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  background-image: none;
+}
+Composite.smartfield-disabled {
+  /* 2px on the right side to move the button a little bit away from the border */
+
+  padding: 0px 2px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+Text.smartfield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Text.smartfield:disabled {
+  background-color: #f4f8fc;
+}
+Button.smartfield_browse {
+  background-image: url(theme/img/button/smartfield_browse.png);
+  border-radius: 5px;
+  cursor: pointer;
+}
+Button.smartfield_browse:disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+  cursor: default;
+}
+Button.smartfield_browse:hover {
+  background-image: url(theme/img/button/smartfield_browse_mouse_over.png);
+}
+Button-FocusIndicator.smartfield_browse {
+  background-color: transparent;
+  border: none;
+}
+Button.smartfield_browse_menu {
+  background-image: url(theme/img/button/smartfield_browse_menu.png);
+  cursor: pointer;
+}
+Button.smartfield_browse_menu:disabled {
+  background-image: url(theme/img/button/smartfield_browse_menu_disabled.png);
+  cursor: default;
+}
+Button.smartfield_browse_menu:hover {
+  background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png);
+}
+Button-FocusIndicator.smartfield_browse_menu {
+  background-color: transparent;
+  border: none;
+}
+/* Popup (Smartfield...) */
+Shell.popup {
+  border: 2px solid #67a8ce;
+  border-radius: 0px;
+  background-color: #f4f8fc;
+}
+/* Popup (Smartfield...) end */
+Table.proposal-form {
+  background-color: #f4f8fc;
+}
+TableItem.proposal-form:selected {
+  color: #fe9a23;
+  background-color: #fafdff;
+}
+Tree.proposal-form {
+  background-color: #ffffff;
+}
+TreeItem.proposal-form:selected {
+  color: #fe9a23;
+  background-color: #fafdff;
+}
+/**
+ *  RwtScoutTabBox / RwtScoutTabItem     start
+ */
+Composite.tabboxContainer {
+  background-color: #cde3ee;
+}
+Composite.tabboxButton {
+  padding: 0px;
+  opacity: 1;
+  background-color: #ebf4f8;
+  background-image: none;
+  border: none;
+}
+Button.tabboxButton,
+Button.tabboxButton:selected,
+Button.tabboxButton:selected:hover,
+Button.tabboxButton:pressed,
+Button.tabboxButton:hover {
+  background-image: none;
+  border: none;
+  text-shadow: none;
+  color: #295973;
+  padding: 8px 15px;
+  font: 14px Arial, Helvetica, sans-serif;
+  padding: 6px 8px 7px 8px;
+}
+Button.tabboxButton-marked,
+Button.tabboxButton-marked:selected,
+Button.tabboxButton-marked:selected:hover,
+Button.tabboxButton-marked:pressed,
+Button.tabboxButton-marked:hover {
+  background-image: url(theme/img/button/icon_changed.png);
+  /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
+
+  /* background-position: bottom right; /* XXX Currently not supported by RAP */
+
+  border: none;
+  text-shadow: none;
+  color: #295973;
+  padding: 8px 15px;
+  font: 14px Arial, Helvetica, sans-serif;
+  padding: 6px 6px 7px 10px;
+}
+Button.tabboxButton-active,
+Button.tabboxButton-active:pressed,
+Button.tabboxButton-active:selected,
+Button.tabboxButton-active:selected:hover,
+Button.tabboxButton-active:hover {
+  background-image: none;
+  background-color: #ebf4f8;
+  border-radius: 5px 5px 0px 0px;
+  border: none;
+  text-shadow: none;
+  color: #000000;
+  font: 14px Arial, Helvetica, sans-serif;
+  padding: 6px 8px 7px 8px;
+}
+Button.tabboxButton-active-marked,
+Button.tabboxButton-active-marked:pressed,
+Button.tabboxButton-active-marked:selected,
+Button.tabboxButton-active-marked:selected:hover,
+Button.tabboxButton-active-marked:hover {
+  background-image: url(theme/img/button/icon_changed-marked.png);
+  /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
+
+  /* background-position: bottom right; /* XXX Currently not supported by RAP */
+
+  /* background-color: @light-tabbox-background-blue; /* XXX Would work in FF and Webkit, but not in IE. A svg element is generated which does not include bg color. Workaround: bg is set in image */
+
+  border-radius: 5px 5px 0px 0px;
+  border: none;
+  text-shadow: none;
+  color: #000000;
+  font: 14px Arial, Helvetica, sans-serif;
+  padding: 6px 6px 7px 10px;
+}
+Button-FocusIndicator.tabboxButton-active,
+Button-FocusIndicator.tabboxButton-active-marked {
+  border: none;
+}
+/** RwtScoutTabBox / RwtScoutTabItem  end */
+/* Table */
+Table {
+  background-color: #ffffff;
+  background-image: none;
+  color: #4a4a4a;
+  border: none;
+  padding: 0px;
+}
+Table:disabled {
+  background-color: #f4f8fc;
+  background-image: none;
+  color: #2a5a76;
+  border: none;
+  padding: 0px;
+}
+Table[BORDER] {
+  border: none;
+}
+/* Shouldn't actually be necessary because it's already declared in table.default.less of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which overrides selection and hover state. */
+Table-RowOverlay {
+  background-color: transparent;
+  color: inherit;
+  background-image: none;
+}
+Composite.tableField {
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  padding: 2px;
+}
+Composite.tableFieldDisabled {
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+  padding: 2px;
+}
+Composite.outlineTableStatus {
+  background-color: #ebf4f8;
+}
+Label.outlineTableStatus {
+  color: #264159;
+  border: 3px solid transparent;
+}
+Label.outlineTableStatus_warning {
+  color: #fe9a23;
+}
+Label.outlineTableStatus_error {
+  color: #cb2020;
+}
+/* Composite.tableStatusContainer{ */
+/*   padding: 2px 0px 0px 0px; */
+/* } */
+Composite.tableStatus {
+  background-color: #ddebf4;
+}
+Label.tableStatus {
+  color: #264159;
+  border: 3px solid transparent;
+}
+Label.tableStatus_warning {
+  color: #fe9a23;
+}
+Label.tableStatus_error {
+  color: #cb2020;
+}
+TableColumn {
+  font: bold 14px Arial, Helvetica, sans-serif;
+  background-color: #ffffff;
+  padding: 9px 4px 5px 4px;
+  background-image: none;
+  color: #000000;
+  border-bottom: 1px solid #e1efec;
+  /* XXX hstaudacher we need to theme the column separator when bug 347771 is fixed */
+
+}
+/* Workaround for malfunctioning ":disabled" behaviour, see comment in org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable.setEnabledFromScout(boolean) */
+TableColumn.customDisabled {
+  color: #2a5a76;
+}
+TableColumn:hover {
+  background-image: none;
+  border-bottom: 1px solid #e1efec;
+}
+TableItem {
+  background-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+TableItem:hover {
+  background-color: #f1f8fe;
+}
+TableItem:selected {
+  color: inherit;
+  background-color: #e5f3fe;
+}
+TableItem:selected:unfocused {
+  color: inherit;
+  background-color: #e5f3fe;
+}
+TableColumn-SortIndicator {
+  background-image: none;
+}
+TableColumn-SortIndicator:up {
+  background-image: url(theme/img/column/table_sort_asc.png);
+}
+TableColumn-SortIndicator:down {
+  background-image: url(theme/img/column/table_sort_desc.png);
+}
+Table-Cell {
+  spacing: 3px;
+  padding: 4px 3px 3px 3px;
+}
+Table-GridLine {
+  color: transparent;
+}
+Table-GridLine:header {
+  color: #e1efec;
+}
+Table-GridLine:horizontal {
+  color: #e1efec;
+}
+Table-Checkbox {
+  /**
+ * For backward compatibility we have to keep the width property.
+ * Deprecated, use "margin" instead.
+ **/
+
+  width: 21px;
+  margin: 0px;
+  background-image: url(theme/img/button/check_box.png);
+}
+Table-Checkbox:disabled {
+  background-image: url(theme/img/button/check_box_disabled.png);
+}
+Table-Checkbox:selected {
+  background-image: url(theme/img/button/check_box_selected.png);
+}
+Table-Checkbox:selected:disabled {
+  background-image: url(theme/img/button/check_box_disabled_selected.png);
+}
+/* Text */
+Text {
+  border: none;
+  padding: 0px 3px;
+  background-image: none;
+  color: #464a4e;
+  background-color: #ffffff;
+}
+Text:disabled {
+  border: none;
+  padding: 0px 3px;
+  background-image: none;
+  background-color: #f4f8fc;
+  color: #2a5a76;
+}
+Text[SINGLE][BORDER] {
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Text[SINGLE][BORDER]:disabled {
+  border: 1px solid #c9dadf;
+  background-color: #f4f8fc;
+}
+Text[SINGLE][BORDER]:read-only {
+  border: 1px solid #c9dadf;
+}
+Text[MULTI][BORDER] {
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  /*
+ * padding currently has no effect because of bug 253644
+ * [TODO] remove comment if bug fixed
+ */
+
+  padding: 0px 0px 0px 4px;
+}
+Text[MULTI][BORDER]:disabled {
+  border: 1px solid #c9dadf;
+  background-color: #f4f8fc;
+}
+Text[MULTI][BORDER]:read-only {
+  border: 1px solid #c9dadf;
+}
+Text-Message {
+  color: #a7a6aa;
+}
+/*Timefield*/
+Composite.timefield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.timefield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+Text.timefield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Text.timefield:disabled {
+  background-color: #f4f8fc;
+}
+Text.timefield[BORDER]:disabled {
+  background-color: #f4f8fc;
+}
+Button.timefield {
+  background-image: url(theme/img/button/datefield_time.png);
+  border-radius: 5px;
+  border: none;
+}
+Button.timefield:selected {
+  background-image: url(theme/img/button/datefield_time_selected.png);
+  border: none;
+}
+Button.timefield:disabled {
+  background-image: url(theme/img/button/datefield_time_disabled.png);
+  border: none;
+}
+Button.timefield:hover {
+  background-image: url(theme/img/button/datefield_time_mouse_over.png);
+  border: none;
+}
+Button-FocusIndicator.timefield {
+  background-color: transparent;
+  border: none;
+}
+/* TimeChooserDialog */
+Shell.timechooser-dialog {
+  border: 2px solid #67a8ce;
+  border-radius: 0px;
+  background-color: #f4f8fc;
+}
+Composite.timechooser-dialog {
+  background-color: transparent;
+}
+Composite.toolButtonBar {
+  background-image: none;
+  background-color: #67a8ce;
+  border-radius: 5px 0px 0px 0px;
+}
+Composite.toolButtonBar-active {
+  background-image: none;
+  background-color: #67a8ce;
+  /* XXX hstaudacher new radius is not applied on the client. Should be fixed automatically with bug 346683 */
+
+  border-radius: 5px 0px 0px 0px;
+}
+Button.toolButtonBarCollapseButton {
+  background-image: url(theme/img/button/icon_slider.png);
+  background-color: #67a8ce;
+  border: none;
+  /*   padding: 8px 15px; */
+
+  /*   border-radius: 0px 0px 0px 0px; */
+
+}
+Button.toolButtonBarCollapseButton:pressed,
+Button.toolButtonBarCollapseButton:selected,
+Button.toolButtonBarCollapseButton:selected:hover,
+Button.toolButtonBarCollapseButton:hover {
+  background-image: url(theme/img/button/icon_slider_mouse_over.png);
+  border: none;
+}
+Button.toolButton {
+  background-image: none;
+  color: #000000;
+}
+Button.toolButton:selected,
+Button.toolButton:selected:hover,
+Button.toolButton:pressed,
+Button.toolButton:hover {
+  background-image: none;
+}
+Button-FocusIndicator.toolButton {
+  background-color: transparent;
+  border: none;
+}
+Button.toolButton-active {
+  background-image: none;
+  background-color: #cde3ee;
+  border-radius: 5px 5px 0px 0px;
+  color: #fe9a23;
+  font: bold 14px Arial, Helvetica, sans-serif;
+}
+Button-FocusIndicator.toolButton-active {
+  background-color: transparent;
+  border: none;
+}
+Button.toolButton-active:pressed,
+Button.toolButton-active:selected,
+Button.toolButton-active:selected:hover,
+Button.toolButton-active:hover {
+  background-image: none;
+}
+Label.toolButton {
+  background-image: none;
+  background-color: #67a8ce;
+  border-radius: 5px 0px 0px 0px;
+  color: #ffffff;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+/* ToolTip */
+ToolTip {
+  cursor: default;
+  border: 1px solid #a4a4a4;
+  border-radius: 5px 5px 5px 5px;
+  padding: 3px 3px 3px 3px;
+  opacity: 1;
+  color: #000000;
+  background-image: gradient(linear, left top, left bottom, from(#ffffff), to(#e4e5f0));
+  background-color: #fcfcfc;
+  animation: fadeIn 200ms linear, fadeOut 600ms ease-out;
+}
+ToolTip-Image[ICON_ERROR] {
+  /*   background-image: url( theme/img/tooltip/error.png ); */
+
+}
+ToolTip-Image[ICON_INFORMATION] {
+  /*   background-image: url( theme/img/tooltip/information.png ); */
+
+}
+ToolTip-Image[ICON_WARNING] {
+  /*   background-image: url( theme/img/tooltip/warning.png ); */
+
+}
+ToolTip-Text {
+  color: #003399;
+}
+ToolTip-Message {
+  color: #000000;
+}
+/* Tree */
+Tree {
+  background-color: #ffffff;
+  background-image: none;
+  color: #4a4a4a;
+  border: none;
+  padding: 0px;
+}
+Tree:disabled {
+  background-color: #f4f8fc;
+  background-image: none;
+  color: #2a5a76;
+  border: none;
+  padding: 0px;
+}
+Tree[BORDER] {
+  border: none;
+}
+/* Shouldn't actually be necessary because it's already declared in tree.default.less of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which overrides selection and hover state. */
+Tree-RowOverlay {
+  background-color: transparent;
+  color: inherit;
+  background-image: none;
+}
+Composite.treeField {
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  padding: 2px;
+}
+Composite.treeFieldDisabled {
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+  padding: 2px;
+}
+TreeItem {
+  background-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+TreeItem:disabled {
+  /* XXX hstaudacher does not work atm. Should be fixed with bug 347934 */
+
+  background-color: transparent;
+  color: #2a5a76;
+  text-decoration: none;
+}
+TreeItem:hover {
+  background-color: transparent;
+}
+TreeItem:selected {
+  background-color: #e5f3fe;
+  color: #000000;
+}
+TreeItem:selected:unfocused {
+  background-color: #e5f3fe;
+  color: #000000;
+}
+TreeItem:linesvisible:even {
+  background-color: #f3f3f4;
+}
+TreeItem:linesvisible:even:hover {
+  background-color: #dae9f7;
+}
+TreeItem:linesvisible:even:selected {
+  background-color: #00589f;
+  color: #ffffff;
+}
+TreeItem:linesvisible:even:selected:unfocused {
+  background-color: #959595;
+  color: #ffffff;
+}
+TreeColumn {
+  background-color: #f8f8ff;
+  padding: 1px 2px;
+  background-image: gradient(linear, left top, left bottom, from(#fbfcfd), to(#ececec));
+  color: #666666;
+  border-bottom: none;
+}
+TreeColumn:disabled {
+  color: #2a5a76;
+}
+TreeColumn:hover {
+  background-image: gradient(linear, left top, left bottom, from(#f4f5f6), to(#e6e6e6));
+  border-bottom: none;
+}
+TreeColumn-SortIndicator {
+  background-image: none;
+}
+TreeColumn-SortIndicator:up {
+  background-image: url(theme/img/column/table_sort_asc.png);
+}
+TreeColumn-SortIndicator:down {
+  background-image: url(theme/img/column/table_sort_desc.png);
+}
+Tree-Cell {
+  spacing: 3px;
+  padding: 3px;
+}
+Tree-GridLine {
+  color: #d2d2d2;
+}
+Tree-GridLine:horizontal {
+  color: transparent;
+}
+Tree-Checkbox {
+  margin: 0px 2px 0px 0px;
+  background-image: url(theme/img/button/check_box.png);
+}
+Tree-Checkbox:disabled {
+  background-image: url(theme/img/button/check_box_disabled.png);
+}
+Tree-Checkbox:selected {
+  background-image: url(theme/img/button/check_box_selected.png);
+}
+Tree-Checkbox:selected:disabled {
+  background-image: url(theme/img/button/check_box_disabled_selected.png);
+}
+Tree-Indent {
+  width: 20px;
+  background-image: url(theme/img/tree/tree-indent.png);
+}
+Tree-Indent:collapsed {
+  background-image: url(theme/img/tree/tree-indent-collapsed.png);
+}
+Tree-Indent:collapsed:hover {
+  background-image: url(theme/img/tree/tree-indent-collapsed.png);
+}
+Tree-Indent:expanded {
+  background-image: url(theme/img/tree/tree-indent-expanded.png);
+}
+Tree-Indent:expanded:hover {
+  background-image: url(theme/img/tree/tree-indent-expanded.png);
+}
+Tree-Indent:line {
+  background-image: url(theme/img/tree/tree-indent-line.png);
+}
+Tree-Indent:first {
+  background-image: url(theme/img/tree/tree-indent-first.png);
+}
+Tree-Indent:first:collapsed {
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+}
+Tree-Indent:first:collapsed:hover {
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+}
+Tree-Indent:first:expanded {
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+}
+Tree-Indent:first:expanded:hover {
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+}
+Tree-Indent:last {
+  background-image: url(theme/img/tree/tree-indent-last.png);
+}
+Tree-Indent:last:collapsed {
+  background-image: url(theme/img/tree/tree-indent-collapsed-last.png);
+}
+Tree-Indent:last:collapsed:hover {
+  background-image: url(theme/img/tree/tree-indent-collapsed-last.png);
+}
+Tree-Indent:last:expanded {
+  background-image: url(theme/img/tree/tree-indent-expanded.png);
+}
+Tree-Indent:last:expanded:hover {
+  background-image: url(theme/img/tree/tree-indent-expanded.png);
+}
+Tree-Indent:first:last {
+  background-image: none;
+}
+Tree-Indent:first:last:collapsed {
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+}
+Tree-Indent:first:last:collapsed:hover {
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+}
+Tree-Indent:first:last:expanded {
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+}
+Tree-Indent:first:last:expanded:hover {
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+}
+Composite.toolbarContainer {
+  background-color: #ddebf4;
+}
+Button.viewButton {
+  background-image: none;
+  color: #000000;
+  padding: 6px 15px;
+  font: 14px Arial, Helvetica, sans-serif;
+}
+Button.viewButton:selected,
+Button.viewButton:selected:hover,
+Button.viewButton:pressed,
+Button.viewButton:hover {
+  background-image: none;
+}
+Button.viewButton-active {
+  background-image: none;
+  background-color: #ffffff;
+  border-radius: 5px 5px 0px 0px;
+  color: #fe9a23;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 6px 15px;
+}
+Button-FocusIndicator.viewButton-active {
+  border: none;
+}
+Button.viewButton-active:pressed,
+Button.viewButton-active:selected,
+Button.viewButton-active:selected:hover,
+Button.viewButton-active:hover {
+  background-image: none;
+}
+Composite.formTabArea {
+  background-color: #ddebf4;
+}
+Composite.formTab {
+  background-color: transparent;
+  border-radius: 8px 8px 0px 0px;
+  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+
+  padding: 2px 5px 0px 5px;
+}
+Composite.formTab-active {
+  background-color: #ffffff;
+  border-radius: 8px 8px 0px 0px;
+  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+
+  padding: 2px 5px 0px 5px;
+}
+Button.formTabClose {
+  background-color: transparent;
+  background-image: url(theme/img/form/form-close.png);
+  padding: 2px 5px 0px 6px;
+}
+Button.formTabClose:hover {
+  background-color: transparent;
+  background-image: url(theme/img/form/form-close-hover.png);
+}
+Button.formTabActivate {
+  background-image: none;
+  background-color: transparent;
+  color: #2a5a76;
+  padding: 2px 5px 0px 6px;
+}
+Button.formTabActivate:hover {
+  background-image: none;
+  background-color: transparent;
+  color: #2a5a76;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 2px 5px 0px 6px;
+}
+Button.formTabActivate-active {
+  background-image: none;
+  background-color: transparent;
+  color: #2a5a76;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 2px 5px 0px 6px;
+}
+Button.formTabActivate-active:hover {
+  background-image: none;
+  background-color: transparent;
+  color: #2a5a76;
+  font: bold 14px Arial, Helvetica, sans-serif;
+  padding: 2px 5px 0px 6px;
+}
+Button-FocusIndicator.formTabActivate-active {
+  border: none;
+}
+Composite.viewsArea {
+  background-color: #FFFFFF;
+  padding: 0px 0px 0px 0px;
+}
+Composite.viewPart {
+  border: 0px;
+  border-radius: 0px;
+}
+Composite.viewPartNoRadius {
+  border: 0px;
+}
+Sash {
+  background-color: #bbcddb;
+}
+Composite.mobileFormHeader {
+  background-color: #67a8ce;
+}
+CLabel.mobileFormHeader {
+  color: white;
+  padding: 3px 0px;
+  text-shadow: 0px -1px 0px #2a78a5;
+  font: bold 17px Arial, Helvetica, sans-serif;
+  background-color: transparent;
+}
+Composite.mobileFormFooter {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
+Composite.smartFieldActionBar {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
+CLabel {
+  /* Top and bottom padding depend on logical grid row height. The text of the label should be aligned with the text of the field. */
+
+  padding: 5px 3px;
+}
+Button.datechooser-dialog-last-year,
+Button.datechooser-dialog-last-year:hover {
+  background-image: url(theme/img/datetime/last-year_30x30.png);
+}
+Button.datechooser-dialog-last-month,
+Button.datechooser-dialog-last-month:hover {
+  background-image: url(theme/img/datetime/last-month_30x30.png);
+}
+Button.datechooser-dialog-next-year,
+Button.datechooser-dialog-next-year:hover {
+  background-image: url(theme/img/datetime/next-year_30x30.png);
+}
+Button.datechooser-dialog-next-month,
+Button.datechooser-dialog-next-month:hover {
+  background-image: url(theme/img/datetime/next-month_30x30.png);
+}
+Button[PUSH],
+Button[TOGGLE],
+Button[BORDER] {
+  font: bold 12px Arial, Helvetica, sans-serif;
+  background-image: gradient(linear, left top, left bottom, from(#53a4d3), to(#4890ba));
+  border: 1px solid #3a7597;
+}
+Button[PUSH]:disabled,
+Button[TOGGLE]:disabled {
+  text-shadow: 0px 1px 0px #fff;
+}
+Button[PUSH]:hover {
+  background-image: gradient(linear, left top, left bottom, from(#fe9915), to(#be7414));
+  border: 1px solid #91560a;
+}
+Button-FocusIndicator[PUSH],
+Button-FocusIndicator[TOGGLE] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Button-FocusIndicator[CHECK] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Button-FocusIndicator[RADIO] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Composite.smartfield {
+  padding: 0px;
+}
+Composite.smartfield-disabled {
+  padding: 0px;
+}
+Composite.smartfield:hover {
+  background-color: #fef9f1;
+}
+Text.smartfield {
+  padding: 0px;
+}
+Composite.smartfield_browse {
+  background-image: url(theme/img/button/smartfield_browse.png);
+}
+Composite.smartfield_browse-disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+}
+Composite.datefield_icon {
+  background-image: url(theme/img/button/datefield_date.png);
+  border-radius: 5px;
+  border: none;
+}
+Text.datefield {
+  padding: 0px;
+}
+Composite.datefield:hover {
+  background-color: #fef9f1;
+}
+Composite.datefield_icon-disabled {
+  background-image: url(theme/img/button/datefield_date_disabled.png);
+  border: none;
+}
+Composite.timefield:hover {
+  background-color: #fef9f1;
+}
+Text.timefield {
+  padding: 0px;
+}
+Composite.timefield_icon {
+  background-image: url(theme/img/button/datefield_time.png);
+  border-radius: 5px;
+  border: none;
+}
+Composite.timefield_icon-disabled {
+  background-image: url(theme/img/button/datefield_time_disabled.png);
+  border: none;
+}
+ScrollBar {
+  width: 0px;
+}
+Shell[BORDER] {
+  box-shadow: 5px 5px 4px 0px #3f3f3f;
+  animation: none;
+}
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: #565656;
+  opacity: 0.5;
+}
+Menu {
+  color: white;
+  font: bold 12px Arial, Helvetica, sans-serif;
+  background-image: gradient(linear, left top, left bottom, from(#53a4d3), to(#4890ba));
+  border: 1px solid #3a7597;
+  border-radius: 5px;
+}
+MenuItem {
+  color: white;
+}
+MenuItem:disabled {
+  color: #33637f;
+}
+MenuItem:hover {
+  background-image: gradient(linear, left top, left bottom, from(#fe9915), to(#be7414));
+  color: white;
+}
+MenuItem-CheckIcon {
+  background-image: url(theme/img/menu/checkbox-white.gif);
+}
+MenuItem-RadioIcon {
+  background-image: url(theme/img/menu/radiobutton-white.gif);
+}
+MenuItem-CascadeIcon {
+  background-image: url(theme/img/menu/arrow-white.gif);
+}
+Text {
+  padding: 0px 6px;
+}
+Composite.form {
+  background-color: #ebf4f8;
+}
+Shell.busy-dialog {
+  border-radius: 3px;
+  border: 1px solid #3a7597;
+  background-color: #67a8ce;
+}
+Label.busy-dialog {
+  color: white;
+}
+Label.outlineTableStatus {
+  color: #2a5a76;
+}
+Label.tableStatus {
+  color: #2a5a76;
+}

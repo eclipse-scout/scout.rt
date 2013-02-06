@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.rt.ui.rap.formfields">
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.svg.client.svgfield.ISvgField"
+            name="Scout SVG field">
+         <uiClass
+               class="org.eclipse.scout.svg.ui.rap.svgfield.RwtScoutSvgField">
+         </uiClass>
+      </formField>
+   </extension>
+   <extension
+         point="org.eclipse.scout.rt.ui.rap.formfields">
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField"
+            name="Scout Calendar field">
+         <uiClass
+               class="org.eclipse.scout.svg.ui.rap.calendarfield.RwtScoutCalendarField">
+         </uiClass>
+      </formField>
+   </extension>
+
+   <extension
+         id="app"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="false">
+         <run
+               class="org.eclipse.scout.svg.ui.rap.internal.TestApplication">
+         </run>
+      </application>
+   </extension>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.scout.svg.ui.swt.app"
+            name="SVG SWT Test">
+         <property
+               name="appName"
+               value="SVG SWT Test">
+         </property>
+      </product>
+   </extension>
+
+</plugin>
+
+
+
+

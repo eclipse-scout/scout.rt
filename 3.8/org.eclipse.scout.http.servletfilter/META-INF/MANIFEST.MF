@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout OSGi Servlet Filter Extension
+Bundle-SymbolicName: org.eclipse.scout.http.servletfilter;singleton:=true
+Bundle-Version: 3.8.2.qualifier
+Bundle-Activator: org.eclipse.scout.http.servletfilter.internal.Activator
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.equinox.http.registry,
+ org.eclipse.scout.commons
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.http.servletfilter,
+ org.eclipse.scout.http.servletfilter.helper,
+ org.eclipse.scout.http.servletfilter.security
+Import-Package: javax.servlet,
+ javax.servlet.http

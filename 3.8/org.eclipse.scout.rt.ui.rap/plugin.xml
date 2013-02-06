@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2011 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<plugin>
+  <extension-point id="org.eclipse.scout.rt.ui.rap.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
+  <extension-point id="org.eclipse.scout.rt.ui.rap.lookAndFeel" name="lookAndFeel" schema="schema/lookAndFeel.exsd"/>
+  <extension-point id="org.eclipse.scout.rt.ui.rap.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
+  <extension point="org.eclipse.scout.service.services">
+    <service class="org.eclipse.scout.rt.ui.rap.services.common.clipboard.RwtScoutClipboardService" />
+    <service class="org.eclipse.scout.rt.ui.rap.services.common.icon.RwtBundleIconProviderService"
+              createImmediately="false"
+              factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+              ranking="-1000">
+    </service>
+    <service class="org.eclipse.scout.rt.ui.rap.services.common.patchedclass.PatchedClassService"
+             createImmediately="true">
+    </service>
+  </extension>
+
+  <extension point="org.eclipse.ui.activities">
+    <activity
+        name="Remove Unused Icons Manager"
+        id="activity.removeUnusedIcons" />
+    <activityPatternBinding
+        activityId="activity.removeUnusedIcons"
+        pattern="org\.eclipse\.ui\.editors/org\.eclipse\.ui\.edit\.text\.gotoLastEditPosition" />
+    <activityPatternBinding
+        activityId="activity.removeUnusedIcons"
+        pattern="org.eclipse.ui.editors/org.eclipse.ui.edit.text.*nnotation" />
+  </extension>
+
+  <extension point="org.eclipse.ui.bindings">
+    <scheme
+        id="org.eclipse.scout.rt.ui.rap.keybindings.scheme"
+        name="Scout SWT Keybindings Scheme">
+    </scheme>
+  </extension>
+  <extension
+        point="org.eclipse.scout.rt.ui.rap.formfields">
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.IFormField"
+            name="Unknown Control"
+            scope="default">
+            <uiClass
+                  class="org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutUnknownControl">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox"
+            name="Tab box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.tabbox.RwtScoutTabBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"
+            name="Group box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.groupbox.RwtScoutGroupBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.snapbox.ISnapBox"
+            name="Snap box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.snapbox.RwtScoutSnapBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
+            name="Smart field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.smartfield.RwtScoutSmartField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox"
+            name="List Box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.listbox.RwtScoutListBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"
+            name="Tree box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.treebox.RwtScoutTreeBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
+            name="Date field"
+            scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.rap.form.fields.datefield.DateFieldFactory">
+        </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"
+            name="Table field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"
+            name="Tree field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.treefield.RwtScoutTreeField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
+            name="Boolean field, checkbox"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.checkbox.RwtScoutCheckbox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField"
+            name="Decimal field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.decimalfield.RwtScoutDecimalField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"
+            name="Label field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.labelfield.RwtScoutLabelField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField"
+            name="Number field"
+            scope="default">
+          <uiClass
+            class="org.eclipse.scout.rt.ui.rap.form.fields.numberfield.RwtScoutNumberField">
+          </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup"
+            name="Radio button group"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.radiobuttongroup.RwtScoutRadioButtonGroup">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox"
+            name="Sequence box"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.sequencebox.RwtScoutSequenceBox">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox"
+            name="Split box"
+            scope="default">
+          <uiClass
+            class="org.eclipse.scout.rt.ui.rap.form.fields.splitbox.RwtScoutSplitBox">
+          </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"
+            name="Image field"
+            scope="default">
+          <uiClass
+            class="org.eclipse.scout.rt.ui.rap.form.fields.imagebox.RwtScoutImageField">
+          </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField"
+            name="Wrapped form field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.wrappedformfield.RwtScoutWrappedFormField">
+            </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField"
+            name="Browser field"
+            scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.browserfield.RwtScoutBrowserField">
+        </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"
+            name="Html field"
+            scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.htmlfield.RwtScoutHtmlField">
+        </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField"
+            name="String field"
+            scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.stringfield.RwtScoutStringField">
+        </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
+            name="Button"
+            scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.rap.form.fields.button.ButtonFieldFactory">
+        </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField"
+            name="Placeholder"
+            scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.placeholder.RwtScoutPlaceholderField">
+        </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"
+            name="Composer field">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.composer.RwtScoutComposerField">
+        </uiClass>
+      </formField>
+  </extension>
+  <extension
+        point="org.eclipse.scout.rt.ui.rap.lookAndFeel">
+      <decorations
+            scope="default">
+        <mandatory>
+            <labelFont>
+            </labelFont>
+            <starMarker
+                  placement="afterLabel">
+            </starMarker>
+        </mandatory>
+      </decorations>
+      <properties
+            scope="default">
+        <property
+              name="logicalGridLayout.defaultColumnWidth"
+              value="360">
+        </property>
+        <property
+              name="logicalGridLayout.defaultPopupWidth"
+              value="230">
+        </property>
+        <property
+              name="logicalGridLayout.verticalGap"
+              value="6">
+        </property>
+        <property
+              name="logicalGridLayout.rowHeight"
+              value="23">
+        </property>
+        <property
+              name="logicalGridLayout.horizontalGap"
+              value="12">
+        </property>
+        <property
+              name="formFieldLabel.width"
+              value="130">
+        </property>
+        <property
+              name="formMainBoxBorder.visible"
+              value="false">
+        </property>
+        <property
+              name="processButton.height"
+              value="23">
+        </property>
+        <property
+              name="processButton.minWidth"
+              value="80">
+        </property>
+        <property
+              name="processButton.maxWidth"
+              value="250">
+        </property>
+        <property
+              name="color.forground.disabled"
+              value="2A5A76">
+        </property>
+        <property
+              name="formFieldLabel.alignment"
+              value="left">
+        </property>
+        <property
+              name="formfield.selectAllOnFocus.enabled"
+              value="true">
+        </property>
+        <property
+              name="dndSupport.enabled"
+              value="true">
+        </property>
+        <property
+              name="table.row.height"
+              value="23">
+        </property>
+        <property
+              name="tree.node.height"
+              value="23">
+        </property>
+        <property
+              name="browserHistory.enabled"
+              value="true">
+        </property>
+      </properties>
+  </extension>
+
+  <extension
+        point="org.eclipse.equinox.http.registry.filters">
+      <filter
+            alias="/"
+            class="org.eclipse.scout.rt.ui.rap.internal.servletfilter.DelegateFilter"
+            httpcontextId="org.eclipse.rap.httpcontext">
+      </filter>
+  </extension>
+
+  <extension point="org.eclipse.scout.http.servletfilter.filters">
+    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter" ranking="1000010">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter
+          aliases="/"
+          class="org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter"
+          ranking="-1000000">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+  </extension>
+
+</plugin>

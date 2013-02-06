@@ -1,0 +1,15 @@
+07.02.2012 abr
+Bugzilla: 370873
+Batik-based SVG integration must stop processing and dispose objects
+The processing thread created by a Batik JSVGCanvas must be stopped and the widget must be disposed.
+And Batik BridgeContext objects should be disposed to help cleaning-up the heap.
+Migration:
+Switch from
+  org.eclipse.scout.svg.client.SVGUtility.readSVGDocument(InputStream, boolean)
+either to (if no CSS, text size and and bounding box operations are required)
+  org.eclipse.scout.svg.client.SVGUtility.readSVGDocument(InputStream)
+or to (for performing CSS, text size and and bounding box operations)
+  org.eclipse.scout.svg.client.SVGUtility.readSVGDocumentForGraphicalModification(InputStream)
+The latter method returns a BridgeContext that must be disposed (BridgeContext.dispose()) when it is
+not required anymore. The actual SVG document is referenced by the bridge context as well:
+  (SVGDocument) bridgeContext.getDocument()

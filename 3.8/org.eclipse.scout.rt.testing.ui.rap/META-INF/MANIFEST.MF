@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Runtime RAP Testing
+Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.rap;singleton:=true
+Bundle-Version: 3.8.2.qualifier
+Bundle-Activator: org.eclipse.scout.rt.testing.ui.rap.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.testing.client;bundle-version="1.0.0";visibility:=reexport,
+ org.eclipse.scout.rt.testing.shared;bundle-version="1.0.0";visibility:=reexport,
+ org.eclipse.scout.rt.ui.rap;bundle-version="3.7.0";visibility:=reexport,
+ com.thoughtworks.selenium;bundle-version="2.21.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project
+Export-Package: org.eclipse.scout.rt.testing.ui.rap
+Import-Package: com.google.common.base;version="12.0.0"

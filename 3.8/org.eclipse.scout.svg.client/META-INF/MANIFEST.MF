@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Client SVG Field
+Bundle-SymbolicName: org.eclipse.scout.svg.client;singleton:=true
+Bundle-Version: 3.8.2.qualifier
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.commons;bundle-version="3.7.0";visibility:=reexport,
+ org.eclipse.scout.rt.client;bundle-version="3.7.0";visibility:=reexport,
+ org.w3c.dom.svg;bundle-version="1.1.0";visibility:=reexport,
+ org.apache.batik.bridge;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.css;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.dom;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.dom.svg;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.ext.awt;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.parser;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.svggen;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.swing;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.transcoder;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.util;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.util.gui;bundle-version="1.6.0";visibility:=reexport,
+ org.apache.batik.xml;bundle-version="1.6.0";visibility:=reexport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Export-Package: org.eclipse.scout.svg.client,
+ org.eclipse.scout.svg.client.svgfield

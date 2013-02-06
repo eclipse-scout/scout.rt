@@ -1,0 +1,326 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.ui.rap" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.scout.rt.ui.rap" id="lookAndFeel" name="Look and feel"/>
+      </appinfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="decorations" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="properties" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="properties">
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="property"/>
+         </sequence>
+         <attribute name="scope" use="required">
+            <annotation>
+               <documentation>
+                  Specifies the scope for which the properties should be valid. The following values are possible:
+&lt;ul&gt;
+  &lt;li&gt;
+  &lt;b&gt;default:&lt;/b&gt; Indicates that the properties are used as default. This scope is typcially used by scout and should not be set by the application.
+  &lt;/li&gt;
+  &lt;li&gt;
+  &lt;b&gt;global:&lt;/b&gt; Indicates that the properties have a global scope. Properties with global scope override default properties.
+  &lt;/li&gt;
+&lt;/ul&gt;
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="global">
+                  </enumeration>
+                  <enumeration value="default">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="deviceType" type="string">
+            <annotation>
+               <documentation>
+                  Specifies for which device types the properties should be valid.&lt;p&gt;
+
+The value can be either &lt;b&gt;desktop, tablet, mobile&lt;/b&gt; or basically any value which matches IUiDeviceType#getIdentifier(). It&apos;s also possible to use &lt;b&gt;touch&lt;/b&gt; as value which covers every device type which returns true for IUiDeviceType#isTouchDevice().&lt;p&gt;
+
+If no value is specified the properties are valid for all device types.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="property">
+      <complexType>
+         <attribute name="name" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="browserHistory.enabled">
+                  </enumeration>
+                  <enumeration value="color.forground.disabled">
+                  </enumeration>
+                  <enumeration value="dialog.minWidth">
+                  </enumeration>
+                  <enumeration value="dialog.minHeight">
+                  </enumeration>
+                  <enumeration value="dndSupport.enabled">
+                  </enumeration>
+                  <enumeration value="formfield.selectAllOnFocus.enabled">
+                  </enumeration>
+                  <enumeration value="formFieldLabel.width">
+                  </enumeration>
+                  <enumeration value="formFieldLabel.alignment">
+                  </enumeration>
+                  <enumeration value="formMainBoxBorder.visible">
+                  </enumeration>
+                  <enumeration value="messageBox.minWidth">
+                  </enumeration>
+                  <enumeration value="messageBox.minHeight">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.defaultColumnWidth">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.defaultPopupWidth">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.rowHeight">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.horizontalGap">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.verticalGap">
+                  </enumeration>
+                  <enumeration value="processButton.height">
+                  </enumeration>
+                  <enumeration value="processButton.minWidth">
+                  </enumeration>
+                  <enumeration value="processButton.maxWidth">
+                  </enumeration>
+                  <enumeration value="table.row.height">
+                  </enumeration>
+                  <enumeration value="tree.node.height">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="decorations">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="mandatory" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="scope" use="required">
+            <annotation>
+               <documentation>
+                  Specifies the scope for which the decorations should be valid. The following values are possible:
+&lt;ul&gt;
+  &lt;li&gt;
+  &lt;b&gt;default:&lt;/b&gt; Indicates that the decorations are used as default. This scope is typcially used by scout and should not be set by the application.
+  &lt;/li&gt;
+  &lt;li&gt;
+  &lt;b&gt;global:&lt;/b&gt; Indicates that the decorations have a global scope. Decorations with global scope override default decorations.
+  &lt;/li&gt;
+&lt;/ul&gt;
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="global">
+                  </enumeration>
+                  <enumeration value="default">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="deviceType" type="string">
+            <annotation>
+               <documentation>
+                  Specifies for which device types the decorations should be valid.&lt;p&gt;
+
+The value can be either desktop, tablet, mobile or basically any value which matches IUiDeviceType#getIdentifier(). It&apos;s also possible to use touch as value which covers every device type which returns true for IUiDeviceType#isTouchDevice().&lt;p&gt;
+
+If no value is specified the decorations are valid for all device types.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mandatory">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="fieldBackground" minOccurs="0" maxOccurs="1"/>
+            <element ref="labelFont" minOccurs="0" maxOccurs="1"/>
+            <element ref="labelTextColor"/>
+            <element ref="starMarker" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="fieldBackground">
+      <complexType>
+         <attribute name="color" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="labelTextColor">
+      <complexType>
+         <attribute name="color" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="labelFont">
+      <complexType>
+         <attribute name="font" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="starMarker">
+      <complexType>
+         <attribute name="placement" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="beforeLabel">
+                  </enumeration>
+                  <enumeration value="afterLabel">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="uiDeviceType">
+      <complexType>
+         <attribute name="enum" type="string" use="default" value="org.eclipse.scout.rt.shared.ui.UiDeviceType">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.shared.ui.IUiDeviceType"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="enumValue" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

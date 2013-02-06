@@ -1,0 +1,876 @@
+14.07.2010 imo
+Since model-based selection filtering leads to many defects and misunderstandings. See ticket 87693 and others (follow).
+removed ITable.acceptSelection and AbstractTable.execAcceptSelection
+removed ITree.acceptSelection and AbstractTree.execAcceptSelection
+removed AbstractListBox.execAcceptSelection
+removed AbstractTreeBox.execAcceptSelection
+old:
+      @Override
+      protected boolean execAcceptSelection(ITreeNode node, Long value, int level) {
+        return level >= 2;
+      }
+new:
+      @Override
+      protected void execFilterNewNode(ITreeNode newNode, int level) throws ProcessingException {
+        newNode.setEnabled(level >= 2);
+      }
+
+14.07.2010 imo
+Disabled rows on ITable and disabled nodes on ITree are (now) selectable, and support for context menus.
+
+14.07.2010 imo
+Changed model of listbox and treebox. The value (checked keys) is separated from the selection (table selection)
+The (existing) checkable property is used to distinguish between listboxes with checkboxes and listboxes that behave like tables.
+On checkable listboxes (normally multi-selection boxes) selecting a row is NOT the same as checking the rows checkbox.
+On non-checkable listboxes (normally single-selection boxes) selecting a row is the same as checking the corresponding key.
+renamed getConfiguredFilterSelectedRows to getConfiguredFilterCheckedRows
+added ITableRow.isChecked
+added ITableRow.setChecked
+added ITreeNode.isChecked
+added ITreeNode.setChecked
+renamed all IListBox.*Select* to IListBox.*Check*
+renamed all ITreeBox.*Select* to ITreeBox.*Check*
+Migration:
+Check all occurrences of ITable.setMultiSelect(true/false) and check if it is a listbox table.
+Most such cases are replaced by ITable.setMultiCheck(true/false), except those where the listbox was set to non-checkable
+either by getConfiguredCheckable(){return false;} or by getMyListBox().getTable().setCheckable(false);
+
+14.07.2010 imo
+Removed the ITable.getContextRow since this is now the same as getSelectedRow()
+Removed the ITree.getContextNode since this is now the same as getSelectedNode()
+
+14.07.2010 imo
+Removed AbstractAction/AbstractMenu.getConfiguredNonSelectionAction() since this is obsolete now that disabled rows can be selected.
+
+15.07.2010 imo
+Removed table context row and tree context node
+old:
+    protected void execContextCellChanged(ITableRow row, IColumn col) throws ProcessingException {
+      ...
+    }
+new:
+  protected void execRowClick(ITableRow row) throws ProcessingException {
+    IColumn col=getContextColumn();
+    ...
+  }
+
+17.07.2010 imo
+Merged Rayo and Scout core widget copies of DateField, TimeField. Created new combined popup window with date/time and a new analog clock.
+
+20.07.2010 imo
+Refactoring IGroupbox.isBorderEnabled and BORDER_DECORATION_NONE
+Due to misleading naming and for better understanding
+Migration:
+RENAME AbstractGroupbox.getConfiguredBorderEnabled TO AbstractGroupbox.getConfiguredBorderVisible
+RENAME IGroupbox.isBorderEnabled TO IGroupbox.isBorderVisible
+RENAME IGroupbox.setBorderEnabled TO IGroupbox.setBorderVisible
+RENAME IGroupbox.BORDER_DECORATION_NONE TO IGroupbox.BORDER_DECORATION_EMPTY.
+
+20.07.2010 imo
+Merged concepts of cyclic locking on swingscout compositions using only a scout-update lock and a ignore-scout-event set throughout all implementations.
+Removed various separate optimistic locks.
+Migration: none necessary
+
+22.07.2010 imo
+NEW property "Tray visible" on IDesktop
+NEW broadcast event TYPE_TRAY_POPUP on DesktopEvent to collect menus for the tray
+NEW method IDesktopUiFacade.fireTrayPopupFromUI to get the tray menus
+NEW operation AbstractDesktop.execAddTrayMenus to contribute to the tray menu
+Migration: none necessary
+
+11.08.2010 imo
+Added cache to Introspector.getBeanInfo: 500ms down to 1 ms
+Saves 1 seconds on all forms when loading and storing
+Migration: none necessary
+
+19.08.2010 imo
+Tuned Introspector.getBeanInfo: 1ms down to 0.05 ms
+Saves 1-4 seconds on all forms when loading and storing
+Migration: none necessary
+
+20.08.2010 imo
+Moved org.eclipse.scout.rt.client.ui.form.fields.htmlfield.HTMLUtility to org.eclipse.scout.commons.HTMLUtility
+Migration: rename org.eclipse.scout.rt.client.ui.form.fields.htmlfield.HTMLUtility by org.eclipse.scout.commons.HTMLUtility
+
+20.08.2010 imo
+Ticket 92'775 revealed that WizardEvents for Suspend,Finish,Cancel are never fired and also not used, since they are subsumized under TYPE_CLOSED.
+However, in order to find out under which condition the wizard was closed, there is a new property IWizard.getCloseType that returns the CloseType enum.
+Migration: (rare) if really used, replace the WizardEvent types TYPE_CANCELLED, TYPE_SUSPENDED, TYPE_FINISHED by TYPE_CLOSED and use IWizard.getCloseType() for details.
+
+30.08.2010 imo
+Ticket 90'088
+Dropped AbstractTable.execSortDataSource(IColumn[] sortColumns)
+This operation is a legacy from scout 2 and is never and nowhere used.
+Migration: if however used, please report to tools@bsiag.com
+
+30.08.2010 abr
+Ticket 93'106: Fixed visibility of the IOutlineTableForm when it is initialized.
+Migration: none
+
+30.08.2010 imo
+Ticket 90'088
+Reset of table columns was re-modeled to be more finegrained.
+Merged AbstractTable.execResetColumnSortOrder with AbstractTable.execResetDisplayableColumns to
+AbstractTable.execResetColumns(boolean visibility, boolean order, boolean sorting, boolean widths)
+This operation is rarely used in custom code.
+Migration: When using these operations, rename it and check the boolean argument as to what aspect is resetting.
+
+30.08.2010 imo
+Ticket 90'088
+Additional table header menu for "Column Filter" similar to excel AutoFilter
+Migration: None
+
+07.09.2010 imo
+Added new IForm display hint: DISPLAY_HINT_POPUP
+
+13.09.2010 abr
+Ticket 91'279
+Added IColumn.isVisibleInternal() that is used to for storing a table column's UI preferences (uses visible only instead of visible && displayable && visibleGranted).
+Migration: None
+
+01.11.2010 pba
+Added opportunity for lazy initialization of search forms on table pages.
+Added org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.execInitSearchForm().
+Migration: optional MOVE all your search form related initialization code form the execInitPage() method to execInitSearchForm().
+
+20.12.2010 imo
+Consolidation of date/time fields. The existing ITimeField is based on Double and is replaced by a new AbstractTimeField based on Date and subclassing AbstractDateField.
+Migration: Usages of AbstractTimeField must be reviewed, form data fields must be changed from Double to Date.
+Legacy support: AbstractTimeColumn and AbstractTimeField have setTimeValue/getTimeValue of type Double, the column accepts/tolerates Double and Date as values.
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration:
+rename IComposerOp -> IDataModelAttributeOp
+rename IComposerEntity -> IDataModelEntity
+rename IComposerAttribute -> IDataModelAttribute
+rename AbstractComposerEntity -> AbstractDataModelEntity
+rename AbstractAttributeEntity -> AbstractDataModelAttribute
+rename ComposerAttributeInjector -> DataModelAttributeInjector
+rename ComposerConstants -> DataModelConstants
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelAttributeOp -> org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelEntity -> org.eclipse.scout.rt.shared.data.model.IDataModelEntity
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelAttribute -> org.eclipse.scout.rt.shared.data.model.IDataModelAttribute
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractDataModelEntity -> org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractDataModelAttribute -> org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.DataModelAttributeInjector -> org.eclipse.scout.rt.shared.data.model.DataModelAttributeInjector
+rename org.eclipse.scout.rt.shared.data.form.fields.composer.DataModelConstants -> org.eclipse.scout.rt.shared.data.model.DataModelConstants
+rename getComposerAttributes()  -> getAttributes()
+rename getComposerEntities()  -> getEntities()
+rename setComposerAttribute(  -> setAttribute(
+Move the composer data model to the shared area:
+extract all entities/attributes from the composer to a new shared DataModel
+In the composer implement execCreateDataModel
+To convert between external entity and attribute ids use DataModelUtility.
+For example: IDataModelEntity e=DataModelUtility.externalIdToEntity(builder.getDataModel(), entityNodeData.getEntityExternalId(), null)
+Legacy:
+There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel.
+
+21.12.2010 imo
+renamed AbstractComposerAggregationField to AbstractDataModelAggregationField
+renamed AbstractComposerOperatorField to AbstractDataModelOperatorField
+
+27.12.2010 jgu
+Change in field validation: Error status is set to WARN instead of ERROR when an invalid date is entered via date picker.
+Affected Field Types: AbstractDateField, AbstractTimeField, AbstractDateTimeField
+
+Problem:
+Validation errors of text input in date fields lead to different results in the GUI than validation of date input (via date picker of keystrokes).
+Invalid date input is not displayed in the text field whereas invalid text input is. In both cases an error icon is shown to indicate that the entered value is not valid.
+In the case of date input, the date is not displayed in the text field, if it is invalid. When the field is re-validated and the previously entered value was valid, the field is valid again and the error disappears.
+A user might not notice that his input value was not accepted, when working fast.
+
+In both cases the model contains only valid values (as always) and an error status (IProcessingStatus.ERROR).
+
+Solution:
+If a date input is invalid, the error status is set to (IProcessingStatus.WARNING) to indicate that the selected value was not accepted, but there might still be a valid value in the text field.
+The warn status only disappears, if a new date or text is entered.
+
+This solution was chosen based on the following principles:
+- The model should only contain valid values (as before)
+- Text input should not be removed or changed when it is wrong (user experience).
+- Date input should not be displayed in the text field, if invalid, because it may not be possible to format it and the date input may depend on the value in the model (keystrokes).
+
+Migration: None
+
+24.01.2011 dwi
+By default, table cells that are disabled should not be editable.
+Migration: None
+
+27.01.2011 dwi
+Problem:
+In SwingScoutTable#prepareRenderer, evaluation of cell's editable state to draw respective marker icon caused loops and UI freeze.
+So far, the only way to determine cell's editable state was to call AbstractColumn#isCellEditable(ITableRow). This required synchronization with model thread which affected performance badly. Even worse, if model thread was busy, the enqueued request did not succeed at all (timeout).
+Solution:
+- Property added to hold result of AbstractColumn#isCellEditable(ITableRow) which can be evaluated in UI thread without need of model thread synchronization.
+- Population of property: Property is populated when AbstractColumn#decorateCellInternal is called.
+- Change of ICellSpecialization and implementing classes: added ICellSpecialization$isEditable(), added ICellSpecialization#setEditable(boolean)
+- Change of ICell and implementing classes: added ICell#isEditable()) -> default value is false
+- Change of Cell: added Cell#isEditable(), added Cell#setEditableInternal(boolean). Accessor setEditableInternal(boolean) is internal by intention as not intended for public use as various checks in AbstractColumn#execIsEditable are bypassed otherwise (JavaDoc added). E.g., do not use in execDecorateCell.
+- Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
+- Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
+Migration: None
+
+10.02.2011 sle
+In SWT Perspective-Handling was never really thought through and tested with more than one perspective and/or more than one scout-application running parallel. This was now done, implemented and tested with Kudi/Bap. (see Visio)
+In general can be said, that now no perspective has to be active/open to run a scout-application. When the Workbench is started the existing scout-application will be started and the model-desktop open. As soon as the perspective is active execGuiAttached will be called on the model-desktop. When the perspective is closed execGuiDettached is called. When a perspective is reset detached/attached is called.
+
+Change in Scout-Client:
+- Everywhere desktop.isGuiAvailable() was called now desktop.isOpened() is called. For Swing there is no change, the two states are changed at the same location.
+- AbstractDesktop.closeInternal goes through all open forms and calls removeForm
+- IDesktopUIFacade has now fireDesktopResetFromUI anymore. This method was used from AbstractSwtEnvironment
+- new Property on IForm: PROP_PERSPECTIVE_ID. This is used from SWT to ensure a form is opend in a chosen perspective. No use in Swing.
+
+Migration: Swing-Gui: none / SWT-Gui: if application uses more than one perspective, changes may be necessary. Please consult with me (s.leicht@bsiag.com / 947)
+
+10.02.2011 abr
+bsi ticket 98'890
+fixed model change counters running out of sync if unchecked exceptions are thrown.
+Migration: None
+
+16.02.2011 imo
+Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStatus
+
+01.03.2011 pba
+#94708 added new Event public static final int TYPE_TABLE_POPULATED = 820;
+to handle the case, when no rows are returned for the first select
+
+03.03.2011 pba
+bsi ticket #93948
+if the Fileservice has a rootpath set, take it and not the relative one, otherwise it is impossible to give a target path independent of the workbench
+
+04.03.2011 pba
+bsi ticket #99504
+Add menus in outline also for node-, not only table pages
+
+04.03.2011 pba
+bsi ticket #99533
+add a reasonable default implementation for getBookmarkIdentifier() in AbstractPage to avoid caching bugs
+
+10.03.2011 imo
+bsi ticket 96627
+do not activate disabled or invisible outlines when activating bookmark
+
+18.03.2011 imo
+Migration of legacy: moving remaining legacy logic from client to server
+Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
+Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
+Migration: None ( legacy search can still be used)
+Continuous Migration:
+1) Create an annotation for already migrated search forms: MigratedSearchForm
+2) in every search form (or if using a custom base class) add:
+  @Override
+  protected void execResetSearchFilter(SearchFilter searchFilter) throws ProcessingException {
+    if (getClass().isAnnotationPresent(MigratedSearchForm.class)) {
+      // Migrated SearchForm
+      setSearchFilter(new SearchFilter());
+    }
+    else {
+      // Legacy SearchForm
+      searchFilter = new LegacySearchFilter();
+      setSearchFilter(searchFilter);
+    }
+    super.execResetSearchFilter(getSearchFilter());
+  }
+
+
+15.04.2011 dwi
+[contributed by oca]
+Problem:
+Sometimes, not all calendar items supposed to be loaded into a calendar by an AbstractCalendarItemProvider (package org.eclipse.scout.rt.client.ui.basic.calendar.provider) are actually shown in the calendar due to race conditions.
+Analysis:
+During initialization of an AbstractCalendarItemProvider in its constructor, loadItemsAsyncInternal() is invoked twice:
+- once via initConfig() -> setRefreshIntervalMillis()
+- once via ensureItemsLoadedInternal()
+If the asynchronous loading of the first invocation of loadItemsAsyncInternal() has not completed while the second invocation is taking place, the first invocation is canceled. However, the first invocation will try to reschedule another job. This will cause the second invocation to be canceled as well. If no m_minDateLoaded, m_maxDateLoaded were set yet, no other jobs are scheduled and the current instance will never provide any calendar items again.
+Solution:
+Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items.
+Migration: None
+
+06.05.2011 imo
+- added IClientSession.getWebSessionId for ajax like apps with gui-backend-to-server-backend communication using virtual sessionId
+- associate state of service with client session instance / client session type for:
+org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkService (Done)
+org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService (Done)
+org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService (Done)
+org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService (Done)
+- added IClientSession.getWebSessionId to support for multi-session web guis such as rap/rwt, wicket, ajax
+Migration: None
+Except: If your project runs as web app (rap/rwt) make sure to refactor state of stateful services to be associated with each individual client session.
+This is normally done as:
+class MyStatefulService{
+  private static final String SESSION_DATA_KEY = "bookmarkServiceState";
+
+  private ServiceState getServiceState() {
+    IClientSession session = ClientJob.getCurrentSession();
+    if (session == null) {
+      LOG.warn("could not find a client session");
+      return null;
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
+  ...
+
+  private static class ServiceState {
+    //this was the global state of the service when run in a single-user osgi
+    EventListenerList m_listenerList = new EventListenerList();
+    BookmarkData m_model;
+  }
+}
+
+08.05.2011 dwi
+bsi ticket #99504
+Problem:
+On the associated folder table of a AbstractPageWithNodes, there was no popup menu support.
+Solution:
+Added support to have the very same menus on the associated folder table as on the AbstractPageWithNodes itself.
+There was some change necessary on ITable and ITree to obtain the validated menus from within the model
+Methods added:
+- ITree#fetchMenusForNodesInternal (AbstractTree#fetchMenusForNodesInternal)
+- ITable#fetchMenusForRowsInternal (AbstractTable#fetchMenusForRowsInternal)
+Methods changed:
+- AbstractPageWithNodes$P_TableListener#tableChanged
+Migration: None
+
+06.05.2011 imo
+Bugzilla Ticket 331535
+
+Added possibility to override/complete texts and translations defined by the scout framework.
+To fully enable this feature, the following adaptations are necessary:
+
+0) Add the additional translations and text overrides to the project specific text resources:
+Adapt Texts_*.properties files in your scout project (com.example.myapp.shared/resources/texts) by adding
+the same keys as defined by the scout framework (org.eclipse.scout.rt.shared/resources/texts/ScoutTexts.properties)
+with your own translations.
+
+1) Override method getNlsTexts in ClientSession:
+
+  @Override
+  public DynamicNls getNlsTexts(){
+    return Texts.getInstance();
+  }
+
+2) Override method getNlsTexts in ServerSession:
+
+  @Override
+  public DynamicNls getNlsTexts(){
+    return Texts.getInstance();
+  }
+
+3) Only required for Swing client: override createSwingEnvironment() in class SwingApplication:
+- set the global text provider for Swing with SwingUtility.setNlsTexts
+- call execInitLocale() to initialize the NlsLocale as stored in the UserPreferences
+
+  @Override
+  protected ISwingEnvironment createSwingEnvironment(){
+    execInitLocale();
+    SwingUtility.setNlsTexts(Texts.getInstance());
+    return new SwingEnvironment();
+  }
+
+11.05.2011 sle
+bsi ticket #101160
+Added convenience methods to ITable as known from deprecated ICheckableTable. Also added know possibility to configure
+a invisible "checkbox-column" for data-transportation to server via formData.
+Methods added:
+ITable:
+- void checkRow(int rowIndex, boolean value) throws ProcessingException;
+- void checkRow(ITableRow row, boolean value) throws ProcessingException;
+- void checkRows(ITableRow[] rows, boolean value) throws ProcessingException;
+- void checkAllRows() throws ProcessingException;
+- void uncheckAllRows() throws ProcessingException;
+
+- void setCheckableColumn(IBooleanColumn checkboxColumn); (for internal use)
+- IBooleanColumn getCheckableColumn(); (for internal use)
+
+AbstractTable:
+- protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn();
+Migration: None
+
+17.05.2011 sle
+bsi ticket 102'010: ScoutInfoForm looks ugly (in SWT)
+Problem:
+a) ScoutInfoForm does not look nice in SWT
+b) ... does not have a Default-Logo
+c) ... has a quirky way of getting the logo.
+
+Solution:
+a) In Swing the GridData is different than for the other ui-layers.
+b) The Bundle org.eclipse.scout.rt.client has now a Default-Logo.
+c) The Logo is searched with th IconLocator.
+
+Migration:
+If ScoutInfoForm is overwritten to be able to get the correct logo this is not necessary anymore. Just the IIconProviderService
+has to be registered and an Icon with the name application_logo_large.png must be in a bundle.
+
+25.05.2011 dwi
+bsi ticket 102'437: support for adding child entities on entity nodes of extended search
+Problem:
+Child entities do not appear on popup menu when being on an entity node
+Solution:
+changed AbstractComposerField#execCreateAttributeNode
+changed AbtractComposerNode#attachAddEntityMenus
+changed constructor of AttributeNode
+changed constructor of EntityNode
+Migration:
+None
+
+30.05.2011 imo
+Added explicit instead of implicit session argument to IClientNotificationConsumerService observer, added possibility to add global observer.
+See javadoc for more details.
+Migration:
+Review deprecated usages of IClientNotificationConsumerService.addClientNotificationConsumerListener and IClientNotificationConsumerService.addClientNotificationConsumerListener.
+Default simply adds "ClientJob.getCurrentSession()" as first argument.
+
+30.05.2011 imo
+bsi ticket 100940
+A menu opened in empty space should not consider any selection on a row.
+Thus the menu should open anyway (not querying the selection status of any row).
+Migration:
+None
+
+06.06.211 sle
+bugzilla 348678
+bsi ticket 102'728
+Smartfield Warn-Text: When a Smartfield-Proposal opens with more than the aloud rows a Warning apears. This is to close to the left border and the color is not styleable.
+Solution: The SmartTableForm had a Label under the table. This label was removed and instead we use the existing TableStatus.
+Migration: None
+
+09.06.2011 imo
+bsi ticket 102823
+do not activate disabled tree nodes when setting new outline on desktop
+Migration: None
+
+28.06.2011 dwi
+bsi ticket #99'948 / #100'755
+Problem:
+If user cancels current running jobs, associated running SQL statements should also be killed.
+Solution:
+Added support to kill associated running JDBC statements if client job gets canceled.
+In StatementProcessor, statements to be executed are registered in RunningStatementStore on behalf of the current session.
+If a ClientJob gets canceled, a subsequent fire-and-forget cancel request is triggered to cancel registered statements.
+Resources changed:
+org.eclipse.scout.rt.client
+- InternalHttpServiceTunnel changed (cancel support for online servermode)
+- plugin.xml changed (registration of cancel processing service)
+com.bsiag.scout.shared
+- IServerProcessingCancelService added (service interface of cancel processing service)
+org.eclipse.scout.rt.server
+- ServerProcessingCancelService added (service implementation of cancel processing service)
+- RunningStatementStore added (store to hold currently running statements)
+- StatementProcessor changed to register / unregister currently running statements
+Migration: None
+
+01.07.2011 dwi
+bsi ticket: #103'490
+bugzilla ticket: 350661
+Problem:
+When setting a new nls local via ClientUIPreferences, the changed entry is not
+flushed to disk, i.e. causing the old entry to still exits. Other changes made,
+e.g. updateTableColumnOrder, are flushed immediately.
+Solution:
+Changed ClientUiPreferences#setNlsLocale(NlsLocale) to flush value to disk
+Migration: None
+
+11.07.2011 aho
+Ticket: 102'194 is about taking screen shots of forms. The problem is since the form is opened async the print event does not get to the form.
+Solution:
+Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
+Migration:
+none
+
+25.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074
+Problem:
+- When form tool button is selected, other tool buttons should only be deselected if of the type AbstractFormToolButton
+Migration: None
+
+09.08.2011 dwi
+bsi ticket #104'887
+Problem:
+When exporting table to CVS file format (AbstractTable#exportTableRowsAsCSV), columns of the type boolean are not considered.
+Solution:
+Added handling for values in boolean column. That is if no custom display text is set for such a cell, an 'X' is exported as value.
+Migration:
+None
+
+12.08.2011 dwi
+bsi ticket #100'300
+Problem:
+If having an editable column of the type boolean, values are rendered as checkboxes. When changing the value of that checkbox, the checkbox jumps from center position to the left edge. Furthermore, not the same checkbox widget is displayed as in non-edit mode.
+Solution:
+- Changed representation of checkbox to look the same in edit and non-edit mode.
+- Fixed layout problems when changing from non-edit to edit-mode (checkbox positioning)
+- Added VerticalAlignment on IBoolean column to align the checkbox in both directions, vertical and horizontal
+- Fixed problems in LogicalGridLayout manager to round resulting floating numbers (center position caluculations) the same way as Java layout managers do. Otherwise, the checkbox is positioned differently in between of the layout managers which causes the checkbox to jump around.
+- Fixed problems in inset calculation to look the same on the different L&F providers
+Migration:
+None
+
+22.08.2011 dwi
+BSI ticket #105'026, #104'976
+Problem:
+- Failed to display corrupt HTML pages (e.g. if missing closing quote in style definition)
+- In HTML editor, no cleanup (auto-correction) should be applied to the given HTML. That is because if the user did some modifications in the HTML source and reloads the HTML in the editor anew, unwanted auto-corrections would be applied.
+Solution:
+- Accomplish consistency concerning HTML styling (cleanup) in between of Swing and SWT in regard of ScoutHtmlField and ScoutHmtEditor.
+  In more detail, this entails the following:
+  - Before passing the HTML to the respective widget (ScoutHtmlEditor, ScoutHtmlField), Abstract[Swing|Swt]Environment#styleHtmlText() is called to cleanup the given HTML.
+  - In case of HTML editor mode, no modifications are applied to the given HTML in both, Swing and SWT, respectively.
+  - However, in non-editor mode, some intelligence is applied to the HTML to ensure proper display of the HTML document.
+    - In Swing, cleanup of HTML structure and CSS definitions is done. That is crucial as Swing HTML viewer has some problems with some CSS constructs.
+    - In SWT, OS default browser is used. That is why cleanup of CSS is not necessary as done by browser itself.
+      But, because the HTML is provided as file to the browser, proper encoding and charset must be set.
+- Failsafe: if HTML text cannot be parsed for cleanup, the raw HTML text is used instead of an exception thrown.
+- Consolidation of HTML cleanup functionality in HTMLUtility for plain and simple use that is applicable for both, SWT and Swing, respectively. That is why various methods in HtmlUtility are removed.
+Plug-Ins affected:
+- org.eclipse.scout.commons (HTMLUtility
+- org.eclipse.scout.rt.client (AbstractHtmlField)
+- org.eclipse.scout.rt.ui.swing (AbstractSwingEnvironment, SwingScoutHtmlField, SwingScoutMailField)
+- org.eclipse.scout.rt.ui.swing.bsi.fragment (SwingScoutHtmlEditor)
+- org.eclipse.scout.rt.ui.swt (AbstractSwtEnvironment, SwtScoutHtmlField)
+- org.eclipse.scout.rt.ui.swt.bsi.fragment (SwtScoutHtmlEditor)
+Migration Swing / SWT:
+- In HTMLUtility, the following methods are removed.
+  - HTMLUtility#parseDocument(String) to be replaced by HTMLUtility.toHtmlDocument(String)
+  - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(HTMLDocument)
+  - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+  - HTMLUtility#wellformDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+Migration SWT:
+- In AbstractSwtEnvironment, the following methods are removed as not required anymore because logic is encapsulated in HTMLUtility.
+  - AbstractSwtEnvironment#styleHtmlText(Control, String)
+  - AbstractSwtEnvironment#createCSS(Control)
+  - AbstractSwtEnvironment#createHtmlDocument(String, String)
+
+22.07.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+bsi ticket #105’126
+Problem:
+When using ‘yyyy’ in the format of an AbstractDateField, there is no interpretation of the century. Entering 11 for the year results in 0011 CE instead of 2011 CE
+Resources changed: AbstractDateField
+Migration: None
+
+30.09.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+Changes/Fixes to Scout Bookmark Handling:
+- Scout implementation should be able to use a customized BookmarkForm
+- AbstractBookmarkTreeField: New/Edit Menu PrepareActions (Permissions) should be customizable
+- AbstractBookmarkTreeField : "New Folder" should not be possible on Bookmark Node
+- Text for Global/Private Bookmarks should be configurable
+Migration: None
+
+04.10.2011 dwi
+BSI ticket #106'222, #99'582, #105'229
+Bugzilla ticket #358064, #359811, #359812
+Problem:
+All the tickets mentioned belong to the editable cell topic:
+a) If properties like visiblity or editability are changed on IColumn, the accessiblity of editable cells within that column is not calculated anew.
+   As consequence, the UI representation of such cells does not correspond to the values on the model.
+b) If a value of an editable boolean column is changed by inline editing, other values of that column are toggled/untoggled as well.
+   Even though holding the correct value on model, their UI representation differs. For instance, if forcing the UI to refresh by resizing a column, the checked state in UI gets corrected.
+c) If toggling three times the very same cell of an editable boolean column, the value is not stored in the model anymore.
+d) If toggling a cell of an editable boolean column, it's value is immediately written back to the model which is good.
+   This has the effect, that if there is an implict or explicit sort installed on that column, toggled rows are scampering.
+   This is especially absurd, if the column is part of an implicit sort, meaning that no CTRL-key was held while determing
+   the sort columns. Due to lack of the visual representation of such an implicit sort column, the user gets really confused
+   as rows are reorganized for no reason. This problem is also applicable to other types of editable columns.
+e) If clicking on a cell of an editable boolean column, the cell transitions into modification state, meaning that the associated cell editor is activated.
+   Even though the toggled value is already written back to model, the editor remains open which is confusing to the user.
+   This should be changed to immediately close the cell editor if the value is toggled.
+f) If an editable colum is moved, the column is not editable anymore. Only if the column is moved back to its origin location, the column becomes editable anymore.
+g) If having a checkable table and a cell editor of an editable column does not fill the whole cell space,
+   clicking on that empty space toggles the checked state of the row. This is confusing and moreover error-prone as not the row is intended to be checked/unchecked but rather the cell editor activated / toggled.
+h) If having a checkable table and moving an editable column to the very first position, a click on that column correctly activates the inline editor.
+   Thus, the checked state of that row cannot be changed by clicking on the presented checkbox.
+   This should be changed to not allow an editable column to be moved to the first position. Moreorver, the first column should also be freezed if the succeeding column is an editable one.
+Solution:
+a) Apply row decoration on property change
+b) This was because the active cell editor remained active after toggling the value.
+   Fixed that a still active cell editor gets closed prior to update the model state.
+c) solved by e)
+d) Changed that if the value of a cell editor is written back to model, the sort (if applicable) is suspended.
+   Thus, even though the column represents an implict or explicit sort column, its values are not sorted anymore which in turn is the expected behavior.
+   In consequence, to get the column's values sorted again, the user has to sort the column anew.
+e) Instead of creating an ICheckBox as cell editor which stays active until the focus get lost, an empty cell editor (null) is created.
+   As the toggled value is immediately written back to the model, this editor gets closed shortly after (see b).
+f) Fixed
+g) Mouseclicks that are targetted to cell editors are not interpereted as row-check nor row-uncheck clicks anymore.
+h) Fixed
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing, org.eclipse.scout.rt.client
+Migration:
+None
+
+04.10.2011 hmu
+Bugzilla ticket #359840
+Problem:
+SmartField doesn't handle isAllowCustomText properly when value changed in ui
+Plug-Ins changed:
+- org.eclipse.scout.rt.client
+Migration:
+None
+
+05.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+- Private Folder should be removed (not needed)
+- Support for additional logic when user opens bookmark: IOpenBookmarkCommand
+- AbstractBookmarkTreeField: Support for custom icons
+- BookmarkFolderForm: Grid width should be 1.
+- IBookmarkForm: JavaDoc shoud be added.
+- Bookmark: Support for new Bookmark (unread Bookmarks) should be added
+Migration: None
+
+13.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+Enhancements/fixes for the bookmark field (client-side only):
+- allow dragging and transfer of multiple nodes
+- Possibility to use a row-level PublishUserBookmarkPermission
+- Deletion of bookmark folders improved
+- some more JavaDoc added.
+Migration: None
+
+18.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 361233
+Allow implementations to handle AbstractBookmarkTreeField's DnD drop requests
+Added IBookmarkNode interface that allows the receiver to read bookmark data.
+Migration: None
+
+24.10.2011 mvi
+Bugzilla ticket 361816
+Replace current NLS support with Text Provider Services
+- added ITextProviderService, IDocumentationTextProviderService, AbstractDynamicNlsTextProviderService
+- Migrated existing text providers to scout text provider services
+- TEXTS class added for consistent translation retrieval
+- Splitted org.eclipse.scout.rt.shared texts into two plugins:
+  - org.eclipse.scout.rt.shared contains text provider service with all texts that are used by the runtime
+  - org.eclipse.scout.rt.shared.legacy.texts.fragment contains all texts that are no longer used by the runtime
+- getConfiguredDoc properties moved to different ConfigProperty type for Scout SDK (support for Docs Text Providers)
+Migration:
+- Add "org.eclipse.scout.rt.shared.legacy.texts.fragment" to all products.
+- For each existing NLS Class (directly or indirectly extending "org.eclipse.scout.rt.shared.ScoutTexts" or "org.eclipse.scout.commons.nls.DynamicNls"):
+  - create a new "<YourSharedPlugin>.services.common.text.<Name>TextProviderService" extending "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService" in the corresponding shared plugin.
+- For each created TextProvider Service:
+  - Overwrite the method "getDynamicNlsBaseName" and return the same value as in the "RESOURCE_BUNDLE_NAME" constant (stored in the corresponding Texts class) as string literal.
+  - Register the service in the corresponding plugin as scout service using the "org.eclipse.scout.service.DefaultServiceFactory", no session class and give a ranking > 0. E.g.: <service class="com.bsiag.crm.shared.core.services.common.text.CoreTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" ranking="100" />
+- Delete all Texts classes and replace all uses of the old Texts classes with the class "org.eclipse.scout.rt.shared.TEXTS".
+- Remove the "getNlsTexts" methods from the Session classes if existent (unless you use session-dependent translations).
+- Correct return type of "getConfiguredNlsProvider" of all SqlServices (if existent) to return the new type defined by AbstractSqlService and return "ScoutTexts.class" inside the method.
+- If somewhere the "SwingUtility.setNlsTexts" method or "SwtUtility.setNlsTextsOnDisplay" method is used, set it to "ScoutTexts.getInstance()".
+- Delete all .nls files (NLS Editor can now be accessed using the TextProviderService Node in the Scout Explorer of the Scout perspective).
+  If you want to keep the .nls files (e.g. to support key shortcuts like ctrl+shift+r) do the following:
+  - Open the .nls file in the text editor (right click -> open with).
+  - Remove the following properties: "Nls-Type", "Nls-File-Prefix", "Nls-Translation-Folder".
+  - Change the property "Nls-Class" to the fully qualified name of the Text Provider Service you would like to edit with this .nls file.
+  - Save the changes and open the .nls file again in the Multilanguage Editor (right click -> open with).
+
+26.10.2011 dwi
+Bugzilla ticket 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+In Java 6 it is possible to contribute custom Locales (e.g. en_CH) to the JRE. That is why Scout NlsLocale is not used anymore and therefore marked as deprecated.
+The user's locale is accessed as follows:
+- On client side, the user's locale is accessed by Locale.getDefault()
+- On server side the request's locale is accessed by LocaleThreadLocal.get() (convenience accessor: ServerSession.get().getLocale())
+Eventhough the class NlsLocale is marked as deprecated for legacy support, its constructor 'NlsLocale(Locale)' was removed because NlsLocale was changed to only act as delegate to the thread's locale (if applicable) or default locale otherwise.
+Please note: A locale consists of its language and country. The country is mainly responsible for format settings as for instance the grouping separator of numbers. A very few locales already exist in the JRE. But if you like to have the application in the English language with Switzerland as its region, you have to contribute your own locale-implementation 'en_CH'. Please see Migration section for detailed instructions to extend JRE with a custom locale.
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.client
+- org.eclipse.scout.rt.server
+- org.eclipse.scout.rt.shared
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.oraclelite10g.core
+- org.eclipse.scout.rt.xstream.shared
+Migration:
+- removed NlsLocale(Locale) (constructor): use Locale instead of NlsLocale
+- removed IServerSession#getNlsLocale(): use IServerSession#getLocale() instead (e.g. replace all ServerSession.get().getNlsLocale().getLocale() by ServerSession.get().getLocale())
+- In client Plug-Ins: replace NlsLocale.getDefault().getLocale() by Locale.getDefault()
+- In server Plug-Ins: replace NlsLocale.getThreadDefault().getLocale() by LocaleThreadLocal.get()
+- In shared Plug-Ins: replace NlsLocale.getDefault().getLocale() by NlsUtility.getDefaultLocale()
+Contribution of custom locales to the JRE:
+1. Create a plain Java project, e.g. x.y.localeprovider.en.ch
+2. Create two classes that inherit from {@link DateFormatProvider} and {@link NumberFormatProvider} and implement the method stubs specific to your locale
+3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
+4. In those files, simply put the the fully qualified name to your date/number provider
+5. Export project as JAR file and put it into \lib\ext of your JRE
+
+15.12.2011 cgu
+Bugzilla ticket 364556
+Problem:
+If a checkbox is defined in a sequence box, the label of the checkbox is shown as label of the sequence box although the checkbox itself already shows the label.
+Solution:
+Excluded BooleanFields from the computation of the compound label.
+Migration:
+- Since the checkbox is excluded the label of the next field is considered for the compound label.
+  So if you use sequenceboxes which contain a checkbox and another field you may want to override execIsLabelSuffixCandidate and return false so that no label suffix is created and only the sequencebox label is shown.
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+When having a single line textfield (getConfiguredMultilineText=false), leading and trailing newlines should not be replaced by spaces but omitted insted.
+Solution:
+Leading and trailing newlines are trimmed prior to replacing them by spaces.
+Plug-Ins changed:
+org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
+Migration: None
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The model detects busy in ClientSyncJob and provides the IBusyManagerService with IBusyHandler.
+See swing, swt, rwt scout implemenations for more details.
+
+19.01.2012 abr
+Bugzilla: 369115, Locale on client-side
+Locale must be available on the ClientSession and all client jobs have to use it (i.e. set LocaleThreadLocal before executing the job).
+Migration:
+- Possibly available ClientSession.getLocale and ClientSession.setLocale must either be removed or renamed.
+- Dynamically changing the locale must be propagated to the client session as well.
+- Accessing a client's locale should always done by invoking LocaleThreadLocal.get()
+- ClientJob.run (and therefore ClientSyncJob.run as well as ClientAsyncJob.run) should not be overridden anymore. The method will be marked final in a subsequent release.
+  Use ClientJob.runStatus or ClientJob.runVoid instead.
+
+30.01.2012 abr
+Bugzilla 370118
+findCodeTypeById on CodeService and CodeServiceClientProxy works for cached code types only
+Solution:
+If findCodeTypeById returns null for a non-null key, populate cache and retry.
+Migration:
+None
+
+07.02.2011 abr
+Bugzilla 370821
+last activated forms on AbstractDesktop are not released
+The AbstractDesktop manages a list of open forms, ordered descending by their last activation. The elements
+of the list are never released and the form listener tracking activation changes is not used at all. Further,
+the last active form returned is not the last, but the first which weak reference is still valid.
+Migration: None
+
+07.02.2011 abr
+Bugzilla 370830
+closing the desktop should close all open forms as well
+When the desktop is closed, all open forms are just removed from the view and dialog stacks, respectively.
+The forms however are not closed. Hence any clean-up operations must be implemented as desktop listeners.
+This approach still breaks a form's life cycle.
+Migration: None
+
+14.02.2012 kle
+Bugzilla 352955
+Problem:
+When using modes IActivityMap.PLANNING_MODE_DAY or IActivityMap.PLANNING_MODE_WEEK
+the selected columns are not handled correctly due to the used values at the end
+boundaries of a MinorColumn object. During construction of a MinorColumn, 1ms is
+automatically subtracted from the end time.
+Solution:
+When fetching the column index for a given end time, it has to be checked if
+the given end time fits into the begin and end time interval of the column.
+Otherwise, the previous column has to be returned.
+Migration:
+None
+
+06.03.2012 abr
+Bugzilla: 373358
+composer field: select parent node when a node is deleted
+Problem:
+The selection in an org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField gets lost if a node
+is removed using its corresponding delete menu. However, the previous node is selected when a node is deleted by
+the delete key stroke.
+Solution:
+Added the selection behavior to the nodes' delete menus and select previous parent node instead of previous node.
+Migration: none
+
+12.03.2012 ast, abr
+Bugzilla: 372381
+Setting up an initial order for IColumns
+Problem:
+Table columns are initially ordered in the GUI the same way as in the model, using the @Order annotation. It is not
+possible to set a different initial ordering for the GUI.
+Solution:
+Added new property viewOrder on IColumn and recompute view orders whenever the property changes for a column. As a
+side effect, view orders can be changed after the model has been initialized.
+Migration: none
+
+13.03.2012 abr
+Bugzilla: 374044
+Problem:
+Currently, table column filters are persisted in user scope preferences. Hence they are reapplied after application
+restarts. They are further applied to all table instances having the same client preference context.
+Solution:
+Table filter settings behave like search form states. i.e. they are remembered as long as a Scout application runs,
+but they do not endure application restarts. Reloading pages having search constraints or filters applied, must
+apply them again. Memory constraints may limit the size of stored search constraints and filter settings.
+Added filter settings cache on IMemoryPolicy.
+Migration: none
+
+26.03.2012 sme, abr
+Bugzilla: 375152
+Problem:
+When a user cancels the search in an outline, the search form keeps its state but the displayed rows belong to the last
+executed search.
+Solution:
+o If a user cancels the search, all rows in the table should be discarded and the user show be notified of the canceled
+  search.
+o Additionally, any exception during loading the table data behaves the same: the table data is discarded and
+  the table status is set appropriately.
+o If the severity of the table population status is IProcessingStatus.CANCEL, the table selection status is hidden and
+  the population status is rendered like a warning (e.g. foreground color orange).
+Migration: none
+
+27.03.2012 bko,jgu
+Bugzilla: 367850
+Problem:
+XML I/O on IForm (IForm.storeXML and IForm.loadXML) does not work properly for
+IFormFields with a non-unique class name. F.e. if a SearchForm with two tabs
+which both contains a TextField with the same class name.
+Solution:
+o The IFromField provides a method getXMLFieldId() which will be used for XML I/O.
+This method will return the fields simple class name by default for fields with unique class names.
+For non-unique class names the simple class name of the parent field is added to the id, until it is unique.
+o Loading older XML files with ambiguous fields is still possible: Data is imported to the first field found (as before).
+Migration: none
+
+10.04.2012 jbr
+Bugzilla: 361985
+Bug following the discussion here:
+http://www.eclipse.org/forums/index.php/t/210744/
+  •  Naming consistency:
+clearDeletedRows() => discardAllDeletedRows()
+  •  Add the possibility to discard a specific deleted row
+discardDeleteRow(TableRow deletedRow)
+discardDeleteRows(TableRow deletedRow)
+discarding a DeletedRow by index (or array of indexes) makes no sense, because if the row is deleted, the row do not have an index anymore.
+Migration: ITable#clearDeletedRows() is deprecated, use ITable#discardAllDeletedRows() instead.
+
+04.12.2012 jgu
+Bugzilla: 378328
+Enhancement for IColumn: New property Fixed Width added to IColumn:
+Configures whether the column width is fixed, meaning that it is not changed by resizing/auto-resizing and cannot be resized by the user.
+
+The width may be stored in the user preferences. In this case the stored width is loaded and applied independent of the "Fixed Width" property. Reset may be used to set it to the original predefined width.
+
+Migration: None
+
+01.02.2013 bme
+Bugzilla: 384051
+Problem:
+When adding an additional column of another entity to a table page (with more than one attribute), one can choose to display the column as a table (in the Add column dialog). There can be several entries for one row.
+When opening the column filter dialog for this column, the cell to display the value of the column is too small, the values that have more than one entry seem to be garbled.
+Solution:
+Although in the table page, the table in the column is displayed as a table, in the column filter dialog, the rows are displayed without table, therefore fitting into one cell. The display in the column filter dialog is the same as if it is not chosen to be displayed as table (in the add column dialog).
+Migration:
+None

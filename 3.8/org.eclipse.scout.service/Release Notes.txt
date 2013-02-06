@@ -1,0 +1,22 @@
+30.05.2011 imo
+bsi ticket 102381: ServiceUse of osgi is re-used unless unget service is called.
+This is bad for ad-hoc proxy services that must be created every time when needed (especially on multiple parall threads)
+Fixed by adding service ref lock in SERVICES helper.
+Migration:
+None
+
+17.07.2012 jgu
+Bugzilla 383083: Added a new extension point to allow customized service initialization
+
+By default, a service of type org.eclipse.scout.service.AbstractService is initialized with properties in the config.ini file.
+If the scout application is running inside another RCP application, the config.ini file often cannot be accessed.
+
+Therefore,a new extension point serviceInitializerFactory has been added to org.eclipse.scout.service.services to allow the registration of a
+custom service initializer factory.
+The default service initialization behavior stays the same.
+
+See also:
+http://wiki.eclipse.org/Scout/NewAndNoteworthy/3.8#New_extension_point_to_allow_customized_service_initialization_.28new_with_3.8.1.29
+
+Migration:
+None

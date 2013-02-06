@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+  <extension-point id="org.eclipse.scout.rt.ui.swing.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
+  <extension-point id="org.eclipse.scout.rt.ui.swing.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
+  <extension
+        point="org.eclipse.scout.rt.ui.swing.formfields">
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
+           name="Button"
+           scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.button.ButtonFactory">
+        </factory>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.chartbox.IChartBox"
+           name="Chart Box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.chartbox.SwingScoutChartBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
+           name="Date field"
+           scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.datefield.DateFieldFactory">
+        </factory>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
+           name="Check Box"
+           scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.checkbox.CheckBoxFactory">
+        </factory>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField"
+           name="Decimal field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.decimalfield.SwingScoutDecimalField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"
+           name="Filechooser field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.filechooserfield.SwingScoutFileChooserField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"
+           name="Group box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.groupbox.SwingScoutGroupBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"
+           name="Html field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.htmlfield.SwingScoutHtmlField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"
+           name="Image field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.imagebox.SwingScoutImageField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"
+           name="Label field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.labelfield.SwingScoutLabelField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox"
+           name="List box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.listbox.SwingScoutListBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField"
+           name="Number field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.numberfield.SwingScoutNumberField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"
+           name="Mail field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.mailfield.SwingScoutMailField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup"
+           name="Radio button group"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.radiobuttongroup.SwingScoutRadioButtonGroup">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox"
+           name="Sequence box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.rangebox.SwingScoutSequenceBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
+           name="Smart field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.smartfield.SwingScoutSmartField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox"
+           name="Tab box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"
+           name="Table field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.tablefield.SwingScoutTableField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField"
+           name="String field"
+           scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.internal.StringFieldFactory">
+        </factory>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"
+           name="Tree box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.treebox.SwingScoutTreeBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"
+           name="Tree field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.treefield.SwingScoutTreeField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"
+           name="Composer field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.composer.SwingScoutComposerField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField"
+           name="Calendar field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.calendarfield.SwingScoutCalendarField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"
+           name="Planner field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.SwingScoutPlannerField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField"
+           name="Wrapped form field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.wrappedformfield.SwingScoutWrappedFormField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox"
+           name="Split box"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.splitbox.SwingScoutSplitBox">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField"
+           name="Placeholder"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.placeholder.SwingScoutPlaceholderField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.IFormField"
+           name="Unknown field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldPlaceholder">
+        </uiClass>
+     </formField>
+  </extension>
+  <extension
+        point="org.eclipse.scout.service.services">
+     <service
+           class="org.eclipse.scout.rt.ui.swing.services.UserActivityProvider"
+           createImmediately="true"
+           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
+     </service>
+     <service
+           class="org.eclipse.scout.rt.ui.swing.services.common.clipboard.SwingScoutClipboardService"
+           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
+     </service>
+     <service
+           class="org.eclipse.scout.rt.ui.swing.services.common.icon.SwingBundleIconProviderService"
+           createImmediately="false"
+           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+           ranking="-1000">
+     </service>
+  </extension>
+</plugin>

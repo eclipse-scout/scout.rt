@@ -1,0 +1,34 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Client Mobile
+Bundle-SymbolicName: org.eclipse.scout.rt.client.mobile;singleton:=true
+Bundle-Version: 3.8.2.qualifier
+Bundle-Activator: org.eclipse.scout.rt.client.mobile.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.commons,
+ org.eclipse.scout.rt.client,
+ org.eclipse.scout.rt.shared
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project
+Scout-Project: org.eclipse.scout.rt
+Scout-Bundle-Type: client
+Export-Package: org.eclipse.scout.rt.client.mobile,
+ org.eclipse.scout.rt.client.mobile.navigation,
+ org.eclipse.scout.rt.client.mobile.services,
+ org.eclipse.scout.rt.client.mobile.services.text,
+ org.eclipse.scout.rt.client.mobile.transformation,
+ org.eclipse.scout.rt.client.mobile.ui.action,
+ org.eclipse.scout.rt.client.mobile.ui.basic.table,
+ org.eclipse.scout.rt.client.mobile.ui.basic.table.columns,
+ org.eclipse.scout.rt.client.mobile.ui.basic.table.form,
+ org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields,
+ org.eclipse.scout.rt.client.mobile.ui.desktop,
+ org.eclipse.scout.rt.client.mobile.ui.form,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.button,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.groupbox,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.table,
+ org.eclipse.scout.rt.client.mobile.ui.form.outline

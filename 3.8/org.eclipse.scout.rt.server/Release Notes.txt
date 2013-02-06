@@ -1,0 +1,418 @@
+19.07.2010 imo (contributed by Sandro Schifferle, ticket 91038)
+Improved security and added possibility to easily reset access control store
+Moved the permission loading away from server session to the (new) project-specific AccessControlService.
+Migration:
+CHANGED ServerSession.java
+OLD
+  void execLoadSession()
+    ...
+    SQL.select(...);
+    SERVICES.getService(IAccessControlService.class).setPermissions(...);
+
+NEW
+  void execLoadSession()
+    ...
+    //no such code any more
+
+ADDED com.bsiag.crm.server.core.services.custom.security.AccessControlService
+package com.bsiag.crm.server.core.services.custom.security;
+import java.security.Permissions;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
+import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.AccessControlUtility;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+
+public class AccessControlService extends AbstractAccessControlService implements IAccessControlService {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlService.class);
+
+  @Override
+  protected Permissions execLoadPermissions() {
+    //moved select statement to here
+    try {
+      Object[][] permissionData = SQL.select(
+          "SELECT  P.PERMISSION_NAME, " +
+              "        MAX(P.PERMISSION_LEVEL) " +
+              "FROM    ORS_USER_ROLE R, ORS_ROLE_PERMISSION P " +
+              "WHERE   R.ROLE_UID=P.ROLE_UID " +
+              "AND     P.PERMISSION_LEVEL>0 " +
+              "AND     R.USER_NR IN( " +
+              "        SELECT  S.USER_NR " +
+              "        FROM    ORS_USER_SUBSTITUTE S " +
+              "        WHERE   S.SUBSTITUTE_NR=:userNr " +
+              "        UNION ALL " +
+              "        SELECT  TO_NUMBER(:userNr) FROM DUAL) " +
+              "GROUP BY P.PERMISSION_NAME"
+          );
+
+      return AccessControlUtility.createPermissions(permissionData);
+    }
+    catch (Throwable t) {
+      LOG.error("update due to client notification", t);
+      return null;
+      // nop
+    }
+  }
+}
+
+ADDED service registration to server plugin.xml
+    <service class="com.bsiag.crm.server.core.services.custom.security.AccessControlService" session="com.bsiag.crm.server.core.ServerSession" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory"/>
+
+16.08.2010 abr (contributed by Daniel Buehler, ticket 91072)
+ADDED two new properties to the org.eclipse.scout.rt.server.services.common.smtp.ISMTPService:
+  useSmtps: controls whether the connection to the SMPT host is encrypted
+  sslProtocols: comma-separated list of SSL protocols used for establishing the connection to the SMTP host
+
+23.08.2010 sle
+Ticket 86'471: SQL Logging
+ADDED AbstractSqlService prints on LogLevel INFO the PlainText-SqlStatement.
+Migration:
+CHANGED SqlService.java
+REMOVED FUNCTIONS:
+  private void createPlainTextLog(String s, Object... bindBases) throws ProcessingException {}
+  public Object[][] select(String s, Object... bindBases) throws ProcessingException {}
+  public void selectInto(String s, Object... bindBases) throws ProcessingException {}
+  public Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {}
+  public int delete(String s, Object... bindBases) throws ProcessingException {}
+  public int update(String s, Object... bindBases) throws ProcessingException {}
+  public int insert(String s, Object... bindBases) throws ProcessingException {}
+
+07.09.2010 imo
+Ticket 89'314
+In ISqlService added support for database specific keyword replacement using ant notation ${name} for:
+${sysdate}
+${upper}
+${lower}
+${trim}
+${nvl}
+
+09.09.2010 imo
+Eliminated direct dependencies to Plug-In javax.servlet and replaced by import-dependencies to package javax.servlet
+Affected Plug-Ins:
+org.eclipse.scout.http.servletfilter
+org.eclipse.scout.rt.server
+Migration:
+com.bsiag.<crm>.server.core, com.bsiag.<crm>.server.online must add an import dependency in their MANIFEST.MF to package javax.servlet.
+In DEVELOPMENT products add the javax.servlet Plug-In.
+In PRODUCTION products eliminate the javax.servlet Plug-In.
+
+13.09.2010 abr
+Merged Tickets 92'255 and 93'777 from branch 20091231.
+Oracle Lite and DB2 require date comparisons making use of to_number(...)
+Migration: None
+
+16.09.2010 abr
+Ticket 94'031
+FormDataStatementBuilder does not take externally defined form data classes into account.
+Migration:
+CHANGED method signature in org.eclipse.scout.rt.server.services.common.jdbc.builder.ValuePartDefinition
+FROM accept(AbstractFormData) TO accept(AbstractFormData, Map<Integer, Map<String, AbstractFormFieldData>>, Map<Integer, Map<String, AbstractPropertyData<?>>>)
+
+03.11.2010 abr
+Ticket 95'772
+FormDataStatementBuilder cannot distinguish between entries of template classes if the template is used multiple times within the same form.
+Now, a ProcessingException is thrown if the statement builder is used with ambiguous ValuePartDefinitions.
+Added org.eclipse.scout.commons.ClassIdentifier for identifying inner template field classes.
+Migration: Added and changed signatures from Class to ClassIdentifier in the following classes:
+  org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder
+  org.eclipse.scout.rt.server.services.common.jdbc.builder.ValuePartDefinition
+  org.eclipse.scout.rt.shared.data.form.AbstractFormData
+
+Example (simplified, without getters):
+  // template field data definition
+  public static class AbstractTemplateFieldData extends AbstractFormFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public class TemplateText extends AbstractValueFieldData<String> {
+      private static final long serialVersionUID = 1L;
+    }
+  }
+
+  public static class FormData extends AbstractFormData {
+    private static final long serialVersionUID = 1L;
+
+    // usual field data
+    public class Text extends AbstractValueFieldData<String> {
+      private static final long serialVersionUID = 1L;
+    }
+
+    // first usage of template field
+    public class Template1GroupBox extends AbstractTemplateFieldData {
+      private static final long serialVersionUID = 1L;
+    }
+
+    // second usage of template field
+    public class Template2GroupBox extends AbstractTemplateFieldData {
+      private static final long serialVersionUID = 1L;
+    }
+  }
+
+Defining a FormDataStatementBuilder for template types works as follows:
+  FormDataStatementBuilder builder = new FormDataStatementBuilder(new OracleSqlStyle());
+  // usual field data
+  builder.setValueDefinition( FormData.Text.class , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^
+  // inner field of the template requires a ClassIdentifier that provides the 'path to the class'. This one references the TemplateText that is within the Template1Group.
+  builder.setValueDefinition( new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class) , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // Like above but it uses the AbstractTemplateFieldData as starting point to get the reference on the TemplateText. This one references the TemplateText that is within the Template2Group.
+  builder.setValueDefinition( new ClassIdentifier(FormData.Template2GroupBox.class, AbstractTemplateFieldData.TemplateText.class) , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Migration: actually no migration but fix occurrences in your projects, if already used at all.
+
+20.12.2010 jgu
+Merged BSI Ticket 95648:
+Passwords are not displayed in service property page anymore, but can still be edited.
+Migration: None
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration: see client release notes for details.
+Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel. Also use LegacyFormDataStatementBuilder instead of FormDataStatementBuilder
+
+18.03.2011 imo
+Migration of legacy: moving remaining legacy logic from client to server
+Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
+Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
+Migration: None
+
+09.05.2011 bko
+Migration:
+Ensure the following two points regarding the ServerApplication:
+- the plugin „org.eclipse.scout.rt.server“ has to be listed as osgi.bundles in the config.ini of the server, otherwise the ServerApplication won’t be started on server startup
+- when using jetty the plugins „org.eclipse.equinox.http.servletbridge“ and „org.eclipse.equinox.servletbridge“ should not be listed in the product configuration, otherwise the ServerApplication will be started twice
+
+10.05.2011 jgu
+Database fragments removed from public eclipse scout:
+
+org.eclipse.scout.rt.server.jdbc.oracle11g.fragment
+org.eclipse.scout.rt.server.jdbc.mysql517.fragment
+org.eclipse.scout.rt.server.jdbc.db2_97.fragment
+org.eclipse.scout.rt.server.jdbc.oracle9i.fragment
+org.eclipse.scout.rt.server.jdbc.oracle10g.fragment
+org.eclipse.scout.rt.server.jdbc.mssql2005.fragment
+
+Migration: None
+
+01.06.2011 imo
+Internal security audit
+- server stack traces must not be sent to client
+- server log must contain all exceptions (except intended business logic exceptions)
+- enhanced access control on gui remote service calls: see IAccessControlService#checkServiceTunnelAccess
+- enhanced security checks on RemoteFileService
+- ServiceTunnelServlet: renamed delegate for transaction dispatching from handleSoapServiceCall to runServerJobTransaction
+Migration: None
+
+13.06.2011 imo
+Internal security audit
+added RemoteServiceAccessPermission
+remote service calls are denied if any of the following
+- the service is not an interface
+- the service is not a IService subtype
+- the method is not defined on the service interface itself
+- the method is on IService (IService2)
+- there is no RemoteServiceAccessPermission for that "service.method" (*)
+- there is an explicit RemoteServiceAccessDenied annotation on the service type or method (general overrule of any existing permission)
+Service policy is centrally applied in BusinessOperationDispatcher
+Migration:
+To support legacy, (*) shows a warning if none RemoteServiceAccessPermission is granted and automatically adds a default *.shared.* permission.
+For 'intranet use' add in your AccessControlService.execLoadPermissions:
+ ...
+ Permissions p = AccessControlUtility.createPermissions(permissionData);
+ p.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
+ return p;
+
+For 'internet/extranet use' add in your AccessControlService.execLoadPermissions a more restrictive list:
+ ...
+ Permissions p = AccessControlUtility.createPermissions(permissionData);
+ p.add(new RemoteServiceAccessPermission("com.mycompany.myproduct.shared.services.*", "*"));
+ ...
+ return p;
+
+28.06.2011 dwi
+bsi ticket #99'948 / #100'755
+Problem:
+If user cancels current running jobs, associated running SQL statements should also be killed.
+Solution:
+Added support to kill associated running JDBC statements if client job gets canceled.
+In StatementProcessor, statements to be executed are registered in RunningStatementStore on behalf of the current session.
+If a ClientJob gets canceled, a subsequent fire-and-forget cancel request is triggered to cancel registered statements.
+Resources changed:
+org.eclipse.scout.rt.client
+- InternalHttpServiceTunnel changed (cancel support for online servermode)
+- plugin.xml changed (registration of cancel processing service)
+com.bsiag.scout.shared
+- IServerProcessingCancelService added (service interface of cancel processing service)
+org.eclipse.scout.rt.server
+- ServerProcessingCancelService added (service implementation of cancel processing service)
+- RunningStatementStore added (store to hold currently running statements)
+- StatementProcessor changed to register / unregister currently running statements
+Migration: None
+
+16.08.2011 abr
+Bugzilla bug #354849
+bsi ticket #105170
+Added method org.eclipse.scout.rt.server.services.common.security.PermissionService.isCandidate(String) for deciding whether a
+class is a potential permission. The method checks the fully-qualified class name. Subclasses may override the default heuristic
+(i.e. '<hosting plug-in's symbolic name>.*.security.*Permission*').
+Migration: None
+
+18.08.2011 abr
+fixed concurrent modifications on RunningStatementStore
+Migration: None
+
+02.10.2011 hmu
+Use same method to extract the username of an logged in Subject in AbstractClientSession and AccessControlStore
+Migration: None
+
+
+18.10.2011 aho
+bugzilla ticket: 361256
+To make reuse of the ServletFilters in RAP projects. The following classes
+should be moved to the 'org.eclipse.scout.http.servletfilter' bundle:
+- org.eclipse.scout.rt.server.servlet.filter.AbstractChainableSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.DataSourceSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.LDAPSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.TomcatSecurityFilter
+
+All servlet filters in the 'org.eclipse.scout.rt.server' bundle were kept as @deprecated subclasses of the moved ones.
+
+Furthermore the
+'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' should
+be moved to the 'org.eclipse.scout.commons' bundle.
+
+Migration: change all 'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' imports to 'org.eclipse.scout.commons.security.SimplePrincipal'.
+
+24.10.2011 mvi
+Bugzilla ticket 361816
+Replace current NLS support with Text Provider Services
+- added ITextProviderService, IDocumentationTextProviderService, AbstractDynamicNlsTextProviderService
+- Migrated existing text providers to scout text provider services
+- TEXTS class added for consistent translation retrieval
+- Splitted org.eclipse.scout.rt.shared texts into two plugins:
+  - org.eclipse.scout.rt.shared contains text provider service with all texts that are used by the runtime
+  - org.eclipse.scout.rt.shared.legacy.texts.fragment contains all texts that are no longer used by the runtime
+- getConfiguredDoc properties moved to different ConfigProperty type for Scout SDK (support for Docs Text Providers)
+Migration:
+- Add "org.eclipse.scout.rt.shared.legacy.texts.fragment" to all products.
+- For each existing NLS Class (directly or indirectly extending "org.eclipse.scout.rt.shared.ScoutTexts" or "org.eclipse.scout.commons.nls.DynamicNls"):
+  - create a new "<YourSharedPlugin>.services.common.text.<Name>TextProviderService" extending "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService" in the corresponding shared plugin.
+- For each created TextProvider Service:
+  - Overwrite the method "getDynamicNlsBaseName" and return the same value as in the "RESOURCE_BUNDLE_NAME" constant (stored in the corresponding Texts class) as string literal.
+  - Register the service in the corresponding plugin as scout service using the "org.eclipse.scout.service.DefaultServiceFactory", no session class and give a ranking > 0. E.g.: <service class="com.bsiag.crm.shared.core.services.common.text.CoreTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" ranking="100" />
+- Delete all Texts classes and replace all uses of the old Texts classes with the class "org.eclipse.scout.rt.shared.TEXTS".
+- Remove the "getNlsTexts" methods from the Session classes if existent (unless you use session-dependent translations).
+- Correct return type of "getConfiguredNlsProvider" of all SqlServices (if existent) to return the new type defined by AbstractSqlService and return "ScoutTexts.class" inside the method.
+- If somewhere the "SwingUtility.setNlsTexts" method or "SwtUtility.setNlsTextsOnDisplay" method is used, set it to "ScoutTexts.getInstance()".
+- Delete all .nls files (NLS Editor can now be accessed using the TextProviderService Node in the Scout Explorer of the Scout perspective).
+  If you want to keep the .nls files (e.g. to support key shortcuts like ctrl+shift+r) do the following:
+  - Open the .nls file in the text editor (right click -> open with).
+  - Remove the following properties: "Nls-Type", "Nls-File-Prefix", "Nls-Translation-Folder".
+  - Change the property "Nls-Class" to the fully qualified name of the Text Provider Service you would like to edit with this .nls file.
+  - Save the changes and open the .nls file again in the Multilanguage Editor (right click -> open with).
+
+26.10.2011 dwi
+Bugzilla ticket 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+In Java 6 it is possible to contribute custom Locales (e.g. en_CH) to the JRE. That is why Scout NlsLocale is not used anymore and therefore marked as deprecated.
+The user's locale is accessed as follows:
+- On client side, the user's locale is accessed by Locale.getDefault()
+- On server side the request's locale is accessed by LocaleThreadLocal.get() (convenience accessor: ServerSession.get().getLocale())
+Eventhough the class NlsLocale is marked as deprecated for legacy support, its constructor 'NlsLocale(Locale)' was removed because NlsLocale was changed to only act as delegate to the thread's locale (if applicable) or default locale otherwise.
+Please note: A locale consists of its language and country. The country is mainly responsible for format settings as for instance the grouping separator of numbers. A very few locales already exist in the JRE. But if you like to have the application in the English language with Switzerland as its region, you have to contribute your own locale-implementation 'en_CH'. Please see Migration section for detailed instructions to extend JRE with a custom locale.
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.client
+- org.eclipse.scout.rt.server
+- org.eclipse.scout.rt.shared
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.oraclelite10g.core
+- org.eclipse.scout.rt.xstream.shared
+Migration:
+- removed NlsLocale(Locale) (constructor): use Locale instead of NlsLocale
+- removed IServerSession#getNlsLocale(): use IServerSession#getLocale() instead (e.g. replace all ServerSession.get().getNlsLocale().getLocale() by ServerSession.get().getLocale())
+- In client Plug-Ins: replace NlsLocale.getDefault().getLocale() by Locale.getDefault()
+- In server Plug-Ins: replace NlsLocale.getThreadDefault().getLocale() by LocaleThreadLocal.get()
+- In shared Plug-Ins: replace NlsLocale.getDefault().getLocale() by NlsUtility.getDefaultLocale()
+Contribution of custom locales to the JRE:
+1. Create a plain Java project, e.g. x.y.localeprovider.en.ch
+2. Create two classes that inherit from {@link DateFormatProvider} and {@link NumberFormatProvider} and implement the method stubs specific to your locale
+3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
+4. In those files, simply put the the fully qualified name to your date/number provider
+5. Export project as JAR file and put it into \lib\ext of your JRE
+
+09.11.2011 imo
+Legacy Cleanup of ThreadContext
+Problem: The generic ThreadContext.get and put methods consume lots of cpu and since the ThreadLocals of jre 1.5 are available,
+there is no more need for the class.
+Solution:
+ThreadContext only contains the 4 scout server state ThreadLocals.
+ThreadContextLegacy contains the old code (including ThreadContext state)
+Migration (optional):
+Code locations referring to old methods of ThreadContext.Xyz should be renamed to ThreadContextLegacy.Xyz
+
+10.11.2011 imo
+Enhancement of transaction cancel process
+Solution:
+see javadoc on IServerProcessingCancelService and ITransaction
+Migration:
+When using custom ITransactionMember objects, use the super class AbstractTransactionMember to support for api extensions.
+
+11.11.2011 imo
+Enhancement of JAAS authentication
+Solution:
+default servlet filters in org.eclipse.scout.rt.server
+/process by DevelopmentAuthFilter with order 1000000
+/process by HttpAuthJaasFilter with order 1000010
+/ajax by SoapWsseJaasFilter with order 1000010
+see javadoc on HttpAuthJaasFilter, SoapWsseJaasFilter and DevelopmentAuthFilter
+Migration:
+None
+
+30.01.2012 abr
+Bugzilla 370118
+findCodeTypeById on CodeService and CodeServiceClientProxy works for cached code types only
+Solution:
+If findCodeTypeById returns null for a non-null key, populate cache and retry.
+Migration:
+None
+
+23.05.2012 lhu/jgu
+Bugzilla 379721: OfflineDispatcherService: dispatcher thread should be 'offline in current thread'
+1) Server services are not found in offline mode in the following case:
+  - OfflineState: online by default, but the current thread is offline
+  - The service is created by the ServerServiceFactory
+  This is because the dispacher thread in OfflineDispatcherService is running in online mode (if online is default)
+  and a service registered with the ServerServiceFactory is only found on the FrontEnd in offline mode.
+  Solution:
+  The OfflineDispatcherService creates a dispacherThread which is always running offline.
+2) Updates on the SharedVariableMap are propagated to the client with ClientNotifications.
+  If some threads are running in online mode and some in offline mode and the state of the online and offline server is different, this leads to problems.
+  The notifications should only come from the server to which the application is connected by default.
+  Solution: Only send client notifications, if the offline state of the current thread is equal to the default.
+Migration:
+None
+
+
+15.01.2013 jgu
+Bugzilla ticket: 398087
+Problem:
+After having canceled a transaction (e.g. by pressing "Press Here to Cancel" in the client application), the execute of a DB call within the execEndTransaction method of an SqlService implementation fails because Scout prevents the execution by throwing an SQLException ("Transaction was cancelled").
+
+Executing a DB call within execEndTransaction can be required in the scenario of a custom audit trail implementation, where each transaction must be logged on the database.
+
+Solution:
+Statements called in execEndTransaction are executed even if the transaction is cancelled. This is done by a new Property in AbstractSqlTransactionMember.
+
+Migration:
+None
+

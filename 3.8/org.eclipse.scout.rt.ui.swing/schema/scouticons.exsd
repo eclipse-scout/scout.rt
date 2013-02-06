@@ -1,0 +1,732 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.ui.swing" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.rt.ui.swing" id="scouticons" name="Scout Icons"/>
+      </appInfo>
+      <documentation>
+         This extension point allows to contribute icons to overwrite Scout default icons.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="navigation_back" minOccurs="0" maxOccurs="1"/>
+            <element ref="navigation_forward" minOccurs="0" maxOccurs="1"/>
+            <element ref="navigation_refresh" minOccurs="0" maxOccurs="1"/>
+            <element ref="navigation_stop" minOccurs="0" maxOccurs="1"/>
+            <element ref="navigation_history" minOccurs="0" maxOccurs="1"/>
+            <element ref="network_latency_green" minOccurs="0" maxOccurs="1"/>
+            <element ref="network_latency_red" minOccurs="0" maxOccurs="1"/>
+            <element ref="network_latency_yellow" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_error" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_info" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_interrupt" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_warning" minOccurs="0" maxOccurs="1"/>
+            <element ref="table_column_filter_active" minOccurs="0" maxOccurs="1"/>
+            <element ref="mandatory" minOccurs="0" maxOccurs="1"/>
+            <element ref="tree_node" minOccurs="0" maxOccurs="1"/>
+            <element ref="tree_node_open" minOccurs="0" maxOccurs="1"/>
+            <element ref="window" minOccurs="0" maxOccurs="1"/>
+            <element ref="window16" minOccurs="0" maxOccurs="1"/>
+            <element ref="window32" minOccurs="0" maxOccurs="1"/>
+            <element ref="window48" minOccurs="0" maxOccurs="1"/>
+            <element ref="window256" minOccurs="0" maxOccurs="1"/>
+            <element ref="tray" minOccurs="0" maxOccurs="1"/>
+            <element ref="logo" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="navigation_back">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;back action&apos; in navigation panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_hover" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for mouse over state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_selected" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for active state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="navigation_forward">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;forward action&apos; in navigation panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_hover" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for mouse over state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_selected" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for active state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="navigation_refresh">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;refresh action&apos; in navigation panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_hover" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for mouse over state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_selected" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for active state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="navigation_stop">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;stop action&apos; in navigation panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_hover" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for mouse over state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_selected" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for active state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="navigation_history">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;history action&apos; in navigation panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_hover" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for mouse over state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_selected" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for active state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="network_latency_green">
+      <annotation>
+         <documentation>
+            Icon to indicate a  &apos;good network connection&apos; in status bar
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="network_latency_yellow">
+      <annotation>
+         <documentation>
+            Icon to indicate an &apos;average network connection&apos; in status bar
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="network_latency_red">
+      <annotation>
+         <documentation>
+            Icon to indicate a &apos;bad network connection&apos; in status bar
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_info">
+      <annotation>
+         <documentation>
+            Icon to represent an information
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_warning">
+      <annotation>
+         <documentation>
+            Icon to represent a warning
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_error">
+      <annotation>
+         <documentation>
+            Icon to represent an error
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_interrupt">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;interruption action &apos; in status bar
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="table_column_filter_active">
+      <annotation>
+         <documentation>
+            Icon to indicate an active table column filter
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mandatory">
+      <annotation>
+         <documentation>
+            Icon to indicate a mandatory field
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon_disabled" type="string">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource for disabled state
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="tree_node_open">
+      <annotation>
+         <documentation>
+            Icon to indicate the open state of a tree node (if supported by L&amp;F)
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="tree_node">
+      <annotation>
+         <documentation>
+            Icon to indicate the closed state of a tree node (if supported by L&amp;F)
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window16">
+      <annotation>
+         <documentation>
+            The application icon with a dimension of 16x16 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window32">
+      <annotation>
+         <documentation>
+            The application icon with a dimension of 32x32 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window48">
+      <annotation>
+         <documentation>
+            The application icon with a dimension of 48x48 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window256">
+      <annotation>
+         <documentation>
+            The application icon with a dimension of 256x256 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window">
+      <annotation>
+         <appInfo>
+            <meta.element deprecated="true"/>
+         </appInfo>
+         <documentation>
+            The application icon with a dimension of 16x16 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="tray">
+      <annotation>
+         <documentation>
+            The tray icon with a dimension of 16x16 pixels. The file must be of the format GIF.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="logo">
+      <annotation>
+         <documentation>
+            The application icon on header panel
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

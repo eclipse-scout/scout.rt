@@ -1,0 +1,223 @@
+17.05.2011 dwi
+Problem:
+Change of API due to ease of simplicity
+Solution:
+
+Change:
+  - Rename of AbstractWebServiceProxyService to AbstractWebServiceClient
+Migration:
+  - Change super type of your webservice consumers and rename the concrete implementation accordingly, e.g. TestWebServiceProxyService to TestWebServiceClient
+  - Update fully qualified names of webservice consumers in config.ini (properties for URL, username and password)
+
+Change:
+  - Rename of ScoutWebServiceProxy annotation to ScoutWebServiceClient
+Migration:
+  - Change code to use renamed annotation
+
+--
+Change:
+  - Removal of factories ICredentialValidationFactory and IAuthenticationFactory
+Migration:
+  - Remove concrete consumer factory implementations from project and instrument WebServiceClient (former WebServiceProxyService) in ScoutWebServiceClient annotation (former ScoutWebServiceProxy) to directly use the respective strategy.
+    Mostly, a strategy was implemented as inner class within the factory. Extract that code to a separate compilation unit.
+  - Remove concrete provider factory implementations from project and instrument WebService in ScoutWebService annotation to directly use the respective strategy.
+    Mostly, a strategy was implemented as inner class within the factory. Extract that code to a separate compilation unit.
+
+--
+Change:
+  - due to previous change, properties in annotation ScoutWebService / ScoutWebServiceClient changed
+Migration:
+  - use authenticationHandler instead of authenticationFactory
+  - use credentialValidationStrategy instead of credentialValidationFactory
+
+--
+Change:
+  - Rename of method [protected List<Handler<? extends MessageContext>> getConfiguredHandlers()] in AbstractWebServiceClient (former AbstractWebServiceProxyService).
+    Furthermore, handler support is limited to only SOAPHandler's.
+Migration:
+  - Use [protected void execInstallHandlers(List<SOAPHandler<SOAPMessageContext>> handlers)] instead and register handlers in given live list
+
+--
+Change:
+  - Rename of method [protected void execPrepareSecurityHandler(IAuthenticationHandler securityHandler) throws ProcessingException] in AbstractWebServiceClient (former AbstractWebServiceProxyService).
+Migration:
+  - Use [protected boolean execPrepareAuthenticationHandler(IAuthenticationHandler authenticationHandler) throws ProcessingException] instead
+
+--
+Change:
+  - Modification to authentication process to support in front authentication, e.g. in an application server.
+    * The request can be authenticated in two ways:
+    * 1. By the application server itself or a previous filter.
+    *    In such situation, we are already running in a respective doAs call which implies that the subject obtained
+    *    is not null and contains one principal at minimum.
+    * 2. By a subsequent {@link IAuthenticationHandler} handler.
+    *    This is if the subject is null or there is no principal associated yet.
+    *    If the current subject is null or readonly, a new one is created.
+Migration:
+  - None
+
+--
+Change:
+  - Changed data adapters to typed adapters which inherit from javax.xml.bind.annotation.adapters.XmlAdapter.
+    This has the advantage, that conversion methods must not be specified in binding.xml anymore and that no anonymous adapter classes are generated at stub generation.
+    When not working with custom packages but rather with the recommended JAX-WS package algorithm, those adapters where mutually overwritten by other stub implementations.
+Migration:
+  - Change registration in binding.xml files:
+    <jaxws:bindings version="2.0" node="wsdl:definitions/wsdl:types/xsd:schema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+      <jaxb:globalBindings>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:date" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:time" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:dateTime" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
+      </jaxb:globalBindings>
+    </jaxws:bindings>
+
+--
+Added:
+  - JAX-WS support in Scout SDK
+    After doing the previous migration steps, your webservices should be recognized by Scout SDK.
+    - remove of old files
+      - remove com.bsiag.crm.ws.gen.jar in WEB-INF/build
+      - remove build ant tasks in WEB-INF/build
+    - repair tasks
+      Still, there will be some problems in regard of building webservice stubs. Please use the proposed repair tasks to solve the problems.
+    - build-jaxws.xml
+      After Scout SDK created a build-jaxws.xml entry for each webservice, you manually have to configure the source folder. This is the folder generated code is placed in when generating the stub.
+      > In order to this, just add the property 'source="src-ws"' to the respective build-jaxws.entry.
+      > For webservice consumers, register WSDL file in Scout property view of your webservice. This is in section 'Webservice properties | WSDL file'.
+    - build directives
+      If you used build directives to build your webservice stubs, move them into the build-jaxws.xml file.
+      A typical configuration would be:
+
+        <property name="b" value="WEB-INF/build/XXX-bindings.xml"/>
+        <property name="verbose"/>
+        <property name="target" value="2.0"/>
+        <property name="Xdebug"/>
+        <property name="Xnocompile"/>
+
+27.06.2011 dwi
+Problem:
+If getter methods for username / password are overwritten, their values are not considered
+Solution:
+- removed domain property as not used yet
+- changed access of username / password property in AbstractWebServiceClient: use getter methods instead of accessing the members directly
+
+26.08.2011 dwi
+Problem:
+- AbstractWebServiceClient#getConfiguredHandlers(List<SOAPHandler<SOAPMessageContext>>) is not used (dead code)
+- LogHandler should be parameterizable to log directly to console and not only to logger (for rapid development)
+Solution:
+- removed AbstractWebServiceClient#getConfiguredHandlers(List<SOAPHandler<SOAPMessageContext>>)
+- added constructor to log handler with sysout as argument
+Migration:
+If AbstractWebServiceClient#getConfiguredHandlers(List<SOAPHandler<SOAPMessageContext>> handlers) is overwritten,
+move handler instantiation to AbstractWebServiceClient#execInstallHandlers(List<SOAPHandler<SOAPMessageContext>>)
+as this had no effect (dead code).
+
+22.10.2011 dwi
+BSI Ticket: 107'106
+Problem:
+It should be possible to set a maximal timeout for a webservice consumer to wait for a response
+Solution:
+- added getConfiguredRequestTimeout(): maximal time to wait for response data to be ready to be read
+- added getConfiguredConnectTimeout(): maximal time to wait for a connection to be established
+Migration:
+None
+
+07.11.2011 dwi
+BSI Ticket: 107'602
+Problem:
+DateAdapterISO8601UTC does not support all valid date-time combinations.
+Also, the xsd:dateTime definition does not fully rely on ISO-8601 standard because lack of timezone information.
+It should be possible to not only work with UTC time.
+Solution:
+- Changed adapter to fully support xsd:date transformation
+- Renamed DateAdapterISO8601UTC to UtcDateAdapter: all transformations are in respect to the UTC time.
+  > Use this adapter if all dates are uniformly to be transformed into UTC time (Zulu-time).
+- Renamed DateAdapter to DefaultTimezoneDateAdapter: all transformations are in respect to the default timezone on server
+  > Use this adapter if you expect to work with dates local to the default timezone.
+- Added CalendarAdapter: transformation into calendar object without loosing local time information.
+  > Use this adapter if you expect to work with dates from various timezones without
+  > loosing the local time. If the UTC (Zulu-time) is sufficient, use {@link UtcDateAdapter} instead.
+Migration:
+- If using the adapter 'DateAdapterISO8601UTC' for xsd:date<>java.util.Date transformation, do the following:
+  1) Go to the binding files of webservice providers and consumers
+  2) Change DateAdapterISO8601UTC to UtcDateAdapter or if applicable, use another one
+  3) Change DateAdapter to DefaultTimezoneDateAdapter or if applicable, use another one
+  4) Rebuild affected webservice stubs
+
+06.01.2012 dwi
+Bugzilla: 367994
+Problem:
+a) The WSDL file of webservice providers whose WSDL file is located in a sub-folder of '/WEB-INF/wsdl' is dynamically generated at JAX-WS bootstrap instead of the existing WSDL file to be published.
+b) Webservice consumer specific WSDL files might interfere with provider specific WSDL files, e.g. if defining same services or ports. In consequence, all webservice providers of that plugin are not published.
+c) redundant WSDL file in webservice stub JAR-file.
+Solution:
+a) changed JAX-WS resource loading to also look in subfolders for existing resources
+b) WS provider specific WSDL files should be located in the folder '/WEB-INF/wsdl/provider' whereas consumer specific WSDL files in '/WEB-INF/wsdl/consumer'. In turn, JAX-WS is instrumented to ignore all the files in the (sub-)folder '/WEB-INF/wsdl/consumer' when publishing the endpoints.
+c) WSDL file is not put into the JAR archive anymore when building the webservice stub.
+Migration:
+- Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
+- Rebuild webservice stubs (should automatically be done if using repair action)
+
+20.01.2012 dwi
+Bugzilla: 369242
+Problem: Basic authentication of webservice providers does not work on tomcat. That is because tomcat converts all the HTTP header names to lower case. According to RFC 2616, this conversion is  eligible as header names are case-insensitive. On Jetty, basic authentication mechanism works fine as header-names are untouched. Because Scout JAX-WS RT handles header-names in a case-sensitive way the authentication fails.
+Solution: Fixed 'BasicAuthenticationHandler' to treat header names case-insensitive.
+Migration: None
+
+06.01.2012 dwi
+Bugzilla: 367994
+Problem:
+a) The WSDL file of webservice providers whose WSDL file is located in a sub-folder of '/WEB-INF/wsdl' is dynamically generated at JAX-WS bootstrap instead of the existing WSDL file to be published.
+b) Webservice consumer specific WSDL files might interfere with provider specific WSDL files, e.g. if defining same services or ports. In consequence, all webservice providers of that plugin are not published.
+c) redundant WSDL file in webservice stub JAR-file.
+Solution:
+a) changed JAX-WS resource loading to also look in subfolders for existing resources
+b) WS provider specific WSDL files should be located in the folder '/WEB-INF/wsdl/provider' whereas consumer specific WSDL files in '/WEB-INF/wsdl/consumer'. In turn, JAX-WS is instrumented to ignore all the files in the (sub-)folder '/WEB-INF/wsdl/consumer' when publishing the endpoints.
+c) WSDL file is not put into the JAR archive anymore when building the webservice stub.
+Migration:
+- Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
+- Rebuild webservice stubs (should automatically be done if using repair action)
+
+24.02.2012 dwi
+Bugzilla: 372476
+Problem: If throwing an exception (SOAP fault or not) in webservice processing, the transaction is not rollbacked.
+Furthermore, SOAP faults should be logged with a severity of INFO instead of ERROR whereas unexpected errors with a severity of WARN.
+Solution:
+- Rollback of transaction (always in case of an error)
+- SOAP faults are logged with a severity of INFO
+- Runtime exceptions are logged with a severity of WARN with the note to handle such faults by respective SOAP faults. Also, the causing exception is not propagated back to the webservice client.
+Migration: None
+
+17.03.2012 dwi
+Bugzilla: 374580
+Problem:
+The webservice endpoints installed should be accessible within Scout application to access their properties.
+Solution:
+- Moved JAX-WS bootstrapping from servlet initialization into service initialization of IJaxWsEndpointService. This service provides access to the installed JAX-WS endpoints.
+- Moved JAX-WS status page from EndpointServlet to IJaxWsEndpointService.
+Migration:
+If you are providing a custom status page for your webservice endpoints, you configured the init-parameters 'bundle-name' and 'bundle-path' in the JAX-WS servlet. Remove those two parameters and set the following properties in config.ini file accordingly:
+org.eclipse.scout.jaxws.resource.bundle-name=<resource-bundle>
+org.eclipse.scout.jaxws.resource.bundle-path=<resource-path within resource-bundle>
+
+20.03.2012 dwi
+Bugzilla: 374837
+Problem:
+WebServiceContext cannot be injected into port type with @Resource annotation.
+That would be necessary to access message context and security information
+relative to a request being served.
+Solution:
+Fixed instance resolver to respect JAX-WS resource injection.
+Migration:
+None
+
+26.04.2012 mvi
+Bugzilla: 377831
+Problem:
+JaxWsStubGenerator crashes when creating providers or consumers under Java 7
+Solution:
+Bridge implemented that can handle both implementation versions.
+Furthermore logging has been improved to get more detailed messages.
+Migration:
+None

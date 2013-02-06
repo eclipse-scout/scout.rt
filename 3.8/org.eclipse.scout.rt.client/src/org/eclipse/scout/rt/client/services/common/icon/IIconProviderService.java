@@ -1,0 +1,36 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.services.common.icon;
+
+import org.eclipse.scout.service.IService2;
+import org.osgi.framework.Bundle;
+
+/**
+ *
+ */
+public interface IIconProviderService extends IService2 {
+
+  /**
+   * the icon lookup can be called with a full icon name (with extension) e.g. 'myIcon.gif' or with a simple icon name
+   * e.g. 'myIcon'. In case of calling this method without an extension the list of extensions will be looped and added
+   * to the simple icon name. The first found icon is returned.
+   * 
+   * @return the icon specification to the icon or null if not found.
+   */
+  IconSpec getIconSpec(String iconName);
+
+  Bundle getHostBundle();
+
+  /**
+   * @return
+   */
+  int getRanking();
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="pages" name="Pages" schema="schema/pages.exsd"/>
+   <extension-point id="menus" name="Menus" schema="schema/menus.exsd"/>
+   <extension-point id="desktopExtensions" name="Desktop Extensions" schema="schema/desktopExtensions.exsd"/>
+   <extension
+         point="org.eclipse.scout.rt.extension.client.desktopExtensions">
+      <desktopExtension
+            active="true"
+            class="org.eclipse.scout.rt.extension.client.ui.desktop.internal.DesktopMenuInjectingDesktopExtension">
+      </desktopExtension>
+   </extension>
+
+</plugin>

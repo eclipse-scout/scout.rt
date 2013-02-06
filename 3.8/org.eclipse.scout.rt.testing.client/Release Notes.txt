@@ -1,0 +1,21 @@
+09.08.2011
+Bugzilla ticket: 350389, improve Scout RT testing support
+BSI ticket: 103'068
+Replaced ClientSessionClass annotation by a more powerful ClientTest annotation that has the following features:
+o annotation can be applied on class-level as well as on a test case level (method).
+o @BeforeClass and @AfterClass methods are executed in the same session defined on class-level
+o @Before, @Test and @After are executed per test method in the same session defined on class-level
+  or in a separate session if the @Test method is also annotated with @ClientTest
+o Sessions are shared as long as they are not marked with @ClientTest(foreceNewSession = true)
+o Tests can be executed as different users. Controlled by @ClientTest(runAs = "principal")
+o The IClientSession class can be provided by the annotation @ClientTest(clientSessionClass = MyClientSession.class)
+  or by setting the default value ScoutClientTestRunner.setDefaultClientSessionClass(MyClientSession.class). The value
+  provided by the @ClientTest annotation is used if both are provided.
+o An existing or new IClientSession is provided by an implementation of IClientSessionProvider. The default provider is
+  DefaultTestClientSessionProvider and is set on ScoutClientTestRunner.setDefaultClientSessionProvider(). It can be
+  overridden using the @ClientTest(clientSessionProvider = MyClientSessionProvider.class) annotation.
+
+Migration:
+o remove all @ClientSessionClass annotations
+o set the project's client session class in the client test applications (headless and different GUI strategies)
+  ScoutClientTestRunner.setDefaultClientSessionClass(ClientSession.class);
