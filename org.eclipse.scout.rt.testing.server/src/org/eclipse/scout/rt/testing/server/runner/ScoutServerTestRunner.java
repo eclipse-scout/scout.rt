@@ -14,11 +14,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.server.DefaultTestServerSessionProvider;
 import org.eclipse.scout.rt.testing.server.ITestServerSessionProvider;
@@ -35,6 +39,13 @@ import org.junit.runners.model.Statement;
 /**
  * JUnit test runner that runs the annotated test class within a Scout server job. Test cases executed by this runner
  * may be configured with {@link ServerTest} annotation.
+ * <p/>
+ * <h3>Custom Test Environments</h3> A custom test environment (e.g. required for running Tests with Maven Tycho) can be
+ * set up using an implementation of {@link IServerTestEnvironment} which must be on the classpath of
+ * {@link SerializationUtility#getClassLoader()}. The custom {@link IServerTestEnvironment} class must use the following
+ * <b>fully qualified</b> class name:
+ * <p/>
+ * <code>org.eclipse.scout.testing.server.runner.CustomServerTestEnvironment</code>
  * <p/>
  * <h3>Sessions and Transactions</h3> The different methods of a test class driven by this runner are invoked in
  * different Scout server sessions and therefore in different Scout transactions (because a Scout transaction is
@@ -72,6 +83,13 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   private static Class<? extends IServerSession> s_defaultServerSessionClass;
   private static String s_defaultPrincipalName;
   private static ITestServerSessionProvider s_defaultServerSessionProvider = new DefaultTestServerSessionProvider();
+  private static final IScoutLogger LOG;
+  private static final IServerTestEnvironment FACTORY;
+
+  static {
+    LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
+    FACTORY = createServerTestEnvironmentFactory();
+  }
 
   private LoginInfo m_loginInfo;
 
@@ -99,6 +117,13 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
    */
   public ScoutServerTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
+
+    if (FACTORY != null) {
+      setDefaultServerSessionClass(FACTORY.getDefaultServerSessionClass());
+      setDefaultPrincipalName(FACTORY.getDefaultPrincipalName());
+      FACTORY.setup();
+    }
+
     try {
       m_loginInfo = getOrCreateServerSession(klass.getAnnotation(ServerTest.class), null);
     }
@@ -294,4 +319,32 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
       return m_serverSession;
     }
   }
+
+  private static IServerTestEnvironment createServerTestEnvironmentFactory() {
+    IServerTestEnvironment environment = null;
+    if (SerializationUtility.getClassLoader() != null) {
+      // check whether there is a custom test environment available
+      try {
+        Class<?> customTestEnvironment = SerializationUtility.getClassLoader().loadClass("org.eclipse.scout.testing.server.runner.CustomServerTestEnvironment");
+        LOG.info("loaded custom test environment: [" + customTestEnvironment + "]");
+        if (!IServerTestEnvironment.class.isAssignableFrom(customTestEnvironment)) {
+          LOG.warn("custom test environment is not implementing [" + IServerTestEnvironment.class + "]");
+        }
+        else if (Modifier.isAbstract(customTestEnvironment.getModifiers())) {
+          LOG.warn("custom test environment is an abstract class [" + customTestEnvironment + "]");
+        }
+        else {
+          environment = (IServerTestEnvironment) customTestEnvironment.newInstance();
+        }
+      }
+      catch (ClassNotFoundException e) {
+        // no custom custom test environment installed
+      }
+      catch (Exception e) {
+        LOG.warn("Unexpected problem while creating a new instance of custom test environment", e);
+      }
+    }
+    return environment;
+  }
+
 }
