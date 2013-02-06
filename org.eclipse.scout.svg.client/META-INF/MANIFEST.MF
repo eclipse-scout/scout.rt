@@ -11,11 +11,11 @@ Export-Package: org.eclipse.scout.svg.client,
  org.eclipse.scout.svg.client.svgfield
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: org.apache.batik.bridge;version="[1.7.0,2.0.0)",
- org.apache.batik.css.engine;version="[1.7.0,2.0.0)",
- org.apache.batik.dom.svg;version="[1.7.0,2.0.0)",
- org.apache.batik.dom.util;version="[1.7.0,2.0.0)",
- org.apache.batik.swing;version="[1.7.0,2.0.0)",
- org.apache.batik.swing.svg;version="[1.7.0,2.0.0)",
- org.apache.batik.util;version="[1.7.0,2.0.0)",
+Import-Package: org.apache.batik.bridge;version="[1.6.0,2.0.0)",
+ org.apache.batik.css.engine;version="[1.6.0,2.0.0)",
+ org.apache.batik.dom.svg;version="[1.6.0,2.0.0)",
+ org.apache.batik.dom.util;version="[1.6.0,2.0.0)",
+ org.apache.batik.swing;version="[1.6.0,2.0.0)",
+ org.apache.batik.swing.svg;version="[1.6.0,2.0.0)",
+ org.apache.batik.util;version="[1.6.0,2.0.0)",
  org.w3c.dom.svg;version="[1.1.0,2.0.0)"
