@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.tabbox;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
@@ -38,12 +40,36 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
   private Image m_tabImage;
   private boolean m_uiFocus;
 
+  private int getVisibleIndex() {
+    int res = -1;
+    IGroupBox groupBox = getScoutObject();
+    if (groupBox != null && groupBox.getParentField() != null) {
+      for (IFormField box : groupBox.getParentField().getFields()) {
+        if (box.isVisible()) {
+          res++;
+          if (box == groupBox) {
+            break;
+          }
+
+        }
+      }
+    }
+    return res;
+  }
+
   @Override
   protected void initializeSwt(Composite parent) {
     CTabFolder folder = (CTabFolder) parent;
-
     folder.setLayout(new FillLayout());
-    m_tabItem = new CTabItem(folder, SWT.NONE);
+    int tabItemCount = folder.getItemCount();
+    int index = getVisibleIndex();
+    if (index >= 0 && index <= tabItemCount) {
+      m_tabItem = new CTabItem(folder, SWT.NONE, index);
+    }
+    else {
+      m_tabItem = new CTabItem(folder, SWT.NONE, tabItemCount);
+    }
+
     m_tabItem.addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {

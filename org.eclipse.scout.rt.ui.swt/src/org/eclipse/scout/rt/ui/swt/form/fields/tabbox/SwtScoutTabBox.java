@@ -30,8 +30,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * <h3>SwtScoutTabBox</h3> ... TODO: - visibility changes dynamic of scout
- * boxes, rebuild box.
+ * <h3>SwtScoutTabBox</h3> ...
  * 
  * @since 1.0.0 04.04.2008
  */
@@ -42,7 +41,6 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
   private Listener m_uiTabFocusListener;
   private P_TabListener m_tabListener = new P_TabListener();
   private OptimisticLock m_selectedTabLock;
-  private OptimisticLock m_rebuildItemsLock = new OptimisticLock();
 
   public SwtScoutTabBox() {
     m_selectedTabLock = new OptimisticLock();
@@ -59,7 +57,7 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
     for (IGroupBox box : getScoutObject().getGroupBoxes()) {
       box.addPropertyChangeListener(m_tabListener);
     }
-    rebuildItems();
+    buildItems();
     if (m_uiTabFocusListener == null) {
       m_uiTabFocusListener = new P_SwtFocusListener();
     }
@@ -68,48 +66,25 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
     tabFolder.addListener(SWT.FocusOut, m_uiTabFocusListener);
   }
 
-  protected void rebuildItems() {
+  protected void buildItems() {
     try {
-      m_rebuildItemsLock.acquire();
       getSwtContainer().setRedraw(false);
-      IGroupBox selectedBox = null;
-      // remove old
-      if (m_tabs != null) {
-        CTabItem selectedTab = getSwtField().getSelection();
-        if (selectedTab != null) {
-          SwtScoutTabItem swtScoutTabItem = m_tabs.get(selectedTab);
-          if (swtScoutTabItem != null && swtScoutTabItem.getScoutObject().isVisible()) {
-            selectedBox = swtScoutTabItem.getScoutObject();
-          }
-        }
-        for (SwtScoutTabItem item : m_tabs.values()) {
-          item.getTabItem().dispose();
-          item.dispose();
-
-        }
-      }
       m_tabs = new HashMap<CTabItem, SwtScoutTabItem>();
-      CTabItem selectedCItem = null;
       for (IGroupBox box : getScoutObject().getGroupBoxes()) {
         if (box.isVisible()) {
           // XXX make tabitem exchangeable... extension point and provide a ITabItemInterface
           SwtScoutTabItem item = new SwtScoutTabItem();
           item.createField(getSwtField(), box, getEnvironment());
           m_tabs.put(item.getTabItem(), item);
-          if (box.equals(selectedBox)) {
-            selectedCItem = item.getTabItem();
-          }
-          if (selectedBox == null) {
-            selectedBox = box;
-            selectedCItem = item.getTabItem();
-          }
         }
       }
-      getSwtField().setSelection(selectedCItem);
+      SwtScoutTabItem selectedTabItem = getTabItem(getScoutObject().getSelectedTab());
+      if (selectedTabItem != null) {
+        getSwtField().setSelection(selectedTabItem.getTabItem());
+      }
     }
     finally {
       getSwtContainer().setRedraw(true);
-      m_rebuildItemsLock.release();
     }
 
   }
@@ -248,25 +223,67 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
 
   private class P_TabListener implements PropertyChangeListener {
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals(IGroupBox.PROP_VISIBLE)) {
-        try {
-          if (m_rebuildItemsLock.acquire()) {
-            RunnableWithData t = new RunnableWithData() {
-              @Override
-              public void run() {
-                rebuildItems();
-              }
-            };
-
-            getEnvironment().invokeSwtLater(t);
+        RunnableWithData t = new RunnableWithData() {
+          @Override
+          public void run() {
+            IGroupBox groupBox = (IGroupBox) evt.getSource();
+            if (groupBox.isVisible()) {
+              showGroupBox(groupBox);
+            }
+            else {
+              hideGroupBox(groupBox);
+            }
           }
-        }
-        finally {
-          m_rebuildItemsLock.release();
-        }
+        };
+
+        getEnvironment().invokeSwtLater(t);
       }
     }
+  }
+
+  private void showGroupBox(IGroupBox groupBox) {
+    try {
+      getSwtContainer().setRedraw(false);
+      SwtScoutTabItem item = getTabItem(groupBox);
+      if (item == null || item.isDisposed()) {
+        item = new SwtScoutTabItem();
+        item.createField(getSwtField(), groupBox, getEnvironment());
+        m_tabs.put(item.getTabItem(), item);
+
+      }
+    }
+    finally {
+      getSwtContainer().setRedraw(true);
+    }
+  }
+
+  private void hideGroupBox(IGroupBox groupBox) {
+    try {
+      getSwtContainer().setRedraw(false);
+      SwtScoutTabItem item = getTabItem(groupBox);
+      m_tabs.remove(item.getTabItem());
+      if (item != null && item.isInitialized() && !item.isDisposed()) {
+        item.getTabItem().dispose();
+        item.dispose();
+      }
+    }
+    finally {
+      getSwtContainer().setRedraw(true);
+    }
+  }
+
+  private SwtScoutTabItem getTabItem(IGroupBox groupBox) {
+    if (groupBox == null) {
+      return null;
+    }
+    for (SwtScoutTabItem item : m_tabs.values()) {
+      if (item.getScoutObject() == groupBox) {
+        return item;
+      }
+    }
+    return null;
   }
 
 }
