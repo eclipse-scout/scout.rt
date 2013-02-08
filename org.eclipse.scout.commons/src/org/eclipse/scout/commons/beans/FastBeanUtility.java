@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -129,25 +130,26 @@ public final class FastBeanUtility {
   }
 
   public static Method[] getDeclaredPublicMethods(Class c) {
-    Method[] result = null;
+    Method[] methods = null;
     final Class fc = c;
-    result = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+    methods = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
       @Override
       public Method[] run() {
         return fc.getDeclaredMethods();
       }
     });
-    //clear non-public methods
-    if (result != null) {
-      for (int i = 0; i < result.length; i++) {
-        Method method = result[i];
+    //clear non-public methods:
+    ArrayList<Method> methodsList = new ArrayList<Method>();
+    if (methods != null) {
+      for (int i = 0; i < methods.length; i++) {
+        Method method = methods[i];
         int mods = method.getModifiers();
-        if (!Modifier.isPublic(mods)) {
-          result[i] = null;
+        if (Modifier.isPublic(mods)) {
+          methodsList.add(method);
         }
       }
     }
-    return result;
+    return methodsList.toArray(new Method[methodsList.size()]);
   }
 
 }
