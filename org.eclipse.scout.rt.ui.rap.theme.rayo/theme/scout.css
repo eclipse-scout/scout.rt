@@ -774,6 +774,106 @@ Button.formButton-active:selected:hover,
 Button.formButton-active:hover {
   background-image: none;
 }
+/* Shell */
+Shell {
+  border: none;
+  padding: 0px;
+  background-image: none;
+  opacity: 1;
+}
+Shell[TITLE],
+Shell[BORDER] {
+  background-color: #ffffff;
+  border: 2px solid #67a8ce;
+  border-radius: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+Shell[BORDER]:inactive,
+Shell[TITLE]:inactive {
+  border: 2px solid #91b8cf;
+}
+Shell:maximized,
+Shell:maximized:inactive {
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: transparent;
+}
+/* Shell titlebar */
+Shell-Titlebar {
+  font: bold 12px Arial, Helvetica, sans-serif;
+  background-color: #67a8ce;
+  color: #ffffff;
+  padding: 2px 0px 2px 13px;
+  margin: 0px;
+  height: 18px;
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-Titlebar:inactive {
+  background-color: #91b8cf;
+}
+Shell-MinButton,
+Shell-MaxButton,
+Shell-CloseButton {
+  margin: 0px;
+}
+/* Shell buttons */
+/* Minimize button */
+Shell-MinButton {
+  background-image: url(theme/img/window/shell-min.png);
+}
+Shell-MinButton:hover {
+  background-image: url(theme/img/window/shell-min-hover.png);
+}
+Shell-MinButton:inactive {
+  background-image: url(theme/img/window/shell-min.png);
+}
+Shell-MinButton:inactive:hover {
+  background-image: url(theme/img/window/shell-min-hover.png);
+}
+/* Maximize button */
+Shell-MaxButton {
+  background-image: url(theme/img/window/shell-max.png);
+}
+Shell-MaxButton:hover {
+  background-image: url(theme/img/window/shell-max-hover.png);
+}
+Shell-MaxButton:inactive {
+  background-image: url(theme/img/window/shell-max.png);
+}
+Shell-MaxButton:inactive:hover {
+  background-image: url(theme/img/window/shell-max-hover.png);
+}
+/* Restore button */
+Shell-MaxButton:maximized {
+  background-image: url(theme/img/window/shell-restore.png);
+}
+Shell-MaxButton:maximized:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png);
+}
+Shell-MaxButton:maximized:inactive {
+  background-image: url(theme/img/window/shell-restore.png);
+}
+Shell-MaxButton:maximized:inactive:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png);
+}
+/* Close button */
+Shell-CloseButton {
+  background-image: url(theme/img/window/shell-close.png);
+}
+Shell-CloseButton:hover {
+  background-image: url(theme/img/window/shell-close-hover.png);
+}
+Shell-CloseButton:inactive {
+  background-image: url(theme/img/window/shell-close.png);
+}
+Shell-CloseButton:inactive:hover {
+  background-image: url(theme/img/window/shell-close-hover.png);
+}
 /* generated at http://www.ajaxload.info */
 Composite.busyIndicator {
   padding: 8px;
@@ -1208,106 +1308,6 @@ ScrollBar-DownButton-Icon[HORIZONTAL] {
 }
 ScrollBar-DownButton-Icon[HORIZONTAL]:hover {
   background-image: url(theme/img/scrollbar/scrollbar-left.png);
-}
-/* Shell */
-Shell {
-  border: none;
-  padding: 0px;
-  background-image: none;
-  opacity: 1;
-}
-Shell[TITLE],
-Shell[BORDER] {
-  background-color: #ffffff;
-  border: 2px solid #67a8ce;
-  border-radius: 0px 0px 0px 0px;
-  padding: 0px 0px 0px 0px;
-}
-Shell[BORDER]:inactive,
-Shell[TITLE]:inactive {
-  border: 2px solid #91b8cf;
-}
-Shell:maximized,
-Shell:maximized:inactive {
-  border: none;
-  border-radius: 0px 0px 0px 0px;
-}
-Shell-DisplayOverlay {
-  animation: none;
-  background-image: none;
-  background-color: transparent;
-}
-/* Shell titlebar */
-Shell-Titlebar {
-  font: bold 12px Arial, Helvetica, sans-serif;
-  background-color: #67a8ce;
-  color: #ffffff;
-  padding: 2px 0px 2px 13px;
-  margin: 0px;
-  height: 18px;
-  border: none;
-  border-radius: 0px 0px 0px 0px;
-}
-Shell-Titlebar:inactive {
-  background-color: #91b8cf;
-}
-Shell-MinButton,
-Shell-MaxButton,
-Shell-CloseButton {
-  margin: 0px;
-}
-/* Shell buttons */
-/* Minimize button */
-Shell-MinButton {
-  background-image: url(theme/img/window/shell-min.png);
-}
-Shell-MinButton:hover {
-  background-image: url(theme/img/window/shell-min-hover.png);
-}
-Shell-MinButton:inactive {
-  background-image: url(theme/img/window/shell-min.png);
-}
-Shell-MinButton:inactive:hover {
-  background-image: url(theme/img/window/shell-min-hover.png);
-}
-/* Maximize button */
-Shell-MaxButton {
-  background-image: url(theme/img/window/shell-max.png);
-}
-Shell-MaxButton:hover {
-  background-image: url(theme/img/window/shell-max-hover.png);
-}
-Shell-MaxButton:inactive {
-  background-image: url(theme/img/window/shell-max.png);
-}
-Shell-MaxButton:inactive:hover {
-  background-image: url(theme/img/window/shell-max-hover.png);
-}
-/* Restore button */
-Shell-MaxButton:maximized {
-  background-image: url(theme/img/window/shell-restore.png);
-}
-Shell-MaxButton:maximized:hover {
-  background-image: url(theme/img/window/shell-restore-hover.png);
-}
-Shell-MaxButton:maximized:inactive {
-  background-image: url(theme/img/window/shell-restore.png);
-}
-Shell-MaxButton:maximized:inactive:hover {
-  background-image: url(theme/img/window/shell-restore-hover.png);
-}
-/* Close button */
-Shell-CloseButton {
-  background-image: url(theme/img/window/shell-close.png);
-}
-Shell-CloseButton:hover {
-  background-image: url(theme/img/window/shell-close-hover.png);
-}
-Shell-CloseButton:inactive {
-  background-image: url(theme/img/window/shell-close.png);
-}
-Shell-CloseButton:inactive:hover {
-  background-image: url(theme/img/window/shell-close-hover.png);
 }
 Composite.smartfield {
   /* 2px on the right side to move the button a little bit away from the border */
