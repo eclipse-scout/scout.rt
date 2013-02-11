@@ -40,6 +40,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
   private boolean m_tableMouseMoveSelectionSupportEnabled;
+  private boolean m_tableMultilineTooltipSupportEnabled;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -242,5 +243,14 @@ public class UiDecoration implements IUiDecoration {
   @Override
   public boolean isTableMouseMoveSelectionSupportEnabled() {
     return m_tableMouseMoveSelectionSupportEnabled;
+  }
+
+  public void setTableMultilineTooltipSupportEnabled(boolean tableMultilineTooltipSupportEnabled) {
+    m_tableMultilineTooltipSupportEnabled = tableMultilineTooltipSupportEnabled;
+  }
+
+  @Override
+  public boolean isTableMultilineTooltipSupportEnabled() {
+    return m_tableMultilineTooltipSupportEnabled;
   }
 }

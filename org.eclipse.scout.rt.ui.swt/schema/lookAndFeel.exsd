@@ -24,21 +24,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -84,7 +84,7 @@
          <attribute name="name" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
             <simpleType>
@@ -125,13 +125,15 @@
                   </enumeration>
                   <enumeration value="table.mouseMoveSelectionSupport.enabled">
                   </enumeration>
+                  <enumeration value="table.multilineTooltipSupport.enabled">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
          <attribute name="value" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -185,7 +187,7 @@
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -197,7 +199,7 @@
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -209,7 +211,7 @@
          <attribute name="font" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -221,7 +223,7 @@
          <attribute name="placement" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
             <simpleType>

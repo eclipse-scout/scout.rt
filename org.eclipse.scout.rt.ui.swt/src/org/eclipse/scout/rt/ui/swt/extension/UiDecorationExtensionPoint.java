@@ -245,6 +245,9 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyString(ILookAndFeelProperties.PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED) != null) {
         LOOK_AND_FEEL.setTableMouseMoveSelectionSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED));
       }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_TABLE_MULTILINE_TOOLTIP_SUPPORT_ENABLED) != null) {
+        LOOK_AND_FEEL.setTableMultilineTooltipSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_TABLE_MULTILINE_TOOLTIP_SUPPORT_ENABLED));
+      }
     }
   }
 
