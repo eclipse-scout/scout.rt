@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessorMonitor;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
@@ -78,6 +80,7 @@ public class StatementProcessor implements IStatementProcessor {
   private final String m_originalStm;
   private Object[] m_bindBases;
   private int m_maxRowCount;
+  private int m_maxFetchSize = -1;
   private BindModel m_bindModel;
   private IToken[] m_ioTokens;
   private List<IBindInput> m_inputList;
@@ -87,6 +90,7 @@ public class StatementProcessor implements IStatementProcessor {
   private int m_currentOutputBatchIndex = -1;
   private String m_currentInputStm;
   private TreeMap<Integer/* jdbcBindIndex */, SqlBind> m_currentInputBindMap;
+  private int m_maxFetchMemorySize = 1048576; // = 1MB default
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) throws ProcessingException {
     this(callerService, stm, bindBases, 0);
@@ -97,6 +101,10 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException("statement is null");
     }
     try {
+      String maxFetchMemorySize = ConfigIniUtility.getProperties(getClass()).get("maxFetchMemorySize");
+      if (maxFetchMemorySize != null) {
+        m_maxFetchMemorySize = Integer.parseInt(maxFetchMemorySize);
+      }
       m_callerService = callerService;
       m_originalStm = stm;
       m_maxRowCount = maxRowCount;
@@ -193,9 +201,35 @@ public class StatementProcessor implements IStatementProcessor {
     return row;
   }
 
+  private int getMaxFetchSize(ResultSet rs) throws SQLException {
+    if (m_maxFetchSize == -1) {
+      int memoryUsagePerRow = 32; // reference to array
+      ResultSetMetaData meta = rs.getMetaData();
+      for (int i = 1; i <= meta.getColumnCount(); i++) {
+        memoryUsagePerRow += meta.getColumnDisplaySize(i);
+      }
+      m_maxFetchSize = m_maxFetchMemorySize / memoryUsagePerRow;
+    }
+    return m_maxFetchSize;
+  }
+
   protected List<Object[]> processResultRows(ResultSet rs, int maxRowCount) throws SQLException, ProcessingException {
+    boolean isDynamicPrefetch = false;
+    int rowCount = 0;
+    int initialFetchSize = 0;
+    int dynamicFetchSize = 0;
+    if (m_callerService.getSqlStyle() != null && m_callerService.getSqlStyle() instanceof OracleSqlStyle) {
+      // init prefetch params
+      isDynamicPrefetch = true;
+      initialFetchSize = rs.getFetchSize();
+      dynamicFetchSize = initialFetchSize;
+    }
     ArrayList<Object[]> rows = new ArrayList<Object[]>();
     while (rs.next()) {
+      if (isDynamicPrefetch && ++rowCount % dynamicFetchSize == 0 && dynamicFetchSize < getMaxFetchSize(rs)) {
+        dynamicFetchSize = Math.min(Math.max(initialFetchSize, rowCount / 2), getMaxFetchSize(rs));
+        rs.setFetchSize(dynamicFetchSize);
+      }
       Object[] row = processResultRow(rs);
       rows.add(row);
       if (maxRowCount > 0 && rows.size() >= maxRowCount) {
