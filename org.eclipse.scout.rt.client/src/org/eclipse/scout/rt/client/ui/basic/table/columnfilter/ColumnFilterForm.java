@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -267,7 +269,8 @@ public class ColumnFilterForm extends AbstractForm {
           List<LookupRow> hist = getColumnFilter().createHistogram();
           ArrayList<ITableRow> rowList = new ArrayList<ITableRow>(hist.size() + 1);
           for (LookupRow histRow : hist) {
-            TableRow tableRow = new TableRow(getTable().getColumnSet(), new Object[]{histRow.getKey(), histRow.getText()});
+            String text = StringUtility.isNullOrEmpty(StringUtility.getTag(histRow.getText(), "body")) ? histRow.getText() : HTMLUtility.getPlainText(histRow.getText());
+            TableRow tableRow = new TableRow(getTable().getColumnSet(), new Object[]{histRow.getKey(), text});
             tableRow.setIconId(histRow.getIconId());
             tableRow.setForegroundColor(histRow.getForegroundColor());
             tableRow.setBackgroundColor(histRow.getBackgroundColor());

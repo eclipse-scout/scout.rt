@@ -44,6 +44,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.RowIndexComparator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
@@ -224,6 +226,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   private synchronized void checkTooltipListener() {
+    // Ensure multiline tooltip is not used for smartfield tables or list boxes
+    if (getScoutObject() instanceof SmartTableForm.MainBox.ResultTableField.Table || getScoutObject() instanceof DefaultListBoxTable) {
+      return;
+    }
     getSwtTableViewer().getTable().setToolTipText("");
     if (m_multiLineTooltipListener == null) {
       m_multiLineTooltipListener = new P_MultilineTooltipListener();
@@ -1413,6 +1419,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
 
             // "Disable" native tooltip
             getSwtTableViewer().getTable().setToolTipText("");
+            Control oldControl = getEnvironment().getDisplay().getFocusControl();
 
             m_tooltip = new Shell(getSwtTableViewer().getTable().getShell(), SWT.TOOL);
             m_tooltip.setBackground(getSwtTableViewer().getTable().getParent().getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
@@ -1454,6 +1461,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
 
                 switch (tooltipLabelEvent.type) {
 
+                  case SWT.MouseUp: {
+                    handleSwtRowClick(row);
+                    break;
+                  }
                   case SWT.MouseDown: {
                     getSwtTableViewer().getTable().setFocus();
                     int button = tooltipLabelEvent.button;
@@ -1502,6 +1513,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
             };
             m_tooltipLabel.addListener(SWT.MouseDown, tooltipLabelListener);
             m_tooltipLabel.addListener(SWT.MouseExit, tooltipLabelListener);
+            m_tooltipLabel.addListener(SWT.MouseUp, tooltipLabelListener);
 
             Point size = m_tooltip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
@@ -1521,7 +1533,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
               }
               s_activeMultlineTooltipTable = SwtScoutTable.this;
               m_tooltip.setVisible(true);
-              getSwtTableViewer().getTable().forceFocus();
+              if (oldControl != null) {
+                oldControl.forceFocus();
+              }
             }
           }
         }

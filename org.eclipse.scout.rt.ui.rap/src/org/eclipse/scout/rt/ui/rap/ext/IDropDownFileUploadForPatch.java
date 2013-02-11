@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.ext;
 
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -38,6 +39,10 @@ public interface IDropDownFileUploadForPatch {
   void addFocusListener(FocusListener listener);
 
   void addMouseListener(MouseListener listener);
+
+  void addMenuListener(MenuListener listener);
+
+  void removeMenuListener(MenuListener listener);
 
   Shell getShell();
 

@@ -15,19 +15,14 @@ import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 
 public class DropDownFileUpload extends FileUpload implements IDropDownFileUploadForPatch {
   private static final long serialVersionUID = 1L;
@@ -44,58 +39,15 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   public DropDownFileUpload(Composite parent, int style) {
     super(parent, style | SWT.DOUBLE_BUFFERED);
 
-    addListener(SWT.Traverse, new Listener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void handleEvent(Event e) {
-        switch (e.detail) {
-        /* Do tab group traversal */
-          case SWT.TRAVERSE_ESCAPE:
-          case SWT.TRAVERSE_RETURN:
-          case SWT.TRAVERSE_TAB_NEXT:
-          case SWT.TRAVERSE_TAB_PREVIOUS:
-            e.doit = true;
-            break;
-        }
-      }
-    });
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(' '), false);
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.CR), false);
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.ARROW_DOWN), false);
-
-    addFocusListener(new FocusAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void focusGained(FocusEvent e) {
-        redraw();
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-        redraw();
-      }
-    });
     super.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void widgetSelected(SelectionEvent e) {
         handleSelectionInternal(e);
-        redraw();
       }
     });
 
-    addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        // remove key strokes
-        getUiEnvironment().removeKeyStrokes(DropDownFileUpload.this);
-      }
-    });
   }
 
   /**
@@ -112,17 +64,31 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   }
 
   protected void handleSelectionInternal(SelectionEvent event) {
-//FIXME there is a open bugzilla: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423
+//FIXME selection event comes after a file has been selected, therefore a different solution has to be found to distinguish a click on the dropDownArea and the buttonArea (see also bugzilla: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423)
 //    Point pt = new Point(event.x, event.y);
 //    if (m_buttonArea.contains(pt)) {
     fireSelectionEvent(event);
 //    }
 //    else if (m_dropDownArea.contains(pt) && isDropdownEnabled()) {
-//      if (getMenu() != null) {
-//        getMenu().setLocation(toDisplay(event.x, event.y));
-//        getMenu().setVisible(true);
+//      Menu menu = createMenu();
+//      if (menu != null) {
+//        menu.setLocation(toDisplay(event.x, event.y));
+//        menu.setVisible(true);
 //      }
 //    }
+  }
+
+  protected Menu createMenu() {
+    Menu contextMenu = getMenu();
+    if (getMenu() == null) {
+      contextMenu = new Menu(getShell(), SWT.POP_UP);
+      for (MenuListener listener : m_eventListeners.getListeners(MenuListener.class)) {
+        contextMenu.addMenuListener(listener);
+      }
+      setMenu(contextMenu);
+    }
+
+    return contextMenu;
   }
 
   @Override
@@ -145,6 +111,16 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   }
 
   @Override
+  public void addMenuListener(MenuListener listener) {
+    m_eventListeners.add(MenuListener.class, listener);
+  }
+
+  @Override
+  public void removeMenuListener(MenuListener listener) {
+    m_eventListeners.remove(MenuListener.class, listener);
+  }
+
+  @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     if (!StringUtility.hasText(m_originalVariant)) {
@@ -153,7 +129,6 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     String customVariant = m_dropdownEnabled ? m_originalVariant + "_menu" : m_originalVariant;
     setData(RWT.CUSTOM_VARIANT, customVariant);
     super.setEnabled(isButtonEnabled());
-    redraw();
   }
 
   @Override
@@ -165,7 +140,6 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
     super.setEnabled(isButtonEnabled());
-    redraw();
   }
 
   @Override
@@ -178,7 +152,6 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     super.setEnabled(enabled);
     m_buttonEnabled = enabled;
     m_dropdownEnabled = enabled;
-    redraw();
   }
 
   @Override
@@ -190,30 +163,4 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     return (IRwtEnvironment) getDisplay().getData(IRwtEnvironment.class.getName());
   }
 
-  private class P_KeyStroke extends RwtKeyStroke {
-    public P_KeyStroke(int keyCode) {
-      super(keyCode);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      switch (e.keyCode) {
-        case ' ':
-        case SWT.CR: {
-          SelectionEvent selEvent = new SelectionEvent(e);
-          fireSelectionEvent(selEvent);
-          break;
-        }
-        case SWT.ARROW_DOWN: {
-          if (isDropdownEnabled() && getMenu() != null) {
-            getMenu().setLocation(toDisplay(e.x, e.y));
-            getMenu().setVisible(true);
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    }
-  }
 }
