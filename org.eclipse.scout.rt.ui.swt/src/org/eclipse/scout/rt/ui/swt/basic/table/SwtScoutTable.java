@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.Defaul
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
@@ -77,6 +78,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -181,6 +183,13 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addListener(SWT.MouseDoubleClick, swtTableListener);
     table.addListener(SWT.MenuDetect, swtTableListener);
     table.addListener(SWT.KeyUp, swtTableListener);
+    //add listener for editable tables
+    for (IColumn<?> col : getScoutObject().getColumns()) {
+      if (col.isEditable()) {
+        table.addListener(SWT.PaintItem, swtTableListener);
+        break;
+      }
+    }
 
     // context menu
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -1133,7 +1142,26 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           }
           break;
         }
+        case SWT.PaintItem:
+          TableItem item = (TableItem) event.item;
+          if (isEditableIconNeeded(event, item)) {
+            IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
+            ICell cell = ((ITableRow) item.getData()).getCell(col);
+            Image markerIcon = Activator.getIcon("marker");
+            if (markerIcon != null && cell.isEditable()) {
+              event.gc.drawImage(markerIcon, event.x, event.y);
+            }
+          }
+          break;
       }
+    }
+
+    private boolean isEditableIconNeeded(Event event, TableItem item) {
+      IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
+      if (col != null && col.isEditable() && !col.getDataType().isAssignableFrom(Boolean.class)) {
+        return true;
+      }
+      return false;
     }
   }
 
