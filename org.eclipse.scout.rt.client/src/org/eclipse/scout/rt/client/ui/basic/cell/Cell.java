@@ -15,10 +15,13 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -46,8 +49,13 @@ public class Cell implements ICell {
   private String m_text;
   private ICellSpecialization m_cellSpecialization = DEFAULT_CELL_STYLE;
 
+  private IProcessingStatus m_errorStatus;
+
+  private String m_validIconId;
+
   public Cell() {
     super();
+    clearErrorStatus();
   }
 
   public Cell(ICell c) {
@@ -140,6 +148,9 @@ public class Cell implements ICell {
 
   @Override
   public String getTooltipText() {
+    if (getErrorStatus() != null) {
+      return getErrorStatus().getMessage();
+    }
     return m_cellSpecialization.getTooltipText();
   }
 
@@ -280,6 +291,27 @@ public class Cell implements ICell {
     if (getObserver() != null) {
       getObserver().cellChanged(this, bitPos);
     }
+  }
+
+  public IProcessingStatus getErrorStatus() {
+    return m_errorStatus;
+  }
+
+  public void setErrorStatus(String message) {
+    setErrorStatus(new ProcessingStatus(message, null, 0, IProcessingStatus.ERROR));
+  }
+
+  public void setErrorStatus(IProcessingStatus status) {
+    if (getErrorStatus() == null) {
+      m_validIconId = getIconId();
+      setIconId(AbstractIcons.StatusError);
+    }
+    m_errorStatus = status;
+  }
+
+  public void clearErrorStatus() {
+    setIconId(m_validIconId);
+    m_errorStatus = null;
   }
 
   @Override
