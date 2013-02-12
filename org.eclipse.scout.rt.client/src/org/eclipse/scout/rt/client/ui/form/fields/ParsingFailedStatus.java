@@ -20,11 +20,27 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 public class ParsingFailedStatus extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
 
+  private final String m_parseInputString;
+
   public ParsingFailedStatus(String message) {
-    super(message, ERROR);
+    this(message, null);
   }
 
   public ParsingFailedStatus(IProcessingStatus s) {
+    this(s, null);
+  }
+
+  public ParsingFailedStatus(String message, String parseInputString) {
+    super(message, ERROR);
+    m_parseInputString = parseInputString;
+  }
+
+  public ParsingFailedStatus(IProcessingStatus s, String parseInputString) {
     super(s, ERROR);
+    m_parseInputString = parseInputString;
+  }
+
+  public String getParseInputString() {
+    return m_parseInputString;
   }
 }
