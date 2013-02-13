@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -102,7 +103,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by swt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- *
+ * 
  * @since 1.0.0 28.03.2008
  */
 public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScoutTable {
@@ -155,7 +156,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
     });
-    TableViewer viewer = new TableViewer(table);
+    TableViewer viewer = new P_TableViewerEx(table);
     viewer.setUseHashlookup(true);
     setSwtTableViewer(viewer);
     setSwtField(table);
@@ -1025,6 +1026,30 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   }
 
+  private class P_TableViewerEx extends TableViewer {
+
+    public P_TableViewerEx(Table table) {
+      super(table);
+    }
+
+    @Override
+    protected void triggerEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+      //Make sure editor is closed when clicking on another cell. Mainly necessary when using the second mouse button to open the context menu
+      for (CellEditor editor : getCellEditors()) {
+        if (editor != null && editor.isActivated()) {
+          applyEditorValue();
+        }
+      }
+      super.triggerEditorActivationEvent(event);
+    }
+
+    @Override
+    public void applyEditorValue() {
+      super.applyEditorValue();
+    }
+
+  }
+
   private class P_ScoutTableListener implements TableListener {
     @Override
     public void tableChanged(final TableEvent e) {
@@ -1093,18 +1118,24 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private class P_SwtTableListener implements Listener {
     @Override
     public void handleEvent(Event event) {
+      TableViewer swtTableViewer = getSwtTableViewer();
       switch (event.type) {
         case SWT.MouseDown: {
+          //Close cell editor on empty space click
+          if (swtTableViewer.getTable().getItem(new Point(event.y, event.y)) == null && swtTableViewer instanceof P_TableViewerEx) {
+            ((P_TableViewerEx) swtTableViewer).applyEditorValue();
+          }
+
           setContextColumnFromSwt(getSwtColumnAt(new Point(event.x, event.y)));
           if (getSwtField().getItem(new Point(event.x, event.y)) == null) {
-            getSwtTableViewer().setSelection(null);
+            swtTableViewer.setSelection(null);
             setSelectionFromSwt(new StructuredSelection());
           }
           break;
         }
         case SWT.MouseUp: {
           if (event.count == 1) {
-            StructuredSelection selection = (StructuredSelection) getSwtTableViewer().getSelection();
+            StructuredSelection selection = (StructuredSelection) swtTableViewer.getSelection();
             if (selection.size() == 1) {
               handleSwtRowClick((ITableRow) selection.getFirstElement());
             }
@@ -1112,7 +1143,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           break;
         }
         case SWT.MouseDoubleClick: {
-          StructuredSelection selection = (StructuredSelection) getSwtTableViewer().getSelection();
+          StructuredSelection selection = (StructuredSelection) swtTableViewer.getSelection();
           if (selection.size() == 1) {
             handleSwtRowAction((ITableRow) selection.getFirstElement());
           }
@@ -1131,7 +1162,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
               switch (event.keyCode) {
                 case ' ':
                 case SWT.CR:
-                  ITableRow[] selectedRows = SwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getSwtTableViewer().getSelection());
+                  ITableRow[] selectedRows = SwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) swtTableViewer.getSelection());
                   if (selectedRows != null && selectedRows.length > 0) {
                     handleSwtRowClick(selectedRows[0]);
                   }

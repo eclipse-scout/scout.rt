@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext.table;
 
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
@@ -43,6 +45,22 @@ public class TableViewerEx extends TableViewer {
    */
   public TableViewerEx(Table table) {
     super(table);
+  }
+
+  @Override
+  public void applyEditorValue() {
+    super.applyEditorValue();
+  }
+
+  @Override
+  protected void triggerEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+    //Make sure editor is closed when clicking on another cell. Mainly necessary when using the second mouse button to open the context menu
+    for (CellEditor editor : getCellEditors()) {
+      if (editor != null && editor.isActivated()) {
+        applyEditorValue();
+      }
+    }
+    super.triggerEditorActivationEvent(event);
   }
 
   @Override

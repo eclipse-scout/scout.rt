@@ -1101,11 +1101,17 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     @Override
     public void handleEvent(Event event) {
       Point eventPosition = new Point(event.x, event.y);
+      TableViewer uiTableViewer = getUiTableViewer();
       switch (event.type) {
         case SWT.MouseDown: {
-          setContextColumnFromUi(RwtUtility.getRwtColumnAt(getUiTableViewer().getTable(), eventPosition));
+          //Close cell editor on empty space click
+          if (uiTableViewer.getTable().getItem(new Point(event.y, event.y)) == null && uiTableViewer instanceof TableViewerEx) {
+            ((TableViewerEx) uiTableViewer).applyEditorValue();
+          }
+
+          setContextColumnFromUi(RwtUtility.getRwtColumnAt(uiTableViewer.getTable(), eventPosition));
           if (getUiField().getItem(eventPosition) == null) {
-            getUiTableViewer().setSelection(null);
+            uiTableViewer.setSelection(null);
             setSelectionFromUi(new StructuredSelection());
           }
           break;
@@ -1117,7 +1123,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
               break;
             }
           }
-          StructuredSelection selection = (StructuredSelection) getUiTableViewer().getSelection();
+          StructuredSelection selection = (StructuredSelection) uiTableViewer.getSelection();
           if (selection != null && selection.size() == 1) {
             handleUiRowClick((ITableRow) selection.getFirstElement());
           }
@@ -1127,7 +1133,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           synchronized (m_doubleClicked) {
             m_doubleClicked = Boolean.TRUE;
           }
-          StructuredSelection selection = (StructuredSelection) getUiTableViewer().getSelection();
+          StructuredSelection selection = (StructuredSelection) uiTableViewer.getSelection();
           if (selection != null && selection.size() == 1) {
             handleUiRowAction((ITableRow) selection.getFirstElement());
           }
