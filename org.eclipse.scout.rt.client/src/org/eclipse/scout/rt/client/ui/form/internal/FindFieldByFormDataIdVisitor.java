@@ -14,36 +14,73 @@ import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 
+/**
+ * Visitor for finding a form field by its form data field Id.
+ * 
+ * @see IFormField#getFieldId()
+ * @see FormDataUtility#getFieldDataId(String)
+ */
 public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
 
   private static final CompositeObject PERFECT_VALUE_FIELD_MATCH_KEY = new CompositeObject(0, 0);
 
   private String[] m_fieldIdParts;
   private TreeMap<CompositeObject, IFormField> m_prioMap;
+  /**
+   * {@link IForm} this visitor starts on. The closer a field is embedded into this form, the more likely it will be the
+   * result of this visitor. may be <code>null</code>
+   */
+  private IForm m_searchContextRootForm;
 
   public FindFieldByFormDataIdVisitor(String fieldId) {
+    this(fieldId, null);
+  }
+
+  /**
+   * @param fieldId
+   *          The field Id of the {@link IFormField} to find
+   * @param searchContextRootForm
+   *          Optional form the visitor starts on. If <code>null</code>, the form is derived from the first field
+   *          visited.
+   * @since 3.8.2
+   */
+  public FindFieldByFormDataIdVisitor(String fieldId, IForm searchContextRootForm) {
+    m_searchContextRootForm = searchContextRootForm;
     m_fieldIdParts = fieldId.split("[/]");
     m_prioMap = new TreeMap<CompositeObject, IFormField>();
   }
 
   @Override
   public boolean visitField(IFormField field, int level, int fieldIndex) {
+    if (m_searchContextRootForm == null) {
+      // auto-initialize search context
+      // we assume the form field tree is traversed pre-order (i.e. first node itself, then its children)
+      m_searchContextRootForm = field.getForm();
+    }
     if (matchesAllParts(field)) {
-      int fieldTypeRank;
+      int fieldTypeRank = 0;
+      if (m_searchContextRootForm != null) {
+        IForm form = field.getForm();
+        while (form != null && form != m_searchContextRootForm) {
+          fieldTypeRank += 10;
+          form = form.getOuterForm();
+        }
+      }
       if (field instanceof IValueField) {
-        fieldTypeRank = 0;
+        // fieldTypeRank is fine
       }
       else if (!(field instanceof ICompositeField)) {
-        fieldTypeRank = 1;
+        fieldTypeRank += 1;
       }
       else {
-        fieldTypeRank = 2;
+        fieldTypeRank += 2;
       }
       // Compute the enclosing field path rank that is used as additional hint for determining the
       // best matching form field for the requested formId. Note: for compatibility reasons, the enclosing
@@ -76,7 +113,7 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
   }
 
   /**
-   * @return Returns the rank of the given field's enclosing field path and the one the is requested by this visitor. A
+   * @return Returns the rank of the given field's enclosing field path and the one that is requested by this visitor. A
    *         perfect match yields 0. Every mismatch increases the rank by 1. Hence the greatest number has the worst
    *         match.
    */

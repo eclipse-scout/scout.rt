@@ -792,7 +792,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       for (Map.Entry<String, AbstractFormFieldData> e : targetMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
-        FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId);
+        FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
         visitFields(v);
         IFormField f = v.getField();
         if (f != null) {
@@ -839,7 +839,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       for (Map.Entry<String, AbstractFormFieldData> e : sourceMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
-        FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId);
+        FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
         visitFields(v);
         IFormField f = v.getField();
         if (f != null) {
