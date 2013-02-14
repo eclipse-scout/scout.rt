@@ -1,20 +1,36 @@
 # Set default behaviour, in case users don't have core.autocrlf set.
 * text=auto
 
-#
-# The above will handle all files NOT found below
-#
 # These files are text and should be normalized (Convert crlf => lf)
-*.java text
-*.xml text
-*.txt text
+*.java       text
+*.xml        text
+*.txt        text
+*.js         text
+*.jsp        text
+*.sh         text
+*.cmd        text
+*.bat        text
+*.html       text
+*.htm        text
+*.css        text
+*.wsdl       text
+*.properties text
+*.launch     text
+.project     text
+.classpath   text
+
 
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
-*.jar binary
-*.so binary
-*.dll binary
-*.png binary
-*.jpg binary
-*.ai binary
-*.vsd binary
+*.class  binary
+*.jar    binary
+*.so     binary
+*.dll    binary
+*.png    binary
+*.jpg    binary
+*.ai     binary
+*.vsd    binary
+*.gz     binary
+*.tar    binary
+*.exe    binary
+*.zip    binary
