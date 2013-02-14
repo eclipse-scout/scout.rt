@@ -11,6 +11,14 @@
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
     </location>
+
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="eclipse_egit" location="http://download.eclipse.org/egit/updates/"/>
+
+      <unit id="org.eclipse.egit.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.jgit.feature.group" version="0.0.0"/>
+    </location>
+
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="orbit_S20130201140822" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130201140822/repository/"/>
 
