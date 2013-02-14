@@ -53,6 +53,10 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
   static {
     LOG = ScoutLogManager.getLogger(ScoutClientTestRunner.class);
     FACTORY = createClientTestEnvironmentFactory();
+
+    if (FACTORY != null) {
+      FACTORY.setupGlobalEnvironment();
+    }
   }
 
   private final IClientSession m_clientSession;
@@ -85,9 +89,7 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
     super(klass);
 
     if (FACTORY != null) {
-      setDefaultClientSessionClass(FACTORY.getDefaultClientSessionClass());
-      FACTORY.installCookieStore();
-      FACTORY.installNetAuthenticator();
+      FACTORY.setupInstanceEnvironment();
     }
 
     try {

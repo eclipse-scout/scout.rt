@@ -19,8 +19,7 @@ import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner.ServerTe
  * {@link ScoutServerTestRunner} if located on {@link SerializationUtility#getClassLoader()} classpath. This environment
  * will be instantiated statically by {@link ScoutServerTestRunner} before any tests are executed.
  * <p/>
- * The custom {@link IServerTestEnvironment} class must use the following
- * <b>fully qualified</b> class name:
+ * The custom {@link IServerTestEnvironment} class must use the following <b>fully qualified</b> class name:
  * <p/>
  * <code>org.eclipse.scout.testing.server.runner.CustomServerTestEnvironment</code>
  * <p/>
@@ -30,20 +29,24 @@ import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner.ServerTe
 public interface IServerTestEnvironment {
 
   /**
-   * General setup for the test environment.
+   * This method is statically called only once for all test classes using {@link ScoutServerTestRunner}.
+   * <p/>
+   * Typically the following steps are executed:
+   * <ul>
+   * <li>Use {@link ScoutServerTestRunner#setDefaultServerSessionClass(Class)} to set a {@link IServerSession}
+   * implementation used by default for running tests when {@link ServerTest#serverSessionClass()} is not set.</li>
+   * <li>Use {@link ScoutServerTestRunner#setDefaultPrincipalName(String)} to set a default user which is used for
+   * running the tests. This can be overriden by setting the {@link ServerTest#runAs()} annotation on your test class</li>
+   * </ul>
    */
-  void setup();
+  void setupGlobalEnvironment();
 
   /**
-   * @return {@link IServerSession} implementation used by default for running tests when
-   *         {@link ServerTest#serverSessionClass()} is not set.
+   * This method is called once for every test class that is executed with {@link ScoutServerTestRunner}.
+   * <p/>
+   * For performance reasons, it is recommended to do as much setup as possible in
+   * {@link IServerTestEnvironment#setupGlobalEnvironment()}
    */
-  Class<? extends IServerSession> getDefaultServerSessionClass();
-
-  /**
-   * @return the default user which is used for running the tests. This can be overriden by setting the
-   *         {@link ServerTest#runAs()} annotation on your test class.
-   */
-  String getDefaultPrincipalName();
+  void setupInstanceEnvironment();
 
 }

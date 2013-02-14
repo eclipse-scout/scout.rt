@@ -24,8 +24,7 @@ import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientSessionCoo
  * {@link ScoutClientTestRunner} if located on {@link SerializationUtility#getClassLoader()} classpath. This environment
  * will be instantiated statically by {@link ScoutClientTestRunner} before any tests are executed.
  * <p/>
- * The custom {@link IClientTestEnvironment} class must use the following
- * <b>fully qualified</b> class name:
+ * The custom {@link IClientTestEnvironment} class must use the following <b>fully qualified</b> class name:
  * <p/>
  * <code>org.eclipse.scout.testing.client.runner.CustomClientTestEnvironment</code>
  * 
@@ -34,24 +33,28 @@ import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientSessionCoo
 public interface IClientTestEnvironment {
 
   /**
-   * Typically required to set the default {@link CookieManager} to a custom manager based on
-   * {@link MultiClientSessionCookieStore} to support tests with different users.
+   * This method is statically called only once for all test classes using {@link ScoutClientTestRunner}.
+   * <p/>
+   * Typically the following steps are executed:
+   * <ul>
+   * <li>Install an {@link Authenticator} based on {@link MultiClientAuthenticator} to support tests with different
+   * users. The default user can be set using {@link MultiClientAuthenticator#setDefaultUser()}, as opposed to the
+   * {@link IServerTestEnvironment} where the default user can be directly set on the test environment. The default user
+   * can be overriden by using the {@link ClientTest#runAs()} annotation on your test class.</li>
+   * <li>Set the default {@link CookieManager} to a custom manager based on {@link MultiClientSessionCookieStore} to
+   * support tests with different users.
+   * <li>Use {@link ScoutClientTestRunner#setDefaultClientSessionClass(Class) to set a {@link IClientSession}
+   * implementation used for running tests when {@link ClientTest#clientSessionClass()} is not set.</li>
+   * </ul>
    */
-  void installCookieStore();
+  void setupGlobalEnvironment();
 
   /**
-   * Typically used to install an {@link Authenticator} based on {@link MultiClientAuthenticator} to support tests with
-   * different users. The default user can be set using {@link MultiClientAuthenticator#setDefaultUser()}, as opposed to
-   * the {@link IServerTestEnvironment} where the default user can be directly set on the test environment. The default
-   * user can be overriden by
-   * using the {@link ClientTest#runAs()} annotation on your test class.
+   * This method is called once for every test class that is executed with {@link ScoutClientTestRunner}.
+   * <p/>
+   * For performance reasons, it is recommended to do as much setup as possible in
+   * {@link IClientTestEnvironment#setupGlobalEnvironment()}
    */
-  void installNetAuthenticator();
-
-  /**
-   * @return {@link IClientSession} implementation used for running tests when {@link ClientTest#clientSessionClass()}
-   *         is not set.
-   */
-  Class<? extends IClientSession> getDefaultClientSessionClass();
+  void setupInstanceEnvironment();
 
 }

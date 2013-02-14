@@ -89,6 +89,10 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   static {
     LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
     FACTORY = createServerTestEnvironmentFactory();
+
+    if (FACTORY != null) {
+      FACTORY.setupGlobalEnvironment();
+    }
   }
 
   private LoginInfo m_loginInfo;
@@ -119,9 +123,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
     super(klass);
 
     if (FACTORY != null) {
-      setDefaultServerSessionClass(FACTORY.getDefaultServerSessionClass());
-      setDefaultPrincipalName(FACTORY.getDefaultPrincipalName());
-      FACTORY.setup();
+      FACTORY.setupInstanceEnvironment();
     }
 
     try {
