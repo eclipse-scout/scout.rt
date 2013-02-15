@@ -13,17 +13,20 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.RunnableWithException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.browserfield.ISwingScoutBrowserField;
 import org.eclipse.swt.SWT;
@@ -66,6 +69,14 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
+
+    //Don't create a label if not explicitly requested by the model. Necessary for backward compatibility, check will be removed in 3.9.0.
+    if (ConfigurationUtility.isMethodOverwrite(AbstractFormField.class, "getConfiguredLabelVisible", null, getScoutObject().getClass())) {
+      JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
+      container.add(label);
+      setSwingLabel(label);
+    }
+
     JPanelEx wordComponent = new JPanelEx();
     m_canvas = new P_CanvasEx();
     wordComponent.add(m_canvas);
