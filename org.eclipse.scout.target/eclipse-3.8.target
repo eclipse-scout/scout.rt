@@ -89,7 +89,8 @@
       <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
     </location>
   </locations>
 </target>
