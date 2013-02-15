@@ -54,7 +54,16 @@ public final class SVGUtility {
   public static final String SVG_NS = SVGDOMImplementation.SVG_NAMESPACE_URI;
   public static final String XLINK_NS = XMLConstants.XLINK_NAMESPACE_URI;
 
-  public static interface INodeVisitor {
+  /**
+   * Conversion of points/mm/inch and more see http://www.endmemo.com/convert/topography.php
+   */
+  private static final float PIXEL_PER_POINT = 1.333333f;
+  private static final float PIXEL_PER_MM = 3.779528f;
+  private static final float PIXEL_PER_INCH = 96f;
+
+  private static final float DEFAULT_FONT_HEIGHT = 14f;
+
+  public interface INodeVisitor {
     /**
      * @return true to continue visiting, false to stop
      */
@@ -211,7 +220,7 @@ public final class SVGUtility {
    * @param rowGap
    *          in px
    */
-  public static void setTextContent(Element e, String value, Float rowGap) {
+  public static void setTextContent(Element e, String value, final Float rowGap) {
     if (e == null) {
       return;
     }
@@ -245,12 +254,10 @@ public final class SVGUtility {
       tmpNode = tmpNode.getParentNode();
     }
     if (fontHeight == 0f) {
-      fontHeight = 14f;
+      fontHeight = DEFAULT_FONT_HEIGHT;
     }
-    if (rowGap == null) {
-      rowGap = 1f;
-    }
-    float rowHeight = fontHeight + rowGap;
+    Float rGap = rowGap == null ? Float.valueOf(1f) : rowGap;
+    float rowHeight = fontHeight + rGap;
     //create tspan lines
     float y = 0;
     setTextContent(textElement, null);
@@ -484,13 +491,13 @@ public final class SVGUtility {
       return f;
     }
     if (unit.equals("pt")) {
-      return f * 1.333333f;
+      return f * PIXEL_PER_POINT;
     }
     if (unit.equals("mm")) {
-      return f * 3.78f;
+      return f * PIXEL_PER_MM;
     }
     if (unit.equals("in")) {
-      return f * 96f;
+      return f * PIXEL_PER_INCH;
     }
     return f;
   }

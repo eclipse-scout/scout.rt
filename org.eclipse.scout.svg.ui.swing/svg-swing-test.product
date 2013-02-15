@@ -4,9 +4,18 @@
 <product name="SVG Swing Test" id="org.eclipse.scout.svg.ui.swing.product" application="org.eclipse.scout.svg.ui.swing.app" useFeatures="false" includeLaunchers="true">
 
    <configIni use="">
+      <linux>/org.eclipse.scout.svg.ui.swing/config.ini</linux>
+      <macosx>/org.eclipse.scout.svg.ui.swing/config.ini</macosx>
+      <solaris>/org.eclipse.scout.svg.ui.swing/config.ini</solaris>
+      <win32>/org.eclipse.scout.svg.ui.swing/config.ini</win32>
    </configIni>
 
    <launcherArgs>
+      <programArgsMac>--launcher.secondThread</programArgsMac>
+      <vmArgs>-Xms64m
+-Xmx512m
+-XX:MaxPermSize=256m
+-Dcom.sun.management.jmxremote</vmArgs>
    </launcherArgs>
 
    <launcher>
@@ -17,7 +26,10 @@
    </launcher>
 
    <vm>
-      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
+      <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
+      <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</macos>
+      <solaris include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</solaris>
+      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</windows>
    </vm>
 
    <plugins>

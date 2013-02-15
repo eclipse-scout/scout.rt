@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012,2013 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.svg.ui.rap;
 
 import java.io.ByteArrayOutputStream;
@@ -31,12 +41,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.w3c.dom.svg.SVGDocument;
 
 public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends RwtScoutFieldComposite<T> {
-  private final static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutSvgComposite.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutSvgComposite.class);
 
   /* because the scroll-bar layout of IE is different: add an offset to ensure the full svg element can be shown without scrollbars */
-  protected final static int SVG_ELEMENT_INNER_SPACE = 7;
+  protected static final int SVG_ELEMENT_INNER_SPACE = 7;
 
-  private final static String DOCUMENT_ENCODING = "UTF-8";
+  private static final String DOCUMENT_ENCODING = "UTF-8";
 
   private BrowserExtension m_browserExtension;
 

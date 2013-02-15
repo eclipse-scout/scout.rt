@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2011,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.svg.client.svgfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -42,13 +41,15 @@ public interface ISvgField extends IFormField {
 
   /**
    * @return the point of the selection. This is set by the ui facade when a click or hyperlink occurs. Use
-   *         {@link SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)} to find affected
+   *         {@link org.eclipse.scout.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
+   *         to find affected
    *         elements
    */
   SVGPoint getSelection();
 
   /**
-   * set the selected point. Use {@link SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
+   * set the selected point. Use
+   * {@link org.eclipse.scout.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
    * to find affected elements
    */
   void setSelection(SVGPoint point);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2011,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,8 @@ import org.eclipse.scout.svg.client.svgfield.ISvgField;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> implements ISwingScoutSvgField {
+
+  private static final int DEFAULT_CANCEL_TIMEOUT = 5678;
 
   public SwingScoutSvgField() {
   }
@@ -123,7 +125,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
           getScoutObject().getUIFacade().fireClickFromUI(svgPoint);
         }
       };
-      getSwingEnvironment().invokeScoutLater(t, 5678);
+      getSwingEnvironment().invokeScoutLater(t, DEFAULT_CANCEL_TIMEOUT);
       // end notify
     }
     catch (NoninvertibleTransformException e1) {
@@ -148,7 +150,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
         //notify scout later
         new ClientSyncJob("Hyperlink", getSwingEnvironment().getScoutSession()) {
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          protected void runVoid(IProgressMonitor monitor) {
             getScoutObject().getUIFacade().fireHyperlinkFromUI(url);
           }
         }.schedule();

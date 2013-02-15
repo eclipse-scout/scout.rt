@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.equinox.app.IApplicationContext;
 public class TestApplication implements IApplication {
 
   @Override
-  public Object start(IApplicationContext context) throws Exception {
+  public Object start(IApplicationContext context) throws InterruptedException {
     SwingViewer.show();
     Thread.sleep(Long.MAX_VALUE);
     return EXIT_OK;
@@ -25,5 +25,4 @@ public class TestApplication implements IApplication {
   @Override
   public void stop() {
   }
-
 }

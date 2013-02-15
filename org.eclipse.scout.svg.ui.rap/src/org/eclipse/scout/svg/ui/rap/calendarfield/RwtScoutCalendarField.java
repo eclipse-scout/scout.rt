@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012,2013 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.svg.ui.rap.calendarfield;
 
 import java.beans.PropertyChangeEvent;
@@ -23,13 +33,14 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalendarField<?>> implements IRwtScoutCalendarField {
 
-  private final static int CONTEXT_MENU_POS_INSET = 10;
+  private static final int CALENDAR_DISPLAY_MODE_COUNT = 4;
+  private static final int CONTEXT_MENU_POS_INSET = 10;
 
   private P_InnerCalendarPropertyChangeListener m_innerCalPropertyListener;
   private AbstractCalendarDocumentBuilder[] m_documentBuilders;
 
   public RwtScoutCalendarField() {
-    m_documentBuilders = new AbstractCalendarDocumentBuilder[4];
+    m_documentBuilders = new AbstractCalendarDocumentBuilder[CALENDAR_DISPLAY_MODE_COUNT];
   }
 
   @Override

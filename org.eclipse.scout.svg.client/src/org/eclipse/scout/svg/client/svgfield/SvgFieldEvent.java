@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2011 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,13 +13,15 @@ package org.eclipse.scout.svg.client.svgfield;
 import java.net.URL;
 import java.util.EventObject;
 
+import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGPoint;
 
 public class SvgFieldEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
-  private final SVGPoint m_point;
+  private final float m_pointX;
+  private final float m_pointY;
   private final URL m_url;
 
   /**
@@ -34,7 +36,8 @@ public class SvgFieldEvent extends EventObject {
   SvgFieldEvent(ISvgField source, int type, SVGPoint point, URL url) {
     super(source);
     m_type = type;
-    m_point = point;
+    m_pointX = point.getX();
+    m_pointY = point.getY();
     m_url = url;
   }
 
@@ -47,7 +50,7 @@ public class SvgFieldEvent extends EventObject {
   }
 
   public SVGPoint getPoint() {
-    return m_point;
+    return new SVGOMPoint(m_pointX, m_pointY);
   }
 
   public URL getURL() {
