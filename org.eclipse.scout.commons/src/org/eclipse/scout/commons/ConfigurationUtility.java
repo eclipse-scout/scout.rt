@@ -83,8 +83,9 @@ public final class ConfigurationUtility {
   /**
    * Sorts the elements according to their order:
    * <ol>
-   * <li>If an {@link Order} annotation is available, its {@link Order#value()} is used</li>
-   * <li>If the object implements {@link IOrdered}, {@link IOrdered#getOrder()} is used.</li>
+   * <li>If an {@link Order} annotation is present, its {@link Order#value()} is used</li>
+   * <li>If a {@link Replace} annotation is present, the superclass' order is used</li>
+   * <li>If the object implements {@link IOrdered}, {@link IOrdered#getOrder()} is used</li>
    * <li>Finally, the index in the original collection is used</li>
    * </ol>
    * 
@@ -99,8 +100,12 @@ public final class ConfigurationUtility {
     for (T element : list) {
       Class<?> c = element.getClass();
       double order;
-      if (c.isAnnotationPresent(Order.class)) {
-        order = c.getAnnotation(Order.class).value();
+      Order orderAnnotation;
+      while ((orderAnnotation = c.getAnnotation(Order.class)) == null && c.isAnnotationPresent(Replace.class)) {
+        c = c.getSuperclass();
+      }
+      if (orderAnnotation != null) {
+        order = orderAnnotation.value();
       }
       else if (element instanceof IOrdered) {
         order = ((IOrdered) element).getOrder();

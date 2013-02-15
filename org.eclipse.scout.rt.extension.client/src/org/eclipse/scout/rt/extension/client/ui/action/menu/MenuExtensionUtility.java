@@ -17,6 +17,7 @@ import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -121,7 +122,11 @@ public final class MenuExtensionUtility {
     int counter = 0;
     for (IMenu m : menuList) {
       double order;
-      Order orderAnnotation = m.getClass().getAnnotation(Order.class);
+      Class<?> tmpClass = m.getClass();
+      Order orderAnnotation;
+      while ((orderAnnotation = tmpClass.getAnnotation(Order.class)) == null && m.getClass().isAnnotationPresent(Replace.class)) {
+        tmpClass = tmpClass.getSuperclass();
+      }
       if (orderAnnotation != null) {
         order = orderAnnotation.value();
       }

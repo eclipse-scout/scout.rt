@@ -470,7 +470,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       }
       //convert validation error to parsing error
       else if (getErrorStatus() instanceof ValidationFailedStatus) {
-        setErrorStatus(new ParsingFailedStatus(getErrorStatus()));
+        setErrorStatus(new ParsingFailedStatus(getErrorStatus(), text));
       }
       return true;
     }
@@ -483,7 +483,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         LOG.warn(null, t);
         e = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), t);
       }
-      ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus());
+      ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus(), text);
       setErrorStatus(internalStatus);
       return false;
     }

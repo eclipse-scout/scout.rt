@@ -311,6 +311,10 @@
                name="table.mouseMoveSelectionSupport.enabled"
                value="true">
          </property>
+         <property
+               name="table.multilineTooltipSupport.enabled"
+               value="false">
+         </property>
       </properties>
    </extension>
    <extension point="org.eclipse.scout.service.services">

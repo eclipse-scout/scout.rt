@@ -14,9 +14,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.testing.client.DefaultTestClientSessionProvider;
@@ -31,11 +35,29 @@ import org.junit.runners.model.Statement;
 /**
  * JUnit test runner that runs the annotated test class within a Scout client job. Test cases executed by this runner
  * may be configured with a {@link ClientTest} annotation.
+ * <p/>
+ * <h3>Custom Test Environments</h3> A custom test environment (e.g. required for running Tests with Maven Tycho) can be
+ * set up using an implementation of {@link IClientTestEnvironment} which must be on the classpath of
+ * {@link SerializationUtility#getClassLoader()}. The custom {@link IClientTestEnvironment} class must use the following
+ * <b>fully qualified</b> class name:
+ * <p/>
+ * <code>org.eclipse.scout.testing.client.runner.CustomClientTestEnvironment</code>
  */
 public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
 
   private static ITestClientSessionProvider s_defaultClientSessionProvider = new DefaultTestClientSessionProvider();
   private static Class<? extends IClientSession> s_defaultClientSessionClass;
+  private static final IScoutLogger LOG;
+  private static final IClientTestEnvironment FACTORY;
+
+  static {
+    LOG = ScoutLogManager.getLogger(ScoutClientTestRunner.class);
+    FACTORY = createClientTestEnvironmentFactory();
+
+    if (FACTORY != null) {
+      FACTORY.setupGlobalEnvironment();
+    }
+  }
 
   private final IClientSession m_clientSession;
 
@@ -65,6 +87,11 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
    */
   public ScoutClientTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
+
+    if (FACTORY != null) {
+      FACTORY.setupInstanceEnvironment();
+    }
+
     try {
       m_clientSession = getOrCreateClientSession(klass.getAnnotation(ClientTest.class), null);
     }
@@ -238,4 +265,32 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
     }
     return forceCreateNewSession;
   }
+
+  private static IClientTestEnvironment createClientTestEnvironmentFactory() {
+    IClientTestEnvironment environment = null;
+    if (SerializationUtility.getClassLoader() != null) {
+      // check whether there is a custom test environment available
+      try {
+        Class<?> customTestEnvironment = SerializationUtility.getClassLoader().loadClass("org.eclipse.scout.testing.client.runner.CustomClientTestEnvironment");
+        LOG.info("loaded custom test environment: [" + customTestEnvironment + "]");
+        if (!IClientTestEnvironment.class.isAssignableFrom(customTestEnvironment)) {
+          LOG.warn("custom test environment is not implementing [" + IClientTestEnvironment.class + "]");
+        }
+        else if (Modifier.isAbstract(customTestEnvironment.getModifiers())) {
+          LOG.warn("custom test environment is an abstract class [" + customTestEnvironment + "]");
+        }
+        else {
+          environment = (IClientTestEnvironment) customTestEnvironment.newInstance();
+        }
+      }
+      catch (ClassNotFoundException e) {
+        // no custom test environment installed
+      }
+      catch (Exception e) {
+        LOG.warn("Unexpected problem while creating a new instance of custom test environment", e);
+      }
+    }
+    return environment;
+  }
+
 }

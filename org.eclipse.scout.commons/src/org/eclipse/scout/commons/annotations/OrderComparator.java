@@ -47,9 +47,13 @@ public class OrderComparator implements Comparator<Object> {
       return 0;
     }
     double d = 0;
-    Order order = o.getClass().getAnnotation(Order.class);
-    if (order != null) {
-      d = order.value();
+    Class<?> c = o.getClass();
+    Order orderAnnotation;
+    while ((orderAnnotation = c.getAnnotation(Order.class)) == null && c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    if (orderAnnotation != null) {
+      d = orderAnnotation.value();
     }
     else if (o instanceof IOrdered) {
       d = ((IOrdered) o).getOrder();

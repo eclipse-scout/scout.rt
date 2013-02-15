@@ -145,6 +145,10 @@ public class CodeService extends AbstractService implements ICodeService {
         else {
           continue;
         }
+        // Skip uninteresting bundles
+        if (!acceptBundle(bundle, classPrefix)) {
+          continue;
+        }
         String[] classNames;
         try {
           BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
@@ -157,19 +161,12 @@ public class CodeService extends AbstractService implements ICodeService {
         // filter
         for (String className : classNames) {
           // fast pre-check
-          if (className.indexOf("CodeType") >= 0) {
+          if (acceptClassName(bundle, className)) {
             try {
               Class c = null;
               c = bundle.loadClass(className);
-              if (ICodeType.class.isAssignableFrom(c)) {
-                if (!c.isInterface()) {
-                  int flags = c.getModifiers();
-                  if (Modifier.isPublic(flags) && (!Modifier.isAbstract(flags)) && (!c.getSimpleName().startsWith("Abstract"))) {
-                    if (ICodeType.class.isAssignableFrom(c)) {
-                      discoveredCodeTypes.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
-                    }
-                  }
-                }
+              if (acceptClass(bundle, c)) {
+                discoveredCodeTypes.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
               }
             }
             catch (Throwable t) {
@@ -214,4 +211,60 @@ public class CodeService extends AbstractService implements ICodeService {
     return m_codeTypeStore.getCodeTypeCache(partitionId, LocaleThreadLocal.get());
   }
 
+  /**
+   * Checks whether the given bundle should be scanned for code type classes. The default implementations accepts
+   * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
+   * bundle).
+   * 
+   * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for code type classes.
+   *         <code>false</code> otherwise.
+   */
+  protected boolean acceptBundle(Bundle bundle, String classPrefix) {
+    return !Platform.isFragment(bundle);
+  }
+
+  /**
+   * Checks whether the given class name is a potential code type class. Class names that do not meet the
+   * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
+   * The default implementation checks whether the class name contains <code>"CodeType"</code>.
+   * 
+   * @param bundle
+   *          The class's hosting bundle
+   * @param className
+   *          the class name to be checked
+   * @return Returns <code>true</code> if the given class name meets the requirements to be considered as a code type
+   *         class. <code>false</code> otherwise.
+   */
+  protected boolean acceptClassName(Bundle bundle, String className) {
+    return (className.indexOf("CodeType") >= 0);
+  }
+
+  /**
+   * Checks whether the given class is a CodeType class that should be visible to this service. The default
+   * implementation checks if the class meets the following conditions:
+   * <ul>
+   * <li>subclass of {@link ICodeType}
+   * <li><code>public</code>
+   * <li>not an <code>interface</code>
+   * <li>not <code>abstract</code>
+   * <li>the class's simple name does not start with <code>"Abstract"</code> (convenience check)
+   * </ul>
+   * 
+   * @param bundle
+   *          The class's hosting bundle
+   * @param c
+   *          the class to be checked
+   * @return Returns <code>true</code> if the class is a code type class. <code>false</code> otherwise.
+   */
+  protected boolean acceptClass(Bundle bundle, Class<?> c) {
+    if (ICodeType.class.isAssignableFrom(c)) {
+      if (!c.isInterface()) {
+        int flags = c.getModifiers();
+        if (Modifier.isPublic(flags) && (!Modifier.isAbstract(flags)) && (!c.getSimpleName().startsWith("Abstract"))) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

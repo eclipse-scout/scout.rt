@@ -58,6 +58,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -469,12 +470,20 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       try {
         lsm.setValueIsAdjusting(true);
         //
+        int lastIndex = -1;
         for (int index : addSet) {
           lsm.addSelectionInterval(index, index);
+          lastIndex = index;
         }
         for (int index : removeSet) {
           lsm.removeSelectionInterval(index, index);
         }
+        if (lastIndex < 0) {
+          lastIndex = lsm.getMinSelectionIndex();
+        }
+        // update lead and anchor in model (bug 353998)
+        lsm.setAnchorSelectionIndex(lastIndex);
+        lsm.setLeadSelectionIndex(lastIndex);
       }
       finally {
         lsm.setValueIsAdjusting(false);
@@ -1107,6 +1116,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     return new int[0];
   }
 
+  private void closeEditor() {
+    TableCellEditor cellEditor = getSwingTable().getCellEditor();
+    if (cellEditor != null) {
+      cellEditor.stopCellEditing();
+    }
+  }
+
   private class P_SwingTable extends SwingTable {
     private static final long serialVersionUID = 1L;
 
@@ -1370,6 +1386,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public void mousePressed(MouseEvent e) {
+      closeEditor();
       fix = new MouseClickedBugFix(e);
       m_pressedPoint = e.getPoint();
       JTableEx table = getSwingTable();
@@ -1449,9 +1466,15 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public void mousePressed(MouseEvent e) {
+      JTableEx table = getSwingTable();
+      Point editingCell = new Point(table.getEditingColumn(), table.getEditingRow());
+      Point currentCell = new Point(table.columnAtPoint(e.getPoint()), table.rowAtPoint(e.getPoint()));
+      if (CompareUtility.notEquals(editingCell, currentCell)) {
+        //Make sure editor is closed when clicking on another cell. Mainly necessary when using the second mouse button to open the context menu
+        closeEditor();
+      }
       fix = new MouseClickedBugFix(e);
       //
-      JTableEx table = getSwingTable();
       int pressedRow = table.rowAtPoint(e.getPoint());
       // if selection is empty or click outside selection then make section of
       // this row
@@ -1527,6 +1550,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   private class P_SwingEmptySpaceMouseListener extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
+      closeEditor();
       // Mac popup
       if (e.isPopupTrigger()) {
         handleSwingEmptySpacePopup(e);

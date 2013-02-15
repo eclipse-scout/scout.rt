@@ -15,7 +15,10 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -40,7 +43,8 @@ public class TableMultilineListener implements Listener {
 
   private final boolean m_multiline;
   private final int m_rowHeight;
-
+  private final Image m_editableMarkerImage;
+  private final int m_editableMarkerWidth;
   private final Set<Integer> m_wrapTextColumns;
 
   /**
@@ -61,6 +65,8 @@ public class TableMultilineListener implements Listener {
     m_wrapTextColumns = wrapTextColumns;
     m_text_margin_y = textMarginY;
     m_text_margin_x = textMarginX;
+    m_editableMarkerImage = Activator.getIcon("marker");
+    m_editableMarkerWidth = (m_editableMarkerImage != null) ? m_editableMarkerImage.getBounds().width : 0;
   }
 
   /**
@@ -133,8 +139,11 @@ public class TableMultilineListener implements Listener {
         Point mSize = new Point(0, 0);
         TableItem mitem = (TableItem) event.item;
         Image img = mitem.getImage(event.index);
+        int editableIconOffset = 0;
         if (img != null) {
+          editableIconOffset = isEditableIconNeeded(event, mitem) ? m_editableMarkerWidth : 1;
           Rectangle imgBounds = img.getBounds();
+          img.getBounds().width += editableIconOffset;
           mSize.x += imgBounds.width + 2;
           mSize.y = Math.max(mSize.y, imgBounds.height + 2 * m_text_margin_y);
         }
@@ -142,19 +151,23 @@ public class TableMultilineListener implements Listener {
         Point textSize = m_multiline ? event.gc.textExtent(mtext) : event.gc.stringExtent(mtext);
         mSize.x += textSize.x + 2 * m_text_margin_x;
         mSize.y = Math.max(mSize.y, textSize.y + 2 * m_text_margin_y);
-        event.width = mSize.x;
+        event.width = mSize.x + editableIconOffset;
         event.height = Math.max(event.height, mSize.y);
         break;
       case SWT.PaintItem:
         TableItem pitem = (TableItem) event.item;
         String ptext = getCelldisplayText(event, pitem);
+
+        //alignment
         int align = SWT.LEFT;
         TableColumn tc = pitem.getParent().getColumn(event.index);
         if (tc != null) {
           align = (tc.getStyle() & (SWT.CENTER | SWT.LEFT | SWT.RIGHT));
         }
+
         /* center column 1 vertically */
         Rectangle itemBounds = pitem.getBounds(event.index);
+        editableIconOffset = isEditableIconNeeded(event, pitem) ? m_editableMarkerWidth : 1;
         int xImageOffset = itemBounds.x;
         int xTextOffset = xImageOffset + m_text_margin_x;
         int yOffset = itemBounds.y + m_text_margin_y;
@@ -196,6 +209,16 @@ public class TableMultilineListener implements Listener {
         }
         event.gc.drawText(ptext, xTextOffset, yOffset, true);
         event.gc.setForeground(event.gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+        TableItem item = (TableItem) event.item;
+        if (isEditableIconNeeded(event, item)) {
+          IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
+          ICell cell = ((ITableRow) item.getData()).getCell(col);
+          Image markerIcon = m_editableMarkerImage;
+          if (markerIcon != null && cell.isEditable()) {
+            event.gc.drawImage(markerIcon, event.x, event.y);
+          }
+        }
+
         break;
       case SWT.EraseItem:
         //Focus rectangle looks ugly in Windows XP if there is a column with an image so we just remove the rectangle
@@ -229,6 +252,14 @@ public class TableMultilineListener implements Listener {
       }
     }
     return text;
+  }
+
+  private boolean isEditableIconNeeded(Event event, TableItem item) {
+    IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
+    if (col != null && col.isEditable() && !col.getDataType().isAssignableFrom(Boolean.class)) {
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -46,6 +46,9 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
+    //Make sure the browser has a transparent background as default (necessary because there is no css background property for the browser)
+    container.setBackgroundMode(SWT.INHERIT_DEFAULT);
+
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);

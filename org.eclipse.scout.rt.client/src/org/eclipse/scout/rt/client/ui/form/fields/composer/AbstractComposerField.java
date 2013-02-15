@@ -287,7 +287,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @ConfigOperation
   @Order(140)
-  protected EitherOrNode execCreateAdditionalOrNode(ITreeNode parentNode, boolean negated) {
+  protected EitherOrNode execCreateAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
     EitherOrNode node = new EitherOrNode(this, false);
     node.setNegative(negated);
     node.setStatus(ITreeNode.STATUS_INSERTED);
@@ -638,10 +638,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public EitherOrNode addAdditionalOrNode(ITreeNode parentNode, boolean negated) {
-    EitherOrNode node = execCreateAdditionalOrNode(parentNode, negated);
+  public EitherOrNode addAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
+    EitherOrNode node = execCreateAdditionalOrNode(eitherOrNode, negated);
     if (node != null) {
-      getTree().addChildNode(parentNode.getChildNodeIndex() + 1, parentNode.getParentNode(), node);
+      getTree().addChildNode(eitherOrNode.getChildNodeIndex() + 1, eitherOrNode.getParentNode(), node);
       getTree().setNodeExpanded(node, true);
     }
     return node;
@@ -822,7 +822,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           return addEitherNode(parentNode, eonodeData.isNegative());
         }
         else {
-          return addAdditionalOrNode(parentNode, eonodeData.isNegative());
+          // Bugzilla 400056: get sibling either/or node, must be latest child
+          ITreeNode eitherOrNode = parentNode.getChildNode(parentNode.getChildNodeCount() - 1);
+          return addAdditionalOrNode(eitherOrNode, eonodeData.isNegative());
         }
       }
       else {
