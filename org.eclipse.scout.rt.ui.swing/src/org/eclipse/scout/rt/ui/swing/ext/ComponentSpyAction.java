@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -27,6 +28,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.RootPaneContainer;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -48,6 +51,7 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 public class ComponentSpyAction extends AbstractAction {
   private static final long serialVersionUID = 1L;
 
+  private static final String ESCAPE_KEYSTROKE = "ComponentSpyAction-EscapeKeyStroke";
   private static JDialog currentDialog;
 
   @Override
@@ -106,14 +110,17 @@ public class ComponentSpyAction extends AbstractAction {
     dlg.setModal(false);
     dlg.getContentPane().add(BorderLayout.CENTER, new JScrollPaneEx(tree));
     JPanelEx buttonPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.RIGHT));
-    buttonPanel.add(new JButtonEx(new AbstractAction("Close") {
+    AbstractAction closeAction = new AbstractAction("Close") {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void actionPerformed(ActionEvent e) {
         dlg.dispose();
       }
-    }));
+    };
+    buttonPanel.add(new JButtonEx(closeAction));
+    dlg.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ESCAPE_KEYSTROKE);
+    dlg.getRootPane().getActionMap().put(ESCAPE_KEYSTROKE, closeAction);
     dlg.getContentPane().add(BorderLayout.SOUTH, buttonPanel);
     dlg.getContentPane().setPreferredSize(new Dimension(800, 600));
     dlg.pack();
@@ -396,6 +403,13 @@ public class ComponentSpyAction extends AbstractAction {
             newList.add(newNode);
             newNode.setParent(this);
           }
+        }
+      }
+      if (o instanceof IWrappedFormField) {
+        if (m_markedChild != null && m_markedChild.getUserObject() == ((IWrappedFormField<?>) o).getInnerForm()) {
+          ScoutNode newNode = m_markedChild;
+          newList.add(newNode);
+          newNode.setParent(this);
         }
       }
       m_children = newList;
