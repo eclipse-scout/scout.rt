@@ -470,12 +470,20 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       try {
         lsm.setValueIsAdjusting(true);
         //
+        int lastIndex = -1;
         for (int index : addSet) {
           lsm.addSelectionInterval(index, index);
+          lastIndex = index;
         }
         for (int index : removeSet) {
           lsm.removeSelectionInterval(index, index);
         }
+        if (lastIndex < 0) {
+          lastIndex = lsm.getMinSelectionIndex();
+        }
+        // update lead and anchor in model (bug 353998)
+        lsm.setAnchorSelectionIndex(lastIndex);
+        lsm.setLeadSelectionIndex(lastIndex);
       }
       finally {
         lsm.setValueIsAdjusting(false);
