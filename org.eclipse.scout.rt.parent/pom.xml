@@ -89,6 +89,7 @@
         <module>../org.eclipse.scout.rt.extension.client.test.fragment</module>
         <module>../org.eclipse.scout.rt.testing-feature</module>
         <module>../org.eclipse.scout.rt.rap.testing-feature</module>
+        <module>../org.eclipse.scout.rt.testing.commons</module>
       </modules>
     </profile>
 

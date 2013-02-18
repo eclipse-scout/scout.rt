@@ -39,6 +39,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.scout.rt.testing.commons"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.scout.rt.testing.shared"
          download-size="0"
          install-size="0"
