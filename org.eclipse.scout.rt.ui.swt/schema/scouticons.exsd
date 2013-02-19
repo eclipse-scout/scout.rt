@@ -25,25 +25,26 @@
             <element ref="status_warning" minOccurs="0" maxOccurs="1"/>
             <element ref="checkbox_yes" minOccurs="0" maxOccurs="1"/>
             <element ref="checkbox_no" minOccurs="0" maxOccurs="1"/>
+            <element ref="cell_editable" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -180,6 +181,26 @@
       <annotation>
          <documentation>
             Icon to represent &apos;checked state false&apos; in a checkable table cell
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="cell_editable">
+      <annotation>
+         <documentation>
+            Icon to represent mark an editable table cell
          </documentation>
       </annotation>
       <complexType>

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -65,7 +66,7 @@ public class TableMultilineListener implements Listener {
     m_wrapTextColumns = wrapTextColumns;
     m_text_margin_y = textMarginY;
     m_text_margin_x = textMarginX;
-    m_editableMarkerImage = Activator.getIcon("marker");
+    m_editableMarkerImage = Activator.getIcon(SwtIcons.CellEditable);
     m_editableMarkerWidth = (m_editableMarkerImage != null) ? m_editableMarkerImage.getBounds().width : 0;
   }
 
