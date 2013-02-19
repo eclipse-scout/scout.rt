@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.imagebox;
 
 import java.io.ByteArrayInputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -18,21 +19,30 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>SwtScoutImageBox</h3> ...
@@ -59,6 +69,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
         freeResources();
       }
     });
+    imgViewer.addMenuDetectListener(new P_RwtMenuDetectListener());
 
     // layout
     getSwtContainer().setLayout(new LogicalGridLayout(1, 0));
@@ -119,6 +130,66 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
     }
     super.handleScoutPropertyChange(name, newValue);
+
+  }
+
+  private Menu createMenu() {
+    if (getSwtField().getMenu() != null) {
+      getSwtField().getMenu().dispose();
+      getSwtField().setMenu(null);
+    }
+
+    Menu contextMenu = new Menu(getSwtField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener());
+    getSwtField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    menu.setLocation(location);
+    menu.setVisible(true);
+  }
+
+  private class P_ContextMenuListener extends MenuAdapter {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuShown(MenuEvent e) {
+      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          scoutMenusRef.set(scoutMenus);
+        }
+      };
+      JobEx job = SwtScoutImageField.this.getEnvironment().invokeScoutLater(t, 1200);
+      try {
+        job.join(1200);
+      }
+      catch (InterruptedException ex) {
+        //nop
+      }
+
+      // grab the actions out of the job, when the actions are provided within
+      // the scheduled time the popup will be handled.
+      if (scoutMenusRef.get() != null) {
+        Menu menu = ((Menu) e.getSource());
+        SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), menu, SwtScoutImageField.this.getEnvironment());
+      }
+    }
+  }
+
+  private class P_RwtMenuDetectListener implements MenuDetectListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuDetected(MenuDetectEvent e) {
+      createAndShowMenu(new Point(e.x, e.y));
+    }
 
   }
 
