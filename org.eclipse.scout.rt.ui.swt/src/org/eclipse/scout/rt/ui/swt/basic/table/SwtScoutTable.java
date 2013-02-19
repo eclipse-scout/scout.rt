@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
@@ -1178,7 +1179,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           if (isEditableIconNeeded(event, item)) {
             IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
             ICell cell = ((ITableRow) item.getData()).getCell(col);
-            Image markerIcon = Activator.getIcon("marker");
+            Image markerIcon = Activator.getIcon(SwtIcons.CellEditable);
             if (markerIcon != null && cell.isEditable()) {
               event.gc.drawImage(markerIcon, event.x, event.y);
             }

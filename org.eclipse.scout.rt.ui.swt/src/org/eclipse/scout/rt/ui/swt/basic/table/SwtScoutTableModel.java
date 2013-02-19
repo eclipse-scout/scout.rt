@@ -58,7 +58,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     m_imgCheckboxTrue = Activator.getIcon(SwtIcons.CheckboxYes);
     m_imgCheckboxFalse = Activator.getIcon(SwtIcons.CheckboxNo);
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
-    Image markerIcon = Activator.getIcon("marker");
+    Image markerIcon = Activator.getIcon(SwtIcons.CellEditable);
     m_markerIconWith = (markerIcon != null) ? markerIcon.getBounds().width : 0;
   }
 

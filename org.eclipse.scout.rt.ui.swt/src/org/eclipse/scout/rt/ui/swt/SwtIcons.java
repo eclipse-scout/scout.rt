@@ -18,4 +18,5 @@ public interface SwtIcons {
   String Window = "window";
   String CheckboxYes = "checkbox_yes";
   String CheckboxNo = "checkbox_no";
+  String CellEditable = "cell_editable";
 }
