@@ -461,6 +461,11 @@ ProgressBar-Indicator:paused { background-color:#ebebeb; }
 
 ProgressBar-Indicator:error { background-color:#cb2020; }
 
+SystemMessage-DisplayOverlay {
+  background-color:transparent;
+  background-image:none;
+}
+
 Sash {
   border:none;
   background-image:none;

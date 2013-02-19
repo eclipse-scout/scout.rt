@@ -492,6 +492,12 @@ ProgressBar-Indicator:paused {
 ProgressBar-Indicator:error {
   background-color: #cb2020;
 }
+/* Shouldn't actually be necessary because it's already declared in Widget.default.less of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which means the whole screen gets white. */
+SystemMessage-DisplayOverlay {
+  background-color: transparent;
+  background-image: none;
+}
 /* Sash */
 Sash {
   border: none;
