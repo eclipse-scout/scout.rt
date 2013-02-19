@@ -33,6 +33,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
   private ISvgFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
+  // only do one action at a time
+  private boolean m_actionRunning;
 
   public AbstractSvgField() {
     this(true);
@@ -40,6 +42,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
   public AbstractSvgField(boolean callInitializer) {
     super(callInitializer);
+    m_actionRunning = false;
   }
 
   @ConfigPropertyValue("0")
@@ -127,33 +130,49 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   }
 
   private void fireHyperlink(URL url) {
-    SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, url);
-    // single observer
-    try {
-      execHyperlink(e);
+    if (!m_actionRunning) {
+      try {
+        m_actionRunning = true;
+        SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, url);
+        // single observer
+        try {
+          execHyperlink(e);
+        }
+        catch (ProcessingException pe) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        }
+        fireSvgFieldEventInternal(e);
+      }
+      finally {
+        m_actionRunning = false;
+      }
     }
-    catch (ProcessingException pe) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
-    }
-    catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
-    }
-    fireSvgFieldEventInternal(e);
   }
 
   private void fireClick() {
-    SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_CLICKED, getSelection(), null);
-    // single observer
-    try {
-      execClicked(e);
+    if (!m_actionRunning) {
+      try {
+        m_actionRunning = true;
+        SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_CLICKED, getSelection(), null);
+        // single observer
+        try {
+          execClicked(e);
+        }
+        catch (ProcessingException pe) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        }
+        fireSvgFieldEventInternal(e);
+      }
+      finally {
+        m_actionRunning = false;
+      }
     }
-    catch (ProcessingException pe) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
-    }
-    catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
-    }
-    fireSvgFieldEventInternal(e);
   }
 
   private void fireSvgFieldEventInternal(SvgFieldEvent e) {
