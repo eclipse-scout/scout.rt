@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.ui.rap.html;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.service.IResourceManager;
+import org.eclipse.rap.rwt.service.ResourceManager;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.StringUtility;
@@ -116,7 +118,7 @@ public class HtmlAdapter {
       return null;
     }
 
-    IResourceManager resourceManager = RWT.getResourceManager();
+    ResourceManager resourceManager = RWT.getResourceManager();
     return resourceManager.getLocation(image.internalImage.getResourceName());
   }
 
@@ -151,27 +153,29 @@ public class HtmlAdapter {
     return buf.toString();
   }
 
-  private static final Pattern localLinkTagPattern = Pattern.compile("<a (href=\"" + ITable.LOCAL_URL_PREFIX + "[^>]*)>([^>]*)</a>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  private static final Pattern localLinkTagPattern = Pattern.compile("(<a[ \r\n]+href=)(\"" + ITable.LOCAL_URL_PREFIX + "[^>\"]*\")([^>]*>[^>]*</a>)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
+    return convertLinksWithLocalUrlsInHtmlCell(uiComposite, rawHtml, null);
+  }
 
   /**
    * @return converted links to local urls in html text. <b>&lt;a&gt;</b> -&gt; styled <b>&lt;span&gt;</b> as in Link
    *         widget.
    */
-  public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
+  public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml, Map<String, String> additionalParams) {
     Matcher m = localLinkTagPattern.matcher(rawHtml);
     StringBuilder buf = new StringBuilder();
     int lastPos = 0;
     while (m.find()) {
       buf.append(rawHtml.substring(lastPos, m.start()));
 
-      buf.append("<span ");
-      buf.append("class=\"link\" ");
-      buf.append("style=\"");
-      buf.append("text-decoration:underline;cursor:pointer;\" ");
       buf.append(rawHtml.substring(m.start(1), m.end(1)));
-      buf.append(">");
-      buf.append(rawHtml.substring(m.start(2), m.end(2)));
-      buf.append("</span>");
+      String url = rawHtml.substring(m.start(2) + 1, m.end(2) - 1);
+      url = "\"" + adjustUrl(url, additionalParams) + "\"";
+      buf.append(url);
+      buf.append(" target=\"_rwt\"");
+      buf.append(rawHtml.substring(m.start(3), m.end(3)));
 
       lastPos = m.end();
     }
@@ -179,6 +183,22 @@ public class HtmlAdapter {
       buf.append(rawHtml.substring(lastPos));
     }
     return buf.toString();
+  }
+
+  private String adjustUrl(String url, Map<String, String> additionalParams) {
+    if (additionalParams == null) {
+      return url;
+    }
+
+    String paramChar = "?";
+    if (url.contains("?") || url.contains("&#63;")) {
+      paramChar = "&amp;";
+    }
+    for (Entry<String, String> entry : additionalParams.entrySet()) {
+      url += paramChar + entry.getKey() + "=" + entry.getValue();
+      paramChar = "&amp;";
+    }
+    return url;
   }
 
   /**

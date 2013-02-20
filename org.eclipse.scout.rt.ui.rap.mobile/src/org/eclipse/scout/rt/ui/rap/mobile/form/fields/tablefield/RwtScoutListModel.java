@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -24,11 +25,19 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
+import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Image;
 
 public class RwtScoutListModel implements IRwtScoutListModel {
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Query parameter which will be appended to the actual hyperlink url.
+   * <p>
+   * Necessary because there is no other possibility to get the row of the clicked hyperlink.
+   */
+  public static final String HYPERLINK_ROW_PARAM = "1row1Num1";
 
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
@@ -163,8 +172,13 @@ public class RwtScoutListModel implements IRwtScoutListModel {
       text = "";
     }
     if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
-      text = m_uiList.getUiEnvironment().adaptHtmlCell(m_uiList, text);
-      text = m_uiList.getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(m_uiList, text);
+      HtmlAdapter htmlAdapter = m_uiList.getUiEnvironment().getHtmlAdapter();
+      text = htmlAdapter.adaptHtmlCell(m_uiList, text);
+
+      Map<String, String> params = new HashMap<String, String>();
+      ITableRow tableRow = (ITableRow) element;
+      params.put(HYPERLINK_ROW_PARAM, tableRow.getRowIndex() + "");
+      text = htmlAdapter.convertLinksWithLocalUrlsInHtmlCell(m_uiList, text, params);
     }
     else {
       boolean multiline = false;

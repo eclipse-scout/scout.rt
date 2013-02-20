@@ -41,8 +41,8 @@ import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.HyperlinkEvent;
-import org.eclipse.swt.events.HyperlinkListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
@@ -117,10 +117,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     P_RwtTableListener rwtTableListener = new P_RwtTableListener();
     list.addListener(SWT.MouseUp, rwtTableListener);
     list.addListener(SWT.MouseDoubleClick, rwtTableListener);
-
-    //HyperlinkListener is not part of the official rap api so this line might generate compile errors
-    //See https://bugs.eclipse.org/bugs/show_bug.cgi?id=347436
-    list.addHyperlinkListener(new P_RwtHyperlinkListener());
+    list.addSelectionListener(new P_RwtHyperlinkSelectionListener());
 
     getUiEnvironment().addKeyStroke(list, new RwtKeyStroke((int) ' ') {
 
@@ -530,7 +527,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     // end notify
   }
 
-  protected void handleUiHyperlinkAction(String urlText) {
+  protected void handleUiHyperlinkAction(final ITableRow row, String urlText) {
     if (getScoutObject() == null) {
       return;
     }
@@ -548,7 +545,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       @Override
       public void run() {
         ITable table = getScoutObject();
-        table.getUIFacade().fireHyperlinkActionFromUI(table.getSelectedRow(), table.getContextColumn(), url);
+        table.getUIFacade().fireHyperlinkActionFromUI(row, table.getContextColumn(), url);
       }
     };
     getUiEnvironment().invokeScoutLater(t, 0);
@@ -692,12 +689,42 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     }
   }
 
-  public class P_RwtHyperlinkListener implements HyperlinkListener {
+  private class P_RwtHyperlinkSelectionListener extends SelectionAdapter {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void activated(HyperlinkEvent event) {
-      handleUiHyperlinkAction(event.url);
+    public void widgetSelected(SelectionEvent event) {
+      if (event.detail == RWT.HYPERLINK) {
+        String url = event.text;
+        ITableRow row = extractTableRow(url);
+        if (row == null) {
+          throw new RuntimeException("Hyperlink cannot be activated. Could not extract row index from hyperlink: " + url);
+        }
+        handleUiHyperlinkAction(row, url);
+      }
+    }
+
+    private ITableRow extractTableRow(String url) {
+      String[] paramPairs = url.split("[\\?\\&]");
+      if (paramPairs.length == 0) {
+        return null;
+      }
+
+      for (String paramPair : paramPairs) {
+        String[] param = paramPair.split("=");
+        if (param.length != 2) {
+          continue;
+        }
+
+        String key = param[0];
+        if (RwtScoutListModel.HYPERLINK_ROW_PARAM.equals(key)) {
+          String value = param[1];
+          int rowIndex = Integer.parseInt(value);
+          return getScoutObject().getRow(rowIndex);
+        }
+      }
+
+      return null;
     }
   }
 

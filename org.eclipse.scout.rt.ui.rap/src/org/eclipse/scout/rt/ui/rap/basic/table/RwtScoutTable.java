@@ -34,6 +34,8 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -90,6 +92,8 @@ import org.eclipse.swt.widgets.TableItem;
  */
 @SuppressWarnings("restriction")
 public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTableForPatch {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTable.class);
+
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
 
@@ -153,13 +157,15 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     viewer.setInput(tableModel);
 
     // ui listeners
-    viewer.addSelectionChangedListener(new P_RwtSelectionListener());
+    viewer.addSelectionChangedListener(new P_RwtSelectionChangedListener());
     P_RwtTableListener rwtTableListener = new P_RwtTableListener();
     table.addListener(SWT.MouseDown, rwtTableListener);
     table.addListener(SWT.MouseUp, rwtTableListener);
     table.addListener(SWT.MouseDoubleClick, rwtTableListener);
     table.addListener(SWT.MenuDetect, rwtTableListener);
     table.addListener(SWT.Resize, rwtTableListener);
+    table.addSelectionListener(new P_RwtHyperlinkSelectionListener());
+
     getUiEnvironment().addKeyStroke(table, new RwtKeyStroke((int) ' ') {
 
       @Override
@@ -805,22 +811,23 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
   }
 
-  protected void handleUiHyperlinkAction(String urlText) {
+  protected void handleUiHyperlinkAction(final ITableRow row, String urlText) {
     if (getScoutObject() != null) {
       final URL url;
       try {
         url = new URL(urlText);
       }
       catch (MalformedURLException e) {
-        //nop
+        LOG.error("Hyperlink could not be activated", e);
         return;
       }
+
       // notify Scout
       Runnable t = new Runnable() {
         @Override
         public void run() {
           ITable table = getScoutObject();
-          table.getUIFacade().fireHyperlinkActionFromUI(table.getSelectedRow(), table.getContextColumn(), url);
+          table.getUIFacade().fireHyperlinkActionFromUI(row, table.getContextColumn(), url);
         }
       };
       getUiEnvironment().invokeScoutLater(t, 0);
@@ -1171,10 +1178,23 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
   } // end class P_SwtResizeListener
 
-  public class P_RwtSelectionListener implements ISelectionChangedListener {
+  public class P_RwtSelectionChangedListener implements ISelectionChangedListener {
     @Override
     public void selectionChanged(SelectionChangedEvent event) {
       setSelectionFromUi((StructuredSelection) event.getSelection());
+    }
+  }
+
+  private class P_RwtHyperlinkSelectionListener extends SelectionAdapter {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void widgetSelected(SelectionEvent event) {
+      if (event.detail == RWT.HYPERLINK) {
+        TableItem tableItem = (TableItem) event.item;
+        ITableRow row = (ITableRow) tableItem.getData();
+        handleUiHyperlinkAction(row, event.text);
+      }
     }
   }
 

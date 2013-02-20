@@ -24,13 +24,22 @@ public class ListEx extends List {
     super(parent, style);
   }
 
-  @SuppressWarnings("null")
   public String getItem(Point point) {
+    String result = null;
+    int index = getItemIndex(point);
+    if (index >= 0 && index < getItemCount()) {
+      result = getItem(index);
+    }
+    return result;
+  }
+
+  @SuppressWarnings("null")
+  public int getItemIndex(Point point) {
     checkWidget();
     if (point == null) {
       SWT.error(SWT.ERROR_NULL_ARGUMENT);
     }
-    String result = null;
+
     Rectangle itemArea = getClientArea();
     if (itemArea.contains(point)) {
       int itemHeight = getItemHeight();
@@ -39,11 +48,9 @@ public class ListEx extends List {
         index++;
       }
       index += getTopIndex();
-      if (index >= 0 && index < getItemCount()) {
-        result = getItem(index);
-      }
+      return index;
     }
-    return result;
+    return -1;
   }
 
 }
