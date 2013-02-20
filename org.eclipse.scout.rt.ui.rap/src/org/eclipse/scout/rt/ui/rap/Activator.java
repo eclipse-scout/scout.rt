@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.util.Hashtable;
 
-import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.ui.rap.login.internal.InternalNetAuthenticator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -29,18 +28,12 @@ public class Activator extends AbstractUIPlugin {
   private static final String CLIENT_LOG_LEVEL = "org.eclipse.rwt.clientLogLevel";
   private static final String ALL_CLIENT_LOG_LEVEL = "ALL";
 
-  private static final String CLIENT_LIBRARY_VARIANT = "org.eclipse.rwt.clientLibraryVariant";
-  private static final String DEBUG_CLIENT_LIBRARY_VARIANT = "DEBUG";
-
   private static Activator m_plugin;
 
   private ServiceRegistration m_netAuthRegistration;
 
   public Activator() {
     System.setProperty(CLIENT_LOG_LEVEL, ALL_CLIENT_LOG_LEVEL);
-    //[imo] js patching mode. Rebuild client.js before removing these lines of code!! - SLE client.js is patched
-//    System.out.println("Debug does not use compiled client.js; Setting " + CLIENT_LIBRARY_VARIANT + "=" + DEBUG_CLIENT_LIBRARY_VARIANT);
-//    System.setProperty(CLIENT_LIBRARY_VARIANT, DEBUG_CLIENT_LIBRARY_VARIANT);
   }
 
   public static Activator getDefault() {
@@ -55,8 +48,6 @@ public class Activator extends AbstractUIPlugin {
     Hashtable<String, Object> map = new Hashtable<String, Object>();
     map.put(Constants.SERVICE_RANKING, -1);
     m_netAuthRegistration = Activator.getDefault().getBundle().getBundleContext().registerService(java.net.Authenticator.class.getName(), new InternalNetAuthenticator(), map);
-    // set default webclient state
-    WebClientState.setWebClientDefault(true);
   }
 
   @Override

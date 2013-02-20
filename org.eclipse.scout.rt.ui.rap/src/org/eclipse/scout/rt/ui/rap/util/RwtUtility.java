@@ -54,7 +54,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -1487,15 +1486,6 @@ public final class RwtUtility {
       return text;
     }
     return MNEMONIC_PATTERN.matcher(text).replaceAll("\\&$1");
-  }
-
-  /**
-   * @deprecated Use {@link RwtLayoutUtility#createGridLayoutNoSpacing(int, boolean)}. <br/>
-   *             Will be removed in 3.9.0
-   */
-  @Deprecated
-  public static GridLayout createGridLayoutNoSpacing(int columnCount, boolean makeColumnsEqualWidth) {
-    return RwtLayoutUtility.createGridLayoutNoSpacing(columnCount, makeColumnsEqualWidth);
   }
 
   public static void verifyUiInput(Control control) {

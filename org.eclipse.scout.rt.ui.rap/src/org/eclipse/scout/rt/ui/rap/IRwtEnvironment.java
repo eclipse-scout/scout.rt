@@ -211,9 +211,6 @@ public interface IRwtEnvironment {
 
   HtmlAdapter getHtmlAdapter();
 
-  @Deprecated
-  String getLogoutLandingUri();
-
   Display getDisplay();
 
   IClientSession getClientSession();

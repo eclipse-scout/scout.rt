@@ -46,7 +46,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   private Shell m_rootShell;
   private RwtScoutDesktop m_uiDesktop;
   private RwtScoutFormButtonBar m_uiButtonArea;
-  private ServerPushSession m_pushSession;
+  private ServerPushSession m_clientNotificationPushSession;
 
   public AbstractStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     super(applicationBundle, clientSessionClazz);
@@ -118,10 +118,8 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
     if (needsClientNotificationServerPushSession()) {
       // Necessary for client notifications.
-      // TODO RAP 2.0 Migration - check
-      // old code UICallBack.activate(getClass().getName() + getClass().hashCode());
-      m_pushSession = new ServerPushSession();
-      m_pushSession.start();
+      m_clientNotificationPushSession = new ServerPushSession();
+      m_clientNotificationPushSession.start();
     }
 
     while (!shell.isDisposed()) {

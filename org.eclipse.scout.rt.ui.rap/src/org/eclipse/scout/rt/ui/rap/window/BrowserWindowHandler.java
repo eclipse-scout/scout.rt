@@ -77,9 +77,6 @@ public class BrowserWindowHandler {
       return;
     }
 
-    // TODO RAP 2.0 migration - check
-    // old code String nextId = UUID.randomUUID().toString();
-    // old code ExternalBrowser.open(nextId, link, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
     UrlLauncher launcher = RWT.getClient().getService(UrlLauncher.class);
     if (launcher != null) {
       launcher.openURL(link);

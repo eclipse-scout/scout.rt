@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.rap.rwt.SessionSingletonBase;
+import org.eclipse.rap.rwt.SingletonUtil;
 import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -39,7 +39,7 @@ public class CustomWidgetIdGenerator {
   private Map<String, Integer> m_existingIds = new HashMap<String, Integer>();
 
   public static CustomWidgetIdGenerator getInstance() {
-    return SessionSingletonBase.getInstance(CustomWidgetIdGenerator.class);
+    return SingletonUtil.getSessionInstance(CustomWidgetIdGenerator.class);
   }
 
   private CustomWidgetIdGenerator() {

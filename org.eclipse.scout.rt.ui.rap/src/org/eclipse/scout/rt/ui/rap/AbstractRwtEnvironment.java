@@ -37,9 +37,7 @@ import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
-import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
@@ -165,7 +163,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
   private P_RequestInterceptor m_requestInterceptor;
-  private ServerPushSession m_serverPushSession;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
@@ -273,24 +270,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   /**
-   * @deprecated use {@link #dispose()} instead
-   */
-  @Deprecated
-  protected void stopScout() {
-    dispose();
-  }
-
-  /**
-   * @deprecated use {@link #getLogoutLocation()} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public String getLogoutLandingUri() {
-    return getLogoutLocation();
-  }
-
-  /**
    * @see {@link LogoutFilter}
    */
   protected String getLogoutLocation() {
@@ -307,7 +286,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   public void logout() {
     HttpServletResponse response = RWT.getResponse();
-    String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
+    String logoutUri = response.encodeRedirectURL(getLogoutLocation());
     String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
     JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
     if (executor != null) {
@@ -423,11 +402,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
       // notify ui available
       // notify desktop that it is loaded
-
-      // TODO RAP 2.0 Migration - check
-      // old code UICallBack.activate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
-      m_serverPushSession = new ServerPushSession();
-      m_serverPushSession.start();
       new ClientSyncJob("Desktop opened", getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -599,18 +573,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     return getHtmlAdapter().styleHtmlText(uiComposite, rawHtml);
   }
 
-  /**
-   * @deprecated To adjust the behavior override {@link HtmlAdapter} instead. Will be removed in 3.9.0
-   */
-  @Deprecated
-  protected DefaultFont createDefaultFontSettings(IRwtScoutFormField<?> uiComposite) {
-    return getHtmlAdapter().createDefaultFontSettings(uiComposite);
-  }
-
   protected HtmlAdapter createHtmlAdapter() {
     return new HtmlAdapter(this);
   }
 
+  @Override
   public HtmlAdapter getHtmlAdapter() {
     if (m_htmlAdapter == null) {
       m_htmlAdapter = createHtmlAdapter();
@@ -1121,14 +1088,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
             @Override
             public void run() {
               showFormPart(e.getForm());
-              getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  // TODO RAP 2.0 Migration - check
-                  // old code UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
-                  m_serverPushSession.stop();
-                }
-              });
             }
           };
           invokeUiLater(t);
@@ -1149,14 +1108,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
             @Override
             public void run() {
               ensureFormPartVisible(e.getForm());
-              getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  // TODO RAP 2.0 Migration - check
-// old code          UICallBack.deactivate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
-                  m_serverPushSession.stop();
-                }
-              });
             }
           };
           invokeUiLater(t);
@@ -1455,7 +1406,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     public void handleEvent(Event event) {
       getDisplay().removeListener(SWT.Dispose, this);
 
-      stopScout();
+      dispose();
     }
 
   }
