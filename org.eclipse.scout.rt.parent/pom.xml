@@ -34,8 +34,7 @@
     <module>../org.eclipse.scout.rt.client.mobile</module>
     <module>../org.eclipse.scout.http.servletfilter</module>
     <module>../org.eclipse.scout.rt.server</module>
-    <module>../org.apache.derby.jdbc_1053.fragment</module>
-    <module>../org.apache.derby.jdbc_1082.fragment</module>
+    <module>../org.apache.derby.jdbc_1091.fragment</module>
     <module>../org.eclipse.scout.rt.jdbc.derby</module>
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>

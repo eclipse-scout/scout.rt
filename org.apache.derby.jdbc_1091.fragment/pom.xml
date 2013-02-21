@@ -21,7 +21,7 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.apache.derby.jdbc_1053.fragment</artifactId>
-  <version>10.5.3-SNAPSHOT</version>
+  <artifactId>org.apache.derby.jdbc_1091.fragment</artifactId>
+  <version>10.9.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 </project>

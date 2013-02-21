@@ -134,14 +134,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.derby.jdbc_1053.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.apache.derby.jdbc_1082.fragment"
+         id="org.apache.derby.jdbc_1091.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"
