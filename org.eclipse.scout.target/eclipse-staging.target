@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-3.9.target" sequenceNumber="9">
+<target name="scout-3.9-staging.target" sequenceNumber="9">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_staging" location="http://download.eclipse.org/releases/staging/"/>
