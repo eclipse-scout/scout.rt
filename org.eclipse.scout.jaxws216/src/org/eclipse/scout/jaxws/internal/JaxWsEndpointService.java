@@ -12,6 +12,7 @@ package org.eclipse.scout.jaxws.internal;
 
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -108,7 +111,10 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
     if (!StringUtility.hasText(pathInfo)) {
       // ensure proper resource loading if trailing slash is missing
       response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-      response.setHeader("Location", new Path(JaxWsHelper.getBaseAddress(request, false)).append(request.getRequestURI()).addTrailingSeparator().toString());
+
+      final URI baseUri = URIUtil.fromString(JaxWsHelper.getBaseAddress(request, false));
+      final IPath contextPath = new Path(request.getRequestURI()).addTrailingSeparator();
+      response.setHeader("Location", URIUtil.append(baseUri, contextPath.toString()).toString());
       return;
     }
 
@@ -136,15 +142,15 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
       }
     }
 
-    response.getOutputStream().write(content);
-    response.setStatus(HttpServletResponse.SC_OK);
-    response.setContentLength(content.length);
-
     String contentType = FileUtility.getContentTypeForExtension(new Path(pathInfo).getFileExtension());
     if (contentType == null) {
       contentType = "application/unknown";
     }
     response.setContentType(contentType);
+    response.setContentLength(content.length);
+
+    response.getOutputStream().write(content);
+    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   protected String createHtmlStatusPage(final String contextPath, final ServletAdapter[] servletAdapters) throws Exception {
