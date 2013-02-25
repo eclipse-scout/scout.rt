@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.svg.client.svgfield;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.EventObject;
 
@@ -20,8 +21,7 @@ public class SvgFieldEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
-  private final float m_pointX;
-  private final float m_pointY;
+  private final Point m_point;
   private final URL m_url;
 
   /**
@@ -36,8 +36,13 @@ public class SvgFieldEvent extends EventObject {
   SvgFieldEvent(ISvgField source, int type, SVGPoint point, URL url) {
     super(source);
     m_type = type;
-    m_pointX = point.getX();
-    m_pointY = point.getY();
+    if (point != null) {
+      //Wrap in a custom point because SVGPoint is not serializable but EventObject is
+      m_point = new Point(point.getX(), point.getY());
+    }
+    else {
+      m_point = null;
+    }
     m_url = url;
   }
 
@@ -50,10 +55,34 @@ public class SvgFieldEvent extends EventObject {
   }
 
   public SVGPoint getPoint() {
-    return new SVGOMPoint(m_pointX, m_pointY);
+    if (m_point == null) {
+      return null;
+    }
+
+    return new SVGOMPoint(m_point.getX(), m_point.getY());
   }
 
   public URL getURL() {
     return m_url;
+  }
+
+  private class Point implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private float m_x;
+    private float m_y;
+
+    public Point(float x, float y) {
+      m_x = x;
+      m_y = y;
+    }
+
+    public float getX() {
+      return m_x;
+    }
+
+    public float getY() {
+      return m_y;
+    }
   }
 }
