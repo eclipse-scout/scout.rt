@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.browser.BrowserExtension;
+import org.eclipse.scout.rt.ui.rap.ext.browser.IHyperlinkCallback;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -52,7 +53,16 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
-    m_browserExtension = new BrowserExtension(browser);
+    setUiField(browser);
+
+    m_browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
+
+      @Override
+      public void execute(String url) {
+        getUiField().setUrl(url);
+      }
+
+    });
     m_browserExtension.attach();
     browser.addDisposeListener(new DisposeListener() {
       private static final long serialVersionUID = 1L;
@@ -76,7 +86,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
             url = new File(event.location).toURI().toURL();
           }
           catch (MalformedURLException e1) {
-            e1.printStackTrace();
+            LOG.error("", e1);
           }
         }
         if (url != null) {
@@ -90,7 +100,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     //
     setUiContainer(container);
     setUiLabel(label);
-    setUiField(browser);
+
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
 
@@ -137,7 +147,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
       }
     }
     String cleanHtml = getUiEnvironment().styleHtmlText(this, rawHtml);
-    cleanHtml = m_browserExtension.adaptLocalHyperlinks(cleanHtml, 1);
+    cleanHtml = m_browserExtension.adaptLocalHyperlinks(cleanHtml);
     //fast create of browser content if there are no attachments
     if (a == null || a.length == 0) {
       getUiField().setText(cleanHtml);

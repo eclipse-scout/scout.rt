@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.browser.BrowserExtension;
+import org.eclipse.scout.rt.ui.rap.ext.browser.IHyperlinkCallback;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -52,7 +53,16 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
-    m_browserExtension = new BrowserExtension(browser);
+    setUiField(browser);
+
+    m_browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
+
+      @Override
+      public void execute(String url) {
+        getUiField().setUrl(url);
+      }
+
+    });
     m_browserExtension.attach();
     browser.addDisposeListener(new DisposeListener() {
       private static final long serialVersionUID = 1L;
@@ -78,7 +88,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     //
     setUiContainer(container);
     setUiLabel(label);
-    setUiField(browser);
+
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
   }
@@ -113,7 +123,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
         }
         else {
           String content = IOUtility.getContent(r.getDecompressedReader());
-          content = m_browserExtension.adaptLocalHyperlinks(content, 1);
+          content = m_browserExtension.adaptLocalHyperlinks(content);
           location = m_browserExtension.addResource(r.getName(), new ByteArrayInputStream(content.getBytes("UTF-8")));
         }
         //Prevent caching by making the request unique
@@ -147,7 +157,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
           String path = f.getAbsolutePath().substring(prefixLen);
           if (path.toLowerCase().matches(".*\\.(htm|html)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-            content = m_browserExtension.adaptLocalHyperlinks(content, 1);
+            content = m_browserExtension.adaptLocalHyperlinks(content);
             if (location == null && path.startsWith(simpleName)) {
               //this is the index.html
               location = m_browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
@@ -158,7 +168,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
           }
           else if (path.toLowerCase().matches(".*\\.(svg)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
-            content = m_browserExtension.adaptLocalHyperlinks(content, 1);
+            content = m_browserExtension.adaptLocalHyperlinks(content);
             m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
           }
           else {

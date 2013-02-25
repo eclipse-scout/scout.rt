@@ -26,11 +26,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.browser.BrowserExtension;
+import org.eclipse.scout.rt.ui.rap.ext.browser.IHyperlinkCallback;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
-import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -68,23 +67,18 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
 
     // create label
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
+    setUiLabel(label);
 
     // create browser that shows the SVG
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NO_SCROLL);
+    setUiField(browser);
+
     browser.addDisposeListener(new DisposeListener() {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void widgetDisposed(DisposeEvent e) {
         getBrowserExtension().detach();
-      }
-    });
-    browser.addLocationListener(new LocationAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void changed(LocationEvent event) {
-        locationChangedFromUi(event);
       }
     });
     browser.addControlListener(new ControlListener() {
@@ -101,11 +95,15 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
         updateSvgDocument();
       }
     });
-    setBrowserExtension(new BrowserExtension(browser));
-    getBrowserExtension().attach();
+    setBrowserExtension(new BrowserExtension(browser, new IHyperlinkCallback() {
 
-    setUiLabel(label);
-    setUiField(browser);
+      @Override
+      public void execute(String url) {
+        hyperlinkActivatedFromUi(url);
+      }
+
+    }));
+    getBrowserExtension().attach();
 
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
@@ -144,7 +142,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
       doc.getRootElement().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, browserBounds.width + "px");
 
       // get the svg code as string and rewrite the local links
-      String svgText = getBrowserExtension().adaptLocalHyperlinks(getSvgContentFromDocument(doc), 2);
+      String svgText = getBrowserExtension().adaptLocalHyperlinks(getSvgContentFromDocument(doc));
 
       // bugfix for SVG fields to ensure all context menus are closed when the user clicks into the svg field
       String contextMenuHideScript = "parent.parent.org.eclipse.rwt.MenuManager.getInstance().update(null, 'mousedown');";
@@ -185,7 +183,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
 
   protected abstract SVGDocument getSvgDocument();
 
-  protected abstract void locationChangedFromUi(LocationEvent event);
+  protected abstract void hyperlinkActivatedFromUi(String url);
 
   @Override
   protected void setEnabledFromScout(boolean b) {

@@ -144,13 +144,11 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         if (getCompositeOnWidget(getUiContainer()) == null) {
           registerCompositeOnWidget(getUiContainer(), this);
         }
-        setCustomWidgetIds(getUiContainer());
       }
       if (getUiField() != null) {
         if (getCompositeOnWidget(getUiField()) == null) {
           registerCompositeOnWidget(getUiField(), this);
         }
-        setCustomWidgetIds(getUiField());
       }
       try {
         getUpdateUiFromScoutLock().acquire();
@@ -197,6 +195,8 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     if (m_uiContainer != null) {
       P_RwtContainerDisposeListener listener = new P_RwtContainerDisposeListener();
       m_uiContainer.addListener(SWT.Dispose, listener);
+
+      setCustomWidgetIds(m_uiContainer);
     }
   }
 
@@ -228,6 +228,8 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
       }
       P_RwtFieldDisposeListener listener = new P_RwtFieldDisposeListener();
       m_uiField.addListener(SWT.Dispose, listener);
+
+      setCustomWidgetIds(m_uiField);
     }
   }
 

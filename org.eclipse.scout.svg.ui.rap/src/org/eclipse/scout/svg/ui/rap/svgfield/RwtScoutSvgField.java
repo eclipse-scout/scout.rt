@@ -15,7 +15,6 @@ import java.net.URL;
 
 import org.eclipse.scout.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.svg.ui.rap.AbstractRwtScoutSvgComposite;
-import org.eclipse.swt.browser.LocationEvent;
 import org.w3c.dom.svg.SVGDocument;
 
 public class RwtScoutSvgField extends AbstractRwtScoutSvgComposite<ISvgField> implements IRwtScoutSvgField {
@@ -38,9 +37,9 @@ public class RwtScoutSvgField extends AbstractRwtScoutSvgComposite<ISvgField> im
   }
 
   @Override
-  protected void locationChangedFromUi(final LocationEvent event) {
+  protected void hyperlinkActivatedFromUi(String urlStr) {
     try {
-      final URL url = new URL(event.location);
+      final URL url = new URL(urlStr);
       // notify Scout
       Runnable t = new Runnable() {
         @Override

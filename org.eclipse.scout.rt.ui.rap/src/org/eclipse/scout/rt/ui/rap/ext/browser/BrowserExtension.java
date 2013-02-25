@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext.browser;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,102 +18,78 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.service.ResourceManager;
-import org.eclipse.rap.rwt.service.ServerPushSession;
-import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.internal.events.EventTypes;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.browser.BrowserFunction;
 
 /**
  * <h3>BrowserSupport</h3> adding hyperlink callback support as in normal swt to the rwt browser
  * <p>
  * Adding support for registering/unregistering (publishing) local resources.
  * 
- * @author imo
  * @since 3.8.0
  */
 public class BrowserExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserExtension.class);
   private static final Pattern LOCAL_URL_PATTERN = Pattern.compile("(['\"])(http://local[?/][^'\"]*)(['\"])", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  private static final String HYPERLINK_FUNCTION_NAME = "scoutActivateLocalUrl";
 
   private final Browser m_browser;
   private final HashMap<String, String> m_hyperlinkMap;
-  private final String m_serviceHandlerId;
-  private ServiceHandler m_serviceHandler;
-  private ServerPushSession m_pushSession;
+  private BrowserFunction m_hyperlinkBrowserFunction;
+  private IHyperlinkCallback m_hyperlinkCallback;
+  private String m_resourceFolderId;
   //
   private HashSet<String> m_tempFileNames = new HashSet<String>();
 
-  public BrowserExtension(Browser b) {
+  public BrowserExtension(Browser b, IHyperlinkCallback hyperlinkCallback) {
     m_browser = b;
+    m_hyperlinkCallback = hyperlinkCallback;
     m_hyperlinkMap = new HashMap<String, String>();
-    m_serviceHandlerId = UUID.randomUUID().toString();
+    m_resourceFolderId = UUID.randomUUID().toString();
   }
-
-  /**
-   * @return the unique {@link UUID} serviceHandlerId
-   */
-  public String getServiceHandlerId() {
-    return m_serviceHandlerId;
-  }
-
-  // TODO RAP 2.0 migration - old code
-//  private String getUiCallbackId() {
-//    return getClass().getName() + "" + hashCode();
-//  }
 
   public void attach() {
-    if (m_serviceHandler == null) {
-      // TODO RAP 2.0 migration - old code
-// old code       UICallBack.activate(getUiCallbackId());
-      m_pushSession = new ServerPushSession();
-      m_pushSession.start();
-      m_serviceHandler = new ServiceHandler() {
-        @Override
-        public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-          String localUrl = m_hyperlinkMap.get(request.getParameter("p"));
-          if (localUrl == null) {
-            return;
-          }
-          fireLocationChangedEvent(localUrl);
-        }
-      };
-      RWT.getServiceManager().registerServiceHandler(m_serviceHandlerId, m_serviceHandler);
+    if (m_hyperlinkBrowserFunction == null) {
+      m_hyperlinkBrowserFunction = createLocalHyperlinkFunction();
     }
+  }
+
+  private BrowserFunction createLocalHyperlinkFunction() {
+    return new BrowserFunction(m_browser, getLocalHyperlinkFunctionName()) {
+      @Override
+      public Object function(Object[] arguments) {
+        String localUrl = m_hyperlinkMap.get(arguments[0]);
+        if (localUrl == null) {
+          LOG.error("Hyperlink could not be activated. No url specified.");
+          return null;
+        }
+        if (m_hyperlinkCallback == null) {
+          LOG.error("Hyperlink could not be activated. Please specify the runnable to be executed.");
+          return null;
+        }
+
+        m_hyperlinkCallback.execute(localUrl);
+
+        return null;
+      }
+    };
   }
 
   public void detach() {
-    // TODO RAP 2.0 migration - old code
-// old code   UICallBack.deactivate(getUiCallbackId());
-    m_pushSession.stop();
+    if (m_hyperlinkBrowserFunction != null) {
+      m_hyperlinkBrowserFunction.dispose();
+      m_hyperlinkBrowserFunction = null;
+    }
     clearLocalHyperlinkCache();
     clearResourceCache();
-    if (m_serviceHandler != null) {
-      m_serviceHandler = null;
-      RWT.getServiceManager().unregisterServiceHandler(m_serviceHandlerId);
-    }
   }
 
   /**
-   * Adds a text resource that is encoded with the given <code>charset</code>.
-   * <p>
-   * By specifying an <code>option</code> other than <code>NONE</code> the resource will be versioned and/or compressed.
-   * As compressing is only intended for resources that contain JavaScript, versioning might be useful for other
-   * resources as well. When versioning is enabled a version number is appended to the resources' name which is derived
-   * from its content.
-   * </p>
-   * <p>
+   * Registers a text resource in the {@link ResourceManager}.
    * 
    * @param content
    *          the content of the resource to add.
@@ -129,7 +103,7 @@ public class BrowserExtension {
     if (!name.startsWith("/")) {
       name = "/" + name;
     }
-    String uniqueName = m_serviceHandlerId + name;
+    String uniqueName = m_resourceFolderId + name;
     m_tempFileNames.add(uniqueName);
     ResourceManager resourceManager = RWT.getResourceManager();
     resourceManager.register(uniqueName, content);
@@ -149,81 +123,32 @@ public class BrowserExtension {
   }
 
   /**
-   * @param html
-   *          replaces all http://local/... urls by a ajax callback with a {@link LocationEvent} in html text
-   * @param childDepth
-   *          when the document is inside a iframe or thelike, then childDepth is 1, if it is in addition inside an
-   *          embed tag (such as svg), then childDepth is 2.
+   * Replaces all http://local/... urls with a call to a javascript callback function named
+   * {@link #getLocalHyperlinkFunctionName()}.
+   * 
+   * @see {@link BrowserFunction}
    */
-  public String adaptLocalHyperlinks(String html, int childDepth) {
-    String p;
-    if (childDepth <= 0) {
-      p = "this";
-    }
-    else {
-      p = "parent";
-      for (int i = 1; i < childDepth; i++) {
-        p = "parent." + p;
-      }
-    }
-    return rewriteLocalHyperlinks(html, p, m_serviceHandlerId, m_hyperlinkMap);
+  public String adaptLocalHyperlinks(String html) {
+    return rewriteLocalHyperlinks(html, m_hyperlinkMap, getLocalHyperlinkFunctionName());
   }
 
   public void clearLocalHyperlinkCache() {
     m_hyperlinkMap.clear();
   }
 
-  private void fireLocationChangedEvent(final String location) {
-
-    m_browser.getDisplay().asyncExec(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Constructor<?> c = LocationEvent.class.getDeclaredConstructor(Object.class);
-          c.setAccessible(true);
-          //send changing
-          LocationEvent event = (LocationEvent) c.newInstance(new Event());
-          event.location = location;
-          event.top = true;
-
-          //send changing
-          final Listener[] locationChangingListeners = m_browser.getListeners(EventTypes.LOCALTION_CHANGING);
-          if (locationChangingListeners != null) {
-            for (Listener l : locationChangingListeners) {
-              if (l instanceof LocationListener) {
-                ((LocationListener) l).changing(event);
-              }
-            }
-          }
-          //send changed
-          final Listener[] locationChangedListeners = m_browser.getListeners(EventTypes.LOCALTION_CHANGED);
-          if (locationChangedListeners != null) {
-            for (Listener l : locationChangedListeners) {
-              if (l instanceof LocationListener) {
-                ((LocationListener) l).changed(event);
-              }
-            }
-          }
-
-        }
-        catch (Throwable t) {
-          //nop
-        }
-      }
-    });
+  protected String getLocalHyperlinkFunctionName() {
+    return HYPERLINK_FUNCTION_NAME;
   }
 
   /**
-   * Replace all href="http://local/... references in the html file and replace by an ajax call.
+   * Replaces all href="http://local/... references in the html file with a javascript callback function
    * 
    * @param html
-   * @param rwtServiceHandler
-   *          is called with the parameter "p" containing the local url key to the generatedMapping
    * @param generatedMappings
    *          is being filled up with the generated mappings
    * @return the rewritten html
    */
-  private static String rewriteLocalHyperlinks(String html, String ajaxParentContext, String rwtServiceHandler, Map<String /*externalKey*/, String /*url*/> generatedMappings) {
+  private static String rewriteLocalHyperlinks(String html, Map<String /*externalKey*/, String /*url*/> generatedMappings, String callbackFuncName) {
     if (html == null) {
       return html;
     }
@@ -233,19 +158,8 @@ public class BrowserExtension {
     while (m.find(nextFind)) {
       String localUrl = m.group(2);
       String externalKey = "" + generatedMappings.size();
-      StringBuilder urlBuf = new StringBuilder();
-      urlBuf.append("?");
-      urlBuf.append("nocache='+new Date().getTime()+'");
-      urlBuf.append("&amp;");
-      urlBuf.append("custom_service_handler");
-      urlBuf.append("=");
-      urlBuf.append(rwtServiceHandler);
-      urlBuf.append("&amp;");
-      urlBuf.append("p");
-      urlBuf.append("=");
-      urlBuf.append(externalKey);
-      String encodedURL = RWT.getResponse().encodeURL(urlBuf.toString());
-      String callableURL = "javascript:a=" + ajaxParentContext + ".qx.net.HttpRequest.create();a.open('GET','" + encodedURL + "',true);a.send(null);";
+      String callableURL = "javascript:" + callbackFuncName + "('" + externalKey + "');";
+
       buf.append(html.substring(nextFind, m.start()));
       buf.append(m.group(1));
       buf.append(callableURL);

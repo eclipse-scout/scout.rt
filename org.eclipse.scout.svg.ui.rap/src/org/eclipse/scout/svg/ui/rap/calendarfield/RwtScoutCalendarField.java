@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.ui.svg.calendar.builder.AbstractCalendarDocumentBuil
 import org.eclipse.scout.rt.ui.svg.calendar.builder.listener.ICalendarDocumentListener;
 import org.eclipse.scout.svg.ui.rap.AbstractRwtScoutSvgComposite;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -115,13 +114,13 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
   }
 
   @Override
-  protected void locationChangedFromUi(LocationEvent event) {
-    if (event == null || event.location == null || event.location.length() < 1) {
+  protected void hyperlinkActivatedFromUi(String url) {
+    if (url == null || url.length() < 1) {
       return;
     }
 
     // forward the hyperlink event to the document
-    getDocBuilder().hyperlinkActivated(event.location);
+    getDocBuilder().hyperlinkActivated(url);
   }
 
   private AbstractCalendarDocumentBuilder getDocBuilder() {
