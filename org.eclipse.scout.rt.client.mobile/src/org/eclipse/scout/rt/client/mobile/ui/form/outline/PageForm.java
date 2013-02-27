@@ -76,6 +76,20 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
+  public void initForm() throws ProcessingException {
+    // form
+    initFormInternal();
+
+    // fields
+    PageFormInitFieldVisitor v = new PageFormInitFieldVisitor();
+    visitFields(v);
+    v.handleResult();
+
+    // custom
+    execInitForm();
+  }
+
+  @Override
   public PageFormConfig getPageFormConfig() {
     return m_pageFormConfig;
   }
@@ -249,11 +263,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     for (AutoLeafPageWithNodes autoLeafPage : m_autoLeafPageMap.values()) {
       disposeAutoLeafPage(autoLeafPage);
     }
-
-    if (m_page != null && m_page.getDetailForm() != null) {
-      m_page.getDetailForm().doClose();
-      m_page.setDetailForm(null);
-    }
   }
 
   private void updateDrillDownStyle() {
@@ -403,6 +412,23 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
         selectPageTableRowIfNecessary(pageTable);
       }
     }
+  }
+
+  @Override
+  public boolean isDirty() {
+    if (m_pageFormConfig.isDetailFormVisible()) {
+      if (m_page.getDetailForm() != getPageDetailFormField().getInnerForm()) {
+        return true;
+      }
+    }
+    if (m_pageFormConfig.isTablePageAllowed() && m_page instanceof IPageWithTable) {
+      ITable pageTable = ((IPageWithTable) m_page).getTable();
+      if (pageTable != getPageTableField().getTable()) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Order(10.0f)

@@ -221,6 +221,11 @@ public class PageFormManager {
     updateLeftPageIfNecessary(page, viewId);
 
     IPageForm pageForm = m_pageFormMap.get(viewId, page);
+    if (pageForm != null && pageForm.isDirty()) {
+      pageForm.doClose();
+      m_pageFormMap.remove(pageForm);
+      pageForm = null;
+    }
     if (pageForm == null) {
       if (getLeftPageSlotViewId().equals(viewId)) {
         pageForm = createMainPageForm(page);

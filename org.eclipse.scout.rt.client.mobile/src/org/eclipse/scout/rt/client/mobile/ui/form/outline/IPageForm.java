@@ -23,4 +23,10 @@ public interface IPageForm extends IForm {
   void start() throws ProcessingException;
 
   void pageSelectedNotify() throws ProcessingException;
+
+  /**
+   * returns true if either the detail form or the table of the page has changed, which makes a recreation of the form
+   * necessary.
+   */
+  boolean isDirty();
 }
