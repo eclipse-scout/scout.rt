@@ -188,7 +188,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_contentHandler;
   }
 
-  private Bundle[] getOrderedBundleList() {
+  protected Bundle[] getOrderedBundleList() {
     synchronized (m_orderedBundleListLock) {
       if (m_orderedBundleList == null) {
         String prefix = m_serverSessionClass.getPackage().getName().replaceAll("^(.*\\.)(client|shared|server)(\\.core)?.*$", "$1");

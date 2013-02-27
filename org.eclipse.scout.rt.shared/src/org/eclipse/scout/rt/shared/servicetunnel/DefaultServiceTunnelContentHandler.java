@@ -157,6 +157,10 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     m_sendCompressed = COMPRESS;
   }
 
+  protected Bundle[] getBundleList() {
+    return m_bundleList;
+  }
+
   @Override
   public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception {
     // build soap message without sax (hi-speed)
