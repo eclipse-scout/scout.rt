@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 /**
  * Legacy
  * 
- * @deprecated use {@link ITable} with {@link ITable#setCheckable(boolean)}
+ * @deprecated use {@link ITable} with {@link ITable#setCheckable(boolean)} Will be removed in Release 3.10.
  */
 @Deprecated
 @SuppressWarnings("deprecation")

@@ -24,7 +24,6 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -48,12 +47,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   private JStatusLabelEx m_swingStatusLabel;
   // cache
   private IKeyStroke[] m_installedScoutKs;
-
-  /**
-   * @deprecated since 3.8, replaced by {@link FormEvent#TYPE_REQUEST_FOCUS}
-   */
-  @Deprecated
-  public static final String CLIENT_PROP_FOCUSED = "scout.ui.swing.focused";
 
   public SwingScoutFieldComposite() {
     super();

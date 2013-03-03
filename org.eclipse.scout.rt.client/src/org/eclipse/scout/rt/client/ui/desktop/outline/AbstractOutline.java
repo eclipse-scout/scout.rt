@@ -99,7 +99,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * <p>
    * Use {@link Order} annotations to define the sort ordering of the outlines on the desktop instead.
    * <p>
-   * Subclasses can override this method. Default is 0.
+   * Subclasses can override this method. Default is 0. Will be removed in Release 3.10.
    * 
    * @return the sort order of this outline.
    */

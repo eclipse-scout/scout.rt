@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.data.form.fields.composer;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
- * @deprecated use {@link DataModelConstants}
+ * @deprecated use {@link DataModelConstants}. Will be removed in Release 3.10.
  */
 @Deprecated
 public interface ComposerConstants extends DataModelConstants {

@@ -125,7 +125,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   }
 
   /**
-   * @deprecated use {@link #getAvailableColumns()} and filter by visible property
+   * @deprecated use {@link #getAvailableColumns()} and filter by visible property. Will be removed in Release 3.10.
    */
   @SuppressWarnings("unchecked")
   @Deprecated
@@ -135,7 +135,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
 
   /**
    * @deprecated use {@link #setAvailableColumns()} and set all available columns (with sort index, dispayable, visible
-   *             and width property), not just the visible ones
+   *             and width property), not just the visible ones. Will be removed in Release 3.10.
    */
   @Deprecated
   public void setVisibleColumns(List<TableColumnState> cols) {

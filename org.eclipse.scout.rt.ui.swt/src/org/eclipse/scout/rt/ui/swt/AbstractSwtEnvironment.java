@@ -645,15 +645,23 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return defaultFont;
   }
 
+  /**
+   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public boolean isBusy() {
     //replaced by SwtBusyHandler
     return false;
   }
 
+  /**
+   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public void setBusyFromSwt(boolean b) {
     //replaced by SwtBusyHandler
   }
@@ -1652,8 +1660,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return m_perspectiveId;
   }
 
+  /**
+   * @deprecated use {@link IForm#getEventHistory()}. Will be removed in Release 3.10
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public FormEvent[] fetchPendingPrintEvents(IForm form) {
     return new FormEvent[0];
   }

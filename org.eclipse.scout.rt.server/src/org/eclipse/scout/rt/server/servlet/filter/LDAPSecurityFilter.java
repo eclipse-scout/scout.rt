@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.servlet.filter;
 
-
 /**
  * @see {@link org.eclipse.scout.http.servletfilter.security.LDAPSecurityFilter}
  * @deprecated use {@link org.eclipse.scout.http.servletfilter.security.LDAPSecurityFilter} instead.
+ *             Will be removed in Release 3.10
  */
 @Deprecated
 public class LDAPSecurityFilter extends org.eclipse.scout.http.servletfilter.security.LDAPSecurityFilter {

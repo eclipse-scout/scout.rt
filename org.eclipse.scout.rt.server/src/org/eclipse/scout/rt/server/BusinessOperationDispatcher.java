@@ -16,7 +16,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
- * @deprecated use {@link DefaultTransactionDelegate}
+ * @deprecated use {@link DefaultTransactionDelegate}. Will be removed in Release 3.10.
  */
 @Deprecated
 public class BusinessOperationDispatcher extends DefaultTransactionDelegate {

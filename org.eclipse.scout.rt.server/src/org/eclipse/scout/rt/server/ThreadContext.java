@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  * This eliminates the need of creating special event dispatching
  * threads to run job queues, handle Thread-based session values etc.
  */
-
 public final class ThreadContext {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ThreadContext.class);
   private static final ThreadLocal<HttpServletRequest> HTTP_SERVLET_REQUEST = new ThreadLocal<HttpServletRequest>();
@@ -52,14 +52,21 @@ public final class ThreadContext {
     return TRANSACTION.get();
   }
 
-  @SuppressWarnings("deprecation")
   public static Map<Class, Object> backup() {
-    return ThreadContextLegacy.backup();
+    HashMap<Class, Object> copyMap = new HashMap<Class, Object>();
+    copyMap.put(HttpServletRequest.class, ThreadContext.getHttpServletRequest());
+    copyMap.put(HttpServletResponse.class, ThreadContext.getHttpServletResponse());
+    copyMap.put(IServerSession.class, ThreadContext.getServerSession());
+    copyMap.put(ITransaction.class, ThreadContext.getTransaction());
+    return copyMap;
   }
 
-  @SuppressWarnings("deprecation")
   public static void restore(Map<Class, Object> map) {
-    ThreadContextLegacy.restore(map);
+    HashMap<Class, Object> copyMap = (map != null ? new HashMap<Class, Object>(map) : new HashMap<Class, Object>());
+    ThreadContext.putHttpServletRequest((HttpServletRequest) copyMap.remove(HttpServletRequest.class));
+    ThreadContext.putHttpServletResponse((HttpServletResponse) copyMap.remove(HttpServletResponse.class));
+    ThreadContext.putServerSession((IServerSession) copyMap.remove(IServerSession.class));
+    ThreadContext.putTransaction((ITransaction) copyMap.remove(ITransaction.class));
   }
 
   public static void putHttpServletRequest(HttpServletRequest value) {
@@ -76,18 +83,6 @@ public final class ThreadContext {
 
   public static void putTransaction(ITransaction value) {
     TRANSACTION.set(value);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public static <T> T get(Class<T> key) {
-    return ThreadContextLegacy.get(key);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public static <T> void put(T value) {
-    ThreadContextLegacy.put(value);
   }
 
 }

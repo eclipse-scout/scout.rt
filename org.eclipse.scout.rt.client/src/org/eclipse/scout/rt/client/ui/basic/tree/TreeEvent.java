@@ -296,7 +296,7 @@ public class TreeEvent extends EventObject {
   }
 
   /**
-   * @deprecated Use {@link TreeUtility#calculateCommonParentNode(ITreeNode[])};
+   * @deprecated Use {@link TreeUtility#calculateCommonParentNode(ITreeNode[])}; Will be removed in Release 3.10.
    */
   @Deprecated
   public static ITreeNode calculateCommonParentNode(ITreeNode[] nodes) {

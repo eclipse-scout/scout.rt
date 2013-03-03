@@ -51,7 +51,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
         Pattern.compile(".*\\\\([^/@]+)[/@].*"),
         Pattern.compile("([^/@]+)"),
         Pattern.compile("([^/@]+)[/@].*"),
-        };
+    };
   }
 
   /**
@@ -232,7 +232,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   }
 
   /**
-   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead
+   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead. Will be removed in Release 3.10.
    */
   @SuppressWarnings("deprecation")
   @Override

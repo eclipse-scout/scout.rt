@@ -198,7 +198,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   protected abstract ServiceTunnelResponse tunnelOnline(ServiceTunnelRequest call);
 
   /**
-   * @deprecated version mismatch is handled in the {@link ErrorHandler}
+   * @deprecated version mismatch is handled in the {@link ErrorHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   protected void handleVersionMismatch(final VersionMismatchException ve) {

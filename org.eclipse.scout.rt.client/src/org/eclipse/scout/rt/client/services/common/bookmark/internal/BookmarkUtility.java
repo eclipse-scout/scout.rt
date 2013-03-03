@@ -152,31 +152,11 @@ public final class BookmarkUtility {
   }
 
   /**
-   * TODO 3.9 remove
-   * 
-   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableKeys(Object[], boolean)} instead
-   */
-  @Deprecated
-  public static Object[] makeSerializableKeys(Object[] a) {
-    return makeSerializableKeys(a, true);
-  }
-
-  /**
    * intercept objects that are not remoting-capable or not serializable and
    * replace by strings
    */
   public static Object[] makeSerializableKeys(Object[] a, boolean useLegacySupport) {
     return (Object[]) makeSerializableKey(a, useLegacySupport);
-  }
-
-  /**
-   * TODO 3.9 remove
-   * 
-   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableKey(Object, boolean)} instead
-   */
-  @Deprecated
-  public static Object makeSerializableKey(Object o) {
-    return makeSerializableKey(o, true);
   }
 
   public static Object makeSerializableKey(Object o, boolean useLegacySupport) {
@@ -232,16 +212,6 @@ public final class BookmarkUtility {
       }
       return o.toString();
     }
-  }
-
-  /**
-   * TODO 3.9 remove
-   * 
-   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableClass(Class, boolean)} instead
-   */
-  @Deprecated
-  public static Class makeSerializableClass(Class c) {
-    return makeSerializableClass(c, true);
   }
 
   /**

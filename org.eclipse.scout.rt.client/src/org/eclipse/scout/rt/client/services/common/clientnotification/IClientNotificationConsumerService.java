@@ -36,7 +36,8 @@ public interface IClientNotificationConsumerService extends IService {
    * 
    * @deprecated use {@link #addClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
    *             instead. Services that register in their {@link IService#initializeService()} phase normally use
-   *             {@link #addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener)}
+   *             {@link #addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener)}. Will be
+   *             removed in Release 3.10.
    */
   @Deprecated
   void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
@@ -44,7 +45,7 @@ public interface IClientNotificationConsumerService extends IService {
   /**
    * @deprecated use
    *             {@link #removeClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
-   *             instead
+   *             instead. Will be removed in Release 3.10.
    */
   @Deprecated
   void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener);

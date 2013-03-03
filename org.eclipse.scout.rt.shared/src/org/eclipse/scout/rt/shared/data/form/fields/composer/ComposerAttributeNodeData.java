@@ -36,28 +36,28 @@ public class ComposerAttributeNodeData extends TreeNodeData implements DataModel
   }
 
   /**
-   * any of the {@link ComposerConstants}.OPERATOR_* values
+   * any of the {@link DataModelConstants}.OPERATOR_* values
    */
   public int getOperator() {
     return m_operator;
   }
 
   /**
-   * any of the {@link ComposerConstants}.OPERATOR_* values
+   * any of the {@link DataModelConstants}.OPERATOR_* values
    */
   public void setOperator(int operation) {
     m_operator = operation;
   }
 
   /**
-   * any of the {@link ComposerConstants}.AGGREGATION_* values
+   * any of the {@link DataModelConstants}.AGGREGATION_* values
    */
   public Integer getAggregationType() {
     return m_aggregationType;
   }
 
   /**
-   * any of the {@link ComposerConstants}.AGGREGATION_* values
+   * any of the {@link DataModelConstants}.AGGREGATION_* values
    */
   public void setAggregationType(Integer aggregationType) {
     m_aggregationType = aggregationType;

@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.IService;
@@ -64,34 +63,5 @@ public interface IClientSessionRegistryService extends IService {
    *      {@link IClientSession#getUserAgent()},{@link IClientSession#isActive()}
    */
   <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent);
-
-  /**
-   * Creates and starts a new {@link IClientSession}. Such a new session is created and started once per osgi. It is
-   * cached as long as it is active
-   * <p>
-   * Note: If the creation of the session requires a special jaas context call it only inside a
-   * {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
-   * <p>
-   * Warning: Only use this method if the client environment is a rich client (swt, swing, ...) and therefore supports
-   * singleton user sessions. Don't use it with web clients (rap, wicket, ...). With web clients rather use
-   * {@link #newClientSession(Class, Subject, String, UserAgent)} and provide a virtualSessionId.
-   * 
-   * @return the cached (if active) client session of type clazz or a new one if
-   *         none was cached
-   *         <p>
-   * @deprecated Use {@link #newClientSession(Class, UserAgent)}, {@link ClientJob#getCurrentSession()} or
-   *             {@link #getClientSessionFor(Class)} instead.
-   *             Will be removed in 3.9.0
-   * @see {@link IClientSession#isActive()}, {@link IClientSession#startSession(org.osgi.framework.Bundle)}
-   */
-  @Deprecated
-  <T extends IClientSession> T getClientSession(Class<T> clazz);
-
-  /**
-   * @deprecated Use {@link #newClientSession(Class, Subject, String, UserAgent)} instead.<br/>
-   *             Will be removed in 3.9.0
-   */
-  @Deprecated
-  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
 
 }

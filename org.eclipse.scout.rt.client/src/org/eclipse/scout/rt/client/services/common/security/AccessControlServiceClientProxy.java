@@ -197,6 +197,9 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     //nop
   }
 
+  /**
+   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override

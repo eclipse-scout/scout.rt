@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.servlet.filter;
 /**
  * @see {@link org.eclipse.scout.http.servletfilter.security.TomcatSecurityFilter}
  * @deprecated use {@link org.eclipse.scout.http.servletfilter.security.TomcatSecurityFilter} instead.
+ *             Will be removed in Release 3.10
  */
 @Deprecated
 public class TomcatSecurityFilter extends org.eclipse.scout.http.servletfilter.security.TomcatSecurityFilter {

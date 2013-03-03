@@ -68,7 +68,7 @@ public interface ISwingEnvironment {
    * {@link Boolean} busy/idle handling Use positive edge from swing 0->1 and
    * negative edge from scout 1->0
    * 
-   * @deprecated replaced by {@link SwingBusyHandler}
+   * @deprecated replaced by {@link SwingBusyHandler} Will be removed in Release 3.10.
    */
   @Deprecated
   String PROP_BUSY = "busy";
@@ -180,7 +180,7 @@ public interface ISwingEnvironment {
   void interceptUIDefaults(UIDefaults defaults);
 
   /**
-   * @deprecated replaced by {@link SwingBusyHandler}
+   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   void setBusyFromSwing(boolean b);
@@ -207,7 +207,7 @@ public interface ISwingEnvironment {
   IFormField findFocusOwnerField();
 
   /**
-   * @deprecated replaced by {@link SwingBusyHandler}
+   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   boolean isBusy();
@@ -333,13 +333,13 @@ public interface ISwingEnvironment {
   void invokeSwingLater(Runnable j);
 
   /**
-   * @deprecated will be removed
+   * @deprecated Will be removed in Release 3.10
    */
   @Deprecated
   boolean acceptAsFocusTarget(Component comp);
 
   /**
-   * @deprecated use {@link #createStatusLabel(IFormField)} instead.
+   * @deprecated use {@link #createStatusLabel(IFormField)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   JStatusLabelEx createStatusLabel();
@@ -376,7 +376,7 @@ public interface ISwingEnvironment {
   String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml);
 
   /**
-   * @deprecated use {@link IForm#getEventHistory()}
+   * @deprecated use {@link IForm#getEventHistory()}. Will be removed in Release 3.10.
    */
   @Deprecated
   FormEvent[] fetchPendingPrintEvents(IForm form);

@@ -13,8 +13,7 @@ package org.eclipse.scout.commons;
 import java.util.Date;
 
 /**
- * UTC date marker subclass as an exception to StaticDate conversion in {@link ServiceTunnelInputStream} and
- * {@link ServiceTunnelOutputStream}.
+ * UTC date marker subclass as an exception to StaticDate conversion in {@link ServiceTunnelObjectReplacer}.
  */
 public class UTCDate extends Date {
   private static final long serialVersionUID = 1L;

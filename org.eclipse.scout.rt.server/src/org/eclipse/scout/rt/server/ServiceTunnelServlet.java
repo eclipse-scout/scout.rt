@@ -163,7 +163,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * @deprecated use {@link #createContentHandler(Class)}
+   * @deprecated use {@link #createContentHandler(Class)}. Will be removed in Release 3.10.
    */
   @Deprecated
   protected IServiceTunnelContentHandler createMessageEncoder(Class<? extends IServerSession> sessionClass) {

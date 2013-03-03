@@ -337,7 +337,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * @deprecated use {@link #getUserPreferenceContext()} instead
+   * @deprecated use {@link #getUserPreferenceContext()} instead. Will be removed in Release 3.10.
    */
   @Override
   @SuppressWarnings("deprecation")

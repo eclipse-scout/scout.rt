@@ -71,12 +71,23 @@ public class ClientNotificationConsumerService extends AbstractService implement
     }
   }
 
+  /**
+   * @deprecated use {@link #addClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
+   *             instead. Services that register in their {@link import org.eclipse.scout.service.IService#initializeService()} phase normally use
+   *             {@link #addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener)}. Will be
+   *             removed in Release 3.10.
+   */
   @Override
   @Deprecated
   public void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
     addClientNotificationConsumerListener(ClientJob.getCurrentSession(), listener);
   }
 
+  /**
+   * @deprecated use
+   *             {@link #removeClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
+   *             instead. Will be removed in Release 3.10.
+   */
   @Override
   @Deprecated
   public void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {

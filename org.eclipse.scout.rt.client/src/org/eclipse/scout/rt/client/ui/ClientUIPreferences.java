@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.client.ui;
 
 import java.awt.Rectangle;
 import java.util.List;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -39,7 +37,6 @@ import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
 
 /**
@@ -87,32 +84,8 @@ public class ClientUIPreferences {
   private static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
   private static final String FORM_BOUNDS = "form.bounds.";
 
-  /**
-   * @deprecated to be removed in release 3.9.0
-   */
-  @Deprecated
-  private static final String NLS_LOCALE_ISO = "nls_locale_iso";
-  /**
-   * @deprecated to be removed in release 3.9.0
-   */
-  @Deprecated
-  private static final String NLS_LOCALE_LANGUAGE = "locale.language";
-  /**
-   * @deprecated to be removed in release 3.9.0
-   */
-  @Deprecated
-  private static final String NLS_LOCALE_COUNTRY = "locale.country";
-
   private final IClientSession m_session;
   private Preferences m_env;
-
-  /**
-   * @deprecated use {@link #getInstance()}
-   */
-  @Deprecated
-  public ClientUIPreferences() {
-    this(ClientSessionThreadLocal.get());
-  }
 
   private ClientUIPreferences(IClientSession session) {
     m_session = session;
@@ -263,16 +236,6 @@ public class ClientUIPreferences {
       key += "#" + context;
     }
     return key;
-  }
-
-  /**
-   * TODO 3.9 remove
-   * 
-   * @deprecated use {@link #getTableCustomizerData(String)} instead. This method will be removed in 3.9.
-   */
-  @Deprecated
-  public Object getTableCustomizerData(String customizerKey, Bundle loaderBundle) {
-    return getTableCustomizerData(customizerKey);
   }
 
   public Object getTableCustomizerData(String customizerKey) {
@@ -753,55 +716,6 @@ public class ClientUIPreferences {
       return splits;
     }
     return null;
-  }
-
-  /**
-   * @deprecated use {@link LocaleThreadLocal#get()} or {@link Locale#getDefault()}
-   */
-  @Deprecated
-  public Locale getLocale() {
-    // >> legacy support. To be removed in release 3.9.0.
-    String strLegacy = m_env.get(NLS_LOCALE_ISO, null);
-    if (strLegacy != null) {
-      m_env.remove(NLS_LOCALE_ISO); // remove legacy entry
-      m_env.put(NLS_LOCALE_LANGUAGE, strLegacy);
-      flush();
-    }
-    // << legacy support. To be removed in release 3.9.0.
-
-    String strLanguage = m_env.get(NLS_LOCALE_LANGUAGE, null);
-    String strCountry = m_env.get(NLS_LOCALE_COUNTRY, null);
-    if (strLanguage != null && strCountry != null) {
-      return new Locale(strLanguage, strCountry);
-    }
-    else if (strLanguage != null) {
-      return new Locale(strLanguage, ClientUIPreferences.getHostLocale().getCountry());
-    }
-    return null;
-  }
-
-  /**
-   * @deprecated use {@link LocaleThreadLocal#set(Locale)} or {@link Locale#setDefault(Locale)}
-   */
-  @Deprecated
-  public void setLocale(Locale locale) {
-    if (locale != null) {
-      m_env.put(NLS_LOCALE_LANGUAGE, locale.getLanguage());
-      m_env.put(NLS_LOCALE_COUNTRY, locale.getCountry());
-    }
-    else {
-      m_env.remove(NLS_LOCALE_LANGUAGE);
-      m_env.remove(NLS_LOCALE_COUNTRY);
-    }
-    flush();
-  }
-
-  /**
-   * @deprecated to be removed in release 3.9.0
-   */
-  @Deprecated
-  public static Locale getHostLocale() {
-    return Locale.getDefault();
   }
 
   public void setDesktopColumnSplits(int[][] splits) {

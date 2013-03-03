@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ public final class AccessControlUtility {
    * @param classLoaderBundle
    *          bundle used to load the permission classes.
    * @deprecated this method does not work if permission classes are defined in different bundles. Use
-   *             {@link AccessControlUtility#createPermissions(Object[][])} instead.
+   *             {@link AccessControlUtility#createPermissions(Object[][])} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   public static Permissions createPermissions(Object[][] permissionData, Bundle classLoaderBundle) {

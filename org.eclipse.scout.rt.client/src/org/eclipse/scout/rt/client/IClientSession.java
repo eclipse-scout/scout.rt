@@ -99,7 +99,7 @@ public interface IClientSession extends ISession {
   void goOffline() throws ProcessingException;
 
   /**
-   * @deprecated, use {@link #isSingleThreadSession()} instead
+   * @deprecated, use {@link #isSingleThreadSession()} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   boolean isWebSession();

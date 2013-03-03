@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  * Indicates whether the client is a web-client or a rich-standalone-client
  * <p>
  * 
- * @deprecated Use {@link UserAgentUtility} instead.
+ * @deprecated Use {@link UserAgentUtility} instead. Will be removed in Release 3.10.
  */
 @Deprecated
 public final class WebClientState {

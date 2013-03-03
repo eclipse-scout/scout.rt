@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.osgi.ContextFinderBasedObjectInputStream;
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 /**
@@ -378,20 +376,6 @@ public class SimpleXmlElement {
       o = defaultValue;
     }
     return o;
-  }
-
-  /**
-   * @return a serialized object attribute from base64 serialized data using {@link ContextFinderBasedObjectInputStream}
-   *         that tries
-   *         to find the class using default osgi class loading and in a
-   *         second stage using the caller classes class loaders.
-   * @deprecated This method will be removed in Scout 3.9. Use {@link #getObjectAttribute(String, Object)} instead.
-   *             Reason: the given primaryLoader is not used anymore. Scout provides an {@link IObjectSerializer} which
-   *             is responsible for any serialization tasks.
-   */
-  @Deprecated
-  public Object getObjectAttribute(String name, Object defaultValue, ClassLoader primaryLoader) throws IOException, ClassNotFoundException {
-    return getObjectAttribute(name, defaultValue);
   }
 
   /**

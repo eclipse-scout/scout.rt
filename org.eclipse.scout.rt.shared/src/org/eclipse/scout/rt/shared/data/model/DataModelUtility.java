@@ -363,7 +363,7 @@ public final class DataModelUtility {
    */
 
   /**
-   * @deprecated use {@link #entityPathToExternalId(IDataModel, EntityPath)} instead
+   * @deprecated use {@link #entityPathToExternalId(IDataModel, EntityPath)} instead. Will be removed in Release 3.10.
    */
   @SuppressWarnings("deprecation")
   @Deprecated
@@ -385,7 +385,8 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #attributePathToExternalId(IDataModel, AttributePath)} instead
+   * @deprecated use {@link #attributePathToExternalId(IDataModel, AttributePath)} instead. Will be removed in Release
+   *             3.10.
    */
   @SuppressWarnings("deprecation")
   @Deprecated
@@ -399,7 +400,7 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #externalIdToEntityPath(IDataModel, String)} instead
+   * @deprecated use {@link #externalIdToEntityPath(IDataModel, String)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   public static IDataModelEntity externalIdToEntity(IDataModel f, String externalId, IDataModelEntity parentEntity) {
@@ -428,7 +429,7 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #externalIdToAttributePath(IDataModel, String)} instead
+   * @deprecated use {@link #externalIdToAttributePath(IDataModel, String)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   public static IDataModelAttribute externalIdToAttribute(IDataModel f, String externalId, IDataModelEntity parentEntity) {
@@ -457,7 +458,7 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #findEntity(IDataModelEntity[], String, Map)} instead
+   * @deprecated use {@link #findEntity(IDataModelEntity[], String, Map)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName) {
@@ -465,7 +466,8 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #attributePathToExternalId(IDataModel, AttributePath)} instead
+   * @deprecated use {@link #attributePathToExternalId(IDataModel, AttributePath)} instead. Will be removed in Release
+   *             3.10.
    */
   @Deprecated
   public static String attributeToExternalId(IDataModelAttribute a, IDataModelEntity... entityPath) {
@@ -478,7 +480,7 @@ public final class DataModelUtility {
   }
 
   /**
-   * @deprecated use {@link #externalIdToEntityPath(IDataModel, String)} instead
+   * @deprecated use {@link #externalIdToEntityPath(IDataModel, String)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   public static IDataModelEntity[] externalIdToEntityPath(IDataModel f, String externalId, IDataModelEntity parentEntity) {

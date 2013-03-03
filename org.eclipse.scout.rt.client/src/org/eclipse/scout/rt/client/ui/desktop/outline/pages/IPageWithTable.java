@@ -31,13 +31,13 @@ public interface IPageWithTable<T extends ITable> extends IPage {
   T getTable();
 
   /**
-   * @deprecated use {@link IPage#getPagePopulateStatus()}
+   * @deprecated use {@link IPage#getPagePopulateStatus()}. Will be removed in Release 3.10.
    */
   @Deprecated
   IProcessingStatus getTablePopulateStatus();
 
   /**
-   * @deprecated use {@link IPage#setPagePopulateStatus(IProcessingStatus)}
+   * @deprecated use {@link IPage#setPagePopulateStatus(IProcessingStatus)}. Will be removed in Release 3.10.
    */
   @Deprecated
   void setTablePopulateStatus(IProcessingStatus status);

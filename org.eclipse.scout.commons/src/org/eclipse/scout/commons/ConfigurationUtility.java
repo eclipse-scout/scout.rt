@@ -73,7 +73,7 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * @deprecated use {@link #sortByOrder(Collection)} instead.
+   * @deprecated use {@link #sortByOrder(Collection)} instead. Will be removed in release 3.10.
    */
   @Deprecated
   public static <T> Collection<T> sortByOrderAnnotation(Collection<T> list) {

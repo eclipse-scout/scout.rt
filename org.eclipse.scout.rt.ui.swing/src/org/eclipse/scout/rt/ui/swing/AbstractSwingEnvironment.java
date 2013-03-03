@@ -473,15 +473,23 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return m_scoutSession;
   }
 
+  /**
+   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public boolean isBusy() {
     //replaced by SwingBusyHandler
     return false;
   }
 
+  /**
+   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public void setBusyFromSwing(boolean b) {
     //replaced by SwingBusyHandler
   }
@@ -1043,8 +1051,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return new SwingScoutFocusTraversalPolicy().accept(comp);
   }
 
+  /**
+   * @deprecated use {@link #createStatusLabel(IFormField)} instead. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public JStatusLabelEx createStatusLabel() {
     return createStatusLabel(null);
   }
@@ -1142,8 +1154,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  /**
+   * @deprecated use {@link IForm#getEventHistory()}. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public FormEvent[] fetchPendingPrintEvents(IForm form) {
     return new FormEvent[0];
   }

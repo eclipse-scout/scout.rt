@@ -63,7 +63,7 @@ public abstract class AbstractServerSession implements IServerSession {
   }
 
   /**
-   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead
+   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   protected boolean getConfiguredWebSession() {
@@ -145,18 +145,6 @@ public abstract class AbstractServerSession implements IServerSession {
     return m_scoutTexts;
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Object getAttribute(String key) {
-    return getData(key);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setAttribute(String key, Object value) {
-    setData(key, value);
-  }
-
   @Override
   public Object getData(String key) {
     synchronized (m_attributesLock) {
@@ -226,14 +214,16 @@ public abstract class AbstractServerSession implements IServerSession {
   }
 
   /**
-   * @deprecated never called by the framework
+   * @deprecated never called by the framework. Will be removed in Release 3.10.
    */
   @Deprecated
   protected void execLocaleChanged() throws ProcessingException {
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
+  /**
+   * @deprecated use #isSingleThreadSession instead. Will be removed in Release 3.10.
+   */
+  @Deprecated
   public boolean isWebSession() {
     return isSingleThreadSession();
   }

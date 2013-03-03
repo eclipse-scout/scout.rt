@@ -17,8 +17,8 @@ import java.security.Permissions;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -61,7 +61,7 @@ public interface IAccessControlService extends IService {
   void clearCache();
 
   /**
-   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead
+   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   @RemoteServiceAccessDenied
@@ -78,6 +78,7 @@ public interface IAccessControlService extends IService {
 
   /**
    * @deprecated
+   *             Will be removed in Release 3.10.
    */
   @Deprecated
   boolean checkServiceTunnelAccess(Class serviceInterfaceClass, Method method, Object[] args);

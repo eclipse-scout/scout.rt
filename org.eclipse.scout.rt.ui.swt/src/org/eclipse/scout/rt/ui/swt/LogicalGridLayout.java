@@ -253,7 +253,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   }
 
   /**
-   * @deprecated use {@link #validateLayout(Composite, int, boolean)}
+   * @deprecated use {@link #validateLayout(Composite, int, boolean)}. Will be removed in Release 3.10.
    */
   @Deprecated
   protected void validateLayout(Composite parent) {

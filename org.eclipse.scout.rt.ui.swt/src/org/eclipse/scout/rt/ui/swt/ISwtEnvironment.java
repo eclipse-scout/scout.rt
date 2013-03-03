@@ -68,7 +68,7 @@ public interface ISwtEnvironment {
    * {@link Boolean} busy/idle handling Use positive edge from swt 0->1 and
    * negative edge from scout 1->0
    * 
-   * @deprecated replaced by {@link SwtBusyHandler}
+   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   String PROP_BUSY = "busy";
@@ -93,7 +93,7 @@ public interface ISwtEnvironment {
   void ensureInitialized();
 
   /**
-   * @deprecated replaced by {@link SwtBusyHandler}
+   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   boolean isBusy();
@@ -250,7 +250,7 @@ public interface ISwtEnvironment {
   String getPerspectiveId();
 
   /**
-   * @deprecated replaced by {@link SwtBusyHandler}
+   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
    */
   @Deprecated
   void setBusyFromSwt(boolean b);
@@ -285,7 +285,7 @@ public interface ISwtEnvironment {
   String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml);
 
   /**
-   * @deprecated use {@link IForm#getEventHistory()}
+   * @deprecated use {@link IForm#getEventHistory()} Will be removed in Release 3.10.
    */
   @Deprecated
   FormEvent[] fetchPendingPrintEvents(IForm form);

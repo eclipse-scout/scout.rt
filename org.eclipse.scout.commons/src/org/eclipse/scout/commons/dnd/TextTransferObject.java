@@ -32,15 +32,6 @@ public class TextTransferObject extends TransferObject {
     return true;
   }
 
-  /**
-   * @deprecated use {@link TextTransferObject#getPlainText()}. Will be removed in release 3.8.0
-   * @return
-   */
-  @Deprecated
-  public String getText() {
-    return getPlainText();
-  }
-
   public String getPlainText() {
     return m_plainText;
   }

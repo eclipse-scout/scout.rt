@@ -1458,8 +1458,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given {@link AbstractTableRowData}
-   * type.
+   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
+   * {@link AbstractTableRowData} type.
    * 
    * @param rowType
    * @return
@@ -2844,6 +2844,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return (IColumn<?>) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
   }
 
+  /**
+   * @deprecated use {@link #discardAllDeletedRows()} instead. Will be removed in Release 3.10.
+   */
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override

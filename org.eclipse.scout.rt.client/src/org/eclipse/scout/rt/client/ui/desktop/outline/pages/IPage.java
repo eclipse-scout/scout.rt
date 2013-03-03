@@ -36,7 +36,7 @@ public abstract interface IPage extends ITreeNode {
   void initPage() throws ProcessingException;
 
   /**
-   * @deprecated use {@link #getUserPreferenceContext()} instead
+   * @deprecated use {@link #getUserPreferenceContext()} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   String getBookmarkIdentifier();

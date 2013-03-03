@@ -22,24 +22,4 @@ public interface IServerSession extends ISession {
 
   void loadSession(Bundle bundle) throws ProcessingException;
 
-  /**
-   * @deprecated Use {@link #getData(String)} instead.<br/>
-   *             Will be removed in 3.9.0
-   */
-  @Deprecated
-  Object getAttribute(String key);
-
-  /**
-   * @deprecated Use {@link #setData(String, Object)} isntead.<br/>
-   *             Will be removed in 3.9.0
-   */
-  @Deprecated
-  void setAttribute(String key, Object value);
-
-  /**
-   * @deprecated Use {@link #isSingleThreadSession()} instead.<br/>
-   *             Will be removed in 3.9.0
-   */
-  @Deprecated
-  boolean isWebSession();
 }

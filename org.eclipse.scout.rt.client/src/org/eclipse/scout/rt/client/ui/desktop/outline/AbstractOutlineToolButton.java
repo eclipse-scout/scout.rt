@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
- * @deprecated use {@link AbstractOutlineViewButton}
+ * @deprecated use {@link AbstractOutlineViewButton}. Will be removed in Release 3.10.
  */
 @Deprecated
 public abstract class AbstractOutlineToolButton extends AbstractOutlineViewButton {

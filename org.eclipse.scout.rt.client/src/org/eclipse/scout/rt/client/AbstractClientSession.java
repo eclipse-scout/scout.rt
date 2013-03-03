@@ -94,7 +94,7 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   /**
-   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead
+   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   protected boolean getConfiguredWebSession() {

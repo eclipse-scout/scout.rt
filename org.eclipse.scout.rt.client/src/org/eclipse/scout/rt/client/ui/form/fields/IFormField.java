@@ -384,13 +384,13 @@ public interface IFormField extends IPropertyObserver {
   void setLabelSuppressed(boolean b);
 
   /**
-   * @deprecated Use {@link #getProperty(String)} instead.
+   * @deprecated Use {@link #getProperty(String)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   Object getCustomProperty(String propName);
 
   /**
-   * @deprecated Use {@link #setProperty(String, Object)} instead.
+   * @deprecated Use {@link #setProperty(String, Object)} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   void setCustomProperty(String propName, Object o);

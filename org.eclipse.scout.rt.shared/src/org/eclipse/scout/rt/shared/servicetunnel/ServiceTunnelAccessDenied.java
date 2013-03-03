@@ -16,7 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated use {@link RemoteServiceAccessDenied}
+ * @deprecated use {@link RemoteServiceAccessDenied}. Will be removed in Release 3.10.
  */
 @Deprecated
 @Retention(RetentionPolicy.RUNTIME)

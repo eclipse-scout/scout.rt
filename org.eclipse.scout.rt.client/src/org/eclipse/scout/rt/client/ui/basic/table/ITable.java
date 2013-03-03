@@ -740,7 +740,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   void discardDeletedRows(ITableRow[] deletedRows);
 
   /**
-   * @deprecated use {@link #discardAllDeletedRows()} instead.
+   * @deprecated use {@link #discardAllDeletedRows()} instead. Will be removed in Release 3.10.
    */
   @Deprecated
   void clearDeletedRows();

@@ -25,7 +25,7 @@ public interface ITableField<T extends ITable> extends IFormField {
   /**
    * {@link String}
    * 
-   * @deprecated use {@value #PROP_TABLE_SELECTION_STATUS}
+   * @deprecated use {@value #PROP_TABLE_SELECTION_STATUS}. Will be removed in Release 3.10.
    */
   @Deprecated
   String PROP_TABLE_STATUS = "tableStatus";

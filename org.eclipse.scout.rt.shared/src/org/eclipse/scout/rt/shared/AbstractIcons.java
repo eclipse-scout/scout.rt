@@ -38,12 +38,12 @@ public abstract class AbstractIcons implements Serializable {
   public static final String DateFieldTime = "datefield_time";
   public static final String FileChooserFieldFile = "filechooserfield_file";
   /**
-   * Use {@link AbstractIcons#TreeNode} instead due to icon semantic
+   * Use {@link AbstractIcons#TreeNode} instead due to icon semantic. Will be removed in Release 3.10.
    */
   @Deprecated
   public static final String Folder = AbstractIcons.TreeNode;
   /**
-   * Use {@link AbstractIcons#TreeNodeOpen} instead due to icon semantic
+   * Use {@link AbstractIcons#TreeNodeOpen} instead due to icon semantic. Will be removed in Release 3.10.
    */
   @Deprecated
   public static final String FolderOpen = AbstractIcons.TreeNodeOpen;

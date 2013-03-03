@@ -114,18 +114,4 @@ public class TestingClientSessionRegistryService extends AbstractService impleme
 
   }
 
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public <T extends IClientSession> T getClientSession(Class<T> clazz) {
-    return m_delegate.getClientSession(clazz);
-  }
-
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
-    return m_delegate.newClientSession(clazz, subject, virtualSessionId);
-  }
-
 }
