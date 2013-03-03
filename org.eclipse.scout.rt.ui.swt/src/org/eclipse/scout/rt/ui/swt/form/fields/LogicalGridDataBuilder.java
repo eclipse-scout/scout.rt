@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swt.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
-import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 
 public final class LogicalGridDataBuilder extends LogicalGridData {
@@ -37,7 +36,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   }
 
   /**
-   * label and status is combined in one component {@link StatusLabelEx}
+   * label and status is combined in one component {@link org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx StatusLabelEx}
    */
   public static LogicalGridData createLabel(GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();

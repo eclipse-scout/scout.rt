@@ -16,14 +16,13 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Default SWT busy handler for a {@link IClientSession}
+ * Default SWT busy handler for a {@link org.eclipse.scout.rt.client.IClientSession IClientSession}
  * 
  * @author imo
  * @since 3.8

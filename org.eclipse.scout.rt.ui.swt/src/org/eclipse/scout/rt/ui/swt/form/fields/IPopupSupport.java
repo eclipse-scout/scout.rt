@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields;
 
-import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
-import org.eclipse.scout.rt.ui.swt.form.fields.datefield.SwtScoutDateField;
-import org.eclipse.scout.rt.ui.swt.form.fields.datefield.SwtScoutTimeField;
-import org.eclipse.scout.rt.ui.swt.form.fields.smartfield.SwtScoutSmartField;
-
 /**
- * Fields that open popup dialogs to edit their value (e.g. {@link SwtScoutDateField}, {@link SwtScoutTimeField},
- * {@link SwtScoutSmartField}) should implement this interface. This allows listeners to be
+ * Fields that open popup dialogs to edit their value (e.g.
+ * {@link org.eclipse.scout.rt.ui.swt.form.fields.datefield.SwtScoutDateField SwtScoutDateField},
+ * {@link org.eclipse.scout.rt.ui.swt.form.fields.datefield.SwtScoutTimeField SwtScoutTimeField},
+ * {@link org.eclipse.scout.rt.ui.swt.form.fields.smartfield.SwtScoutSmartField SwtScoutSmartField}) should implement
+ * this interface. This allows listeners to be
  * notified about the popup state. Especially, this is crucial if the field is used inline within an editable table
- * to handle focus-lost events properly (see {@link SwtScoutTableCellEditor.P_FocusLostListener}).
+ * to handle focus-lost events properly (see
+ * {@link org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor.P_FocusLostListener
+ * SwtScoutTableCellEditor.P_FocusLostListener}).
  */
 public interface IPopupSupport {
 

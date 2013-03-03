@@ -15,7 +15,6 @@ import java.util.Collection;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -27,8 +26,6 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
-import org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
@@ -36,7 +33,6 @@ import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.tray.ISwtScoutTray;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -81,7 +77,9 @@ public interface ISwtEnvironment {
 
   /**
    * @param modalities
-   *          combination of {@link SWT#SYSTEM_MODAL}, {@link SWT#APPLICATION_MODAL}, {@link SWT#MODELESS}
+   *          combination of {@link org.eclipse.swt.SWT#SYSTEM_MODAL SWT.SYSTEM_MODAL},
+   *          {@link org.eclipse.swt.SWT#APPLICATION_MODAL SWT.APPLICATION_MODAL}, {@link org.eclipse.swt.SWT#MODELESS
+   *          SWT.MODELESS}
    * @return best effort to get the "current" parent shell. Never null. ticket
    *         79624
    */
@@ -122,7 +120,7 @@ public interface ISwtEnvironment {
    * The job is only run when it reaches the model within the cancelTimeout. This means if the job is delayed longer
    * than cancelTimeout millis when the model job runs it, then the job is ignored.
    * 
-   * @return the created and scheduled job, a {@link ClientJob}
+   * @return the created and scheduled job, a {@link org.eclipse.scout.rt.client.ClientJob ClientJob}
    */
   JobEx invokeScoutLater(Runnable job, long cancelTimeout);
 
@@ -132,8 +130,10 @@ public interface ISwtEnvironment {
    * Called from scout job/thread to post an immediate swt job into the waiting queue.
    * <p>
    * These jobs are run when calling {@link #dispatchImmediateSwtJobs()}. Normally this kind of code is only used to
-   * early apply visible and enabled properties in {@link SwtScoutFieldComposite#handleSwingInputVerifier()} in order to
-   * have before-focus-traversal visible/enabled state-update
+   * early apply visible and enabled properties in
+   * {@link org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite#handleSwingInputVerifier()
+   * SwtScoutFieldComposite#handleSwingInputVerifier()} in order to have before-focus-traversal visible/enabled
+   * state-update
    */
   void postImmediateSwtJob(Runnable r);
 
@@ -164,22 +164,26 @@ public interface ISwtEnvironment {
   boolean removeGlobalKeyStroke(ISwtKeyStroke stroke);
 
   /**
-   * @see IKeyStrokeManager#addKeyStroke(Widget, ISwtKeyStroke)
+   * @see org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager#addKeyStroke(Widget, ISwtKeyStroke)
+   *      IKeyStrokeManager#addKeyStroke(Widget, ISwtKeyStroke)
    */
   void addKeyStroke(Widget widget, ISwtKeyStroke stroke);
 
   /**
-   * @see IKeyStrokeManager#removeKeyStroke(Widget, ISwtKeyStroke)
+   * @see org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager#removeKeyStroke(Widget, ISwtKeyStroke)
+   *      IKeyStrokeManager#removeKeyStroke(Widget, ISwtKeyStroke)
    */
   boolean removeKeyStroke(Widget widget, ISwtKeyStroke stroke);
 
   /**
-   * @see IKeyStrokeManager#addKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
+   * @see org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager#addKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
+   *      IKeyStrokeManager#addKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
    */
   void addKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter);
 
   /**
-   * @see IKeyStrokeManager#removeKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
+   * @see org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager#removeKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
+   *      IKeyStrokeManager#removeKeyStrokeFilter(Widget, ISwtKeyStrokeFilter)
    */
   boolean removeKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter);
 
