@@ -18,8 +18,6 @@ import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Hashtable;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.swing.JOptionPane;
@@ -45,7 +43,6 @@ import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Version;
 
 /**
  * This abstract class is the base class for all Scout Swing (Eclipse) applications.
@@ -74,12 +71,6 @@ abstract class BaseSwingApplication implements IApplication {
       catch (Throwable t) {
         // nop
       }
-    }
-    // check jre>=1.6.0
-    Matcher m = Pattern.compile("([0-9]+\\.[0-9]+\\.[0-9]+)(_.*)?").matcher(System.getProperty("java.version", "0.0.0_00"));
-    if (m.matches() && new Version(m.group(1)).compareTo(new Version(1, 6, 0)) < 0) {
-      System.out.println("Swing requires at least Java 1.6.0 Current is " + m.group(1));
-      System.exit(-1);
     }
     try {
       // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.
