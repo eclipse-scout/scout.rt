@@ -467,7 +467,7 @@ public class DefaultTransactionDelegate {
   }
 
   protected void warnMissingInputValidation(Object serviceImpl, Method op) {
-    LOG.warn("Legacy security hint for: " + op.getDeclaringClass().getName() + "#" + op.getName() + ": missing either annotation " + InputValidation.class.getSimpleName() + " or override of server-side" + getClass().getSimpleName() + "#findInputValidationStrategyByPolicy. To support legacy the QUERY strategy is used.");
+    LOG.warn("Legacy security hint for: " + op.getDeclaringClass().getName() + "#" + op.getName() + ": missing either annotation " + InputValidation.class.getSimpleName() + " or override of server-side " + getClass().getSimpleName() + "#findInputValidationStrategyByPolicy. To support legacy the QUERY strategy is used.");
   }
 
   /**
