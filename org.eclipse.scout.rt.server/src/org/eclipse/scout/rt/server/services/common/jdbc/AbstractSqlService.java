@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.server.ThreadContext;
-import org.eclipse.scout.rt.server.services.common.code.CodeService;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.legacy.LegacyStatementBuilder;
@@ -46,6 +45,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter.WhereToken;
@@ -88,6 +88,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   @Override
   public void initializeService() {
     super.initializeService();
+
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
     IPermissionService psvc = SERVICES.getService(IPermissionService.class);
@@ -109,7 +110,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
     m_codeNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
-    CodeService csvc = SERVICES.getService(CodeService.class);
+    ICodeService csvc = SERVICES.getService(ICodeService.class);
     if (csvc != null) {
       for (BundleClassDescriptor d : csvc.getAllCodeTypeClasses("")) {
         List<BundleClassDescriptor> list = m_codeNameToDescriptor.get(d.getSimpleClassName());
