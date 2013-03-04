@@ -26,7 +26,7 @@ import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwingViewer {
-  private final static IScoutLogger LOG = ScoutLogManager.getLogger(SwingViewer.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingViewer.class);
 
   private static final int DEFAULT_FRAME_WIDTH = 800;
   private static final int DEFAULT_FRAME_HEIGHT = 600;

@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwtViewer extends Composite {
-  private final static IScoutLogger LOG = ScoutLogManager.getLogger(SwtViewer.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtViewer.class);
 
   static {
     System.setProperty("sun.awt.noerasebackground", "true");

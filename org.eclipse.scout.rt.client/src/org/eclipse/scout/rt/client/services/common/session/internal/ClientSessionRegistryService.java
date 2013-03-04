@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.session.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,9 +28,6 @@ import org.osgi.framework.Bundle;
 @Priority(-1)
 public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
-
-  private final Map<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
-  private final Object m_cacheLock = new Object();
 
   @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {

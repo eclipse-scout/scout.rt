@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -30,8 +29,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
-import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
-import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -45,8 +42,8 @@ import org.osgi.service.prefs.Preferences;
  * <p>
  * Warning: Only use this class within a ClientJob with an {@link IClientSession}.
  * <p>
- * Calling from outside a {@link IClientSession} {@link ClientJob} will produce a warning. In release 3.9 (TODO) will
- * produce an error.
+ * Calling from outside a {@link IClientSession} {@link org.eclipse.scout.rt.client.ClientJob ClientJob} will produce a
+ * warning. In release 3.9 (TODO) will produce an error.
  */
 public class ClientUIPreferences {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientUIPreferences.class);
@@ -56,8 +53,8 @@ public class ClientUIPreferences {
    *         <p>
    *         Warning: Only use this class within a ClientJob with an {@link IClientSession}.
    *         <p>
-   *         Calling from outside a {@link IClientSession} {@link ClientJob} will produce a warning. Starting with
-   *         release 3.9 it will fail with an error.
+   *         Calling from outside a {@link IClientSession} {@link org.eclipse.scout.rt.client.ClientJob ClientJob} will
+   *         produce a warning. Starting with release 3.9 it will fail with an error.
    */
   public static ClientUIPreferences getInstance() {
     return new ClientUIPreferences(ClientSessionThreadLocal.get());
@@ -96,8 +93,9 @@ public class ClientUIPreferences {
   }
 
   /**
-   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
-   * {@link IUiDeviceType}.
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
    */
   public Rectangle getFormBounds(IForm form) {
     String key = form.computeCacheBoundsKey();
@@ -131,8 +129,9 @@ public class ClientUIPreferences {
   }
 
   /**
-   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
-   * {@link IUiDeviceType}.
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
    */
   public void setFormBounds(IForm form, Rectangle bounds) {
     String key = form.computeCacheBoundsKey();
@@ -192,8 +191,9 @@ public class ClientUIPreferences {
   }
 
   /**
-   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
-   * {@link IUiDeviceType}.
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
    * 
    * @since 3.8.0
    */
@@ -214,8 +214,9 @@ public class ClientUIPreferences {
   }
 
   /**
-   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
-   * {@link IUiDeviceType}.
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
    * 
    * @since 3.8.0
    */
@@ -465,8 +466,9 @@ public class ClientUIPreferences {
   }
 
   /**
-   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
-   * {@link IUiDeviceType}.
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
    */
   public int getTableColumnWidth(IColumn col, int defaultWidth) {
     String keySuffix = getColumnKey(col);

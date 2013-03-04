@@ -15,25 +15,14 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
-import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -46,19 +35,25 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * <li>{@link IValueField}:<br/>
  * Value fields allow user input through the GUI and contain a value of a certain type. Typical examples are:
  * <ul>
- * <li>{@link IStringField}: A text field containing a single line string (no line breaks).</li>
- * <li>{@link IDateField}: A field containing a formatted date.</li>
- * <li>{@link ISmartField}: A smart field allows to choose from a possibly predefined list of values.</li>
+ * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField IStringField}: A text field containing
+ * a single line string (no line breaks).</li>
+ * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField IDateField}: A field containing a
+ * formatted date.</li>
+ * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}: A smart field allows to
+ * choose from a possibly predefined list of values.</li>
  * </ul>
  * </li>
- * <li>{@link IButton}:<br/>
+ * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton IButton}:<br/>
  * Buttons allow the user to trigger events on the GUI. Typical examples on a form are the 'Ok' and 'Close' buttons (see
- * {@link AbstractOkButton} or {@link AbstractCancelButton}).</li>
+ * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton AbstractOkButton} or
+ * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton
+ * AbstractCancelButton}).</li>
  * <li>{@link IComposite}:<br/>
  * Composite fields group multiple form fields. The most common are:<br/>
  * <ul>
  * <li>{@link IGroupBox}: Groups multiple form fields and draws a border on the GUI.</li>
- * <li>{@link ITabBox}: Groups multiple form fields which are represented within tabs.</li>
+ * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox ITabBox}: Groups multiple form fields which are
+ * represented within tabs.</li>
  * </ul>
  * </li>
  * </ul>
@@ -90,7 +85,8 @@ public interface IFormField extends IPropertyObserver {
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_KEY_STROKES = "keyStrokes";
   /**
-   * @deprecated since 3.8, sent via {@link FormEvent#TYPE_REQUEST_FOCUS}
+   * @deprecated since 3.8, sent via {@link org.eclipse.scout.rt.client.ui.form.FormEvent#TYPE_REQUEST_FOCUS
+   *             FormEvent#TYPE_REQUEST_FOCUS}
    */
   @Deprecated
   String PROP_FOCUS_REQUESTED = "focusRequested";
@@ -306,7 +302,8 @@ public interface IFormField extends IPropertyObserver {
    * @return Returns the list of fields that are enclosing this field, starting with the furthermost (from outside to
    *         inside). An enclosing field is part of the enclosing classes path that is abstract or the outermost
    *         enclosing class. The latter is the primary type.
-   * @see ConfigurationUtility#getEnclosingContainerType(Object)
+   * @see org.eclipse.scout.commons.ConfigurationUtility#getEnclosingContainerType(Object)
+   *      ConfigurationUtility#getEnclosingContainerType(Object)
    * @since 3.8.1
    */
   List<ICompositeField> getEnclosingFieldList();
@@ -376,7 +373,8 @@ public interface IFormField extends IPropertyObserver {
   /**
    * Meta property over labelVisible<br>
    * This property is used to suppress the label even if it is visible<br>
-   * see {@link ISequenceBox} where the label of the first visible child field
+   * see {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox ISequenceBox} where the label of the
+   * first visible child field
    * is suppressed and appended to the range box's label
    */
   boolean isLabelSuppressed();
@@ -437,7 +435,8 @@ public interface IFormField extends IPropertyObserver {
   /**
    * This property is used by buttons. Buttons set the property to false while in work.
    * 
-   * @return true if process button is not in {@link IButton#doClick()} action
+   * @return true if process button is not in
+   *         {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#doClick() IButton#doClick()} action
    */
   boolean isEnabledProcessingButton();
 
@@ -557,7 +556,8 @@ public interface IFormField extends IPropertyObserver {
   void setLabelFont(FontSpec f);
 
   /**
-   * @return the grid data hints used by the {@link GridDataBuilder} to create the final grid data which can be
+   * @return the grid data hints used by the {@link org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder
+   *         GridDataBuilder} to create the final grid data which can be
    *         accessed using {@link #getGridData()}.
    */
   GridData getGridDataHints();

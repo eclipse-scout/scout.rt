@@ -21,35 +21,24 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
 import javax.swing.UIDefaults;
 
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
-import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutDesktop;
@@ -68,7 +57,8 @@ public interface ISwingEnvironment {
    * {@link Boolean} busy/idle handling Use positive edge from swing 0->1 and
    * negative edge from scout 1->0
    * 
-   * @deprecated replaced by {@link SwingBusyHandler} Will be removed in Release 3.10.
+   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler} Will be
+   *             removed in Release 3.10.
    */
   @Deprecated
   String PROP_BUSY = "busy";
@@ -110,9 +100,12 @@ public interface ISwingEnvironment {
   /**
    * @return the height of a process button (in the bottom part of a group box)
    *         <p>
-   *         see {@link IButton#isProcessButton()}
+   *         see {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#isProcessButton()
+   *         IButton#isProcessButton()}
    *         <p>
-   *         by default {@link AbstractOkButton}, {@link AbstractCancelButton}, {@link AbstractCloseButton} etc. are
+   *         by default {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton AbstractOkButton},
+   *         {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton AbstractCancelButton},
+   *         {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton AbstractCloseButton} etc. are
    *         process buttons
    */
   int getProcessButtonHeight();
@@ -180,7 +173,8 @@ public interface ISwingEnvironment {
   void interceptUIDefaults(UIDefaults defaults);
 
   /**
-   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
+   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler}. Will be
+   *             removed in Release 3.10.
    */
   @Deprecated
   void setBusyFromSwing(boolean b);
@@ -207,7 +201,8 @@ public interface ISwingEnvironment {
   IFormField findFocusOwnerField();
 
   /**
-   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
+   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler}. Will be
+   *             removed in Release 3.10.
    */
   @Deprecated
   boolean isBusy();
@@ -294,15 +289,18 @@ public interface ISwingEnvironment {
 
   /**
    * create a gui for a list of action, takes care of duplicate, leading and trailing separator handling and
-   * recursively creates and attaches child actions on {@link IActionNode}s and menus
+   * recursively creates and attaches child actions on {@link org.eclipse.scout.rt.client.ui.action.tree.IActionNode
+   * IActionNode}s and menus
    * 
    * @param parent
-   *          must not be null, typically a {@link JPopupMenu}, a {@link JMenu} or a {@link JMenuBar}
+   *          must not be null, typically a {@link javax.swing.JPopupMenu JPopupMenu}, a {@link javax.swing.JMenu JMenu}
+   *          or a {@link javax.swing.JMenuBar JMenuBar}
    */
   void appendActions(JComponent parent, List<? extends IAction> actions);
 
   /**
-   * create a gui for an action, recursively creates and attaches child actions on {@link IActionNode}s and menus
+   * create a gui for an action, recursively creates and attaches child actions on
+   * {@link org.eclipse.scout.rt.client.ui.action.tree.IActionNode IActionNode}s and menus
    */
   ISwingScoutAction createAction(JComponent parent, IAction action);
 
@@ -310,8 +308,10 @@ public interface ISwingEnvironment {
    * Called from scout job/thread to post an immediate swing job into the waiting queue.
    * <p>
    * These jobs are run when calling {@link #dispatchImmediateSwingJobs()}. Normally this kind of code is only used to
-   * early apply visible and enabled properties in {@link SwingScoutFieldComposite#handleSwingInputVerifier()} in order
-   * to have before-focus-traversal visible/enabled state-update
+   * early apply visible and enabled properties in
+   * {@link org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite#handleSwingInputVerifier()
+   * SwingScoutFieldComposite#handleSwingInputVerifier()} in order to have before-focus-traversal visible/enabled
+   * state-update
    */
   void postImmediateSwingJob(Runnable r);
 
@@ -323,7 +323,7 @@ public interface ISwingEnvironment {
    * The job is only run when it reaches the model within the cancelTimeout. This means if the job is delayed longer
    * than cancelTimeout millis when the model job runs it, then the job is ignored.
    * 
-   * @return the created and scheduled job, a {@link ClientJob}
+   * @return the created and scheduled job, a {@link org.eclipse.scout.rt.client.ClientJob ClientJob}
    */
   JobEx invokeScoutLater(Runnable j, long cancelTimeout);
 
