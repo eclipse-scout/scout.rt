@@ -62,8 +62,11 @@ import org.osgi.framework.Version;
  * Use this servlet to dispatch scout gui service requests using {@link ServiceTunnelRequest},
  * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  * <p>
- * Override the methods {@link #filterInbound(Object)} and {@link #filterOutbound(Object)} to do central input/output
- * validation.
+ * Override the methods
+ * {@link DefaultTransactionDelegate#validateInput(org.eclipse.scout.rt.shared.validate.IValidationStrategy, Object, java.lang.reflect.Method, Object[])
+ * DefaultTransactionDelegate#validateInput} and
+ * {@link DefaultTransactionDelegate#validateOutput(org.eclipse.scout.rt.shared.validate.IValidationStrategy, Object, java.lang.reflect.Method, Object, Object[])
+ * DefaultTransactionDelegate#validateOutput} to do central input/output validation.
  * <p>
  * By default there is a jaas convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
  * on /ajax with priority 1000
