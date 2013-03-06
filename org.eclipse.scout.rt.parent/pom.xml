@@ -59,9 +59,7 @@
       <modules>
         <module>../org.eclipse.scout.rt.ui.rap</module>
         <module>../org.eclipse.scout.rt.ui.rap.workbench</module>
-<!-- This Bundle needs changes in rap not commited yet
         <module>../org.eclipse.scout.rt.ui.rap.mobile</module>
--->
         <module>../org.eclipse.scout.rt.ui.rap.theme.rayo</module>
         <module>../org.eclipse.scout.rt.ui.rap.theme.rayo.mobile</module>
         <module>../org.eclipse.scout.svg.ui.rap</module>
