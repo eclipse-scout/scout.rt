@@ -27,9 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>RwtScoutTreeBox</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutTreeBox extends RwtScoutValueFieldComposite<ITreeBox<?>> implements IRwtScoutTreeBox {
 
