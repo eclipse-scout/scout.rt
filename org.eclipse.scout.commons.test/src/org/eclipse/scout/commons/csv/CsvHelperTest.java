@@ -28,9 +28,6 @@ import org.junit.Test;
  */
 public class CsvHelperTest {
 
-  /**
-   * ticket 89708
-   */
   @Test
   public void testExportData() throws ProcessingException, IOException {
 

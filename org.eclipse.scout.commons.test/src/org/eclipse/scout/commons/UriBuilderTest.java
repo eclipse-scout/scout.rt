@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.net.URI;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -35,109 +30,109 @@ public class UriBuilderTest {
   @Test
   public void testScheme() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNull(builder.getScheme());
+    Assert.assertNull(builder.getScheme());
     //
-    assertSame(builder, builder.scheme(null));
+    Assert.assertSame(builder, builder.scheme(null));
     //
     builder.scheme("ftp");
-    assertEquals("ftp", builder.getScheme());
+    Assert.assertEquals("ftp", builder.getScheme());
     //
     builder = new UriBuilder("http://acme.com:1234/scout");
-    assertEquals("http", builder.getScheme());
+    Assert.assertEquals("http", builder.getScheme());
   }
 
   @Test
   public void testHost() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNull(builder.getHost());
+    Assert.assertNull(builder.getHost());
     //
-    assertSame(builder, builder.host(null));
+    Assert.assertSame(builder, builder.host(null));
     //
     String host = "www.eclipse.org";
     builder.host(host);
-    assertEquals(host, builder.getHost());
+    Assert.assertEquals(host, builder.getHost());
     //
     builder = new UriBuilder("http://acme.com:1234/scout");
-    assertEquals("acme.com", builder.getHost());
+    Assert.assertEquals("acme.com", builder.getHost());
   }
 
   @Test
   public void testPort() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertEquals(-1, builder.getPort());
+    Assert.assertEquals(-1, builder.getPort());
     //
-    assertSame(builder, builder.port(-1));
+    Assert.assertSame(builder, builder.port(-1));
     //
     builder.port(433);
-    assertEquals(433, builder.getPort());
+    Assert.assertEquals(433, builder.getPort());
     //
     builder.port(1);
-    assertEquals(1, builder.getPort());
+    Assert.assertEquals(1, builder.getPort());
     //
     builder.port(0);
-    assertEquals(-1, builder.getPort());
+    Assert.assertEquals(-1, builder.getPort());
     //
     builder.port(-15);
-    assertEquals(-1, builder.getPort());
+    Assert.assertEquals(-1, builder.getPort());
     //
     builder = new UriBuilder("http://www.ecipse.org:1234/scout");
-    assertEquals(1234, builder.getPort());
+    Assert.assertEquals(1234, builder.getPort());
     //
     builder.port(42);
-    assertEquals(42, builder.getPort());
+    Assert.assertEquals(42, builder.getPort());
   }
 
   @Test
   public void testPath() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNull(builder.getPath());
+    Assert.assertNull(builder.getPath());
     //
-    assertSame(builder, builder.path(null));
+    Assert.assertSame(builder, builder.path(null));
     //
     String path = "scout/foo";
     builder.path(path);
-    assertEquals(path, builder.getPath());
+    Assert.assertEquals(path, builder.getPath());
     //
     builder = new UriBuilder("http://acme.com:1234/scout/test/3");
-    assertEquals("/scout/test/3", builder.getPath());
+    Assert.assertEquals("/scout/test/3", builder.getPath());
   }
 
   @Test
   public void testAddPath() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNull(builder.getPath());
+    Assert.assertNull(builder.getPath());
     //
     builder.addPath(null);
-    assertNull(builder.getPath());
+    Assert.assertNull(builder.getPath());
     //
-    assertSame(builder, builder.addPath(null));
+    Assert.assertSame(builder, builder.addPath(null));
     //
     String path = "scout/foo";
     builder.addPath(path);
-    assertEquals(path, builder.getPath());
+    Assert.assertEquals(path, builder.getPath());
     //
     builder = new UriBuilder("http://acme.com:1234/scout/test/3");
     builder.addPath("test");
-    assertEquals("/scout/test/3/test", builder.getPath());
+    Assert.assertEquals("/scout/test/3/test", builder.getPath());
     //
     builder = new UriBuilder("http://acme.com:1234");
     builder.addPath("test");
-    assertEquals("test", builder.getPath());
+    Assert.assertEquals("test", builder.getPath());
   }
 
   @Test
   public void testFragment() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNull(builder.getFragment());
+    Assert.assertNull(builder.getFragment());
     //
-    assertSame(builder, builder.fragment(null));
+    Assert.assertSame(builder, builder.fragment(null));
     //
     String fragment = ANCHOR;
     builder.fragment(fragment);
-    assertEquals(fragment, builder.getFragment());
+    Assert.assertEquals(fragment, builder.getFragment());
     //
     builder = new UriBuilder("http://acme.com:1234/scout/test/3#bottomPart");
-    assertEquals("bottomPart", builder.getFragment());
+    Assert.assertEquals("bottomPart", builder.getFragment());
   }
 
   static final String NAME1 = "name1";
@@ -148,61 +143,61 @@ public class UriBuilderTest {
   @Test
   public void testParamenter() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertNotNull(builder.getParameters());
-    assertTrue(builder.getParameters().isEmpty());
+    Assert.assertNotNull(builder.getParameters());
+    Assert.assertTrue(builder.getParameters().isEmpty());
     //
     builder.parameter(null, null);
     builder.parameter(NAME1, null);
     builder.parameter(null, VALUE1);
     builder.parameter(NAME2, VALUE2);
-    assertEquals(1, builder.getParameters().size());
-    assertEquals(VALUE2, builder.getParameters().get(NAME2));
+    Assert.assertEquals(1, builder.getParameters().size());
+    Assert.assertEquals(VALUE2, builder.getParameters().get(NAME2));
     builder.parameter(NAME2, null);
-    assertTrue(builder.getParameters().isEmpty());
+    Assert.assertTrue(builder.getParameters().isEmpty());
     //
-    assertSame(builder, builder.parameter(null, null));
+    Assert.assertSame(builder, builder.parameter(null, null));
     //
     builder = new UriBuilder("http://acme.com:1234/scout?name1=value1&name2=value2");
-    assertEquals(2, builder.getParameters().size());
-    assertEquals(VALUE1, builder.getParameters().get(NAME1));
-    assertEquals(VALUE2, builder.getParameters().get(NAME2));
+    Assert.assertEquals(2, builder.getParameters().size());
+    Assert.assertEquals(VALUE1, builder.getParameters().get(NAME1));
+    Assert.assertEquals(VALUE2, builder.getParameters().get(NAME2));
   }
 
   @Test
   public void testCreateUri() throws Exception {
     UriBuilder builder = new UriBuilder();
-    assertEquals(URI.create(""), builder.createURI());
+    Assert.assertEquals(URI.create(""), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST);
-    assertEquals(URI.create("scheme://host"), builder.createURI());
+    Assert.assertEquals(URI.create("scheme://host"), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).path(PATH_TO_SCHEME);
-    assertEquals(URI.create("scheme:/path/to"), builder.createURI());
+    Assert.assertEquals(URI.create("scheme:/path/to"), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME);
-    assertEquals(URI.create("scheme://host/path/to"), builder.createURI());
+    Assert.assertEquals(URI.create("scheme://host/path/to"), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR);
-    assertEquals(URI.create("scheme://host/path/to#anchor"), builder.createURI());
+    Assert.assertEquals(URI.create("scheme://host/path/to#anchor"), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "value");
-    assertEquals(URI.create("scheme://host/path/to?key=value#anchor"), builder.createURI());
+    Assert.assertEquals(URI.create("scheme://host/path/to?key=value#anchor"), builder.createURI());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25E4%25F6%25FC#anchor", builder.createURI().toASCIIString());
+    Assert.assertEquals("scheme://host/path/to?key=%25E4%25F6%25FC#anchor", builder.createURI().toASCIIString());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI("UTF-8").toASCIIString());
+    Assert.assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI("UTF-8").toASCIIString());
     //
     URI baseUri = new URI("http://www.eclipse.org/scout");
     builder = new UriBuilder(baseUri);
-    assertEquals(baseUri, builder.createURI());
+    Assert.assertEquals(baseUri, builder.createURI());
   }
 }

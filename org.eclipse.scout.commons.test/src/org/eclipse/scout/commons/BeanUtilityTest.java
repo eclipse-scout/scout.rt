@@ -10,16 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Constructor;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -31,54 +25,54 @@ public class BeanUtilityTest {
 
   @Test
   public void testGetConstructorNullAndDefault() throws Exception {
-    assertNull(BeanUtility.findConstructor(null));
+    Assert.assertNull(BeanUtility.findConstructor(null));
     //
-    assertEquals(1, OnlyDefalutConstructor.class.getConstructors().length);
+    Assert.assertEquals(1, OnlyDefalutConstructor.class.getConstructors().length);
     Constructor<OnlyDefalutConstructor> expected = OnlyDefalutConstructor.class.getConstructor((Class<?>[]) null);
-    assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class));
-    assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class, (Class<?>[]) null));
+    Assert.assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class));
+    Assert.assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class, (Class<?>[]) null));
     //
-    assertNull(BeanUtility.findConstructor(OnlyPrivateDefalutConstructor.class));
+    Assert.assertNull(BeanUtility.findConstructor(OnlyPrivateDefalutConstructor.class));
   }
 
   @Test
   public void testGetConstructorInvisibleClass() throws Exception {
-    assertNull(BeanUtility.findConstructor(InvisibleClass.class));
+    Assert.assertNull(BeanUtility.findConstructor(InvisibleClass.class));
   }
 
   @Test
   public void testGetConstructorNonStaticClass() throws Exception {
-    assertNull(BeanUtility.findConstructor(NonStaticInnerClass.class));
-    assertEquals(NonStaticInnerClass.class.getConstructor(BeanUtilityTest.class), BeanUtility.findConstructor(NonStaticInnerClass.class, BeanUtilityTest.class));
+    Assert.assertNull(BeanUtility.findConstructor(NonStaticInnerClass.class));
+    Assert.assertEquals(NonStaticInnerClass.class.getConstructor(BeanUtilityTest.class), BeanUtility.findConstructor(NonStaticInnerClass.class, BeanUtilityTest.class));
   }
 
   @Test
   public void testGetConstructorPolymorphism() throws Exception {
-    assertNull(BeanUtility.findConstructor(ParamConstructor.class));
-    assertNull(BeanUtility.findConstructor(ParamConstructor.class, String.class));
+    Assert.assertNull(BeanUtility.findConstructor(ParamConstructor.class));
+    Assert.assertNull(BeanUtility.findConstructor(ParamConstructor.class, String.class));
     //
     Constructor<ParamConstructor> expected = ParamConstructor.class.getConstructor(A.class);
-    assertEquals(expected, BeanUtility.findConstructor(ParamConstructor.class, A.class));
-    assertEquals(expected, BeanUtility.findConstructor(ParamConstructor.class, AExt.class));
+    Assert.assertEquals(expected, BeanUtility.findConstructor(ParamConstructor.class, A.class));
+    Assert.assertEquals(expected, BeanUtility.findConstructor(ParamConstructor.class, AExt.class));
   }
 
   @Test
   public void testGetConstructorPolymorphismOverloadedConstructors() throws Exception {
-    assertEquals(MultyParamConstructor.class.getConstructor(), BeanUtility.findConstructor(MultyParamConstructor.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, A.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt2.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExtExt.class));
+    Assert.assertEquals(MultyParamConstructor.class.getConstructor(), BeanUtility.findConstructor(MultyParamConstructor.class));
+    Assert.assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, A.class));
+    Assert.assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt.class));
+    Assert.assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt2.class));
+    Assert.assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExtExt.class));
   }
 
   @Test
   public void testGetConstructorAmbiguousSignatures() throws Exception {
-    assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(A.class, B.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, A.class, B.class));
-    assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(AExt.class, B.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, AExt.class, B.class));
-    assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(A.class, BExt.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, A.class, BExt.class));
+    Assert.assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(A.class, B.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, A.class, B.class));
+    Assert.assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(AExt.class, B.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, AExt.class, B.class));
+    Assert.assertEquals(AmbiguousSignaturesConstructor.class.getConstructor(A.class, BExt.class), BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, A.class, BExt.class));
     try {
       Constructor<AmbiguousSignaturesConstructor> ctor = BeanUtility.findConstructor(AmbiguousSignaturesConstructor.class, AExt.class, BExt.class);
-      fail("Expected ambiguous constructor but got '" + ctor.toString() + "'");
+      Assert.fail("Expected ambiguous constructor but got '" + ctor.toString() + "'");
     }
     catch (ProcessingException e) {
       // ok
@@ -87,53 +81,53 @@ public class BeanUtilityTest {
 
   @Test
   public void testGetConstructorPrimitiveAndComplexType() throws Exception {
-    assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, long.class));
-    assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, Long.class));
-    assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{null}));
+    Assert.assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, long.class));
+    Assert.assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, Long.class));
+    Assert.assertEquals(PrimitiveAndComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{null}));
   }
 
   @Test
   public void testGetConstructorComplexType() throws Exception {
-    assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, Long.class));
+    Assert.assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, Long.class));
     // auto-boxing
-    assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, long.class));
+    Assert.assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, long.class));
   }
 
   @Test
   public void testGetConstructorPrimitiveType() throws Exception {
-    assertEquals(PrimitiveTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveTypeConstructor.class, long.class));
+    Assert.assertEquals(PrimitiveTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveTypeConstructor.class, long.class));
     // auto-unboxing
-    assertEquals(PrimitiveTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveTypeConstructor.class, Long.class));
+    Assert.assertEquals(PrimitiveTypeConstructor.class.getConstructor(long.class), BeanUtility.findConstructor(PrimitiveTypeConstructor.class, Long.class));
   }
 
   @Test
   public void testGetConstructorArray() throws Exception {
-    assertEquals(ArrayConstructor.class.getConstructor(String[].class), BeanUtility.findConstructor(ArrayConstructor.class, String[].class));
+    Assert.assertEquals(ArrayConstructor.class.getConstructor(String[].class), BeanUtility.findConstructor(ArrayConstructor.class, String[].class));
   }
 
   @Test
   public void testCreateInstanceNullAndEmpty() throws Exception {
-    assertNull(BeanUtility.createInstance(null));
-    assertNull(BeanUtility.createInstance(null, null, null));
+    Assert.assertNull(BeanUtility.createInstance(null));
+    Assert.assertNull(BeanUtility.createInstance(null, null, null));
     //
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class) instanceof OnlyDefalutConstructor);
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, (Object[]) null) instanceof OnlyDefalutConstructor);
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, null, null) instanceof OnlyDefalutConstructor);
+    Assert.assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class) instanceof OnlyDefalutConstructor);
+    Assert.assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, (Object[]) null) instanceof OnlyDefalutConstructor);
+    Assert.assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, null, null) instanceof OnlyDefalutConstructor);
   }
 
   @Test
   public void testCreateInstanceInvisibleClass() throws Exception {
-    assertNull(BeanUtility.createInstance(InvisibleClass.class));
+    Assert.assertNull(BeanUtility.createInstance(InvisibleClass.class));
   }
 
   @Test
   public void testCreateInstanceNonStaticClass() throws Exception {
-    assertNull(BeanUtility.createInstance(NonStaticInnerClass.class));
+    Assert.assertNull(BeanUtility.createInstance(NonStaticInnerClass.class));
   }
 
   @Test
   public void testCreateInstanceNonStaticClassWithThisArgument() throws Exception {
-    assertNotNull(BeanUtility.createInstance(NonStaticInnerClass.class, this));
+    Assert.assertNotNull(BeanUtility.createInstance(NonStaticInnerClass.class, this));
   }
 
   static final long TEST_LONG_42 = 42L;
@@ -146,22 +140,22 @@ public class BeanUtilityTest {
   public void testCreateInstancePrimitiveType() throws Exception {
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, TEST_LONG_42);
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Object[]{null});
-      assertNull(obj);
+      Assert.assertNull(obj);
     }
   }
 
@@ -169,23 +163,23 @@ public class BeanUtilityTest {
   public void testCreateInstanceComplexType() throws Exception {
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, TEST_LONG_42);
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Object[]{null});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
     }
   }
 
@@ -193,23 +187,23 @@ public class BeanUtilityTest {
   public void testCreateInstancePrimitiveAndComplexType() throws Exception {
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_NEG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_NEG_42, obj.getLong());
     }
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, TEST_LONG_42);
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_NEG_42, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_NEG_42, obj.getLong());
     }
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Object[]{null});
-      assertNotNull(obj);
-      assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
+      Assert.assertNotNull(obj);
+      Assert.assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
     }
   }
 
@@ -220,13 +214,13 @@ public class BeanUtilityTest {
   public void testCreateInstanceArray() throws Exception {
     {
       ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
-      assertNotNull(obj);
-      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
+      Assert.assertNotNull(obj);
+      Assert.assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
     {
       ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, (Object) new String[]{HELLO, WORLD});
-      assertNotNull(obj);
-      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
+      Assert.assertNotNull(obj);
+      Assert.assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
   }
 
@@ -234,13 +228,13 @@ public class BeanUtilityTest {
   public void testCreateInstanceVararg() throws Exception {
     {
       VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
-      assertNotNull(obj);
-      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
+      Assert.assertNotNull(obj);
+      Assert.assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
     {
       VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, (Object) new String[]{HELLO, WORLD});
-      assertNotNull(obj);
-      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
+      Assert.assertNotNull(obj);
+      Assert.assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
   }
 

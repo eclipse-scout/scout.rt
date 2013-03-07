@@ -97,9 +97,6 @@ public class StringUtilityTest extends Assert {
     assertEquals("1, 2", StringUtility.join(", ", new Long[]{Long.valueOf(1), null, Long.valueOf(2)}));
   }
 
-  /**
-   * ticket 88592
-   */
   @Test
   public void testMnemonics() {
     String s = "Button &Test";
@@ -119,9 +116,6 @@ public class StringUtilityTest extends Assert {
   // UTF-8 length is 13 to avoid accidental buffer size matches
   static final String CHARACTERS = "aouäöüàé";
 
-  /**
-   * ticket 90988
-   */
   @Test
   public void testDecompress_umlauts() throws Exception {
 
@@ -237,7 +231,7 @@ public class StringUtilityTest extends Assert {
    * @param original
    *          the original String
    */
-  private void assertEqualsAfterEncodeDecode(String original) {
+  private static void assertEqualsAfterEncodeDecode(String original) {
     assertEqualsAfterEncodeDecode(original, false);
   }
 
@@ -249,7 +243,7 @@ public class StringUtilityTest extends Assert {
    * @param replaceSpace
    *          replace all spaces when encoding
    */
-  private void assertEqualsAfterEncodeDecode(String original, boolean replaceSpaces) {
+  private static void assertEqualsAfterEncodeDecode(String original, boolean replaceSpaces) {
     String encoded = StringUtility.htmlEncode(original, replaceSpaces);
     String decoded = StringUtility.htmlDecode(encoded);
     Assert.assertEquals(original, decoded);

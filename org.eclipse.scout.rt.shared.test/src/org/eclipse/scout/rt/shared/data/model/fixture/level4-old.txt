@@ -1,0 +1,176 @@
+[org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel] DataModel
+ [org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel$CompanyEntity] Company CompanyEntity
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) CompanyEntity/NameAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/AccountManagerEntity/BirthdateAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/FirstNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/LastNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/EmployeeEntity/BirthdateAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/FirstNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/LastNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+ [org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel$PersonEntity] Person PersonEntity
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) PersonEntity/BirthdateAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) PersonEntity/FirstNameAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) PersonEntity/LastNameAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/EmployeeEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+ [org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel$InternalPersonEntity] Employee InternalPersonEntity
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractInternalPersonEntity$PartTimeAttribute] PartTimePercent (type-8) InternalPersonEntity/PartTimeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractInternalPersonEntity$SalaryTypeAttribute] SalaryType (type-9) InternalPersonEntity/SalaryTypeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/BirthdateAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/FirstNameAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/LastNameAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$NameAttribute] Name (type-15) InternalPersonEntity/CompanyEntity/NameAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$AccountManagerEntity] AccountManager InternalPersonEntity/CompanyEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/AccountManagerEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/AccountManagerEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/CompanyEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/LegalAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/CompanyEntity/PrimaryAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/CityAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/CompanyEntity/PrimaryAddressEntity/ZipCodeAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractCompanyEntity$EmployeeEntity] Employee InternalPersonEntity/CompanyEntity/EmployeeEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$BirthdateAttribute] Birthdate (type-5) InternalPersonEntity/CompanyEntity/EmployeeEntity/BirthdateAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$FirstNameAttribute] FirstName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/FirstNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LastNameAttribute] LastName (type-15) InternalPersonEntity/CompanyEntity/EmployeeEntity/LastNameAttribute
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$AccountManagerEntity] AccountManager InternalPersonEntity/AccountManagerEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$CompanyEntity] Company InternalPersonEntity/CompanyEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+    [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$LegalAddressEntity] LegalAddress InternalPersonEntity/LegalAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/LegalAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/LegalAddressEntity/ZipCodeAttribute
+  [org.eclipse.scout.rt.shared.data.model.fixture.AbstractPersonEntity$PrimaryAddressEntity] PrimaryAddress InternalPersonEntity/PrimaryAddressEntity
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$CityAttribute] City (type-15) InternalPersonEntity/PrimaryAddressEntity/CityAttribute
+   [org.eclipse.scout.rt.shared.data.model.fixture.AbstractAddressEntity$ZipCodeAttribute] Zip (type-15) InternalPersonEntity/PrimaryAddressEntity/ZipCodeAttribute
+

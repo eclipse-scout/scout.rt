@@ -1,8 +1,5 @@
 package org.eclipse.scout.rt.client.test.ui.desktop.navigation;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -11,6 +8,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -27,7 +25,7 @@ public class BookmarkUtilityTest {
   public void testBookmarkArrayKeyLegacy() {
     Bookmark[] in = new Bookmark[]{new Bookmark()};
     Object out = BookmarkUtility.makeSerializableKey(in, true);
-    assertTrue(out instanceof String[]);
+    Assert.assertTrue(out instanceof String[]);
   }
 
   /**
@@ -37,7 +35,7 @@ public class BookmarkUtilityTest {
   public void testBookmarkArrayKey() {
     Bookmark[] in = new Bookmark[]{new Bookmark()};
     Object out = BookmarkUtility.makeSerializableKey(in, false);
-    assertTrue(out instanceof Bookmark[]);
+    Assert.assertTrue(out instanceof Bookmark[]);
   }
 
   /**
@@ -47,7 +45,7 @@ public class BookmarkUtilityTest {
   public void testBookmarkKeyLegacy() {
     Bookmark in = new Bookmark();
     Object out = BookmarkUtility.makeSerializableKey(in, true);
-    assertTrue(out instanceof String);
+    Assert.assertTrue(out instanceof String);
   }
 
   /**
@@ -57,14 +55,14 @@ public class BookmarkUtilityTest {
   public void testBookmarkKey() {
     Bookmark in = new Bookmark();
     Object out = BookmarkUtility.makeSerializableKey(in, false);
-    assertTrue(out instanceof Bookmark);
+    Assert.assertTrue(out instanceof Bookmark);
   }
 
   @Test
   public void testMakeSerializableNullKey() {
     Object in = null;
     Object out = BookmarkUtility.makeSerializableKey(in, false);
-    assertNull(out);
+    Assert.assertNull(out);
   }
 
   @Test
@@ -151,7 +149,7 @@ public class BookmarkUtilityTest {
     assertValidKeyWithDumpObject(in, out);
   }
 
-  private void assertValidKey(Object in, Object out) {
+  private static void assertValidKey(Object in, Object out) {
     final String input = "Input:  " + (in != null ? in.getClass() : null) + " " + VerboseUtility.dumpObject(in);
     final String output = "Output: " + (out != null ? out.getClass() : null) + " " + VerboseUtility.dumpObject(out);
     if (LOG.isDebugEnabled()) {
@@ -163,13 +161,13 @@ public class BookmarkUtilityTest {
       System.out.println(output);
     }
 
-    assertTrue(CompareUtility.equals(in, out));
+    Assert.assertTrue(CompareUtility.equals(in, out));
     if (in != null && out != null) {
-      assertTrue(in.getClass().equals(out.getClass()));
+      Assert.assertTrue(in.getClass().equals(out.getClass()));
     }
   }
 
-  private void assertValidKeyWithDumpObject(Object in, Object out) {
+  private static void assertValidKeyWithDumpObject(Object in, Object out) {
     final String input = "Input:  " + (in != null ? in.getClass() : null) + " " + VerboseUtility.dumpObject(in);
     final String output = "Output: " + (out != null ? out.getClass() : null) + " " + VerboseUtility.dumpObject(out);
     if (LOG.isDebugEnabled()) {
@@ -181,7 +179,7 @@ public class BookmarkUtilityTest {
       System.out.println(output);
     }
 
-    assertTrue(CompareUtility.equals(VerboseUtility.dumpObject(in), VerboseUtility.dumpObject(out)));
+    Assert.assertTrue(CompareUtility.equals(VerboseUtility.dumpObject(in), VerboseUtility.dumpObject(out)));
   }
 
   private static class SerializablePrimaryKey implements Serializable {

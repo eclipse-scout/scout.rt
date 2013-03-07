@@ -34,9 +34,6 @@ public class MatrixUtilityTest {
     m_array = new Object[][]{E1, E2, E3, E4, E5};
   }
 
-  /**
-   * ticket 87801
-   */
   @Test
   public void testSort() {
     Object[][] data = new Object[][]{

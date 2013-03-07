@@ -24,8 +24,6 @@ import org.junit.Test;
 public class MailUtilityTest {
 
   /**
-   * ticket 91844
-   * <p>
    * Message without sender can be created
    * 
    * @throws ProcessingException
