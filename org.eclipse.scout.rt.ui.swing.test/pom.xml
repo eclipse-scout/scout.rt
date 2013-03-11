@@ -18,6 +18,6 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.ui.swing.test.fragment</artifactId>
+  <artifactId>org.eclipse.scout.rt.ui.swing.test</artifactId>
   <packaging>eclipse-test-plugin</packaging>
 </project>
