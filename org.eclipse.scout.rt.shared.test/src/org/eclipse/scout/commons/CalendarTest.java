@@ -128,7 +128,7 @@ public class CalendarTest {
     Integer transferredhours = new Integer(new SimpleDateFormat("HH").format(transferredDate));
 
     Assert.assertEquals(inDate, transferredDate);
-    Assert.assertEquals(new Integer(hours - 1), transferredhours);
+    Assert.assertEquals(new Integer((hours - 1 + 24) % 24), transferredhours);
   }
 
   /**
