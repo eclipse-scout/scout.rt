@@ -31,6 +31,9 @@ public class TextEx extends Text {
 
   @Override
   public boolean setFocus() {
-    return getEditable();
+    if (getEditable()) {
+      return super.setFocus();
+    }
+    return false;
   }
 }
