@@ -1190,12 +1190,11 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
     @Override
     public void widgetSelected(SelectionEvent event) {
-      //FIXME CGU uncomment as soon as rap 2.1 updatesite is available
-//      if (event.detail == RWT.HYPERLINK) {
-//        TableItem tableItem = (TableItem) event.item;
-//        ITableRow row = (ITableRow) tableItem.getData();
-//        handleUiHyperlinkAction(row, event.text);
-//      }
+      if (event.detail == RWT.HYPERLINK) {
+        TableItem tableItem = (TableItem) event.item;
+        ITableRow row = (ITableRow) tableItem.getData();
+        handleUiHyperlinkAction(row, event.text);
+      }
     }
   }
 

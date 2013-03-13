@@ -694,15 +694,14 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
     @Override
     public void widgetSelected(SelectionEvent event) {
-      //FIXME CGU uncomment as soon as rap 2.1 updatesite is available
-//      if (event.detail == RWT.HYPERLINK) {
-//        String url = event.text;
-//        ITableRow row = extractTableRow(url);
-//        if (row == null) {
-//          throw new RuntimeException("Hyperlink cannot be activated. Could not extract row index from hyperlink: " + url);
-//        }
-//        handleUiHyperlinkAction(row, url);
-//      }
+      if (event.detail == RWT.HYPERLINK) {
+        String url = event.text;
+        ITableRow row = extractTableRow(url);
+        if (row == null) {
+          throw new RuntimeException("Hyperlink cannot be activated. Could not extract row index from hyperlink: " + url);
+        }
+        handleUiHyperlinkAction(row, url);
+      }
     }
 
     private ITableRow extractTableRow(String url) {
