@@ -20,7 +20,7 @@
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_S20130201140822" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130201140822/repository/"/>
+      <repository id="orbit_S20130308121626" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130308121626/repository/"/>
 
       <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
       <unit id="javax.wsdl.source" version="1.6.2.v201012040545"/>
