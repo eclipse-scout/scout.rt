@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.extension.client.ExtensionUtility;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility;
 import org.eclipse.scout.rt.shared.ContextMap;
@@ -67,6 +66,5 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   protected void injectMenusInternal(List<IMenu> menuList) {
     super.injectMenusInternal(menuList);
     MenuExtensionUtility.adaptMenus(this, this, menuList);
-    ExtensionUtility.processReplaceAnnotations(menuList);
   }
 }
