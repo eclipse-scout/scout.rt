@@ -127,6 +127,20 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
   }
 
   /**
+   * Removes the given row.
+   * 
+   * @param row
+   * @returns Returns <code>true</code> if the row was removed. Otherwise <code>false</code>.
+   */
+  public boolean removeRow(AbstractTableRowData row) {
+    if (m_rowList.remove(row)) {
+      setValueSet(true);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Removes all rows.
    */
   public void clearRows() {
