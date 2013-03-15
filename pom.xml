@@ -21,8 +21,7 @@
     <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
-  <groupId>org.eclipse.scout.rt</groupId>
-  <artifactId>eclipse.scout.rt</artifactId>
+  <artifactId>org.eclipse.scout.rt.parent</artifactId>
   <version>3.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 

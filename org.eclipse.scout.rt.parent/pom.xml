@@ -16,11 +16,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.scout.rt</groupId>
-    <artifactId>eclipse.scout.rt</artifactId>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>org.eclipse.scout.rt.parent</artifactId>
     <version>3.9.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt.parent</artifactId>
   <packaging>pom</packaging>
 
