@@ -13,15 +13,10 @@
     </location>
 
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_egit" location="http://download.eclipse.org/egit/updates/"/>
-
-      <unit id="org.eclipse.egit.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.jgit.feature.group" version="0.0.0"/>
-    </location>
-
-    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="orbit_S20130308121626" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130308121626/repository/"/>
 
+      <unit id="javax.servlet" version="3.0.0.v201112011016"/>
+      <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
       <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
       <unit id="javax.wsdl.source" version="1.6.2.v201012040545"/>
       <unit id="javax.xml" version="1.3.4.v201005080400"/>
@@ -79,7 +74,6 @@
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="rap_2.0" location="http://download.eclipse.org/rt/rap/nightly/runtime/"/>
 
-      <unit id="org.eclipse.rap.equinox.target.feature.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
     </location>
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
