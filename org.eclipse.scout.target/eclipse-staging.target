@@ -8,6 +8,10 @@
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.equinox.server.servletbridge.feature.group" version="0.0.0"/>
+
       <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
     </location>

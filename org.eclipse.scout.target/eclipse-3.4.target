@@ -8,6 +8,9 @@
       <unit id="org.eclipse.equinox.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.equinox.server.servletbridge.feature.group" version="0.0.0"/>
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
