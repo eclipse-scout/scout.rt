@@ -9,6 +9,6 @@ Require-Bundle: org.eclipse.scout.rt.testing.client;bundle-version="[3.9.0,4.0.0
  org.eclipse.scout.rt.testing.shared;bundle-version="[3.9.0,4.0.0)",
  org.eclipse.scout.rt.client.testenvironment;bundle-version="[3.9.0,4.0.0)"
 Import-Package: org.easymock;version="[2.0.0,3.0.0)",
- org.junit;version="4.8.1",
- org.junit.runner;version="4.8.1"
+ org.junit;version="[4.3.0,5.0.0)",
+ org.junit.runner;version="[4.3.0,5.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
