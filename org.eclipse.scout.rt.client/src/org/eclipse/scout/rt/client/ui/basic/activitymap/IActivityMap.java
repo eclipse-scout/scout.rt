@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 /**
  * The activity map is a specialized model which contains a set of {@link ActivityCell}s that are grouped by resourceId.
  */
-public interface IActivityMap extends IPropertyObserver {
+public interface IActivityMap<RI, AI> extends IPropertyObserver {
 
   /**
    * {@link java.util.Date}[] truncated to day using {@link com.bsiag.DateUtility#truncDate(Date)}
@@ -223,7 +223,7 @@ public interface IActivityMap extends IPropertyObserver {
 
   void setSelectedTime(Date beginTime, Date endTime);
 
-  void decorateActivityCell(ActivityCell p);
+  void decorateActivityCell(ActivityCell<RI, AI> p);
 
   /**
    * collect all selected days from starthour to endhour and intersect with
@@ -253,49 +253,49 @@ public interface IActivityMap extends IPropertyObserver {
    */
   void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration);
 
-  ActivityCell resolveActivityCell(ActivityCell cell);
+  ActivityCell<RI, AI> resolveActivityCell(ActivityCell<RI, AI> cell);
 
-  ActivityCell[] resolveActivityCells(ActivityCell[] cells);
+  ActivityCell<RI, AI>[] resolveActivityCells(ActivityCell<RI, AI>[] cells);
 
-  ActivityCell[] getActivityCells(long resourceId);
+  ActivityCell<RI, AI>[] getActivityCells(RI resourceId);
 
-  ActivityCell[] getActivityCells(Long[] resourceIds);
+  ActivityCell<RI, AI>[] getActivityCells(RI[] resourceIds);
 
-  ActivityCell[] getAllActivityCells();
+  ActivityCell<RI, AI>[] getAllActivityCells();
 
-  void addActivityCells(ActivityCell[] cells);
+  void addActivityCells(ActivityCell<RI, AI>[] cells);
 
-  void updateActivityCells(ActivityCell[] cells);
+  void updateActivityCells(ActivityCell<RI, AI>[] cells);
 
-  void updateActivityCells(Long[] resourceIds);
+  void updateActivityCells(RI[] resourceIds);
 
-  void removeActivityCells(ActivityCell[] cells);
+  void removeActivityCells(ActivityCell<RI, AI>[] cells);
 
-  void removeActivityCells(Long[] resourceIds);
+  void removeActivityCells(RI[] resourceIds);
 
   void removeAllActivityCells();
 
-  ActivityCell getSelectedActivityCell();
+  ActivityCell<RI, AI> getSelectedActivityCell();
 
-  void setSelectedActivityCell(ActivityCell cell);
+  void setSelectedActivityCell(ActivityCell<RI, AI> cell);
 
-  boolean isSelectedActivityCell(ActivityCell cell);
+  boolean isSelectedActivityCell(ActivityCell<RI, AI> cell);
 
   /**
    * available resource ids in the same order as the resource table
    */
-  Long[] getResourceIds();
+  RI[] getResourceIds();
 
-  void setResourceIds(Long[] resourceIds);
+  void setResourceIds(RI[] resourceIds);
 
   /**
    * selected resource ids in arbitrary order
    */
-  Long[] getSelectedResourceIds();
+  RI[] getSelectedResourceIds();
 
-  void setSelectedResourceIds(Long[] resourceIds);
+  void setSelectedResourceIds(RI[] resourceIds);
 
-  void isSelectedResourceId(Long resourceId);
+  void isSelectedResourceId(RI resourceId);
 
   /**
    * Indicates whether the selected sections in the activity

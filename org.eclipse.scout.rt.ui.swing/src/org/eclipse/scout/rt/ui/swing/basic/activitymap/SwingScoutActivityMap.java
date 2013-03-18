@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.JScrollPane;
@@ -37,7 +38,7 @@ import org.eclipse.scout.rt.ui.swing.ext.activitymap.ActivityMapSelectionEvent;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.ActivityMapSelectionListener;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.JActivityMap;
 
-public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
+public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?>> {
   private JScrollPane m_swingScrollPane;
   /**
    * The metrics table is used to determine header and row heights
@@ -194,32 +195,32 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
             case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
             case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
             case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
-            Runnable t = new Runnable() {
-              @Override
-              public void run() {
-                switch (e.getType()) {
-                  case ActivityMapEvent.TYPE_ACTIVITIES_DELETED:
-                  case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
-                  case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
-                  case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
-                  try {
-                    getUpdateSwingFromScoutLock().acquire();
-                    //
-                    handleActivitiesChangedFromScout();
+              Runnable t = new Runnable() {
+                @Override
+                public void run() {
+                  switch (e.getType()) {
+                    case ActivityMapEvent.TYPE_ACTIVITIES_DELETED:
+                    case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
+                    case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
+                    case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
+                      try {
+                        getUpdateSwingFromScoutLock().acquire();
+                        //
+                        handleActivitiesChangedFromScout();
+                      }
+                      finally {
+                        getUpdateSwingFromScoutLock().release();
+                      }
+                      break;
+                    }
                   }
-                  finally {
-                    getUpdateSwingFromScoutLock().release();
-                  }
-                  break;
                 }
-              }
+              };
+              getSwingEnvironment().invokeSwingLater(t);
+              break;
             }
-            };
-            getSwingEnvironment().invokeSwingLater(t);
-            break;
           }
         }
-      }
       };
       getScoutActivityMap().addActivityMapListener(m_scoutListener);
     }
@@ -229,7 +230,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     setSelectionFromScout();
   }
 
-  public IActivityMap getScoutActivityMap() {
+  public IActivityMap<?, ?> getScoutActivityMap() {
     return getScoutObject();
   }
 
@@ -247,7 +248,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     setSelectionFromScout();
   }
 
-  private void setResourceIdsFromScout(Long[] resourceIds) {
+  private void setResourceIdsFromScout(Object[] resourceIds) {
     getSwingActivityMap().setModel(new SwingActivityMapModel(getScoutActivityMap(), m_metricsTable));
   }
 
@@ -260,9 +261,10 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
       return;
     }
     //
-    final ActivityCell cell = (comp != null ? comp.getScoutActivityCell() : null);
+    final ActivityCell<?, ?> cell = (comp != null ? comp.getScoutActivityCell() : null);
     // notify Scout
     Runnable t = new Runnable() {
+      @SuppressWarnings("unchecked")
       @Override
       public void run() {
         getScoutActivityMap().getUIFacade().setSelectedActivityCellFromUI(cell);
@@ -284,9 +286,10 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     final int row = getSwingActivityMap().pixToRow(p.y);
     // notify Scout
     Runnable t = new Runnable() {
+      @SuppressWarnings("unchecked")
       @Override
       public void run() {
-        long resourceId = getScoutActivityMap().getResourceIds()[row];
+        Object resourceId = getScoutActivityMap().getResourceIds()[row];
         getScoutActivityMap().getUIFacade().fireCellActionFromUI(resourceId, range, cell);
       }
     };
@@ -295,8 +298,8 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void setSelectionFromScout() {
-    HashSet<Long> selectedIds = new HashSet<Long>(Arrays.asList(getScoutActivityMap().getSelectedResourceIds()));
-    Long[] ids = getScoutActivityMap().getResourceIds();
+    HashSet<Object> selectedIds = new HashSet<Object>(Arrays.asList(getScoutActivityMap().getSelectedResourceIds()));
+    Object[] ids = getScoutActivityMap().getResourceIds();
     TreeSet<Integer> indexes = new TreeSet<Integer>();
     for (int i = 0; i < ids.length; i++) {
       if (selectedIds.contains(ids[i])) {
@@ -318,16 +321,17 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     }
     //
     final double[] normalizedRange = range;
-    Long[] ids = getScoutActivityMap().getResourceIds();
-    final TreeSet<Long> selectedIds = new TreeSet<Long>();
+    Object[] ids = getScoutActivityMap().getResourceIds();
+    final Set<Object> selectedIds = new HashSet<Object>();
     for (int i : rows) {
       selectedIds.add(ids[i]);
     }
     // notify Scout
     Runnable t = new Runnable() {
+      @SuppressWarnings("unchecked")
       @Override
       public void run() {
-        getScoutActivityMap().getUIFacade().setSelectionFromUI(selectedIds.toArray(new Long[selectedIds.size()]), normalizedRange);
+        getScoutActivityMap().getUIFacade().setSelectionFromUI(selectedIds.toArray(new Object[selectedIds.size()]), normalizedRange);
       }
     };
 
@@ -385,7 +389,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
       setSelectionFromScout();
     }
     else if (name.equals(IActivityMap.PROP_RESOURCE_IDS)) {
-      setResourceIdsFromScout((Long[]) newValue);
+      setResourceIdsFromScout((Object[]) newValue);
     }
     else if (name.equals(IActivityMap.PROP_DRAW_SECTIONS)) {
       getSwingActivityMap().getSelector().setDrawSections((Boolean) newValue);

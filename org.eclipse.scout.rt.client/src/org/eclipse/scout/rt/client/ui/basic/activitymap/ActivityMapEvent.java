@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 @SuppressWarnings("serial")
-public class ActivityMapEvent extends java.util.EventObject {
+public class ActivityMapEvent<RI> extends java.util.EventObject {
   /**
    * Some activities have been added valid properties: activities,
    * firstActivity, lastActivity
@@ -59,7 +59,7 @@ public class ActivityMapEvent extends java.util.EventObject {
   private int m_type;
   private ActivityCell[] m_activities = new ActivityCell[0];
   private List<IMenu> m_popupMenus;
-  private long m_resourceId;
+  private RI m_resourceId;
   private MinorTimeColumn m_column;
 
   public ActivityMapEvent(IActivityMap source, int type) {
@@ -83,7 +83,7 @@ public class ActivityMapEvent extends java.util.EventObject {
     }
   }
 
-  public ActivityMapEvent(IActivityMap source, int type, long resourceId, MinorTimeColumn column, ActivityCell activity) {
+  public ActivityMapEvent(IActivityMap source, int type, RI resourceId, MinorTimeColumn column, ActivityCell activity) {
     super(source);
     m_type = type;
     if (activity != null) {
@@ -101,7 +101,7 @@ public class ActivityMapEvent extends java.util.EventObject {
     return m_type;
   }
 
-  public long getResourceId() {
+  public RI getResourceId() {
     return m_resourceId;
   }
 

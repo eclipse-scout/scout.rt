@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,9 +27,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CompositeLong;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -41,21 +44,24 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractActivityMap extends AbstractPropertyObserver implements IActivityMap {
+public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserver implements IActivityMap<RI, AI> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractActivityMap.class);
 
   private boolean m_initialized;
   private EventListenerList m_listenerList;
   private IActivityMapUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
-  private HashMap<Long/* resourceId */, List<ActivityCell>> m_resourceIdToActivities;
-  private HashMap<CompositeLong/* resourceId,activityId */, ActivityCell> m_activities;
-  private HashSet<Long/* resourceId */> m_selectedResourceIds;
+  private HashMap<RI/* resourceId */, List<ActivityCell<RI, AI>>> m_resourceIdToActivities;
+  private HashMap<CompositeObject/* resourceId,activityId */, ActivityCell<RI, AI>> m_activities;
+  private HashSet<RI/* resourceId */> m_selectedResourceIds;
   private int m_tableChanging;
   private ArrayList<ActivityMapEvent> m_eventBuffer = new ArrayList<ActivityMapEvent>();
   private IMenu[] m_menus;
-  private IActivityCellObserver m_cellObserver;
+  private IActivityCellObserver<RI, AI> m_cellObserver;
   private boolean m_timeScaleValid;
+
+  private Class<RI> m_resourceIdClass;
+  private Class<AI> m_activityIdClass;
 
   public AbstractActivityMap() {
     this(true);
@@ -72,6 +78,22 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
       initConfig();
       m_initialized = true;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Class<RI> getResourceIdClass() {
+    if (m_resourceIdClass == null) {
+      m_resourceIdClass = TypeCastUtility.getGenericsParameterClass(getClass(), IActivityMap.class, 0);
+    }
+    return m_resourceIdClass;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Class<AI> getActivityIdClass() {
+    if (m_activityIdClass == null) {
+      m_activityIdClass = TypeCastUtility.getGenericsParameterClass(getClass(), IActivityMap.class, 1);
+    }
+    return m_activityIdClass;
   }
 
   /*
@@ -147,7 +169,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
    */
   @ConfigOperation
   @Order(60)
-  protected void execDecorateActivityCell(ActivityCell cell) throws ProcessingException {
+  protected void execDecorateActivityCell(ActivityCell<RI, AI> cell) throws ProcessingException {
   }
 
   /**
@@ -156,7 +178,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
    */
   @ConfigOperation
   @Order(70)
-  protected void execActivityCellSelected(ActivityCell cell) throws ProcessingException {
+  protected void execActivityCellSelected(ActivityCell<RI, AI> cell) throws ProcessingException {
   }
 
   /**
@@ -165,7 +187,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
    */
   @ConfigOperation
   @Order(75)
-  protected void execCellAction(long resourceId, MinorTimeColumn column, ActivityCell activityCell) throws ProcessingException {
+  protected void execCellAction(RI resourceId, MinorTimeColumn column, ActivityCell<RI, AI> activityCell) throws ProcessingException {
   }
 
   @ConfigOperation
@@ -210,10 +232,10 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   protected void initConfig() {
     m_listenerList = new EventListenerList();
     m_activityMapUIFacade = createUIFacade();
-    m_resourceIdToActivities = new HashMap<Long, List<ActivityCell>>();
-    m_activities = new HashMap<CompositeLong, ActivityCell>();
+    m_resourceIdToActivities = new HashMap<RI, List<ActivityCell<RI, AI>>>();
+    m_activities = new HashMap<CompositeObject, ActivityCell<RI, AI>>();
     m_cellObserver = new P_ActivityCellObserver();
-    m_selectedResourceIds = new HashSet<Long>();
+    m_selectedResourceIds = new HashSet<RI>();
     //
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
@@ -276,7 +298,8 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
           }
         }
         else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY_CELL)) {
-          ActivityCell cell = (ActivityCell) e.getNewValue();
+          @SuppressWarnings("unchecked")
+          ActivityCell<RI, AI> cell = (ActivityCell<RI, AI>) e.getNewValue();
           if (cell != null) {
             try {
               execActivityCellSelected(cell);
@@ -391,15 +414,16 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
-  public ActivityCell resolveActivityCell(ActivityCell cell) {
+  public ActivityCell<RI, AI> resolveActivityCell(ActivityCell<RI, AI> cell) {
     if (cell == null) {
       return cell;
     }
-    return m_activities.get(new CompositeLong(cell.getResourceId(), cell.getActivityId()));
+    return m_activities.get(new CompositeObject(cell.getResourceId(), cell.getActivityId()));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell[] resolveActivityCells(ActivityCell[] cells) {
+  public ActivityCell<RI, AI>[] resolveActivityCells(ActivityCell<RI, AI>[] cells) {
     if (cells == null) {
       cells = new ActivityCell[0];
     }
@@ -411,7 +435,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
       }
     }
     if (mismatchCount > 0) {
-      ActivityCell[] resolvedCells = new ActivityCell[cells.length - mismatchCount];
+      ActivityCell<RI, AI>[] resolvedCells = new ActivityCell[cells.length - mismatchCount];
       int index = 0;
       for (int i = 0; i < cells.length; i++) {
         if (resolveActivityCell(cells[i]) == cells[i]) {
@@ -425,15 +449,19 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
-  public ActivityCell[] getActivityCells(long resourceId) {
-    return getActivityCells(new Long[]{resourceId});
+  public ActivityCell<RI, AI>[] getActivityCells(RI resourceId) {
+    @SuppressWarnings("unchecked")
+    RI[] array = (RI[]) Array.newInstance(getResourceIdClass(), 1);
+    array[0] = resourceId;
+    return getActivityCells(array);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell[] getActivityCells(Long[] resourceIds) {
-    ArrayList<ActivityCell> all = new ArrayList<ActivityCell>();
-    for (Long resourceId : resourceIds) {
-      List<ActivityCell> list = m_resourceIdToActivities.get(resourceId);
+  public ActivityCell<RI, AI>[] getActivityCells(RI[] resourceIds) {
+    ArrayList<ActivityCell<RI, AI>> all = new ArrayList<ActivityCell<RI, AI>>();
+    for (RI resourceId : resourceIds) {
+      List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(resourceId);
       if (list != null) {
         all.addAll(list);
       }
@@ -441,21 +469,23 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return all.toArray(new ActivityCell[all.size()]);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell[] getAllActivityCells() {
+  public ActivityCell<RI, AI>[] getAllActivityCells() {
     return m_activities.values().toArray(new ActivityCell[m_activities.size()]);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void addActivityCells(ActivityCell[] cells) {
-    ArrayList<ActivityCell> addedCells = new ArrayList<ActivityCell>();
-    for (ActivityCell cell : cells) {
-      CompositeLong key = new CompositeLong(cell.getResourceId(), cell.getActivityId());
+  public void addActivityCells(ActivityCell<RI, AI>[] cells) {
+    ArrayList<ActivityCell<RI, AI>> addedCells = new ArrayList<ActivityCell<RI, AI>>();
+    for (ActivityCell<RI, AI> cell : cells) {
+      CompositeObject key = new CompositeObject(cell.getResourceId(), cell.getActivityId());
       if (!m_activities.containsKey(key)) {
         m_activities.put(key, cell);
-        List<ActivityCell> list = m_resourceIdToActivities.get(cell.getResourceId());
+        List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(cell.getResourceId());
         if (list == null) {
-          list = new ArrayList<ActivityCell>();
+          list = new ArrayList<ActivityCell<RI, AI>>();
           m_resourceIdToActivities.put(cell.getResourceId(), list);
         }
         list.add(cell);
@@ -470,42 +500,42 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
-  public void updateActivityCells(ActivityCell[] cells) {
+  public void updateActivityCells(ActivityCell<RI, AI>[] cells) {
     cells = resolveActivityCells(cells);
     updateActivityCellsInternal(cells);
   }
 
   @Override
-  public void updateActivityCells(Long[] resourceIds) {
+  public void updateActivityCells(RI[] resourceIds) {
     updateActivityCellsInternal(getActivityCells(resourceIds));
   }
 
   // resolved cells
-  private void updateActivityCellsInternal(ActivityCell[] cells) {
-    for (ActivityCell cell : cells) {
+  private void updateActivityCellsInternal(ActivityCell<RI, AI>[] cells) {
+    for (ActivityCell<RI, AI> cell : cells) {
       decorateActivityCell(cell);
     }
     fireActivitiesUpdated(cells);
   }
 
   @Override
-  public void removeActivityCells(ActivityCell[] cells) {
+  public void removeActivityCells(ActivityCell<RI, AI>[] cells) {
     cells = resolveActivityCells(cells);
     removeActivityCellsInternal(cells);
   }
 
   @Override
-  public void removeActivityCells(Long[] resourceIds) {
+  public void removeActivityCells(RI[] resourceIds) {
     removeActivityCellsInternal(getActivityCells(resourceIds));
   }
 
   // cells are resolved
-  private void removeActivityCellsInternal(ActivityCell[] cells) {
+  private void removeActivityCellsInternal(ActivityCell<RI, AI>[] cells) {
     if (cells.length > 0) {
-      for (ActivityCell cell : cells) {
+      for (ActivityCell<RI, AI> cell : cells) {
         cell.setObserver(null);
-        m_activities.remove(new CompositeLong(cell.getResourceId(), cell.getActivityId()));
-        List<ActivityCell> list = m_resourceIdToActivities.get(cell.getResourceId());
+        m_activities.remove(new CompositeObject(cell.getResourceId(), cell.getActivityId()));
+        List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(cell.getResourceId());
         if (list != null) {
           list.remove(cell);
         }
@@ -516,9 +546,9 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
 
   @Override
   public void removeAllActivityCells() {
-    ActivityCell[] a = getAllActivityCells();
+    ActivityCell<RI, AI>[] a = getAllActivityCells();
     if (a.length > 0) {
-      for (ActivityCell cell : a) {
+      for (ActivityCell<RI, AI> cell : a) {
         cell.setObserver(null);
       }
       m_activities.clear();
@@ -527,64 +557,76 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell getSelectedActivityCell() {
-    return (ActivityCell) propertySupport.getProperty(PROP_SELECTED_ACTIVITY_CELL);
+  public ActivityCell<RI, AI> getSelectedActivityCell() {
+    return (ActivityCell<RI, AI>) propertySupport.getProperty(PROP_SELECTED_ACTIVITY_CELL);
   }
 
   @Override
-  public void setSelectedActivityCell(ActivityCell cell) {
+  public void setSelectedActivityCell(ActivityCell<RI, AI> cell) {
     cell = resolveActivityCell(cell);
     propertySupport.setProperty(PROP_SELECTED_ACTIVITY_CELL, cell);
   }
 
   @Override
-  public boolean isSelectedActivityCell(ActivityCell cell) {
+  public boolean isSelectedActivityCell(ActivityCell<RI, AI> cell) {
     return getSelectedActivityCell() == cell;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Long[] getSelectedResourceIds() {
-    Long[] a = (Long[]) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
+  public RI[] getSelectedResourceIds() {
+    RI[] a = (RI[]) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
     if (a == null) {
-      a = new Long[0];
+      a = (RI[]) Array.newInstance(getResourceIdClass(), 0);
     }
     return a;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setSelectedResourceIds(Long[] resourceIds) {
+  public void setSelectedResourceIds(RI[] resourceIds) {
+    RI[] internalResourceIds;
     if (resourceIds == null) {
-      resourceIds = new Long[0];
+      internalResourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
     }
+    else {
+      // Guarantee the type of the array. This is necessary for raw type clients which might still pass Object[]
+      internalResourceIds = (RI[]) Array.newInstance(getResourceIdClass(), resourceIds.length);
+      System.arraycopy(resourceIds, 0, internalResourceIds, 0, resourceIds.length);
+    }
+
     m_selectedResourceIds.clear();
-    m_selectedResourceIds.addAll(Arrays.asList(resourceIds));
-    propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, resourceIds);
+    m_selectedResourceIds.addAll(Arrays.asList(internalResourceIds));
+    propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, internalResourceIds);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Long[] getResourceIds() {
-    Long[] resourceIds = (Long[]) propertySupport.getProperty(PROP_RESOURCE_IDS);
+  public RI[] getResourceIds() {
+    RI[] resourceIds = (RI[]) propertySupport.getProperty(PROP_RESOURCE_IDS);
     if (resourceIds == null) {
-      resourceIds = new Long[0];
+      resourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
     }
     return resourceIds;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setResourceIds(Long[] resourceIds) {
+  public void setResourceIds(RI[] resourceIds) {
     if (resourceIds == null) {
-      resourceIds = new Long[0];
+      resourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
     }
-    // delete activities of resourceIds that no longer exist
-    HashSet<Long> eliminatedResourceIdSet = new HashSet<Long>();
+    // delete activities of resourceIds that no Objecter exist
+    HashSet<RI> eliminatedResourceIdSet = new HashSet<RI>();
     eliminatedResourceIdSet.addAll(Arrays.asList(getResourceIds()));
     eliminatedResourceIdSet.removeAll(Arrays.asList(resourceIds));
     try {
       setActivityMapChanging(true);
       //
       propertySupport.setProperty(PROP_RESOURCE_IDS, resourceIds);
-      removeActivityCells(eliminatedResourceIdSet.toArray(new Long[eliminatedResourceIdSet.size()]));
+      removeActivityCells(eliminatedResourceIdSet.toArray((RI[]) Array.newInstance(getResourceIdClass(), eliminatedResourceIdSet.size())));
       updateActivityCellsInternal(getAllActivityCells());
     }
     finally {
@@ -593,7 +635,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
-  public void isSelectedResourceId(Long resourceId) {
+  public void isSelectedResourceId(RI resourceId) {
     m_selectedResourceIds.contains(resourceId);
   }
 
@@ -612,7 +654,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return m_menus;
   }
 
-  private IMenu[] fireEditActivityPopup(ActivityCell cell) {
+  private IMenu[] fireEditActivityPopup(ActivityCell<RI, AI> cell) {
     if (cell != null) {
       ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_EDIT_ACTIVITY_POPUP, cell);
       // single observer for declared menus
@@ -675,7 +717,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
-  private void fireCellAction(long resourceId, MinorTimeColumn column, ActivityCell activityCell) {
+  private void fireCellAction(RI resourceId, MinorTimeColumn column, ActivityCell<RI, AI> activityCell) {
     // single observer
     try {
       execCellAction(resourceId, column, activityCell);
@@ -686,26 +728,26 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     catch (Throwable t) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
-    ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
+    ActivityMapEvent e = new ActivityMapEvent<RI>(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesInserted(ActivityCell[] a) {
+  private void fireActivitiesInserted(ActivityCell<RI, AI>[] a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_INSERTED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesUpdated(ActivityCell[] a) {
+  private void fireActivitiesUpdated(ActivityCell<RI, AI>[] a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_UPDATED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesDeleted(ActivityCell[] a) {
+  private void fireActivitiesDeleted(ActivityCell<RI, AI>[] a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_DELETED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireAllActivitiesDeleted(ActivityCell[] a) {
+  private void fireAllActivitiesDeleted(ActivityCell<RI, AI>[] a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED, a);
     fireActivityMapEventInternal(e);
   }
@@ -1093,7 +1135,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
-  public void decorateActivityCell(ActivityCell cell) {
+  public void decorateActivityCell(ActivityCell<RI, AI> cell) {
     try {
       cell.setObserver(null);
       //
@@ -1111,7 +1153,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
-  protected void decorateActivityCellInternal(ActivityCell p) {
+  protected void decorateActivityCellInternal(ActivityCell<RI, AI> p) {
     String from = getTimeScale().getDateFormat().format(p.getBeginTime());
     String to = from;
     if (p.getEndTime() != null) {
@@ -1188,12 +1230,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     if (multiTimeRange.isEmpty()) {
       return;
     }
-    TreeMap<CompositeLong, ActivityCell> sortMap = new TreeMap<CompositeLong, ActivityCell>();
+    TreeMap<CompositeLong, ActivityCell<Integer, Integer>> sortMap = new TreeMap<CompositeLong, ActivityCell<Integer, Integer>>();
     Random rnd = new Random();
     int resourceIndex = 0;
-    for (Long resourceId : getSelectedResourceIds()) {
+    for (RI resourceId : getSelectedResourceIds()) {
       MultiTimeRange localTimeRanges = (MultiTimeRange) multiTimeRange.clone();
-      for (ActivityCell a : getActivityCells(resourceId)) {
+      for (ActivityCell<RI, AI> a : getActivityCells(resourceId)) {
         localTimeRanges.remove(a.getBeginTime(), a.getEndTime());
       }
       // now only available time ranges for that resource are left
@@ -1201,13 +1243,13 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
         long durationMillis = tr.getDurationMillis();
         long sortNo = chooseRandom ? rnd.nextLong() : resourceIndex;
         if (durationMillis >= preferredDuration) {
-          ActivityCell a = new ActivityCell(0, 0);
+          ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
           a.setBeginTime(tr.getFrom());
           a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
           sortMap.put(new CompositeLong(0, a.getBeginTime().getTime(), sortNo), a);
         }
         else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
-          ActivityCell a = new ActivityCell(0, 0);
+          ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
           a.setBeginTime(tr.getFrom());
           a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
           sortMap.put(new CompositeLong(1, -durationMillis, sortNo), a);
@@ -1217,10 +1259,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
     // the top entry of the sort map is the one with best score (lowest number)
     if (!sortMap.isEmpty()) {
-      ActivityCell a = sortMap.get(sortMap.firstKey());
-      // select row
-      setSelectedResourceIds(new Long[]{a.getResourceId()});
-      // add planned item
+      ActivityCell<Integer, Integer> a = sortMap.get(sortMap.firstKey());
       setSelectedTime(a.getBeginTime(), a.getEndTime());
     }
   }
@@ -1239,9 +1278,9 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     if (multiTimeRange.isEmpty()) {
       return;
     }
-    TreeMap<CompositeLong, ActivityCell> sortMap = new TreeMap<CompositeLong, ActivityCell>();
-    for (Long resourceId : getSelectedResourceIds()) {
-      for (ActivityCell a : getActivityCells(resourceId)) {
+    TreeMap<CompositeLong, ActivityCell<Integer, Integer>> sortMap = new TreeMap<CompositeLong, ActivityCell<Integer, Integer>>();
+    for (RI resourceId : getSelectedResourceIds()) {
+      for (ActivityCell<RI, AI> a : getActivityCells(resourceId)) {
         multiTimeRange.remove(a.getBeginTime(), a.getEndTime());
       }
     }
@@ -1249,13 +1288,13 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     for (TimeRange tr : multiTimeRange.getTimeRanges()) {
       long durationMillis = tr.getDurationMillis();
       if (durationMillis >= preferredDuration) {
-        ActivityCell a = new ActivityCell(0, 0);
+        ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
         a.setBeginTime(tr.getFrom());
         a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
         sortMap.put(new CompositeLong(0, a.getBeginTime().getTime()), a);
       }
       else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
-        ActivityCell a = new ActivityCell(0, 0);
+        ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
         a.setBeginTime(tr.getFrom());
         a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
         sortMap.put(new CompositeLong(1, -durationMillis), a);
@@ -1263,7 +1302,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
     // the top entry of the sort map is the one with best score (lowest number)
     if (!sortMap.isEmpty()) {
-      ActivityCell a = sortMap.get(sortMap.firstKey());
+      ActivityCell<Integer, Integer> a = sortMap.get(sortMap.firstKey());
       setSelectedTime(a.getBeginTime(), a.getEndTime());
     }
   }
@@ -1276,10 +1315,11 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   /**
    * Private planned activity cell observer
    */
-  private class P_ActivityCellObserver implements IActivityCellObserver {
+  private class P_ActivityCellObserver implements IActivityCellObserver<RI, AI> {
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void cellChanged(ActivityCell cell, int bitPos) {
+    public void cellChanged(ActivityCell<RI, AI> cell, int bitPos) {
       fireActivitiesUpdated(new ActivityCell[]{cell});
     }
   }
@@ -1287,14 +1327,14 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   /**
    * Specialized ui facade
    */
-  private class P_ActivityMapUIFacade implements IActivityMapUIFacade {
+  private class P_ActivityMapUIFacade implements IActivityMapUIFacade<RI, AI> {
 
     public void setSelectedDayListFromUI(Date[] days) {
       setDays(days);
     }
 
     @Override
-    public void setSelectionFromUI(Long[] resourceIds, double[] normalizedRange) {
+    public void setSelectionFromUI(RI[] resourceIds, double[] normalizedRange) {
       try {
         setActivityMapChanging(true);
         //
@@ -1325,12 +1365,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
 
     @Override
-    public void setSelectedActivityCellFromUI(ActivityCell cell) {
+    public void setSelectedActivityCellFromUI(ActivityCell<RI, AI> cell) {
       setSelectedActivityCell(cell);
     }
 
     @Override
-    public void fireCellActionFromUI(long resourceId, double[] normalizedRange, ActivityCell activityCell) {
+    public void fireCellActionFromUI(RI resourceId, double[] normalizedRange, ActivityCell<RI, AI> activityCell) {
       if (activityCell != null) {
         setSelectedActivityCell(activityCell);
       }

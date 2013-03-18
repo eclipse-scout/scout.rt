@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.layout.PlannerFieldLayout;
 import org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.layout.PlannerFieldLayoutConstraints;
 
-public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerField<?, ?>> implements ISwingScoutPlannerField {
+public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerField<?, ?, ?, ?>> implements ISwingScoutPlannerField {
   private ISwingScoutTable m_resourceTableComposite;
   private SwingScoutActivityMap m_activityMapComposite;
   private DateChooser[] m_miniDateChooser;

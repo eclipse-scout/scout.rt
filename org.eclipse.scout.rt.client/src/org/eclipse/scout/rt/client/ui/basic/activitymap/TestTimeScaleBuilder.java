@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,7 @@ public final class TestTimeScaleBuilder {
   }
 
   public static void main(String[] args) {
-    IActivityMap map = new AbstractActivityMap() {
+    IActivityMap<Long, Long> map = new AbstractActivityMap<Long, Long>() {
 
     };
     map.setDays(new Date[]{new Date(), new Date(System.currentTimeMillis() + 1000L * 3600L * 24L * 5), new Date(System.currentTimeMillis() + 1000L * 3600L * 24L * 7)});

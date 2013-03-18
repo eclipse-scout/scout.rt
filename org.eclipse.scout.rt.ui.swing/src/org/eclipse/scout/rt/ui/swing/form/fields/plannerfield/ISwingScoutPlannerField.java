@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.swing.basic.activitymap.SwingScoutActivityMap;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
-public interface ISwingScoutPlannerField extends ISwingScoutFormField<IPlannerField<?, ?>> {
+public interface ISwingScoutPlannerField extends ISwingScoutFormField<IPlannerField<?, ?, ?, ?>> {
 
   ISwingScoutTable getResourceTableComposite();
 

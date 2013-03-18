@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
-public abstract class AbstractExtensibleActivityMap extends AbstractActivityMap implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleActivityMap<RI, AI> extends AbstractActivityMap<RI, AI> implements IExtensibleScoutObject {
 
   public AbstractExtensibleActivityMap() {
     super();

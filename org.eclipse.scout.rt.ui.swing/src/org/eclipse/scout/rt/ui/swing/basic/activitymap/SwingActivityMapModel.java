@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,10 +25,11 @@ public class SwingActivityMapModel implements ActivityMapModel {
   private final JTable m_metricsTable;
   private final SwingActivityComponent[] m_components;
 
+  @SuppressWarnings("unchecked")
   public SwingActivityMapModel(IActivityMap map, JTable metricsTable) {
     m_map = map;
     m_metricsTable = metricsTable;
-    Long[] resourceIds = map.getResourceIds();
+    Object[] resourceIds = map.getResourceIds();
     ArrayList<SwingActivityComponent> list = new ArrayList<SwingActivityComponent>();
     for (int i = 0; i < resourceIds.length; i++) {
       for (ActivityCell cell : map.getActivityCells(resourceIds[i])) {

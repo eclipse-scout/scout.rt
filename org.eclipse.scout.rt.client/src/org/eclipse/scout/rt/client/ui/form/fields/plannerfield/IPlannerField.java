@@ -26,27 +26,41 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * This class strintly uses java.util.Date staticly AND dynamicly<br>
  * All Date-Objects and subclasses are run through {@link com.bsiag.DateUtility#toUtilDate(java.util.Date)}()
  * <p>
- * The planner field contains a ITable and a IPlanner<br>
- * The inner table contains at least one primary key column, the first primary key column of type Long is assumed to be
- * the resourceId column.<br>
- * which values are passed to {@link #execLoadActivityMapData(ITableRow[])} and {@link #execLoadActivities(ITableRow[])}
+ * The planner field contains one inner class extending {@link ITable} and another one extending {@link IActivityMap}<br>
+ * The inner table contains a primary key column, the type of the primary key column corresponds with RI the type
+ * parameter for the resourceId. The the type parameter AI for the activityId is passed on together with RI to
+ * {@link IActivityMap}<br>
  * <p>
  * Example usage:
  * 
  * <pre>
- * public class ExamplePlannerField extends AbstractPlannerField&lt;ExamplePlannerField.ResourceTable, ExamplePlannerField.ActivityMap&gt; {
+ * public class ExamplePlannerField extends AbstractPlannerField&lt;ExamplePlannerField.ResourceTable, ExamplePlannerField.ActivityMap, Long, Long&gt; {
+ * 
+ *   protected Object[][] execLoadActivityMapData(Long[] resourceIds, ITableRow[] resourceRows) throws ProcessingException {
+ *    return ...;
+ *   }
+ * 
  *   public class ResourceTable extends AbstractTable {
- *     public class ResourceIdColumn extends AbstractLongColumn {
+ *     public class ResourceIdColumn extends AbstractColumn&lt;Long&gt; {
  *     }
  *   }
  * 
- *   public class ActivityMap extends AbstractActivityMap {
+ *   public class ActivityMap extends AbstractActivityMap&lt;Long, Long&gt; {
+ *     protected void execCellAction(Long resourceId, MinorTimeColumn column, ActivityCell&lt;Long, Long&gt; activityCell) throws ProcessingException {
+ *     }
+ * 
+ *     protected void execDecorateActivityCell(ActivityCell&lt;Long, Long&gt; cell) {
+ *     }
  *   }
  * }
+ * 
+ * 
+ * 
+ * 
  * </pre>
  */
 
-public interface IPlannerField<T extends ITable, P extends IActivityMap> extends IFormField {
+public interface IPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends IFormField {
 
   String PROP_MINI_CALENDAR_COUNT = "miniCalendarCount";
 
@@ -79,13 +93,13 @@ public interface IPlannerField<T extends ITable, P extends IActivityMap> extends
    */
   void loadActivityMapDataOfSelectedRecources() throws ProcessingException;
 
-  ITableRow activityCellToResourceRow(ActivityCell activityCell);
+  ITableRow activityCellToResourceRow(ActivityCell<RI, AI> activityCell);
 
-  ITableRow[] activityCellsToResourceRows(ActivityCell[] activityCells);
+  ITableRow[] activityCellsToResourceRows(ActivityCell<RI, AI>[] activityCells);
 
-  ActivityCell[] resourceRowToActivityCells(ITableRow resourceRow);
+  ActivityCell<RI, AI>[] resourceRowToActivityCells(ITableRow resourceRow);
 
-  ActivityCell[] resourceRowsToActivityCells(ITableRow[] resourceRows);
+  ActivityCell<RI, AI>[] resourceRowsToActivityCells(ITableRow[] resourceRows);
 
   IPlannerFieldUIFacade getUIFacade();
 

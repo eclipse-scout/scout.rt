@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 /**
  * Representation of an activity containing an ActivityData
  */
-public class ActivityCell extends MemoryOptimizedObject {
+public class ActivityCell<RI, AI> extends MemoryOptimizedObject {
   private static final long serialVersionUID = 1L;
 
   public static final int OBSERVER_BIT = 0;
@@ -99,7 +99,7 @@ public class ActivityCell extends MemoryOptimizedObject {
   private ActivityCell() {
   }
 
-  public ActivityCell(long resourceId, long activityId) {
+  public ActivityCell(RI resourceId, AI activityId) {
     setValueInternal(RESOURCE_ID_BIT, resourceId);
     setValueInternal(ACTIVITY_ID_BIT, activityId);
   }
@@ -115,7 +115,7 @@ public class ActivityCell extends MemoryOptimizedObject {
    * @param majorValue
    * @param minorValue
    */
-  public ActivityCell(long resourceId, long activityId, Date startTime, Date endTime, String text, String tooltipText, String iconId, float majorValue, float minorValue) {
+  public ActivityCell(RI resourceId, AI activityId, Date startTime, Date endTime, String text, String tooltipText, String iconId, float majorValue, float minorValue) {
     setValueInternal(RESOURCE_ID_BIT, resourceId);
     setValueInternal(ACTIVITY_ID_BIT, activityId);
     setValueInternal(BEGIN_TIME_BIT, startTime);
@@ -128,15 +128,18 @@ public class ActivityCell extends MemoryOptimizedObject {
   }
 
   /**
-   * @param resourceId
-   * @param activityId
-   * @param startTime
-   * @param endTime
-   * @param text
-   * @param tooltipText
-   * @param iconId
-   * @param majorValue
-   * @param minorValue
+   * @param row
+   *          <ul>
+   *          <li>resourceId of type RI
+   *          <li>activityId of type AI
+   *          <li>startTime of type {@link Date}
+   *          <li>endTime of type {@link Date}
+   *          <li>text of type {@link String}
+   *          <li>tooltipText of type {@link String}
+   *          <li>iconId of type {@link String}
+   *          <li>majorValue of type {@link Number}
+   *          <li>minorValue of type {@link Number}
+   *          </ul>
    */
   public ActivityCell(Object[] row) {
     if (row == null || row.length < 2) {
@@ -146,17 +149,17 @@ public class ActivityCell extends MemoryOptimizedObject {
       throw new IllegalArgumentException("resourceId must not be null");
     }
     if (row[1] == null) {
-      throw new IllegalArgumentException("itemid must not be null");
+      throw new IllegalArgumentException("activityId must not be null");
     }
     for (int i = 0; i < row.length; i++) {
       if (row[i] != null) {
         switch (i) {
           case 0: {
-            setValueInternal(RESOURCE_ID_BIT, ((Number) row[i]).longValue());
+            setValueInternal(RESOURCE_ID_BIT, row[i]);
             break;
           }
           case 1: {
-            setValueInternal(ACTIVITY_ID_BIT, ((Number) row[i]).longValue());
+            setValueInternal(ACTIVITY_ID_BIT, row[i]);
             break;
           }
           case 2: {
@@ -192,11 +195,12 @@ public class ActivityCell extends MemoryOptimizedObject {
     }
   }
 
-  public IActivityCellObserver getObserver() {
+  @SuppressWarnings("unchecked")
+  public IActivityCellObserver<RI, AI> getObserver() {
     return (IActivityCellObserver) getValueInternal(OBSERVER_BIT);
   }
 
-  public void setObserver(IActivityCellObserver observer) {
+  public void setObserver(IActivityCellObserver<RI, AI> observer) {
     setValueInternal(OBSERVER_BIT, observer);
   }
 
@@ -211,14 +215,14 @@ public class ActivityCell extends MemoryOptimizedObject {
     return b;
   }
 
-  public long getActivityId() {
-    Object o = getValueInternal(ACTIVITY_ID_BIT);
-    return o != null ? (Long) o : null;
+  @SuppressWarnings("unchecked")
+  public AI getActivityId() {
+    return (AI) getValueInternal(ACTIVITY_ID_BIT);
   }
 
-  public long getResourceId() {
-    Object o = getValueInternal(RESOURCE_ID_BIT);
-    return o != null ? (Long) o : null;
+  @SuppressWarnings("unchecked")
+  public RI getResourceId() {
+    return (RI) getValueInternal(RESOURCE_ID_BIT);
   }
 
   public Date getBeginTime() {
