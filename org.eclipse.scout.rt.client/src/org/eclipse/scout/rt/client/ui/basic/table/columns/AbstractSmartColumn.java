@@ -93,6 +93,16 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   }
 
   /**
+   * valid when configuredBrowseHierarchy=true
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(280)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredBrowseAutoExpandAll() {
+    return true;
+  }
+
+  /**
    * Configures whether the values are sorted by display text or by sort code in case of a code type class. This
    * configuration only is useful if a code type class is set (see {@link #getConfiguredCodeType()}). In case of a
    * lookup call, the values are sorted by display text.
@@ -105,6 +115,59 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   @Order(160)
   @ConfigPropertyValue("false")
   protected boolean getConfiguredSortCodesByDisplayText() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(265)
+  @ConfigPropertyValue("100")
+  protected int getConfiguredBrowseMaxRowCount() {
+    return 100;
+  }
+
+  /**
+   * When the smart proposal finds no matching records and this property is not
+   * null, then it displays a link or menu with this label.<br>
+   * When clicked the method {@link #execBrowseNew(String)} is invoked, which in
+   * most cases is implemented as opening a "New XY..." dialog
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(315)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredBrowseNewText() {
+    return null;
+  }
+
+  /**
+   * @return true: inactive rows are display together with active rows<br>
+   *         false: inactive rows ae only displayed when selected by the model
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(270)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredActiveFilterEnabled() {
+    return false;
+  }
+
+  /**
+   * valid when configuredBrowseHierarchy=true
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(240)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredBrowseLoadIncremental() {
+    return false;
+  }
+
+  /**
+   * Code-Assistant<br>
+   * Don't just allow smart field values, but also custom text as valid values;
+   * smartfield is simply used as code assistent
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(290)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredAllowCustomText() {
     return false;
   }
 
@@ -155,6 +218,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     if (m_codeTypeClass != null) {
       m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
+    validateColumnValues();
   }
 
   @Override
@@ -187,7 +251,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   public LookupCall prepareLookupCall(ITableRow row) {
     if (getLookupCall() != null) {
       LookupCall call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, AbstractSmartColumn.this));
-      call.setKey(getValue(row));
+      call.setKey(getValueInternal(row));
       call.setText(null);
       call.setAll(null);
       call.setRec(null);
@@ -224,6 +288,12 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
     AbstractSmartField<T> f = new AbstractSmartField<T>() {
       @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractSmartColumn.this.propertySupport.getPropertiesMap());
+      }
+
+      @Override
       public Class<T> getHolderType() {
         return AbstractSmartColumn.this.getDataType();
       }
@@ -234,8 +304,15 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
       }
     };
 
+    f.setCodeTypeClass(getCodeTypeClass());
     f.setLookupCall(getLookupCall());
     f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
+    f.setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
+    f.setBrowseNewText(getConfiguredBrowseNewText());
+    f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
+    f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
+    f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+    f.setAllowCustomText(getConfiguredAllowCustomText());
     return f;
   }
 

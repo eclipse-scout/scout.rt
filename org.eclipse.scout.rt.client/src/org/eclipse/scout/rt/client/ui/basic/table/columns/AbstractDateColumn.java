@@ -35,6 +35,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private boolean m_hasTime;
   private boolean m_hasDate;
   private DateFormat m_fmt;
+  private long m_autoTimeMillis;
 
   public AbstractDateColumn() {
     super();
@@ -89,12 +90,23 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return false;
   }
 
+  /**
+   * When a date without time is picked, this time value is used as hh/mm/ss.
+   */
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(152)
+  @ConfigPropertyValue("0")
+  protected long getConfiguredAutoTimeMillis() {
+    return 0;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
     setFormat(getConfiguredFormat());
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
+    setAutoTimeMillis(getConfiguredAutoTimeMillis());
   }
 
   /*
@@ -104,6 +116,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   public void setFormat(String s) {
     m_format = s;
     m_fmt = null;
+    validateColumnValues();
   }
 
   @Override
@@ -115,12 +128,14 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   public void setHasDate(boolean b) {
     m_hasDate = b;
     m_fmt = null;
+    validateColumnValues();
   }
 
   @Override
   public void setHasTime(boolean b) {
     m_hasTime = b;
     m_fmt = null;
+    validateColumnValues();
   }
 
   @Override
@@ -131,6 +146,21 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public boolean isHasTime() {
     return m_hasTime;
+  }
+
+  @Override
+  public void setAutoTimeMillis(long l) {
+    m_autoTimeMillis = l;
+  }
+
+  @Override
+  public void setAutoTimeMillis(int hour, int minute, int second) {
+    setAutoTimeMillis(((hour * 60L + minute) * 60L + second) * 1000L);
+  }
+
+  @Override
+  public long getAutoTimeMillis() {
+    return m_autoTimeMillis;
   }
 
   @Override
@@ -172,10 +202,16 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractDateField f = new AbstractDateField() {
+      @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractDateColumn.this.propertySupport.getPropertiesMap());
+      }
     };
     f.setFormat(getFormat());
     f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
+    f.setAutoTimeMillis(getAutoTimeMillis());
     return f;
   }
 

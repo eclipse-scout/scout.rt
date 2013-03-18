@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -54,5 +55,7 @@ public interface ICell {
   boolean isEditable();
 
   ICellObserver getObserver();
+
+  IProcessingStatus getErrorStatus();
 
 }

@@ -10,27 +10,48 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.util.Date;
+import java.text.NumberFormat;
 
-public interface IDateColumn extends IColumn<Date> {
-  double MILLIS_PER_DAY = 1000.0 * 3600.0 * 24.0;
+/**
+ *
+ */
+public interface IDecimalColumn<T extends Number> extends IColumn<T> {
 
   void setFormat(String s);
 
   String getFormat();
 
-  boolean isHasDate();
+  void setMinFractionDigits(int i);
 
-  void setHasDate(boolean b);
+  int getMinFractionDigits();
 
-  boolean isHasTime();
+  void setMaxFractionDigits(int i);
 
-  void setHasTime(boolean b);
+  int getMaxFractionDigits();
 
-  void setAutoTimeMillis(long l);
+  void setGroupingUsed(boolean b);
 
-  void setAutoTimeMillis(int hour, int minute, int second);
+  boolean isGroupingUsed();
 
-  long getAutoTimeMillis();
+  void setPercent(boolean b);
 
+  boolean isPercent();
+
+  void setFractionDigits(int i);
+
+  int getFractionDigits();
+
+  void setMinValue(T d);
+
+  T getMinValue();
+
+  void setMaxValue(T d);
+
+  T getMaxValue();
+
+  void setMultiplier(int b);
+
+  int getMultiplier();
+
+  NumberFormat getNumberFormat();
 }

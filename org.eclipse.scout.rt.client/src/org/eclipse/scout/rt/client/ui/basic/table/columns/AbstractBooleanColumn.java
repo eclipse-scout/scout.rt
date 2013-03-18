@@ -70,6 +70,11 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
     AbstractBooleanField f = new AbstractBooleanField() {
+      @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractBooleanColumn.this.propertySupport.getPropertiesMap());
+      }
     };
     return f;
   }
@@ -77,8 +82,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   /**
    * Configures the horizontal alignment of text inside this column (including header text).
    * <p>
-   * Subclasses can override this method. For boolean columns, the default is {@code 0} (center
-   * alignment).
+   * Subclasses can override this method. For boolean columns, the default is {@code 0} (center alignment).
    * 
    * @return {@code -1} for left, {@code 0} for center and {@code 1} for right alignment.
    */

@@ -20,18 +20,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 
 /**
  * Column holding Integer
  */
-public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> implements IIntegerColumn {
-  // DO NOT init members, this has the same effect as if they were set AFTER
-  // initConfig()
-  private String m_format;
-  private boolean m_groupingUsed;
-  private NumberFormat m_fmt;
+public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer> implements IIntegerColumn {
 
   public AbstractIntegerColumn() {
     super();
@@ -46,67 +40,30 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
    * Configuration
    */
 
-  /**
-   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
-   * about the expected format.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   * 
-   * @return Format of this column.
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(140)
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(160)
   @ConfigPropertyValue("null")
-  protected String getConfiguredFormat() {
+  protected Integer getConfiguredMaxValue() {
     return null;
   }
 
-  /**
-   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
-   * group separator.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   * 
-   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(150)
-  @ConfigPropertyValue("true")
-  protected boolean getConfiguredGroupingUsed() {
-    return true;
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(170)
+  @ConfigPropertyValue("null")
+  protected Integer getConfiguredMinValue() {
+    return null;
   }
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    setFormat(getConfiguredFormat());
-    setGroupingUsed(getConfiguredGroupingUsed());
+    setMaxValue(getConfiguredMaxValue());
+    setMinValue(getConfiguredMinValue());
   }
 
   /*
    * Runtime
    */
-  @Override
-  public void setFormat(String s) {
-    m_format = s;
-    m_fmt = null;
-  }
-
-  @Override
-  public String getFormat() {
-    return m_format;
-  }
-
-  @Override
-  public void setGroupingUsed(boolean b) {
-    m_groupingUsed = b;
-    m_fmt = null;
-  }
-
-  @Override
-  public boolean isGroupingUsed() {
-    return m_groupingUsed;
-  }
 
   @Override
   protected Integer parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
@@ -127,12 +84,14 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
   }
 
   @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractIntegerField f = new AbstractIntegerField() {
+  protected AbstractIntegerField getEditorField() {
+    return new AbstractIntegerField() {
+      @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractIntegerColumn.this.propertySupport.getPropertiesMap());
+      }
     };
-    f.setFormat(getFormat());
-    f.setGroupingUsed(isGroupingUsed());
-    return f;
   }
 
   @Override
@@ -148,22 +107,23 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
 
   @Override
   public NumberFormat getNumberFormat() {
-    if (m_fmt == null) {
+    if (super.getNumberFormat() == null) {
       if (getFormat() != null) {
         DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
         x.applyPattern(getFormat());
         x.setMinimumFractionDigits(0);
         x.setMaximumFractionDigits(0);
-        m_fmt = x;
+        setNumberFormat(x);
       }
       else {
-        m_fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
-        m_fmt.setMinimumFractionDigits(0);
-        m_fmt.setMaximumFractionDigits(0);
-        m_fmt.setGroupingUsed(isGroupingUsed());
+        NumberFormat y = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+        y.setMinimumFractionDigits(0);
+        y.setMaximumFractionDigits(0);
+        y.setGroupingUsed(isGroupingUsed());
+        setNumberFormat(y);
       }
     }
-    return m_fmt;
+    return super.getNumberFormat();
   }
 
 }

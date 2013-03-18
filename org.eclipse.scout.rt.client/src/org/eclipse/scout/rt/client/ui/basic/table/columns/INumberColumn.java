@@ -10,7 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.text.NumberFormat;
 
-public interface IIntegerColumn extends INumberColumn<Integer> {
+/**
+ *
+ */
+public interface INumberColumn<T extends Number> extends IColumn<T> {
 
+  void setFormat(String s);
+
+  String getFormat();
+
+  void setGroupingUsed(boolean b);
+
+  boolean isGroupingUsed();
+
+  void setMinValue(T value);
+
+  T getMinValue();
+
+  void setMaxValue(T value);
+
+  T getMaxValue();
+
+  NumberFormat getNumberFormat();
 }

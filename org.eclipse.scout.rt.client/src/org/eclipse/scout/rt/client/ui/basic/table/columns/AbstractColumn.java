@@ -16,7 +16,9 @@ import java.lang.reflect.Array;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -27,6 +29,7 @@ import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,7 +48,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -72,6 +77,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   private boolean m_initialSortAscending;
   private boolean m_initialAlwaysIncludeSortAtBegin;
   private boolean m_initialAlwaysIncludeSortAtEnd;
+  /**
+   * Used for mutable tables to keep last valid value per row and column.
+   */
+  private Map<ITableRow, T> m_validatedValues;
 
   public AbstractColumn() {
     m_headerCell = new HeaderCell();
@@ -88,6 +97,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
         }
       }
     });
+
+    clearValidatedValues();
+  }
+
+  public final void clearValidatedValues() {
+    m_validatedValues = new HashMap<ITableRow, T>();
+  }
+
+  protected Map<String, Object> getPropertiesMap() {
+    return propertySupport.getPropertiesMap();
   }
 
   /*
@@ -594,9 +613,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     IFormField f = prepareEditInternal(row);
     if (f != null) {
       f.setLabelVisible(false);
-      if (getConfiguredMandatory()) {
-        f.setMandatory(true);
-      }
       GridData gd = f.getGridDataHints();
       // apply horizontal alignment of column to respective editor field
       gd.horizontalAlignment = getHorizontalAlignment();
@@ -626,8 +642,14 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
     if (editingField instanceof IValueField) {
       IValueField v = (IValueField) editingField;
-      if (v.isSaveNeeded()) {
-        applyValueInternal(row, parseValue(row, ((IValueField) editingField).getValue()));
+      if (v.isSaveNeeded() || editingField.getErrorStatus() != null || row.getCell(this).getErrorStatus() != null) {
+        T parsedValue = parseValue(row, v.getValue());
+        applyValueInternal(row, parsedValue);
+        validateColumnValue(row, editingField);
+        if (editingField.isContentValid()) {
+          m_validatedValues.put(row, parsedValue);
+        }
+        persistRowChange(row);
       }
     }
   }
@@ -732,6 +754,17 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public void disposeColumn() throws ProcessingException {
     execDisposeColumn();
+  }
+
+  @Override
+  public void setMandatory(boolean mandatory) {
+    propertySupport.setPropertyBool(IFormField.PROP_MANDATORY, mandatory);
+    validateColumnValues();
+  }
+
+  @Override
+  public boolean isMandatory() {
+    return propertySupport.getPropertyBool(IFormField.PROP_MANDATORY);
   }
 
   @Override
@@ -842,8 +875,17 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public T getValue(ITableRow r) {
+    T validatedValue = m_validatedValues.get(r);
+    if (validatedValue == null) {
+      validatedValue = getValueInternal(r);
+    }
+    m_validatedValues.put(r, validatedValue);
+    return validatedValue;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T getValueInternal(ITableRow r) {
     return (r != null) ? (T) r.getCellValue(getColumnIndex()) : null;
   }
 
@@ -1180,8 +1222,9 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractValueField<T> f = new AbstractValueField<T>() {
       @Override
-      public Class<T> getHolderType() {
-        return AbstractColumn.this.getDataType();
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractColumn.this.propertySupport.getPropertiesMap());
       }
     };
     return f;
@@ -1205,7 +1248,9 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public void decorateCell(ITableRow row) {
     Cell cell = row.getCellForUpdate(getColumnIndex());
-    decorateCellInternal(cell, row);
+    if (cell.getErrorStatus() == null) {
+      decorateCellInternal(cell, row);
+    }
     try {
       execDecorateCell(cell, row);
     }
@@ -1443,6 +1488,74 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + getHeaderCell().getText() + " width=" + getWidth() + (isPrimaryKey() ? " primaryKey" : "") + (isSummary() ? " summary" : "") + " viewIndexHint=" + getVisibleColumnIndexHint() + "]";
+  }
+
+  /**
+   * Called when a value has been changed in an editable cell.
+   * Can be used to persist data directly after a value has been modified in a cell editor.
+   * CAUTION: This method is called even when an invalid value has been entered in the cell editor.
+   * In this case the last valid value is retrieved while {@link #getValue(ITableRow)} is called.
+   * @param row The row changed in the table.
+   * 
+   * @throws ProcessingException
+   */
+  protected void persistRowChange(ITableRow row) throws ProcessingException {
+  }
+
+  public void validateColumnValues() {
+    if (getTable() == null) {
+      return;
+    }
+    for (ITableRow row : getTable().getRows()) {
+      validateColumnValue(row, null);
+    }
+  }
+
+  public void validateColumnValue(ITableRow row, IFormField editor) {
+    if (row == null) {
+      LOG.error("validateColumnValue called with row=null");
+      return;
+    }
+    if (isCellEditable(row)) {
+      try {
+        if (editor == null) {
+          editor = prepareEdit(row);
+        }
+        if (editor != null) {
+          IProcessingStatus errorStatus = editor.getErrorStatus();
+          boolean editorValid = editor.isContentValid() && errorStatus == null;
+          Cell cell = row.getCellForUpdate(this);
+          if (!editorValid) {
+            if (isDisplayable() && !isVisible()) {
+              //column should become visible
+              setVisible(true);
+            }
+            if (errorStatus != null) {
+              cell.setErrorStatus(errorStatus);
+              if (errorStatus instanceof ParsingFailedStatus) {
+                cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
+              }
+
+            }
+            else {
+              cell.setErrorStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
+            }
+          }
+          else {
+            cell.clearErrorStatus();
+            decorateCellInternal(cell, row);
+            ITable table = getTable();
+            if (table instanceof AbstractTable) {
+              ((AbstractTable) table).wasEverValid(row);
+            }
+          }
+        }
+      }
+      catch (Throwable t) {
+        LOG.error("validating " + getTable().getClass().getSimpleName() + " for new row for column " + getClass().getSimpleName(), t);
+      }
+    }
+
   }
 
 }

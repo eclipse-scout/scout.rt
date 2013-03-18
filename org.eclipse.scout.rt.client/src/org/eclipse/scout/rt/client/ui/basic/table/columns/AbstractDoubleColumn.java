@@ -20,22 +20,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 
 /**
  * Column holding Double
  */
-public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implements IDoubleColumn {
-  // DO NOT init members, this has the same effect as if they were set AFTER
-  // initConfig()
-  private String m_format;
-  private boolean m_groupingUsed;
-  private int m_maxFractionDigits;
-  private int m_minFractionDigits;
-  private boolean m_percent;
-  private int m_multiplier;
-  private NumberFormat m_fmt;
+public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double> implements IDoubleColumn {
 
   public AbstractDoubleColumn() {
     super();
@@ -50,192 +40,30 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
    * Configuration
    */
 
-  /**
-   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
-   * about the expected format.
-   * <p>
-   * This property has higher priority than {@link #getConfiguredMaxFractionDigits()},
-   * {@link #getConfiguredMinFractionDigits()} and {@link #getConfiguredGroupingUsed()}. Hence, if a format is
-   * specified, these properties will be ignored.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   * 
-   * @return Format of this column.
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(140)
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(200)
   @ConfigPropertyValue("null")
-  protected String getConfiguredFormat() {
+  protected Double getConfiguredMaxValue() {
     return null;
   }
 
-  /**
-   * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
-   * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.
-   * <p>
-   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
-   * <p>
-   * Subclasses can override this method. Default is {@code 2}.
-   * 
-   * @return Minimum number of fraction digits of this column.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(150)
-  @ConfigPropertyValue("2")
-  protected int getConfiguredMinFractionDigits() {
-    return 2;
-  }
-
-  /**
-   * Configures the maximum number of fraction digits used to display the value. To use an exact number of fraction
-   * digits, the same number as for {@link #getConfiguredMinFractionDigits()} must be returned.
-   * <p>
-   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
-   * <p>
-   * Subclasses can override this method. Default is {@code 2}.
-   * 
-   * @return maximum number of fraction digits of this column.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(160)
-  @ConfigPropertyValue("2")
-  protected int getConfiguredMaxFractionDigits() {
-    return 2;
-  }
-
-  /**
-   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
-   * group separator.
-   * <p>
-   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   * 
-   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(170)
-  @ConfigPropertyValue("true")
-  protected boolean getConfiguredGroupingUsed() {
-    return true;
-  }
-
-  /**
-   * Configures whether the value is a percentage and is displayed with the appropriate sign. A value of 12 is displayed
-   * as 12 % (depending on the locale). Use {@link #getConfiguredMultiplier()} to handle the value differently (e.g.
-   * display a value of 0.12 as 12 %).
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   * 
-   * @return {@code true} if the column represents a percentage value, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(180)
-  @ConfigPropertyValue("false")
-  protected boolean getConfiguredPercent() {
-    return false;
-  }
-
-  /**
-   * Configures the multiplier used to display the value. See {@link DecimalFormat#setMultiplier(int)} for more
-   * information about multipliers.
-   * <p>
-   * Subclasses can override this method. Default is {@code 1}.
-   * 
-   * @return The multiplier used to display the value.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(190)
-  @ConfigPropertyValue("1")
-  protected int getConfiguredMultiplier() {
-    return 1;
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(210)
+  @ConfigPropertyValue("null")
+  protected Double getConfiguredMinValue() {
+    return null;
   }
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    setFormat(getConfiguredFormat());
-    setMinFractionDigits(getConfiguredMinFractionDigits());
-    setMaxFractionDigits(getConfiguredMaxFractionDigits());
-    setGroupingUsed(getConfiguredGroupingUsed());
-    setPercent(getConfiguredPercent());
-    setMultiplier(getConfiguredMultiplier());
+    setMaxValue(getConfiguredMaxValue());
+    setMinValue(getConfiguredMinValue());
   }
 
   /*
    * Runtime
    */
-  @Override
-  public void setFormat(String s) {
-    m_format = s;
-    m_fmt = null;
-  }
-
-  @Override
-  public String getFormat() {
-    return m_format;
-  }
-
-  @Override
-  public void setMinFractionDigits(int i) {
-    if (i > getMaxFractionDigits()) {
-      m_maxFractionDigits = i;
-    }
-    m_minFractionDigits = i;
-    m_fmt = null;
-  }
-
-  @Override
-  public int getMinFractionDigits() {
-    return m_minFractionDigits;
-  }
-
-  @Override
-  public void setMaxFractionDigits(int i) {
-    if (i < getMinFractionDigits()) {
-      m_minFractionDigits = i;
-    }
-    m_maxFractionDigits = i;
-    m_fmt = null;
-  }
-
-  @Override
-  public int getMaxFractionDigits() {
-    return m_maxFractionDigits;
-  }
-
-  @Override
-  public void setGroupingUsed(boolean b) {
-    m_groupingUsed = b;
-    m_fmt = null;
-  }
-
-  @Override
-  public boolean isGroupingUsed() {
-    return m_groupingUsed;
-  }
-
-  @Override
-  public void setPercent(boolean b) {
-    m_percent = b;
-    m_fmt = null;
-  }
-
-  @Override
-  public boolean isPercent() {
-    return m_percent;
-  }
-
-  @Override
-  public void setMultiplier(int i) {
-    m_multiplier = i;
-    m_fmt = null;
-  }
-
-  @Override
-  public int getMultiplier() {
-    return m_multiplier;
-  }
 
   @Override
   protected Double parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
@@ -256,17 +84,14 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
   }
 
   @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractDoubleField f = new AbstractDoubleField() {
+  protected AbstractDoubleField getEditorField() {
+    return new AbstractDoubleField() {
+      @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractDoubleColumn.this.propertySupport.getPropertiesMap());
+      }
     };
-    f.setFormat(getFormat());
-    f.setMaxFractionDigits(getMaxFractionDigits());
-    f.setMinFractionDigits(getMinFractionDigits());
-    f.setFractionDigits(getNumberFormat().getMaximumFractionDigits());
-    f.setMultiplier(getMultiplier());
-    f.setGroupingUsed(isGroupingUsed());
-    f.setPercent(isPercent());
-    return f;
   }
 
   @Override
@@ -282,31 +107,33 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
 
   @Override
   public NumberFormat getNumberFormat() {
-    if (m_fmt == null) {
+    if (super.getNumberFormat() == null) {
+      NumberFormat fmt;
       if (isPercent()) {
-        m_fmt = NumberFormat.getPercentInstance(LocaleThreadLocal.get());
+        fmt = NumberFormat.getPercentInstance(LocaleThreadLocal.get());
       }
       else {
-        m_fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+        fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
       }
-      if (m_fmt instanceof DecimalFormat) {
-        ((DecimalFormat) m_fmt).setMultiplier(getMultiplier());
+      if (fmt instanceof DecimalFormat) {
+        ((DecimalFormat) fmt).setMultiplier(getMultiplier());
         if (getFormat() != null) {
-          ((DecimalFormat) m_fmt).applyPattern(getFormat());
+          ((DecimalFormat) fmt).applyPattern(getFormat());
         }
         else {
-          m_fmt.setMinimumFractionDigits(getMinFractionDigits());
-          m_fmt.setMaximumFractionDigits(getMaxFractionDigits());
-          m_fmt.setGroupingUsed(isGroupingUsed());
+          fmt.setMinimumFractionDigits(getMinFractionDigits());
+          fmt.setMaximumFractionDigits(getMaxFractionDigits());
+          fmt.setGroupingUsed(isGroupingUsed());
         }
       }
       else {
-        m_fmt.setMinimumFractionDigits(getMinFractionDigits());
-        m_fmt.setMaximumFractionDigits(getMaxFractionDigits());
-        m_fmt.setGroupingUsed(isGroupingUsed());
+        fmt.setMinimumFractionDigits(getMinFractionDigits());
+        fmt.setMaximumFractionDigits(getMaxFractionDigits());
+        fmt.setGroupingUsed(isGroupingUsed());
       }
+      setNumberFormat(fmt);
     }
-    return m_fmt;
+    return super.getNumberFormat();
   }
 
 }

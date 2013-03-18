@@ -130,6 +130,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final EventListenerList m_listenerList = new EventListenerList();
   //cell editing
   private P_CellEditorContext m_editContext;
+  private HashMap<ITableRow, Boolean> m_rowValidty;
   //checkable table
   private IBooleanColumn m_checkableColumn;
   //auto filter
@@ -149,6 +150,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerTable(this);
     }
+    m_rowValidty = new HashMap<ITableRow, Boolean>();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
@@ -2561,6 +2563,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private ITableRow addRowImpl(ITableRow newRow, boolean markAsInserted) throws ProcessingException {
+
+    for (IColumn<?> col : getColumns()) {
+      if (col instanceof AbstractColumn<?>) {
+        ((AbstractColumn<?>) col).validateColumnValue(newRow, null);
+      }
+    }
     if (markAsInserted) {
       newRow.setStatus(ITableRow.STATUS_INSERTED);
     }
@@ -3565,6 +3573,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  public boolean wasEverValid(ITableRow row) {
+    Boolean res = BooleanUtility.nvl(m_rowValidty.get(row));
+    if (!res) {
+      for (IColumn<?> col : getColumns()) {
+        if (row.getCell(col).getErrorStatus() != null) {
+          return res;
+        }
+      }
+      res = true;
+      m_rowValidty.put(row, res);
+    }
+    return res;
+  }
+
   protected void decorateCellInternal(Cell view, ITableRow row, IColumn<?> col) {
   }
 
@@ -3928,6 +3950,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_tableEventBuffer.add(e);
     }
     else {
+      //Ensure all editor values have been applied.
+//      getUIFacade().completeCellEditFromUI();
+
       EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
       if (listeners != null && listeners.length > 0) {
         for (int i = 0; i < listeners.length; i++) {

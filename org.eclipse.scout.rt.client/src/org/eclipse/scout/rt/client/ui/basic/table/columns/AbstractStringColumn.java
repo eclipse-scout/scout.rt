@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
 /**
  * Column holding Strings
@@ -27,9 +28,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 public abstract class AbstractStringColumn extends AbstractColumn<String> implements IStringColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
-  private boolean m_inputMasked;
-  private String m_format;
-  private boolean m_wrap;
 
   public AbstractStringColumn() {
     super();
@@ -99,12 +97,41 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(170)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredFormat() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(180)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredSelectAllOnEdit() {
+    return true;
+  }
+
+  /**
+   * Causes the ui to send a validate event every time the text field content is changed.
+   * <p>
+   * Be careful when using this property since this can influence performance and the charateristics of text input.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(180)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredValidateOnAnyKey() {
+    return false;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
     setInputMasked(getConfiguredInputMasked());
     setDisplayFormat(getConfiguredDisplayFormat());
+    setMaxLength(getConfiguredMaxLength());
     setTextWrap(getConfiguredTextWrap());
+    setSelectAllOnEdit(getConfiguredSelectAllOnEdit());
+    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
   }
 
   /*
@@ -112,32 +139,70 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @Override
   public void setInputMasked(boolean b) {
-    m_inputMasked = b;
+    propertySupport.setPropertyBool(IStringField.PROP_INPUT_MASKED, b);
   }
 
   @Override
   public boolean isInputMasked() {
-    return m_inputMasked;
+    return propertySupport.getPropertyBool(IStringField.PROP_INPUT_MASKED);
   }
 
   @Override
   public void setDisplayFormat(String s) {
-    m_format = s;
+    propertySupport.setPropertyString(IStringField.PROP_FORMAT, s);
   }
 
   @Override
   public String getDisplayFormat() {
-    return m_format;
+    return propertySupport.getPropertyString(IStringField.PROP_FORMAT);
   }
 
   @Override
   public void setTextWrap(boolean b) {
-    m_wrap = b;
+    propertySupport.setPropertyBool(IStringField.PROP_WRAP_TEXT, b);
+    validateColumnValues();
   }
 
   @Override
   public boolean isTextWrap() {
-    return m_wrap;
+    return propertySupport.getPropertyBool(IStringField.PROP_WRAP_TEXT);
+  }
+
+  @Override
+  public boolean isSelectAllOnEdit() {
+    return propertySupport.getPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS);
+  }
+
+  @Override
+  public void setSelectAllOnEdit(boolean b) {
+    propertySupport.setPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS, b);
+  }
+
+  @Override
+  public void setValidateOnAnyKey(boolean b) {
+    propertySupport.setPropertyBool(IStringField.PROP_VALIDATE_ON_ANY_KEY, b);
+  }
+
+  @Override
+  public boolean isValidateOnAnyKey() {
+    return propertySupport.getPropertyBool(IStringField.PROP_VALIDATE_ON_ANY_KEY);
+  }
+
+  @Override
+  public void setMaxLength(int len) {
+    if (len > 0) {
+      propertySupport.setPropertyInt(IStringField.PROP_MAX_LENGTH, len);
+    }
+    validateColumnValues();
+  }
+
+  @Override
+  public int getMaxLength() {
+    int len = propertySupport.getPropertyInt(IStringField.PROP_MAX_LENGTH);
+    if (len <= 0) {
+      len = 200;
+    }
+    return len;
   }
 
   @Override
@@ -172,9 +237,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractStringField f = new AbstractStringField() {
+      @Override
+      protected void initConfig() {
+        super.initConfig();
+        propertySupport.putPropertiesMap(AbstractStringColumn.this.propertySupport.getPropertiesMap());
+      }
+
     };
-    f.setMaxLength(getConfiguredMaxLength());
-    f.setInputMasked(isInputMasked());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
     f.setWrapText(true); // avoid to have an horizontal scroll bar
@@ -183,12 +252,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
 
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
+    String format = getDisplayFormat();
     super.decorateCellInternal(cell, row);
-    if (m_format != null && cell.getValue() != null) {
-      if (FORMAT_LOWER.equals(m_format)) {
+    if (format != null && cell.getValue() != null) {
+      if (FORMAT_LOWER.equals(format)) {
         cell.setText(((String) cell.getValue()).toLowerCase());
       }
-      else if (FORMAT_UPPER.equals(m_format)) {
+      else if (FORMAT_UPPER.equals(format)) {
         cell.setText(((String) cell.getValue()).toUpperCase());
       }
     }

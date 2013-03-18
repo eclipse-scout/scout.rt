@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable2;
@@ -51,7 +52,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidateFormFieldDescriptor;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -555,19 +555,16 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         for (IColumn col : table.getColumns()) {
           if (col.isCellEditable(row)) {
             try {
-              IFormField editor = col.prepareEdit(row);
-              if (editor != null) {
-                boolean editorValid = editor.isContentValid();
-                if (!editorValid) {
-                  if (col.isDisplayable() && !col.isVisible()) {
-                    //column should become visible
-                    invisbleColumnsWithErrors.add(col);
-                  }
-                  if (tableDesc == null) {
-                    tableDesc = new ValidateTableFieldDescriptor(this, row, col);
-                  }
-                  columnNames.add(col.getHeaderCell().getText());
+              ICell cell = row.getCell(col);
+              if (cell.getErrorStatus() != null) {
+                if (col.isDisplayable() && !col.isVisible()) {
+                  //column should become visible
+                  invisbleColumnsWithErrors.add(col);
                 }
+                if (tableDesc == null) {
+                  tableDesc = new ValidateTableFieldDescriptor(this, row, col);
+                }
+                columnNames.add(col.getHeaderCell().getText());
               }
             }
             catch (Throwable t) {

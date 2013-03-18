@@ -35,4 +35,16 @@ public interface IStringColumn extends IColumn<String> {
 
   boolean isTextWrap();
 
+  boolean isSelectAllOnEdit();
+
+  public void setSelectAllOnEdit(boolean b);
+
+  public void setValidateOnAnyKey(boolean b);
+
+  public boolean isValidateOnAnyKey();
+
+  public void setMaxLength(int len);
+
+  public int getMaxLength();
+
 }

@@ -293,6 +293,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public IProcessingStatus getErrorStatus() {
     return m_errorStatus;
   }
