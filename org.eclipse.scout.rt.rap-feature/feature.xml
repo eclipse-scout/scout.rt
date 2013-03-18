@@ -25,29 +25,14 @@
    <requires>
       <import feature="org.eclipse.scout.rt" version="3.9.0" match="compatible"/>
       <import plugin="org.eclipse.rap.rwt" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.rwt.osgi" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt.osgi.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.jface" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.jface.databinding" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.jface.databinding.source" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.jface.source" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.junit" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.junit.runtime" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.junit.runtime.source" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.junit.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.ui" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.cheatsheets" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.cheatsheets.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.ui.forms" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.forms.source" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.ui.views" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.views.source" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.rap.ui.workbench" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.workbench.source" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt.testfixture" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt.testfixture.source" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.rap.ui.cheatsheets" version="2.0.0" match="compatible"/>
    </requires>
 
    <plugin
