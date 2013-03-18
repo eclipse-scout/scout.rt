@@ -14,12 +14,8 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientRule;
-import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -27,11 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 /**
@@ -107,7 +99,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /**
    * Object
    * <p>
-   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    * 
@@ -163,13 +158,15 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   /**
    * @return the context in which the table and column settings (order, width,
-   *         visible,...) are loaded and stored from the {@link ClientUIPreferences}
+   *         visible,...) are loaded and stored from the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences
+   *         ClientUIPreferences}
    */
   String getUserPreferenceContext();
 
   /**
    * Set the context in which the table and column settings (order, width,
-   * visible,...) are loaded and stored from the {@link ClientUIPreferences}
+   * visible,...) are loaded and stored from the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences
+   * ClientUIPreferences}
    * <p>
    * Be very careful when changing this property during runtime and when the table is initialized. Use the constructor
    * argument instead.
@@ -291,7 +288,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   IMenu[] getMenus();
 
   /**
-   * Convenience to find a menu, uses {@link ActionFinder}
+   * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
    */
   <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
 
@@ -363,7 +360,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    *         {@link IColumn#isVisible()} )
    *         <p>
    *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
+   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
    */
   boolean isCellEditable(int rowIndex, int columnIndex);
 
@@ -372,7 +370,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    *         {@link IColumn#isVisible()} )
    *         <p>
    *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
+   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
    */
   boolean isCellEditable(ITableRow row, int visibleColumnIndex);
 
@@ -381,7 +380,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    *         {@link IColumn#isVisible()} )
    *         <p>
    *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
+   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
    */
   boolean isCellEditable(ITableRow row, IColumn<?> column);
 
@@ -484,7 +484,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * This property changes the behaviour of {@link #replaceRows(ITableRow[])} and {@link #deleteRows(int[])} true
    * discards rows when deleted, false keeps
    * them in the cache for later usage in change management Default value is
-   * true for {@link IPageWithTable} and false for {@link ITableField}
+   * true for {@link IPageWithTable} and false for
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField}
    */
   boolean isAutoDiscardOnDelete();
 
@@ -774,7 +775,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   void setTableCustomizer(ITableCustomizer c);
 
   /**
-   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    * 
