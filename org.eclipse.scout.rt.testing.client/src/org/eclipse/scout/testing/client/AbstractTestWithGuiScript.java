@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.testing.shared.ScoutAssert;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
