@@ -57,6 +57,7 @@ import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractSqlService extends AbstractService implements ISqlService, ILegacySqlQueryService, IAdaptable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
+  public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1048576; // = 1MB default
 
   private SqlConnectionPool m_pool;
   private Class<? extends ScoutTexts> m_nlsProvider;
@@ -76,6 +77,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   private String m_defaultUser;
   private String m_defaultPass;
   private int m_queryCacheSize;
+  private int m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
+
   //
   private HashMap<String, List<BundleClassDescriptor>> m_permissionNameToDescriptor;
   private HashMap<String, List<BundleClassDescriptor>> m_codeNameToDescriptor;
@@ -517,6 +520,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return m_jdbcPoolConnectionBusyTimeout;
   }
 
+  public int getMaxFetchMemorySize() {
+    return m_maxFetchMemorySize;
+  }
+
   public void setTransactionMemberId(String s) {
     m_transactionMemberId = s;
   }
@@ -578,6 +585,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   public void setJdbcPoolConnectionBusyTimeout(long t) {
     m_jdbcPoolConnectionBusyTimeout = t;
+  }
+
+  public void setMaxFetchMemorySize(int maxFetchMemorySize) {
+    m_maxFetchMemorySize = maxFetchMemorySize;
   }
 
   @Override
@@ -813,7 +824,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   protected IStatementProcessor createStatementProcessor(String s, Object[] bindBases, int maxRowCount) throws ProcessingException {
-    return new StatementProcessor(this, s, bindBases, maxRowCount);
+    return new StatementProcessor(this, s, bindBases, maxRowCount, m_maxFetchMemorySize);
   }
 
   /**

@@ -104,10 +104,9 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     P_RwtTreeListener treeListener = new P_RwtTreeListener();
     viewer.getTree().addListener(SWT.MouseDown, treeListener);
     viewer.getTree().addListener(SWT.MouseUp, treeListener);
-    viewer.getTree().addListener(SWT.KeyUp, treeListener);
     viewer.getTree().addListener(SWT.MenuDetect, treeListener);
 
-    getUiEnvironment().addKeyStroke(viewer.getTree(), new P_RwtKeyReturnAvoidDoubleClickListener(), false);
+    getUiEnvironment().addKeyStroke(viewer.getTree(), new P_RwtToggleKeyStroke(), false);
   }
 
   protected TreeViewer createTreeModel(Composite parent) {
@@ -714,9 +713,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     menu.setVisible(true);
   }
 
-  /**
-   * @param event
-   */
   private void handleUiDoubleClick(StructuredSelection sel) {
     @SuppressWarnings("unchecked")
     ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
@@ -735,6 +731,21 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   }
 
+  protected void handleUiToggleAction(Event event) {
+    if (!event.doit || !getScoutObject().isCheckable()) {
+      return;
+    }
+    if (event.stateMask == 0 && event.keyCode == ' ') {
+      StructuredSelection sel = (StructuredSelection) getUiTreeViewer().getSelection();
+      @SuppressWarnings("unchecked")
+      ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
+      if (nodes != null && nodes.length > 0) {
+        handleUiNodeClick(nodes[0]);
+      }
+      event.doit = false;
+    }
+  }
+
   private class P_RwtTreeListener implements Listener {
     private static final long serialVersionUID = 1L;
 
@@ -746,24 +757,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           if (cell != null && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();
             handleUiNodeClick(nodeToClick);
-          }
-          break;
-        }
-        case SWT.KeyUp: {
-          if (getScoutObject().isCheckable()) {
-            if (event.stateMask == 0) {
-              switch (event.keyCode) {
-                case ' ':
-                  StructuredSelection sel = (StructuredSelection) getUiTreeViewer().getSelection();
-                  @SuppressWarnings("unchecked")
-                  ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
-                  if (nodes != null && nodes.length > 0) {
-                    handleUiNodeClick(nodes[0]);
-                  }
-                  event.doit = false;
-                  break;
-              }
-            }
           }
           break;
         }
@@ -792,20 +785,16 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   } // end class P_RwtExpansionListener
 
-  /**
-   * @rn sle, 03.12.2010, ticket #97056
-   */
-  private class P_RwtKeyReturnAvoidDoubleClickListener extends RwtKeyStroke {
+  private class P_RwtToggleKeyStroke extends RwtKeyStroke {
     private static final long serialVersionUID = 1L;
 
-    public P_RwtKeyReturnAvoidDoubleClickListener() {
-      super(SWT.CR);
+    public P_RwtToggleKeyStroke() {
+      super(' ');
     }
 
     @Override
     public void handleUiAction(Event e) {
-      //to avoid the postEvent(DoubleClickEvent) from Tree.WM_CHAR(...) set e.doit to false
-      e.doit = false;
+      handleUiToggleAction(e);
     }
   } // end class P_RwtKeyReturnAvoidDoubleClickListener
 

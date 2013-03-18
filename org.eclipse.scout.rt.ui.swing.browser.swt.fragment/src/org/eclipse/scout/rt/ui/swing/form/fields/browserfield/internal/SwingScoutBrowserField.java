@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.ext.PopupFactoryEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.browserfield.ISwingScoutBrowserField;
 import org.eclipse.swt.SWT;
@@ -119,10 +120,11 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   private void attachSwtSafe() {
+    if (isSwtAttached()) {
+      return;
+    }
+    PopupFactoryEx.activate();
     try {
-      if (isSwtAttached()) {
-        return;
-      }
       // must be executed synchronously
       swtDisplay.syncExec(new Runnable() {
         @Override
@@ -163,10 +165,11 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   private void detachSwtSafe() {
+    if (!isSwtAttached()) {
+      return;
+    }
+    PopupFactoryEx.deactivate();
     try {
-      if (!isSwtAttached()) {
-        return;
-      }
       // must be executed synchronously
       swtDisplay.syncExec(new Runnable() {
         @Override

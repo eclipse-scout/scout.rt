@@ -97,6 +97,15 @@ public class PageFormMap {
     }
   }
 
+  public void remove(IPageForm pageForm) {
+    for (List<IPageForm> pageFormList : m_pageFormMaps.values()) {
+      if (pageFormList == null) {
+        continue;
+      }
+      pageFormList.remove(pageForm);
+    }
+  }
+
   public void clear() {
     m_pageFormMaps.clear();
   }

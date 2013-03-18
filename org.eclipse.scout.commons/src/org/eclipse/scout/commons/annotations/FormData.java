@@ -124,7 +124,7 @@ import java.lang.annotation.Target;
  * public abstract class <b>AbstractTableField<T extends ITable></b> extends AbstractFormField implements ITableField<T> { ...
  * </pre>
  */
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface FormData {
 

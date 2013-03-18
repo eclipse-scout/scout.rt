@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -51,6 +50,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISelectStreamHandler;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
@@ -90,24 +90,25 @@ public class StatementProcessor implements IStatementProcessor {
   private int m_currentOutputBatchIndex = -1;
   private String m_currentInputStm;
   private TreeMap<Integer/* jdbcBindIndex */, SqlBind> m_currentInputBindMap;
-  private int m_maxFetchMemorySize = 1048576; // = 1MB default
+  private int m_maxFetchMemorySize;
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) throws ProcessingException {
     this(callerService, stm, bindBases, 0);
   }
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) throws ProcessingException {
+    this(callerService, stm, bindBases, maxRowCount, AbstractSqlService.DEFAULT_MEMORY_PREFETCH_SIZE);
+  }
+
+  public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount, int maxFetchMemorySize) throws ProcessingException {
     if (stm == null) {
       throw new ProcessingException("statement is null");
     }
     try {
-      String maxFetchMemorySize = ConfigIniUtility.getProperties(getClass()).get("maxFetchMemorySize");
-      if (maxFetchMemorySize != null) {
-        m_maxFetchMemorySize = Integer.parseInt(maxFetchMemorySize);
-      }
       m_callerService = callerService;
       m_originalStm = stm;
       m_maxRowCount = maxRowCount;
+      m_maxFetchMemorySize = maxFetchMemorySize;
       // expand bind bases to list
       ArrayList<Object> bases = new ArrayList<Object>();
       if (bindBases != null) {
