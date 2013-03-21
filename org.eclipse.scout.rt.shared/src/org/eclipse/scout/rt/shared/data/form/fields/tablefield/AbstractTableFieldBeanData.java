@@ -20,6 +20,18 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 /**
  * Form field data for table fields. This class uses {@link AbstractTableRowData} beans for storing the table's
  * contents.
+ * <p/>
+ * {@link #isValueSet()} does not behave the same as on {@link AbstractTableFieldData}. It does not track any
+ * modifications of table row properties or their row states. The following methods may change the result of
+ * {@link #isValueSet()}:
+ * <ul>
+ * <li>{@link #addRow()}</li>
+ * <li>{@link #addRow(int)}</li>
+ * <li>{@link #setRows(AbstractTableRowData[])}</li>
+ * <li>{@link #removeRow(AbstractTableRowData)}</li>
+ * <li>{@link #removeRow(int)}</li>
+ * <li>{@link #clearRows()}</li>
+ * </ul>
  * 
  * @since 3.8.2
  */
@@ -124,6 +136,20 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
   public void removeRow(int index) {
     m_rowList.remove(index);
     setValueSet(true);
+  }
+
+  /**
+   * Removes the given row.
+   * 
+   * @param row
+   * @returns Returns <code>true</code> if the row was removed. Otherwise <code>false</code>.
+   */
+  public boolean removeRow(AbstractTableRowData row) {
+    if (m_rowList.remove(row)) {
+      setValueSet(true);
+      return true;
+    }
+    return false;
   }
 
   /**
