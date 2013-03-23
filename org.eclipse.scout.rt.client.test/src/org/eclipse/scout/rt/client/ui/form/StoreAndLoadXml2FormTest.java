@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXml2FormTest.TestForm.Mai
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

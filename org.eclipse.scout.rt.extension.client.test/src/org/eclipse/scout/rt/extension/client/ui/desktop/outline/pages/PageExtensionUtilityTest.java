@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageContributionExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageModificationExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageRemoveExtension;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

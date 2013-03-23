@@ -8,23 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 package org.eclipse.scout.testing.client.form;
 
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
-
 /**
- * Dynamic field to build an ad-hoc application for testing
+ * Deprecated: use {@link org.eclipse.scout.rt.testing.client.form.DynamicOkButton} instead
+ * will be removed with the L-Release.
  */
-public class DynamicOkButton extends AbstractOkButton {
-
-  public DynamicOkButton() {
-    super();
-    setProperty("id", "ok");
-  }
-
-  @Override
-  public String getFieldId() {
-    return (String) getProperty("id");
-  }
-
+@Deprecated
+public class DynamicOkButton extends org.eclipse.scout.rt.testing.client.form.DynamicOkButton {
 }

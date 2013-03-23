@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMe
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuTest.PageWithTable.Table.PageWithTableEmptySpaceMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuTest.PageWithTable.Table.PageWithTableRowMenu;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

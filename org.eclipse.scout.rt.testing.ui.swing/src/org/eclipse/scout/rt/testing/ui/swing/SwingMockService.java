@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.testing.client.IGuiMock;
+import org.eclipse.scout.rt.testing.client.IGuiMockService;
 import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.testing.client.IGuiMock;
-import org.eclipse.scout.testing.client.IGuiMockService;
 
 /**
  * Uses {@link Robot}

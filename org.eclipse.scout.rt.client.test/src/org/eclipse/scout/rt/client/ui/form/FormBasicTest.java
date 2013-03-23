@@ -14,14 +14,14 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.testing.client.form.DynamicCancelButton;
+import org.eclipse.scout.rt.testing.client.form.DynamicForm;
+import org.eclipse.scout.rt.testing.client.form.DynamicGroupBox;
+import org.eclipse.scout.rt.testing.client.form.DynamicOkButton;
+import org.eclipse.scout.rt.testing.client.form.DynamicStringField;
+import org.eclipse.scout.rt.testing.client.form.FormHandler;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.eclipse.scout.testing.client.form.DynamicCancelButton;
-import org.eclipse.scout.testing.client.form.DynamicForm;
-import org.eclipse.scout.testing.client.form.DynamicGroupBox;
-import org.eclipse.scout.testing.client.form.DynamicOkButton;
-import org.eclipse.scout.testing.client.form.DynamicStringField;
-import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

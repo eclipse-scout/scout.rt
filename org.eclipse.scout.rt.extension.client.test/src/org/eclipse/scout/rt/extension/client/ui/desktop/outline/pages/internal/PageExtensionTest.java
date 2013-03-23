@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

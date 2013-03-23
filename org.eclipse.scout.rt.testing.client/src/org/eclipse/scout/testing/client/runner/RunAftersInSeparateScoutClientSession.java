@@ -1,33 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+
 package org.eclipse.scout.testing.client.runner;
 
 import java.util.List;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.testing.shared.runner.AbstractRunAftersInSeparateScoutSession;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
- * Invokes all methods of a test class annotated with {@link org.junit.AfterClass} in a separate Scout client session.
- * </p><b>Note:</b> This allows to execute clean-up operations with different privileges than the actual test cases. It
- * has however no impact on Scout's transaction handling. Every operations invoked on the backend is performed in its
- * own Scout transaction.
+ * Deprecated: use {@link org.eclipse.scout.rt.testing.client.runner.RunAftersInSeparateScoutClientSession} instead
+ * will be removed with the L-Release.
  */
-public class RunAftersInSeparateScoutClientSession extends AbstractRunAftersInSeparateScoutSession {
-  private final ScoutClientJobWrapperStatement m_aftersStatement;
+@Deprecated
+public class RunAftersInSeparateScoutClientSession extends org.eclipse.scout.rt.testing.client.runner.RunAftersInSeparateScoutClientSession {
 
   public RunAftersInSeparateScoutClientSession(IClientSession clientSession, Statement statement, List<FrameworkMethod> afters, Object target) {
-    super(statement, afters, target);
-    m_aftersStatement = new ScoutClientJobWrapperStatement(clientSession, new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        evaluateAfters();
-      }
-    });
-  }
-
-  @Override
-  protected void evaluateAftersInScoutSession() throws Throwable {
-    m_aftersStatement.evaluate();
+    super(clientSession, statement, afters, target);
   }
 }

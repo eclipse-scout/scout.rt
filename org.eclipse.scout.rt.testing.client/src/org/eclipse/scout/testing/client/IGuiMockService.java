@@ -8,21 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 package org.eclipse.scout.testing.client;
 
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.IService2;
-
 /**
- * This interface is used to support gui testing with an abstraction layer.
- * <p>
- * Therefore swt and swing gui tests can be programmed just once in the client and run with both guis.
+ * Deprecated: use {@link org.eclipse.scout.rt.testing.client.IGuiMockService} instead
+ * will be removed with the L-Release.
  */
-public interface IGuiMockService extends IService2 {
-
-  UserAgent initUserAgent();
-
-  IGuiMock createMock(IClientSession session);
-
+@Deprecated
+public interface IGuiMockService extends org.eclipse.scout.rt.testing.client.IGuiMockService {
 }

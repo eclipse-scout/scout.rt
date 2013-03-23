@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test1Column;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test2Column;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -57,14 +57,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.testing.client.IGuiMock;
+import org.eclipse.scout.rt.testing.client.robot.JavaRobot;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
-import org.eclipse.scout.testing.client.IGuiMock;
-import org.eclipse.scout.testing.client.robot.JavaRobot;
 
 /**
  * Uses {@link Robot}

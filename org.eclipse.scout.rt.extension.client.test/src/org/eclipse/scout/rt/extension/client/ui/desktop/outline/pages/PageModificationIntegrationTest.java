@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.mo
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageAnchorFilter;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageModificationExtension;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

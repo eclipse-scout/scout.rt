@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTabl
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
