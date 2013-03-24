@@ -8,21 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.scout.testing.client.form;
 
-/**
- * Deprecated: use {@link org.eclipse.scout.rt.testing.client.form.DynamicStringField} instead
- * will be removed with the L-Release.
- */
-@Deprecated
-public class DynamicStringField extends org.eclipse.scout.rt.testing.client.form.DynamicStringField {
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
-  /**
-   * @param id
-   * @param label
-   */
+/**
+ * Dynamic field to build an ad-hoc application for testing
+ */
+public class DynamicStringField extends AbstractStringField {
+
   public DynamicStringField(String id, String label) {
-    super(id, label);
+    super();
+    setProperty("id", id);
+    setLabel(label);
   }
+
+  @Override
+  public String getFieldId() {
+    return (String) getProperty("id");
+  }
+
 }

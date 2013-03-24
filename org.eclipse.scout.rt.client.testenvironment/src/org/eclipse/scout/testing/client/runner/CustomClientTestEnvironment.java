@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.client.runner;
+package org.eclipse.scout.testing.client.runner;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 

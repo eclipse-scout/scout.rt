@@ -15,10 +15,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.testing.client.IGuiMockService;
-import org.eclipse.scout.rt.testing.client.TestingClientSessionRegistryService;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
 import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.testing.client.IGuiMockService;
+import org.eclipse.scout.testing.client.TestingClientSessionRegistryService;
 
 /**
  * Runs all @Test annotated methods in all classes and then exit

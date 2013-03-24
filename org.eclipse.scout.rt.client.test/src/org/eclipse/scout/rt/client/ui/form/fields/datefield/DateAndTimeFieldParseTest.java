@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldPars
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyWithFormatField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.testing.client.form.FormHandler;
-import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.testing.client.form.FormHandler;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuContributionExtensionTest.P_CalendarField.Calendar;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuContributionExtensionTest.P_TestMenu.Constructor;
-import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

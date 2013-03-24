@@ -8,13 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.scout.testing.client.form;
 
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
+
 /**
- * Deprecated: use {@link org.eclipse.scout.rt.testing.client.form.DynamicCancelButton} instead
- * will be removed with the L-Release.
+ * Dynamic field to build an ad-hoc application for testing
  */
-@Deprecated
-public class DynamicCancelButton extends org.eclipse.scout.rt.testing.client.form.DynamicCancelButton {
+public class DynamicCancelButton extends AbstractCancelButton {
+
+  public DynamicCancelButton() {
+    super();
+    setProperty("id", "cancel");
+  }
+
+  @Override
+  public String getFieldId() {
+    return (String) getProperty("id");
+  }
+
 }

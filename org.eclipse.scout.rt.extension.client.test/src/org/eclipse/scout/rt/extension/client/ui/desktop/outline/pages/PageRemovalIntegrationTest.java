@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.re
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageAnchorFilter;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageRemoveExtension;
-import org.eclipse.scout.rt.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

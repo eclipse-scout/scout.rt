@@ -4,17 +4,38 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.scout.testing.client.form;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+
 /**
- * Deprecated: use {@link org.eclipse.scout.rt.testing.client.form.DynamicGroupBox} instead
- * will be removed with the L-Release.
+ * Dynamic group box to build an ad-hoc application for testing
  */
-@Deprecated
-public class DynamicGroupBox extends org.eclipse.scout.rt.testing.client.form.DynamicGroupBox {
+public class DynamicGroupBox extends AbstractGroupBox {
+  private IFormField[] m_injectedFields;
+
+  public DynamicGroupBox(IFormField... fields) {
+    super(false);
+    m_injectedFields = fields;
+    callInitializer();
+  }
+
+  /**
+   * This is the place to inject fields dynamically
+   */
+  @Override
+  protected void injectFieldsInternal(List<IFormField> fieldList) {
+    if (m_injectedFields != null) {
+      for (IFormField f : m_injectedFields) {
+        fieldList.add(f);
+      }
+    }
+  }
 }

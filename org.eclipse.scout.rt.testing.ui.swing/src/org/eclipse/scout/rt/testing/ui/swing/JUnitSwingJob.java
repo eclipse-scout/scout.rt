@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.testing.client.IGuiMock;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.testing.client.IGuiMock;
 
 /**
  * Runs all @Test annotated methods in all classes and then exit
