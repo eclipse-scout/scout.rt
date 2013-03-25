@@ -137,7 +137,6 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
   }
 
-  private Bundle[] m_bundleList;
   private String m_originAddress;
   private Boolean m_sendCompressed;
   private Boolean m_receivedCompressed;
@@ -150,7 +149,6 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
 
   @Override
   public void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader) {
-    m_bundleList = classResolveBundles;
     try {
       m_originAddress = InetAddress.getLocalHost().getHostAddress();
     }
