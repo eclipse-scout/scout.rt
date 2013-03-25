@@ -223,6 +223,15 @@
      </formField>
      <formField
            active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.ITypedPlannerField"
+           name="Planner field (typed)"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.SwingScoutTypedPlannerField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField"
            name="Wrapped form field"
            scope="default">
