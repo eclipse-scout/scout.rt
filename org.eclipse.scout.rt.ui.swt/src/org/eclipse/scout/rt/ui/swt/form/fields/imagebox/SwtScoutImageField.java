@@ -122,15 +122,13 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (IImageField.PROP_IMAGE.equals(name)) {
+    if (name.equals(IImageField.PROP_IMAGE_ID) || IImageField.PROP_IMAGE.equals(name)) {
       updateImageFromScout();
     }
     else if (IImageField.PROP_AUTO_FIT.equals(name)) {
       updateAutoFitFromScout();
-
     }
     super.handleScoutPropertyChange(name, newValue);
-
   }
 
   private Menu createMenu() {
