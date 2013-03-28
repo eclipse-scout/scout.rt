@@ -28,7 +28,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
 
   private boolean m_exists = true;
   private long m_lastModified;
-  private long m_id;
+  private Object m_itemId;
   private String m_owner;
   private String m_subject;
   private String m_body;
@@ -36,10 +36,11 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
   private RecurrencePattern m_recurrencyPattern;
 
   public AbstractCalendarItem() {
+    this(Long.valueOf(0L));
   }
 
-  public AbstractCalendarItem(long id) {
-    m_id = id;
+  public AbstractCalendarItem(Object id) {
+    m_itemId = id;
   }
 
   public ICalendarItem copy() {
@@ -48,7 +49,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
       AbstractCalendarItem a = (AbstractCalendarItem) c.newInstance();
       a.m_exists = this.m_exists;
       a.m_lastModified = this.m_lastModified;
-      a.m_id = this.m_id;
+      a.m_itemId = this.m_itemId;
       a.m_owner = this.m_owner;
       a.m_subject = this.m_subject;
       a.m_body = this.m_body;
@@ -92,13 +93,30 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public long getId() {
-    return m_id;
+    if (m_itemId instanceof Number) {
+      return ((Number) m_itemId).longValue();
+    }
+    else {
+      throw new UnsupportedOperationException("Id is not a number.");
+    }
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setId(long newId) {
-    m_id = newId;
+    m_itemId = Long.valueOf(newId);
+  }
+
+  @Override
+  public Object getItemId() {
+    return m_itemId;
+  }
+
+  @Override
+  public void setItemId(Object itemId) {
+    m_itemId = itemId;
   }
 
   @Override
@@ -144,7 +162,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
   protected void dumpState(Map<String, Object> attributes) {
     attributes.put("exists", m_exists);
     attributes.put("lastModified", getDumpDateFormat().format(m_lastModified));
-    attributes.put("id", m_id);
+    attributes.put("id", String.valueOf(m_itemId));
     attributes.put("owner", m_owner);
     attributes.put("subject", m_subject);
     if (m_body != null) {

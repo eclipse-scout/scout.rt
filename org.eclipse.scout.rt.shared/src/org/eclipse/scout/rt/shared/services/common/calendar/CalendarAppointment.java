@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment, Serializable {
   private static final long serialVersionUID = 1L;
   //
-  private Long m_personId;
+  private Object m_person;
   private Date m_start;
   private Date m_end;
   private boolean m_fullDay;
@@ -35,8 +35,8 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   }
 
   /**
-   * @param id
-   * @param personId
+   * @param itemId
+   * @param person
    * @param startDate
    * @param endDate
    * @param fullDay
@@ -44,9 +44,9 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param body
    * @param color
    */
-  public CalendarAppointment(long id, Long personId, Date startDate, Date endDate, boolean fullDay, String subject, String body, String color) {
-    setId(id);
-    setPersonId(personId);
+  public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String subject, String body, String color) {
+    setItemId(itemId);
+    setPerson(person);
     setStart(startDate);
     setEnd(endDate);
     setFullDay(fullDay);
@@ -56,8 +56,8 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   }
 
   /**
-   * @param id
-   * @param personId
+   * @param itemId
+   * @param person
    * @param startDate
    * @param endDate
    * @param fullDay
@@ -71,11 +71,11 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
         if (data[i] != null) {
           switch (i) {
             case 0: {
-              setId(((Number) data[i]).longValue());
+              setItemId(data[i]);
               break;
             }
             case 1: {
-              setPersonId(((Number) data[i]).longValue());
+              setPerson(data[i]);
               break;
             }
             case 2: {
@@ -114,13 +114,33 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public Long getPersonId() {
-    return m_personId;
+    if (m_person instanceof Number) {
+      return ((Number) m_person).longValue();
+    }
+    else if (m_person == null) {
+      return null;
+    }
+    else {
+      throw new UnsupportedOperationException("Person id is not a number.");
+    }
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setPersonId(Long n) {
-    m_personId = n;
+    m_person = n;
+  }
+
+  @Override
+  public Object getPerson() {
+    return m_person;
+  }
+
+  @Override
+  public void setPerson(Object person) {
+    m_person = person;
   }
 
   @Override
@@ -195,7 +215,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   @Override
   public ICalendarItem copy() {
     CalendarAppointment a = (CalendarAppointment) super.copy();
-    a.m_personId = this.m_personId;
+    a.m_person = this.m_person;
     a.m_start = this.m_start;
     a.m_end = this.m_end;
     a.m_fullDay = this.m_fullDay;
