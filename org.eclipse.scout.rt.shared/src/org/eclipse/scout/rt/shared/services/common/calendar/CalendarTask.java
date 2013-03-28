@@ -39,7 +39,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
    */
   public CalendarTask(long id, Long responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String color) {
     setId(id);
-    setResponsibleId(id);
+    setResponsibleId(responsibleId);
     setStart(startDate);
     setDue(dueDate);
     setComplete(completeDate);
