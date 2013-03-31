@@ -32,7 +32,7 @@ public class DB2SqlStyle extends AbstractSqlStyle {
 
   @Override
   protected int getMaxListSize() {
-    return 1000;
+    return MAX_LIST_SIZE;
   }
 
   @Override

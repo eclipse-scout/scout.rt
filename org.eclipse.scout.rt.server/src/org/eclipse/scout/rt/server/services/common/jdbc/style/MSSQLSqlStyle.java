@@ -31,7 +31,7 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
 
   @Override
   protected int getMaxListSize() {
-    return 1000;
+    return MAX_LIST_SIZE;
   }
 
   @Override

@@ -61,6 +61,10 @@ import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
  */
 public interface ISqlStyle extends Serializable {
   /**
+   * Default maximal in-list size
+   */
+  int MAX_LIST_SIZE = 1000;
+  /**
    * Maximal length of a plain text string.
    */
   int MAX_SQL_STRING_LENGTH = 4000;
