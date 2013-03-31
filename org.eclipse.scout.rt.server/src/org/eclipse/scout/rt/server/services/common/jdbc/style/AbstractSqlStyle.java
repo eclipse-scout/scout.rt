@@ -78,17 +78,17 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
     else if (value instanceof String) {
       String s = (String) value;
-      if (s.length() > 4000) {
-        s = s.substring(0, 4000);
-        LOG.warn("toPlainText of a String with more than 4000 characters failed; truncated to '" + s + "'");
+      if (s.length() > MAX_SQL_STRING_LENGTH) {
+        s = s.substring(0, MAX_SQL_STRING_LENGTH);
+        LOG.warn("toPlainText of a String with more than " + MAX_SQL_STRING_LENGTH + " characters failed; truncated to '" + s + "'");
         return "'" + s.replaceAll("'", "''") + "'";
       }
       return "'" + s.replaceAll("'", "''") + "'";
     }
     else if (value instanceof char[]) {
-      if (((char[]) value).length > 4000) {
-        String s = new String((char[]) value, 0, 4000);
-        LOG.warn("toPlainText of a CLOB with more than 4000 characters failed; truncated to '" + s + "'");
+      if (((char[]) value).length > MAX_SQL_STRING_LENGTH) {
+        String s = new String((char[]) value, 0, MAX_SQL_STRING_LENGTH);
+        LOG.warn("toPlainText of a CLOB with more than " + MAX_SQL_STRING_LENGTH + " characters failed; truncated to '" + s + "'");
         return "'" + s.replaceAll("'", "''") + "'";
       }
       String s = new String((char[]) value);
@@ -384,7 +384,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   public Object readBind(ResultSet rs, ResultSetMetaData meta, int type, int jdbcBindIndex) throws SQLException {
     Object o = null;
     switch (type) {
-      // General Number
+    // General Number
       case Types.DECIMAL:
       case Types.NUMERIC: {
         BigDecimal bd = rs.getBigDecimal(jdbcBindIndex);
@@ -398,7 +398,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         }
         break;
       }
-        // Long
+      // Long
       case Types.BIT:
       case Types.BIGINT:
       case Types.SMALLINT:
@@ -407,20 +407,20 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = new Long(rs.getLong(jdbcBindIndex));
         break;
       }
-        // Double
+      // Double
       case Types.DOUBLE:
       case Types.FLOAT:
       case Types.REAL: {
         o = new Double(rs.getDouble(jdbcBindIndex));
         break;
       }
-        // String
+      // String
       case Types.VARCHAR:
       case Types.CHAR: {
         o = rs.getString(jdbcBindIndex);
         break;
       }
-        // Date
+      // Date
       case Types.DATE: {
         // Build 154: changed from getDate to getTimestamp()
         // o=result.getDate(i+1);
@@ -435,7 +435,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = rs.getTimestamp(jdbcBindIndex);
         break;
       }
-        // Raw
+      // Raw
       case Types.LONGVARCHAR: {
         try {
           o = rs.getString(jdbcBindIndex);

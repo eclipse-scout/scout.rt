@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,7 +36,7 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
 
   @Override
   public boolean isLargeString(String s) {
-    return (s.length() > 4000);
+    return (s.length() > MAX_SQL_STRING_LENGTH);
   }
 
   @Override
@@ -61,16 +61,6 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    /*
-     * Statement testStatement=null;
-     * try{ testStatement=conn.createStatement();
-     * testStatement.execute("SELECT 1 FROM DUAL");
-     * //TODO what is the name of a dummy table or typical check statement to run as a test?
-     * }
-     * finally{
-     * if(testStatement!=null) try{testStatement.close();}catch(Throwable t){}
-     * }
-     */
+    //TODO what is the name of a dummy table or typical check statement to run as a test?
   }
-
 }
