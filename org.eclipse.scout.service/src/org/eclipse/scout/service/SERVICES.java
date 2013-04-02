@@ -24,11 +24,10 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
 /**
- * Convenience for
- * AbstractSession.getAbstractSession().getServiceRegistry().getService()
+ * Utility class for querying registered OSGi services
  * <p>
  * There might be log warnings when a service returns null due to factory visiblity decisions. see bug
- * https://bugs.eclipse.org/bugs/show_bug.cgi?id=299351
+ * https://bugs.eclipse.org/bugs/show_bug.cgi?id=299351 (solved with eclipse 3.6)
  * <p>
  * see also {@link INullService}
  */
@@ -39,13 +38,19 @@ public final class SERVICES {
   }
 
   /**
-   * @return the service with the highest ranking
+   * @param serviceInterfaceClass
+   *          The interface or class name with which the service was registered.
+   * @return the service with the highest ranking or <code>null</code>, if the service is not found.
    */
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass) {
     return getService(serviceInterfaceClass, null);
   }
 
   /**
+   * @param serviceInterfaceClass
+   *          The interface or class name with which the service was registered.
+   * @param filter
+   *          The filter expression or {@code null}. Invalid filter expressions are ignored.
    * @return the service with the highest ranking
    */
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass, String filter) {
@@ -115,14 +120,18 @@ public final class SERVICES {
   }
 
   /**
-   * @return the services in order of registration (not by ranking)
+   * @return the services ordered by ranking or an empty array, if no services are found.
    */
   public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass) {
     return getServices(serviceInterfaceClass, null);
   }
 
   /**
-   * @return the services in order of registration (not by ranking)
+   * @param serviceInterfaceClass
+   *          The interface or class name with which the service was registered.
+   * @param filter
+   *          The filter expression or {@code null}. Invalid filter expressions are ignored.
+   * @return the services ordered by ranking or an empty array, if no services are found.
    */
   @SuppressWarnings("unchecked")
   public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass, String filter) {
