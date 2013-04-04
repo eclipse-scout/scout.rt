@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.internal.servletfilter;
+package org.eclipse.scout.rt.ui.rap.servletfilter;
 
 import java.io.IOException;
 

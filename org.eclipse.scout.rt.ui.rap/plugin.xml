@@ -381,7 +381,7 @@
     </filter>
     <filter
           aliases="/"
-          class="org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter"
+          class="org.eclipse.scout.rt.ui.rap.servletfilter.LogoutFilter"
           ranking="-1000000">
        <init-param
              name="active"
