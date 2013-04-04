@@ -22,19 +22,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
 
 /**
  * Filter which checks for a query parameter called "doLogout" and invalidates the session if the parameter is set.
  * <p>
  * After invalidating the session a redirect to the originally requested site is sent and the filter chain gets
- * interrupted (no more filters will be executed).
+ * interrupted (no more filters will be executed).<br>
+ * Alternatively the "redirectUrl" parameter can be specified in the config.ini. If this parameter is set, the redirect
+ * will follow the given url instead of the originally requested site.<br>
+ * Example:<br>
+ * <code>org.eclipse.scout.rt.ui.rap.servletfilter.LogoutFilter#redirectUrl=res/logout.html</code>
  * <p>
  * 
  * @since 3.8.2
  */
 public class LogoutFilter implements Filter {
-  public static String LOGOUT_PARAM = "doLogout";
+
+  public final static String REDIR_INIT_PARAM = "redirectUrl";
+  public final static String LOGOUT_PARAM = "doLogout";
 
   private FilterConfigInjection m_injection;
 
@@ -72,8 +79,12 @@ public class LogoutFilter implements Filter {
     session.invalidate();
 
     HttpServletResponse httpResponse = (HttpServletResponse) response;
-    String servletPath = getRedirectUrl(httpRequest);
-    httpResponse.sendRedirect(httpResponse.encodeRedirectURL(servletPath));
+    String redirPath = config.getInitParameter(REDIR_INIT_PARAM);
+    if (!StringUtility.hasText(redirPath)) {
+      // default when no redirect URL is given
+      redirPath = getRedirectUrl(httpRequest);
+    }
+    httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirPath));
   }
 
   protected String getRedirectUrl(HttpServletRequest httpRequest) {
