@@ -82,6 +82,8 @@
         <module>../org.eclipse.scout.rt.server.test</module>
         <module>../org.eclipse.scout.rt.server.testenvironment</module>
         <module>../org.eclipse.scout.rt.shared.test</module>
+        <module>../org.eclipse.scout.rt.ui.rap.test</module>
+        <module>../org.eclipse.scout.rt.ui.swing.test</module>
         <module>../org.eclipse.scout.service.test</module>
         <module>../org.eclipse.scout.rt.testing-feature</module>
         <module>../org.eclipse.scout.rt.testing.client</module>
@@ -92,7 +94,6 @@
         <module>../org.eclipse.scout.rt.testing.ui.rap</module>
         <module>../org.eclipse.scout.rt.testing.ui.swing</module>
         <module>../org.eclipse.scout.rt.testing.ui.swt</module>
-        <module>../org.eclipse.scout.rt.ui.swing.test</module>
       </modules>
     </profile>
 
