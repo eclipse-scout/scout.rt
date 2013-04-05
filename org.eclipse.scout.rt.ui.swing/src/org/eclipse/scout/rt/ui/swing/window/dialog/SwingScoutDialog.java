@@ -294,7 +294,7 @@ public class SwingScoutDialog implements ISwingScoutView {
     @Override
     public void windowClosed(WindowEvent e) {
       Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-      if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
+      if (SwingUtility.VERIFY_INPUT_ON_WINDOW_CLOSED && focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
         ((JComponent) focusOwner).getInputVerifier().verify((JComponent) focusOwner);
       }
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDialog.this, SwingScoutViewEvent.TYPE_CLOSED));
