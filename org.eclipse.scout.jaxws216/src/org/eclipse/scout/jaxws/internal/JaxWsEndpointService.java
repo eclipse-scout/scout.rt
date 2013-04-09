@@ -27,11 +27,11 @@ import javax.xml.ws.handler.Handler;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.UriBuilder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.Activator;
@@ -112,9 +112,13 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
       // ensure proper resource loading if trailing slash is missing
       response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 
-      final URI baseUri = URIUtil.fromString(JaxWsHelper.getBaseAddress(request, false));
-      final IPath contextPath = new Path(request.getRequestURI()).addTrailingSeparator();
-      response.setHeader("Location", URIUtil.append(baseUri, contextPath.toString()).toString());
+      final String baseUrl = JaxWsHelper.getBaseAddress(request, false);
+      IPath contextPath = new Path(request.getRequestURI()).addTrailingSeparator().makeAbsolute();
+      if (contextPath.isUNC()) {
+        contextPath = contextPath.makeUNC(false);
+      }
+      final URI redirectUri = new UriBuilder(baseUrl).path(contextPath.toString()).createURI();
+      response.setHeader("Location", redirectUri.toString());
       return;
     }
 
