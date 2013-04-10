@@ -42,9 +42,15 @@ public class ConfigurationUtilityTest {
     OrderStatic10 static10 = new OrderStatic10();
     OrderStatic20Dynamic0 static20Dynamic0 = new OrderStatic20Dynamic0();
     OrderDynamic30 dynamic30 = new OrderDynamic30();
+    //
     List<Object> orderedElements = Arrays.asList(dynamic30, static20Dynamic0, static10);
     Collection<Object> sorted = ConfigurationUtility.sortByOrder(orderedElements);
     Assert.assertArrayEquals(new Object[]{static10, static20Dynamic0, dynamic30}, sorted.toArray());
+    //
+    ReplaceOrderStatic10 replaceOrderStatic10 = new ReplaceOrderStatic10();
+    orderedElements = Arrays.<Object> asList(dynamic30, static20Dynamic0, replaceOrderStatic10);
+    sorted = ConfigurationUtility.sortByOrder(orderedElements);
+    Assert.assertArrayEquals(new Object[]{replaceOrderStatic10, static20Dynamic0, dynamic30}, sorted.toArray());
   }
 
   @Test
@@ -311,6 +317,14 @@ public class ConfigurationUtilityTest {
     @Override
     public double getOrder() {
       return 30;
+    }
+  }
+
+  @Replace
+  public static class ReplaceOrderStatic10 extends OrderStatic10 implements IOrdered {
+    @Override
+    public double getOrder() {
+      return 40;
     }
   }
 
