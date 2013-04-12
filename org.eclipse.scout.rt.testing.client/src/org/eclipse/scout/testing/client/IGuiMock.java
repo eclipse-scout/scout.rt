@@ -328,4 +328,14 @@ public interface IGuiMock {
   String getClipboardText();
 
   Object internal0(Object o);
+
+  /**
+   * Click left on magnifier of a smartfield
+   */
+  void clickLeftOnSmartFieldMagnifier(FieldState fieldState);
+
+  /**
+   * Click right on magnifier of a smartfield
+   */
+  void clickRightOnSmartFieldMagnifier(FieldState fieldState);
 }

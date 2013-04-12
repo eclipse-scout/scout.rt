@@ -284,7 +284,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     @Override
     public void internalFrameClosed(InternalFrameEvent e) {
       Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-      if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
+      if (SwingUtility.VERIFY_INPUT_ON_WINDOW_CLOSED && focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
         ((JComponent) focusOwner).getInputVerifier().verify((JComponent) focusOwner);
       }
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutInternalFrame.this, SwingScoutViewEvent.TYPE_CLOSED));

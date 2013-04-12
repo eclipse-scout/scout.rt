@@ -1129,4 +1129,16 @@ public class SwtMock implements IGuiMock {
       waitForIdle();
     }
   }
+
+  @Override
+  public void clickLeftOnSmartFieldMagnifier(FieldState fieldState) {
+    gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
+    clickLeft();
+  }
+
+  @Override
+  public void clickRightOnSmartFieldMagnifier(FieldState fieldState) {
+    gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
+    clickRight();
+  }
 }

@@ -1438,4 +1438,14 @@ public class RapMock implements IGuiMock {
         throw new IllegalArgumentException("Unknown keyboard key: " + key);
     }
   }
+
+  @Override
+  public void clickLeftOnSmartFieldMagnifier(FieldState fieldState) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  @Override
+  public void clickRightOnSmartFieldMagnifier(FieldState fieldState) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
 }

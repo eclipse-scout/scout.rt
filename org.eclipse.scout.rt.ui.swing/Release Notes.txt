@@ -552,3 +552,25 @@ public JDialogEx createJDialogEx(Dialog swingParent) {
 public JDialogEx createJDialogEx(Frame swingParent) {
   return new JDialogEx(swingParent);
 }
+
+08.04.2013 kle
+Bugzilla: 401191
+Problem:
+There is a problem with the keyboard focus in Java 7 when using smartfields.
+A value (e.g. value 1) is selected in a smartfield that has the keyboard focus. The smartfield has a menu to open a new form. After closing the new form, a different value (e.g. value 2) is set on the smartfield inside the method execAction of the menu.
+The expected value would now be 2, however depending on the Java VM version in use, the result could also be 1.
+Analysis:
+In summary, this problem arises when Java 7 is used since the KeyboardFocusManager has a different behavior. When the form gets closed, which was opened by the menu before, the Java 7 KeyboardFocusManager returns the smartfield on the other form as a focused component whereas the KeyboardFocusManager in Java 6 does not return any focused components. This difference results in an input verification being executed. Since the smartfield had the value 1 at the time the form was closed, the value is first set to 2 (part of execAction method) and then back to 1 (part of input verification).
+A thorough analysis can be found at [1] and [2].
+Solution:
+After discussion with IMO and BSC we decided to remove the input verification upon a WindowClosed event because we do not expect any focused component when the form is closed (remark: verification has NOT been removed upon a WindowClosing event).
+However, since we are not sure if there might be use cases where input verification must be done upon the event WindowClosed, the verification can be activated again in the config.ini file.
+Migration (optional):
+If you experience any misbehavior due to the deactivation of the input verification, add the following line to your config.ini file to restore the old behavior:
+scout.ui.verifyInputOnWindowClosed=true
+
+Input verification is disabled by default (i.e. if the line is missing) or if set explicitly in the config.ini file:
+scout.ui.verifyInputOnWindowClosed=false
+
+[1] https://bugs.eclipse.org/bugs/show_bug.cgi?id=401191
+[2] http://www.eclipse.org/forums/index.php/t/455987/
