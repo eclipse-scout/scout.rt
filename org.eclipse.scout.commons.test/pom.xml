@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2012 BSI Business Systems Integration AG.
+   Copyright (c) 2012,2013 BSI Business Systems Integration AG.
    All rights reserved. This program and the accompanying materials
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
   Contributors:
      Stephan Leicht Vogt - initial implementation
 -->
-
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
@@ -23,4 +22,49 @@
 
   <artifactId>org.eclipse.scout.commons.test</artifactId>
   <packaging>eclipse-test-plugin</packaging>
+
+  <!-- to be able to execute the Mail-Tests javax.mail has to be in the endorsed
+    dir of the running jre. As this is not the case for every environment the
+    said tests are excluded in the 'default' profile -->
+  <profiles>
+    <profile>
+      <id>withoutJavaxMail</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/Mail*Test.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>javaxMail</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
