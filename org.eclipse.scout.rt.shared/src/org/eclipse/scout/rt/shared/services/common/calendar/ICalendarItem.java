@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,13 +36,20 @@ public interface ICalendarItem {
   boolean isIntersecting(Date minDate, Date maxDate);
 
   /**
-   * @return the internal id
+   * @return the internal id (as long if it is a number)
+   * @throws UnsupportedOperationException
+   *           if internal id is <code>null</code> or not a number
+   * @deprecated use {@link #getItemId()}. method will be removed in 3.10
    */
+  @Deprecated
   long getId();
 
   /**
    * set the internal id
+   * 
+   * @deprecated use {@link #setItemId(Object)}. method will be removed in 3.10
    */
+  @Deprecated
   void setId(long id);
 
   String getSubject();
@@ -66,5 +73,9 @@ public interface ICalendarItem {
   RecurrencePattern getRecurrencePattern();
 
   void setRecurrencePattern(RecurrencePattern p);
+
+  void setItemId(Object itemId);
+
+  Object getItemId();
 
 }

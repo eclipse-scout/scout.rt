@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.DateUtility;
 public class CalendarTask extends AbstractCalendarItem implements ICalendarTask, java.io.Serializable {
   private static final long serialVersionUID = 0L;
 
-  private Long m_responsibleId;
+  private Object m_responsibleIdObject;
   private Date m_start;
   private Date m_due;
   private Date m_complete;
@@ -37,9 +37,9 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
    * @param body
    * @param color
    */
-  public CalendarTask(long id, Long responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String color) {
-    setId(id);
-    setResponsibleId(id);
+  public CalendarTask(Object id, Object responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String color) {
+    setItemId(id);
+    setResponsible(responsibleId);
     setStart(startDate);
     setDue(dueDate);
     setComplete(completeDate);
@@ -64,11 +64,11 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
         if (data[i] != null) {
           switch (i) {
             case 0: {
-              setId(((Number) data[i]).longValue());
+              setItemId(data[i]);
               break;
             }
             case 1: {
-              setResponsibleId(((Number) data[i]).longValue());
+              setResponsible(data[i]);
               break;
             }
             case 2: {
@@ -111,13 +111,33 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public Long getResponsibleId() {
-    return m_responsibleId;
+    if (m_responsibleIdObject instanceof Number) {
+      return ((Number) m_responsibleIdObject).longValue();
+    }
+    else if (m_responsibleIdObject == null) {
+      return null;
+    }
+    else {
+      throw new UnsupportedOperationException("Responsible id is not a number.");
+    }
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setResponsibleId(Long n) {
-    m_responsibleId = n;
+    m_responsibleIdObject = n;
+  }
+
+  @Override
+  public Object getResponsible() {
+    return m_responsibleIdObject;
+  }
+
+  @Override
+  public void setResponsible(Object responsibleIdObject) {
+    m_responsibleIdObject = responsibleIdObject;
   }
 
   @Override
@@ -153,7 +173,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
   @Override
   public ICalendarItem copy() {
     CalendarTask t = (CalendarTask) super.copy();
-    t.m_responsibleId = this.m_responsibleId;
+    t.m_responsibleIdObject = this.m_responsibleIdObject;
     t.m_start = this.m_start;
     t.m_due = this.m_due;
     t.m_complete = this.m_complete;
