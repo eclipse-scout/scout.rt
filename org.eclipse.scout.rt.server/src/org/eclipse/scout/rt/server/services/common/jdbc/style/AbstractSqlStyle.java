@@ -231,6 +231,14 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     else if (BigDecimal.class.isAssignableFrom(c)) {
       return new SqlBind(Types.NUMERIC, o);
     }
+    else if (Character.class.isAssignableFrom(c)) {
+      if (o == null) {
+        return new SqlBind(Types.VARCHAR, o);
+      }
+      else {
+        return new SqlBind(Types.VARCHAR, o.toString());
+      }
+    }
     else if (String.class.isAssignableFrom(c) || char[].class == c) {
       if (o == null) {
         return new SqlBind(Types.VARCHAR, o);
@@ -374,10 +382,25 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         }
         break;
       }
+      case Types.DECIMAL:
+      case Types.NUMERIC: {
+        if (bind.getValue() instanceof BigDecimal) {
+          int scale = ((BigDecimal) bind.getValue()).scale();
+          ps.setObject(jdbcBindIndex, bind.getValue(), bind.getSqlType(), scale);
+        }
+        else {
+          writeDefaultBind(ps, jdbcBindIndex, bind);
+        }
+        break;
+      }
       default: {
-        ps.setObject(jdbcBindIndex, bind.getValue(), bind.getSqlType());
+        writeDefaultBind(ps, jdbcBindIndex, bind);
       }
     }
+  }
+
+  private void writeDefaultBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
+    ps.setObject(jdbcBindIndex, bind.getValue(), bind.getSqlType());
   }
 
   @Override
