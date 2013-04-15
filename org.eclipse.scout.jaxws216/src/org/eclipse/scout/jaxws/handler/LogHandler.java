@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class LogHandler implements SOAPHandler<SOAPMessageContext> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogHandler.class);
+  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(LogHandler.class);
 
   private int m_logLevel;
 
@@ -63,6 +63,9 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
   }
 
   private void handleLogMessageInternal(SOAPMessageContext context) {
+    if (!LOG.isLoggable(getLogLevel())) {
+      return;
+    }
     try {
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       context.getMessage().writeTo(bos);
@@ -75,6 +78,17 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
     }
   }
 
+  /**
+   * To be overwritten to implement specific log behavior, e.g. to write the log entry into a database.
+   * 
+   * @param directionType
+   *          indicates the direction of the message flow; {@link DirectionType#In} for inbound and
+   *          {@link DirectionType#Out} for outbound traffic, respectively.
+   * @param soapMessage
+   *          the SOAP message formatted as {@link String}.
+   * @param context
+   *          {@link SOAPMessageContext}
+   */
   protected void handleLogMessage(DirectionType directionType, String soapMessage, SOAPMessageContext context) {
     String logMessage = "WS SOAP [service=" + context.get(SOAPMessageContext.WSDL_SERVICE) + ", port=" + context.get(SOAPMessageContext.WSDL_PORT) + ", operation=" + context.get(SOAPMessageContext.WSDL_OPERATION) + ", direction=" + directionType + ", message=" + soapMessage + "]";
 
@@ -102,12 +116,21 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
     m_logLevel = logLevel;
   }
 
+  /**
+   * To configure the log level the SOAP-message is logged with.
+   * 
+   * @return the log level
+   * @see IScoutLogger for the available log levels.
+   */
   @Order(10.0)
   @ConfigProperty(ConfigProperty.INTEGER)
   protected int getConfiguredLogLevel() {
     return IScoutLogger.LEVEL_INFO;
   }
 
+  /**
+   * The direction of the message flow.
+   */
   public static enum DirectionType {
     In, Out;
   }
