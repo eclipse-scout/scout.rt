@@ -154,8 +154,8 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
     response.setContentType(contentType);
     response.setContentLength(content.length);
 
-    response.getOutputStream().write(content);
     response.setStatus(HttpServletResponse.SC_OK);
+    response.getOutputStream().write(content);
   }
 
   protected String createHtmlStatusPage(final String contextPath, final ServletAdapter[] servletAdapters) throws Exception {
