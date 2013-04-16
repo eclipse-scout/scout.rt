@@ -39,12 +39,11 @@ public class CalendarItemTest {
     Assert.assertNull(task.getColor());
   }
 
-//TODO: fix this test with Bug 404012
-//  @Test
-//  public void testCalendarTaskConstruction2() {
-//    ICalendarTask task = new CalendarTask(0L, null, DATE_1, DATE_2, DATE_3, "1", "2", "3");
-//    verifyCalendarTask(task);
-//  }
+  @Test
+  public void testCalendarTaskConstruction2() {
+    ICalendarTask task = new CalendarTask(0L, null, DATE_1, DATE_2, DATE_3, "1", "2", "3");
+    verifyCalendarTask(task);
+  }
 
   @Test
   public void testCalendarTaskConstruction3() {
@@ -112,112 +111,111 @@ public class CalendarItemTest {
     Assert.assertEquals("appointment color", "3", app.getColor());
   }
 
-//TODO: fix this test with Bug 404012
-//  @Test
-//  public void testItemIdInstanceCreation() {
-//    ICalendarItem item = new CalendarTask();
-//    Assert.assertEquals(item.getItemId(), 0L);
-//  }
-//
-//  @Test
-//  public void testItemIdInstanceCreation_2() {
-//    ICalendarItem item = new CalendarAppointment();
-//    Assert.assertEquals(item.getItemId(), 0L);
-//  }
-//
-//  @Test
-//  public void testItemIdGetSet_1() {
-//    ICalendarItem item = new CalendarTask();
-//    item.setId(1L);
-//    Assert.assertEquals(item.getItemId(), 1L);
-//  }
-//
-//  @Test
-//  public void testItemIdGetSet_2() {
-//    ICalendarItem item = new CalendarTask();
-//    item.setItemId(1L);
-//    Assert.assertEquals(item.getId(), 1L);
-//  }
-//
-//  @Test
-//  public void testItemIdGetSet_3() {
-//    ICalendarItem item = new CalendarTask();
-//    item.setItemId(new String("1"));
-//    Assert.assertEquals(item.getItemId(), "1");
-//  }
-//
-//  @Test(expected = UnsupportedOperationException.class)
-//  public void testItemIdGetSet_4() {
-//    ICalendarItem item = new CalendarTask();
-//    item.setItemId(new String("1"));
-//    item.getId();
-//  }
-//
-//  @Test
-//  public void testResponsibleInstanceCreation() {
-//    ICalendarTask task = new CalendarTask();
-//    Assert.assertNull(task.getResponsibleId());
-//  }
-//
-//  @Test
-//  public void testResponsibleGetSet_1() {
-//    ICalendarTask task = new CalendarTask();
-//    task.setResponsibleId(1L);
-//    Assert.assertEquals(task.getResponsible(), 1L);
-//  }
-//
-//  @Test
-//  public void testResponsibleGetSet_2() {
-//    ICalendarTask task = new CalendarTask();
-//    task.setResponsible(1L);
-//    Assert.assertEquals(task.getResponsibleId(), Long.valueOf(1L));
-//  }
-//
-//  @Test
-//  public void testResponsibleGetSet_3() {
-//    ICalendarTask task = new CalendarTask();
-//    task.setResponsible(new String("1"));
-//    Assert.assertEquals(task.getResponsible(), "1");
-//  }
-//
-//  @Test(expected = UnsupportedOperationException.class)
-//  public void testResponsibleGetSet_4() {
-//    ICalendarTask task = new CalendarTask();
-//    task.setResponsible(new String("1"));
-//    task.getResponsibleId();
-//  }
-//
-//  @Test
-//  public void testPersonInstanceCreation() {
-//    ICalendarAppointment app = new CalendarAppointment();
-//    Assert.assertNull(app.getPersonId());
-//  }
-//
-//  @Test
-//  public void testPersonGetSet_1() {
-//    ICalendarAppointment app = new CalendarAppointment();
-//    app.setPersonId(1L);
-//    Assert.assertEquals(app.getPerson(), 1L);
-//  }
-//
-//  @Test
-//  public void testPersonGetSet_2() {
-//    ICalendarAppointment app = new CalendarAppointment();
-//    app.setPerson(1L);
-//    Assert.assertEquals(app.getPersonId(), Long.valueOf(1L));
-//  }
-//
-//  @Test
-//  public void testPersonGetSet_3() {
-//    ICalendarAppointment app = new CalendarAppointment();
-//    app.setPerson(new String("1"));
-//    Assert.assertEquals(app.getPerson(), "1");
-//  }
-//
-//  @Test(expected = UnsupportedOperationException.class)
-//  public void testPersonGetSet_4() {
-//    ICalendarAppointment app = new CalendarAppointment();
-//    app.setPerson(new String("1"));
-//    app.getPersonId();
-//  }
+  @Test
+  public void testItemIdInstanceCreation() {
+    ICalendarItem item = new CalendarTask();
+    Assert.assertEquals("Item Id", 0L, item.getItemId());
+  }
+
+  @Test
+  public void testItemIdInstanceCreation_2() {
+    ICalendarItem item = new CalendarAppointment();
+    Assert.assertEquals("Item Id", 0L, item.getItemId());
+  }
+
+  @Test
+  public void testItemIdGetSet_1() {
+    ICalendarItem item = new CalendarTask();
+    item.setId(1L);
+    Assert.assertEquals("Item Id", 1L, item.getItemId());
+  }
+
+  @Test
+  public void testItemIdGetSet_2() {
+    ICalendarItem item = new CalendarTask();
+    item.setItemId(1L);
+    Assert.assertEquals("Item Id", 1L, item.getId());
+  }
+
+  @Test
+  public void testItemIdGetSet_3() {
+    ICalendarItem item = new CalendarTask();
+    item.setItemId(new String("1"));
+    Assert.assertEquals("Item Id", "1", item.getItemId());
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testItemIdGetSet_4() {
+    ICalendarItem item = new CalendarTask();
+    item.setItemId(new String("1"));
+    item.getId();
+  }
+
+  @Test
+  public void testResponsibleInstanceCreation() {
+    ICalendarTask task = new CalendarTask();
+    Assert.assertNull("ResponsibleId", task.getResponsibleId());
+  }
+
+  @Test
+  public void testResponsibleGetSet_1() {
+    ICalendarTask task = new CalendarTask();
+    task.setResponsibleId(1L);
+    Assert.assertEquals("Responsible", 1L, task.getResponsible());
+  }
+
+  @Test
+  public void testResponsibleGetSet_2() {
+    ICalendarTask task = new CalendarTask();
+    task.setResponsible(1L);
+    Assert.assertEquals("Responsible Id", Long.valueOf(1L), task.getResponsibleId());
+  }
+
+  @Test
+  public void testResponsibleGetSet_3() {
+    ICalendarTask task = new CalendarTask();
+    task.setResponsible(new String("1"));
+    Assert.assertEquals("Responsible", "1", task.getResponsible());
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testResponsibleGetSet_4() {
+    ICalendarTask task = new CalendarTask();
+    task.setResponsible(new String("1"));
+    task.getResponsibleId();
+  }
+
+  @Test
+  public void testPersonInstanceCreation() {
+    ICalendarAppointment app = new CalendarAppointment();
+    Assert.assertNull("PersonId", app.getPersonId());
+  }
+
+  @Test
+  public void testPersonGetSet_1() {
+    ICalendarAppointment app = new CalendarAppointment();
+    app.setPersonId(1L);
+    Assert.assertEquals("Person", 1L, app.getPerson());
+  }
+
+  @Test
+  public void testPersonGetSet_2() {
+    ICalendarAppointment app = new CalendarAppointment();
+    app.setPerson(1L);
+    Assert.assertEquals("PersonId", Long.valueOf(1L), app.getPersonId());
+  }
+
+  @Test
+  public void testPersonGetSet_3() {
+    ICalendarAppointment app = new CalendarAppointment();
+    app.setPerson(new String("1"));
+    Assert.assertEquals("Person", "1", app.getPerson());
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testPersonGetSet_4() {
+    ICalendarAppointment app = new CalendarAppointment();
+    app.setPerson(new String("1"));
+    app.getPersonId();
+  }
 }
