@@ -75,6 +75,7 @@
       </activation>
       <modules>
         <module>../org.eclipse.scout.commons.test</module>
+        <module>../org.eclipse.scout.jaxws216.test</module>
         <module>../org.eclipse.scout.rt.client.test</module>
         <module>../org.eclipse.scout.rt.client.testenvironment</module>
         <module>../org.eclipse.scout.rt.extension.client.test</module>
@@ -87,9 +88,11 @@
         <module>../org.eclipse.scout.service.test</module>
         <module>../org.eclipse.scout.rt.testing-feature</module>
         <module>../org.eclipse.scout.rt.testing.client</module>
+        <module>../org.eclipse.scout.rt.testing.client.test</module>
         <module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
         <module>../org.eclipse.scout.rt.testing.commons</module>
         <module>../org.eclipse.scout.rt.testing.server</module>
+        <module>../org.eclipse.scout.rt.testing.server.test</module>
         <module>../org.eclipse.scout.rt.testing.shared</module>
         <module>../org.eclipse.scout.rt.testing.ui.rap</module>
         <module>../org.eclipse.scout.rt.testing.ui.swing</module>
