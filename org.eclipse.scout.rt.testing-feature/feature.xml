@@ -28,7 +28,7 @@
 
    <requires>
       <import plugin="org.apache.ant" version="1.7.1" match="compatible"/>
-      <import plugin="org.junit" version="4.5.0" match="compatible"/>
+      <import plugin="org.junit" version="4.9.0" match="compatible"/>
    </requires>
 
    <plugin

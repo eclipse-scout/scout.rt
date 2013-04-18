@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.server.runner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,6 +22,8 @@ import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,6 +32,16 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ScoutServerTestRunner.class)
 public class ScoutServerTransactionTest {
+
+  @BeforeClass
+  public static void beforeClassCheck() {
+    assertTrue("This check ensures the before class runner from scout testing works. @See bug405846", true);
+  }
+
+  @AfterClass
+  public static void afterClassCheck() {
+    assertTrue("This check ensures the after class runner from scout testing works. @See bug405846", true);
+  }
 
   @Test
   public void testValidTransactionMember() {

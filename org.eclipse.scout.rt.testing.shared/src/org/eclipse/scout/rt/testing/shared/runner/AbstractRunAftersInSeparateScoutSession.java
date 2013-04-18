@@ -13,15 +13,14 @@ package org.eclipse.scout.rt.testing.shared.runner;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
  * Invokes all methods of a test class annotated with {@link org.junit.AfterClass} in a separate Scout session and
  * therefore in a separate Scout transaction.
  */
-@SuppressWarnings("restriction")
 public abstract class AbstractRunAftersInSeparateScoutSession extends Statement {
   private final Statement m_statement;
   private final Object m_target;

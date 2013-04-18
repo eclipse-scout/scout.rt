@@ -30,7 +30,7 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void start(BundleContext bundleContext) throws Exception {
-    Activator.context = bundleContext;
+    context = bundleContext;
   }
 
   /*
@@ -41,7 +41,6 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
-    Activator.context = null;
+    context = null;
   }
-
 }

@@ -23,7 +23,9 @@ import org.eclipse.scout.testing.client.DefaultTestClientSessionProvider;
 import org.eclipse.scout.testing.client.ITestClientSessionProvider;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientTest;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.NullTestClientSessionProvider;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.model.InitializationError;
 
@@ -35,6 +37,16 @@ public class ScoutClientTestRunnerTest {
   private ScoutClientTestRunnerEx m_runner;
   private ClientTest m_allValuesClientTest;
   private ClientTest m_defaultValuesClientTest;
+
+  @BeforeClass
+  public static void beforeClassCheck() {
+    assertTrue("This check ensures the before class runner from scout testing works. @See bug405846", true);
+  }
+
+  @AfterClass
+  public static void afterClassCheck() {
+    assertTrue("This check ensures the after class runner from scout testing works. @See bug405846", true);
+  }
 
   @Before
   public void setUp() throws Exception {
