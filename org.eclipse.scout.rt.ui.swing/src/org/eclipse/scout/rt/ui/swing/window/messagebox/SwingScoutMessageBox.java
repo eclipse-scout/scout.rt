@@ -64,7 +64,12 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
 
   private static final int MAX_WIDTH = 800;
   private static final int MAX_HEIGHT = 600;
+
+  private static final int VERTICAL_PADDING = 12;
   private static final int HORIZONTAL_PADDING = 12;
+  private static final int EMPTY_BORDER_PADDING = 12;
+
+  private static final int COLOR_LIGHT_GRAY = 0xf2f2f2;
 
   private P_ScoutMessageBoxListener m_scoutMessageBoxListener;
   private Window m_swingParent;
@@ -76,10 +81,10 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
 
   public SwingScoutMessageBox(Window swingParent) {
     super();
-    while (swingParent != null && !(swingParent instanceof Dialog || swingParent instanceof Frame)) {
-      swingParent = SwingUtilities.getWindowAncestor(swingParent);
-    }
     m_swingParent = swingParent;
+    while (swingParent != null && !(swingParent instanceof Dialog || swingParent instanceof Frame)) {
+      m_swingParent = SwingUtilities.getWindowAncestor(swingParent);
+    }
   }
 
   @Override
@@ -101,11 +106,11 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     // content
     JPanel contentPane = (JPanel) m_swingDialog.getContentPane();
     contentPane.setLayout(new P_Layout());
-    contentPane.setBackground(new Color(0xf2f2f2));
+    contentPane.setBackground(new Color(COLOR_LIGHT_GRAY));
     if (getScoutMessageBox().getIntroText() != null) {
       String s = getScoutMessageBox().getIntroText();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
-      labelPanel.setBorder(new EmptyBorder(16, HORIZONTAL_PADDING, 16, HORIZONTAL_PADDING));
+      labelPanel.setBorder(new EmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING));
       labelPanel.setBackground(Color.white);
       labelPanel.setOpaque(true);
       JLabelEx label = new JLabelEx();
@@ -117,7 +122,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     if (getScoutMessageBox().getActionText() != null) {
       String s = getScoutMessageBox().getActionText();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
-      labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(16, HORIZONTAL_PADDING, 16, HORIZONTAL_PADDING)));
+      labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING)));
       labelPanel.setOpaque(false);
       JLabelEx label = new JLabelEx();
       label.setText(s);
@@ -127,7 +132,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     }
     // buttons
     JPanel buttonPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.RIGHT));
-    buttonPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(12, 12, 12, 12)));
+    buttonPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING)));
     buttonPanel.setOpaque(false);
     JButton defaultButton = null;
     if (getScoutMessageBox().getYesButtonText() != null) {
@@ -217,9 +222,6 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
   @Override
   public void showSwingMessageBox() {
     setOptimizedDialogBounds();
-    if (m_swingDialog.isModal()) {
-      //getSwingEnvironment().interruptWaitingForSwing();
-    }
     m_swingDialog.setVisible(true);
   }
 
@@ -353,12 +355,16 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
                   handleScoutMessageBoxClosed(e);
                   break;
                 }
+                default:
+                  break;
               }
             }
           };
           getSwingEnvironment().invokeSwingLater(t);
           break;
         }
+        default:
+          break;
       }
     }
   }// end private class
@@ -370,7 +376,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     }
   }// end private class
 
-  private class P_TopSeparatorBorder implements Border {
+  private static class P_TopSeparatorBorder implements Border {
 
     @Override
     public Insets getBorderInsets(Component c) {
@@ -392,7 +398,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     }
   }
 
-  private class P_Layout extends BorderLayoutEx {
+  private static class P_Layout extends BorderLayoutEx {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -421,7 +427,8 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
    *          the label component with its initial text set
    */
   private void ensureProperDimension(final JLabel label) {
-    if (label.getPreferredSize().width <= MAX_WIDTH) {
+    final int maxLabelWidth = MAX_WIDTH - 2 * HORIZONTAL_PADDING;
+    if (label.getPreferredSize().width <= maxLabelWidth) {
       return;
     }
 
@@ -444,7 +451,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
         final float initialVerticalSpan = view.getPreferredSpan(View.Y_AXIS);
 
         // narrow horizontal span to allow proper height calculation. This precedes initial size calculation.
-        view.setSize(Math.min(MAX_WIDTH - 24, initialHorizontalSpan), initialVerticalSpan);
+        view.setSize(Math.min(maxLabelWidth, initialHorizontalSpan), initialVerticalSpan);
 
         /*
          * Restore initial span to allow the label to be resized wider than the preferred span specified.
