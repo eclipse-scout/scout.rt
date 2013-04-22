@@ -56,8 +56,6 @@
             <configuration>
               <excludes>
                 <plugin id="org.eclipse.scout.rt.feature.about" />
-                <plugin id="org.apache.derby.jdbc_1053.fragment" />
-                <plugin id="org.apache.derby.jdbc_1082.fragment" />
               </excludes>
             </configuration>
           </execution>

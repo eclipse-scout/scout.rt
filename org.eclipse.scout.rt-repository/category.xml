@@ -12,16 +12,46 @@
    <feature url="features/org.eclipse.scout.rt.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.source" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
-   <feature url="features/org.eclipse.scout.rt.rap_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap" version="0.0.0">
+   <feature url="features/org.eclipse.scout.rt.testing.core_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.core" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
-   <feature url="features/org.eclipse.scout.rt.rap.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.source" version="0.0.0">
+   <feature url="features/org.eclipse.scout.rt.testing.core.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.core.source" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
-   <feature url="features/org.eclipse.scout.rt.rap.testing_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.testing" version="0.0.0">
+   <feature url="features/org.eclipse.scout.rt.testing.swing_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.swing" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
-   <feature url="features/org.eclipse.scout.rt.rap.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.testing.source" version="0.0.0">
+   <feature url="features/org.eclipse.scout.rt.testing.swing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.swing.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.testing.swt_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.swt" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.testing.swt.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.swt.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.core_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.core" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.core.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.core.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.client_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.client" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.client.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.client.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.swing_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.swing" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.swing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.swing.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.swt_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.swt" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.swt.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.swt.source" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
    <category-def name="Eclipse Scout RT" label="Scout Application Development RT">

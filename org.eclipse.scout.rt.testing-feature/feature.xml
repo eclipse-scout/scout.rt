@@ -23,68 +23,24 @@
    </url>
 
    <includes
-         id="org.eclipse.scout.rt"
+         id="org.eclipse.scout.rt.core"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.scout.rt.testing.core"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.scout.rt.testing.swing"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.scout.rt.testing.swt"
          version="0.0.0"/>
 
    <requires>
       <import plugin="org.apache.ant" version="1.7.1" match="compatible"/>
       <import plugin="org.junit" version="4.9.0" match="compatible"/>
    </requires>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.client"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.commons"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.shared"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.server"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.ui.swing"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.ui.swt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.easymock"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
 </feature>

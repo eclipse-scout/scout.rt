@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.scout.rt.rap_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap" version="0.0.0">
+      <category name="Eclipse Scout RAP RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.rap.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.source" version="0.0.0">
+      <category name="Eclipse Scout RAP RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.rap.basic.target_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.basic.target" version="0.0.0">
+      <category name="Eclipse Scout RAP RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.rap.testing_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.testing" version="0.0.0">
+      <category name="Eclipse Scout RAP RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.rap.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.testing.source" version="0.0.0">
+      <category name="Eclipse Scout RAP RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.client.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.client.source" version="0.0.0"/>
+   <feature url="features/org.eclipse.scout.rt.client_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.client" version="0.0.0"/>
+   <feature url="features/org.eclipse.scout.rt.core.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.core.source" version="0.0.0"/>
+   <feature url="features/org.eclipse.scout.rt.core_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.core" version="0.0.0"/>
+   <feature url="features/org.eclipse.scout.rt.testing.core.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.core.source" version="0.0.0"/>
+   <feature url="features/org.eclipse.scout.rt.testing.core_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.core" version="0.0.0"/>
+   <category-def name="Eclipse Scout RAP RT" label="Scout RAP Target Platform Components">
+      <description>
+         Scout RAP Target Platform Components
+      </description>
+   </category-def>
+</site>

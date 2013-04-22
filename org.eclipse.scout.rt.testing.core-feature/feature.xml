@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.rt.testing.core"
+      label="%featureName"
+      version="3.9.0.qualifier"
+      provider-name="%providerName">
+
+   <description url="http://www.eclipse.org/scout/">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
+   </url>
+
+   <includes
+         id="org.eclipse.scout.rt.core"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.apache.ant" version="1.7.1" match="compatible"/>
+      <import plugin="org.junit" version="4.9.0" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.client"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.commons"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.shared"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.server"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.easymock"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

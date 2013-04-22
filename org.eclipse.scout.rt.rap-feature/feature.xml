@@ -23,16 +23,8 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.rt" version="3.9.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.rwt.osgi" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.jface" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.jface.databinding" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.forms" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.views" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.workbench" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.rap.ui.cheatsheets" version="2.0.0" match="compatible"/>
+      <import feature="org.eclipse.rap.feature" version="2.0.0" match="compatible"/>
+      <import feature="org.eclipse.scout.rt.client" version="3.9.0" match="compatible"/>
    </requires>
 
    <plugin
