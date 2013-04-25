@@ -53,5 +53,5 @@ public interface IDeviceTransformer {
    */
   List<String> getAcceptedViewIds();
 
-  DeviceTransformationExcluder getDeviceTransformationExcluder();
+  DeviceTransformationConfig getDeviceTransformationConfig();
 }

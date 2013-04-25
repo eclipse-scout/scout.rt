@@ -49,7 +49,6 @@ public class PageFormManager {
 
   private String m_leftPageSlotViewId;
   private String m_middlePageSlotViewId;
-  private boolean m_tableStatusVisible;
   private IDesktop m_desktop;
 
   private List<IForm> m_blockedForms;
@@ -92,14 +91,6 @@ public class PageFormManager {
     if (pageSlotViewIds.length > 1) {
       m_middlePageSlotViewId = pageSlotViewIds[1];
     }
-  }
-
-  public void setTableStatusVisible(boolean tableStatusVisible) {
-    m_tableStatusVisible = tableStatusVisible;
-  }
-
-  public boolean isTableStatusVisible() {
-    return m_tableStatusVisible;
   }
 
   public String getLeftPageSlotViewId() {
@@ -277,7 +268,7 @@ public class PageFormManager {
   private IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
     PageFormConfig config = new PageFormConfig();
     config.setTablePageAllowed(true);
-    config.setTableStatusVisible(isTableStatusVisible());
+    config.setTableStatusVisible(true);
     if (hasOnlyOnePageSlot()) {
       config.setDetailFormVisible(true);
     }

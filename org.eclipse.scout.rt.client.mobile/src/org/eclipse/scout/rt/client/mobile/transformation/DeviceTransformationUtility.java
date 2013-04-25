@@ -10,18 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import org.eclipse.scout.service.SERVICES;
+
 /**
  * @since 3.9.0
  */
-public enum MobileDeviceTransformation implements IDeviceTransformation {
-  MOVE_FIELD_LABEL_TO_TOP,
-  MAKE_FIELD_SCALEABLE,
-  MAKE_MAINBOX_SCROLLABLE,
-  REDUCE_GROUPBOX_COLUMNS_TO_ONE,
-  HIDE_PLACEHOLDER_FIELD,
-  DISABLE_FORM_CANCEL_CONFIRMATION,
-  DISPLAY_FORM_HEADER,
-  ADD_MISSING_BACK_ACTION_TO_FORM_HEADER,
-  DISPLAY_OUTLINE_ROOT_NODE,
-  DISPLAY_PAGE_TABLE
+public class DeviceTransformationUtility {
+
+  /**
+   * @return a reference to the active device transformation configuration.
+   */
+  public static DeviceTransformationConfig getDeviceTransformationConfig() {
+    IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+    if (service != null && service.getDeviceTransformer() != null) {
+      return service.getDeviceTransformer().getDeviceTransformationConfig();
+    }
+
+    return null;
+  }
 }

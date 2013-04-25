@@ -23,11 +23,50 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  * @since 3.9.0
  */
-public class DeviceTransformationExcluder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DeviceTransformationExcluder.class);
+public class DeviceTransformationConfig {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DeviceTransformationConfig.class);
 
+  private Set<IDeviceTransformation> m_enabledTransformations = new HashSet<IDeviceTransformation>();
   private Map<IForm, ExclusionInfo> m_excludedForms = new WeakHashMap<IForm, ExclusionInfo>();
   private Map<IFormField, ExclusionInfo> m_excludedFields = new WeakHashMap<IFormField, ExclusionInfo>();
+
+  public void enableTransformation(IDeviceTransformation transformation) {
+    m_enabledTransformations.add(transformation);
+  }
+
+  public void disableTransformation(IDeviceTransformation transformation) {
+    m_enabledTransformations.remove(transformation);
+  }
+
+  public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    return m_enabledTransformations.contains(transformation);
+  }
+
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form) {
+    if (!isTransformationEnabled(transformation)) {
+      return false;
+    }
+    if (isFormTransformationExcluded(form, transformation)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field) {
+    if (!isTransformationEnabled(transformation)) {
+      return false;
+    }
+    if (isFormTransformationExcluded(field.getForm(), transformation)) {
+      return false;
+    }
+
+    if (isFieldTransformationExcluded(field, transformation)) {
+      return false;
+    }
+
+    return true;
+  }
 
   public void excludeForm(IForm form) {
     ExclusionInfo exclusionInfo = m_excludedForms.get(form);
@@ -41,7 +80,7 @@ public class DeviceTransformationExcluder {
     LOG.debug("Excluding form " + form);
   }
 
-  public void excludeFormTransformation(IForm form, MobileDeviceTransformation transformation) {
+  public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
     ExclusionInfo exclusionInfo = m_excludedForms.get(form);
     if (exclusionInfo == null) {
       exclusionInfo = new ExclusionInfo();
@@ -66,7 +105,7 @@ public class DeviceTransformationExcluder {
     return false;
   }
 
-  public boolean isFormTransformationExcluded(IForm form, MobileDeviceTransformation transformation) {
+  public boolean isFormTransformationExcluded(IForm form, IDeviceTransformation transformation) {
     ExclusionInfo exclusionInfo = m_excludedForms.get(form);
     if (exclusionInfo == null) {
       return false;
@@ -91,7 +130,7 @@ public class DeviceTransformationExcluder {
     LOG.debug("Excluding field " + formField);
   }
 
-  public void excludeFieldTransformation(IFormField formField, MobileDeviceTransformation transformation) {
+  public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
     ExclusionInfo exclusionInfo = m_excludedFields.get(formField);
     if (exclusionInfo == null) {
       exclusionInfo = new ExclusionInfo();
@@ -116,7 +155,7 @@ public class DeviceTransformationExcluder {
     return false;
   }
 
-  public boolean isFieldTransformationExcluded(IFormField formField, MobileDeviceTransformation transformation) {
+  public boolean isFieldTransformationExcluded(IFormField formField, IDeviceTransformation transformation) {
     ExclusionInfo exclusionInfo = m_excludedFields.get(formField);
     if (exclusionInfo == null) {
       return false;
@@ -131,13 +170,13 @@ public class DeviceTransformationExcluder {
 
   private class ExclusionInfo {
     private boolean m_excludeAllTransformations = false;
-    private Set<MobileDeviceTransformation> m_excludedTransformations;
+    private Set<IDeviceTransformation> m_excludedTransformations;
 
     public ExclusionInfo() {
-      m_excludedTransformations = new HashSet<MobileDeviceTransformation>();
+      m_excludedTransformations = new HashSet<IDeviceTransformation>();
     }
 
-    public Set<MobileDeviceTransformation> getExcludedTransformations() {
+    public Set<IDeviceTransformation> getExcludedTransformations() {
       return m_excludedTransformations;
     }
 

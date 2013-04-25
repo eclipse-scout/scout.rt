@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.mobile.ui.form.IMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IMainPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -83,7 +83,11 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   }
 
   @Override
-  public IRwtScoutFormHeader createFormHeader(Composite parent, IForm scoutForm) {
+  public IRwtScoutFormHeader createFormHeader(org.eclipse.swt.widgets.Composite parent, IForm scoutForm) {
+    if (!AbstractMobileForm.isHeaderVisible(scoutForm)) {
+      return null;
+    }
+
     IRwtScoutFormHeader uiFormHeader = null;
     if (scoutForm instanceof IMainPageForm || scoutForm instanceof IOutlineChooserForm) {
       uiFormHeader = new RwtScoutMobileOutlineFormHeader();
@@ -99,13 +103,13 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
 
   @Override
   public IRwtScoutFormFooter createFormFooter(Composite parent, IForm scoutForm) {
-    if (scoutForm instanceof IMobileForm && ((IMobileForm) scoutForm).isFooterVisible()) {
-      RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();
-      mobileFormFooter.createUiField(parent, scoutForm, this);
-      return mobileFormFooter;
+    if (!AbstractMobileForm.isFooterVisible(scoutForm)) {
+      return null;
     }
 
-    return null;
+    RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();
+    mobileFormFooter.createUiField(parent, scoutForm, this);
+    return mobileFormFooter;
   }
 
   @Override

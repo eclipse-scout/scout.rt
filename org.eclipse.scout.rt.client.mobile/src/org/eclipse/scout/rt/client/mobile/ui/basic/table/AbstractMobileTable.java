@@ -144,12 +144,13 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return m_drillDownStyleMap;
   }
 
-  public static void setAutoCreateRowForm(ITable table, Boolean autoCreateRowForm) {
+  public static void setAutoCreateRowForm(ITable table, boolean autoCreateRowForm) {
     table.setProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateRowForm);
   }
 
-  public static Boolean isAutoCreateRowForm(ITable table) {
-    return (Boolean) table.getProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM);
+  public static boolean isAutoCreateRowForm(ITable table) {
+    Boolean b = (Boolean) table.getProperty(PROP_AUTO_CREATE_TABLE_ROW_FORM);
+    return b != null ? b.booleanValue() : false;
   }
 
   public static void setDrillDownStyleMap(ITable table, DrillDownStyleMap drillDownStyles) {
@@ -168,24 +169,27 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return (String) table.getProperty(IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE);
   }
 
-  public static Boolean isPagingEnabled(ITable table) {
-    return (Boolean) table.getProperty(IMobileTable.PROP_PAGING_ENABLED);
+  public static boolean isPagingEnabled(ITable table) {
+    Boolean b = (Boolean) table.getProperty(PROP_PAGING_ENABLED);
+    return b != null ? b.booleanValue() : false;
   }
 
-  public static void setPagingEnabled(ITable table, Boolean enabled) {
+  public static void setPagingEnabled(ITable table, boolean enabled) {
     table.setProperty(IMobileTable.PROP_PAGING_ENABLED, enabled);
   }
 
-  public static Integer getPageSize(ITable table) {
-    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_SIZE);
+  public static int getPageSize(ITable table) {
+    Number n = (Number) table.getProperty(PROP_PAGE_SIZE);
+    return n != null ? n.intValue() : 0;
   }
 
   public static void setPageSize(ITable table, int pageSize) {
     table.setProperty(IMobileTable.PROP_PAGE_SIZE, pageSize);
   }
 
-  public static Integer getPageIndex(ITable table) {
-    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_INDEX);
+  public static int getPageIndex(ITable table) {
+    Number n = (Number) table.getProperty(PROP_PAGE_INDEX);
+    return n != null ? n.intValue() : 0;
   }
 
   public static void setPageIndex(ITable table, int index) {

@@ -12,24 +12,24 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
+import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.DefaultOutlineChooserForm.MainBox.OutlinesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.service.SERVICES;
 
-public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineChooserForm {
+public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOutlineChooserForm {
 
   public DefaultOutlineChooserForm() throws ProcessingException {
     super();
@@ -67,6 +67,16 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
     return getFieldByClass(OutlinesTableField.class);
   }
 
+  @Override
+  protected boolean getConfiguredHeaderVisible() {
+    return true;
+  }
+
+  @Override
+  protected boolean getConfiguredFooterVisible() {
+    return true;
+  }
+
   @Order(10.0)
   public class MainBox extends AbstractGroupBox {
 
@@ -78,9 +88,9 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
     @Override
     protected void execInitField() throws ProcessingException {
       //Table already is scrollable, it's not necessary to make the form scrollable too
-      IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
-      if (service != null && service.getDeviceTransformer() != null) {
-        service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+      DeviceTransformationConfig config = DeviceTransformationUtility.getDeviceTransformationConfig();
+      if (config != null) {
+        config.excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
       }
     }
 

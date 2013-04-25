@@ -43,11 +43,12 @@ public class AbstractMobileAction extends AbstractMenu implements IMobileAction 
     setHorizontalAlignment(this, alignment);
   }
 
-  public static Integer getHorizontalAlignment(IAction action) {
-    return (Integer) action.getProperty(PROP_HORIZONTAL_ALIGNMENT);
+  public static int getHorizontalAlignment(IAction action) {
+    Number n = (Number) action.getProperty(PROP_HORIZONTAL_ALIGNMENT);
+    return n != null ? n.intValue() : 0;
   }
 
-  public static void setHorizontalAlignment(IAction action, Integer alignment) {
+  public static void setHorizontalAlignment(IAction action, int alignment) {
     action.setProperty(PROP_HORIZONTAL_ALIGNMENT, alignment);
   }
 

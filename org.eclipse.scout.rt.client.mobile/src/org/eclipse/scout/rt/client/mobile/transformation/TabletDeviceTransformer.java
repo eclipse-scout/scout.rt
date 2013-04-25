@@ -39,11 +39,16 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
   }
 
   @Override
-  protected PageFormManager createPageFormManager(IDesktop desktop) {
-    PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
-    manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
+  protected void initTransformationConfig() {
+    super.initTransformationConfig();
 
-    return manager;
+    getDeviceTransformationConfig().disableTransformation(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
+    getDeviceTransformationConfig().disableTransformation(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER);
+  }
+
+  @Override
+  protected PageFormManager createPageFormManager(IDesktop desktop) {
+    return new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
   }
 
   @Override
@@ -87,18 +92,4 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     }
   }
 
-  @Override
-  protected boolean shouldPageDetailFormBeEmbedded() {
-    return false;
-  }
-
-  @Override
-  protected boolean autoAddBackActionToFormHeader() {
-    return false;
-  }
-
-  @Override
-  protected boolean shouldLabelBeMovedToTop() {
-    return false;
-  }
 }

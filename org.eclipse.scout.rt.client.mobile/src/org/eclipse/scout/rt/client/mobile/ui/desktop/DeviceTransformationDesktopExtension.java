@@ -17,14 +17,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
@@ -32,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
@@ -181,30 +178,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       return false;
     }
 
-  }
-
-  @Order(30.0)
-  public class LogoutMenu extends AbstractMenu {
-
-    @Override
-    protected boolean getConfiguredSingleSelectionAction() {
-      return true;
-    }
-
-    @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("Logoff");
-    }
-
-    @Override
-    protected boolean getConfiguredVisible() {
-      return false;
-    }
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      ClientJob.getCurrentSession().stopSession();
-    }
   }
 
 }

@@ -31,9 +31,14 @@ public abstract class AbstractMobileForm extends AbstractForm implements IMobile
   protected void initConfig() throws ProcessingException {
     super.initConfig();
 
+    setHeaderVisible(getConfiguredHeaderVisible());
     setFooterVisible(getConfiguredFooterVisible());
     setHeaderActionFetcher(createHeaderActionFetcher());
     setFooterActionFetcher(createFooterActionFetcher());
+  }
+
+  protected boolean getConfiguredHeaderVisible() {
+    return false;
   }
 
   protected boolean getConfiguredFooterVisible() {
@@ -41,13 +46,41 @@ public abstract class AbstractMobileForm extends AbstractForm implements IMobile
   }
 
   @Override
+  public boolean isHeaderVisible() {
+    return isHeaderVisible(this);
+  }
+
+  @Override
+  public void setHeaderVisible(boolean visible) {
+    setHeaderVisible(this, visible);
+  }
+
+  public static void setHeaderVisible(IForm form, boolean visible) {
+    form.setProperty(PROP_HEADER_VISIBLE, visible);
+  }
+
+  public static boolean isHeaderVisible(IForm form) {
+    Boolean b = (Boolean) form.getProperty(PROP_HEADER_VISIBLE);
+    return b != null ? b.booleanValue() : false;
+  }
+
+  @Override
   public boolean isFooterVisible() {
-    return propertySupport.getPropertyBool(PROP_FOOTER_VISIBLE);
+    return isFooterVisible(this);
   }
 
   @Override
   public void setFooterVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_FOOTER_VISIBLE, visible);
+    setFooterVisible(this, visible);
+  }
+
+  public static boolean isFooterVisible(IForm form) {
+    Boolean b = (Boolean) form.getProperty(PROP_FOOTER_VISIBLE);
+    return b != null ? b.booleanValue() : false;
+  }
+
+  public static void setFooterVisible(IForm form, boolean visible) {
+    form.setProperty(PROP_FOOTER_VISIBLE, visible);
   }
 
   protected IActionFetcher createHeaderActionFetcher() {
