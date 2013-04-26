@@ -421,7 +421,8 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
    *          the label component with its initial text set
    */
   private void ensureProperDimension(final JLabel label) {
-    if (label.getPreferredSize().width <= MAX_WIDTH) {
+    final int maxLabelWidth = MAX_WIDTH - 2 * HORIZONTAL_PADDING;
+    if (label.getPreferredSize().width <= maxLabelWidth) {
       return;
     }
 
@@ -444,7 +445,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
         final float initialVerticalSpan = view.getPreferredSpan(View.Y_AXIS);
 
         // narrow horizontal span to allow proper height calculation. This precedes initial size calculation.
-        view.setSize(Math.min(MAX_WIDTH - 24, initialHorizontalSpan), initialVerticalSpan);
+        view.setSize(Math.min(maxLabelWidth, initialHorizontalSpan), initialVerticalSpan);
 
         /*
          * Restore initial span to allow the label to be resized wider than the preferred span specified.
