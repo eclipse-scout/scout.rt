@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.ui.svg.calendar.comp;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -10,6 +11,7 @@ import org.w3c.dom.Element;
 
 public abstract class AbstractComponentElementFactory implements IComponentElementFactory {
 
+  private final AtomicInteger m_componentCounter = new AtomicInteger();
   private CalendarComponent m_selectedComponent;
 
   @Override
@@ -50,7 +52,7 @@ public abstract class AbstractComponentElementFactory implements IComponentEleme
     newEl.appendChild(title);
 
     // ID
-    newEl.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, "comp" + c.getItem().getId());
+    newEl.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, "comp" + m_componentCounter.incrementAndGet());
 
     // background and border
     CalendarSvgUtility.removeBorder(newEl);

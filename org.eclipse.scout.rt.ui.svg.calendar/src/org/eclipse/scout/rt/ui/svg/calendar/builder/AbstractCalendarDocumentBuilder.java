@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.dom.svg.SVGTextContentSupport;
 import org.apache.batik.util.SVGConstants;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -25,6 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.ui.svg.calendar.Activator;
 import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgUtility;
 import org.eclipse.scout.rt.ui.svg.calendar.builder.listener.CalendarDocumentEvent;
@@ -107,6 +109,10 @@ public abstract class AbstractCalendarDocumentBuilder {
   private CalendarComponent[] m_components;
   private int m_numContextMenus;
   private final HashMap<Element, Date> m_gridDateMap;
+
+  private int m_linkCounter;
+  private final Map<Integer, Object> m_linkIdToItemIdMap;
+  private final Map<Object, Integer> m_ItemIdToLinkIdMap;
 
   protected AbstractCalendarDocumentBuilder(String svgFile) {
     // read document
@@ -198,6 +204,11 @@ public abstract class AbstractCalendarDocumentBuilder {
     initDisplayModeLinks();
     initTimeLineText();
     initGridHyperlink();
+
+    // init link Id support
+    m_linkCounter = 1;
+    m_linkIdToItemIdMap = new HashMap<Integer, Object>();
+    m_ItemIdToLinkIdMap = new HashMap<Object, Integer>();
   }
 
   protected abstract int getNumWeekdays();
@@ -259,12 +270,13 @@ public abstract class AbstractCalendarDocumentBuilder {
     else if (hyperlinkUrl.startsWith(LINK_COMPONENT_PREFIX)) {
       Matcher m = REGEX_URL_COMP_CLICK.matcher(hyperlinkUrl);
       if (m.matches()) {
-        long id = Long.parseLong(m.group(1));
+        int linkId = Integer.parseInt(m.group(1));
         int weekday = Integer.parseInt(m.group(2));
         int week = Integer.parseInt(m.group(3));
 
         Date clickedDate = getDateAt(weekday, week);
-        CalendarComponent selected = getComponentWithId(id);
+        Object itemId = getItemId(linkId);
+        CalendarComponent selected = getComponentWithId(itemId);
         setSelection(clickedDate, selected);
       }
     }
@@ -687,9 +699,35 @@ public abstract class AbstractCalendarDocumentBuilder {
     refreshComponents(map);
   }
 
-  private CalendarComponent getComponentWithId(long id) {
+  /**
+   * @return Translates the given link ID into the effective {@link ICalendarItem#getItemId()}.
+   */
+  private Object getItemId(int linkId) {
+    return m_linkIdToItemIdMap.get(linkId);
+  }
+
+  /**
+   * @return Translates the given {@link ICalendarItem#getItemId()} into a numeric link ID.
+   */
+  private int getOrCreateLinkId(Object itemId) {
+    if (itemId == null) {
+      throw new IllegalArgumentException("itemId must not be null");
+    }
+    Integer linkId = m_ItemIdToLinkIdMap.get(itemId);
+    if (linkId == null) {
+      linkId = m_linkCounter++;
+      m_linkIdToItemIdMap.put(linkId, itemId);
+      m_ItemIdToLinkIdMap.put(itemId, linkId);
+    }
+    return linkId.intValue();
+  }
+
+  private CalendarComponent getComponentWithId(Object itemId) {
+    if (itemId == null) {
+      return null;
+    }
     for (CalendarComponent c : getComponents()) {
-      if (c != null && c.getItem() != null && c.getItem().getId() == id) {
+      if (c != null && c.getItem() != null && CompareUtility.equals(c.getItem().getItemId(), itemId)) {
         return c;
       }
     }
@@ -717,7 +755,8 @@ public abstract class AbstractCalendarDocumentBuilder {
           if (compEls != null && compEls.size() > 0) {
             for (Entry<CalendarComponent, Element> el : compEls.entrySet()) {
               m_elComponentsContainer.appendChild(el.getValue());
-              SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + el.getKey().getItem().getId() + "/" + p.x + "" + p.y);
+              int linkId = getOrCreateLinkId(el.getKey().getItem().getItemId());
+              SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + linkId + "/" + p.x + "" + p.y);
             }
           }
         }
