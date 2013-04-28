@@ -68,8 +68,8 @@
       <unit id="org.json" version="1.0.0.v201011060100"/>
       <unit id="org.w3c.css.sac" version="1.3.1.v200903091627"/>
       <unit id="org.w3c.css.sac.source" version="1.3.1.v200903091627"/>
-      <unit id="org.w3c.dom.smil" version="1.0.0.v200806040011"/>
-      <unit id="org.w3c.dom.smil.source" version="1.0.0.v200806040011"/>
+      <unit id="org.w3c.dom.smil" version="1.0.1.v200903091627"/>
+      <unit id="org.w3c.dom.smil.source" version="1.0.1.v200903091627"/>
       <unit id="org.w3c.dom.svg" version="1.1.0.v201011041433"/>
       <unit id="org.w3c.dom.svg.source" version="1.1.0.v201011041433"/>
       <unit id="com.thoughtworks.selenium" version="2.25.0.v201212071504"/>
@@ -91,7 +91,6 @@
       <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
     </location>
   </locations>
