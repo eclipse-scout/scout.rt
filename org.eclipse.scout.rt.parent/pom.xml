@@ -97,6 +97,7 @@
         <module>../org.eclipse.scout.rt.shared.test</module>
         <module>../org.eclipse.scout.rt.ui.rap.test</module>
         <module>../org.eclipse.scout.rt.ui.swing.test</module>
+        <module>../org.eclipse.scout.rt.ui.swt.test</module>
         <module>../org.eclipse.scout.service.test</module>
         <module>../org.eclipse.scout.rt.testing-feature</module>
         <module>../org.eclipse.scout.rt.testing.client</module>
