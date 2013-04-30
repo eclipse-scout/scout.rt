@@ -1421,7 +1421,7 @@ public final class TypeCastUtility {
   }
 
   private boolean txBigDecimalToBoolean(BigDecimal o) {
-    return o.equals(new BigDecimal(BigInteger.ONE));
+    return BigInteger.ONE.equals(o.toBigInteger());
   }
 
   private byte txBigDecimalToByte(BigDecimal o) {
