@@ -54,7 +54,8 @@
             </goals>
             <configuration>
               <excludes>
-<!--                 <plugin id="org.eclipse.scout.rt.feature.about" /> -->
+                <plugin id="org.eclipse.scout.rt.ui.rap.theme.rayo" />
+                <plugin id="org.eclipse.scout.rt.ui.rap.theme.rayo.mobile" />
               </excludes>
             </configuration>
           </execution>

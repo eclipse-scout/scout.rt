@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout UI RAP Rayo Theme
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap.theme.rayo;singleton:=true
 Bundle-Version: 3.9.0.qualifier
-Bundle-Activator: org.eclipse.scout.rt.ui.rap.rayo.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.rap.ui;bundle-version="[2.0.0,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
