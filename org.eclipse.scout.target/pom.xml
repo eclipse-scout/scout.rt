@@ -84,32 +84,42 @@
           </execution>
         </executions>
       </plugin>
-
-<!--       <plugin> -->
-<!--         <groupId>org.eclipse.tycho.extras</groupId> -->
-<!--         <artifactId>target-platform-validation-plugin</artifactId> -->
-<!--         <version>${tycho-extras.version}</version> -->
-<!--         <executions> -->
-<!--           <execution> -->
-<!--             <phase>verify</phase> -->
-<!--             <goals> -->
-<!--               <goal>validate-target-platform</goal> -->
-<!--             </goals> -->
-<!--             <configuration> -->
-<!--               <targetFiles> -->
-<!--                 <param>eclipse-3.4.target</param> -->
-<!--                 <param>eclipse-3.5.target</param> -->
-<!--                 <param>eclipse-3.6.target</param> -->
-<!--                 <param>eclipse-3.7.target</param> -->
-<!--                 <param>eclipse-3.8.target</param> -->
-<!--                 <param>eclipse-3.9.target</param> -->
-<!--                 <param>eclipse-staging.target</param> -->
-<!--               </targetFiles> -->
-<!--               <failOnError>true</failOnError> -->
-<!--             </configuration> -->
-<!--           </execution> -->
-<!--         </executions> -->
-<!--       </plugin> -->
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>checkTargets</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>target-platform-validation-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>validate-target-platform</goal>
+                </goals>
+                <configuration>
+                  <targetFiles>
+                    <param>eclipse-3.4.target</param>
+                    <param>eclipse-3.5.target</param>
+                    <param>eclipse-3.6.target</param>
+                    <param>eclipse-3.7.target</param>
+                    <param>eclipse-3.8.target</param>
+                    <param>eclipse-3.9.target</param>
+                    <param>eclipse-3.9I.target</param>
+                    <param>eclipse-staging.target</param>
+                  </targetFiles>
+                  <failOnError>true</failOnError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

@@ -6,14 +6,19 @@
       <repository id="eclipse_kepler_I" location="http://download.eclipse.org/eclipse/updates/4.3-I-builds/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.pde.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.jdt.source.feature.group" version="0.0.0"/>
 
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.equinox.server.servletbridge.feature.group" version="0.0.0"/>
 
       <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.emf.common.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.emf.ecore.source.feature.group" version="0.0.0"/>
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
@@ -97,6 +102,14 @@
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
+      
+      <unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.rap.testing.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.scout.sdk.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.sdk.rap.source.feature.group" version="0.0.0"/>
     </location>
   </locations>
 </target>
