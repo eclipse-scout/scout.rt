@@ -335,7 +335,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         break;
       }
       case Types.CLOB: {
-        if (bind.getValue() instanceof Clob) {
+        if (bind.getValue() instanceof Clob || bind.getValue() == null) {
           ps.setClob(jdbcBindIndex, (Clob) bind.getValue());
         }
         else {
@@ -345,7 +345,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         break;
       }
       case Types.BLOB: {
-        if (bind.getValue() instanceof Blob) {
+        if (bind.getValue() instanceof Blob || bind.getValue() == null) {
           ps.setBlob(jdbcBindIndex, (Blob) bind.getValue());
         }
         else {
@@ -356,7 +356,12 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       }
       case Types.LONGVARCHAR: {
         String s = (String) bind.getValue();
-        ps.setCharacterStream(jdbcBindIndex, new StringReader(s), s.length());
+        if (s != null) {
+          ps.setCharacterStream(jdbcBindIndex, new StringReader(s), s.length());
+        }
+        else {
+          ps.setNull(jdbcBindIndex, Types.LONGVARCHAR);
+        }
         break;
       }
       case Types.LONGVARBINARY: {
