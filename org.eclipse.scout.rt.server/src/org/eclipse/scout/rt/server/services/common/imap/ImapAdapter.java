@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,19 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
+ *     Adrian Sacchi <adrian.sacchi@bsiag.com> - Bug 406813 - ImapAdapter: 6 Issues
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.imap;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
@@ -31,16 +36,17 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public class ImapAdapter {
 
   public static final String TRASH_FOLDER_NAME = "Trash";
+  public static final int DEFAULT_IMAP_PORT = 143;
+
   private boolean m_useSSL;
   private String[] m_sslProtocols;
   private String m_host;
-  private int m_port = 143;
+  private int m_port = DEFAULT_IMAP_PORT;
   private String m_username;
   private String m_password;
   private String m_defaultFolderName;
   private Store m_store;
-  private HashMap<String, Folder> m_cachedFolders;
-  private boolean m_connected = false;
+  private Map<String, Folder> m_cachedFolders;
 
   public ImapAdapter() {
     m_cachedFolders = new HashMap<String, Folder>();
@@ -137,15 +143,28 @@ public class ImapAdapter {
     }
   }
 
+  /**
+   * messages are flagged as DELETED and their folder is closed in order to delete them on the server
+   * 
+   * @param messages
+   * @throws ProcessingException
+   */
   public void deleteMessagesPermanently(Message[] messages) throws ProcessingException {
     connect();
-    for (Message msg : messages) {
-      try {
+    Set<Folder> folders = new HashSet<Folder>();
+    try {
+      for (Message msg : messages) {
+        folders.add(msg.getFolder());
         msg.setFlag(Flags.Flag.DELETED, true);
       }
-      catch (MessagingException e) {
-        throw new ProcessingException(e.getMessage(), e);
+      for (Folder f : folders) {
+        if (f.isOpen()) {
+          f.expunge();
+        }
       }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException(e.getMessage(), e);
     }
   }
 
@@ -171,7 +190,7 @@ public class ImapAdapter {
 
   public void connect() throws ProcessingException {
     if (!isConnected()) {
-      // try{
+      m_cachedFolders.clear();
       Properties props = new Properties();
       props.put("mail.transport.protocol", "imap");
       if (getHost() != null) {
@@ -186,7 +205,7 @@ public class ImapAdapter {
       if (isUseSSL()) {
         props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.setProperty("mail.imap.socketFactory.fallback", "false");
-        props.setProperty("mail.imap.socketFactory.port", "993");
+        props.setProperty("mail.imap.socketFactory.port", "" + getPort());
 
         if (ListUtility.length(getSSLProtocols()) > 0) {
           props.setProperty("mail.imap.ssl.protocols", StringUtility.join(" ", getSSLProtocols()));
@@ -206,12 +225,11 @@ public class ImapAdapter {
         }
       }
       catch (AuthenticationFailedException e) {
-        throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port);
+        throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port + ":" + m_username);
       }
       catch (Exception e) {
         throw new ProcessingException(e.getMessage(), e);
       }
-      m_connected = true;
     }
   }
 
@@ -292,7 +310,6 @@ public class ImapAdapter {
         exceptions.add(e);
       }
       m_cachedFolders.clear();
-      m_connected = false;
       if (!exceptions.isEmpty()) {
         throw new ProcessingException(exceptions.get(0).getMessage());
       }
@@ -300,7 +317,7 @@ public class ImapAdapter {
   }
 
   public boolean isConnected() {
-    return m_connected;
+    return m_store != null && m_store.isConnected();
   }
 
   public Store getStore() throws ProcessingException {
@@ -357,10 +374,10 @@ public class ImapAdapter {
   }
 
   public String[] getSSLProtocols() {
-    return m_sslProtocols;
+    return Arrays.copyOf(m_sslProtocols, m_sslProtocols.length);
   }
 
   public void setSSLProtocols(String[] sslProtocols) {
-    m_sslProtocols = sslProtocols;
+    m_sslProtocols = Arrays.copyOf(sslProtocols, sslProtocols.length);
   }
 }
