@@ -17,15 +17,18 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.easymock.EasyMock;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
+import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.junit.Test;
 
@@ -47,7 +50,7 @@ public class SwingScoutTableFieldUiTest {
     form.getOuterForm();
     expectLastCall().andReturn(form);
 
-    ITable scoutTable = new P_Table();
+    P_Table scoutTable = new P_Table();
 
     ITableField<?> scoutObject = createNiceMock(ITableField.class);
     scoutObject.getGridData();
@@ -68,6 +71,10 @@ public class SwingScoutTableFieldUiTest {
     expectLastCall().andReturn(100).anyTimes();
     environment.createTable(scoutTable); //Bug 405354: creation of the table is delegated to ISwingEnvironment
     expectLastCall().andReturn(new SwingScoutTable());
+    environment.createColumn(0, scoutTable.getFirstColumn()); //Bug 406059: creation of the column is delegated to ISwingEnvironment
+    expectLastCall().andReturn(new SwingTableColumn(0, scoutTable.getFirstColumn()));
+    environment.createColumn(1, scoutTable.getSecondColumn()); //Bug 406059: creation of the column is delegated to ISwingEnvironment
+    expectLastCall().andReturn(new SwingTableColumn(1, scoutTable.getSecondColumn()));
 
     replay(form, scoutObject, environment);
 
@@ -78,5 +85,35 @@ public class SwingScoutTableFieldUiTest {
   }
 
   public static class P_Table extends AbstractTable {
+
+    public FirstColumn getFirstColumn() {
+      return getColumnSet().getColumnByClass(FirstColumn.class);
+    }
+
+    public SecondColumn getSecondColumn() {
+      return getColumnSet().getColumnByClass(SecondColumn.class);
+    }
+
+    @Order(10)
+    public class FirstColumn extends AbstractStringColumn {
+      @Override
+      protected boolean getConfiguredSummary() {
+        return true;
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 60;
+      }
+    }
+
+    @Order(20)
+    public class SecondColumn extends AbstractIntegerColumn {
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 40;
+      }
+    }
   }
 }

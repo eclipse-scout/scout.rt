@@ -91,7 +91,7 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
       }
       IColumn[] scoutCols = m_swingScoutTable.getScoutObject().getColumnSet().getVisibleColumns();
       for (int i = 0; i < scoutCols.length; i++) {
-        SwingTableColumn swingColumn = new SwingTableColumn(i, scoutCols[i]);
+        SwingTableColumn swingColumn = m_env.createColumn(i, scoutCols[i]);
         // add column
         addColumn(swingColumn);
       }

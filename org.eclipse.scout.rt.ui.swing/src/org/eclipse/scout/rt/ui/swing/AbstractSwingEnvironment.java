@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
+import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
 import org.eclipse.scout.rt.ui.swing.concurrency.SwingScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
@@ -1196,6 +1198,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public ISwingScoutTable createTable(ITable table) {
     return new SwingScoutTable();
+  }
+
+  @Override
+  public SwingTableColumn createColumn(int swingModelIndex, IColumn scoutColumn) {
+    return new SwingTableColumn(swingModelIndex, scoutColumn);
   }
 
 }
