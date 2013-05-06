@@ -3,5 +3,18 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_cs.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_de_DE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_es.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_fr.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_hu.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_it.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_ja_JP.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_ko_KR.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_pl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_pt_BR.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_ru.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_zh_CN.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbyLocale_zh_TW.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -58,8 +58,7 @@
                 <plugin id="org.apache.xerces" />
                 <plugin id="org.apache.xml.resolver" />
                 <plugin id="org.apache.xml.serializer" />
-                <plugin id="org.apache.derby.jdbc_1053.fragment" />
-                <plugin id="org.apache.derby.jdbc_1082.fragment" />
+                <plugin id="org.apache.derby.jdbc_1091.fragment" />
               </excludes>
             </configuration>
           </execution>
