@@ -118,7 +118,4 @@ public class ColumnAutoResizeTest {
 
   public static class PageWithNode extends AbstractPageWithNodes {
   }
-
-  public static class P_Desktop extends AbstractDesktop {
-  }
 }

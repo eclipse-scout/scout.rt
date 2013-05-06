@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
-public class ImportFormDataWithTemplatesTest {
+public class FormDataImportWithTemplatesTest {
 
   @Test
   public void testExportImport() throws ProcessingException {
