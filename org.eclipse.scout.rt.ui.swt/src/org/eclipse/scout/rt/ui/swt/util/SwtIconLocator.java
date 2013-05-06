@@ -31,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * Looks for icons in the resources/icons folder of bundles
  */
-public class SwtIconLocator {
+public class SwtIconLocator implements ISwtIconLocator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtIconLocator.class);
 
   private final ImageRegistry imageRegistry;
@@ -45,6 +45,7 @@ public class SwtIconLocator {
     imageRegistry.put("close_a_16", getFalse());
   }
 
+  @Override
   public ImageDescriptor getImageDescriptor(String name) {
     if (name == null) {
       return null;
@@ -70,6 +71,7 @@ public class SwtIconLocator {
   /**
    * Find icon in plugin dependency path starting with root bundle {@link Platform#getProduct#getDefiningBundle}
    */
+  @Override
   public Image getIcon(String name) {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
@@ -112,6 +114,7 @@ public class SwtIconLocator {
     return desc;
   }
 
+  @Override
   public void dispose() {
     imageRegistry.dispose();
   }

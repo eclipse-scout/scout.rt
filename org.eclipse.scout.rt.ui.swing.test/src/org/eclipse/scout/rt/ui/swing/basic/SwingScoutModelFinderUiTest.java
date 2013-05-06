@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFields
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.TreeBoxField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**

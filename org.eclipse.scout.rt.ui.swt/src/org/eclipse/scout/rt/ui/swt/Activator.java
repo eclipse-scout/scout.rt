@@ -15,6 +15,7 @@ import java.util.Hashtable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.rt.ui.swt.icons.SwtBundleIconLocator;
 import org.eclipse.scout.rt.ui.swt.login.internal.InternalNetAuthenticator;
+import org.eclipse.scout.rt.ui.swt.util.ISwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.SwtIconLocator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -30,7 +31,7 @@ public class Activator extends AbstractUIPlugin {
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.swt";
 
   private static Activator m_plugin;
-  private SwtIconLocator m_iconLocator;
+  private ISwtIconLocator m_iconLocator;
   private ServiceRegistration m_netAuthRegistration;
 
   public static Activator getDefault() {
