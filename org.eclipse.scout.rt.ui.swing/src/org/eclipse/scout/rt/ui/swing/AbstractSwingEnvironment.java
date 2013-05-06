@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -69,6 +70,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
+import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.concurrency.SwingScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
@@ -1189,4 +1192,10 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       ClientUIPreferences.getInstance(getScoutSession()).setFormBounds(m_form, bounds);
     }
   }
+
+  @Override
+  public ISwingScoutTable createTable(ITable table) {
+    return new SwingScoutTable();
+  }
+
 }

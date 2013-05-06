@@ -14,13 +14,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
-import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
@@ -36,8 +36,9 @@ public class SwingScoutListBox extends SwingScoutValueFieldComposite<IListBox<?>
     container.setOpaque(false);
     JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
-    m_tableComposite = new SwingScoutTable();
-    m_tableComposite.createField(getScoutObject().getTable(), getSwingEnvironment());
+    ITable scoutTable = getScoutObject().getTable();
+    m_tableComposite = getSwingEnvironment().createTable(scoutTable);
+    m_tableComposite.createField(scoutTable, getSwingEnvironment());
     //adjust table row height
     JTable table = m_tableComposite.getSwingTable();
     if (UIManager.get("ListBox.rowHeight") != null) {

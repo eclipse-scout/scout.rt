@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
-import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
@@ -94,7 +93,7 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
         getSwingTable().getTableHeader().repaint();
       }
     }
-	// << bugzilla 364121
+    // << bugzilla 364121
   }
 
   protected void setTableStatusFromScout() {
@@ -117,7 +116,7 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
         m_tableComposite = null;
       }
       if (newTable != null) {
-        ISwingScoutTable newTableComposite = new SwingScoutTable();
+        ISwingScoutTable newTableComposite = getSwingEnvironment().createTable(newTable);
         newTableComposite.createField(newTable, getSwingEnvironment());
 
         // TODO replace with AbstractSwingEnvironment.createFormField.
