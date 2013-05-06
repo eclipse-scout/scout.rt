@@ -11,7 +11,7 @@
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_S20130308121626" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130308121626/repository/"/>
+      <repository id="orbit_S20130427215344" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20130427215344/repository/"/>
 
       <unit id="javax.servlet" version="2.5.0.v201103041518"/>
       <unit id="javax.servlet.source" version="2.5.0.v201103041518"/>
