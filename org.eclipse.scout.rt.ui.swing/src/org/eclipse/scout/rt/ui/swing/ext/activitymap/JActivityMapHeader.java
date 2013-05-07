@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,8 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import org.eclipse.scout.rt.ui.swing.ext.activitymap.JActivityMapHeaderValidator.ColumnType;
+
 /**
  * activity map with column model and data model
  */
@@ -34,11 +36,13 @@ public class JActivityMapHeader extends JComponent {
   private static final long serialVersionUID = 1L;
 
   private JActivityMap m_map;
+  private JActivityMapHeaderValidator m_validator;
   // cache
-  private HashMap<Rectangle, String> m_tooltipMapCache;
+  private Map<Rectangle, String> m_tooltipMapCache;
 
   protected JActivityMapHeader(JActivityMap map) {
     m_map = map;
+    m_validator = new JActivityMapHeaderValidator();
     setBackground(Color.white);
     setToolTipText("...");// in order to easyly attach to tooltip manager
   }
@@ -137,30 +141,9 @@ public class JActivityMapHeader extends JComponent {
       textRects.add(r);
     }
     // determine text size
-    FontMetrics fm = g.getFontMetrics();
     ArrayList<String> texts = new ArrayList<String>();
-    int size = ActivityMapColumnModel.LARGE;
-    ArrayList<Rectangle> validatedRects = new ArrayList<Rectangle>();
-    for (Object o : majorCols) {
-      texts.add(m_map.getColumnModel().getMajorColumnText(o, size));
-    }
-    if (!validateTextSizes(fm, texts, textRects, validatedRects)) {
-      size = ActivityMapColumnModel.MEDIUM;
-      texts.clear();
-      for (Object o : majorCols) {
-        texts.add(m_map.getColumnModel().getMajorColumnText(o, size));
-      }
-      if (!validateTextSizes(fm, texts, textRects, validatedRects)) {
-        size = ActivityMapColumnModel.SMALL;
-        texts.clear();
-        for (Object o : majorCols) {
-          texts.add(m_map.getColumnModel().getMajorColumnText(o, size));
-        }
-        if (!validateTextSizes(fm, texts, textRects, validatedRects)) {
-          // nop
-        }
-      }
-    }
+    List<Rectangle> validatedRects = m_validator.calculateTextSizeRectangles(majorCols, ColumnType.MAJOR, m_map.getColumnModel(), textRects, g.getFontMetrics(), texts);
+
     for (int i = 0; i < textRects.size(); i++) {
       String text = texts.get(i);
       if (text != null && text.length() > 0) {
@@ -183,33 +166,13 @@ public class JActivityMapHeader extends JComponent {
     for (Object o : minorCols) {
       rects.add(getMinorHeaderRect(o));
     }
+
     // determine text size
-    FontMetrics fm = g.getFontMetrics();
     ArrayList<String> texts = new ArrayList<String>();
-    int size = ActivityMapColumnModel.LARGE;
-    ArrayList<Rectangle> validatedRects = new ArrayList<Rectangle>();
-    for (Object o : minorCols) {
-      texts.add(m_map.getColumnModel().getMinorColumnText(o, size));
-    }
-    if (!validateTextSizes(fm, texts, rects, validatedRects)) {
-      size = ActivityMapColumnModel.MEDIUM;
-      texts.clear();
-      for (Object o : minorCols) {
-        texts.add(m_map.getColumnModel().getMinorColumnText(o, size));
-      }
-      if (!validateTextSizes(fm, texts, rects, validatedRects)) {
-        size = ActivityMapColumnModel.SMALL;
-        texts.clear();
-        for (Object o : minorCols) {
-          texts.add(m_map.getColumnModel().getMinorColumnText(o, size));
-        }
-        if (!validateTextSizes(fm, texts, rects, validatedRects)) {
-          // nop
-        }
-      }
-    }
+    List<Rectangle> validatedRects = m_validator.calculateTextSizeRectangles(minorCols, ColumnType.MINOR, m_map.getColumnModel(), rects, g.getFontMetrics(), texts);
+
     for (int i = 0; i < rects.size(); i++) {
-      Rectangle r = rects.get(i);
+      Rectangle r = validatedRects.get(i);
       String text = texts.get(i);
       paintText(g, r, text, true, true);
     }
@@ -236,12 +199,14 @@ public class JActivityMapHeader extends JComponent {
   }
 
   /**
+   * Deprecated: Use @see{JActivityMapHeaderValidator} will be removed in scout 3.10
    * checks available space for texts When a text is null or empty, the previous
    * text gets the space
    * 
    * @param validatedRects
    *          is an out parameter
    */
+  @Deprecated
   private boolean validateTextSizes(FontMetrics fm, List<String> texts, List<Rectangle> rects, List<Rectangle> validatedRects) {
     validatedRects.clear();
     validatedRects.addAll(rects);
