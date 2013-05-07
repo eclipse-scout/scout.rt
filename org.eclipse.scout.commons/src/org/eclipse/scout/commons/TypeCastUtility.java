@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,11 +28,13 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public final class TypeCastUtility {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TypeCastUtility.class);
 
   // singleton
@@ -59,6 +61,8 @@ public final class TypeCastUtility {
   private static final int UTCDATE = 19;
   private static final int VOID = 9999;
 
+  private static final String ZULU_DATE_TO_STRING_FORMAT = "dd.MM.yyyy'T'HH:mm:ss.sss'Z'";
+
   @SuppressWarnings("unchecked")
   public static <T> T castValue(Object o, Class<T> castType) {
     return (T) instance.castValueImpl(o, castType);
@@ -69,10 +73,10 @@ public final class TypeCastUtility {
    * fast access to debug flag
    */
   private boolean m_debugEnabled;
-  private final HashMap<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
-  private final HashMap<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
-  private final HashMap<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
-  private final HashMap<GPCKey, Class<?>> m_genericsParameterClassCache = new HashMap<GPCKey, Class<?>>();
+  private final Map<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
+  private final Map<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
+  private final Map<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
+  private final Map<GPCKey, Class<?>> m_genericsParameterClassCache = new HashMap<GPCKey, Class<?>>();
 
   private TypeCastUtility() {
     m_wrapperTypeMap.put(char.class, Character.class);
@@ -85,36 +89,36 @@ public final class TypeCastUtility {
     m_wrapperTypeMap.put(double.class, Double.class);
     m_wrapperTypeMap.put(void.class, Void.class);
     //
-    m_typeMap.put(Character.class, new Integer(CHARACTER));
-    m_typeMap.put(Byte.class, new Integer(BYTE));
-    m_typeMap.put(Boolean.class, new Integer(BOOLEAN));
-    m_typeMap.put(TriState.class, new Integer(TRISTATE));
-    m_typeMap.put(Short.class, new Integer(SHORT));
-    m_typeMap.put(Integer.class, new Integer(INTEGER));
-    m_typeMap.put(Long.class, new Integer(LONG));
-    m_typeMap.put(Float.class, new Integer(FLOAT));
-    m_typeMap.put(Double.class, new Integer(DOUBLE));
-    m_typeMap.put(String.class, new Integer(STRING));
-    m_typeMap.put(Object.class, new Integer(OBJECT));
-    m_typeMap.put(BigInteger.class, new Integer(BIGINTEGER));
-    m_typeMap.put(BigDecimal.class, new Integer(BIGDECIMAL));
-    m_typeMap.put(UTCDate.class, new Integer(UTCDATE));
-    m_typeMap.put(Date.class, new Integer(DATE));
-    m_typeMap.put(Calendar.class, new Integer(CALENDAR));
-    m_typeMap.put(GregorianCalendar.class, new Integer(CALENDAR));
-    m_typeMap.put(java.sql.Date.class, new Integer(SQLDATE));
-    m_typeMap.put(Time.class, new Integer(SQLTIME));
-    m_typeMap.put(Timestamp.class, new Integer(SQLTIMESTAMP));
-    m_typeMap.put(Void.class, new Integer(VOID));
+    m_typeMap.put(Character.class, Integer.valueOf(CHARACTER));
+    m_typeMap.put(Byte.class, Integer.valueOf(BYTE));
+    m_typeMap.put(Boolean.class, Integer.valueOf(BOOLEAN));
+    m_typeMap.put(TriState.class, Integer.valueOf(TRISTATE));
+    m_typeMap.put(Short.class, Integer.valueOf(SHORT));
+    m_typeMap.put(Integer.class, Integer.valueOf(INTEGER));
+    m_typeMap.put(Long.class, Integer.valueOf(LONG));
+    m_typeMap.put(Float.class, Integer.valueOf(FLOAT));
+    m_typeMap.put(Double.class, Integer.valueOf(DOUBLE));
+    m_typeMap.put(String.class, Integer.valueOf(STRING));
+    m_typeMap.put(Object.class, Integer.valueOf(OBJECT));
+    m_typeMap.put(BigInteger.class, Integer.valueOf(BIGINTEGER));
+    m_typeMap.put(BigDecimal.class, Integer.valueOf(BIGDECIMAL));
+    m_typeMap.put(UTCDate.class, Integer.valueOf(UTCDATE));
+    m_typeMap.put(Date.class, Integer.valueOf(DATE));
+    m_typeMap.put(Calendar.class, Integer.valueOf(CALENDAR));
+    m_typeMap.put(GregorianCalendar.class, Integer.valueOf(CALENDAR));
+    m_typeMap.put(java.sql.Date.class, Integer.valueOf(SQLDATE));
+    m_typeMap.put(Time.class, Integer.valueOf(SQLTIME));
+    m_typeMap.put(Timestamp.class, Integer.valueOf(SQLTIMESTAMP));
+    m_typeMap.put(Void.class, Integer.valueOf(VOID));
     //
-    m_primitiveTypeMap.put(boolean.class, new Integer(BOOLEAN));
-    m_primitiveTypeMap.put(byte.class, new Integer(BYTE));
-    m_primitiveTypeMap.put(char.class, new Integer(CHARACTER));
-    m_primitiveTypeMap.put(short.class, new Integer(SHORT));
-    m_primitiveTypeMap.put(int.class, new Integer(INTEGER));
-    m_primitiveTypeMap.put(long.class, new Integer(LONG));
-    m_primitiveTypeMap.put(float.class, new Integer(FLOAT));
-    m_primitiveTypeMap.put(double.class, new Integer(DOUBLE));
+    m_primitiveTypeMap.put(boolean.class, Integer.valueOf(BOOLEAN));
+    m_primitiveTypeMap.put(byte.class, Integer.valueOf(BYTE));
+    m_primitiveTypeMap.put(char.class, Integer.valueOf(CHARACTER));
+    m_primitiveTypeMap.put(short.class, Integer.valueOf(SHORT));
+    m_primitiveTypeMap.put(int.class, Integer.valueOf(INTEGER));
+    m_primitiveTypeMap.put(long.class, Integer.valueOf(LONG));
+    m_primitiveTypeMap.put(float.class, Integer.valueOf(FLOAT));
+    m_primitiveTypeMap.put(double.class, Integer.valueOf(DOUBLE));
   }
 
   @SuppressWarnings("unchecked")
@@ -193,28 +197,28 @@ public final class TypeCastUtility {
     }
     switch (fromId) {
       case BOOLEAN: {
-        return (T) new Boolean(false);
+        return (T) Boolean.FALSE;
       }
       case BYTE: {
         return (T) Byte.valueOf((byte) 0);
       }
       case CHARACTER: {
-        return (T) new Character('\u0000');
+        return (T) Character.valueOf('\u0000');
       }
       case SHORT: {
-        return (T) new Short((short) 0);
+        return (T) Short.valueOf((short) 0);
       }
       case INTEGER: {
-        return (T) new Integer(0);
+        return (T) Integer.valueOf(0);
       }
       case LONG: {
-        return (T) new Long(0L);
+        return (T) Long.valueOf(0L);
       }
       case FLOAT: {
-        return (T) new Float(0.0f);
+        return (T) Float.valueOf(0.0f);
       }
       case DOUBLE: {
-        return (T) new Double(0.0);
+        return (T) Double.valueOf(0.0);
       }
       default: {
         throw new IllegalArgumentException(primitiveType + " no primitive type");
@@ -244,11 +248,9 @@ public final class TypeCastUtility {
       // arrays
       if (o instanceof Collection) {
         o = ((Collection) o).toArray();
-        fromType = o.getClass();
       }
       else if (o instanceof Map) {
         o = ((Map) o).values().toArray();
-        fromType = o.getClass();
       }
       else {
         throw createException(o, fromType, toType, 1, "object is not an array");
@@ -309,28 +311,28 @@ public final class TypeCastUtility {
             return o;
           }
           case BYTE: {
-            return new Byte(txCharToByte(((Character) o).charValue()));
+            return Byte.valueOf(txCharToByte(((Character) o).charValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txCharToBoolean(((Character) o).charValue()));
+            return Boolean.valueOf(txCharToBoolean(((Character) o).charValue()));
           }
           case TRISTATE: {
             return txCharToTriState(((Character) o).charValue());
           }
           case SHORT: {
-            return new Short(txCharToShort(((Character) o).charValue()));
+            return Short.valueOf(txCharToShort(((Character) o).charValue()));
           }
           case INTEGER: {
-            return new Integer(txCharToInt(((Character) o).charValue()));
+            return Integer.valueOf(txCharToInt(((Character) o).charValue()));
           }
           case LONG: {
-            return new Long(txCharToLong(((Character) o).charValue()));
+            return Long.valueOf(txCharToLong(((Character) o).charValue()));
           }
           case FLOAT: {
-            return new Float(txCharToFloat(((Character) o).charValue()));
+            return Float.valueOf(txCharToFloat(((Character) o).charValue()));
           }
           case DOUBLE: {
-            return new Double(txCharToDouble(((Character) o).charValue()));
+            return Double.valueOf(txCharToDouble(((Character) o).charValue()));
           }
           case STRING: {
             return txCharToString(((Character) o).charValue());
@@ -350,31 +352,31 @@ public final class TypeCastUtility {
       case BYTE: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txByteToChar(((Byte) o).byteValue()));
+            return Character.valueOf(txByteToChar(((Byte) o).byteValue()));
           }
           case BYTE: {
             return o;
           }
           case BOOLEAN: {
-            return new Boolean(txByteToBoolean(((Byte) o).byteValue()));
+            return Boolean.valueOf(txByteToBoolean(((Byte) o).byteValue()));
           }
           case TRISTATE: {
             return txByteToTriState(((Byte) o).byteValue());
           }
           case SHORT: {
-            return new Short(txByteToShort(((Byte) o).byteValue()));
+            return Short.valueOf(txByteToShort(((Byte) o).byteValue()));
           }
           case INTEGER: {
-            return new Integer(txByteToInt(((Byte) o).byteValue()));
+            return Integer.valueOf(txByteToInt(((Byte) o).byteValue()));
           }
           case LONG: {
-            return new Long(txByteToLong(((Byte) o).byteValue()));
+            return Long.valueOf(txByteToLong(((Byte) o).byteValue()));
           }
           case FLOAT: {
-            return new Float(txByteToFloat(((Byte) o).byteValue()));
+            return Float.valueOf(txByteToFloat(((Byte) o).byteValue()));
           }
           case DOUBLE: {
-            return new Double(txByteToDouble(((Byte) o).byteValue()));
+            return Double.valueOf(txByteToDouble(((Byte) o).byteValue()));
           }
           case STRING: {
             return txByteToString(((Byte) o).byteValue());
@@ -394,10 +396,10 @@ public final class TypeCastUtility {
       case BOOLEAN: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txBooleanToChar(((Boolean) o).booleanValue()));
+            return Character.valueOf(txBooleanToChar(((Boolean) o).booleanValue()));
           }
           case BYTE: {
-            return new Byte(txBooleanToByte(((Boolean) o).booleanValue()));
+            return Byte.valueOf(txBooleanToByte(((Boolean) o).booleanValue()));
           }
           case BOOLEAN: {
             return o;
@@ -406,19 +408,19 @@ public final class TypeCastUtility {
             return txBooleanToTriState(((Boolean) o).booleanValue());
           }
           case SHORT: {
-            return new Short(txBooleanToShort(((Boolean) o).booleanValue()));
+            return Short.valueOf(txBooleanToShort(((Boolean) o).booleanValue()));
           }
           case INTEGER: {
-            return new Integer(txBooleanToInt(((Boolean) o).booleanValue()));
+            return Integer.valueOf(txBooleanToInt(((Boolean) o).booleanValue()));
           }
           case LONG: {
-            return new Long(txBooleanToLong(((Boolean) o).booleanValue()));
+            return Long.valueOf(txBooleanToLong(((Boolean) o).booleanValue()));
           }
           case FLOAT: {
-            return new Float(txBooleanToFloat(((Boolean) o).booleanValue()));
+            return Float.valueOf(txBooleanToFloat(((Boolean) o).booleanValue()));
           }
           case DOUBLE: {
-            return new Double(txBooleanToDouble(((Boolean) o).booleanValue()));
+            return Double.valueOf(txBooleanToDouble(((Boolean) o).booleanValue()));
           }
           case STRING: {
             return txBooleanToString(((Boolean) o).booleanValue());
@@ -438,10 +440,10 @@ public final class TypeCastUtility {
       case TRISTATE: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txTriStateToChar((TriState) o));
+            return Character.valueOf(txTriStateToChar((TriState) o));
           }
           case BYTE: {
-            return new Byte(txTriStateToByte((TriState) o));
+            return Byte.valueOf(txTriStateToByte((TriState) o));
           }
           case BOOLEAN: {
             return txTriStateToBoolean((TriState) o);
@@ -450,19 +452,19 @@ public final class TypeCastUtility {
             return o;
           }
           case SHORT: {
-            return new Short(txTriStateToShort((TriState) o));
+            return Short.valueOf(txTriStateToShort((TriState) o));
           }
           case INTEGER: {
-            return new Integer(txTriStateToInt((TriState) o));
+            return Integer.valueOf(txTriStateToInt((TriState) o));
           }
           case LONG: {
-            return new Long(txTriStateToLong((TriState) o));
+            return Long.valueOf(txTriStateToLong((TriState) o));
           }
           case FLOAT: {
-            return new Float(txTriStateToFloat((TriState) o));
+            return Float.valueOf(txTriStateToFloat((TriState) o));
           }
           case DOUBLE: {
-            return new Double(txTriStateToDouble((TriState) o));
+            return Double.valueOf(txTriStateToDouble((TriState) o));
           }
           case STRING: {
             return txTriStateToString((TriState) o);
@@ -482,13 +484,13 @@ public final class TypeCastUtility {
       case SHORT: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txShortToChar(((Short) o).shortValue()));
+            return Character.valueOf(txShortToChar(((Short) o).shortValue()));
           }
           case BYTE: {
-            return new Byte(txShortToByte(((Short) o).shortValue()));
+            return Byte.valueOf(txShortToByte(((Short) o).shortValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txShortToBoolean(((Short) o).shortValue()));
+            return Boolean.valueOf(txShortToBoolean(((Short) o).shortValue()));
           }
           case TRISTATE: {
             return txShortToTriState(((Short) o).shortValue());
@@ -497,16 +499,16 @@ public final class TypeCastUtility {
             return o;
           }
           case INTEGER: {
-            return new Integer(txShortToInt(((Short) o).shortValue()));
+            return Integer.valueOf(txShortToInt(((Short) o).shortValue()));
           }
           case LONG: {
-            return new Long(txShortToLong(((Short) o).shortValue()));
+            return Long.valueOf(txShortToLong(((Short) o).shortValue()));
           }
           case FLOAT: {
-            return new Float(txShortToFloat(((Short) o).shortValue()));
+            return Float.valueOf(txShortToFloat(((Short) o).shortValue()));
           }
           case DOUBLE: {
-            return new Double(txShortToDouble(((Short) o).shortValue()));
+            return Double.valueOf(txShortToDouble(((Short) o).shortValue()));
           }
           case STRING: {
             return txShortToString(((Short) o).shortValue());
@@ -526,31 +528,31 @@ public final class TypeCastUtility {
       case INTEGER: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txIntToChar(((Integer) o).intValue()));
+            return Character.valueOf(txIntToChar(((Integer) o).intValue()));
           }
           case BYTE: {
-            return new Byte(txIntToByte(((Integer) o).intValue()));
+            return Byte.valueOf(txIntToByte(((Integer) o).intValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txIntToBoolean(((Integer) o).intValue()));
+            return Boolean.valueOf(txIntToBoolean(((Integer) o).intValue()));
           }
           case TRISTATE: {
             return txIntToTriState(((Integer) o).intValue());
           }
           case SHORT: {
-            return new Short(txIntToShort(((Integer) o).intValue()));
+            return Short.valueOf(txIntToShort(((Integer) o).intValue()));
           }
           case INTEGER: {
             return o;
           }
           case LONG: {
-            return new Long(txIntToLong(((Integer) o).intValue()));
+            return Long.valueOf(txIntToLong(((Integer) o).intValue()));
           }
           case FLOAT: {
-            return new Float(txIntToFloat(((Integer) o).intValue()));
+            return Float.valueOf(txIntToFloat(((Integer) o).intValue()));
           }
           case DOUBLE: {
-            return new Double(txIntToDouble(((Integer) o).intValue()));
+            return Double.valueOf(txIntToDouble(((Integer) o).intValue()));
           }
           case STRING: {
             return txIntToString(((Integer) o).intValue());
@@ -570,31 +572,31 @@ public final class TypeCastUtility {
       case LONG: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txLongToChar(((Long) o).longValue()));
+            return Character.valueOf(txLongToChar(((Long) o).longValue()));
           }
           case BYTE: {
-            return new Byte(txLongToByte(((Long) o).longValue()));
+            return Byte.valueOf(txLongToByte(((Long) o).longValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txLongToBoolean(((Long) o).longValue()));
+            return Boolean.valueOf(txLongToBoolean(((Long) o).longValue()));
           }
           case TRISTATE: {
             return txLongToTriState(((Long) o).longValue());
           }
           case SHORT: {
-            return new Short(txLongToShort(((Long) o).longValue()));
+            return Short.valueOf(txLongToShort(((Long) o).longValue()));
           }
           case INTEGER: {
-            return new Integer(txLongToInt(((Long) o).longValue()));
+            return Integer.valueOf(txLongToInt(((Long) o).longValue()));
           }
           case LONG: {
             return o;
           }
           case FLOAT: {
-            return new Float(txLongToFloat(((Long) o).longValue()));
+            return Float.valueOf(txLongToFloat(((Long) o).longValue()));
           }
           case DOUBLE: {
-            return new Double(txLongToDouble(((Long) o).longValue()));
+            return Double.valueOf(txLongToDouble(((Long) o).longValue()));
           }
           case STRING: {
             return txLongToString(((Long) o).longValue());
@@ -614,31 +616,31 @@ public final class TypeCastUtility {
       case FLOAT: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txFloatToChar(((Float) o).floatValue()));
+            return Character.valueOf(txFloatToChar(((Float) o).floatValue()));
           }
           case BYTE: {
-            return new Byte(txFloatToByte(((Float) o).floatValue()));
+            return Byte.valueOf(txFloatToByte(((Float) o).floatValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txFloatToBoolean(((Float) o).floatValue()));
+            return Boolean.valueOf(txFloatToBoolean(((Float) o).floatValue()));
           }
           case TRISTATE: {
             return txFloatToTriState(((Float) o).floatValue());
           }
           case SHORT: {
-            return new Short(txFloatToShort(((Float) o).floatValue()));
+            return Short.valueOf(txFloatToShort(((Float) o).floatValue()));
           }
           case INTEGER: {
-            return new Integer(txFloatToInt(((Float) o).floatValue()));
+            return Integer.valueOf(txFloatToInt(((Float) o).floatValue()));
           }
           case LONG: {
-            return new Long(txFloatToLong(((Float) o).floatValue()));
+            return Long.valueOf(txFloatToLong(((Float) o).floatValue()));
           }
           case FLOAT: {
             return o;
           }
           case DOUBLE: {
-            return new Double(txFloatToDouble(((Float) o).floatValue()));
+            return Double.valueOf(txFloatToDouble(((Float) o).floatValue()));
           }
           case STRING: {
             return txFloatToString(((Float) o).floatValue());
@@ -658,28 +660,28 @@ public final class TypeCastUtility {
       case DOUBLE: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txDoubleToChar(((Double) o).doubleValue()));
+            return Character.valueOf(txDoubleToChar(((Double) o).doubleValue()));
           }
           case BYTE: {
-            return new Byte(txDoubleToByte(((Double) o).doubleValue()));
+            return Byte.valueOf(txDoubleToByte(((Double) o).doubleValue()));
           }
           case BOOLEAN: {
-            return new Boolean(txDoubleToBoolean(((Double) o).doubleValue()));
+            return Boolean.valueOf(txDoubleToBoolean(((Double) o).doubleValue()));
           }
           case TRISTATE: {
             return txDoubleToTriState(((Double) o).doubleValue());
           }
           case SHORT: {
-            return new Short(txDoubleToShort(((Double) o).doubleValue()));
+            return Short.valueOf(txDoubleToShort(((Double) o).doubleValue()));
           }
           case INTEGER: {
-            return new Integer(txDoubleToInt(((Double) o).doubleValue()));
+            return Integer.valueOf(txDoubleToInt(((Double) o).doubleValue()));
           }
           case LONG: {
-            return new Long(txDoubleToLong(((Double) o).doubleValue()));
+            return Long.valueOf(txDoubleToLong(((Double) o).doubleValue()));
           }
           case FLOAT: {
-            return new Float(txDoubleToFloat(((Double) o).doubleValue()));
+            return Float.valueOf(txDoubleToFloat(((Double) o).doubleValue()));
           }
           case DOUBLE: {
             return o;
@@ -706,31 +708,31 @@ public final class TypeCastUtility {
         // strings
         switch (toId) {
           case CHARACTER: {
-            return new Character(txStringToChar((String) o));
+            return Character.valueOf(txStringToChar((String) o));
           }
           case BYTE: {
-            return new Byte(txStringToByte((String) o));
+            return Byte.valueOf(txStringToByte((String) o));
           }
           case BOOLEAN: {
-            return new Boolean(txStringToBoolean((String) o));
+            return Boolean.valueOf(txStringToBoolean((String) o));
           }
           case TRISTATE: {
             return txStringToTriState((String) o);
           }
           case SHORT: {
-            return new Short(txStringToShort((String) o));
+            return Short.valueOf(txStringToShort((String) o));
           }
           case INTEGER: {
-            return new Integer(txStringToInt((String) o));
+            return Integer.valueOf(txStringToInt((String) o));
           }
           case LONG: {
-            return new Long(txStringToLong((String) o));
+            return Long.valueOf(txStringToLong((String) o));
           }
           case FLOAT: {
-            return new Float(txStringToFloat((String) o));
+            return Float.valueOf(txStringToFloat((String) o));
           }
           case DOUBLE: {
-            return new Double(txStringToDouble((String) o));
+            return Double.valueOf(txStringToDouble((String) o));
           }
           case STRING: {
             return o;
@@ -779,31 +781,31 @@ public final class TypeCastUtility {
       case BIGINTEGER: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txBigIntegerToChar((BigInteger) o));
+            return Character.valueOf(txBigIntegerToChar((BigInteger) o));
           }
           case BYTE: {
-            return new Byte(txBigIntegerToByte((BigInteger) o));
+            return Byte.valueOf(txBigIntegerToByte((BigInteger) o));
           }
           case BOOLEAN: {
-            return new Boolean(txBigIntegerToBoolean((BigInteger) o));
+            return Boolean.valueOf(txBigIntegerToBoolean((BigInteger) o));
           }
           case TRISTATE: {
             return txBigIntegerToTriState((BigInteger) o);
           }
           case SHORT: {
-            return new Short(txBigIntegerToShort((BigInteger) o));
+            return Short.valueOf(txBigIntegerToShort((BigInteger) o));
           }
           case INTEGER: {
-            return new Integer(txBigIntegerToInt((BigInteger) o));
+            return Integer.valueOf(txBigIntegerToInt((BigInteger) o));
           }
           case LONG: {
-            return new Long(txBigIntegerToLong((BigInteger) o));
+            return Long.valueOf(txBigIntegerToLong((BigInteger) o));
           }
           case FLOAT: {
-            return new Float(txBigIntegerToFloat((BigInteger) o));
+            return Float.valueOf(txBigIntegerToFloat((BigInteger) o));
           }
           case DOUBLE: {
-            return new Double(txBigIntegerToDouble((BigInteger) o));
+            return Double.valueOf(txBigIntegerToDouble((BigInteger) o));
           }
           case STRING: {
             return txBigIntegerToString((BigInteger) o);
@@ -823,31 +825,31 @@ public final class TypeCastUtility {
       case BIGDECIMAL: {
         switch (toId) {
           case CHARACTER: {
-            return new Character(txBigDecimalToChar((BigDecimal) o));
+            return Character.valueOf(txBigDecimalToChar((BigDecimal) o));
           }
           case BYTE: {
-            return new Byte(txBigDecimalToByte((BigDecimal) o));
+            return Byte.valueOf(txBigDecimalToByte((BigDecimal) o));
           }
           case BOOLEAN: {
-            return new Boolean(txBigDecimalToBoolean((BigDecimal) o));
+            return Boolean.valueOf(txBigDecimalToBoolean((BigDecimal) o));
           }
           case TRISTATE: {
             return txBigDecimalToTriState((BigDecimal) o);
           }
           case SHORT: {
-            return new Short(txBigDecimalToShort((BigDecimal) o));
+            return Short.valueOf(txBigDecimalToShort((BigDecimal) o));
           }
           case INTEGER: {
-            return new Integer(txBigDecimalToInt((BigDecimal) o));
+            return Integer.valueOf(txBigDecimalToInt((BigDecimal) o));
           }
           case LONG: {
-            return new Long(txBigDecimalToLong((BigDecimal) o));
+            return Long.valueOf(txBigDecimalToLong((BigDecimal) o));
           }
           case FLOAT: {
-            return new Float(txBigDecimalToFloat((BigDecimal) o));
+            return Float.valueOf(txBigDecimalToFloat((BigDecimal) o));
           }
           case DOUBLE: {
-            return new Double(txBigDecimalToDouble((BigDecimal) o));
+            return Double.valueOf(txBigDecimalToDouble((BigDecimal) o));
           }
           case STRING: {
             return txBigDecimalToString((BigDecimal) o);
@@ -1421,7 +1423,7 @@ public final class TypeCastUtility {
   }
 
   private boolean txBigDecimalToBoolean(BigDecimal o) {
-    return o.equals(new BigDecimal(BigInteger.ONE));
+    return BigInteger.ONE.equals(o.toBigInteger());
   }
 
   private byte txBigDecimalToByte(BigDecimal o) {
@@ -1493,7 +1495,7 @@ public final class TypeCastUtility {
   }
 
   private String txCalendarToString(Calendar o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o.getTime());
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o.getTime());
   }
 
   private BigDecimal txCharToBigDecimal(char o) {
@@ -1527,7 +1529,7 @@ public final class TypeCastUtility {
   }
 
   private String txDateToString(Date o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o);
   }
 
   private Date txUTCDateToDate(UTCDate o) {
@@ -1553,7 +1555,7 @@ public final class TypeCastUtility {
   }
 
   private String txUTCDateToString(UTCDate o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o);
   }
 
   private BigDecimal txDoubleToBigDecimal(double o) {
@@ -1615,7 +1617,7 @@ public final class TypeCastUtility {
   }
 
   private String txSqlDateToString(java.sql.Date o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o);
   }
 
   private Calendar txSqlTimestampToCalendar(java.sql.Timestamp o) {
@@ -1637,7 +1639,7 @@ public final class TypeCastUtility {
   }
 
   private String txSqlTimestampToString(java.sql.Timestamp o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o);
   }
 
   private Calendar txSqlTimeToCalendar(java.sql.Time o) {
@@ -1659,12 +1661,12 @@ public final class TypeCastUtility {
   }
 
   private String txSqlTimeToString(java.sql.Time o) {
-    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+    return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).format(o);
   }
 
   private Date txStringToDate(String o) {
     try {
-      return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").parse(o);
+      return new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).parse(o);
     }
     catch (ParseException pe) {
       throw createException(o, String.class, Date.class, 5, pe.getMessage());
@@ -1673,7 +1675,7 @@ public final class TypeCastUtility {
 
   private UTCDate txStringToUTCDate(String o) {
     try {
-      Date d = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").parse(o);
+      Date d = new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).parse(o);
       return new UTCDate(d.getTime());
     }
     catch (ParseException pe) {
@@ -1684,7 +1686,7 @@ public final class TypeCastUtility {
   private Calendar txStringToCalendar(String o) {
     try {
       Calendar cal = Calendar.getInstance();
-      cal.setTime(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").parse(o));
+      cal.setTime(new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).parse(o));
       return cal;
     }
     catch (ParseException pe) {
@@ -1712,7 +1714,7 @@ public final class TypeCastUtility {
 
   private java.sql.Timestamp txStringToSqlTimestamp(String o) {
     try {
-      return new java.sql.Timestamp(new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").parse(o).getTime());
+      return new java.sql.Timestamp(new SimpleDateFormat(ZULU_DATE_TO_STRING_FORMAT).parse(o).getTime());
     }
     catch (ParseException pe) {
       throw createException(o, String.class, java.sql.Timestamp.class, 8, pe.getMessage());
@@ -1904,11 +1906,12 @@ public final class TypeCastUtility {
     HashSet<Type> loopDetector = new HashSet<Type>();
     visitGenericsHierarchy(queryClass, genericsOwnerClass, genericsParameterIndex, desc, loopDetector);
     if (desc.resolvedClazz == null) {
-      String s = (desc.typeVariable != null ? desc.typeVariable.getName() : "null");
+      StringBuilder s = new StringBuilder(desc.typeVariable != null ? desc.typeVariable.getName() : "null");
+
       for (int i = 0; i < desc.arrayDim; i++) {
-        s += "[]";
+        s.append("[]");
       }
-      throw new IllegalArgumentException("cannot resolve " + s + " to a 'Class' type on " + queryClass);
+      throw new IllegalArgumentException("cannot resolve " + s.toString() + " to a 'Class' type on " + queryClass);
     }
     if (desc.arrayDim > 0) {
       result = Array.newInstance(desc.resolvedClazz, new int[desc.arrayDim]).getClass();
@@ -1920,7 +1923,7 @@ public final class TypeCastUtility {
     return result;
   }
 
-  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, HashSet<Type> loopDetector) {
+  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector) {
     if (loopDetector.contains(type)) {
       return false;
     }
@@ -1935,17 +1938,16 @@ public final class TypeCastUtility {
         return true;
       }
       boolean foundStopClass = false;
-      if (!foundStopClass) {
-        if (!c.isInterface()) {
-          Type a = c.getGenericSuperclass();
-          if (a != null) {
-            try {
-              loopDetector.add(type);
-              foundStopClass = visitGenericsHierarchy(a, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
-            }
-            finally {
-              loopDetector.remove(type);
-            }
+      if (!foundStopClass
+          && !c.isInterface()) {
+        Type a = c.getGenericSuperclass();
+        if (a != null) {
+          try {
+            loopDetector.add(type);
+            foundStopClass = visitGenericsHierarchy(a, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+          }
+          finally {
+            loopDetector.remove(type);
           }
         }
       }
