@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,11 +21,7 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 public final class CloneUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CloneUtility.class);
 
   private CloneUtility() {
   }
@@ -52,18 +48,16 @@ public final class CloneUtility {
 
     public DeepCopyObjectWriter(OutputStream out) throws IOException {
       super(out);
-      enableReplaceObject(true);
     }
 
     @Override
-    protected Object replaceObject(Object obj) throws IOException {
-      if (obj != null) {
-        ClassLoader cl = obj.getClass().getClassLoader();
+    protected void annotateClass(Class<?> c) throws IOException {
+      if (c != null) {
+        ClassLoader cl = c.getClassLoader();
         if (cl != null) {
           m_usedClassLoaders.add(cl);
         }
       }
-      return obj;
     }
 
     public Set<ClassLoader> getUsedClassLoaders() {
