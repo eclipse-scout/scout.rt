@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -11,12 +12,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.dom.svg.SVGTextContentSupport;
 import org.apache.batik.util.SVGConstants;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -36,41 +39,43 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGStylable;
 
 public abstract class AbstractCalendarDocumentBuilder {
-  private final static Pattern REGEX_URL_GRID_CLICK = Pattern.compile(AbstractCalendarDocumentBuilder.LINK_GRID_PREFIX + "([0-9]{1})([0-9]{1})");
-  private final static Pattern REGEX_URL_COMP_CLICK = Pattern.compile(AbstractCalendarDocumentBuilder.LINK_COMPONENT_PREFIX + "([0-9]*)/([0-9]{1})([0-9]{1})");
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarDocumentBuilder.class);
 
-  public final static float ORIG_CALENDAR_WIDTH = 557.0f; // width of the calendar on 100% scale (as defined in the svg)
-  public final static float ORIG_CALENDAR_HEIGHT = 464.667f; // height of the calendar on 100% scale (as defined in the svg)
+  private static final Pattern REGEX_URL_GRID_CLICK = Pattern.compile(AbstractCalendarDocumentBuilder.LINK_GRID_PREFIX + "([0-9]{1})([0-9]{1})");
+  private static final Pattern REGEX_URL_COMP_CLICK = Pattern.compile(AbstractCalendarDocumentBuilder.LINK_COMPONENT_PREFIX + "([0-9]*)/([0-9]{1})([0-9]{1})");
 
-  private final static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarDocumentBuilder.class);
+  public static final float ORIG_CALENDAR_WIDTH = 557.0f; // width of the calendar on 100% scale (as defined in the svg)
+  public static final float ORIG_CALENDAR_HEIGHT = 464.667f; // height of the calendar on 100% scale (as defined in the svg)
 
-  private final static float MIN_FONT_SIZE = 8; // min font size (calendar will scale the text based on the UI size until down to this min value)
-  private final static float ORIG_FONT_SIZE = 12; // font size at 100%
-  private final static float MAX_FONT_SIZE = 23; // max font size (calendar will scale the text based on the UI size until up to this max value)
-  private final static int NUM_TIME_LINE_ROWS = 15; // how many timeline rows exist (7:00-18:00, earlier, later, full day row)
+  private static final float MARGIN = 12.0f; // between the display mode links
+  private static final float MIN_FONT_SIZE = 8; // min font size (calendar will scale the text based on the UI size until down to this min value)
+  private static final float ORIG_FONT_SIZE = 12; // font size at 100%
+  private static final float MAX_FONT_SIZE = 23; // max font size (calendar will scale the text based on the UI size until up to this max value)
+  private static final int NUM_TIME_LINE_ROWS = 15; // how many timeline rows exist (7:00-18:00, earlier, later, full day row)
 
-  protected final static int NUM_DAYS_IN_WEEK = 7;
+  protected static final int NUM_DAYS_IN_WEEK = 7;
+  protected static final int NUM_MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
 
-  private final static String LINK_NEXT_SMALL = "http://local/arrow/nextSmall";
-  private final static String LINK_NEXT_BIG = "http://local/arrow/nextBig";
-  private final static String LINK_PREV_SMALL = "http://local/arrow/prevSmall";
-  private final static String LINK_PREV_BIG = "http://local/arrow/prevBig";
-  private final static String LINK_CONTEXT_MENU = "http://local/menu";
+  private static final String LINK_NEXT_SMALL = "http://local/arrow/nextSmall";
+  private static final String LINK_NEXT_BIG = "http://local/arrow/nextBig";
+  private static final String LINK_PREV_SMALL = "http://local/arrow/prevSmall";
+  private static final String LINK_PREV_BIG = "http://local/arrow/prevBig";
+  private static final String LINK_CONTEXT_MENU = "http://local/menu";
 
-  private final static String FONT = "Arial";
+  private static final String FONT = "Arial";
 
-  private final static String LINK_COMPONENT_PREFIX = "http://local/comp/";
-  private final static String LINK_DISPLAY_MODE_PREFIX = "http://local/displayMode/";
-  private final static String LINK_GRID_PREFIX = "http://local/grid/";
+  private static final String LINK_COMPONENT_PREFIX = "http://local/comp/";
+  private static final String LINK_DISPLAY_MODE_PREFIX = "http://local/displayMode/";
+  private static final String LINK_GRID_PREFIX = "http://local/grid/";
 
-  private final static String COLOR_LINKS = CalendarSvgUtility.COLOR_PREFIX + "67a8ce";
-  private final static String COLOR_BLACK = CalendarSvgUtility.COLOR_PREFIX + "000000";
-  private final static String COLOR_WHITE = CalendarSvgUtility.COLOR_PREFIX + "ffffff";
-  private final static String COLOR_FOREIGN_MONTH_BACKGROUND = CalendarSvgUtility.COLOR_PREFIX + "eeeeee";
-  private final static String COLOR_TIME_LINE = CalendarSvgUtility.COLOR_PREFIX + "cccccc";
-  private final static String COLOR_MONTH_BACKGROUND = COLOR_WHITE;
-  private final static String COLOR_SELECTED_DAY_BORDER = COLOR_BLACK;
-  private final static String COLOR_NOT_SELECTED_DAY_BORDER = CalendarSvgUtility.COLOR_PREFIX + "c0c0c0";
+  private static final String COLOR_LINKS = CalendarSvgUtility.COLOR_PREFIX + "67a8ce";
+  private static final String COLOR_BLACK = CalendarSvgUtility.COLOR_PREFIX + "000000";
+  private static final String COLOR_WHITE = CalendarSvgUtility.COLOR_PREFIX + "ffffff";
+  private static final String COLOR_FOREIGN_MONTH_BACKGROUND = CalendarSvgUtility.COLOR_PREFIX + "eeeeee";
+  private static final String COLOR_TIME_LINE = CalendarSvgUtility.COLOR_PREFIX + "cccccc";
+  private static final String COLOR_MONTH_BACKGROUND = COLOR_WHITE;
+  private static final String COLOR_SELECTED_DAY_BORDER = COLOR_BLACK;
+  private static final String COLOR_NOT_SELECTED_DAY_BORDER = CalendarSvgUtility.COLOR_PREFIX + "c0c0c0";
 
   private final BridgeContext m_bridgeContext;
 
@@ -106,7 +111,11 @@ public abstract class AbstractCalendarDocumentBuilder {
   private CalendarComponent m_selectedComponent;
   private CalendarComponent[] m_components;
   private int m_numContextMenus;
-  private final HashMap<Element, Date> m_gridDateMap;
+  private final Map<Element, Date> m_gridDateMap;
+
+  private int m_linkCounter;
+  private final Map<Integer, Object> m_linkIdToItemIdMap;
+  private final Map<Object, Integer> m_ItemIdToLinkIdMap;
 
   protected AbstractCalendarDocumentBuilder(String svgFile) {
     // read document
@@ -198,6 +207,11 @@ public abstract class AbstractCalendarDocumentBuilder {
     initDisplayModeLinks();
     initTimeLineText();
     initGridHyperlink();
+
+    // init link Id support
+    m_linkCounter = 1;
+    m_linkIdToItemIdMap = new HashMap<Integer, Object>();
+    m_ItemIdToLinkIdMap = new HashMap<Object, Integer>();
   }
 
   protected abstract int getNumWeekdays();
@@ -259,12 +273,13 @@ public abstract class AbstractCalendarDocumentBuilder {
     else if (hyperlinkUrl.startsWith(LINK_COMPONENT_PREFIX)) {
       Matcher m = REGEX_URL_COMP_CLICK.matcher(hyperlinkUrl);
       if (m.matches()) {
-        long id = Long.parseLong(m.group(1));
+        int linkId = Integer.parseInt(m.group(1));
         int weekday = Integer.parseInt(m.group(2));
         int week = Integer.parseInt(m.group(3));
 
         Date clickedDate = getDateAt(weekday, week);
-        CalendarComponent selected = getComponentWithId(id);
+        Object itemId = getItemId(linkId);
+        CalendarComponent selected = getComponentWithId(itemId);
         setSelection(clickedDate, selected);
       }
     }
@@ -306,7 +321,6 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private void initDisplayModeLinks() {
     final int[] linkMenuIds = new int[]{ICalendar.DISPLAY_MODE_DAY, ICalendar.DISPLAY_MODE_WORKWEEK, ICalendar.DISPLAY_MODE_WEEK, ICalendar.DISPLAY_MODE_MONTH};
-    final float MARGIN = 12.0f; // between the display mode links
 
     float xPos = 4.0f; // start position (aligned with left grid start of svg)
     for (int i = 0; i < m_elDisplayMode.length; i++) {
@@ -603,7 +617,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private Point getPosition(Date d) {
     if (isInRange(d)) {
-      long dif = (d.getTime() - m_startDate.getTime()) / (1000 * 60 * 60 * 24);
+      long dif = (d.getTime() - m_startDate.getTime()) / NUM_MILLIS_PER_DAY;
       int x = (int) dif % NUM_DAYS_IN_WEEK;
       int y = (int) dif / NUM_DAYS_IN_WEEK;
       return new Point(x, y);
@@ -611,10 +625,6 @@ public abstract class AbstractCalendarDocumentBuilder {
     else {
       return null;
     }
-  }
-
-  private Point getPosition(Element e) {
-    return getPosition(getDateOfGridElement(e));
   }
 
   private Date getDateOfGridElement(Element e) {
@@ -665,17 +675,25 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   public CalendarComponent[] getComponents() {
-    return m_components;
+    if (m_components == null) {
+      return null;
+    }
+    return Arrays.copyOf(m_components, m_components.length);
   }
 
   public void setComponents(CalendarComponent[] components) {
-    m_components = components;
+    if (components != null) {
+      m_components = Arrays.copyOf(components, components.length);
+    }
+    else {
+      m_components = null;
+    }
 
-    HashMap<Date, HashSet<CalendarComponent>> map = new HashMap<Date, HashSet<CalendarComponent>>();
+    HashMap<Date, Set<CalendarComponent>> map = new HashMap<Date, Set<CalendarComponent>>();
     if (m_components != null) {
       for (CalendarComponent c : m_components) {
         for (Date d : c.getCoveredDays()) {
-          HashSet<CalendarComponent> l = map.get(d);
+          Set<CalendarComponent> l = map.get(d);
           if (l == null) {
             l = new HashSet<CalendarComponent>();
             map.put(d, l);
@@ -687,9 +705,37 @@ public abstract class AbstractCalendarDocumentBuilder {
     refreshComponents(map);
   }
 
-  private CalendarComponent getComponentWithId(long id) {
+  /**
+   * @return Translates the given link ID into the effective
+   *         {@link org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem#getItemId()}.
+   */
+  private Object getItemId(int linkId) {
+    return m_linkIdToItemIdMap.get(linkId);
+  }
+
+  /**
+   * @return Translates the given {@link org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem#getItemId()}
+   *         into a numeric link ID.
+   */
+  private int getOrCreateLinkId(Object itemId) {
+    if (itemId == null) {
+      throw new IllegalArgumentException("itemId must not be null");
+    }
+    Integer linkId = m_ItemIdToLinkIdMap.get(itemId);
+    if (linkId == null) {
+      linkId = m_linkCounter++;
+      m_linkIdToItemIdMap.put(linkId, itemId);
+      m_ItemIdToLinkIdMap.put(itemId, linkId);
+    }
+    return linkId.intValue();
+  }
+
+  private CalendarComponent getComponentWithId(Object itemId) {
+    if (itemId == null) {
+      return null;
+    }
     for (CalendarComponent c : getComponents()) {
-      if (c != null && c.getItem() != null && c.getItem().getId() == id) {
+      if (c != null && c.getItem() != null && CompareUtility.equals(c.getItem().getItemId(), itemId)) {
         return c;
       }
     }
@@ -700,11 +746,11 @@ public abstract class AbstractCalendarDocumentBuilder {
     setComponents(m_components);
   }
 
-  private void refreshComponents(HashMap<Date, HashSet<CalendarComponent>> map) {
+  private void refreshComponents(Map<Date, Set<CalendarComponent>> map) {
     // remove all old components from the components layer
     CalendarSvgUtility.clearChildNodes(m_elComponentsContainer);
 
-    for (Entry<Date, HashSet<CalendarComponent>> e : map.entrySet()) {
+    for (Entry<Date, Set<CalendarComponent>> e : map.entrySet()) {
       Point p = getPosition(e.getKey());
       if (p != null && e.getValue() != null) {
         Element parent = m_elGridBox[p.y][p.x];
@@ -717,11 +763,11 @@ public abstract class AbstractCalendarDocumentBuilder {
           if (compEls != null && compEls.size() > 0) {
             for (Entry<CalendarComponent, Element> el : compEls.entrySet()) {
               m_elComponentsContainer.appendChild(el.getValue());
-              SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + el.getKey().getItem().getId() + "/" + p.x + "" + p.y);
+              int linkId = getOrCreateLinkId(el.getKey().getItem().getItemId());
+              SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + linkId + "/" + p.x + "" + p.y);
             }
           }
         }
-
       }
     }
   }
@@ -760,11 +806,17 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   public Date getEndDate() {
-    return m_endDate;
+    if (m_endDate == null) {
+      return null;
+    }
+    return (Date) m_endDate.clone();
   }
 
   public Date getStartDate() {
-    return m_startDate;
+    if (m_startDate == null) {
+      return null;
+    }
+    return (Date) m_startDate.clone();
   }
 
   public SVGDocument getSVGDocument() {
@@ -812,7 +864,7 @@ public abstract class AbstractCalendarDocumentBuilder {
     }
   }
 
-  private static interface IGridVisitor {
+  private interface IGridVisitor {
     void visit(Element element, int x, int y);
   }
 }
