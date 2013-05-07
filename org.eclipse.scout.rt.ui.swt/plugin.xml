@@ -211,15 +211,15 @@
                class="org.eclipse.scout.rt.ui.swt.form.fields.htmlfield.SwtScoutHtmlField">
          </uiClass>
       </formField>
-      <formField
-            active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField"
-            name="String field"
-            scope="default">
-         <uiClass
-               class="org.eclipse.scout.rt.ui.swt.form.fields.stringfield.SwtScoutStringField">
-         </uiClass>
-      </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField"
+           name="String field"
+           scope="default">
+         <factory
+               class="org.eclipse.scout.rt.ui.swt.form.fields.stringfield.StringFieldFactory">
+         </factory>
+     </formField>
       <formField
             active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
