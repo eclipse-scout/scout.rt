@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.LongArrayHolder;
 import org.junit.Assert;
@@ -18,7 +22,7 @@ import org.junit.Test;
 /**
  * JUnit tests for {@link TypeCastUtility}
  */
-public class TypeCastUtilityTest extends Assert {
+public class TypeCastUtilityTest {
 
   @Test
   public void testGetGenericsParameterClass() {
@@ -31,30 +35,49 @@ public class TypeCastUtilityTest extends Assert {
     Class<?> genericT;
     //
     genericT = TypeCastUtility.getGenericsParameterClass(LongArrayHolder.class, IHolder.class, 0);
-    assertEquals(Long[].class, genericT);
+    Assert.assertEquals(Long[].class, genericT);
     //
     try {
       TypeCastUtility.getGenericsParameterClass(X0.class, X0.class, 0);
-      fail("no specific parametrized type defined, must fail");
+      Assert.fail("no specific parametrized type defined, must fail");
     }
     catch (IllegalArgumentException t) {
       //nop
     }
     try {
       TypeCastUtility.getGenericsParameterClass(X1.class, X0.class, 0);
-      fail("no specific parametrized type defined, must fail");
+      Assert.fail("no specific parametrized type defined, must fail");
     }
     catch (IllegalArgumentException t) {
       //nop
     }
     genericT = TypeCastUtility.getGenericsParameterClass(X2.class, X0.class, 0);
-    assertEquals(Data2.class, genericT);
+    Assert.assertEquals(Data2.class, genericT);
     //
     genericT = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 0);
-    assertEquals(Data3.class, genericT);
+    Assert.assertEquals(Data3.class, genericT);
     //
     genericT = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 1);
-    assertEquals(Flavor3.class, genericT);
+    Assert.assertEquals(Flavor3.class, genericT);
+  }
+
+  @Test
+  public void testCastBigDecimalToBoolean() throws Exception {
+    //Bug 406875
+    Assert.assertFalse(TypeCastUtility.castValue(BigDecimal.ZERO, boolean.class));
+    Assert.assertTrue(TypeCastUtility.castValue(BigDecimal.ONE, boolean.class));
+
+    Assert.assertFalse(TypeCastUtility.castValue(createCustomBigDecimal(0), boolean.class));
+    Assert.assertTrue(TypeCastUtility.castValue(createCustomBigDecimal(1), boolean.class));
+  }
+
+  protected BigDecimal createCustomBigDecimal(long l) {
+    int scale = 10;
+    int precision = 30;
+    RoundingMode roundingMode = RoundingMode.HALF_UP;
+    MathContext mathContext = new MathContext(precision, roundingMode);
+    BigDecimal customZero = new BigDecimal(l, mathContext).setScale(scale, roundingMode);
+    return customZero;
   }
 
   static class Data0 {
