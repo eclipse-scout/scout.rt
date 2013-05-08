@@ -108,6 +108,10 @@ public class CentralPanel extends Composite {
     });
   }
 
+  public SwtCalendar getCalendar() {
+    return m_calendar;
+  }
+
   protected void setState() {
 
     // clear existing widgets

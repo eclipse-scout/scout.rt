@@ -320,29 +320,29 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 //        System.out.println(toString() + " got event " + e);
         switch (e.detail) {
           case SWT.TRAVERSE_TAB_NEXT:
-        case SWT.TRAVERSE_ARROW_NEXT:
-          Calendar newDate = Calendar.getInstance();
-          newDate.setTime(m_cellDate.getTime());
-          newDate.add(Calendar.DATE, 1);
-          AbstractCell cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
-          if (cell != null) {
-            cell.setSelected();
-          }
-          e.doit = false;
-          break;
-        case SWT.TRAVERSE_TAB_PREVIOUS:
-        case SWT.TRAVERSE_ARROW_PREVIOUS:
-          newDate = Calendar.getInstance();
-          newDate.setTime(m_cellDate.getTime());
-          newDate.add(Calendar.DATE, -1);
-          cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
-          if (cell != null) {
-            cell.setSelected();
-          }
-          e.doit = false;
-          break;
+          case SWT.TRAVERSE_ARROW_NEXT:
+            Calendar newDate = Calendar.getInstance();
+            newDate.setTime(m_cellDate.getTime());
+            newDate.add(Calendar.DATE, 1);
+            AbstractCell cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
+            if (cell != null) {
+              cell.setSelected();
+            }
+            e.doit = false;
+            break;
+          case SWT.TRAVERSE_TAB_PREVIOUS:
+          case SWT.TRAVERSE_ARROW_PREVIOUS:
+            newDate = Calendar.getInstance();
+            newDate.setTime(m_cellDate.getTime());
+            newDate.add(Calendar.DATE, -1);
+            cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
+            if (cell != null) {
+              cell.setSelected();
+            }
+            e.doit = false;
+            break;
+        }
       }
-    }
     });
     // to make this cell focusable
     addListener(SWT.KeyDown, new Listener() {
@@ -418,13 +418,10 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     setWeekText(weekName);
 
     // gray background for cell not in the curent month
-    if (m_isCurrentPeriod) {
-      setBackground(SwtColors.getInstance().getWhite());
-    }
-    else {
+    setBackground(SwtColors.getInstance().getWhite());
+    if (!m_isCurrentPeriod && m_calendar.getMarkOutOfMonthDays()) {
       setBackground(SwtColors.getInstance().getLightgray());
     }
-
   }
 
   /** add items to this cell */

@@ -71,6 +71,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   private int m_displayType = DateChooser.DISPLAY_MODE_MONTH;
   private int m_startHour = 6;// 6-7 is for all items before 7 //MIN=0
   private int m_endHour = 19;// 18-19 is for all items after 18 //MAX=23
+  private boolean m_useOverflowCells = false;
   private String m_weekLabel;
   private String m_dateLabel;
   private String m_dayLabel;
@@ -116,6 +117,13 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   @Override
   public void resetItemCache() {
     m_itemsCached = null;
+  }
+
+  @Override
+  public void setWorkingHours(int startHour, int endHour, boolean useOverflowCells) {
+    m_startHour = startHour;
+    m_endHour = endHour;
+    m_useOverflowCells = useOverflowCells;
   }
 
   @Override
@@ -315,10 +323,8 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    if (m_isMajor) {
-      setBackground(m_yesMajorColor);
-    }
-    else {
+    setBackground(m_yesMajorColor);
+    if (!m_isMajor && m_dateChooser.getMarkOutOfMonthDays()) {
       setBackground(m_notMajorColor);
     }
     Insets insets = getInsets();

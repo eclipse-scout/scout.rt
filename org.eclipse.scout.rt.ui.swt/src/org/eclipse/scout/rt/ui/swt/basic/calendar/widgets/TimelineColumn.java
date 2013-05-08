@@ -87,37 +87,35 @@ public class TimelineColumn extends Composite implements PaintListener {
     int hTimeless = Math.max(0, timelessHeight - 1);
     int yTimed = m_realOffsetY + hTimeless + 1;
 
-    int slots = (CalendarConstants.DAY_TIMELINE_END_TIME - CalendarConstants.DAY_TIMELINE_START_TIME);
+    int slots = (m_centralPanel.getCalendar().getEndHour() - m_centralPanel.getCalendar().getStartHour());
     double deltaY = Double.valueOf((bounds.height - yTimed) / (slots * 1.0));
 
     // draw noon rect
     int x1 = 1;
-    int y1 = (int) Math.round(deltaY * (12 - CalendarConstants.DAY_TIMELINE_START_TIME)) + yTimed;
+    int y1 = (int) Math.round(deltaY * (12 - m_centralPanel.getCalendar().getStartHour())) + yTimed;
     int x2 = bounds.width - 3;
     int y2 = (int) Math.round(deltaY);
+    // right background color within noon rectangle
     Rectangle noon = new Rectangle(x1, y1, x2, y2);
-    e.gc.setBackground(SwtColors.getInstance().getLightgray());
+    if (m_centralPanel.getCalendar().getMarkNoonHour()) {
+      e.gc.setBackground(SwtColors.getInstance().getLightgray());
+    }
+    else {
+      e.gc.setBackground(SwtColors.getInstance().getWhite());
+    }
     e.gc.fillRectangle(noon);
     e.gc.setBackground(SwtColors.getInstance().getWhite());
 
-    int time = CalendarConstants.DAY_TIMELINE_START_TIME;
+    int time = m_centralPanel.getCalendar().getStartHour();
     for (int i = 0; i < slots; i++) {
       int y = (int) Math.round(deltaY * i) + yTimed;
 
-      // right background color within noon rectangle
-      if (time == 12) {
-        e.gc.setBackground(SwtColors.getInstance().getLightgray());
-      }
-      else {
-        e.gc.setBackground(SwtColors.getInstance().getWhite());
-      }
-
       e.gc.drawLine(0, y, bounds.width - 1, y);
 
-      if (time <= CalendarConstants.DAY_TIMELINE_START_TIME) {
+      if (time <= m_centralPanel.getCalendar().getStartHour() && m_centralPanel.getCalendar().getUseOverflowCells()) {
         e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_earlier"), 3, y + 1, true);
       }
-      else if (time >= CalendarConstants.DAY_TIMELINE_END_TIME - 1) {
+      else if ((time >= m_centralPanel.getCalendar().getEndHour() - 1) && m_centralPanel.getCalendar().getUseOverflowCells()) {
         e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_later"), 3, y + 1, true);
       }
       else {

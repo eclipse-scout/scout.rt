@@ -26,6 +26,9 @@ public class WeekItemLayout extends Layout {
 
   private static final int MIN_WIDTH = 3;
   private static final int MIN_HEIGHT = 4;
+  private int m_startHour = CalendarConstants.DAY_TIMELINE_START_TIME;
+  private int m_endHour = CalendarConstants.DAY_TIMELINE_END_TIME;
+  private boolean m_useOverflowCells = true;
 
   @Override
   protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
@@ -58,7 +61,7 @@ public class WeekItemLayout extends Layout {
       int hTimed = clipRect.height - yOffset - hTimeless;
 
       Rectangle r = new Rectangle(0, 0, 0, 0);
-      long intervalMillis = (CalendarConstants.DAY_TIMELINE_END_TIME /*+ 1*/- CalendarConstants.DAY_TIMELINE_START_TIME) * CalendarConstants.HOUR_MILLIS;
+      long intervalMillis = (m_endHour /*+ 1*/- m_startHour) * CalendarConstants.HOUR_MILLIS;
 
       int timelessItemHeight = 0;
       int countTimeless = dat.getTimelessCount();
@@ -107,6 +110,17 @@ public class WeekItemLayout extends Layout {
 
     } // end for loop
 
+  }
+
+  /**
+   * @param startHour
+   * @param endHour
+   * @param useOverflowCells
+   */
+  public void setWorkingHours(int startHour, int endHour, boolean useOverflowCells) {
+    m_startHour = startHour;
+    m_endHour = endHour;
+    m_useOverflowCells = useOverflowCells;
   }
 
 }

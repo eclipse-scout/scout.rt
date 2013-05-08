@@ -60,6 +60,33 @@ public interface ICalendar extends IPropertyObserver {
    */
   String PROP_LOAD_IN_PROGRESS = "loadInProgress";
   /**
+   * type int
+   */
+  String PROP_START_HOUR = "startHour";
+  /**
+   * type int
+   */
+  String PROP_END_HOUR = "endHour";
+  /**
+   * type {@link Boolean}
+   */
+  String PROP_USE_OVERFLOW_CELLS = "useOverflowCells";
+  /**
+   * type {@link Boolean}
+   */
+  String PROP_SHOW_DISPLAY_MODE_SELECTION = "showDisplayModeSelection";
+
+  /**
+   * type {@link Boolean}
+   */
+  String PROP_MARK_NOON_HOUR = "markNoonHour";
+
+  /**
+   * type {@link Boolean}
+   */
+  String PROP_MARK_OUT_OF_MONTH_DAYS = "markOutOfMonthDays";
+
+  /**
    * {@link Object}
    * <p>
    * Container of this calendar, {@link ICalendarField}
@@ -145,6 +172,77 @@ public interface ICalendar extends IPropertyObserver {
   void setCalendarChanging(boolean b);
 
   boolean isCalendarChanging();
+
+  /**
+   * Configures the starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode.
+   * Together with getEndHour and getOverflowCells is defines the timeline of a day.
+   * <p>
+   * Default {@code 6}.
+   * 
+   * @see getEndHour
+   * @see getUseOverflowCells
+   */
+  int getStartHour();
+
+  void setStartHour(int hour);
+
+  /**
+   * The starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode.
+   * Together with getStartHour and getUseOverflowCells is defines the timeline of a day.
+   * <p>
+   * Default {@code 19}.
+   * 
+   * @see getStartHour
+   * @see getUseOverflowCells
+   */
+  int getEndHour();
+
+  void setEndHour(int hour);
+
+  /**
+   * Defines the label of the first and last cell of the calendar. Only visible when the calendar is in day, week or
+   * work-week mode. Together with getConfiguredStartHour and getConfiguredEndHour it defines the timeline of a day. If
+   * true the timeline displays "sooner" and "later" instead of the first and last defined hour.
+   * <p>
+   * Appointments that are outside the defined hours of the calender are still shown in the first and last cell.
+   * <p>
+   * Default {@code true}.
+   * 
+   * @see getEndHour
+   * @see getStartHour
+   */
+  boolean getUseOverflowCells();
+
+  void setUseOverflowCells(boolean useOverflowCells);
+
+  /**
+   * Specifies whether the display mode options (day, week, workweek or month) at the bottom of the calendar are visible
+   * or not. If hidden, set the mode in code with setDisplayMode(ICalendar.DISPLAY_MODE_WEEK);
+   * <p>
+   * Default {@code true}.
+   */
+  boolean getShowDisplayModeSelection();
+
+  void setShowDisplayModeSelection(boolean showDisplayModeSelection);
+
+  /**
+   * Defines whether or not the noon hour is painted with a darker color. The type of client (Swing, SWT) defines how
+   * it is actually painted. In RAP this is not supported.
+   */
+  boolean getMarkNoonHour();
+
+  void setMarkNoonHour(boolean markNoonHour);
+
+  /**
+   * Defines whether or not days that are outside the current month are painted with a darker background color.
+   */
+  boolean getMarkOutOfMonthDays();
+
+  void setMarkOutOfMonthDays(boolean markOutOfMonthDays);
+
+  /*
+   * UI interface
+   */
 
   /**
    * {@link Object}

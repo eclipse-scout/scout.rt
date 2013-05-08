@@ -2,10 +2,12 @@ package org.eclipse.scout.rt.ui.svg.calendar.builder;
 
 import java.util.Calendar;
 
+import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.IComponentElementFactory;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.TimeLineTextComponentElementFactory;
+import org.w3c.dom.Element;
 
 public class CalendarDayBuilder extends AbstractCalendarDocumentBuilder {
   public CalendarDayBuilder() {
@@ -19,7 +21,7 @@ public class CalendarDayBuilder extends AbstractCalendarDocumentBuilder {
 
   @Override
   protected IComponentElementFactory getComponentElementFactory() {
-    return new TimeLineTextComponentElementFactory();
+    return new TimeLineTextComponentElementFactory(getStartHour(), getEndHour());
   }
 
   @Override
@@ -61,5 +63,16 @@ public class CalendarDayBuilder extends AbstractCalendarDocumentBuilder {
   @Override
   protected int getBigNextField() {
     return Calendar.WEEK_OF_YEAR;
+  }
+
+  @Override
+  protected double getGridTop() {
+    return 30.672;
+  }
+
+  @Override
+  protected void resizeDayBoxes(double height) {
+    Element el = getSVGDocument().getElementById("b00");
+    el.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "" + height);
   }
 }

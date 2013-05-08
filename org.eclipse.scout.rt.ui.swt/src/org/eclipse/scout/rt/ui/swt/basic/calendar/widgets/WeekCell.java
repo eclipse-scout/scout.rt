@@ -93,6 +93,7 @@ public class WeekCell extends AbstractCell {
 
     // create new grid layout
     WeekItemLayout layout = new WeekItemLayout();
+    layout.setWorkingHours(getCalendar().getStartHour(), getCalendar().getEndHour(), getCalendar().getUseOverflowCells());
     this.setLayout(layout);
   }
 
@@ -116,7 +117,7 @@ public class WeekCell extends AbstractCell {
     int yTimed = m_realOffsetY + hTimeless + 1;
 
     Rectangle bounds = getBounds();
-    int slots = (CalendarConstants.DAY_TIMELINE_END_TIME - CalendarConstants.DAY_TIMELINE_START_TIME);
+    int slots = (getCalendar().getEndHour() - getCalendar().getStartHour());
     double deltaY = Double.valueOf((bounds.height - yTimed) / (slots * 1.0));
 
     // set foreground color
@@ -124,15 +125,20 @@ public class WeekCell extends AbstractCell {
 
     // draw noon rect
     int x1 = 1;
-    int y1 = (int) Math.round(deltaY * (12 - CalendarConstants.DAY_TIMELINE_START_TIME)) + yTimed;
+    int y1 = (int) Math.round(deltaY * (12 - getCalendar().getStartHour())) + yTimed;
     int x2 = bounds.width - 3;
     int y2 = (int) Math.round(deltaY);
     Rectangle noon = new Rectangle(x1, y1, x2, y2);
-    e.gc.setBackground(SwtColors.getInstance().getLightgray());
+    if (getCalendar().getMarkNoonHour() || (!isCurrentPeriod() && getCalendar().getMarkOutOfMonthDays())) {
+      e.gc.setBackground(SwtColors.getInstance().getLightgray());
+    }
+    else {
+      e.gc.setBackground(SwtColors.getInstance().getWhite());
+    }
     e.gc.fillRectangle(noon);
     e.gc.setBackground(SwtColors.getInstance().getWhite());
 
-    int time = CalendarConstants.DAY_TIMELINE_START_TIME; // we have 1 slot before start time
+    int time = getCalendar().getStartHour(); // we have 1 slot before start time
     for (int i = 0; i < slots; i++) { // we go one slot after end time
       int y = (int) Math.round(deltaY * i) + yTimed;
       e.gc.drawLine(0, y, bounds.width - 1, y);

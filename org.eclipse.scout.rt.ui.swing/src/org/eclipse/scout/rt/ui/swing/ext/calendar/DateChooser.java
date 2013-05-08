@@ -60,6 +60,8 @@ public class DateChooser {
   public static final int DISPLAY_MODE_MONTH = ICalendar.DISPLAY_MODE_MONTH;
   public static final int DISPLAY_MODE_WORKWEEK = ICalendar.DISPLAY_MODE_WORKWEEK;
 
+  public static final int MIN_CELLPANEL_HEIGHT = 150;
+
   private int m_displayMode = DISPLAY_MODE_MONTH;
   private int m_timelessHeight = 0;
   private boolean m_largeVersion;
@@ -90,6 +92,13 @@ public class DateChooser {
   private DateChooser m_childCalendar;
   private boolean m_calendarUpdating;
 
+  private int m_startHour = 6;
+  private int m_endHour = 19;
+  private boolean m_useOverflowCells = true;
+  private DateFormat m_formatHHMM;
+  private boolean m_markOutOfMonthDays;
+  private boolean m_markNoonHour = true;
+
   public DateChooser() {
     this(false);
   }
@@ -115,6 +124,7 @@ public class DateChooser {
     m_listenerList = new EventListenerList();
     preConstructorInitialization(params);
     initializationByConstructor(largeVersion, displayMode, displayCondensed);
+    m_formatHHMM = new DateTimeFormatFactory().getHourMinute();
   }
 
   /**
@@ -890,6 +900,7 @@ public class DateChooser {
       updateSelections();
       fireVisibleRangeChanged();
     }
+
   }
 
   public Date getViewDate() {
@@ -936,6 +947,7 @@ public class DateChooser {
         m_daysPanel.add(createDayLabel(wd[i]));
       }
     }
+
     //
     MouseProxyAdapter proxy = new MouseProxyAdapter();
     m_cellsPanel.removeAll();
@@ -967,9 +979,21 @@ public class DateChooser {
         m_cell[y][x] = createCalendarCell();
         m_cell[y][x].setBorder(m_cellBorder);
         m_cell[y][x].addMouseListener(proxy);
+        m_cell[y][x].setWorkingHours(m_startHour, m_endHour, m_useOverflowCells);
         rowPanel.add(m_cell[y][x]);
       }
     }
+  }
+
+  private String formatHour(int h) {
+    Calendar cal = Calendar.getInstance();
+    cal.clear();
+    cal.set(2000, 01, 01, h, 0, 0);
+    String s = m_formatHHMM.format(cal.getTime());
+    if (s.charAt(1) == ':') {
+      s = "0" + s;
+    }
+    return s;
   }
 
   private void updateSelections() {
@@ -1085,6 +1109,40 @@ public class DateChooser {
         return false;
       }
     }
+  }
+
+  public void setWorkHours(int startHour, int endHour, boolean useOverflowCells) {
+    m_startHour = startHour;
+    m_endHour = endHour;
+    m_useOverflowCells = useOverflowCells;
+    for (int i = 0; i < m_cell.length; i++) {
+      for (int k = 0; k < m_cell[i].length; k++) {
+        m_cell[i][k].setWorkingHours(startHour, endHour, useOverflowCells);
+      }
+    }
+    reconfigureLayout();
+  }
+
+  public void setShowDisplayModeSelectionPanel(boolean visible) {
+    if (m_controlPanel != null) {
+      m_controlPanel.setVisible(visible);
+    }
+  }
+
+  public boolean getMarkNoonHour() {
+    return m_markNoonHour;
+  }
+
+  public void setMarkNoonHour(boolean markNoonHour) {
+    m_markNoonHour = markNoonHour;
+  }
+
+  public void setMarkOutOfMonthDays(boolean markOutOfMonthDays) {
+    m_markOutOfMonthDays = markOutOfMonthDays;
+  }
+
+  public boolean getMarkOutOfMonthDays() {
+    return m_markOutOfMonthDays;
   }
 
   public static Date nextDay(Date d) {

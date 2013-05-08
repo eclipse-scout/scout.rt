@@ -85,6 +85,10 @@ public class SwtScoutCalendar extends SwtCalendar {
       selectedDate.setTime(calendarModel.getSelectedDate());
     }
     setViewDate(selectedDate);
+    setWorkingHours(calendarModel.getStartHour(), calendarModel.getEndHour(), calendarModel.getUseOverflowCells());
+    setShowDisplayModeSelection(calendarModel.getShowDisplayModeSelection());
+    setMarkNoonHour(calendarModel.getMarkNoonHour());
+    setMarkOutOfMonthDays(calendarModel.getMarkOutOfMonthDays());
 
     //attach property listener
     m_activePropertyListener = new P_ScoutCalendarPropertyListener();

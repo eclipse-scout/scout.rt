@@ -62,4 +62,13 @@ public class CalendarMonthBuilder extends AbstractCalendarDocumentBuilder {
   protected int getBigNextField() {
     return Calendar.YEAR;
   }
+
+  @Override
+  protected void resizeDayBoxes(double gridHeight) {
+  }
+
+  @Override
+  protected double getGridTop() {
+    return 0;
+  }
 }

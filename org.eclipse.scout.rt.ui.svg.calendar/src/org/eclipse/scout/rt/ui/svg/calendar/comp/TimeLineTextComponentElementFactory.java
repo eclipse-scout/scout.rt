@@ -13,6 +13,14 @@ import org.w3c.dom.Element;
  */
 public class TimeLineTextComponentElementFactory extends TimeLineComponentElementFactory {
 
+  /**
+   * @param startHour
+   * @param endHour
+   */
+  public TimeLineTextComponentElementFactory(int startHour, int endHour) {
+    super(startHour, endHour);
+  }
+
   private final static float TEXT_Y_OFFSET = 4.0f; // small offset so that it looks better
 
   @Override

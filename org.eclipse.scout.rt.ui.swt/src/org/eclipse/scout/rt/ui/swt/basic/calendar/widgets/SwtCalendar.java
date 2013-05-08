@@ -18,11 +18,12 @@ import java.util.Map;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarConstants;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarModel;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarViewEvent;
+import org.eclipse.scout.rt.ui.swt.basic.calendar.DisplayMode;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.EmptyCalendarModel;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.ICalendarViewListener;
-import org.eclipse.scout.rt.ui.swt.basic.calendar.DisplayMode;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -82,6 +83,13 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   /** selection scope widget (month, week, work week, day */
   private SelectionScopeBar m_selectionScope;
+
+  /** workingHour settings **/
+  private int m_startHour = CalendarConstants.DAY_TIMELINE_START_TIME;
+  private int m_endHour = CalendarConstants.DAY_TIMELINE_END_TIME;
+  private boolean m_useOverflowCells = true;
+  private boolean m_markNoonHour = true;
+  private boolean m_markOutOfMonthDays = true;
 
   public SwtCalendar(Composite parent, int style) {
     super(parent, style);
@@ -268,6 +276,49 @@ public class SwtCalendar extends Composite implements PaintListener {
     if (m_calendarPanel != null) {
       m_calendarPanel.reloadCalendarItems();
     }
+  }
+
+  /**
+   * @param showDisplayModeSelection
+   */
+  public void setShowDisplayModeSelection(boolean showDisplayModeSelection) {
+    m_selectionScope.setVisible(showDisplayModeSelection);
+    ((GridData) m_selectionScope.getLayoutData()).exclude = !showDisplayModeSelection;
+  }
+
+  public void setWorkingHours(int startHour, int endHour, boolean useOverflowCells) {
+    m_startHour = startHour;
+    // to keep swt in sync with swing, swt needs an extra hour to draw timeline
+    m_endHour = endHour + 1;
+    m_useOverflowCells = useOverflowCells;
+  }
+
+  public void setMarkNoonHour(boolean markNoonHour) {
+    m_markNoonHour = markNoonHour;
+  }
+
+  public void setMarkOutOfMonthDays(boolean markOutOfMonthDays) {
+    m_markOutOfMonthDays = markOutOfMonthDays;
+  }
+
+  public int getStartHour() {
+    return m_startHour;
+  }
+
+  public int getEndHour() {
+    return m_endHour;
+  }
+
+  public boolean getUseOverflowCells() {
+    return m_useOverflowCells;
+  }
+
+  public boolean getMarkNoonHour() {
+    return m_markNoonHour;
+  }
+
+  public boolean getMarkOutOfMonthDays() {
+    return m_markOutOfMonthDays;
   }
 
   public void setDisplayMode(int newMode) {

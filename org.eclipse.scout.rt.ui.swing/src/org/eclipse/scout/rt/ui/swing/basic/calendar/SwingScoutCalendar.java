@@ -77,6 +77,26 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     setSetupFromScout(getScoutObject().getDisplayMode(), getScoutObject().isDisplayCondensed());
     setCalendarComponentsFromScout(getScoutObject().getComponents());
     setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
+    setWorkHours(getScoutObject().getStartHour(), getScoutObject().getEndHour(), getScoutObject().getUseOverflowCells());
+    setShowDisplayModeSelectionPanel(getScoutObject().getShowDisplayModeSelection());
+    setMarkNoonHour(getScoutObject().getMarkNoonHour());
+    setMarkOutOfMonthDays(getScoutObject().getMarkOutOfMonthDays());
+  }
+
+  private void setWorkHours(int startHour, int endHour, boolean useOverflowCells) {
+    getDateChooser().setWorkHours(startHour, endHour, useOverflowCells);
+  }
+
+  private void setShowDisplayModeSelectionPanel(boolean visible) {
+    getDateChooser().setShowDisplayModeSelectionPanel(visible);
+  }
+
+  private void setMarkNoonHour(boolean visible) {
+    getDateChooser().setMarkNoonHour(visible);
+  }
+
+  private void setMarkOutOfMonthDays(boolean visible) {
+    getDateChooser().setMarkOutOfMonthDays(visible);
   }
 
   public DateChooser getDateChooser() {
@@ -298,7 +318,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       if (e.isPopupTrigger()) {
         handleSwingCalendarPopup(e);
       }
-      if(fix!=null) {
+      if (fix != null) {
         fix.mouseReleased(this, e);
       }
     }

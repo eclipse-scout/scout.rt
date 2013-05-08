@@ -87,5 +87,7 @@ public abstract class AbstractCalendarCell extends JLabel {
 
   public abstract void resetItemCache();
 
+  public abstract void setWorkingHours(int startHour, int endHour, boolean useOverflowCells);
+
   public abstract void refresh();
 }

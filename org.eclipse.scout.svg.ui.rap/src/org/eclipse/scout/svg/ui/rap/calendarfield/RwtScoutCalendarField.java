@@ -139,6 +139,12 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
   private void initDocBuilder(AbstractCalendarDocumentBuilder builder) {
     Date selDate = getScoutObject().getCalendar().getSelectedDate();
     CalendarComponent selComp = getScoutObject().getCalendar().getSelectedComponent();
+
+    builder.setWorkHours(getScoutObject().getCalendar().getStartHour(), getScoutObject().getCalendar().getEndHour(), getScoutObject().getCalendar().getUseOverflowCells());
+    builder.setShowDisplayModeSelectionPanel(getScoutObject().getCalendar().getShowDisplayModeSelection());
+    builder.setMarkNoonHour(getScoutObject().getCalendar().getMarkNoonHour());
+    builder.setMarkOutOfMonthDays(getScoutObject().getCalendar().getMarkOutOfMonthDays());
+    builder.reconfigureLayout();
     builder.setShownDate(selDate);
     builder.setSelection(selDate, selComp);
     builder.setNumContextMenus(getContextMenusFromScout().length);

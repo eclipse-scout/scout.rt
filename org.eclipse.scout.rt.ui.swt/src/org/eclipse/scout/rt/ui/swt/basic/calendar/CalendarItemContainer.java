@@ -42,7 +42,7 @@ public class CalendarItemContainer implements Comparable {
     m_bounds = new Rectangle(1, 2, 3, 4);
     long repTimeOfDayStart = AbstractCell.getTimeOfDayMillis(m_cell.getDate().getTime());
     // TODO why + 1
-    long displayInterval = CalendarConstants.HOUR_MILLIS * (CalendarConstants.DAY_TIMELINE_END_TIME /* TODO need this? + 1 */- CalendarConstants.DAY_TIMELINE_START_TIME);
+    long displayInterval = CalendarConstants.HOUR_MILLIS * (cell.getCalendar().getEndHour() /* TODO need this? + 1 */- cell.getCalendar().getStartHour());
     CalendarModel model = m_cell.getCalendar().getModel();
     //
     m_fullDay = model.isFullDay(item);
@@ -60,7 +60,7 @@ public class CalendarItemContainer implements Comparable {
       m_toRelative = m_fromRelative;
     }
     else {
-      m_toRelative = AbstractCell.getTimeOfDayMillis(d2) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * CalendarConstants.DAY_TIMELINE_START_TIME;
+      m_toRelative = AbstractCell.getTimeOfDayMillis(d2) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * cell.getCalendar().getStartHour();
     }
     if (m_toRelative < 0) {
       m_toRelative = 0;
@@ -70,7 +70,7 @@ public class CalendarItemContainer implements Comparable {
     }
     // check end of day set
     if (m_fromRelative >= displayInterval - CalendarConstants.HOUR_MILLIS
-        && m_toRelative >= displayInterval - CalendarConstants.DAY_TIMELINE_END_TIME * CalendarConstants.HOUR_MILLIS) {
+        && m_toRelative >= displayInterval - cell.getCalendar().getEndHour() * CalendarConstants.HOUR_MILLIS) {
       m_fromRelative = displayInterval - CalendarConstants.HOUR_MILLIS;
       m_toRelative = displayInterval;
     }

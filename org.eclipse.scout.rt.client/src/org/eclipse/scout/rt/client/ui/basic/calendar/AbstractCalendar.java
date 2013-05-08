@@ -92,6 +92,48 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(500)
+  @ConfigPropertyValue("6")
+  protected int getConfiguredStartHour() {
+    return 6;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(510)
+  @ConfigPropertyValue("19")
+  protected int getConfiguredEndHour() {
+    return 19;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(520)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredUseOverflowCells() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(530)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredShowDisplayModeSelection() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(540)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredMarkNoonHour() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(550)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredMarkOutOfMonthDays() {
+    return true;
+  }
+
   private Class<? extends ICalendarItemProvider>[] getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<ICalendarItemProvider>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, ICalendarItemProvider.class);
@@ -139,6 +181,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     m_uiFacade = new P_UIFacade();
     setTitle(getConfiguredTitle());
     setSelectedDate(new Date());
+    setStartHour(getConfiguredStartHour());
+    setEndHour(getConfiguredEndHour());
+    setUseOverflowCells(getConfiguredUseOverflowCells());
+    setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
+    setMarkNoonHour(getConfiguredMarkNoonHour());
+    setMarkOutOfMonthDays(getConfiguredMarkOutOfMonthDays());
+
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
@@ -255,6 +304,66 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
+  }
+
+  @Override
+  public int getEndHour() {
+    return (Integer) propertySupport.getProperty(PROP_END_HOUR);
+  }
+
+  @Override
+  public void setEndHour(int hour) {
+    propertySupport.setProperty(PROP_END_HOUR, hour);
+  }
+
+  @Override
+  public int getStartHour() {
+    return (Integer) propertySupport.getProperty(PROP_START_HOUR);
+  }
+
+  @Override
+  public void setStartHour(int hour) {
+    propertySupport.setProperty(PROP_START_HOUR, hour);
+  }
+
+  @Override
+  public boolean getUseOverflowCells() {
+    return (Boolean) propertySupport.getProperty(PROP_USE_OVERFLOW_CELLS);
+  }
+
+  @Override
+  public void setUseOverflowCells(boolean useOverflowCells) {
+    propertySupport.setProperty(PROP_USE_OVERFLOW_CELLS, useOverflowCells);
+  }
+
+  @Override
+  public boolean getShowDisplayModeSelection() {
+    return (Boolean) propertySupport.getProperty(PROP_SHOW_DISPLAY_MODE_SELECTION);
+  }
+
+  @Override
+  public void setShowDisplayModeSelection(boolean showDisplayModeSelection) {
+    propertySupport.setProperty(PROP_SHOW_DISPLAY_MODE_SELECTION, showDisplayModeSelection);
+  }
+
+  @Override
+  public boolean getMarkNoonHour() {
+    return (Boolean) propertySupport.getProperty(PROP_MARK_NOON_HOUR);
+  }
+
+  @Override
+  public void setMarkNoonHour(boolean markNoonHour) {
+    propertySupport.setProperty(PROP_MARK_NOON_HOUR, markNoonHour);
+  }
+
+  @Override
+  public boolean getMarkOutOfMonthDays() {
+    return (Boolean) propertySupport.getProperty(PROP_MARK_OUT_OF_MONTH_DAYS);
+  }
+
+  @Override
+  public void setMarkOutOfMonthDays(boolean markOutOfMonthDays) {
+    propertySupport.setProperty(PROP_MARK_OUT_OF_MONTH_DAYS, markOutOfMonthDays);
   }
 
   @Override

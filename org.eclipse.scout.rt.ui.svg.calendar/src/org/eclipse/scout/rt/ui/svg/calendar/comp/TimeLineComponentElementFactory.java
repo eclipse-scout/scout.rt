@@ -22,8 +22,8 @@ import org.w3c.dom.Element;
  * parallel components are displayed by splitting the horizontal space as needed.
  */
 public class TimeLineComponentElementFactory extends AbstractComponentElementFactory {
-  private static final int START_HOUR = 7;
-  private static final int END_HOUR = 19;
+  private static int m_startHour = 7;
+  private static int m_endHour = 19;
   private static final float PADDING = 1.5f;
 
   // defines the minimal height of an calendar element to ensure it can be clicked even if the linear duration scale would be smaller
@@ -35,6 +35,12 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   // ensuring that the end event always comes first, allows us to display elements in one column if they happen serialized.
   private static final Integer EVENT_START = new Integer(2);
   private static final Integer EVENT_END = new Integer(1);
+
+  public TimeLineComponentElementFactory(int startHour, int endHour) {
+    super();
+    m_startHour = startHour;
+    m_endHour = endHour;
+  }
 
   /**
    * helper class to store meta data to a calendar component.
@@ -139,6 +145,7 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
     setElementDimensions(newEl, elementDimension);
 
     composite.appendChild(newEl);
+
     Element txt = createTextElement(c.comp, newEl, elementDimension, day);
     if (txt != null) {
       composite.appendChild(txt);
@@ -201,7 +208,8 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   }
 
   private static float getYOffset(CalendarComponentComposite d, SvgRect container, boolean isEnd) {
-    final int NUM_ELEMENTS = END_HOUR - START_HOUR + 3;
+
+    final int NUM_ELEMENTS = m_endHour - m_startHour + 2;
     final float ELEMENT_HEIGHT = container.height / NUM_ELEMENTS;
 
     // get time of current element
@@ -224,7 +232,7 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
         return 0;
       }
     }
-    else if (hour < START_HOUR) {
+    else if (hour < m_startHour) {
       // EARLIER
       if (isEnd) {
         return ELEMENT_HEIGHT * 2;
@@ -233,7 +241,7 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
         return ELEMENT_HEIGHT;
       }
     }
-    else if (hour >= END_HOUR) {
+    else if (hour >= m_endHour) {
       // LATER
       if (isEnd) {
         return container.height;
@@ -244,8 +252,8 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
     }
     else {
       // LINEAR TIME LINE
-      final int minutes = ((hour - START_HOUR) * 60) + minute;
-      final int totalMinutes = (END_HOUR - START_HOUR) * 60;
+      final int minutes = ((hour - m_startHour) * 60) + minute;
+      final int totalMinutes = (m_endHour - m_startHour) * 60;
       final float timeHeight = container.height - (2 * ELEMENT_HEIGHT);
       return ELEMENT_HEIGHT + (minutes * timeHeight / totalMinutes);
     }
