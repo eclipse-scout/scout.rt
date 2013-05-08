@@ -79,15 +79,27 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     if (m_viewComposite != null) {
       // attach to view
       m_viewComposite.getSwingContentPane().removeAll();
-      // use grid layout with decent min-width
-      JPanelEx optimalSizePanel = new JPanelEx(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
-      optimalSizePanel.setName(getScoutForm().getClass().getSimpleName() + ".optimalSizePanel");
-      SwingScoutFormFieldGridData layoutData = new SwingScoutFormFieldGridData(getScoutForm().getRootGroupBox());
-      getSwingFormPane().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, layoutData);
-      optimalSizePanel.add(getSwingFormPane());
-      m_viewComposite.getSwingContentPane().add(BorderLayout.CENTER, optimalSizePanel);
+      Component rootPanel = decorateFormPane(getSwingFormPane());
+      m_viewComposite.getSwingContentPane().add(BorderLayout.CENTER, rootPanel);
       attachSwingView();
     }
+  }
+
+  /**
+   * Decorates the form pane. The default implementation wraps the form pane in a JPanelEx with a LogicalGridLayout,
+   * acting as parent for the form pane. Override this method if you have to change this behavior. For instance when
+   * you don't need the wrapper pane at all, you'd simply return the formPane here.
+   * 
+   * @param formPane
+   * @return
+   */
+  protected Component decorateFormPane(JComponent formPane) {
+    JPanelEx wrapperPanel = new JPanelEx(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
+    wrapperPanel.setName(getScoutForm().getClass().getSimpleName() + ".optimalSizePanel");
+    SwingScoutFormFieldGridData layoutData = new SwingScoutFormFieldGridData(getScoutForm().getRootGroupBox());
+    getSwingFormPane().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, layoutData);
+    wrapperPanel.add(formPane);
+    return wrapperPanel;
   }
 
   @Override
