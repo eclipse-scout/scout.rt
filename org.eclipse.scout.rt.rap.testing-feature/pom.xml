@@ -55,6 +55,7 @@
             </goals>
             <configuration>
               <excludes>
+                <plugin id="org.json" />
               </excludes>
             </configuration>
           </execution>
@@ -75,4 +76,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>
