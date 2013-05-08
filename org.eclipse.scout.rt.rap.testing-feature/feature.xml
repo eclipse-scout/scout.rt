@@ -31,13 +31,14 @@
          version="0.0.0"/>
 
    <requires>
-      <import plugin="com.google.guava" version="12.0.0" match="greaterOrEqual"/>
       <import plugin="com.thoughtworks.selenium" version="2.25.0" match="greaterOrEqual"/>
+      <import plugin="com.google.guava" version="12.0.0" match="greaterOrEqual"/>
       <import plugin="org.apache.httpcomponents.httpcore" version="4.1.4" match="greaterOrEqual"/>
       <import plugin="org.apache.httpcomponents.httpclient" version="4.1.3" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.codec" version="1.1.4" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.exec" version="1.1.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.scout.rt.rap" version="3.9.0" match="compatible"/>
+      <import plugin="org.json"/>
    </requires>
 
    <plugin
@@ -48,14 +49,14 @@
          unpack="false"/>
 
    <plugin
-         id="com.google.guava"
+         id="com.thoughtworks.selenium"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.thoughtworks.selenium"
+         id="com.google.guava"
          download-size="0"
          install-size="0"
          version="0.0.0"
