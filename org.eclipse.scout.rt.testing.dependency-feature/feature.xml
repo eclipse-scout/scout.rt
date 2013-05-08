@@ -49,14 +49,14 @@ BSI Business Systems Integration AG - initial API and implementation
          version="0.0.0"/>
 
    <plugin
-         id="com.google.guava"
+         id="com.thoughtworks.selenium"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.thoughtworks.selenium"
+         id="com.google.guava"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -85,6 +85,13 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <plugin
          id="org.apache.commons.exec"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.json"
          download-size="0"
          install-size="0"
          version="0.0.0"
