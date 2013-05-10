@@ -1,8 +1,0 @@
-analyseLocally=false
-eclipse.preferences.version=1
-projectArtifactId=org.eclipse.scout.rt.testing.client
-projectBranch=
-projectGroupId=org.eclipse.scout.rt
-projectKey=org.eclipse.scout.rt\:org.eclipse.scout.rt.testing.client\:master
-serverUrl=https\://scout.bsiag.com/sonar
-version=2

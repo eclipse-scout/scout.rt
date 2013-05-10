@@ -1,8 +1,0 @@
-analyseLocally=false
-eclipse.preferences.version=1
-projectArtifactId=org.eclipse.scout.svg.ui.swing
-projectBranch=
-projectGroupId=org.eclipse.scout.rt
-projectKey=org.eclipse.scout.rt\:org.eclipse.scout.svg.ui.swing\:master
-serverUrl=https\://scout.bsiag.com/sonar
-version=2

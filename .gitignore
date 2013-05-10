@@ -20,3 +20,6 @@ target/
 # settings files are handled in rt-feature project and settings files should not be changed (can be enforecd with 'git add .settings -f')
 /.settings
 /.project
+
+# Sonar settings potentially change after every build
+org.sonar.ide.eclipse.core.prefs

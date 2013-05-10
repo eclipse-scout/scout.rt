@@ -1,8 +1,0 @@
-analyseLocally=false
-eclipse.preferences.version=1
-projectArtifactId=org.apache.derby.jdbc_1091.fragment
-projectBranch=
-projectGroupId=org.eclipse.scout.rt
-projectKey=org.eclipse.scout.rt\:org.apache.derby.jdbc_1091.fragment\:master
-serverUrl=https\://scout.bsiag.com/sonar
-version=2
