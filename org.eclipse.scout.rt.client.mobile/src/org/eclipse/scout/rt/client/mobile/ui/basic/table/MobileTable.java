@@ -40,7 +40,7 @@ import org.eclipse.scout.service.SERVICES;
  * A table optimized for mobile devices which wraps another table.
  * <p>
  * It consists of a content column which displays the relevant information of the original table.
- * 
+ *
  * @since 3.9.0
  */
 public class MobileTable extends AbstractMobileTable implements IMobileTable {
@@ -95,9 +95,8 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   @Override
   protected boolean execIsAutoCreateTableRowForm() {
-    Boolean autoCreateRowForm = isAutoCreateRowForm(getOriginalTable());
-    if (autoCreateRowForm != null) {
-      return autoCreateRowForm;
+    if(getOriginalTable().hasProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM)) {
+      return isAutoCreateRowForm(getOriginalTable());
     }
 
     if (getOriginalTable().isCheckable()) {
@@ -109,9 +108,8 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   @Override
   protected String execComputeDefaultDrillDownStyle() {
-    String defaultDrillDownStyle = getDefaultDrillDownStyle(getOriginalTable());
-    if (defaultDrillDownStyle != null) {
-      return defaultDrillDownStyle;
+    if(getOriginalTable().hasProperty(PROP_DEFAULT_DRILL_DOWN_STYLE)) {
+      return getDefaultDrillDownStyle(getOriginalTable());
     }
 
     if (getOriginalTable().isCheckable()) {
