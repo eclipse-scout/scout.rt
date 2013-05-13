@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
-import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -26,11 +25,9 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class FormBasedDesktopFormBoundsProvider implements IFormBoundsProvider {
   private final IForm m_form;
-  private IRwtEnvironment m_uiEnvironment;
 
-  public FormBasedDesktopFormBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
+  public FormBasedDesktopFormBoundsProvider(IForm form) {
     m_form = form;
-    m_uiEnvironment = uiEnvironment;
   }
 
   @Override

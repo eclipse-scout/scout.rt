@@ -36,7 +36,7 @@ public class MobileSmartFieldFactory implements IFormFieldFactory {
       field = new RwtScoutSmartField();
     }
 
-    ISmartField<?> formField = (ISmartField) model;
+    ISmartField<?> formField = (ISmartField<?>) model;
     field.createUiField(parent, formField, uiEnvironment);
 
     return field;

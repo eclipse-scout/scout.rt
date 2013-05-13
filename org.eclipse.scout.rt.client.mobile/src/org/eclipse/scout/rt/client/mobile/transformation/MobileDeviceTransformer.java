@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
@@ -57,8 +55,6 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3.9.0
  */
 public class MobileDeviceTransformer implements IDeviceTransformer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDeviceTransformer.class);
-
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private IDesktop m_desktop;
   private PageFormManager m_pageFormManager;

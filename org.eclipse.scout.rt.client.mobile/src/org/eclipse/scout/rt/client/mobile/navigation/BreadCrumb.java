@@ -14,8 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -25,8 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  * @since 3.9.0
  */
 public class BreadCrumb implements IBreadCrumb {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BreadCrumb.class);
-
   private IForm m_form;
   private IBreadCrumbsNavigation m_breadCrumbsNavigation;
 

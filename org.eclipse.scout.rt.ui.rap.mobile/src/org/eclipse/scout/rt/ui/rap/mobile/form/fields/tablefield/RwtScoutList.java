@@ -26,6 +26,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -66,6 +68,8 @@ import org.eclipse.swt.widgets.TableItem;
  */
 @SuppressWarnings("restriction")
 public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScoutList {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTable.class);
+
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
   private ListViewer m_uiViewer;
@@ -537,7 +541,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       url = new URL(urlText);
     }
     catch (MalformedURLException e) {
-      //nop
+      LOG.error("Hyperlink could not be activated", e);
       return;
     }
     // notify Scout

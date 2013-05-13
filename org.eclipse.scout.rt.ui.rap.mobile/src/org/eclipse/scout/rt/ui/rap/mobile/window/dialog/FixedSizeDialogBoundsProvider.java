@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.dialog;
 
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -30,14 +28,10 @@ import org.eclipse.swt.widgets.Display;
 public class FixedSizeDialogBoundsProvider implements IFormBoundsProvider {
   public static final int DIALOG_WIDTH = 700;
 
-  private final IForm m_form;
   private int m_maxWidth = DIALOG_WIDTH;
   private int m_maxHeight = Integer.MAX_VALUE;
-  private IRwtEnvironment m_uiEnvironment;
 
-  public FixedSizeDialogBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
-    m_form = form;
-    m_uiEnvironment = uiEnvironment;
+  public FixedSizeDialogBoundsProvider() {
   }
 
   @Override

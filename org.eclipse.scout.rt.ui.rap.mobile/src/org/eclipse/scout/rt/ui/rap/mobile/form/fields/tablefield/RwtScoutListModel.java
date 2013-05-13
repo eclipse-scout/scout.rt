@@ -41,7 +41,6 @@ public class RwtScoutListModel implements IRwtScoutListModel {
 
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
-  private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
   private final RwtScoutList m_uiList;
   private boolean m_multiline;
 

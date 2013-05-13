@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.treefield;
 
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.ui.rap.form.fields.treefield.RwtScoutTreeField;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 public class RwtScoutMobileTreeField extends RwtScoutTreeField {
 
   @Override
-  protected IRwtScoutActionBar createRwtScoutActionBar() {
+  protected IRwtScoutActionBar<? extends IPropertyObserver> createRwtScoutActionBar() {
     RwtScoutTreeActionBar actionBar = new RwtScoutTreeActionBar();
     actionBar.createUiField(getUiContainer(), getScoutObject(), getUiEnvironment());
     return actionBar;

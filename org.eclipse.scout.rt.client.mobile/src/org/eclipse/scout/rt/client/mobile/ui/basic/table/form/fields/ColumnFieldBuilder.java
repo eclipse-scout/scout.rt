@@ -32,13 +32,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  */
 public class ColumnFieldBuilder {
 
-  public Map<IColumn, IFormField> build(IColumn<?>[] columns, ITableRow row) throws ProcessingException {
-    Map<IColumn, IFormField> fields = new HashMap<IColumn, IFormField>();
+  public Map<IColumn<?>, IFormField> build(IColumn<?>[] columns, ITableRow row) throws ProcessingException {
+    Map<IColumn<?>, IFormField> fields = new HashMap<IColumn<?>, IFormField>();
     if (columns == null) {
       return fields;
     }
 
-    for (IColumn column : columns) {
+    for (IColumn<?> column : columns) {
       IFormField field = createValueField(column, row);
       if (field != null) {
         fields.put(column, field);

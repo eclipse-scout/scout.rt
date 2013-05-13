@@ -204,10 +204,6 @@ public class PageFormManager {
     return getMiddlePageSlotViewId();
   }
 
-  private void showPageInLeftForm(IPage page) throws ProcessingException {
-    showPage(page, getLeftPageSlotViewId());
-  }
-
   private IPageForm showPage(IPage page, String viewId) throws ProcessingException {
     updateLeftPageIfNecessary(page, viewId);
 

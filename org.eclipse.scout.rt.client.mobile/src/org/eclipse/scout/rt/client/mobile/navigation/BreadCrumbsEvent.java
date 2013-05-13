@@ -31,4 +31,7 @@ public class BreadCrumbsEvent extends EventObject {
     return (IBreadCrumbsNavigation) getSource();
   }
 
+  public int getType() {
+    return m_type;
+  }
 }

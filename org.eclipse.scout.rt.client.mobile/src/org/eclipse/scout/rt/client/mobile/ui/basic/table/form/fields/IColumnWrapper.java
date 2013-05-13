@@ -16,5 +16,5 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 /**
  * @since 3.9.0
  */
-public interface IColumnWrapper<WRAPPABLE extends IColumn> extends IWrapper<WRAPPABLE> {
+public interface IColumnWrapper<WRAPPABLE extends IColumn<?>> extends IWrapper<WRAPPABLE> {
 }

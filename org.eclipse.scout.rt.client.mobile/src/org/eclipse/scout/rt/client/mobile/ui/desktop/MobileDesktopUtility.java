@@ -60,7 +60,7 @@ public class MobileDesktopUtility {
   public static IToolButton getToolButtonFor(IForm form) {
     for (IToolButton toolButton : getDesktop().getToolButtons()) {
       if (toolButton instanceof AbstractFormToolButton) {
-        IForm toolForm = ((AbstractFormToolButton) toolButton).getForm();
+        IForm toolForm = ((AbstractFormToolButton<?>) toolButton).getForm();
         if (form == toolForm) {
           return toolButton;
         }

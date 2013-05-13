@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -98,7 +99,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
   }
 
   @Override
-  protected IRwtScoutActionBar createRwtScoutActionBar() {
+  protected IRwtScoutActionBar<? extends IPropertyObserver> createRwtScoutActionBar() {
     boolean actionBarVisible = true;
     if (getScoutObject() instanceof IMobileTableField) {
       actionBarVisible = ((IMobileTableField) getScoutObject()).isActionBarVisible();

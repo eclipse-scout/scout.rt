@@ -15,8 +15,6 @@ import java.util.Collection;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -35,8 +33,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
 public class DeviceTransformationDesktopExtension extends AbstractDesktopExtension {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DeviceTransformationDesktopExtension.class);
-
   private boolean m_active;
   private IDeviceTransformer m_deviceTransformer;
 

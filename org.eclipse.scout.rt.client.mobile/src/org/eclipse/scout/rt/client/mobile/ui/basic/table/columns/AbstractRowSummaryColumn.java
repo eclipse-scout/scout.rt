@@ -38,8 +38,8 @@ import org.eclipse.scout.service.SERVICES;
 public class AbstractRowSummaryColumn extends AbstractStringColumn implements IRowSummaryColumn {
   private boolean m_initialized;
 
-  private IColumn m_cellHeaderColumn;
-  private List<IColumn> m_cellDetailColumns;
+  private IColumn<?> m_cellHeaderColumn;
+  private List<IColumn<?>> m_cellDetailColumns;
   private String m_htmlCellTemplate;
   private String m_htmlDrillDown;
   private String m_htmlDrillDownButton;
@@ -139,7 +139,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
    */
   public void initializeDecorationConfiguration(ITable table, int maxCellDetailColumns) {
     m_cellHeaderColumn = null;
-    m_cellDetailColumns = new ArrayList<IColumn>(maxCellDetailColumns);
+    m_cellDetailColumns = new ArrayList<IColumn<?>>(maxCellDetailColumns);
 
     for (IColumn<?> column : table.getColumnSet().getVisibleColumns()) {
       if (m_cellDetailColumns.size() >= maxCellDetailColumns) {

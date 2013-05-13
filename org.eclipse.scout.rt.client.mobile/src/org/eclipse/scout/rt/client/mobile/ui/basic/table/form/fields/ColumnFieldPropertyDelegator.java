@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  * @since 3.9.0
  */
-public class ColumnFieldPropertyDelegator<SENDER extends IColumn, RECEIVER extends IFormField> extends PropertyDelegator<SENDER, RECEIVER> {
+public class ColumnFieldPropertyDelegator<SENDER extends IColumn<?>, RECEIVER extends IFormField> extends PropertyDelegator<SENDER, RECEIVER> {
 
   public ColumnFieldPropertyDelegator(SENDER sender, RECEIVER receiver) {
     super(sender, receiver);

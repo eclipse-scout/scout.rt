@@ -51,7 +51,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   }
 
   private String findAppropriateTitle() {
-    for (IColumn column : m_tableRow.getTable().getColumns()) {
+    for (IColumn<?> column : m_tableRow.getTable().getColumns()) {
       if (column.isVisible()) {
         return m_tableRow.getTable().getCell(m_tableRow, column).getText();
       }

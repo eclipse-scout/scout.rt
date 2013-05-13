@@ -59,7 +59,7 @@ public class RwtScoutMobileDialog extends RwtScoutDialog {
 
   @Override
   protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
-    return new FixedSizeDialogBoundsProvider(scoutForm, uiEnvironment);
+    return new FixedSizeDialogBoundsProvider();
   }
 
   /**

@@ -12,13 +12,9 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
@@ -40,18 +36,12 @@ import org.eclipse.swt.widgets.Menu;
  * @since 3.9.0
  */
 public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements IRwtScoutActionButton {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutActionButton.class);
-
-  private ButtonListener m_scoutButtonListener;
-  private OptimisticLock m_selectionLock;
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
-  private boolean m_selectionAlreadyRemoved;
   private int m_menuOpeningDirection = SWT.DOWN;
   private boolean m_ellipsisRemovalEnabled;
 
   public RwtScoutActionButton() {
-    m_selectionLock = new OptimisticLock();
     m_ellipsisRemovalEnabled = true;
   }
 

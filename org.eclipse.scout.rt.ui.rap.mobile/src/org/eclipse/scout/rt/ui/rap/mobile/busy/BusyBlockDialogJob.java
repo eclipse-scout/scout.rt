@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.rap.mobile.busy;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.swt.SWT;
@@ -21,7 +19,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class BusyBlockDialogJob extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusyBlockDialogJob.class);
 
   public BusyBlockDialogJob(String name, RwtBusyHandler handler) {
     super(name, handler);

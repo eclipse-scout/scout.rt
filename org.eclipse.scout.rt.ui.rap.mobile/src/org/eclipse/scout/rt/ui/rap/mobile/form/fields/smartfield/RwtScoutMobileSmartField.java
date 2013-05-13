@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartFieldProposalFormProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
@@ -34,8 +32,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileSmartField.class);
-
   private Composite m_browseIconContainer;
   private Composite m_smartContainer;
 

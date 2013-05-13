@@ -62,7 +62,7 @@ public class PageFormInitFieldVisitor implements IFormFieldVisitor {
 
   private boolean allowInitField(IFormField field) {
     if (field instanceof IWrappedFormField<?>) {
-      IForm innerForm = ((IWrappedFormField) field).getInnerForm();
+      IForm innerForm = ((IWrappedFormField<?>) field).getInnerForm();
       if (innerForm != null) {
         m_formsToIgnore.add(innerForm);
       }
