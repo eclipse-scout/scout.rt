@@ -199,7 +199,7 @@ class JActivityMapHeaderValidator {
   /**
    * Container for holding validated text and rectangle information
    */
-  private static class ValidatedTextData {
+  static class ValidatedTextData {
 
     private final List<String> m_texts;
     private final List<Boolean> m_textsFit;
