@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.internal.Activator;
 import org.osgi.framework.BundleContext;
 
@@ -75,4 +76,26 @@ public final class BundleContextUtility {
     }
     return t;
   }
+
+  /**
+   * Returns safely a property from the bundle context of the bundle activator. Returns null, if no OSGi environment is
+   * available (e.g. unit tests). You can use this method whenever you must read a property from the bundle context.
+   * 
+   * @param key
+   *          Name of the property
+   * @return Value of the given property or null if the property is not defined or null, if not in an OSGi environment
+   * @since 3.10.0
+   */
+  public static String getProperty(String key) {
+    Plugin activator = Activator.getDefault();
+    if (activator != null) {
+      return activator.getBundle().getBundleContext().getProperty(key);
+    }
+    return null;
+  }
+
+  public static boolean parseBooleanProperty(String key, boolean defaultValue) {
+    return StringUtility.parseBoolean(getProperty(key), defaultValue);
+  }
+
 }

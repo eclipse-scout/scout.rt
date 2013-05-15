@@ -43,6 +43,7 @@ import javax.swing.border.LineBorder;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -612,7 +613,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    * </pre>
    */
   protected void decorateAppZone(RootPaneContainer root) {
-    String zone = Activator.getDefault().getBundle().getBundleContext().getProperty("app.zone");
+    String zone = BundleContextUtility.getProperty("app.zone");
     if (zone == null) {
       //production
     }

@@ -18,20 +18,15 @@ import java.util.HashSet;
 
 import javax.swing.SwingUtilities;
 
+import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.SecurePreferencesUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.swing.Activator;
 
 public class InternalNetAuthenticator extends Authenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalNetAuthenticator.class);
 
-  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED;
-
-  static {
-    String s = Activator.getDefault().getBundle().getBundleContext().getProperty("java.net.authenticate.cache.enabled");
-    NET_AUTHENTICATION_CACHE_ENABLED = s != null ? s.equals("true") : false;
-  }
+  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED = BundleContextUtility.parseBooleanProperty("java.net.authenticate.cache.enabled", false);
 
   private HashSet<String> m_visitedKeys;
 

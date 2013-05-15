@@ -70,6 +70,7 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -92,12 +93,13 @@ import org.eclipse.scout.rt.ui.swing.simulator.SimulatorAction;
 import org.eclipse.scout.rt.ui.swing.simulator.SwingScoutSimulator;
 
 public final class SwingUtility {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingUtility.class);
 
   public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
-  public static final boolean DO_RESET_COMPONENT_BOUNDS = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.layout.resetBoundsOnInvalidate"), true);
-  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.verifyInputOnWindowClosed"), false);
+  public static final boolean DO_RESET_COMPONENT_BOUNDS = BundleContextUtility.parseBooleanProperty("scout.ui.layout.resetBoundsOnInvalidate", true);
+  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = BundleContextUtility.parseBooleanProperty("scout.ui.verifyInputOnWindowClosed", false);
 
   private SwingUtility() {
   }
