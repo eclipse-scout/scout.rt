@@ -555,7 +555,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     if (getUpdateUiFromScoutLock().isAcquired()) {
       return;
     }
-    if (getUiField().isVisible() && getUiField().isFocusControl()) {
+    if (getUiField().isVisible()) {
       String text = getUiField().getText();
       if (text == null || text.length() == 0) {
         // allow empty field without proposal
