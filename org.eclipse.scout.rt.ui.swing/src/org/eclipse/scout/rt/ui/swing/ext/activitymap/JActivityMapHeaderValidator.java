@@ -47,17 +47,6 @@ class JActivityMapHeaderValidator {
 
     retrieveColumnTexts(columns, columnType, columnModel, largeTexts, mediumTexts, smallTexts);
 
-    System.out.println("FontMetrics " + fm);
-    System.out.println("textrects " + textRects.size());
-
-    for (Rectangle rect : textRects) {
-      System.out.println(rect);
-    }
-
-    for (int i = 0; i < largeTexts.size(); i++) {
-      System.out.println("large " + largeTexts.get(i) + ", medium " + mediumTexts.get(i) + ", small " + smallTexts.get(i));
-    }
-
     Map<Integer, ValidatedTextData> validatedTextDataMap = validateAllTexts(fm, textRects, largeTexts, mediumTexts, smallTexts);
     List<Rectangle> validatedRects = mergeTexts(validatedTextDataMap, texts);
 
@@ -131,8 +120,6 @@ class JActivityMapHeaderValidator {
           k++;
         }
         isTextTooLarge = fm.stringWidth(text) > validatedRects.get(i).width - 4;
-
-        System.out.println(isTextTooLarge + ", text " + text + ", stringwidth " + fm.stringWidth(text) + " validaterect " + (validatedRects.get(i).width - 4));
 
       }
       textsFit.add(Boolean.valueOf(!isTextTooLarge));
