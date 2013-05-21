@@ -374,10 +374,18 @@ public class ImapAdapter {
   }
 
   public String[] getSSLProtocols() {
+    if (m_sslProtocols == null) {
+      return null;
+    }
     return Arrays.copyOf(m_sslProtocols, m_sslProtocols.length);
   }
 
   public void setSSLProtocols(String[] sslProtocols) {
-    m_sslProtocols = Arrays.copyOf(sslProtocols, sslProtocols.length);
+    if (sslProtocols == null) {
+      m_sslProtocols = null;
+    }
+    else {
+      m_sslProtocols = Arrays.copyOf(sslProtocols, sslProtocols.length);
+    }
   }
 }
