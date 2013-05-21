@@ -83,7 +83,7 @@
       <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="rap_2.1" location="http://download.eclipse.org/rt/rap/2.1/M2-20130506-1748/"/>
+      <repository id="rap_2.1" location="http://download.eclipse.org/rt/rap/2.1/RC1-20130520-1326/"/>
 
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
     </location>
