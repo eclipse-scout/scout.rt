@@ -210,7 +210,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
    * be the job of the GUI, but it seems not to be possible with the list widget of rap.
    */
   private String addGridLine(String existingHtml) {
-    String borderDivStart = "<div style=\"position: absolute; width: 100%; height: 100%; border-bottom:1px solid #e1efec\">";
+    String borderDivStart = "<div style=\"width: 100%; height: 100%; border-bottom:1px solid #e1efec\">";
     String borderDivEnd = "</div>";
     String prePart = "";
     String mainPart = "";
