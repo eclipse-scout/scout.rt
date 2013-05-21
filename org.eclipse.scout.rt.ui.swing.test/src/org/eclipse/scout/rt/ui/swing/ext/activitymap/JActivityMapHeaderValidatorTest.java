@@ -36,13 +36,7 @@ public class JActivityMapHeaderValidatorTest {
   }
 
   @Test
-  public void testCalculateTextSizeRectangles() {
-    testCalculateTextSizeRectanglesNoResize();
-    testCalculateTextSizeRectanglesWithResizeWithEmpty();
-    testCalculateTextSizeRectanglesWithResizeWithNull();
-  }
-
-  private void testCalculateTextSizeRectanglesNoResize() {
+  public void testCalculateTextSizeRectanglesNoResize() {
     int[] rectWidths = new int[]{54, 29, 19};
     String[] largeTexts = new String[]{"October 2013", "November 2013", "December 2013"};
     String[] mediumTexts = new String[]{"Oct 13", "Nov 13", "Dec 13"};
@@ -63,7 +57,8 @@ public class JActivityMapHeaderValidatorTest {
     assertEquals("Dec", resultTexts.get(2));
   }
 
-  private void testCalculateTextSizeRectanglesWithResizeWithEmpty() {
+  @Test
+  public void testCalculateTextSizeRectanglesWithResizeWithEmpty() {
     int[] rectWidths = new int[]{40, 25, 29};
     String[] largeTexts = new String[]{"October 2013", "", "December 2013"};
     String[] mediumTexts = new String[]{"Oct 13", "", "Dec 13"};
@@ -84,7 +79,8 @@ public class JActivityMapHeaderValidatorTest {
     assertEquals("Dec 13", resultTexts.get(2));
   }
 
-  private void testCalculateTextSizeRectanglesWithResizeWithNull() {
+  @Test
+  public void testCalculateTextSizeRectanglesWithResizeWithNull() {
     int[] rectWidths = new int[]{40, 25, 19};
     String[] largeTexts = new String[]{"October 2013", null, "December 2013"};
     String[] mediumTexts = new String[]{"Oct 13", null, "Dec 13"};

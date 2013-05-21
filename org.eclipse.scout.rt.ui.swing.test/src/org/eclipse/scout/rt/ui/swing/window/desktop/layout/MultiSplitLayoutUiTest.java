@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
