@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -140,18 +141,30 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         0
         ));
     // add configured child codes
+    for (ICode childCode : execCreateChildCodes()) {
+      addChildCodeInternal(childCode);
+    }
+  }
+
+  /**
+   * @return Creates and returns child codes. Note: {@link #addChildCodeInternal(ICode)} must not be invoked.
+   * @since 3.8.3
+   */
+  protected List<ICode<?>> execCreateChildCodes() {
+    List<ICode<?>> codes = new ArrayList<ICode<?>>();
     Class<? extends ICode>[] a = getConfiguredCodes();
     if (a != null) {
       for (int i = 0; i < a.length; i++) {
         try {
           ICode code = ConfigurationUtility.newInnerInstance(this, a[i]);
-          addChildCodeInternal(code);
+          codes.add(code);
         }
         catch (Exception e) {
           LOG.warn(null, e);
         }
       }
     }
+    return codes;
   }
 
   /**
