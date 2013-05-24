@@ -25,7 +25,6 @@ public class StringFieldFactory implements IFormFieldFactory {
 
   @Override
   public ISwtScoutFormField<?> createFormField(Composite parent, IFormField field, ISwtEnvironment environment) {
-    System.out.println("StringFieldFactory.createFormField()");
     if (field instanceof IStringField) {
       IStringField s = (IStringField) field;
       if (s.isInputMasked()) {
