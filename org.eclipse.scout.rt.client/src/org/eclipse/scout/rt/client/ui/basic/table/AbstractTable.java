@@ -2563,16 +2563,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private ITableRow addRowImpl(ITableRow newRow, boolean markAsInserted) throws ProcessingException {
-
-    for (IColumn<?> col : getColumns()) {
-      if (col instanceof AbstractColumn<?>) {
-        ((AbstractColumn<?>) col).validateColumnValue(newRow, null);
-      }
-    }
     if (markAsInserted) {
       newRow.setStatus(ITableRow.STATUS_INSERTED);
     }
     InternalTableRow newIRow = new InternalTableRow(this, newRow);
+    for (IColumn<?> col : getColumns()) {
+      if (col instanceof AbstractColumn<?>) {
+        ((AbstractColumn<?>) col).validateColumnValue(newIRow, null);
+      }
+    }
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
     }
