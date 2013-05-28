@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,12 +36,18 @@ public class SwingPopupWorker implements Runnable {
   private Component m_target;
   private Point m_point;
   private IMenu[] m_scoutMenus;
+  private boolean m_isLightWeightPopup;
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IMenu[] scoutMenus) {
+    this(env, target, point, scoutMenus, true);
+  }
+
+  public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IMenu[] scoutMenus, boolean isLightWeightPopup) {
     m_env = env;
     m_target = target;
     m_point = point;
     m_scoutMenus = scoutMenus;
+    m_isLightWeightPopup = isLightWeightPopup;
   }
 
   @Override
@@ -51,6 +57,7 @@ public class SwingPopupWorker implements Runnable {
     }
     //
     JPopupMenu pop = new JPopupMenu();
+    pop.setLightWeightPopupEnabled(m_isLightWeightPopup);
     // recursively add actions
     m_env.appendActions(pop, Arrays.asList(m_scoutMenus));
     try {
