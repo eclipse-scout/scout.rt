@@ -63,6 +63,8 @@ public class PrintFormsAction extends AbstractAction {
   private int m_imageCount;
   private int m_errorCount;
 
+  private final List<Runnable> m_runnables = Collections.synchronizedList(new ArrayList<Runnable>());
+
   public PrintFormsAction() {
     super();
     m_contentType = "image/jpg";
@@ -81,7 +83,8 @@ public class PrintFormsAction extends AbstractAction {
    * Convenience setter to choose all existing form types in a specific plugin
    */
   public void setFormTypesByBundle(Bundle bundle) {
-    BundleBrowser b = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
+    BundleBrowser b = new BundleBrowser(bundle.getSymbolicName(),
+        bundle.getSymbolicName());
     ArrayList<Class<?>> list = new ArrayList<Class<?>>();
     for (String name : b.getClasses(false, true)) {
       try {
@@ -163,66 +166,21 @@ public class PrintFormsAction extends AbstractAction {
     Method m = AbstractForm.class.getDeclaredMethod("startInternal", IFormHandler.class);
     m.setAccessible(true);
     m.invoke(f, handler);
+    m_runnables.clear();
     final P_FormListener listener = new P_FormListener();
     f.addFormListener(listener);
 
-    new ClientSyncJob("print " + f.getClass().getSimpleName(), ClientSyncJob.getCurrentSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        printForm(f, null);
-        // set all tabboxes visible
-        for (IFormField field : f.getAllFields()) {
-          if (field instanceof ITabBox && !field.isVisible()) {
-            field.setVisible(true);
-          }
-        }
-        // collect all tabbox tabs and print them
-        for (IFormField field : f.getAllFields()) {
-          if (field instanceof ITabBox && field.isVisible()) {
-            final ITabBox tabBox = (ITabBox) field;
-            IGroupBox selectedTab = null;
-            if (tabBox.isVisible()) {
-              selectedTab = tabBox.getSelectedTab();
-            }
-            if (tabBox.isVisible()) {
-              for (final IGroupBox g : tabBox.getGroupBoxes()) {
-                if (g != selectedTab) {
-                  listener.addRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                      tabBox.setSelectedTab(g);
-                      printFormField(f, tabBox, "_" + g.getClass().getSimpleName());
-                    }
-                  });
-                }
-              }
-            }
-          }
-        }
-        // add form close runnable
-        listener.addRunnable(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              f.doClose();
-            }
-            catch (ProcessingException e) {
-              LOG.error("could not close form '" + f.getClass().getSimpleName() + "'", e);
-            }
-          }
-        });
-
-      }
-    }.schedule();
     f.waitFor();
   }
 
   private class P_FormListener implements FormListener {
-    List<Runnable> m_runnables = Collections.synchronizedList(new ArrayList<Runnable>());
 
     @Override
     public void formChanged(FormEvent e) throws ProcessingException {
-      if (e.getType() == FormEvent.TYPE_PRINTED) {
+      if (e.getType() == FormEvent.TYPE_ACTIVATED) {
+        schedulePrintJob(e.getForm());
+      }
+      else if (e.getType() == FormEvent.TYPE_PRINTED) {
         m_printedFiles.add(e.getPrintedFile());
         if (!m_runnables.isEmpty()) {
           Runnable r = m_runnables.remove(0);
@@ -231,8 +189,59 @@ public class PrintFormsAction extends AbstractAction {
       }
     }
 
-    public void addRunnable(Runnable r) {
-      m_runnables.add(r);
+    private void schedulePrintJob(final IForm f) {
+      new ClientSyncJob("print " + f.getClass().getSimpleName(), ClientSyncJob.getCurrentSession()) {
+
+        @Override
+        protected void runVoid(IProgressMonitor monitor) {
+          printForm(f, null);
+          // set all tabboxes visible
+          for (IFormField field : f.getAllFields()) {
+            if (field instanceof ITabBox && !field.isVisible()) {
+              field.setVisible(true);
+            }
+          }
+          // collect all tabbox tabs and print them
+          for (IFormField field : f.getAllFields()) {
+            if (field instanceof ITabBox && field.isVisible()) {
+              final ITabBox tabBox = (ITabBox) field;
+              IGroupBox selectedTab = null;
+              if (tabBox.isVisible()) {
+                selectedTab = tabBox.getSelectedTab();
+              }
+              if (tabBox.isVisible()) {
+                for (final IGroupBox g : tabBox.getGroupBoxes()) {
+                  if (g != selectedTab) {
+                    m_runnables.add(new Runnable() {
+                      @Override
+                      public void run() {
+                        tabBox.setSelectedTab(g);
+                        printFormField(
+                            f,
+                            tabBox,
+                            "_" + g.getClass().getSimpleName());
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          }
+          // add form close runnable
+          m_runnables.add(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                f.doClose();
+              }
+              catch (ProcessingException e) {
+                LOG.error("could not close form '" + f.getClass().getSimpleName() + "'", e);
+              }
+            }
+          });
+
+        }
+      }.schedule();
     }
   }
 
