@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
@@ -65,6 +66,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   private final HeaderCell m_headerCell;
   private boolean m_primaryKey;
   private boolean m_summary;
+  private boolean m_isValidating;
   /**
    * A column is presented to the user when it is displayable AND visible this
    * column is visible to the user only used when displayable=true
@@ -612,6 +614,9 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
     IFormField f = prepareEditInternal(row);
     if (f != null) {
+      if (f instanceof AbstractValueField<?>) {
+        ((AbstractValueField<?>) f).setAutoDisplayText(!m_isValidating);
+      }
       f.setLabelVisible(false);
       GridData gd = f.getGridDataHints();
       // apply horizontal alignment of column to respective editor field
@@ -644,12 +649,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       IValueField v = (IValueField) editingField;
       if (v.isSaveNeeded() || editingField.getErrorStatus() != null || row.getCell(this).getErrorStatus() != null) {
         T parsedValue = parseValue(row, v.getValue());
-        applyValueInternal(row, parsedValue);
-        validateColumnValue(row, editingField);
-        if (editingField.isContentValid()) {
-          m_validatedValues.put(row, parsedValue);
+        setValueInternal(row, parsedValue, editingField);
+        if (getTable() instanceof AbstractTable && ((AbstractTable) getTable()).wasEverValid(row)) {
+          persistRowChange(row);
         }
-        persistRowChange(row);
       }
     }
   }
@@ -725,6 +728,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     m_primaryKey = getConfiguredPrimaryKey();
     m_summary = getConfiguredSummary();
     setEditable(getConfiguredEditable());
+    setMandatory(getConfiguredMandatory());
     setVisibleColumnIndexHint(-1);
     if (getConfiguredForegroundColor() != null) {
       setForegroundColor((getConfiguredForegroundColor()));
@@ -900,9 +904,23 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public void setValue(ITableRow r, T rawValue) throws ProcessingException {
-    T newValue = validateValue(r, rawValue);
-    r.setCellValue(getColumnIndex(), newValue);
+  public void setValue(ITableRow r, T value) throws ProcessingException {
+    setValueInternal(r, value, null);
+  }
+
+  private void setValueInternal(ITableRow row, T value, IFormField editingField) throws ProcessingException {
+    /*
+     * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
+     * If the passed value is valid, it will be stored in the validated value cache. Otherwise, the old validated
+     * value is used.
+     */
+    validateColumnValue(row, editingField, true, value);
+    ICell cell = row.getCell(this);
+    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
+      m_validatedValues.put(row, value);
+    }
+    T newValue = validateValue(row, value);
+    row.setCellValue(getColumnIndex(), newValue);
   }
 
   @Override
@@ -1495,8 +1513,9 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Can be used to persist data directly after a value has been modified in a cell editor.
    * CAUTION: This method is called even when an invalid value has been entered in the cell editor.
    * In this case the last valid value is retrieved while {@link #getValue(ITableRow)} is called.
-   * @param row The row changed in the table.
    * 
+   * @param row
+   *          The row changed in the table.
    * @throws ProcessingException
    */
   protected void persistRowChange(ITableRow row) throws ProcessingException {
@@ -1507,11 +1526,30 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       return;
     }
     for (ITableRow row : getTable().getRows()) {
-      validateColumnValue(row, null);
+      validateColumnValue(row, null, true, getValue(row));
     }
   }
 
-  public void validateColumnValue(ITableRow row, IFormField editor) {
+  public void validateColumnValue(ITableRow row) {
+    validateColumnValue(row, null, false, getValue(row));
+  }
+
+  /**
+   * This method should be called if single column validation should be used for performance reason and/or
+   * if a value is set in the Scout model (and not by the UI component). In this case, the parameter editor
+   * is null and the passed value will be used.
+   * 
+   * @param row
+   *          The row changed in the table
+   * @param editor
+   *          The form field editor used for validation of the value
+   * @param singleColValidation
+   *          Defines if single column validation should be used
+   * @param value
+   *          The value that is set in the Scout model and not in the UI component
+   */
+  @SuppressWarnings("unchecked")
+  public void validateColumnValue(ITableRow row, IFormField editor, boolean singleColValidation, T value) {
     if (row == null) {
       LOG.error("validateColumnValue called with row=null");
       return;
@@ -1519,7 +1557,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     if (isCellEditable(row)) {
       try {
         if (editor == null) {
+          m_isValidating = true;
           editor = prepareEdit(row);
+          if (editor instanceof IValueField<?>) {
+            ((IValueField<T>) editor).setValue(value);
+          }
+          m_isValidating = false;
         }
         if (editor != null) {
           IProcessingStatus errorStatus = editor.getErrorStatus();
@@ -1535,17 +1578,24 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
               if (errorStatus instanceof ParsingFailedStatus) {
                 cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
               }
-
             }
             else {
               cell.setErrorStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
+              cell.setText("");
             }
           }
           else {
+            /*
+             * Workaround for bugs 396848 & 408741
+             * Currently, we set the error status and value directly on the cell before calling the decorator.
+             * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(ITableRow[] rows)}
+             * to propagate the new error status and value.
+             */
             cell.clearErrorStatus();
+            cell.setValue(value);
             decorateCellInternal(cell, row);
             ITable table = getTable();
-            if (table instanceof AbstractTable) {
+            if (table instanceof AbstractTable && singleColValidation) {
               ((AbstractTable) table).wasEverValid(row);
             }
           }
@@ -1557,5 +1607,4 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     }
 
   }
-
 }

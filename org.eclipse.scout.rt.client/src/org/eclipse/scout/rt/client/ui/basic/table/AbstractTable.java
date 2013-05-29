@@ -2569,9 +2569,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     InternalTableRow newIRow = new InternalTableRow(this, newRow);
     for (IColumn<?> col : getColumns()) {
       if (col instanceof AbstractColumn<?>) {
-        ((AbstractColumn<?>) col).validateColumnValue(newIRow, null);
+        ((AbstractColumn<?>) col).validateColumnValue(newIRow);
       }
     }
+    wasEverValid(newIRow);
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
     }
