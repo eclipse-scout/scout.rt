@@ -51,7 +51,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 abstract class BaseSwingApplication implements IApplication {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingApplication.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BaseSwingApplication.class);
 
   private SplashProgressMonitor m_monitor;
 
@@ -151,6 +151,8 @@ abstract class BaseSwingApplication implements IApplication {
     }
   }
 
+  abstract Object startInSubject(IApplicationContext context) throws Exception;
+
   /**
    * Exit delegate to handle os-specific exit behaviour.
    * <p>
@@ -182,43 +184,13 @@ abstract class BaseSwingApplication implements IApplication {
     return false;
   }
 
-  Object startInSubject(IApplicationContext context) throws Exception {
-    // Post-condition: session is active and loaded
-    context.applicationRunning();
+  protected void stopSplashScreen() {
     if (m_monitorReg != null) {
       m_monitorReg.unregister();
     }
     m_monitor.done();
     m_monitor = null;
-    try {
-      SwingUtilities.invokeAndWait(
-          new Runnable() {
-            @Override
-            public void run() {
-              startGUI();
-            }
-          }
-          );
-    }
-    catch (Exception e) {
-      LOG.warn(null, e);
-      System.exit(0);
-    }
-    return runWhileActive();
   }
-
-  /**
-   * This method blocks the main thread as long as there is an active client session.
-   * 
-   * @return
-   * @throws InterruptedException
-   */
-  abstract int runWhileActive() throws InterruptedException;
-
-  /**
-   * This method starts the GUI.
-   */
-  abstract void startGUI();
 
   protected void showLoadError(Throwable error) {
     ErrorHandler handler = new ErrorHandler(error);

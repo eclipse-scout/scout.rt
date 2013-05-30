@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -151,17 +153,32 @@ final public class ExtensibleSwingApplication extends BaseSwingApplication {
         return EXIT_OK;
       }
     }
-    return super.startInSubject(context);
+    // Post-condition: session is active and loaded
+    context.applicationRunning();
+    stopSplashScreen();
+    try {
+      SwingUtilities.invokeAndWait(
+          new Runnable() {
+            @Override
+            public void run() {
+              startGUI();
+            }
+          }
+          );
+    }
+    catch (Exception e) {
+      LOG.warn("Error starting GUI", e);
+      System.exit(0);
+    }
+    return runWhileActive();
   }
 
-  @Override
   void startGUI() {
     for (ISwingApplicationExtension ext : m_extensions) {
       ext.getEnvironment().showGUI(ext.getClientSession());
     }
   }
 
-  @Override
   int runWhileActive() throws InterruptedException {
     int exitCode = IApplication.EXIT_OK;
     while (true) {

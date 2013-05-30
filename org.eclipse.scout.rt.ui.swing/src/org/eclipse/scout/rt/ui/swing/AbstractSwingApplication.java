@@ -10,20 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing;
 
+import javax.swing.SwingUtilities;
+
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 
 /**
  * This class is the base class for a typical Scout Swing application. See <code>ExtensibleSwingApplication</code> when
- * you must run multiple Scout Swing features in a single eclipse application.
+ * you must run multiple Scout
+ * Swing features in a single eclipse application.
  * 
  * @see ExtensibleSwingApplication
  * @author awe
  */
 public abstract class AbstractSwingApplication extends BaseSwingApplication {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingApplication.class);
 
   private ISwingEnvironment m_env;
 
+  /**
+   * @return The client session for this application. </br>
+   *         May return a new instance every time it is called.
+   */
   protected abstract IClientSession getClientSession();
 
   public AbstractSwingApplication() {
@@ -32,32 +42,52 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
 
   @Override
   protected Object startInSubject(IApplicationContext context) throws Exception {
-    if (!isClientSessionValid(getClientSession())) {
+    final IClientSession clientSession = getClientSession();
+    if (!isClientSessionValid(clientSession)) {
       return EXIT_OK;
     }
-    return super.startInSubject(context);
+    // Post-condition: session is active and loaded
+    context.applicationRunning();
+    stopSplashScreen();
+    try {
+      SwingUtilities.invokeAndWait(
+          new Runnable() {
+            @Override
+            public void run() {
+              m_env.showGUI(clientSession);
+              execSwingStarted(clientSession);
+            }
+          }
+          );
+    }
+    catch (Exception e) {
+      LOG.warn("Error Starting GUI", e);
+      System.exit(0);
+    }
+    return runWhileActive(clientSession);
   }
 
-  @Override
-  int runWhileActive() throws InterruptedException {
+  /**
+   * Blocks the main thread as as the client session is active.
+   * 
+   * @param clientSession
+   * @return exit code {@link org.eclipse.equinox.app.IApplication#EXIT_OK EXIT_OK},
+   *         {@link org.eclipse.equinox.app.IApplication#EXIT_RELAUNCH EXIT_RELAUNCH},
+   *         {@link org.eclipse.equinox.app.IApplication#EXIT_RESTART EXIT_RESTART}
+   * @throws InterruptedException
+   */
+  private int runWhileActive(IClientSession clientSession) throws InterruptedException {
+    Object stateLock = clientSession.getStateLock();
     while (true) {
-      IClientSession clientSession = getClientSession();
-      synchronized (clientSession.getStateLock()) {
+      synchronized (stateLock) {
         if (clientSession.isActive()) {
-          clientSession.getStateLock().wait();
+          stateLock.wait();
         }
         else {
           return clientSession.getExitCode();
         }
       }
     }
-  }
-
-  @Override
-  void startGUI() {
-    IClientSession clientSession = getClientSession();
-    m_env.showGUI(clientSession);
-    execSwingStarted(clientSession);
   }
 
   /**
