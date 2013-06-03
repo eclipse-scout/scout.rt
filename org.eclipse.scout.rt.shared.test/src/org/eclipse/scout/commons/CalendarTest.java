@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,7 +23,6 @@ import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,8 +64,8 @@ public class CalendarTest {
     Date transferredDate = (Date) read(outArray);
     Integer transferredYear = new Integer(new SimpleDateFormat("yyyy").format(transferredDate));
 
-    Assert.assertEquals(buddhistDate, transferredDate);
-    Assert.assertEquals(new Integer(buddhistYear - 543), transferredYear);
+    assertEquals(buddhistDate, transferredDate);
+    assertEquals(new Integer(buddhistYear - 543), transferredYear);
   }
 
   /**
@@ -85,8 +87,8 @@ public class CalendarTest {
     UTCDate transferredDate = (UTCDate) read(outArray);
     Integer transferredYear = new Integer(new SimpleDateFormat("yyyy").format(transferredDate));
 
-    Assert.assertEquals(buddhistDate, transferredDate);
-    Assert.assertEquals(new Integer(buddhistYear - 543), transferredYear);
+    assertEquals(buddhistDate, transferredDate);
+    assertEquals(new Integer(buddhistYear - 543), transferredYear);
   }
 
   /**
@@ -106,8 +108,8 @@ public class CalendarTest {
     Date transferredDate = (Date) read(outArray);
     Integer transferredhours = new Integer(new SimpleDateFormat("hh").format(transferredDate));
 
-    Assert.assertNotSame(inDate, transferredhours);
-    Assert.assertEquals(hours, transferredhours);
+    assertNotSame(inDate, transferredhours);
+    assertEquals(hours, transferredhours);
   }
 
   /**
@@ -127,8 +129,8 @@ public class CalendarTest {
     UTCDate transferredDate = (UTCDate) read(outArray);
     Integer transferredhours = new Integer(new SimpleDateFormat("HH").format(transferredDate));
 
-    Assert.assertEquals(inDate, transferredDate);
-    Assert.assertEquals(new Integer((hours - 1 + 24) % 24), transferredhours);
+    assertEquals(inDate, transferredDate);
+    assertEquals(new Integer((hours - 1 + 24) % 24), transferredhours);
   }
 
   /**

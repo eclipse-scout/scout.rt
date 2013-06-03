@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.security.BasicPermission;
 import java.security.Permission;
@@ -25,7 +27,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -87,7 +88,7 @@ public class LenientPermissionWrapperTest {
     for (Enumeration<Permission> en = actual.elements(); en.hasMoreElements();) {
       a.add(en.nextElement());
     }
-    Assert.assertEquals(e, a);
+    assertEquals(e, a);
   }
 
   public static class A extends BasicPermission {

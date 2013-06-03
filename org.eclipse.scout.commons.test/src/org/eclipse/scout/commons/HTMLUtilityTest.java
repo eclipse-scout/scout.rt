@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -30,7 +31,7 @@ public class HTMLUtilityTest {
         "<body style=\"overflow:auto;\">" +
         "</body>" +
         "</html>";
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(null, true, false, null));
+    assertEquals(output, HTMLUtility.cleanupHtml(null, true, false, null));
 
     // empty html
     output = "" +
@@ -41,7 +42,7 @@ public class HTMLUtilityTest {
         "<body style=\"overflow:auto;\">" +
         "</body>" +
         "</html>";
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml("", true, false, null));
+    assertEquals(output, HTMLUtility.cleanupHtml("", true, false, null));
   }
 
   @Test
@@ -63,7 +64,7 @@ public class HTMLUtilityTest {
         "</html>";
 
     // without encoding information
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     // with encoding information
     input = "" +
@@ -75,7 +76,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("HTML with encoding information", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("HTML with encoding information", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     input = "" +
         "<html>" +
@@ -86,7 +87,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("different encoding than UTF-8", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("different encoding than UTF-8", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     input = "" +
         "<html>" +
@@ -97,7 +98,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("different encoding with additional space", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("different encoding with additional space", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     input = "" +
         "<html>" +
@@ -108,7 +109,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("different encoding with additional new line", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("different encoding with additional new line", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     output = "" +
         "<html>" +
@@ -130,7 +131,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("complete html document with multiple meta tags (including Content-Type)", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("complete html document with multiple meta tags (including Content-Type)", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     output = "" +
         "<html>" +
@@ -152,7 +153,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("complete html document with multiple meta tags in different order (including Content-Type)", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("complete html document with multiple meta tags in different order (including Content-Type)", output, HTMLUtility.cleanupHtml(input, true, false, null));
 
     output = "" +
         "<html>" +
@@ -173,7 +174,7 @@ public class HTMLUtilityTest {
         "Test content" +
         "</body>" +
         "</html>";
-    Assert.assertEquals("complete html document with meta tag different than Content-Type", output, HTMLUtility.cleanupHtml(input, true, false, null));
+    assertEquals("complete html document with meta tag different than Content-Type", output, HTMLUtility.cleanupHtml(input, true, false, null));
   }
 
   @Test
@@ -202,7 +203,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     DefaultFont defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -228,7 +229,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial", "Times New Roman", "sans-serif");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -258,7 +259,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial", "Times New Roman", "sans-serif");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -289,7 +290,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -321,7 +322,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -352,7 +353,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -384,7 +385,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -416,7 +417,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -448,7 +449,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -480,7 +481,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     output = "" +
         "<html>" +
@@ -512,7 +513,7 @@ public class HTMLUtilityTest {
         "</body>" +
         "</html>";
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, true, false, defaultFont));
 
     input = "" +
         "<html>" +
@@ -551,7 +552,7 @@ public class HTMLUtilityTest {
         "</html>";
 
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
-    Assert.assertEquals(output, HTMLUtility.cleanupHtml(input, false, false, defaultFont));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, false, false, defaultFont));
   }
 
   @Test
@@ -559,8 +560,8 @@ public class HTMLUtilityTest {
     String value = "a\nb\tc   d<br/><p>e</p>";
     String htmlEncoded = StringUtility.htmlEncode(value, true);
 
-    Assert.assertEquals("a<br/>b<span style=\"white-space:pre\">&#9;</span>c&nbsp;&nbsp;&nbsp;d&lt;br/&gt;&lt;p&gt;e&lt;/p&gt;", StringUtility.htmlEncode(value, true));
-    Assert.assertEquals("a\nb\tc   d\n<p>e</p>", StringUtility.htmlDecode(htmlEncoded));
+    assertEquals("a<br/>b<span style=\"white-space:pre\">&#9;</span>c&nbsp;&nbsp;&nbsp;d&lt;br/&gt;&lt;p&gt;e&lt;/p&gt;", StringUtility.htmlEncode(value, true));
+    assertEquals("a\nb\tc   d\n<p>e</p>", StringUtility.htmlDecode(htmlEncoded));
   }
 
   private DefaultFont createDefaultFont(int size, int color, String... fontFamilies) {

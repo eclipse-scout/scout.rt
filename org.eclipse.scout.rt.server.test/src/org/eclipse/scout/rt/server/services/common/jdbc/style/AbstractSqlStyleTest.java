@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.style;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -20,7 +24,6 @@ import java.sql.Types;
 
 import org.easymock.EasyMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -183,8 +186,8 @@ public class AbstractSqlStyleTest {
   public void testBuildBindForCharacter() {
     Character c = Character.valueOf('x');
     SqlBind bin = sql.buildBindFor(c, Character.class);
-    Assert.assertEquals(Types.VARCHAR, bin.getSqlType());
-    Assert.assertTrue(bin.getValue() instanceof String);
+    assertEquals(Types.VARCHAR, bin.getSqlType());
+    assertTrue(bin.getValue() instanceof String);
   }
 
   /**
@@ -193,8 +196,8 @@ public class AbstractSqlStyleTest {
   @Test
   public void testBuildBindForNullCharacter() {
     SqlBind bin = sql.buildBindFor(null, Character.class);
-    Assert.assertEquals(Types.VARCHAR, bin.getSqlType());
-    Assert.assertNull(bin.getValue());
+    assertEquals(Types.VARCHAR, bin.getSqlType());
+    assertNull(bin.getValue());
   }
 
   /**
@@ -205,8 +208,8 @@ public class AbstractSqlStyleTest {
     final int testValue = 100;
     final BigDecimal b = BigDecimal.valueOf(testValue);
     SqlBind bin = sql.buildBindFor(b, BigDecimal.class);
-    Assert.assertEquals(Types.NUMERIC, bin.getSqlType());
-    Assert.assertTrue(bin.getValue() instanceof BigDecimal);
+    assertEquals(Types.NUMERIC, bin.getSqlType());
+    assertTrue(bin.getValue() instanceof BigDecimal);
   }
 
   /**
@@ -215,8 +218,8 @@ public class AbstractSqlStyleTest {
   @Test
   public void testBuildBindForNullBigDecimal() {
     SqlBind bin = sql.buildBindFor(null, BigDecimal.class);
-    Assert.assertEquals(Types.NUMERIC, bin.getSqlType());
-    Assert.assertNull(bin.getValue());
+    assertEquals(Types.NUMERIC, bin.getSqlType());
+    assertNull(bin.getValue());
   }
 
 }

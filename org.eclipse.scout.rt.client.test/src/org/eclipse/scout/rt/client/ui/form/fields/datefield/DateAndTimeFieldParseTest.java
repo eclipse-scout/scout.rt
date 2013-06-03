@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Locale;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -28,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +39,7 @@ import org.junit.runner.RunWith;
  * Tests for parsing in AbstractDateFields and AbstractTimeFields.
  */
 @RunWith(ScoutClientTestRunner.class)
-public class DateAndTimeFieldParseTest extends Assert {
+public class DateAndTimeFieldParseTest {
 
   public static class TestForm extends AbstractForm {
 

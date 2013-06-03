@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -23,12 +25,12 @@ public class TextsTest {
 
   @Test
   public void testGet() {
-    Assert.assertEquals("{undefined text anyKey}", TEXTS.get("anyKey"));
+    assertEquals("{undefined text anyKey}", TEXTS.get("anyKey"));
   }
 
   @Test
   public void testGetTextMap() {
     Map<String, String> textMap = ScoutTexts.getInstance().getTextMap(Locale.ENGLISH);
-    Assert.assertNotNull(textMap);
+    assertNotNull(textMap);
   }
 }

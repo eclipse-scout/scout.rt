@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext.table.internal;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.Field;
 import java.util.HashSet;
 
@@ -20,7 +22,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -69,7 +70,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightEqualRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(30);
     String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    Assert.assertEquals(test3Lines, trimmed);
+    assertEquals(test3Lines, trimmed);
   }
 
   /**
@@ -79,7 +80,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightLargerRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(40);
     String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    Assert.assertEquals(test3Lines, trimmed);
+    assertEquals(test3Lines, trimmed);
   }
 
   /**
@@ -89,7 +90,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightSmallerRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(20);
     String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    Assert.assertEquals("1\n2", trimmed);
+    assertEquals("1\n2", trimmed);
   }
 
   /**
@@ -99,7 +100,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightNoRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(0);
     String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    Assert.assertEquals(test3Lines, trimmed);
+    assertEquals(test3Lines, trimmed);
   }
 
   /**
@@ -109,7 +110,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightNullText() {
     TestTableMultilineListener listener = new TestTableMultilineListener(20);
     String trimmed = listener.trimToRowHeight(null, 10);
-    Assert.assertEquals(null, trimmed);
+    assertEquals(null, trimmed);
   }
 
   /**
@@ -119,7 +120,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightEmptyText() {
     TestTableMultilineListener listener = new TestTableMultilineListener(20);
     String trimmed = listener.trimToRowHeight("", 10);
-    Assert.assertEquals("", trimmed);
+    assertEquals("", trimmed);
   }
 
   /**
@@ -129,7 +130,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightSingleLineText() {
     TestTableMultilineListener listener = new TestTableMultilineListener(20);
     String trimmed = listener.trimToRowHeight("1", 10);
-    Assert.assertEquals("1", trimmed);
+    assertEquals("1", trimmed);
   }
 
   /**
@@ -139,7 +140,7 @@ public class TableMultilineListenerUiTest {
   public void testTrimToRowHeightNoTextHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(10);
     String trimmed = listener.trimToRowHeight(test3Lines, 0);
-    Assert.assertEquals(test3Lines, trimmed);
+    assertEquals(test3Lines, trimmed);
   }
 
   /**
@@ -150,7 +151,7 @@ public class TableMultilineListenerUiTest {
     TestTableMultilineListener listener = new TestTableMultilineListener(10);
     Rectangle bounds = new Rectangle(0, 0, 10, 100);
     String wrapped = listener.softWrapText(null, "1 2 3", bounds);
-    Assert.assertEquals(test3Lines, wrapped);
+    assertEquals(test3Lines, wrapped);
   }
 
   /**
@@ -161,7 +162,7 @@ public class TableMultilineListenerUiTest {
     TestTableMultilineListener listener = new TestTableMultilineListener(10);
     Rectangle bounds = new Rectangle(0, 0, 10, 100);
     String wrapped = listener.softWrapText(null, null, bounds);
-    Assert.assertEquals(null, wrapped);
+    assertEquals(null, wrapped);
   }
 
   private static class TestTableMultilineListener extends TableMultilineListener {

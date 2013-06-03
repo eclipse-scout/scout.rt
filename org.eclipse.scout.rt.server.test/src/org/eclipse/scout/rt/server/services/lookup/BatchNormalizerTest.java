@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.lookup;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -23,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.ServiceRegistration;
@@ -137,10 +139,10 @@ public class BatchNormalizerTest {
     LookupRow[][] normResultArray = new BatchLookupService().getBatchDataByKey(new BatchLookupCall(normCallArray));
     LookupRow[][] resultArray = normalizer.denormalizeResults(normResultArray);
     //
-    Assert.assertEquals(resultArray.length, callArray.length);
-    Assert.assertEquals(normResultArray.length, normCallArray.length);
-    Assert.assertEquals(expectedNormalizedSize, normResultArray.length);
-    Assert.assertEquals(expectedServerInvocations, m_serverInvocations);
+    assertEquals(resultArray.length, callArray.length);
+    assertEquals(normResultArray.length, normCallArray.length);
+    assertEquals(expectedNormalizedSize, normResultArray.length);
+    assertEquals(expectedServerInvocations, m_serverInvocations);
     int rowCount = 0;
     int nullArrayCount = 0;
     for (int i = 0; i < resultArray.length; i++) {
@@ -149,15 +151,15 @@ public class BatchNormalizerTest {
       }
       else if (resultArray[i].length == 1) {
         rowCount++;
-        Assert.assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
-        Assert.assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
+        assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
+        assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
       }
       else if (resultArray[i].length > 1) {
-        Assert.fail("result length is expected to be 0 or 1");
+        fail("result length is expected to be 0 or 1");
       }
     }
-    Assert.assertEquals(expectedNullArrayCount, nullArrayCount);
-    Assert.assertEquals(expectedTotalResultRowCount, rowCount);
+    assertEquals(expectedNullArrayCount, nullArrayCount);
+    assertEquals(expectedTotalResultRowCount, rowCount);
   }
 
   private static LookupRow[] createCallResult(LookupCall call) {

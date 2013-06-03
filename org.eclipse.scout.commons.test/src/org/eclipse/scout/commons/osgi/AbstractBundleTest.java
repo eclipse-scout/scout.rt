@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.osgi;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -22,7 +24,6 @@ import java.util.jar.Manifest;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.internal.Activator;
-import org.junit.Assert;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -67,7 +68,7 @@ public abstract class AbstractBundleTest {
   }
 
   protected static void resolveBundles(Bundle... bundles) {
-    Assert.assertNotNull(bundles);
+    assertNotNull(bundles);
     BundleContext context = getBundleContext();
     ServiceReference packageAdminRef = context.getServiceReference(PackageAdmin.class.getName());
     PackageAdmin packageAdmin = null;

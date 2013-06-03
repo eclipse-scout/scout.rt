@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.lookup;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.ServiceRegistration;
@@ -121,13 +122,13 @@ public class BatchLookupTest {
     //
     LookupCall[] callArray = batchCall.getCallBatch();
     LookupRow[][] resultArray = new BatchLookupService().getBatchDataByKey(batchCall);
-    Assert.assertEquals(resultArray.length, callArray.length);
-    Assert.assertEquals(expectedLocalInvocations, m_localInvocations);
-    Assert.assertEquals(expectedServerInvocations, m_serverInvocations);
+    assertEquals(resultArray.length, callArray.length);
+    assertEquals(expectedLocalInvocations, m_localInvocations);
+    assertEquals(expectedServerInvocations, m_serverInvocations);
     for (int i = 0; i < resultArray.length; i++) {
-      Assert.assertEquals(1, resultArray[i].length);
-      Assert.assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
-      Assert.assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
+      assertEquals(1, resultArray[i].length);
+      assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
+      assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
     }
   }
 

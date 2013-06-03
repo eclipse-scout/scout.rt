@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -64,7 +65,7 @@ public class StatementProcessorFindNextBindTest {
     Method m = StatementProcessor.class.getDeclaredMethod("findNextBind", String.class, int.class);
     m.setAccessible(true);
     int actual = (Integer) m.invoke(null, s, start);
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
   }
 
 }

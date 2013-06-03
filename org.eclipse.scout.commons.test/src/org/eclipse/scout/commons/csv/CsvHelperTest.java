@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.csv;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,7 +22,6 @@ import java.util.List;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -52,11 +53,11 @@ public class CsvHelperTest {
       String content = IOUtility.getContent(new FileReader(testFile));
       String[] lines = content.split("\n");
 
-      Assert.assertEquals(lines.length, 5);
+      assertEquals(lines.length, 5);
 
       for (String line : lines) {
         String[] x = line.split(",");
-        Assert.assertEquals(x.length, 5);
+        assertEquals(x.length, 5);
       }
     }
     finally {

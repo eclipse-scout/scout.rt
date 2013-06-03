@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
 import org.eclipse.scout.commons.holders.IHolder;
@@ -17,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -31,25 +32,25 @@ public class TypeCastUtilityClientTest {
     Class<?> T;
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IHolder.class, 0);
-    Assert.assertEquals(Long[].class, T);
+    assertEquals(Long[].class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IValueField.class, 0);
-    Assert.assertEquals(Long[].class, T);
+    assertEquals(Long[].class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IListBox.class, 0);
-    Assert.assertEquals(Long.class, T);
+    assertEquals(Long.class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(LongField.class, IHolder.class, 0);
-    Assert.assertEquals(Long.class, T);
+    assertEquals(Long.class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(LongArrayField.class, IHolder.class, 0);
-    Assert.assertEquals(Long[].class, T);
+    assertEquals(Long[].class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(MapField.class, IHolder.class, 0);
-    Assert.assertEquals(Map.class, T);
+    assertEquals(Map.class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(MapArrayField.class, IHolder.class, 0);
-    Assert.assertEquals(Map[].class, T);
+    assertEquals(Map[].class, T);
   }
 
   static class ListBox extends AbstractListBox<Long> {

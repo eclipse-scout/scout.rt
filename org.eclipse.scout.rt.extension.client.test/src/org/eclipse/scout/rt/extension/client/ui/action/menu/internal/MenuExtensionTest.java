@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.action.menu.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuExtensionFilter;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -29,22 +31,22 @@ public class MenuExtensionTest {
   @Test
   public void testAcceptWithoutFilter() {
     P_MenuExtension menuExtension = new P_MenuExtension(P_Menu.class, null);
-    Assert.assertFalse(menuExtension.accept(null, null, null));
-    Assert.assertFalse(menuExtension.accept(new Object(), null, null));
-    Assert.assertFalse(menuExtension.accept(null, new Object(), null));
-    Assert.assertTrue(menuExtension.accept(new Object(), new Object(), null));
+    assertFalse(menuExtension.accept(null, null, null));
+    assertFalse(menuExtension.accept(new Object(), null, null));
+    assertFalse(menuExtension.accept(null, new Object(), null));
+    assertTrue(menuExtension.accept(new Object(), new Object(), null));
   }
 
   @Test
   public void testAcceptWithAcceptFilter() {
     P_MenuExtension menuExtension = new P_MenuExtension(P_Menu.class, new P_AcceptingMenuExtensionFilter());
-    Assert.assertTrue(menuExtension.accept(new Object(), new Object(), null));
+    assertTrue(menuExtension.accept(new Object(), new Object(), null));
   }
 
   @Test
   public void testAcceptWithRejectFilter() {
     P_MenuExtension menuExtension = new P_MenuExtension(P_Menu.class, new P_RejectingMenuExtensionFilter());
-    Assert.assertFalse(menuExtension.accept(new Object(), new Object(), null));
+    assertFalse(menuExtension.accept(new Object(), new Object(), null));
   }
 
   private static class P_MenuExtension extends AbstractMenuExtension {

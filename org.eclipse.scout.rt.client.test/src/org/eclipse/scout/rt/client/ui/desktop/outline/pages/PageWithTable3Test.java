@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -45,7 +46,7 @@ public class PageWithTable3Test {
     table.resetDisplayableColumns();
     //
     //load table with configured sort columns
-    Assert.assertArrayEquals(new Integer[]{7, 6, 5, 4, 3, 2, 1, 0}, table.getValueColumn().getValues());
+    assertArrayEquals(new Integer[]{7, 6, 5, 4, 3, 2, 1, 0}, table.getValueColumn().getValues());
     //user sorts value column asc (all other columns lost their sort index resp. their sort is now explicit=false)
     table.getUIFacade().fireHeaderSortFromUI(table.getValueColumn(), false);
     assertSortState(table, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7}, new Integer[]{0});
@@ -74,8 +75,8 @@ public class PageWithTable3Test {
         actualExplicitSortIndices.add(c.getColumnIndex());
       }
     }
-    Assert.assertArrayEquals(expectedValues, table.getValueColumn().getValues());
-    Assert.assertArrayEquals(expectedExplicitSortIndices, actualExplicitSortIndices.toArray());
+    assertArrayEquals(expectedValues, table.getValueColumn().getValues());
+    assertArrayEquals(expectedExplicitSortIndices, actualExplicitSortIndices.toArray());
   }
 
   public static class PageWithTableOutline extends AbstractOutline {

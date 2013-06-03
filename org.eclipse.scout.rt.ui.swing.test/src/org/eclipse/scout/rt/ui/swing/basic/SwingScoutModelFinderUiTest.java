@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
@@ -65,7 +68,6 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFields
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.StringField2;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.TreeBoxField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -106,7 +108,7 @@ public class SwingScoutModelFinderUiTest {
 
         }
         catch (ProcessingException e) {
-          Assert.fail("" + e.getMessage());
+          fail("" + e.getMessage());
         }
 
       }
@@ -115,7 +117,7 @@ public class SwingScoutModelFinderUiTest {
         JPanel testContainer = new JPanel();
         ISwingScoutFormField formField = env.createFormField(testContainer, formFieldModel);
         Object resolvedScoutModel = m_swingScoutModelFinder.getScoutModel(formField.getSwingField());
-        Assert.assertEquals("Finding scout model failed ", formFieldModel, resolvedScoutModel);
+        assertEquals("Finding scout model failed ", formFieldModel, resolvedScoutModel);
       }
     });
 

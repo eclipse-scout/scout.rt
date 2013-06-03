@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.exception;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.security.acl.AclNotFoundException;
 import java.util.Arrays;
 
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingException;
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingExceptionWithStringConstructor;
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingStatus;
-import org.junit.Assert;
 import org.junit.Test;
 import org.omg.CORBA.portable.RemarshalException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -124,12 +127,12 @@ public class PlaceholderExceptionTest {
   }
 
   private static void assertEqualExceptionAndCause(Throwable expected, Throwable actual) {
-    Assert.assertTrue((expected == null && actual == null) || (expected != null && actual != null));
+    assertTrue((expected == null && actual == null) || (expected != null && actual != null));
     if (expected != null && actual != null) {
-      Assert.assertNotSame(expected, actual);
-      Assert.assertEquals(expected.getClass(), actual.getClass());
-      Assert.assertEquals(expected.getMessage(), actual.getMessage());
-      Assert.assertTrue("Stacktraces are not equal", Arrays.equals(expected.getStackTrace(), actual.getStackTrace()));
+      assertNotSame(expected, actual);
+      assertEquals(expected.getClass(), actual.getClass());
+      assertEquals(expected.getMessage(), actual.getMessage());
+      assertTrue("Stacktraces are not equal", Arrays.equals(expected.getStackTrace(), actual.getStackTrace()));
       assertEqualExceptionAndCause(expected.getCause(), actual.getCause());
     }
   }

@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -43,14 +44,14 @@ public class FormDataImportWithTemplatesTest {
     f.importFormData(formData);
 
     //new form should contain the stored values
-    Assert.assertEquals("t1", f.getText1Field().getValue());
-    Assert.assertEquals("t3", f.getText3Field().getValue());
-    Assert.assertEquals("t4", f.getText4Field().getValue());
-    Assert.assertEquals("g1t1", f.getG1Box().getText1Field().getValue());
-    Assert.assertEquals("g1t2", f.getG1Box().getText2Field().getValue());
-    Assert.assertEquals("g2t1", f.getG2Box().getText1Field().getValue());
-    Assert.assertEquals("g3g2", f.getG3G4Text2Field().getValue());
-    Assert.assertEquals("g1L", f.getG1Box().getTestListBox().getValue()[0]);
-    Assert.assertEquals("g2L", f.getG2Box().getTestListBox().getValue()[0]);
+    assertEquals("t1", f.getText1Field().getValue());
+    assertEquals("t3", f.getText3Field().getValue());
+    assertEquals("t4", f.getText4Field().getValue());
+    assertEquals("g1t1", f.getG1Box().getText1Field().getValue());
+    assertEquals("g1t2", f.getG1Box().getText2Field().getValue());
+    assertEquals("g2t1", f.getG2Box().getText1Field().getValue());
+    assertEquals("g3g2", f.getG3G4Text2Field().getValue());
+    assertEquals("g1L", f.getG1Box().getTestListBox().getValue()[0]);
+    assertEquals("g2L", f.getG2Box().getTestListBox().getValue()[0]);
   }
 }

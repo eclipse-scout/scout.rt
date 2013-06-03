@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -18,7 +22,6 @@ import org.eclipse.scout.testing.client.form.DynamicForm;
 import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,10 +49,10 @@ public class StoreAndLoadXml1FormTest {
 
       // export to xml and check result
       String xml = f.getXML(null);
-      Assert.assertNotNull(xml);
-      Assert.assertTrue(xml.contains("primitiveInteger"));
-      Assert.assertTrue(xml.contains("primitiveBoolean"));
-      Assert.assertTrue(xml.contains("text"));
+      assertNotNull(xml);
+      assertTrue(xml.contains("primitiveInteger"));
+      assertTrue(xml.contains("primitiveBoolean"));
+      assertTrue(xml.contains("text"));
 
       // reset properties
       f.setPrimitiveBoolean(false);
@@ -58,9 +61,9 @@ public class StoreAndLoadXml1FormTest {
 
       // import xml and check properties
       f.setXML(xml);
-      Assert.assertTrue(f.isPrimitiveBoolean());
-      Assert.assertEquals(42, f.getPrimitiveInteger());
-      Assert.assertEquals(EXPECTED_TEXT, f.getText());
+      assertTrue(f.isPrimitiveBoolean());
+      assertEquals(42, f.getPrimitiveInteger());
+      assertEquals(EXPECTED_TEXT, f.getText());
     }
     finally {
       f.doClose();

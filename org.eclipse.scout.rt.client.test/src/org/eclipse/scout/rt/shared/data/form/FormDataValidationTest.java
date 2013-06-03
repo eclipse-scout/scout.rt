@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -19,7 +22,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -95,7 +97,7 @@ public class FormDataValidationTest {
       //nop
     }
     else {
-      Assert.assertEquals(expectedValue, v2.getValue());
+      assertEquals(expectedValue, v2.getValue());
     }
   }
 
@@ -117,7 +119,7 @@ public class FormDataValidationTest {
       //ok
       return;
     }
-    Assert.fail("should have failed");
+    fail("should have failed");
   }
 
   static class MyFormData extends AbstractFormData {

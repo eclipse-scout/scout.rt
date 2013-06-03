@@ -11,11 +11,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.InputStream;
 
 import org.eclipse.scout.commons.utility.TestUtility;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -23,7 +25,7 @@ import org.junit.Test;
  * 
  * @since 3.9.0
  */
-public class FileUtilityTest extends Assert {
+public class FileUtilityTest {
 
   @Test
   public void testIsZipFile() throws Exception {
@@ -32,8 +34,8 @@ public class FileUtilityTest extends Assert {
     try {
       zipFile = getFile("/zip.zip");
       noZipFile = getFile("/nozip.zip");
-      Assert.assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(zipFile));
-      Assert.assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(noZipFile));
+      assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(zipFile));
+      assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(noZipFile));
     }
     finally {
       TestUtility.deleteTempFile(zipFile);

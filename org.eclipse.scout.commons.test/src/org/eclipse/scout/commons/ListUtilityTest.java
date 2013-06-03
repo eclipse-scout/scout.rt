@@ -10,17 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * tests the {@link ListUtility}
  */
-public class ListUtilityTest extends Assert {
+public class ListUtilityTest {
 
   @Test
   public void testLength() throws Exception {

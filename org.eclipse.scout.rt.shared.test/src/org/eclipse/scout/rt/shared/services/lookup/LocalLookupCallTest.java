@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -39,7 +40,7 @@ public class LocalLookupCallTest {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     LookupRow[] rows = lc.getDataByAll();
 
-    Assert.assertEquals("rows lengh", 6, rows.length);
+    assertEquals("rows lengh", 6, rows.length);
   }
 
   @Test
@@ -47,7 +48,7 @@ public class LocalLookupCallTest {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     LookupRow[] rows = lc.getDataByText();
 
-    Assert.assertEquals("rows length", 6, rows.length);
+    assertEquals("rows length", 6, rows.length);
   }
 
   @Test
@@ -67,7 +68,7 @@ public class LocalLookupCallTest {
     lc.setText(text);
     LookupRow[] rows = lc.getDataByText();
 
-    Assert.assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.length);
   }
 
   @Test
@@ -84,7 +85,7 @@ public class LocalLookupCallTest {
     lc.setKey(key);
     LookupRow[] rows = lc.getDataByKey();
 
-    Assert.assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.length);
   }
 
   @Test
@@ -103,7 +104,7 @@ public class LocalLookupCallTest {
     lc.setRec(parent);
     LookupRow[] rows = lc.getDataByRec();
 
-    Assert.assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.length);
   }
 
   private class P_LocalLookupCall extends LocalLookupCall {

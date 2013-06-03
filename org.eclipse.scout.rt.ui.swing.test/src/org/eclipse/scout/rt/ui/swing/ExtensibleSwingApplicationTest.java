@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swing;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +22,6 @@ import org.easymock.EasyMock;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.ui.swing.extension.ISwingApplicationExtension;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -54,7 +54,7 @@ public class ExtensibleSwingApplicationTest {
   public void testStart_ExtensionAbort() throws Exception {
     assertStart(app, IApplication.EXIT_OK, null, IApplication.EXIT_OK);
     assertStart(app, IApplication.EXIT_RELAUNCH, IApplication.EXIT_RELAUNCH, IApplication.EXIT_OK);
-    // Assert.assertStart(?, null, null) causes the super.start() method to be called
+    // assertStart(?, null, null) causes the super.start() method to be called
     // which results in a call to startSubject. These cases are testet in the testStartInSubject* methods
   }
 
@@ -65,7 +65,7 @@ public class ExtensibleSwingApplicationTest {
     expect(ext2.execStart(null, null)).andReturn(secondReturnValue);
     replay(ext1, ext2);
     app = new ExtensibleSwingApplication(Arrays.asList(ext1, ext2));
-    Assert.assertEquals(expected, app.start(null));
+    assertEquals(expected, app.start(null));
   }
 
   @Test
@@ -74,7 +74,7 @@ public class ExtensibleSwingApplicationTest {
     expect(ext.execStartInSubject(null, null)).andReturn(IApplication.EXIT_OK);
     replay(ext);
     app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    Assert.assertEquals(IApplication.EXIT_OK, app.startInSubject(null));
+    assertEquals(IApplication.EXIT_OK, app.startInSubject(null));
   }
 
   /*
@@ -114,7 +114,7 @@ public class ExtensibleSwingApplicationTest {
   @Test
   public void testRunWhileActive_NoExtensions() throws Exception {
     app = new ExtensibleSwingApplication(Collections.<ISwingApplicationExtension> emptyList());
-    Assert.assertEquals(IApplication.EXIT_OK, Integer.valueOf(app.runWhileActive()));
+    assertEquals(IApplication.EXIT_OK, Integer.valueOf(app.runWhileActive()));
   }
 
   /**
@@ -154,7 +154,7 @@ public class ExtensibleSwingApplicationTest {
     t.start();
 
     app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    Assert.assertEquals(IApplication.EXIT_RELAUNCH, Integer.valueOf(app.runWhileActive()));
+    assertEquals(IApplication.EXIT_RELAUNCH, Integer.valueOf(app.runWhileActive()));
   }
 
   @Test

@@ -10,8 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 import org.eclipse.core.runtime.Platform;
-import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
@@ -26,24 +30,24 @@ public class BundleTestTest extends AbstractBundleTest {
   public void testAbstractBundleTest_base() throws Exception {
     // install
     Bundle aBundle = installBundle(PLUGIN_ID_1, PLUGIN_VERSION);
-    Assert.assertNotNull(aBundle);
-    Assert.assertEquals(Bundle.INSTALLED, aBundle.getState());
-    Assert.assertNull(Platform.getBundle(PLUGIN_ID_1));
+    assertNotNull(aBundle);
+    assertEquals(Bundle.INSTALLED, aBundle.getState());
+    assertNull(Platform.getBundle(PLUGIN_ID_1));
 
     // resolve installed
     resolveBundles(aBundle);
-    Assert.assertEquals(Bundle.RESOLVED, aBundle.getState());
-    Assert.assertSame(aBundle, Platform.getBundle(PLUGIN_ID_1));
+    assertEquals(Bundle.RESOLVED, aBundle.getState());
+    assertSame(aBundle, Platform.getBundle(PLUGIN_ID_1));
 
     // uninstall
     uninstallBundles(aBundle);
-    Assert.assertEquals(Bundle.UNINSTALLED, aBundle.getState());
-    Assert.assertNull(Platform.getBundle(PLUGIN_ID_1));
+    assertEquals(Bundle.UNINSTALLED, aBundle.getState());
+    assertNull(Platform.getBundle(PLUGIN_ID_1));
 
     // resolve uninstalled
     resolveBundles(aBundle);
-    Assert.assertEquals(Bundle.UNINSTALLED, aBundle.getState());
-    Assert.assertNull(Platform.getBundle(PLUGIN_ID_1));
+    assertEquals(Bundle.UNINSTALLED, aBundle.getState());
+    assertNull(Platform.getBundle(PLUGIN_ID_1));
   }
 
   @Test
@@ -52,9 +56,9 @@ public class BundleTestTest extends AbstractBundleTest {
     Bundle aBundle2 = installBundle(PLUGIN_ID_2, PLUGIN_VERSION, PLUGIN_ID_1);
     Bundle aBundle3 = installBundle(PLUGIN_ID_3, PLUGIN_VERSION, PLUGIN_ID_2, PLUGIN_ID_1);
     resolveBundles(aBundle1, aBundle2, aBundle3);
-    Assert.assertSame(aBundle1, Platform.getBundle(PLUGIN_ID_1));
-    Assert.assertSame(aBundle2, Platform.getBundle(PLUGIN_ID_2));
-    Assert.assertSame(aBundle3, Platform.getBundle(PLUGIN_ID_3));
+    assertSame(aBundle1, Platform.getBundle(PLUGIN_ID_1));
+    assertSame(aBundle2, Platform.getBundle(PLUGIN_ID_2));
+    assertSame(aBundle3, Platform.getBundle(PLUGIN_ID_3));
     uninstallBundles(aBundle1, aBundle2, aBundle3);
   }
 }

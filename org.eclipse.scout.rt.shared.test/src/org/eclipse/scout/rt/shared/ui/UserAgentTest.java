@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.ui;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
 
 /**
@@ -26,11 +28,11 @@ public class UserAgentTest {
     UserAgent userAgentRap2 = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
     UserAgent userAgentRapMobile = UserAgent.create(UiLayer.RAP, UiDeviceType.MOBILE);
 
-    Assert.assertEquals(userAgentRap, userAgentRap2);
-    Assert.assertEquals(userAgentRap.hashCode(), userAgentRap2.hashCode());
+    assertEquals(userAgentRap, userAgentRap2);
+    assertEquals(userAgentRap.hashCode(), userAgentRap2.hashCode());
 
-    Assert.assertFalse(userAgentRap.equals(userAgentRapMobile));
-    Assert.assertFalse(userAgentRap.hashCode() == userAgentRapMobile.hashCode());
+    assertFalse(userAgentRap.equals(userAgentRapMobile));
+    assertFalse(userAgentRap.hashCode() == userAgentRapMobile.hashCode());
 
     String chromeUserAgentStr = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19";
     String firefoxUserAgentStr = "Mozilla/5.0 .. Firefox ..";
@@ -38,14 +40,14 @@ public class UserAgentTest {
     UserAgent userAgentRapChrome2 = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, chromeUserAgentStr);
     UserAgent userAgentRapFirefox = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, firefoxUserAgentStr);
 
-    Assert.assertEquals(userAgentRapChrome, userAgentRapChrome2);
-    Assert.assertEquals(userAgentRapChrome.hashCode(), userAgentRapChrome2.hashCode());
+    assertEquals(userAgentRapChrome, userAgentRapChrome2);
+    assertEquals(userAgentRapChrome.hashCode(), userAgentRapChrome2.hashCode());
 
-    Assert.assertFalse(userAgentRap.equals(userAgentRapChrome));
-    Assert.assertFalse(userAgentRap.hashCode() == userAgentRapChrome.hashCode());
+    assertFalse(userAgentRap.equals(userAgentRapChrome));
+    assertFalse(userAgentRap.hashCode() == userAgentRapChrome.hashCode());
 
-    Assert.assertFalse(userAgentRapChrome.equals(userAgentRapFirefox));
-    Assert.assertFalse(userAgentRapChrome.hashCode() == userAgentRapFirefox.hashCode());
+    assertFalse(userAgentRapChrome.equals(userAgentRapFirefox));
+    assertFalse(userAgentRapChrome.hashCode() == userAgentRapFirefox.hashCode());
   }
 
 }

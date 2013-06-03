@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -22,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
@@ -42,7 +45,7 @@ public class PermissionServiceTest {
     List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, testService);
     try {
       IPermissionService service = SERVICES.getService(IPermissionService.class);
-      Assert.assertSame(testService, service);
+      assertSame(testService, service);
       //
       BundleClassDescriptor[] result = service.getAllPermissionClasses();
       boolean testPermission1Found = false;
@@ -57,16 +60,16 @@ public class PermissionServiceTest {
       }
       //
       if (testPermission1Expected) {
-        Assert.assertTrue("TestPermission1 class not found (expected: found)", testPermission1Found);
+        assertTrue("TestPermission1 class not found (expected: found)", testPermission1Found);
       }
       else {
-        Assert.assertFalse("TestPermission1 class found (expected: not found)", testPermission1Found);
+        assertFalse("TestPermission1 class found (expected: not found)", testPermission1Found);
       }
       if (testPermission2Expected) {
-        Assert.assertTrue("TestPermission2 class not found (expected: found)", testPermission2Found);
+        assertTrue("TestPermission2 class not found (expected: found)", testPermission2Found);
       }
       else {
-        Assert.assertFalse("TestPermission2 class found (expected: not found)", testPermission2Found);
+        assertFalse("TestPermission2 class found (expected: not found)", testPermission2Found);
       }
     }
     finally {

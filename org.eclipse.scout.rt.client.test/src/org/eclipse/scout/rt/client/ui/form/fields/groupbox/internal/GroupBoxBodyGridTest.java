@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -81,8 +82,8 @@ public class GroupBoxBodyGridTest {
     GroupBox g = new GroupBox();
     GroupBoxBodyGrid grid = new GroupBoxBodyGrid(g);
     grid.validate();
-    Assert.assertEquals(2, grid.getGridRowCount());
-    Assert.assertEquals(2, grid.getGridColumnCount());
+    assertEquals(2, grid.getGridRowCount());
+    assertEquals(2, grid.getGridColumnCount());
     /*
     GridData gd1 = g.getFieldByClass(GroupBox.FirstField.class).getGridData();
     GridData gd2 = g.getFieldByClass(GroupBox.SecondField.class).getGridData();

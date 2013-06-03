@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,10 +44,10 @@ public class MatrixUtilityTest {
         {"äab"},
         {"Äaa"}};
     MatrixUtility.sort(Locale.GERMAN, data, 0);
-    Assert.assertEquals("Äaa", data[0][0]);
-    Assert.assertEquals("äab", data[1][0]);
-    Assert.assertEquals("Aac", data[2][0]);
-    Assert.assertEquals("ab", data[3][0]);
+    assertEquals("Äaa", data[0][0]);
+    assertEquals("äab", data[1][0]);
+    assertEquals("Aac", data[2][0]);
+    assertEquals("ab", data[3][0]);
   }
 
   @Test
@@ -71,25 +73,25 @@ public class MatrixUtilityTest {
   @Test
   public void testSortUsingDeChLocale() {
     MatrixUtility.sort(new Locale("de", "CH"), m_array, 1);
-    Assert.assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
+    assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
   }
 
   @Test
   public void testSortUsingEnUsLocale() {
     MatrixUtility.sort(new Locale("en", "US"), m_array, 1);
-    Assert.assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
+    assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
   }
 
   @Test
   public void testSortTwoSortColumns() {
     MatrixUtility.sort(new Locale("de", "CH"), m_array, 2, 1);
-    Assert.assertArrayEquals(new Object[][]{E5, E4, E3, E2, E1}, m_array);
+    assertArrayEquals(new Object[][]{E5, E4, E3, E2, E1}, m_array);
   }
 
   @Test
   public void testSortNullSortValues() {
     MatrixUtility.sort(m_array, 3);
-    Assert.assertArrayEquals(new Object[][]{E1, E2, E5, E4, E3}, m_array);
+    assertArrayEquals(new Object[][]{E1, E2, E5, E4, E3}, m_array);
   }
 
   @Test
@@ -122,6 +124,6 @@ public class MatrixUtilityTest {
         {"Ö"},
         {"Ø"}};
 
-    Assert.assertArrayEquals(expected, data);
+    assertArrayEquals(expected, data);
   }
 }

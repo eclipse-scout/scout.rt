@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -19,7 +23,6 @@ import org.eclipse.scout.testing.client.form.DynamicForm;
 import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,9 +53,9 @@ public class FormDataImportWithPropertiesTest {
       f.importFormData(new DynamicFormDataWithProperties());
 
       // all form properties are expected unchanged
-      Assert.assertEquals(EXPECTED_BOOLEAN, f.isPrimitiveBoolean());
-      Assert.assertEquals(EXPECTED_INTEGER, f.getPrimitiveInteger());
-      Assert.assertEquals(EXPECTED_TEXT, f.getText());
+      assertEquals(EXPECTED_BOOLEAN, f.isPrimitiveBoolean());
+      assertEquals(EXPECTED_INTEGER, f.getPrimitiveInteger());
+      assertEquals(EXPECTED_TEXT, f.getText());
     }
     finally {
       f.doClose();
@@ -79,9 +82,9 @@ public class FormDataImportWithPropertiesTest {
       f.importFormData(formData);
 
       // check properties on form
-      Assert.assertFalse(f.isPrimitiveBoolean());
-      Assert.assertEquals(102, f.getPrimitiveInteger());
-      Assert.assertNull(f.getText());
+      assertFalse(f.isPrimitiveBoolean());
+      assertEquals(102, f.getPrimitiveInteger());
+      assertNull(f.getText());
     }
     finally {
       f.doClose();

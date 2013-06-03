@@ -10,6 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -28,7 +36,6 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.P
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageRemoveExtension;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,10 +49,10 @@ public class PageRemovalIntegrationTest {
   public void testDisabledExtensions() throws ProcessingException {
     PageExtensionManager manager = Activator.getDefault().getPagesExtensionManager();
     List<PageRemoveExtension> extensions = manager.getPageRemovalExtensions();
-    Assert.assertNotNull(extensions);
+    assertNotNull(extensions);
     for (PageRemoveExtension ext : extensions) {
       if (ext.getPageClass() == BRemovePageWithNodes.class && ext.getPageFilter() == null) {
-        Assert.fail("Disabled pageRemoval is available for page " + BRemovePageWithNodes.class.getSimpleName());
+        fail("Disabled pageRemoval is available for page " + BRemovePageWithNodes.class.getSimpleName());
       }
     }
   }
@@ -54,37 +61,37 @@ public class PageRemovalIntegrationTest {
   public void testFilters() throws ProcessingException {
     PageExtensionManager manager = Activator.getDefault().getPagesExtensionManager();
     List<PageRemoveExtension> extensions = manager.getPageRemovalExtensions();
-    Assert.assertNotNull(extensions);
+    assertNotNull(extensions);
     for (PageRemoveExtension ext : extensions) {
       if (ext.getPageClass() == AbstractCRemovePageWithNodes.class) {
         // filters only
-        Assert.assertTrue(ext.getPageFilter() != null);
-        Assert.assertSame(CompositePageFilter.class, ext.getPageFilter().getClass());
+        assertTrue(ext.getPageFilter() != null);
+        assertSame(CompositePageFilter.class, ext.getPageFilter().getClass());
         //
         CompositePageFilter filter = (CompositePageFilter) ext.getPageFilter();
-        Assert.assertEquals(2, filter.size());
-        Assert.assertSame(APageFilter.class, filter.getFilters()[0].getClass());
-        Assert.assertSame(BPageFilter.class, filter.getFilters()[1].getClass());
+        assertEquals(2, filter.size());
+        assertSame(APageFilter.class, filter.getFilters()[0].getClass());
+        assertSame(BPageFilter.class, filter.getFilters()[1].getClass());
         //
-        Assert.assertTrue(filter.accept(null, null, new P_Page()));
+        assertTrue(filter.accept(null, null, new P_Page()));
       }
       else if (ext.getPageClass() == C2RemovePageWithNodes.class) {
         // desktop anchor and filters
-        Assert.assertTrue(ext.getPageFilter() != null);
-        Assert.assertSame(CompositePageFilter.class, ext.getPageFilter().getClass());
+        assertTrue(ext.getPageFilter() != null);
+        assertSame(CompositePageFilter.class, ext.getPageFilter().getClass());
         //
         CompositePageFilter filter = (CompositePageFilter) ext.getPageFilter();
-        Assert.assertEquals(3, filter.size());
-        Assert.assertSame(PageAnchorFilter.class, filter.getFilters()[0].getClass());
-        Assert.assertSame(APageFilter.class, filter.getFilters()[1].getClass());
-        Assert.assertSame(BPageFilter.class, filter.getFilters()[2].getClass());
+        assertEquals(3, filter.size());
+        assertSame(PageAnchorFilter.class, filter.getFilters()[0].getClass());
+        assertSame(APageFilter.class, filter.getFilters()[1].getClass());
+        assertSame(BPageFilter.class, filter.getFilters()[2].getClass());
         //
         PageAnchorFilter anchor = (PageAnchorFilter) filter.getFilters()[0];
-        Assert.assertNull(anchor.getOutlineFilterClass());
-        Assert.assertSame(BRemovePageWithNodes.class, anchor.getParentPageFilterClass());
+        assertNull(anchor.getOutlineFilterClass());
+        assertSame(BRemovePageWithNodes.class, anchor.getParentPageFilterClass());
         //
-        Assert.assertFalse(filter.accept(null, null, new P_Page()));
-        Assert.assertTrue(filter.accept(null, new BRemovePageWithNodes(), new P_Page()));
+        assertFalse(filter.accept(null, null, new P_Page()));
+        assertTrue(filter.accept(null, new BRemovePageWithNodes(), new P_Page()));
       }
     }
   }
@@ -94,9 +101,9 @@ public class PageRemovalIntegrationTest {
     // affected by fragment.xml entries
     PageRemoveNodePage extensionPage = new PageRemoveNodePage();
     DynamicOutline outline = new DynamicOutline(extensionPage);
-    Assert.assertSame(extensionPage, outline.getActivePage());
-    Assert.assertEquals(1, extensionPage.getChildNodeCount());
-    Assert.assertSame(BRemovePageWithNodes.class, extensionPage.getChildNode(0).getClass());
+    assertSame(extensionPage, outline.getActivePage());
+    assertEquals(1, extensionPage.getChildNodeCount());
+    assertSame(BRemovePageWithNodes.class, extensionPage.getChildNode(0).getClass());
   }
 
   @Test
@@ -104,8 +111,8 @@ public class PageRemovalIntegrationTest {
     // affected by fragment.xml entries
     PageRemoveOutline outline = new PageRemoveOutline();
     ITreeNode rootNode = outline.getRootNode();
-    Assert.assertNotNull(rootNode);
-    Assert.assertEquals(0, rootNode.getChildNodeCount());
+    assertNotNull(rootNode);
+    assertEquals(0, rootNode.getChildNodeCount());
   }
 
   private static class P_Page extends AbstractPageWithNodes {

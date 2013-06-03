@@ -10,12 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -30,7 +34,7 @@ public class ColumnEditableTest {
   @Test
   public void testInitiallyEditable() {
     AbstractColumn<String> column = getEmptyStringColumn();
-    Assert.assertFalse(column.isEditable());
+    assertFalse(column.isEditable());
   }
 
   /**
@@ -40,9 +44,9 @@ public class ColumnEditableTest {
   public void testSettingProperty() {
     AbstractColumn<String> column = getEmptyStringColumn();
     column.setEditable(true);
-    Assert.assertTrue(column.isEditable());
+    assertTrue(column.isEditable());
     column.setEditable(false);
-    Assert.assertFalse(column.isEditable());
+    assertFalse(column.isEditable());
   }
 
   private AbstractColumn<String> getEmptyStringColumn() {
@@ -65,12 +69,12 @@ public class ColumnEditableTest {
     testTable.setEnabled(true);
     testTable.addRowByArray(getTestRow());
     IColumn editableCol = testTable.getEditableTestColumn();
-    Assert.assertTrue(editableCol.isEditable());
-    Assert.assertTrue(testTable.getCell(0, 0).isEditable());
+    assertTrue(editableCol.isEditable());
+    assertTrue(testTable.getCell(0, 0).isEditable());
 
     IFormField field = editableCol.prepareEdit(testTable.getRow(0));
-    Assert.assertNotNull(field);
-    Assert.assertTrue(field.isEnabled());
+    assertNotNull(field);
+    assertTrue(field.isEnabled());
   }
 
   /**
@@ -83,17 +87,17 @@ public class ColumnEditableTest {
     testTable.addRowByArray(getTestRow());
     testTable.addRowByArray(getTestRow());
     IColumn editableCol = testTable.getDynamicEditableTestColumn();
-    Assert.assertTrue(editableCol.isEditable());
+    assertTrue(editableCol.isEditable());
 
     IFormField field = editableCol.prepareEdit(testTable.getRow(0));
-    Assert.assertNotNull(field);
-    Assert.assertTrue(field.isEnabled());
+    assertNotNull(field);
+    assertTrue(field.isEnabled());
 
     field = editableCol.prepareEdit(testTable.getRow(1));
-    Assert.assertNull(field);
+    assertNull(field);
 
-    Assert.assertTrue(testTable.getCell(0, 0).isEditable());
-    Assert.assertFalse(testTable.getCell(1, 0).isEditable());
+    assertTrue(testTable.getCell(0, 0).isEditable());
+    assertFalse(testTable.getCell(1, 0).isEditable());
   }
 
   /**

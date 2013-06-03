@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 import java.util.Date;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -77,10 +80,10 @@ public class DateUtilityTest {
   public void testIsInDateRange() {
     Date from = DateUtility.parse("01-02-2011 00:00", DATE_TIME_PATTERN);
     Date d = DateUtility.parse("09-02-2011 00:00", DATE_TIME_PATTERN);
-    Assert.assertFalse(DateUtility.isInDateRange(from, d, DateUtility.parse("08-02-2011 14:52", DATE_TIME_PATTERN)));
-    Assert.assertFalse(DateUtility.isInDateRange(from, d, DateUtility.parse("08-02-2011 23:59", DATE_TIME_PATTERN)));
-    Assert.assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:00", DATE_TIME_PATTERN)));
-    Assert.assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:01", DATE_TIME_PATTERN)));
+    assertFalse(DateUtility.isInDateRange(from, d, DateUtility.parse("08-02-2011 14:52", DATE_TIME_PATTERN)));
+    assertFalse(DateUtility.isInDateRange(from, d, DateUtility.parse("08-02-2011 23:59", DATE_TIME_PATTERN)));
+    assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:00", DATE_TIME_PATTERN)));
+    assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:01", DATE_TIME_PATTERN)));
   }
 
   @Test
@@ -247,7 +250,7 @@ public class DateUtilityTest {
    *          Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
    */
   private void testConvertDateToDoubleTime(String input, Double expected) {
-    Assert.assertEquals("Conversion Date <" + input + "> to DoubleTime", expected, DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN)));
+    assertEquals("Conversion Date <" + input + "> to DoubleTime", expected, DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN)));
   }
 
   @Test
@@ -311,7 +314,7 @@ public class DateUtilityTest {
    *          Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
    */
   private void testConvertDateToDoubleTimeToDate(String input) {
-    Assert.assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", DateUtility.parse(input, YEAR_DATE_TIME_PATTERN), DateUtility.convertDoubleTimeToDate(DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN))));
+    assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", DateUtility.parse(input, YEAR_DATE_TIME_PATTERN), DateUtility.convertDoubleTimeToDate(DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN))));
   }
 
   @Test
@@ -375,7 +378,7 @@ public class DateUtilityTest {
    *          Double DoubleTime as defined in {@link DateUtility#convertDateToDoubleTime(java.util.Date)}
    */
   private void testConvertDoubleTimeToDateToDoubleTime(Double input) {
-    Assert.assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", input, DateUtility.convertDateToDoubleTime(DateUtility.convertDoubleTimeToDate(input)));
+    assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", input, DateUtility.convertDateToDoubleTime(DateUtility.convertDoubleTimeToDate(input)));
   }
 
   /**
@@ -392,15 +395,15 @@ public class DateUtilityTest {
     e.clear();
     e.setTime(expected);
 
-    Assert.assertEquals(message + "[MILLIS]", e.get(Calendar.MILLISECOND), v.get(Calendar.MILLISECOND));
-    Assert.assertEquals(message + "[SEC]", e.get(Calendar.SECOND), v.get(Calendar.SECOND));
-    Assert.assertEquals(message + "[MIN]", e.get(Calendar.MINUTE), v.get(Calendar.MINUTE));
-    Assert.assertEquals(message + "[HOURS]", e.get(Calendar.HOUR_OF_DAY), v.get(Calendar.HOUR_OF_DAY));
+    assertEquals(message + "[MILLIS]", e.get(Calendar.MILLISECOND), v.get(Calendar.MILLISECOND));
+    assertEquals(message + "[SEC]", e.get(Calendar.SECOND), v.get(Calendar.SECOND));
+    assertEquals(message + "[MIN]", e.get(Calendar.MINUTE), v.get(Calendar.MINUTE));
+    assertEquals(message + "[HOURS]", e.get(Calendar.HOUR_OF_DAY), v.get(Calendar.HOUR_OF_DAY));
 
-    Assert.assertEquals(message + "[DAY]", e.get(Calendar.DAY_OF_MONTH), v.get(Calendar.DAY_OF_MONTH));
-    Assert.assertEquals(message + "[MONTH]", e.get(Calendar.MONTH), v.get(Calendar.MONTH));
-    Assert.assertEquals(message + "[YEAR]", e.get(Calendar.YEAR), v.get(Calendar.YEAR));
+    assertEquals(message + "[DAY]", e.get(Calendar.DAY_OF_MONTH), v.get(Calendar.DAY_OF_MONTH));
+    assertEquals(message + "[MONTH]", e.get(Calendar.MONTH), v.get(Calendar.MONTH));
+    assertEquals(message + "[YEAR]", e.get(Calendar.YEAR), v.get(Calendar.YEAR));
 
-    Assert.assertEquals(message + "(DATE)", expected, value);
+    assertEquals(message + "(DATE)", expected, value);
   }
 }

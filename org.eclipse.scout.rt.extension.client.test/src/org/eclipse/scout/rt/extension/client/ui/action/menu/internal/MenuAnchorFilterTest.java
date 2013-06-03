@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.action.menu.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -23,50 +25,50 @@ public class MenuAnchorFilterTest {
   @Test
   public void testAcceptNullAnchorClass() {
     MenuAnchorFilter filter = new MenuAnchorFilter(null);
-    Assert.assertFalse(filter.accept(null, null, null));
-    Assert.assertFalse(filter.accept(new Object(), null, null));
-    Assert.assertFalse(filter.accept(null, new Object(), null));
-    Assert.assertTrue(filter.accept(new Object(), new Object(), null));
+    assertFalse(filter.accept(null, null, null));
+    assertFalse(filter.accept(new Object(), null, null));
+    assertFalse(filter.accept(null, new Object(), null));
+    assertTrue(filter.accept(new Object(), new Object(), null));
   }
 
   @Test
   public void testAcceptAnchorMenu() {
     MenuAnchorFilter filter = new MenuAnchorFilter(P_AnchorMenu.class);
-    Assert.assertFalse(filter.accept(new Object(), new Object(), null));
+    assertFalse(filter.accept(new Object(), new Object(), null));
     //
     Object anchorAndContainerMenu = new P_AnchorMenu();
-    Assert.assertTrue(filter.accept(anchorAndContainerMenu, anchorAndContainerMenu, null));
-    Assert.assertTrue(filter.accept(anchorAndContainerMenu, anchorAndContainerMenu, null));
+    assertTrue(filter.accept(anchorAndContainerMenu, anchorAndContainerMenu, null));
+    assertTrue(filter.accept(anchorAndContainerMenu, anchorAndContainerMenu, null));
     //
     Object wrongAnchorMenu = new P_OtherAnchorMenu();
-    Assert.assertFalse(filter.accept(wrongAnchorMenu, wrongAnchorMenu, null));
-    Assert.assertTrue(filter.accept(anchorAndContainerMenu, wrongAnchorMenu, null));
+    assertFalse(filter.accept(wrongAnchorMenu, wrongAnchorMenu, null));
+    assertTrue(filter.accept(anchorAndContainerMenu, wrongAnchorMenu, null));
   }
 
   @Test
   public void testAcceptAnchorNodePage() {
     MenuAnchorFilter filter = new MenuAnchorFilter(P_AnchorPage.class);
-    Assert.assertFalse(filter.accept(new Object(), new Object(), null));
+    assertFalse(filter.accept(new Object(), new Object(), null));
     //
     Object anchorAndContainerNodePage = new P_AnchorPage();
-    Assert.assertTrue(filter.accept(anchorAndContainerNodePage, anchorAndContainerNodePage, null));
-    Assert.assertTrue(filter.accept(anchorAndContainerNodePage, anchorAndContainerNodePage, null));
+    assertTrue(filter.accept(anchorAndContainerNodePage, anchorAndContainerNodePage, null));
+    assertTrue(filter.accept(anchorAndContainerNodePage, anchorAndContainerNodePage, null));
     //
     Object wrongAnchorNodePage = new P_OtherAnchorPage();
-    Assert.assertFalse(filter.accept(wrongAnchorNodePage, wrongAnchorNodePage, null));
-    Assert.assertTrue(filter.accept(anchorAndContainerNodePage, wrongAnchorNodePage, null));
+    assertFalse(filter.accept(wrongAnchorNodePage, wrongAnchorNodePage, null));
+    assertTrue(filter.accept(anchorAndContainerNodePage, wrongAnchorNodePage, null));
   }
 
   @Test
   public void testAcceptPolymorphAnchor() {
     MenuAnchorFilter filter = new MenuAnchorFilter(P_AbstractPolymorphAnchorPage.class);
     Object p1 = new P_PolymorphAnchorPage1();
-    Assert.assertTrue(filter.accept(p1, p1, null));
-    Assert.assertTrue(filter.accept(p1, p1, null));
+    assertTrue(filter.accept(p1, p1, null));
+    assertTrue(filter.accept(p1, p1, null));
     //
     Object p2 = new P_PolymorphAnchorPage2();
-    Assert.assertTrue(filter.accept(p2, p2, null));
-    Assert.assertTrue(filter.accept(p1, p2, null));
+    assertTrue(filter.accept(p2, p2, null));
+    assertTrue(filter.accept(p1, p2, null));
   }
 
   private static class P_AnchorMenu extends AbstractMenu {

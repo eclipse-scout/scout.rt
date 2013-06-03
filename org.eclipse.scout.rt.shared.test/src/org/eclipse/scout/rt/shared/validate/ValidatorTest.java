@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.validate;
 
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,7 +30,6 @@ import org.eclipse.scout.rt.shared.validate.annotations.RegexMatch;
 import org.eclipse.scout.rt.shared.validate.annotations.Treat0AsNull;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ValidatorTest {
@@ -176,12 +177,12 @@ public class ValidatorTest {
     }
     catch (Throwable e) {
       if (expectSuccess) {
-        Assert.fail("expected success");
+        fail("expected success");
       }
       return;
     }
     if (!expectSuccess) {
-      Assert.fail("expected failure");
+      fail("expected failure");
     }
     m.invoke(service, args);
   }
@@ -200,12 +201,12 @@ public class ValidatorTest {
     }
     catch (Throwable e) {
       if (expectSuccess) {
-        Assert.fail("expected success");
+        fail("expected success");
       }
       return;
     }
     if (!expectSuccess) {
-      Assert.fail("expected failure");
+      fail("expected failure");
     }
   }
 

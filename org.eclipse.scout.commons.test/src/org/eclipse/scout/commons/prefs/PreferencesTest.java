@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.prefs;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -32,35 +34,35 @@ public class PreferencesTest {
     prefs.putInt("int", 123);
     prefs.putLong("long", 123L);
     //
-    Assert.assertEquals(true, prefs.isDirty());
-    Assert.assertEquals("X", prefs.name());
-    Assert.assertEquals(7, prefs.keys().length);
-    Assert.assertEquals("Any", prefs.get("any", null));
-    Assert.assertEquals("Xyz", prefs.get("xyz", "Xyz"));
-    Assert.assertEquals(true, prefs.getBoolean("bool", false));
-    Assert.assertEquals(true, prefs.getBoolean("xyz", true));
-    Assert.assertArrayEquals(new byte[]{(byte) 1, (byte) 2, (byte) 3}, prefs.getByteArray("byte", null));
-    Assert.assertArrayEquals(new byte[]{(byte) 9,}, prefs.getByteArray("xyz", new byte[]{(byte) 9,}));
-    Assert.assertEquals(1.23, prefs.getDouble("double", 0), 0.0);
-    Assert.assertEquals(9.0, prefs.getDouble("xyz", 9.0), 0.0);
-    Assert.assertEquals(1.23f, prefs.getFloat("float", 0), 0.0);
-    Assert.assertEquals(9.0f, prefs.getFloat("xyz", 9.0f), 0.0);
-    Assert.assertEquals(123, prefs.getInt("int", 0));
-    Assert.assertEquals(9, prefs.getInt("xyz", 9));
-    Assert.assertEquals(123L, prefs.getLong("long", 0));
-    Assert.assertEquals(9L, prefs.getLong("xyz", 9L));
+    assertEquals(true, prefs.isDirty());
+    assertEquals("X", prefs.name());
+    assertEquals(7, prefs.keys().length);
+    assertEquals("Any", prefs.get("any", null));
+    assertEquals("Xyz", prefs.get("xyz", "Xyz"));
+    assertEquals(true, prefs.getBoolean("bool", false));
+    assertEquals(true, prefs.getBoolean("xyz", true));
+    assertArrayEquals(new byte[]{(byte) 1, (byte) 2, (byte) 3}, prefs.getByteArray("byte", null));
+    assertArrayEquals(new byte[]{(byte) 9,}, prefs.getByteArray("xyz", new byte[]{(byte) 9,}));
+    assertEquals(1.23, prefs.getDouble("double", 0), 0.0);
+    assertEquals(9.0, prefs.getDouble("xyz", 9.0), 0.0);
+    assertEquals(1.23f, prefs.getFloat("float", 0), 0.0);
+    assertEquals(9.0f, prefs.getFloat("xyz", 9.0f), 0.0);
+    assertEquals(123, prefs.getInt("int", 0));
+    assertEquals(9, prefs.getInt("xyz", 9));
+    assertEquals(123L, prefs.getLong("long", 0));
+    assertEquals(9L, prefs.getLong("xyz", 9L));
     //
     prefs.put("double", "123");
     prefs.put("float", "123");
     prefs.put("int", "123");
     prefs.put("long", "123");
-    Assert.assertEquals(123.0, prefs.getDouble("double", 0), 0.0);
-    Assert.assertEquals(123f, prefs.getFloat("float", 0), 0.0);
-    Assert.assertEquals(123, prefs.getInt("int", 0));
-    Assert.assertEquals(123L, prefs.getLong("long", 0));
+    assertEquals(123.0, prefs.getDouble("double", 0), 0.0);
+    assertEquals(123f, prefs.getFloat("float", 0), 0.0);
+    assertEquals(123, prefs.getInt("int", 0));
+    assertEquals(123L, prefs.getLong("long", 0));
     //
     prefs.flush();
-    Assert.assertEquals(false, prefs.isDirty());
+    assertEquals(false, prefs.isDirty());
   }
 
   private static class Prefs extends AbstractPreferences {

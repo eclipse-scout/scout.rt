@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +31,6 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.P
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageModificationExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageRemoveExtension;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,9 +66,9 @@ public class PageExtensionUtilityTest {
   @Test
   public void testContributePagesNullAndEmpty() throws Exception {
     PageExtensionUtility.contributePages(null, null, null, m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
     PageExtensionUtility.contributePages(null, null, Collections.<PageContributionExtension> emptyList(), m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
   }
 
   @Test
@@ -79,13 +84,13 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.contributePages(m_outline, null, extensions, m_pageList);
 
-    Assert.assertEquals(6, m_pageList.size());
-    Assert.assertSame(P_ContribPageB.class, m_pageList.get(0).getClass());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(1));
-    Assert.assertSame(P_ContribPageA.class, m_pageList.get(2).getClass());
-    Assert.assertSame(P_ContribPageC.class, m_pageList.get(3).getClass());
-    Assert.assertSame(m_configuredPageB, m_pageList.get(4));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(5));
+    assertEquals(6, m_pageList.size());
+    assertSame(P_ContribPageB.class, m_pageList.get(0).getClass());
+    assertSame(m_configuredPageA, m_pageList.get(1));
+    assertSame(P_ContribPageA.class, m_pageList.get(2).getClass());
+    assertSame(P_ContribPageC.class, m_pageList.get(3).getClass());
+    assertSame(m_configuredPageB, m_pageList.get(4));
+    assertSame(m_configuredPageC, m_pageList.get(5));
   }
 
   @Test
@@ -108,12 +113,12 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.contributePages(m_outline, null, extensions, m_pageList);
 
-    Assert.assertEquals(5, m_pageList.size());
-    Assert.assertSame(P_ContribPageB.class, m_pageList.get(0).getClass());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(1));
-    Assert.assertSame(P_ContribPageC.class, m_pageList.get(2).getClass());
-    Assert.assertSame(m_configuredPageB, m_pageList.get(3));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(4));
+    assertEquals(5, m_pageList.size());
+    assertSame(P_ContribPageB.class, m_pageList.get(0).getClass());
+    assertSame(m_configuredPageA, m_pageList.get(1));
+    assertSame(P_ContribPageC.class, m_pageList.get(2).getClass());
+    assertSame(m_configuredPageB, m_pageList.get(3));
+    assertSame(m_configuredPageC, m_pageList.get(4));
   }
 
   @Test
@@ -134,12 +139,12 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.contributePages(m_outline, null, extensions, m_pageList);
 
-    Assert.assertEquals(5, m_pageList.size());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(0));
-    Assert.assertSame(P_ContribPageA.class, m_pageList.get(1).getClass());
-    Assert.assertSame(P_ContribPageC.class, m_pageList.get(2).getClass());
-    Assert.assertSame(m_configuredPageB, m_pageList.get(3));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(4));
+    assertEquals(5, m_pageList.size());
+    assertSame(m_configuredPageA, m_pageList.get(0));
+    assertSame(P_ContribPageA.class, m_pageList.get(1).getClass());
+    assertSame(P_ContribPageC.class, m_pageList.get(2).getClass());
+    assertSame(m_configuredPageB, m_pageList.get(3));
+    assertSame(m_configuredPageC, m_pageList.get(4));
   }
 
   /////////////////////////////////////////////////////////
@@ -149,9 +154,9 @@ public class PageExtensionUtilityTest {
   @Test
   public void testRemovePagesNullAndEmpty() throws Exception {
     PageExtensionUtility.removePages(null, null, null, m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
     PageExtensionUtility.removePages(null, null, Collections.<PageRemoveExtension> emptyList(), m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
   }
 
   @Test
@@ -166,9 +171,9 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.removePages(null, null, extensions, m_pageList);
 
-    Assert.assertEquals(2, m_pageList.size());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(0));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(1));
+    assertEquals(2, m_pageList.size());
+    assertSame(m_configuredPageA, m_pageList.get(0));
+    assertSame(m_configuredPageC, m_pageList.get(1));
   }
 
   @Test
@@ -183,8 +188,8 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.removePages(null, null, extensions, m_pageList);
 
-    Assert.assertEquals(1, m_pageList.size());
-    Assert.assertSame(m_configuredPageC, m_pageList.get(0));
+    assertEquals(1, m_pageList.size());
+    assertSame(m_configuredPageC, m_pageList.get(0));
   }
 
   @Test
@@ -196,9 +201,9 @@ public class PageExtensionUtilityTest {
     IPageExtensionFilter pageFilter = new IPageExtensionFilter() {
       @Override
       public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-        Assert.assertNull(outline);
-        Assert.assertNull(parentPage);
-        Assert.assertSame(m_configuredPageC, affectedPage);
+        assertNull(outline);
+        assertNull(parentPage);
+        assertSame(m_configuredPageC, affectedPage);
         return false;
       }
     };
@@ -210,9 +215,9 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.removePages(null, null, extensions, m_pageList);
 
-    Assert.assertEquals(2, m_pageList.size());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(0));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(1));
+    assertEquals(2, m_pageList.size());
+    assertSame(m_configuredPageA, m_pageList.get(0));
+    assertSame(m_configuredPageC, m_pageList.get(1));
   }
 
   /////////////////////////////////////////////////////////
@@ -220,9 +225,9 @@ public class PageExtensionUtilityTest {
   /////////////////////////////////////////////////////////
   public void testModifyPagesNullAndEmpty() throws Exception {
     PageExtensionUtility.modifyPages(null, null, null, m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
     PageExtensionUtility.modifyPages(null, null, Collections.<PageModificationExtension> emptyList(), m_pageList);
-    Assert.assertTrue(m_pageList.isEmpty());
+    assertTrue(m_pageList.isEmpty());
   }
 
   @Test
@@ -237,13 +242,13 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.modifyPages(null, null, extensions, m_pageList);
 
-    Assert.assertEquals(3, m_pageList.size());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(0));
-    Assert.assertSame(m_configuredPageB, m_pageList.get(1));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(2));
+    assertEquals(3, m_pageList.size());
+    assertSame(m_configuredPageA, m_pageList.get(0));
+    assertSame(m_configuredPageB, m_pageList.get(1));
+    assertSame(m_configuredPageC, m_pageList.get(2));
 
-    Assert.assertEquals(1, P_ConfiguredPageAModifier.s_counter);
-    Assert.assertEquals(1, P_ConfiguredPageCModifier.s_counter);
+    assertEquals(1, P_ConfiguredPageAModifier.s_counter);
+    assertEquals(1, P_ConfiguredPageCModifier.s_counter);
   }
 
   @Test
@@ -255,9 +260,9 @@ public class PageExtensionUtilityTest {
     IPageExtensionFilter pageFilter = new IPageExtensionFilter() {
       @Override
       public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-        Assert.assertNull(outline);
-        Assert.assertNull(parentPage);
-        Assert.assertSame(m_configuredPageC, affectedPage);
+        assertNull(outline);
+        assertNull(parentPage);
+        assertSame(m_configuredPageC, affectedPage);
         return false;
       }
     };
@@ -268,13 +273,13 @@ public class PageExtensionUtilityTest {
 
     PageExtensionUtility.modifyPages(null, null, extensions, m_pageList);
 
-    Assert.assertEquals(3, m_pageList.size());
-    Assert.assertSame(m_configuredPageA, m_pageList.get(0));
-    Assert.assertSame(m_configuredPageB, m_pageList.get(1));
-    Assert.assertSame(m_configuredPageC, m_pageList.get(2));
+    assertEquals(3, m_pageList.size());
+    assertSame(m_configuredPageA, m_pageList.get(0));
+    assertSame(m_configuredPageB, m_pageList.get(1));
+    assertSame(m_configuredPageC, m_pageList.get(2));
 
-    Assert.assertEquals(1, P_ConfiguredPageAModifier.s_counter);
-    Assert.assertEquals(0, P_ConfiguredPageCModifier.s_counter);
+    assertEquals(1, P_ConfiguredPageAModifier.s_counter);
+    assertEquals(0, P_ConfiguredPageCModifier.s_counter);
   }
 
   /////////////////////////////////////////////////////////
@@ -308,10 +313,10 @@ public class PageExtensionUtilityTest {
     @Override
     public void modify(IOutline outline, IPage parentPage, IPage page) throws ProcessingException {
       s_counter++;
-      Assert.assertNull(outline);
-      Assert.assertNull(parentPage);
-      Assert.assertNotNull(page);
-      Assert.assertSame(P_ConfiguredPageA.class, page.getClass());
+      assertNull(outline);
+      assertNull(parentPage);
+      assertNotNull(page);
+      assertSame(P_ConfiguredPageA.class, page.getClass());
     }
   }
 
@@ -321,10 +326,10 @@ public class PageExtensionUtilityTest {
     @Override
     public void modify(IOutline outline, IPage parentPage, IPage page) throws ProcessingException {
       s_counter++;
-      Assert.assertNull(outline);
-      Assert.assertNull(parentPage);
-      Assert.assertNotNull(page);
-      Assert.assertSame(P_ConfiguredPageC.class, page.getClass());
+      assertNull(outline);
+      assertNull(parentPage);
+      assertNotNull(page);
+      assertSame(P_ConfiguredPageC.class, page.getClass());
     }
   }
 }

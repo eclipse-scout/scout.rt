@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.file;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,7 +31,6 @@ import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.ServiceRegistration;
@@ -73,7 +76,7 @@ public class FileServiceTest {
     }
     catch (IOException e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
@@ -94,7 +97,7 @@ public class FileServiceTest {
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);
-    Assert.assertFalse("Folder is not synchronized yet, but exists", outFolder.exists());
+    assertFalse("Folder is not synchronized yet, but exists", outFolder.exists());
 
     try {
       //synchronize test folder to path
@@ -105,21 +108,21 @@ public class FileServiceTest {
       File synchronizedFile2 = new File(TEST_PATH_2);
       File synchronizedFolder = new File(TEST_DIR_OUT);
 
-      Assert.assertTrue("Synchronized file does not exist " + synchronizedFile, synchronizedFile.exists());
-      Assert.assertTrue("Synchronized file does not exist " + synchronizedFile2, synchronizedFile2.exists());
-      Assert.assertTrue("Synchronized folder does not exist " + synchronizedFolder, synchronizedFolder.exists());
-      Assert.assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
+      assertTrue("Synchronized file does not exist " + synchronizedFile, synchronizedFile.exists());
+      assertTrue("Synchronized file does not exist " + synchronizedFile2, synchronizedFile2.exists());
+      assertTrue("Synchronized folder does not exist " + synchronizedFolder, synchronizedFolder.exists());
+      assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
 
       //synchronize again
       svc.syncRemoteFilesToPath(TEST_DIR_OUT, TEST_DIR_IN, null);
-      Assert.assertTrue("Synchronized file does not exist " + synchronizedFile, synchronizedFile.exists());
-      Assert.assertTrue("Synchronized file does not exist " + synchronizedFile2, synchronizedFile2.exists());
-      Assert.assertTrue("Synchronized folder does not exist " + synchronizedFolder, synchronizedFolder.exists());
-      Assert.assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
+      assertTrue("Synchronized file does not exist " + synchronizedFile, synchronizedFile.exists());
+      assertTrue("Synchronized file does not exist " + synchronizedFile2, synchronizedFile2.exists());
+      assertTrue("Synchronized folder does not exist " + synchronizedFolder, synchronizedFolder.exists());
+      assertTrue("Incorrect number of synchronized files", synchronizedFolder.listFiles().length == 2);
 
     }
     catch (ProcessingException e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
     finally {
       TestingUtility.unregisterServices(reg);

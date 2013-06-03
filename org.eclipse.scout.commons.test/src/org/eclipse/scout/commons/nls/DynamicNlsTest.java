@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.nls;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -23,10 +26,10 @@ public class DynamicNlsTest {
 
   @Test
   public void testMissingResourceBundles() {
-    Assert.assertEquals(null, MissingResourceBundleTexts.get("anyKey"));
+    assertEquals(null, MissingResourceBundleTexts.get("anyKey"));
     Map<String, String> textMap = MissingResourceBundleTexts.getInstance().getTextMap(Locale.ENGLISH);
-    Assert.assertNotNull(textMap);
-    Assert.assertTrue(textMap.isEmpty());
+    assertNotNull(textMap);
+    assertTrue(textMap.isEmpty());
   }
 
   private static class MissingResourceBundleTexts extends DynamicNls {

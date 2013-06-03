@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.beans;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -101,34 +103,34 @@ public class FastBeanUtilityTest {
   @Test
   public void testDeclaredPublicMethods() {
     Method[] methods = FastBeanUtility.getDeclaredPublicMethods(MyBean.class);
-    Assert.assertEquals("length", 2, methods.length);
+    assertEquals("length", 2, methods.length);
 
     ArrayList<String> methodNames = new ArrayList<String>();
     for (Method method : methods) {
       methodNames.add(method.getName());
     }
-    Assert.assertEquals("contains getId()", true, methodNames.contains("getId"));
-    Assert.assertEquals("contains setId()", true, methodNames.contains("setId"));
+    assertEquals("contains getId()", true, methodNames.contains("getId"));
+    assertEquals("contains setId()", true, methodNames.contains("setId"));
   }
 
   @Test
   public void testSimple() {
     Class clazz1 = LongSimple.class;
     Method[] methods1 = FastBeanUtility.getDeclaredPublicMethods(clazz1);
-    Assert.assertEquals(2, methods1.length);
+    assertEquals(2, methods1.length);
     //
     Class clazz2 = clazz1.getSuperclass();
     Method[] methods2 = FastBeanUtility.getDeclaredPublicMethods(clazz2);
-    Assert.assertEquals(0, methods2.length);
+    assertEquals(0, methods2.length);
     //try all permutations
     for (Method[] m1 : perm2(methods1)) {
       HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
       FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
-      Assert.assertEquals(1, contributeMap.size());
-      Assert.assertNotNull(contributeMap.get("id"));
-      Assert.assertNotNull(contributeMap.get("id").getReadMethod());
-      Assert.assertNotNull(contributeMap.get("id").getWriteMethod());
-      Assert.assertEquals(Long.class, contributeMap.get("id").getPropertyType());
+      assertEquals(1, contributeMap.size());
+      assertNotNull(contributeMap.get("id"));
+      assertNotNull(contributeMap.get("id").getReadMethod());
+      assertNotNull(contributeMap.get("id").getWriteMethod());
+      assertEquals(Long.class, contributeMap.get("id").getPropertyType());
     }
   }
 
@@ -136,22 +138,22 @@ public class FastBeanUtilityTest {
   public void testGetWithSet() {
     Class clazz1 = LongGetWithSet.class;
     Method[] methods1 = FastBeanUtility.getDeclaredPublicMethods(clazz1);
-    Assert.assertEquals(3, methods1.length);
+    assertEquals(3, methods1.length);
     //
     Class clazz2 = clazz1.getSuperclass();
     Method[] methods2 = FastBeanUtility.getDeclaredPublicMethods(clazz2);
-    Assert.assertEquals(1, methods2.length);
+    assertEquals(1, methods2.length);
     //try all permutations
     for (Method[] m1 : perm3(methods1)) {
       for (Method[] m2 : perm1(methods2)) {
         HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
-        Assert.assertEquals(1, contributeMap.size());
-        Assert.assertNotNull(contributeMap.get("id"));
-        Assert.assertNotNull(contributeMap.get("id").getReadMethod());
-        Assert.assertNotNull(contributeMap.get("id").getWriteMethod());
-        Assert.assertEquals(Long.class, contributeMap.get("id").getPropertyType());
+        assertEquals(1, contributeMap.size());
+        assertNotNull(contributeMap.get("id"));
+        assertNotNull(contributeMap.get("id").getReadMethod());
+        assertNotNull(contributeMap.get("id").getWriteMethod());
+        assertEquals(Long.class, contributeMap.get("id").getPropertyType());
       }
     }
   }
@@ -160,22 +162,22 @@ public class FastBeanUtilityTest {
   public void testSetWithGet() {
     Class clazz1 = LongSetWithGet.class;
     Method[] methods1 = FastBeanUtility.getDeclaredPublicMethods(clazz1);
-    Assert.assertEquals(3, methods1.length);
+    assertEquals(3, methods1.length);
     //
     Class clazz2 = clazz1.getSuperclass();
     Method[] methods2 = FastBeanUtility.getDeclaredPublicMethods(clazz2);
-    Assert.assertEquals(1, methods2.length);
+    assertEquals(1, methods2.length);
     //try all permutations
     for (Method[] m1 : perm3(methods1)) {
       for (Method[] m2 : perm1(methods2)) {
         HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
-        Assert.assertEquals(1, contributeMap.size());
-        Assert.assertNotNull(contributeMap.get("id"));
-        Assert.assertNotNull(contributeMap.get("id").getReadMethod());
-        Assert.assertNotNull(contributeMap.get("id").getWriteMethod());
-        Assert.assertEquals(Long.class, contributeMap.get("id").getPropertyType());
+        assertEquals(1, contributeMap.size());
+        assertNotNull(contributeMap.get("id"));
+        assertNotNull(contributeMap.get("id").getReadMethod());
+        assertNotNull(contributeMap.get("id").getWriteMethod());
+        assertEquals(Long.class, contributeMap.get("id").getPropertyType());
       }
     }
   }
@@ -184,22 +186,22 @@ public class FastBeanUtilityTest {
   public void testGetSet() {
     Class clazz1 = LongGetSet.class;
     Method[] methods1 = FastBeanUtility.getDeclaredPublicMethods(clazz1);
-    Assert.assertEquals(4, methods1.length);
+    assertEquals(4, methods1.length);
     //
     Class clazz2 = clazz1.getSuperclass();
     Method[] methods2 = FastBeanUtility.getDeclaredPublicMethods(clazz2);
-    Assert.assertEquals(2, methods2.length);
+    assertEquals(2, methods2.length);
     //try all permutations
     for (Method[] m1 : perm4(methods1)) {
       for (Method[] m2 : perm2(methods2)) {
         HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
-        Assert.assertEquals(1, contributeMap.size());
-        Assert.assertNotNull(contributeMap.get("id"));
-        Assert.assertNotNull(contributeMap.get("id").getReadMethod());
-        Assert.assertNotNull(contributeMap.get("id").getWriteMethod());
-        Assert.assertEquals(Long.class, contributeMap.get("id").getPropertyType());
+        assertEquals(1, contributeMap.size());
+        assertNotNull(contributeMap.get("id"));
+        assertNotNull(contributeMap.get("id").getReadMethod());
+        assertNotNull(contributeMap.get("id").getWriteMethod());
+        assertEquals(Long.class, contributeMap.get("id").getPropertyType());
       }
     }
   }

@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -24,16 +29,16 @@ public class CellTest {
   @Test
   public void testConstructor_default() {
     Cell c = new Cell();
-    Assert.assertNull(c.getValue());
-    Assert.assertNull(c.getText());
-    Assert.assertNull(c.getIconId());
-    Assert.assertNull(c.getTooltipText());
-    Assert.assertEquals(-1, c.getHorizontalAlignment());
-    Assert.assertNull(c.getBackgroundColor());
-    Assert.assertNull(c.getForegroundColor());
-    Assert.assertNull(c.getFont());
-    Assert.assertTrue(c.isEnabled());
-    Assert.assertNull(c.getObserver());
+    assertNull(c.getValue());
+    assertNull(c.getText());
+    assertNull(c.getIconId());
+    assertNull(c.getTooltipText());
+    assertEquals(-1, c.getHorizontalAlignment());
+    assertNull(c.getBackgroundColor());
+    assertNull(c.getForegroundColor());
+    assertNull(c.getFont());
+    assertTrue(c.isEnabled());
+    assertNull(c.getObserver());
   }
 
   @Test
@@ -61,16 +66,16 @@ public class CellTest {
     c.setObserver(observer);
 
     Cell copy = new Cell(c);
-    Assert.assertSame(value, copy.getValue());
-    Assert.assertEquals(text, copy.getText());
-    Assert.assertEquals(iconId, copy.getIconId());
-    Assert.assertEquals(tooltipText, copy.getTooltipText());
-    Assert.assertEquals(100, c.getHorizontalAlignment());
-    Assert.assertEquals(bgColor, c.getBackgroundColor());
-    Assert.assertEquals(fgColor, c.getForegroundColor());
-    Assert.assertEquals(font.toPattern(), c.getFont().toPattern());
-    Assert.assertTrue(c.isEnabled());
-    Assert.assertSame(observer, c.getObserver());
+    assertSame(value, copy.getValue());
+    assertEquals(text, copy.getText());
+    assertEquals(iconId, copy.getIconId());
+    assertEquals(tooltipText, copy.getTooltipText());
+    assertEquals(100, c.getHorizontalAlignment());
+    assertEquals(bgColor, c.getBackgroundColor());
+    assertEquals(fgColor, c.getForegroundColor());
+    assertEquals(font.toPattern(), c.getFont().toPattern());
+    assertTrue(c.isEnabled());
+    assertSame(observer, c.getObserver());
     EasyMock.verify(observer);
   }
 
@@ -80,16 +85,16 @@ public class CellTest {
     EasyMock.replay(observer);
 
     Cell c = new Cell(observer);
-    Assert.assertNull(c.getValue());
-    Assert.assertNull(c.getText());
-    Assert.assertNull(c.getIconId());
-    Assert.assertNull(c.getTooltipText());
-    Assert.assertEquals(-1, c.getHorizontalAlignment());
-    Assert.assertNull(c.getBackgroundColor());
-    Assert.assertNull(c.getForegroundColor());
-    Assert.assertNull(c.getFont());
-    Assert.assertTrue(c.isEnabled());
-    Assert.assertSame(observer, c.getObserver());
+    assertNull(c.getValue());
+    assertNull(c.getText());
+    assertNull(c.getIconId());
+    assertNull(c.getTooltipText());
+    assertEquals(-1, c.getHorizontalAlignment());
+    assertNull(c.getBackgroundColor());
+    assertNull(c.getForegroundColor());
+    assertNull(c.getFont());
+    assertTrue(c.isEnabled());
+    assertSame(observer, c.getObserver());
     EasyMock.verify(observer);
   }
 
@@ -106,8 +111,8 @@ public class CellTest {
     c.setObserver(observer);
 
     boolean changed = c.setValue(value);
-    Assert.assertTrue(changed);
-    Assert.assertSame(value, c.getValue());
+    assertTrue(changed);
+    assertSame(value, c.getValue());
   }
 
   @Test
@@ -123,11 +128,11 @@ public class CellTest {
     c.setObserver(observer);
 
     boolean changed = c.setValue(value);
-    Assert.assertTrue(changed);
+    assertTrue(changed);
 
     changed = c.setValue(value);
-    Assert.assertFalse(changed);
-    Assert.assertSame(value, c.getValue());
+    assertFalse(changed);
+    assertSame(value, c.getValue());
     EasyMock.verify(observer);
   }
 
@@ -143,8 +148,8 @@ public class CellTest {
     EasyMock.replay(observer);
 
     boolean changed = c.setValue(value);
-    Assert.assertTrue(changed);
-    Assert.assertSame(value, c.getValue());
+    assertTrue(changed);
+    assertSame(value, c.getValue());
     EasyMock.verify(observer);
   }
 
@@ -158,8 +163,8 @@ public class CellTest {
     EasyMock.replay(observer);
 
     boolean changed = c.setValue(value);
-    Assert.assertTrue(changed);
-    Assert.assertSame(value, c.getValue());
+    assertTrue(changed);
+    assertSame(value, c.getValue());
     EasyMock.verify(observer);
   }
 
@@ -169,7 +174,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.TEXT_BIT);
     String text = "text";
     c.setText(text);
-    Assert.assertEquals(text, c.getText());
+    assertEquals(text, c.getText());
     EasyMock.verify(observer);
   }
 
@@ -179,7 +184,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.ICON_ID_BIT);
     String iconId = "iconId";
     c.setIconId(iconId);
-    Assert.assertEquals(iconId, c.getIconId());
+    assertEquals(iconId, c.getIconId());
     EasyMock.verify(observer);
   }
 
@@ -189,7 +194,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.TOOLTIP_BIT);
     String tooltip = "tooltip";
     c.setTooltipText(tooltip);
-    Assert.assertEquals(tooltip, c.getTooltipText());
+    assertEquals(tooltip, c.getTooltipText());
     EasyMock.verify(observer);
   }
 
@@ -200,7 +205,7 @@ public class CellTest {
     EasyMock.replay(observer);
     c.setObserver(observer);
     c.setTooltipText(null);
-    Assert.assertNull(c.getTooltipText());
+    assertNull(c.getTooltipText());
     EasyMock.verify(observer);
   }
 
@@ -210,7 +215,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.H_ALIGN_BIT);
     int hAlignment = 100;
     c.setHorizontalAlignment(hAlignment);
-    Assert.assertEquals(hAlignment, c.getHorizontalAlignment());
+    assertEquals(hAlignment, c.getHorizontalAlignment());
     EasyMock.verify(observer);
   }
 
@@ -220,7 +225,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.BG_COLOR_BIT);
     String bgColor = "eeeeee";
     c.setBackgroundColor(bgColor);
-    Assert.assertEquals(bgColor, c.getBackgroundColor());
+    assertEquals(bgColor, c.getBackgroundColor());
     EasyMock.verify(observer);
   }
 
@@ -230,7 +235,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.FG_COLOR_BIT);
     String fgColor = "ff0000";
     c.setForegroundColor(fgColor);
-    Assert.assertEquals(fgColor, c.getForegroundColor());
+    assertEquals(fgColor, c.getForegroundColor());
     EasyMock.verify(observer);
   }
 
@@ -240,7 +245,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c, ICell.FONT_BIT);
     FontSpec font = FontSpec.parse("Arial-bold-italic-13");
     c.setFont(font);
-    Assert.assertEquals(font.toPattern(), c.getFont().toPattern());
+    assertEquals(font.toPattern(), c.getFont().toPattern());
     EasyMock.verify(observer);
   }
 
@@ -253,11 +258,11 @@ public class CellTest {
     EasyMock.replay(observer);
     c.setObserver(observer);
     c.setEnabled(true);
-    Assert.assertTrue(c.isEnabled());
+    assertTrue(c.isEnabled());
     c.setEnabled(false);
-    Assert.assertFalse(c.isEnabled());
+    assertFalse(c.isEnabled());
     c.setEnabled(true);
-    Assert.assertTrue(c.isEnabled());
+    assertTrue(c.isEnabled());
     EasyMock.verify(observer);
   }
 
@@ -267,7 +272,7 @@ public class CellTest {
     ICellObserver observer = EasyMock.createMock(ICellObserver.class);
     EasyMock.replay(observer);
     c.setObserver(observer);
-    Assert.assertSame(observer, c.getObserver());
+    assertSame(observer, c.getObserver());
     EasyMock.verify(observer);
   }
 

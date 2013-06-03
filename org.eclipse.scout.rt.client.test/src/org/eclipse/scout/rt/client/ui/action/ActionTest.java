@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.annotations.Replace;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -23,12 +24,12 @@ public class ActionTest {
 
   @Test
   public void testGetFieldId() {
-    Assert.assertEquals("BaseAction", new BaseAction().getActionId());
-    Assert.assertEquals("BaseAction", new ExtendedTestAction().getActionId());
-    Assert.assertEquals("ExtendedTestActionWithoutReplace", new ExtendedTestActionWithoutReplace().getActionId());
+    assertEquals("BaseAction", new BaseAction().getActionId());
+    assertEquals("BaseAction", new ExtendedTestAction().getActionId());
+    assertEquals("ExtendedTestActionWithoutReplace", new ExtendedTestActionWithoutReplace().getActionId());
     //
-    Assert.assertEquals("Custom", new TestActionWithCustomActionId().getActionId());
-    Assert.assertEquals("Custom", new ExtendedTestActionWithCustomActionId().getActionId());
+    assertEquals("Custom", new TestActionWithCustomActionId().getActionId());
+    assertEquals("Custom", new ExtendedTestActionWithCustomActionId().getActionId());
   }
 
   public static class BaseAction extends AbstractAction {

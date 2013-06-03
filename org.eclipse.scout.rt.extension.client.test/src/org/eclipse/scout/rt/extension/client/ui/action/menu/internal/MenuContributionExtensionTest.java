@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.action.menu.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Field;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -24,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendar
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuContributionExtensionTest.P_CalendarField.Calendar;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuContributionExtensionTest.P_TestMenu.Constructor;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,10 +41,10 @@ public class MenuContributionExtensionTest {
   @Test
   public void testOrder() {
     MenuContributionExtension extension = new MenuContributionExtension(P_TestMenu.class, null, 100d);
-    Assert.assertEquals(100, extension.getOrder(), 0);
+    assertEquals(100, extension.getOrder(), 0);
     //
     extension = new MenuContributionExtension(P_TestMenu.class, null, null);
-    Assert.assertEquals(Double.MAX_VALUE, extension.getOrder(), 0);
+    assertEquals(Double.MAX_VALUE, extension.getOrder(), 0);
   }
 
   @Test
@@ -48,19 +52,19 @@ public class MenuContributionExtensionTest {
     MenuContributionExtension extension = new MenuContributionExtension(P_TestMenu.class, null, 100d);
     try {
       extension.createContribution(null, null);
-      Assert.fail("null anchor and container should not be supported");
+      fail("null anchor and container should not be supported");
     }
     catch (Exception e) {
     }
     try {
       extension.createContribution(new P_AnchorNodePage(), null);
-      Assert.fail("null container should not be supported");
+      fail("null container should not be supported");
     }
     catch (Exception e) {
     }
     try {
       extension.createContribution(null, new P_AnchorNodePage());
-      Assert.fail("null container should not be supported");
+      fail("null container should not be supported");
     }
     catch (Exception e) {
     }
@@ -77,7 +81,7 @@ public class MenuContributionExtensionTest {
     extension = new MenuContributionExtension(P_OtherTestMenu.class, null, 100d);
     P_AnchorNodePage page = new P_AnchorNodePage();
     IMenu menu = extension.createContribution(page, page);
-    Assert.assertNotNull(menu);
+    assertNotNull(menu);
   }
 
   @Test
@@ -88,11 +92,11 @@ public class MenuContributionExtensionTest {
     assertCreateContribution(Constructor.CalendarFieldCalendar, extension, calendarField, calendar);
     //
     Field field = AbstractCalendar.class.getDeclaredField("m_providers");
-    Assert.assertNotNull(field);
+    assertNotNull(field);
     field.setAccessible(true);
     ICalendarItemProvider[] providers = (ICalendarItemProvider[]) field.get(calendar);
-    Assert.assertNotNull(providers);
-    Assert.assertTrue(providers.length == 1);
+    assertNotNull(providers);
+    assertTrue(providers.length == 1);
     assertCreateContribution(Constructor.CalendarFieldCalendarItemProvider, extension, calendarField, providers[0]);
   }
 
@@ -102,8 +106,8 @@ public class MenuContributionExtensionTest {
 
   private static void assertCreateContribution(Constructor expectedConstructor, MenuContributionExtension extension, Object anchor, Object container) throws ProcessingException {
     IMenu menu = extension.createContribution(anchor, container);
-    Assert.assertTrue(menu instanceof P_TestMenu);
-    Assert.assertEquals(expectedConstructor, ((P_TestMenu) menu).m_constructor);
+    assertTrue(menu instanceof P_TestMenu);
+    assertEquals(expectedConstructor, ((P_TestMenu) menu).m_constructor);
   }
 
   public static class P_TestMenu extends AbstractMenu {

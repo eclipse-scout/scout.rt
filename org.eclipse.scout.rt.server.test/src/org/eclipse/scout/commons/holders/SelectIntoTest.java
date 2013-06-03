@@ -13,14 +13,13 @@ package org.eclipse.scout.commons.holders;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * test requiring a server for database stuff
  */
-public class SelectIntoTest extends Assert {
+public class SelectIntoTest {
 
   private SqlServiceMock m_sqlService;
 

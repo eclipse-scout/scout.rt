@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -20,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,7 +35,7 @@ public class NestedMenusTest {
   public void testFindNestedMenuInDesktop() throws Exception {
     IDesktop desktop = new P_Desktop();
     AboutMenu menu = desktop.getMenu(P_Desktop.HelpMenu.AboutMenu.class);
-    Assert.assertNotNull(menu);
+    assertNotNull(menu);
   }
 
   public static class P_Desktop extends AbstractDesktop implements IDesktop {

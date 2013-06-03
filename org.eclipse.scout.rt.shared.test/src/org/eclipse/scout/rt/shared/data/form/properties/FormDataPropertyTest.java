@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.properties;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -22,13 +24,13 @@ public class FormDataPropertyTest {
   @Test
   public void testGetPropertyById() {
     PropertyTestFormData data = new PropertyTestFormData();
-    Assert.assertSame(data.getNameProperty(), data.getPropertyById("Name"));
-    Assert.assertSame(data.getNameProperty(), data.getPropertyById("name"));
-    Assert.assertNull(data.getPropertyById("nameProperty"));
+    assertSame(data.getNameProperty(), data.getPropertyById("Name"));
+    assertSame(data.getNameProperty(), data.getPropertyById("name"));
+    assertNull(data.getPropertyById("nameProperty"));
 
-    Assert.assertSame(data.getCityProp(), data.getPropertyById("CityProp"));
-    Assert.assertSame(data.getCityProp(), data.getPropertyById("cityProp"));
-    Assert.assertNull(data.getPropertyById("city"));
+    assertSame(data.getCityProp(), data.getPropertyById("CityProp"));
+    assertSame(data.getCityProp(), data.getPropertyById("cityProp"));
+    assertNull(data.getPropertyById("city"));
   }
 
   public static class PropertyTestFormData extends AbstractFormData {

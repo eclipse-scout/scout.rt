@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.adapters;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -34,26 +35,26 @@ public class DefaultTimezoneDateAdapterTest {
       DefaultTimezoneDateAdapter adapter = new DefaultTimezoneDateAdapter();
       // test default time (UTC+01:00)
       Calendar calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getDefault());
-      Assert.assertEquals("2011-11-07T12:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T12:50:00.000+01:00", adapter.marshal(calendar.getTime()));
 
       // test local time (UTC+01:00)
       calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getTimeZone("GMT+1:00"));
-      Assert.assertEquals("2011-11-07T12:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T12:50:00.000+01:00", adapter.marshal(calendar.getTime()));
 
       // test time from other timezone than local (UTC-05:00)
       calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getTimeZone("GMT-5:00"));
-      Assert.assertEquals("2011-11-07T18:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T18:50:00.000+01:00", adapter.marshal(calendar.getTime()));
 
       // test time from other timezone than local (UTC+05:00)
       calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getTimeZone("GMT+5:00"));
-      Assert.assertEquals("2011-11-07T08:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T08:50:00.000+01:00", adapter.marshal(calendar.getTime()));
 
       // test UTC time
       calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getTimeZone("GMT+0:00"));
-      Assert.assertEquals("2011-11-07T13:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T13:50:00.000+01:00", adapter.marshal(calendar.getTime()));
 
       calendar = toCalendar(2011, 11, 7, 12, 50, 0, TimeZone.getTimeZone("UTC"));
-      Assert.assertEquals("2011-11-07T13:50:00.000+01:00", adapter.marshal(calendar.getTime()));
+      assertEquals("2011-11-07T13:50:00.000+01:00", adapter.marshal(calendar.getTime()));
     }
     finally {
       TimeZone.setDefault(defaultTimeZone);
@@ -115,13 +116,13 @@ public class DefaultTimezoneDateAdapterTest {
   private void assertDateTime(Date date, int expectedYear, int expectedMonth, int expectedDay, int expectedHour, int expectedMinute, int expectedSecond, TimeZone expectedTimeZone) {
     // assert millis
     long millisUtc = toCalendar(expectedYear, expectedMonth, expectedDay, expectedHour, expectedMinute, expectedSecond, expectedTimeZone).getTime().getTime();
-    Assert.assertEquals(millisUtc, date.getTime());
+    assertEquals(millisUtc, date.getTime());
 
     // assert format
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     format.setTimeZone(expectedTimeZone);
     format.format(date);
-    Assert.assertEquals(expectedYear + "-" +
+    assertEquals(expectedYear + "-" +
         StringUtility.lpad(expectedMonth + "", "0", 2) + "-" +
         StringUtility.lpad(expectedDay + "", "0", 2) + " " +
         StringUtility.lpad(expectedHour + "", "0", 2) + ":" +

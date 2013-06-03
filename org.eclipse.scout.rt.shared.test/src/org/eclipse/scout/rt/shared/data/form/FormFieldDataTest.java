@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -22,12 +23,12 @@ public class FormFieldDataTest {
 
   @Test
   public void testGetFieldId() {
-    Assert.assertEquals("BaseFormFieldData", new BaseFormFieldData().getFieldId());
-    Assert.assertEquals("BaseFormFieldData", new ExtendedFormFieldData().getFieldId());
-    Assert.assertEquals("ExtendedFormFieldDataWithoutReplace", new ExtendedFormFieldDataWithoutReplace().getFieldId());
+    assertEquals("BaseFormFieldData", new BaseFormFieldData().getFieldId());
+    assertEquals("BaseFormFieldData", new ExtendedFormFieldData().getFieldId());
+    assertEquals("ExtendedFormFieldDataWithoutReplace", new ExtendedFormFieldDataWithoutReplace().getFieldId());
     //
-    Assert.assertEquals("Custom", new BaseFormFieldDataWithCustomId().getFieldId());
-    Assert.assertEquals("Custom", new ExtendedFormFieldDataWithCustomId().getFieldId());
+    assertEquals("Custom", new BaseFormFieldDataWithCustomId().getFieldId());
+    assertEquals("Custom", new ExtendedFormFieldDataWithCustomId().getFieldId());
   }
 
   public static class BaseFormFieldData extends AbstractFormFieldData {

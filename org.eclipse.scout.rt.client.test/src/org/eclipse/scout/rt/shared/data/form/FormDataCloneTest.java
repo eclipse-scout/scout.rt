@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,14 +24,13 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Bug 349468: Cloning of a form data does not replace the inner synthetic member
  * see {@link AbstractFormData}
  */
-public class FormDataCloneTest extends Assert {
+public class FormDataCloneTest {
 
   private int outCount;
   private int inCount;

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -23,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,18 +39,18 @@ public class PageWithTable1Test {
   @Test
   public void testReloadPage_multipleSummaryColumns() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    Assert.assertNotNull(desktop);
+    assertNotNull(desktop);
 
     desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();
-    Assert.assertNotNull(outline);
-    Assert.assertSame(PageWithTableOutline.class, outline.getClass());
+    assertNotNull(outline);
+    assertSame(PageWithTableOutline.class, outline.getClass());
 
     IPage page = outline.getActivePage();
-    Assert.assertNotNull(page);
-    Assert.assertSame(PageWithTable.class, page.getClass());
+    assertNotNull(page);
+    assertSame(PageWithTable.class, page.getClass());
 
     page.reloadPage();
     page.reloadPage();

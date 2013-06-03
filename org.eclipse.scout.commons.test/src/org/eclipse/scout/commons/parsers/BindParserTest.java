@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.parsers;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -29,9 +30,9 @@ public class BindParserTest {
     BindModel bindModel = new BindParser(sql).parse();
     IToken[] tokens = bindModel.getIOTokens();
     ValueInputToken tok = (ValueInputToken) tokens[0];
-    Assert.assertEquals("INT_COLUMN_ID", tok.getParsedAttribute());
-    Assert.assertEquals("!=", tok.getParsedOp());
-    Assert.assertEquals(":refId", tok.getParsedToken());
-    Assert.assertEquals("refId", tok.getName());
+    assertEquals("INT_COLUMN_ID", tok.getParsedAttribute());
+    assertEquals("!=", tok.getParsedOp());
+    assertEquals(":refId", tok.getParsedToken());
+    assertEquals("refId", tok.getName());
   }
 }

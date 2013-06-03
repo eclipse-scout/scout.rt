@@ -10,15 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+
 import java.math.BigDecimal;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * JUnit tests for {@link StringUtility}
  */
-public class StringUtilityTest extends Assert {
+public class StringUtilityTest {
 
   @Test
   public void testImplodeDelimiters() {
@@ -100,17 +101,17 @@ public class StringUtilityTest extends Assert {
   @Test
   public void testMnemonics() {
     String s = "Button &Test";
-    Assert.assertEquals('T', StringUtility.getMnemonic(s));
-    Assert.assertEquals("Button Test", StringUtility.removeMnemonic(s));
+    assertEquals('T', StringUtility.getMnemonic(s));
+    assertEquals("Button Test", StringUtility.removeMnemonic(s));
     s = "Button & Test";
-    Assert.assertEquals(0x00, StringUtility.getMnemonic(s));
-    Assert.assertEquals(s, StringUtility.removeMnemonic(s));
+    assertEquals(0x00, StringUtility.getMnemonic(s));
+    assertEquals(s, StringUtility.removeMnemonic(s));
     s = "&test";
-    Assert.assertEquals('t', StringUtility.getMnemonic(s));
-    Assert.assertEquals("test", StringUtility.removeMnemonic(s));
+    assertEquals('t', StringUtility.getMnemonic(s));
+    assertEquals("test", StringUtility.removeMnemonic(s));
     s = "test &";
-    Assert.assertEquals(0x00, StringUtility.getMnemonic(s));
-    Assert.assertEquals(s, StringUtility.removeMnemonic(s));
+    assertEquals(0x00, StringUtility.getMnemonic(s));
+    assertEquals(s, StringUtility.removeMnemonic(s));
   }
 
   // UTF-8 length is 13 to avoid accidental buffer size matches
@@ -127,35 +128,35 @@ public class StringUtilityTest extends Assert {
     String original = builder.toString();
     String decompressed = StringUtility.decompress(StringUtility.compress(original));
 
-    Assert.assertEquals(original, decompressed);
+    assertEquals(original, decompressed);
   }
 
   @Test
   public void testTags() throws Exception {
     String s;
     s = "foo <a>text</a> bar";
-    Assert.assertEquals("foo  bar", StringUtility.removeTag(s, "a"));
+    assertEquals("foo  bar", StringUtility.removeTag(s, "a"));
     s = "foo <a>text</a> <a>text</a> bar";
-    Assert.assertEquals("foo   bar", StringUtility.removeTag(s, "a"));
+    assertEquals("foo   bar", StringUtility.removeTag(s, "a"));
     s = "foo <a>text</a> <a>bar";
-    Assert.assertEquals("foo  <a>bar", StringUtility.removeTag(s, "a"));
+    assertEquals("foo  <a>bar", StringUtility.removeTag(s, "a"));
     s = "foo <a>text</a> </a>bar";
-    Assert.assertEquals("foo  </a>bar", StringUtility.removeTag(s, "a"));
+    assertEquals("foo  </a>bar", StringUtility.removeTag(s, "a"));
     s = "foo <a/> bar";
-    Assert.assertEquals("foo  bar", StringUtility.removeTag(s, "a"));
+    assertEquals("foo  bar", StringUtility.removeTag(s, "a"));
   }
 
   @Test
   public void testRegExPattern() throws Exception {
     String s;
     s = "test*";
-    Assert.assertEquals("test.*", StringUtility.toRegExPattern(s));
+    assertEquals("test.*", StringUtility.toRegExPattern(s));
 
     s = "test?";
-    Assert.assertEquals("test.", StringUtility.toRegExPattern(s));
+    assertEquals("test.", StringUtility.toRegExPattern(s));
 
     s = "com.test.*";
-    Assert.assertEquals("com\\.test\\..*", StringUtility.toRegExPattern(s));
+    assertEquals("com\\.test\\..*", StringUtility.toRegExPattern(s));
   }
 
   @Test
@@ -222,7 +223,7 @@ public class StringUtilityTest extends Assert {
     String testHtml = "<a &lt; b>";
     assertEqualsAfterEncodeDecode(testHtml);
     String htmlDecode = StringUtility.htmlDecode("&lt;a &amp;lt; b&gt;");
-    Assert.assertEquals("<a &lt; b>", htmlDecode);
+    assertEquals("<a &lt; b>", htmlDecode);
   }
 
   /**
@@ -246,7 +247,7 @@ public class StringUtilityTest extends Assert {
   private static void assertEqualsAfterEncodeDecode(String original, boolean replaceSpaces) {
     String encoded = StringUtility.htmlEncode(original, replaceSpaces);
     String decoded = StringUtility.htmlDecode(encoded);
-    Assert.assertEquals(original, decoded);
+    assertEquals(original, decoded);
   }
 
 }

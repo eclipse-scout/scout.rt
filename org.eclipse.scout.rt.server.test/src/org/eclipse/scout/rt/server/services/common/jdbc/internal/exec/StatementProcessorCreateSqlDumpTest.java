@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +22,6 @@ import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -137,7 +138,7 @@ public class StatementProcessorCreateSqlDumpTest {
     P_StatementProcessor_UnderTest statementProcessor = new P_StatementProcessor_UnderTest(callerService, statement, bindBases);
     String dump = statementProcessor.getDump(type);
 
-    Assert.assertEquals(type.name() + " dump", expected, dump);
+    assertEquals(type.name() + " dump", expected, dump);
   }
 
   public enum StatementType {

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.window.desktop.layout;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
@@ -24,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,8 +83,8 @@ public class MultiSplitLayoutUiTest {
         resizeView(viewS, 300, 300, 300, 300);
       }
     });
-    Assert.assertEquals(900, frame.getWidth());
-    Assert.assertEquals(600, frame.getHeight());
+    assertEquals(900, frame.getWidth());
+    assertEquals(600, frame.getHeight());
   }
 
   @After
@@ -118,7 +120,7 @@ public class MultiSplitLayoutUiTest {
 
   private static void assertEqualsLenient(int expected, int actual) {
     int d = Math.abs(expected - actual);
-    Assert.assertTrue("difference less than 5", d < 5);
+    assertTrue("difference less than 5", d < 5);
   }
 
   private int[] samples(int begin, int mid, int end) {
@@ -157,8 +159,8 @@ public class MultiSplitLayoutUiTest {
 
   @Test
   public void testHorizontalWindowResize() throws Exception {
-    Assert.assertEquals(900, frame.getWidth());
-    Assert.assertEquals(600, frame.getHeight());
+    assertEquals(900, frame.getWidth());
+    assertEquals(600, frame.getHeight());
 
     swing(new Runnable() {
       @Override
@@ -243,8 +245,8 @@ public class MultiSplitLayoutUiTest {
 
   @Test
   public void testVerticalWindowResize() throws Exception {
-    Assert.assertEquals(900, frame.getWidth());
-    Assert.assertEquals(600, frame.getHeight());
+    assertEquals(900, frame.getWidth());
+    assertEquals(600, frame.getHeight());
 
     swing(new Runnable() {
       @Override
@@ -335,12 +337,12 @@ public class MultiSplitLayoutUiTest {
 
   @Test
   public void testHorizontalSplitDrag() {
-    //Assert.fail();
+    //fail();
   }
 
   @Test
   public void testVerticalSplitDrag() {
-    //Assert.fail();
+    //fail();
   }
 
 }

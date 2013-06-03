@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.ServiceRegistration;
@@ -185,6 +186,6 @@ public class SmartFieldTest {
   private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {
     String expectedStyle = tt + ", " + bg + ", " + fg + ", " + (font != null ? FontSpec.parse(font).toPattern() : null);
     String actualStyle = f.getTooltipText() + ", " + f.getBackgroundColor() + ", " + f.getForegroundColor() + ", " + (f.getFont() != null ? f.getFont().toPattern() : null);
-    Assert.assertEquals(expectedStyle, actualStyle);
+    assertEquals(expectedStyle, actualStyle);
   }
 }

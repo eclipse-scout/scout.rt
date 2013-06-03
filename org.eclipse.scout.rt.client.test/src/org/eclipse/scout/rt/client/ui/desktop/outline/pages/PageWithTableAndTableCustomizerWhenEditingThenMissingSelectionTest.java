@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,7 +90,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   }
 
   private static void assertSelection(PageWithTable.Table table, Integer[] expectedIds) {
-    Assert.assertArrayEquals(expectedIds, table.getIdColumn().getSelectedValues());
+    assertArrayEquals(expectedIds, table.getIdColumn().getSelectedValues());
   }
 
   public static class Outline extends AbstractOutline {

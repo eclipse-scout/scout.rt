@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,30 +42,30 @@ public class PageAnchorFilterTest {
   @Test
   public void testAcceptEmpty() {
     PageAnchorFilter filter = new PageAnchorFilter(null, null);
-    Assert.assertTrue(filter.accept(null, null, null));
-    Assert.assertTrue(filter.accept(m_outline, null, null));
-    Assert.assertTrue(filter.accept(null, m_page, null));
-    Assert.assertTrue(filter.accept(m_outline, m_page, null));
+    assertTrue(filter.accept(null, null, null));
+    assertTrue(filter.accept(m_outline, null, null));
+    assertTrue(filter.accept(null, m_page, null));
+    assertTrue(filter.accept(m_outline, m_page, null));
   }
 
   @Test
   public void testAcceptOutlineFilterClass() {
     PageAnchorFilter filter = new PageAnchorFilter(P_Outline.class, null);
-    Assert.assertFalse(filter.accept(null, null, null));
-    Assert.assertTrue(filter.accept(m_outline, null, null));
-    Assert.assertFalse(filter.accept(m_otherOutline, null, null));
-    Assert.assertFalse(filter.accept(null, m_page, null));
-    Assert.assertFalse(filter.accept(m_outline, m_page, null));
+    assertFalse(filter.accept(null, null, null));
+    assertTrue(filter.accept(m_outline, null, null));
+    assertFalse(filter.accept(m_otherOutline, null, null));
+    assertFalse(filter.accept(null, m_page, null));
+    assertFalse(filter.accept(m_outline, m_page, null));
   }
 
   @Test
   public void testAcceptPageFilterClass() {
     PageAnchorFilter filter = new PageAnchorFilter(null, P_Page.class);
-    Assert.assertFalse(filter.accept(null, null, null));
-    Assert.assertFalse(filter.accept(m_outline, null, null));
-    Assert.assertTrue(filter.accept(null, m_page, null));
-    Assert.assertFalse(filter.accept(null, m_otherPage, null));
-    Assert.assertTrue(filter.accept(m_outline, m_page, null));
+    assertFalse(filter.accept(null, null, null));
+    assertFalse(filter.accept(m_outline, null, null));
+    assertTrue(filter.accept(null, m_page, null));
+    assertFalse(filter.accept(null, m_otherPage, null));
+    assertTrue(filter.accept(m_outline, m_page, null));
   }
 
   private static class P_Outline extends AbstractOutline {

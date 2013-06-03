@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -25,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.Se
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,44 +57,44 @@ public class SequenceBoxTest {
     EndField end = f.getEndField();
 
     //init -> no error
-    Assert.assertNull(box.getErrorStatus());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertNull(end.getErrorStatus());
+    assertNull(box.getErrorStatus());
+    assertNull(start.getErrorStatus());
+    assertNull(end.getErrorStatus());
 
     //invalid end -> no error
     start.setValue(new Date(2 * ONE_MINUTE));
     end.setValue(new Date(ONE_MINUTE));
 
-    Assert.assertNull(box.getErrorStatus());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertEquals(InvalidSequenceStatus.ERROR, end.getErrorStatus().getSeverity());
+    assertNull(box.getErrorStatus());
+    assertNull(start.getErrorStatus());
+    assertEquals(InvalidSequenceStatus.ERROR, end.getErrorStatus().getSeverity());
 
     //end>start -> no error
     end.setValue(new Date(3 * ONE_MINUTE));
-    Assert.assertNull(box.getErrorStatus());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertNull(end.getErrorStatus());
+    assertNull(box.getErrorStatus());
+    assertNull(start.getErrorStatus());
+    assertNull(end.getErrorStatus());
 
     //start>end -> error (on box instead of first label, because label is merged)
     start.setValue(new Date(4 * ONE_MINUTE));
-    Assert.assertEquals(InvalidSequenceStatus.ERROR, box.getErrorStatus().getSeverity());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertNull(end.getErrorStatus());
+    assertEquals(InvalidSequenceStatus.ERROR, box.getErrorStatus().getSeverity());
+    assertNull(start.getErrorStatus());
+    assertNull(end.getErrorStatus());
 
     //start null ->no error
     start.setValue(null);
-    Assert.assertNull(box.getErrorStatus());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertNull(end.getErrorStatus());
+    assertNull(box.getErrorStatus());
+    assertNull(start.getErrorStatus());
+    assertNull(end.getErrorStatus());
 
     //end null -> no error
     start.setValue(new Date(ONE_MINUTE));
     end.setValue(new Date(0));
-    Assert.assertEquals(InvalidSequenceStatus.ERROR, end.getErrorStatus().getSeverity());
+    assertEquals(InvalidSequenceStatus.ERROR, end.getErrorStatus().getSeverity());
     end.setValue(null);
-    Assert.assertNull(box.getErrorStatus());
-    Assert.assertNull(start.getErrorStatus());
-    Assert.assertNull(end.getErrorStatus());
+    assertNull(box.getErrorStatus());
+    assertNull(start.getErrorStatus());
+    assertNull(end.getErrorStatus());
     f.doClose();
   }
 

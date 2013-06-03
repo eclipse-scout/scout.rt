@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.parsers.sql;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.eclipse.scout.commons.IOUtility;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -52,10 +54,10 @@ public class SqlFormatterTest {
 
   @Test
   public void testBlankString() throws Exception {
-    Assert.assertEquals("", SqlFormatter.wellform(""));
-    Assert.assertEquals("", SqlFormatter.wellform(" "));
-    Assert.assertEquals("", SqlFormatter.wellform("     "));
-    Assert.assertEquals("", SqlFormatter.wellform("\t"));
+    assertEquals("", SqlFormatter.wellform(""));
+    assertEquals("", SqlFormatter.wellform(" "));
+    assertEquals("", SqlFormatter.wellform("     "));
+    assertEquals("", SqlFormatter.wellform("\t"));
   }
 
   protected void check(String resourceName) throws Exception {
@@ -63,8 +65,8 @@ public class SqlFormatterTest {
     String w = SqlFormatter.wellform(s);
     int i = w.toLowerCase().indexOf("unparsed");
     if (i != -1) {
-      Assert.fail("** " + resourceName + " **\n" + w);
+      fail("** " + resourceName + " **\n" + w);
     }
-    Assert.assertEquals(-1, i);
+    assertEquals(-1, i);
   }
 }

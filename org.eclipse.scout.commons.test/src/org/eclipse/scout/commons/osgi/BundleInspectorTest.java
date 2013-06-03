@@ -10,8 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
@@ -23,9 +27,9 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("a");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
-      Assert.assertSame(aBundle, bundles[0]);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertSame(aBundle, bundles[0]);
     }
     finally {
       uninstallBundles(aBundle);
@@ -39,9 +43,9 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle2, aBundle1);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("a");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
-      Assert.assertSame(aBundle2, bundles[0]);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertSame(aBundle2, bundles[0]);
       ScoutAssert.assertOrder(new Bundle[]{aBundle2, aBundle1}, bundles);
     }
     finally {
@@ -57,9 +61,9 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle1, aBundle2, aBundle3);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("a");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
-      Assert.assertSame(aBundle3, bundles[0]);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertSame(aBundle3, bundles[0]);
       ScoutAssert.assertOrder(new Bundle[]{aBundle3, aBundle2, aBundle1}, bundles);
     }
     finally {
@@ -82,15 +86,15 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle1, aBundle2, aBundle3, aBundle4, aBundle5, bBundle1, bBundle2, bBundle3);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("a");
-      Assert.assertNotNull(bundles);
+      assertNotNull(bundles);
       ScoutAssert.assertOrder(new Bundle[]{aBundle3, aBundle2, aBundle1, bBundle3, bBundle2, bBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{aBundle4, aBundle2, aBundle1, bBundle3, bBundle2, bBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{aBundle5, aBundle2, aBundle1, bBundle3, bBundle2, bBundle1}, bundles);
 
       bundles = BundleInspector.getOrderedBundleList("b");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
-      Assert.assertSame(bBundle3, bundles[0]);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertSame(bBundle3, bundles[0]);
       ScoutAssert.assertOrder(new Bundle[]{bBundle3, bBundle2, bBundle1, aBundle3, aBundle2, aBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{bBundle3, bBundle2, bBundle1, aBundle4, aBundle2, aBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{bBundle3, bBundle2, bBundle1, aBundle5, aBundle2, aBundle1}, bundles);
@@ -119,8 +123,8 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle1, aBundle2, aBundle3, aBundle4, aBundle5, bBundle1, bBundle2, bBundle3, cBundle1, cBundle2, cBundle3);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("c", "b");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
       ScoutAssert.assertOrder(new Bundle[]{cBundle3, cBundle2, cBundle1, bBundle3, bBundle2, bBundle1, aBundle3, aBundle2, aBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{cBundle3, cBundle2, cBundle1, bBundle3, bBundle2, bBundle1, aBundle4, aBundle2, aBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{cBundle3, cBundle2, cBundle1, bBundle3, bBundle2, bBundle1, aBundle5, aBundle2, aBundle1}, bundles);
@@ -146,8 +150,8 @@ public class BundleInspectorTest extends AbstractBundleTest {
     try {
       resolveBundles(aBundle1, aBundle2, aBundle3, aBundle4, bBundle1, bBundle2, cBundle1, cBundle2);
       Bundle[] bundles = BundleInspector.getOrderedBundleList("c", "b");
-      Assert.assertNotNull(bundles);
-      Assert.assertEquals(getBundleContext().getBundles().length, bundles.length);
+      assertNotNull(bundles);
+      assertEquals(getBundleContext().getBundles().length, bundles.length);
       ScoutAssert.assertOrder(new Bundle[]{cBundle2, cBundle1, bBundle2, bBundle1, aBundle3, aBundle2, aBundle1}, bundles);
       ScoutAssert.assertOrder(new Bundle[]{cBundle2, cBundle1, bBundle2, bBundle1, aBundle4, aBundle2, aBundle1}, bundles);
     }
@@ -158,14 +162,14 @@ public class BundleInspectorTest extends AbstractBundleTest {
 
   @Test
   public void testGetHostBundle() throws Exception {
-    Assert.assertNull(BundleInspector.getHostBundle(null));
+    assertNull(BundleInspector.getHostBundle(null));
     Bundle bundle = installBundle("a.bundle", "1.0.0");
     Bundle fragment = null;
     try {
-      Assert.assertSame(bundle, BundleInspector.getHostBundle(bundle));
+      assertSame(bundle, BundleInspector.getHostBundle(bundle));
       fragment = installFragment("a.fragment", "1.0.0", "a.bundle");
       resolveBundles(bundle, fragment);
-      Assert.assertSame(bundle, BundleInspector.getHostBundle(fragment));
+      assertSame(bundle, BundleInspector.getHostBundle(fragment));
     }
     finally {
       uninstallBundles(bundle, fragment);

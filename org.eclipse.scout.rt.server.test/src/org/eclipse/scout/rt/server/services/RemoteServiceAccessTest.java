@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services;
 
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Method;
 import java.security.Permissions;
 
@@ -24,7 +26,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.IService2;
-import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -78,7 +79,7 @@ public class RemoteServiceAccessTest {
     catch (SecurityException e) {
       return;
     }
-    Assert.fail("should fail");
+    fail("should fail");
   }
 
   @Priority(10)

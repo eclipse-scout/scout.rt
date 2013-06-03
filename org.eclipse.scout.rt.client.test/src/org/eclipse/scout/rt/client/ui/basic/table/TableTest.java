@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,7 +54,7 @@ public class TableTest {
     assertRowCount(0, 2, table);
 
     ITableRow[] deletedRows = table.getDeletedRows();
-    Assert.assertEquals(2, deletedRows.length);
+    assertEquals(2, deletedRows.length);
     asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[0]);
     asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[1]);
 
@@ -101,7 +103,7 @@ public class TableTest {
     assertRowCount(0, 2, table);
 
     ITableRow[] deletedRows = table.getDeletedRows();
-    Assert.assertEquals(2, deletedRows.length);
+    assertEquals(2, deletedRows.length);
     asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[0]);
     asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[1]);
 
@@ -165,17 +167,17 @@ public class TableTest {
   }
 
   private static void assertRowCount(int expectedRowCount, int expectedDeletedRowCount, P_Table table) {
-    Assert.assertEquals(expectedRowCount, table.getRowCount());
-    Assert.assertEquals(expectedDeletedRowCount, table.getDeletedRowCount());
+    assertEquals(expectedRowCount, table.getRowCount());
+    assertEquals(expectedDeletedRowCount, table.getDeletedRowCount());
   }
 
   private static void asssertStatusAndTable(P_Table expectedTable, int expectedStatus, ITableRow row) {
-    Assert.assertEquals(expectedStatus, row.getStatus());
-    Assert.assertEquals(expectedTable, row.getTable());
+    assertEquals(expectedStatus, row.getStatus());
+    assertEquals(expectedTable, row.getTable());
   }
 
   private static void asssertNoTable(ITableRow row) {
-    Assert.assertNull(row.getTable());
+    assertNull(row.getTable());
   }
 
   public static class P_Table extends AbstractTable {

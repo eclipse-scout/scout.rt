@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.internal;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
@@ -21,32 +25,32 @@ public class CompositeExtensionFilterTest {
   @Test
   public void testEmpty() {
     P_StringCompositeExtensionFilter filter = new P_StringCompositeExtensionFilter();
-    Assert.assertTrue(filter.isEmpty());
-    Assert.assertEquals(0, filter.size());
-    Assert.assertArrayEquals(new String[0], filter.getFilters());
+    assertTrue(filter.isEmpty());
+    assertEquals(0, filter.size());
+    assertArrayEquals(new String[0], filter.getFilters());
   }
 
   @Test
   public void testModifications() {
     P_StringCompositeExtensionFilter filter = new P_StringCompositeExtensionFilter();
-    Assert.assertTrue(filter.addFilter("test"));
-    Assert.assertFalse(filter.isEmpty());
-    Assert.assertEquals(1, filter.size());
+    assertTrue(filter.addFilter("test"));
+    assertFalse(filter.isEmpty());
+    assertEquals(1, filter.size());
     //
-    Assert.assertFalse(filter.addFilter(null));
-    Assert.assertFalse(filter.isEmpty());
-    Assert.assertEquals(1, filter.size());
-    Assert.assertArrayEquals(new String[]{"test"}, filter.getFilters());
+    assertFalse(filter.addFilter(null));
+    assertFalse(filter.isEmpty());
+    assertEquals(1, filter.size());
+    assertArrayEquals(new String[]{"test"}, filter.getFilters());
     //
-    Assert.assertTrue(filter.addFilterAtBegin("other"));
-    Assert.assertFalse(filter.isEmpty());
-    Assert.assertEquals(2, filter.size());
-    Assert.assertArrayEquals(new String[]{"other", "test"}, filter.getFilters());
+    assertTrue(filter.addFilterAtBegin("other"));
+    assertFalse(filter.isEmpty());
+    assertEquals(2, filter.size());
+    assertArrayEquals(new String[]{"other", "test"}, filter.getFilters());
     //
-    Assert.assertTrue(filter.removeFilter("test"));
-    Assert.assertFalse(filter.isEmpty());
-    Assert.assertEquals(1, filter.size());
-    Assert.assertArrayEquals(new String[]{"other"}, filter.getFilters());
+    assertTrue(filter.removeFilter("test"));
+    assertFalse(filter.isEmpty());
+    assertEquals(1, filter.size());
+    assertArrayEquals(new String[]{"other"}, filter.getFilters());
   }
 
   private static class P_StringCompositeExtensionFilter extends AbstractCompositeExtensionFilter<String> {

@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import org.junit.Test;
 
 /**
@@ -56,21 +58,21 @@ public class LogicalGridDataTest {
   @Test
   public void testLogicalGridData() {
     LogicalGridData data = new LogicalGridData();
-    Assert.assertEquals("fillHorizontal", INIT_FILL_HORIZONTAL, data.fillHorizontal);
-    Assert.assertEquals("fillVertical", INIT_FILL_VERTICAL, data.fillVertical);
-    Assert.assertEquals("gridh", INIT_GRID_H, data.gridh);
-    Assert.assertEquals("gridw", INIT_GRID_W, data.gridw);
-    Assert.assertEquals("gridx", INIT_GRID_X, data.gridx);
-    Assert.assertEquals("gridy", INIT_GRID_Y, data.gridy);
-    Assert.assertEquals("heightHint", INIT_HEIGHT_HINT, data.heightHint);
-    Assert.assertEquals("horizontalAlignment", INIT_HORIZONTAL_ALIGNMENT, data.horizontalAlignment);
-    Assert.assertEquals("topInset", INIT_TOP_INSET, data.topInset);
-    Assert.assertEquals("useUiHeight", INIT_USE_UI_HEIGHT, data.useUiHeight);
-    Assert.assertEquals("useUiWidth", INIT_USE_UI_WIDTH, data.useUiWidth);
-    Assert.assertEquals("verticalAlignment", INIT_VERTICAL_ALIGNMENT, data.verticalAlignment);
-    Assert.assertEquals("weightx", INIT_WEIGHT_X, data.weightx, 0.1);
-    Assert.assertEquals("weighty", INIT_WEIGHT_Y, data.weighty, 0.1);
-    Assert.assertEquals("widthHint", INIT_WIDTH_HINT, data.widthHint);
+    assertEquals("fillHorizontal", INIT_FILL_HORIZONTAL, data.fillHorizontal);
+    assertEquals("fillVertical", INIT_FILL_VERTICAL, data.fillVertical);
+    assertEquals("gridh", INIT_GRID_H, data.gridh);
+    assertEquals("gridw", INIT_GRID_W, data.gridw);
+    assertEquals("gridx", INIT_GRID_X, data.gridx);
+    assertEquals("gridy", INIT_GRID_Y, data.gridy);
+    assertEquals("heightHint", INIT_HEIGHT_HINT, data.heightHint);
+    assertEquals("horizontalAlignment", INIT_HORIZONTAL_ALIGNMENT, data.horizontalAlignment);
+    assertEquals("topInset", INIT_TOP_INSET, data.topInset);
+    assertEquals("useUiHeight", INIT_USE_UI_HEIGHT, data.useUiHeight);
+    assertEquals("useUiWidth", INIT_USE_UI_WIDTH, data.useUiWidth);
+    assertEquals("verticalAlignment", INIT_VERTICAL_ALIGNMENT, data.verticalAlignment);
+    assertEquals("weightx", INIT_WEIGHT_X, data.weightx, 0.1);
+    assertEquals("weighty", INIT_WEIGHT_Y, data.weighty, 0.1);
+    assertEquals("widthHint", INIT_WIDTH_HINT, data.widthHint);
 
   }
 
@@ -99,26 +101,26 @@ public class LogicalGridDataTest {
     assertEqualsValue(d1);
 
     LogicalGridData d2 = new LogicalGridData(d1);
-    Assert.assertNotSame(d1, d2);
+    assertNotSame(d1, d2);
     assertEqualsValue(d2);
   }
 
   private static void assertEqualsValue(LogicalGridData data) {
-    Assert.assertEquals("fillHorizontal", VAL_FILL_HORIZONTAL, data.fillHorizontal);
-    Assert.assertEquals("fillVertical", VAL_FILL_VERTICAL, data.fillVertical);
-    Assert.assertEquals("gridh", VAL_GRID_H, data.gridh);
-    Assert.assertEquals("gridw", VAL_GRID_W, data.gridw);
-    Assert.assertEquals("gridx", VAL_GRID_X, data.gridx);
-    Assert.assertEquals("gridy", VAL_GRID_Y, data.gridy);
-    Assert.assertEquals("heightHint", VAL_HEIGHT_HINT, data.heightHint);
-    Assert.assertEquals("horizontalAlignment", VAL_HORIZONTAL_ALIGNMENT, data.horizontalAlignment);
-    Assert.assertEquals("topInset", VAL_TOP_INSET, data.topInset);
-    Assert.assertEquals("useUiHeight", VAL_USE_UI_HEIGHT, data.useUiHeight);
-    Assert.assertEquals("useUiWidth", VAL_USE_UI_WIDTH, data.useUiWidth);
-    Assert.assertEquals("verticalAlignment", VAL_VERTICAL_ALIGNMENT, data.verticalAlignment);
-    Assert.assertEquals("weightx", VAL_WEIGHT_X, data.weightx, 0.1);
-    Assert.assertEquals("weighty", VAL_WEIGHT_Y, data.weighty, 0.1);
-    Assert.assertEquals("widthHint", VAL_WIDTH_HINT, data.widthHint);
+    assertEquals("fillHorizontal", VAL_FILL_HORIZONTAL, data.fillHorizontal);
+    assertEquals("fillVertical", VAL_FILL_VERTICAL, data.fillVertical);
+    assertEquals("gridh", VAL_GRID_H, data.gridh);
+    assertEquals("gridw", VAL_GRID_W, data.gridw);
+    assertEquals("gridx", VAL_GRID_X, data.gridx);
+    assertEquals("gridy", VAL_GRID_Y, data.gridy);
+    assertEquals("heightHint", VAL_HEIGHT_HINT, data.heightHint);
+    assertEquals("horizontalAlignment", VAL_HORIZONTAL_ALIGNMENT, data.horizontalAlignment);
+    assertEquals("topInset", VAL_TOP_INSET, data.topInset);
+    assertEquals("useUiHeight", VAL_USE_UI_HEIGHT, data.useUiHeight);
+    assertEquals("useUiWidth", VAL_USE_UI_WIDTH, data.useUiWidth);
+    assertEquals("verticalAlignment", VAL_VERTICAL_ALIGNMENT, data.verticalAlignment);
+    assertEquals("weightx", VAL_WEIGHT_X, data.weightx, 0.1);
+    assertEquals("weighty", VAL_WEIGHT_Y, data.weighty, 0.1);
+    assertEquals("widthHint", VAL_WIDTH_HINT, data.widthHint);
   }
 
 }

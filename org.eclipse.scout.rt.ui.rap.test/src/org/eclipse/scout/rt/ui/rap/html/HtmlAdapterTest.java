@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.html;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class HtmlAdapterTest {
@@ -25,7 +26,7 @@ public class HtmlAdapterTest {
   private void runConvert(String origString, String expected, Map<String, String> params) {
     HtmlAdapter adapter = new HtmlAdapter(null);
     String result = adapter.convertLinksWithLocalUrlsInHtmlCell(null, origString, params);
-    Assert.assertEquals(expected, result);
+    assertEquals(expected, result);
   }
 
   @Test

@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -25,36 +27,36 @@ public class CodeTypeTest {
   public void testOverwriteCode_overwriteValues() throws Exception {
     TestCodeType ct = new TestCodeType();
     ICode c = ct.getCode(TestCodeType.Test1Code.ID);
-    Assert.assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
-    Assert.assertEquals(TestCodeType.CONFIGURED_ICON, c.getIconId());
-    Assert.assertNull(c.getTooltipText());
-    Assert.assertEquals(TestCodeType.CONFIGURED_BACKGROUND_COLOR, c.getBackgroundColor());
-    Assert.assertEquals(TestCodeType.CONFIGURED_FOREGROUND_COLOR, c.getForegroundColor());
-    Assert.assertEquals(TestCodeType.CONFIGURED_FONT, c.getFont().toPattern());
-    Assert.assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
+    assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
+    assertEquals(TestCodeType.CONFIGURED_ICON, c.getIconId());
+    assertNull(c.getTooltipText());
+    assertEquals(TestCodeType.CONFIGURED_BACKGROUND_COLOR, c.getBackgroundColor());
+    assertEquals(TestCodeType.CONFIGURED_FOREGROUND_COLOR, c.getForegroundColor());
+    assertEquals(TestCodeType.CONFIGURED_FONT, c.getFont().toPattern());
+    assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
     // parent key
-    Assert.assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
-    Assert.assertEquals(TestCodeType.CONFIGURED_EXT_KEY, c.getExtKey());
-    Assert.assertEquals(TestCodeType.CONFIGURED_VALUE, c.getValue());
-    Assert.assertEquals(TestCodeType.DYNAMIC_PARTITION_ID, c.getPartitionId());
+    assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
+    assertEquals(TestCodeType.CONFIGURED_EXT_KEY, c.getExtKey());
+    assertEquals(TestCodeType.CONFIGURED_VALUE, c.getValue());
+    assertEquals(TestCodeType.DYNAMIC_PARTITION_ID, c.getPartitionId());
   }
 
   @Test
   public void testOverwriteCode_keepValues() throws Exception {
     TestCodeType ct = new TestCodeType();
     ICode c = ct.getCode(TestCodeType.Test2Code.ID);
-    Assert.assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
-    Assert.assertEquals(TestCodeType.DYNAMIC_ICON, c.getIconId());
-    Assert.assertEquals(TestCodeType.DYNAMIC_TOOLTIP, c.getTooltipText());
-    Assert.assertEquals(TestCodeType.DYNAMIC_BACKGROUND_COLOR, c.getBackgroundColor());
-    Assert.assertEquals(TestCodeType.DYNAMIC_FOREGROUND_COLOR, c.getForegroundColor());
-    Assert.assertEquals(TestCodeType.DYNAMIC_FONT, c.getFont().toPattern());
-    Assert.assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
+    assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
+    assertEquals(TestCodeType.DYNAMIC_ICON, c.getIconId());
+    assertEquals(TestCodeType.DYNAMIC_TOOLTIP, c.getTooltipText());
+    assertEquals(TestCodeType.DYNAMIC_BACKGROUND_COLOR, c.getBackgroundColor());
+    assertEquals(TestCodeType.DYNAMIC_FOREGROUND_COLOR, c.getForegroundColor());
+    assertEquals(TestCodeType.DYNAMIC_FONT, c.getFont().toPattern());
+    assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
     // parent key
-    Assert.assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
-    Assert.assertEquals(TestCodeType.DYNAMIC_EXT_KEY, c.getExtKey());
-    Assert.assertEquals(TestCodeType.DYNAMIC_VALUE, c.getValue());
-    Assert.assertEquals(TestCodeType.DYNAMIC_PARTITION_ID, c.getPartitionId());
+    assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
+    assertEquals(TestCodeType.DYNAMIC_EXT_KEY, c.getExtKey());
+    assertEquals(TestCodeType.DYNAMIC_VALUE, c.getValue());
+    assertEquals(TestCodeType.DYNAMIC_PARTITION_ID, c.getPartitionId());
   }
 
   private static class TestCodeType extends AbstractCodeType<String> {

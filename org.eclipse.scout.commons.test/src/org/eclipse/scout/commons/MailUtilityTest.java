@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertNotNull;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -32,8 +33,8 @@ public class MailUtilityTest {
   @Test
   public void testMimeMessageWithoutSender() throws ProcessingException, MessagingException {
     MimeMessage message = MailUtility.createMimeMessage("Body", null, null);
-    Assert.assertNotNull(message);
+    assertNotNull(message);
     message = MailUtility.createMimeMessage(null, null, "Subject", "Body", null);
-    Assert.assertNotNull(message);
+    assertNotNull(message);
   }
 }

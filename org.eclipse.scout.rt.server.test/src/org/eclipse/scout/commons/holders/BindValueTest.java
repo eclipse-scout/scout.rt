@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.holders;
 
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +20,6 @@ import java.sql.Types;
 import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
 import org.eclipse.scout.commons.holders.fixture.VerboseMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -51,7 +52,7 @@ public class BindValueTest {
     String expected = m.getProtocol().toString();
 
     //check
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
   }
 
   @Test
@@ -73,7 +74,7 @@ public class BindValueTest {
     String expected = m.getProtocol().toString();
 
     //check
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
   }
 
   @Test
@@ -95,6 +96,6 @@ public class BindValueTest {
     String expected = m.getProtocol().toString();
 
     //check
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
   }
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +34,6 @@ import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -80,15 +81,15 @@ public class ClientJobCancelTest {
   @Test
   public void testPingWithoutDelayAndInterrupt() throws Exception {
     String s = (String) testInternal(10L, false);
-    Assert.assertEquals("pong", s);
+    assertEquals("pong", s);
   }
 
   @Test
   public void testPingWithDelayAndInterruptClientJob() throws Exception {
     UndeclaredThrowableException u = (UndeclaredThrowableException) testInternal(1000000L, true);
     Throwable t = u.getCause().getCause();
-    Assert.assertEquals(InterruptedException.class, t.getClass());
-    Assert.assertEquals(ScoutTexts.get("UserInterrupted"), t.getMessage());
+    assertEquals(InterruptedException.class, t.getClass());
+    assertEquals(ScoutTexts.get("UserInterrupted"), t.getMessage());
   }
 
   /**

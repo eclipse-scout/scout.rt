@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,8 +76,8 @@ public class ColorFactoryUiTest {
 
 	private static void assertColorEquals(int red, int green, int blue,
 			Color color) {
-		Assert.assertEquals("Color red", red, color.getRed());
-		Assert.assertEquals("Color green", green, color.getGreen());
-		Assert.assertEquals("Color blue", blue, color.getBlue());
+		assertEquals("Color red", red, color.getRed());
+		assertEquals("Color green", green, color.getGreen());
+		assertEquals("Color blue", blue, color.getBlue());
 	}
 }

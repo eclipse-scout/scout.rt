@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,9 +48,9 @@ public class TableRowInsertOrderTest {
       table.setTableChanging(false);
     }
 
-    Assert.assertArrayEquals(table.getRows(), tableListener.getInsertedRows());
+    assertArrayEquals(table.getRows(), tableListener.getInsertedRows());
     //No order_change_event expected
-    Assert.assertTrue(tableListener.getOrderedRows() == null);
+    assertTrue(tableListener.getOrderedRows() == null);
   }
 
   @Test
@@ -72,8 +74,8 @@ public class TableRowInsertOrderTest {
       table.setTableChanging(false);
     }
 
-    Assert.assertTrue(table.getRows()[0] != tableListener.getInsertedRows()[0]);
-    Assert.assertArrayEquals(table.getRows(), tableListener.getOrderedRows());
+    assertTrue(table.getRows()[0] != tableListener.getInsertedRows()[0]);
+    assertArrayEquals(table.getRows(), tableListener.getOrderedRows());
   }
 
   private static class P_TableListener extends TableAdapter {

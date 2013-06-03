@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -24,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.framework.ServiceRegistration;
@@ -67,7 +68,7 @@ public class CodeLookupCallTest {
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
     LookupRow[] newRows = newLc.getDataByAll();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   @Test
@@ -78,7 +79,7 @@ public class CodeLookupCallTest {
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
     LookupRow[] newRows = newLc.getDataByText();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   @Test
@@ -103,7 +104,7 @@ public class CodeLookupCallTest {
     newLc.setText(text);
     LookupRow[] newRows = newLc.getDataByText();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   @Test
@@ -125,7 +126,7 @@ public class CodeLookupCallTest {
     newLc.setKey(key);
     LookupRow[] newRows = newLc.getDataByKey();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   @Test
@@ -148,7 +149,7 @@ public class CodeLookupCallTest {
     newLc.setRec(parent);
     LookupRow[] newRows = newLc.getDataByRec();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   @Test
@@ -173,7 +174,7 @@ public class CodeLookupCallTest {
     });
     LookupRow[] newRows = newLc.getDataByAll();
 
-    Assert.assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+    assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
   private static boolean equals(LookupRow[] rows1, LookupRow[] rows2) {

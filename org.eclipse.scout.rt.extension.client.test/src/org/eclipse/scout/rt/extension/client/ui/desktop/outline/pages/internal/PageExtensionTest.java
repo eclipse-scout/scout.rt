@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -17,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNode
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,12 +51,12 @@ public class PageExtensionTest {
   @Test
   public void testAcceptContextNoContextFilter() throws Exception {
     P_PageExtension pageExtension = new P_PageExtension(null);
-    Assert.assertTrue(pageExtension.accept(null, null, null));
-    Assert.assertTrue(pageExtension.accept(m_outline, null, null));
-    Assert.assertTrue(pageExtension.accept(m_outline, m_page, null));
-    Assert.assertTrue(pageExtension.accept(m_outline, m_otherPage, null));
-    Assert.assertTrue(pageExtension.accept(m_otherOutline, m_page, null));
-    Assert.assertTrue(pageExtension.accept(m_otherOutline, m_otherPage, null));
+    assertTrue(pageExtension.accept(null, null, null));
+    assertTrue(pageExtension.accept(m_outline, null, null));
+    assertTrue(pageExtension.accept(m_outline, m_page, null));
+    assertTrue(pageExtension.accept(m_outline, m_otherPage, null));
+    assertTrue(pageExtension.accept(m_otherOutline, m_page, null));
+    assertTrue(pageExtension.accept(m_otherOutline, m_otherPage, null));
   }
 
   @Test
@@ -64,9 +66,9 @@ public class PageExtensionTest {
     P_PageExtension contrib = new P_PageExtension(filter);
     EasyMock.replay(filter);
 
-    Assert.assertTrue(contrib.accept(null, null, null));
-    Assert.assertTrue(contrib.accept(m_outline, null, null));
-    Assert.assertTrue(contrib.accept(null, m_page, null));
+    assertTrue(contrib.accept(null, null, null));
+    assertTrue(contrib.accept(m_outline, null, null));
+    assertTrue(contrib.accept(null, m_page, null));
   }
 
   @Test
@@ -76,9 +78,9 @@ public class PageExtensionTest {
     P_PageExtension contrib = new P_PageExtension(filter);
     EasyMock.replay(filter);
 
-    Assert.assertFalse(contrib.accept(null, null, null));
-    Assert.assertFalse(contrib.accept(m_outline, null, null));
-    Assert.assertFalse(contrib.accept(null, m_page, null));
+    assertFalse(contrib.accept(null, null, null));
+    assertFalse(contrib.accept(m_outline, null, null));
+    assertFalse(contrib.accept(null, m_page, null));
   }
 
   private static class P_PageExtension extends AbstractPageExtension {

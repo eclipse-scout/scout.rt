@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -137,9 +139,9 @@ public class PageContributionExtensionTest {
   private static void assertCreateContribution(Constructor expectedConstructor, Class<? extends AbstractConstructorTestPage> pageClass, IOutline outline, IPageWithNodes parentPage) throws ProcessingException {
     PageContributionExtension ext = new PageContributionExtension(pageClass, 10);
     IPage page = ext.createContribution(outline, parentPage);
-    Assert.assertNotNull(page);
-    Assert.assertEquals(ext.getPageClass(), page.getClass());
-    Assert.assertEquals(expectedConstructor, ((AbstractConstructorTestPage) page).m_constructedBy);
+    assertNotNull(page);
+    assertEquals(ext.getPageClass(), page.getClass());
+    assertEquals(expectedConstructor, ((AbstractConstructorTestPage) page).m_constructedBy);
   }
 
   public static class P_Outline extends AbstractOutline {

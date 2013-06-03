@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -18,7 +21,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTabl
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -45,17 +46,17 @@ public class ColumnAutoResizeTest {
     IOutline outline = desktop.getOutline();
 
     IPage page = outline.getActivePage();
-    Assert.assertNotNull(page);
-    Assert.assertTrue(page instanceof AbstractPageWithTable);
+    assertNotNull(page);
+    assertTrue(page instanceof AbstractPageWithTable);
     ITable table = ((AbstractPageWithTable) page).getTable();
-    Assert.assertTrue(table instanceof ColumnAutoResizeTest.PageWithTable.TestTable);
+    assertTrue(table instanceof ColumnAutoResizeTest.PageWithTable.TestTable);
     ColumnAutoResizeTest.PageWithTable.TestTable testTable = (ColumnAutoResizeTest.PageWithTable.TestTable) table;
     IColumn col1 = testTable.getColumns()[0];
     int width1 = col1.getWidth();
     // when page is reloaded, the column width shall not be different afterwards
     page.reloadPage();
     int width2 = col1.getWidth();
-    Assert.assertTrue(width1 == width2);
+    assertTrue(width1 == width2);
   }
 
   public static class PageWithTableOutline extends AbstractOutline {

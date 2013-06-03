@@ -10,17 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.holders;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Test bean array and form data array binds, requiring a server for database stuff
  */
-public class SelectIntoArrayTest extends Assert {
+public class SelectIntoArrayTest {
 
   @Test
   public void testSelect() throws Exception {
@@ -35,10 +38,10 @@ public class SelectIntoArrayTest extends Assert {
     sql.setResultData(expectedData);
     //
     Object[][] data = sql.select("SELECT A,B,C FROM T WHERE D=0");
-    Assert.assertNotNull(data);
-    Assert.assertEquals(4, data.length);
+    assertNotNull(data);
+    assertEquals(4, data.length);
     for (int i = 0; i < data.length; i++) {
-      Assert.assertArrayEquals(expectedData[i], data[i]);
+      assertArrayEquals(expectedData[i], data[i]);
     }
   }
 
@@ -57,8 +60,8 @@ public class SelectIntoArrayTest extends Assert {
     BeanArrayHolder<MyBean> h = new BeanArrayHolder<SelectIntoArrayTest.MyBean>(MyBean.class);
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{h.active},:{h.state},:{h.name}", new NVPair("h", h));
     MyBean[] a = h.getBeans();
-    Assert.assertNotNull(a);
-    Assert.assertEquals(4, a.length);
+    assertNotNull(a);
+    assertEquals(4, a.length);
     for (int i = 0; i < a.length; i++) {
       a[i].assertValues(expectedData[i]);
     }
@@ -84,10 +87,10 @@ public class SelectIntoArrayTest extends Assert {
     //
     MyFormData[] h = new MyFormData[]{f1, f2};
     Object[][] data = sql.select("SELECT A,B,C FROM T WHERE A=:{h.active} AND B=:{h.state} AND C=:{h.name}", new NVPair("h", h));
-    Assert.assertNotNull(data);
-    Assert.assertEquals(2, data.length);
-    Assert.assertArrayEquals(new Object[]{true, 1, "abc"}, data[0]);
-    Assert.assertArrayEquals(new Object[]{true, 1, "abc"}, data[1]);
+    assertNotNull(data);
+    assertEquals(2, data.length);
+    assertArrayEquals(new Object[]{true, 1, "abc"}, data[0]);
+    assertArrayEquals(new Object[]{true, 1, "abc"}, data[1]);
   }
 
   @Test
@@ -105,8 +108,8 @@ public class SelectIntoArrayTest extends Assert {
     BeanArrayHolder<MyFormData> h = new BeanArrayHolder<SelectIntoArrayTest.MyFormData>(MyFormData.class);
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{h.active},:{h.state},:{h.name}", new NVPair("h", h));
     MyFormData[] a = h.getBeans();
-    Assert.assertNotNull(a);
-    Assert.assertEquals(4, a.length);
+    assertNotNull(a);
+    assertEquals(4, a.length);
     for (int i = 0; i < a.length; i++) {
       a[i].assertValues(expectedData[i]);
     }
@@ -144,7 +147,7 @@ public class SelectIntoArrayTest extends Assert {
     void assertValues(Object[] row) {
       String expected = "" + (row[0] != null ? row[0] : "false") + "," + (row[1] != null ? row[1] : "0") + "," + (row[2] != null ? row[2] : "null");
       String actual = "" + m_active + "," + m_state + "," + m_name;
-      Assert.assertEquals(expected, actual);
+      assertEquals(expected, actual);
     }
   }
 
@@ -178,7 +181,7 @@ public class SelectIntoArrayTest extends Assert {
     void assertValues(Object[] row) {
       String expected = "" + row[0] + "," + row[1] + "," + row[2];
       String actual = "" + getActive().getValue() + "," + getState().getValue() + "," + getName().getValue();
-      Assert.assertEquals(expected, actual);
+      assertEquals(expected, actual);
     }
   }
 }

@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -195,10 +197,10 @@ public class FormattingUtilityTest {
     Locale oldLocale = LocaleThreadLocal.get();
     try {
       if (locale == null) {
-        Assert.fail("locale must not be null");
+        fail("locale must not be null");
       }
       LocaleThreadLocal.set(locale);
-      Assert.assertEquals(expected, FormattingUtility.formatObject(o));
+      assertEquals(expected, FormattingUtility.formatObject(o));
     }
     finally {
       LocaleThreadLocal.set(oldLocale);

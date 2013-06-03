@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -21,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G1Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,9 +32,9 @@ public class StoreAndLoadXml3FormTest {
   @Test
   public void testXmlFieldIds() throws Exception {
     TestForm f = new TestForm();
-    Assert.assertEquals("MainBox", f.getMainBox().getFieldId());
-    Assert.assertEquals("customId", f.getText4Field().getFieldId());
-    Assert.assertEquals("Text1Field", f.getText1Field().getFieldId());
+    assertEquals("MainBox", f.getMainBox().getFieldId());
+    assertEquals("customId", f.getText4Field().getFieldId());
+    assertEquals("Text1Field", f.getText1Field().getFieldId());
   }
 
   @Test
@@ -70,8 +71,8 @@ public class StoreAndLoadXml3FormTest {
   public void testFormId() throws Exception {
     TestForm f = new TestForm();
     SimpleXmlElement xml = f.storeXML();
-    Assert.assertEquals("TestForm", xml.getAttribute("formId"));
-    Assert.assertEquals(TestForm.class.getName(), xml.getAttribute("formQname"));
+    assertEquals("TestForm", xml.getAttribute("formId"));
+    assertEquals(TestForm.class.getName(), xml.getAttribute("formQname"));
   }
 
   @Test
@@ -94,15 +95,15 @@ public class StoreAndLoadXml3FormTest {
     f.setXML(xml);
 
     //new form should contain the stored values
-    Assert.assertEquals("t1", f.getText1Field().getValue());
-    Assert.assertEquals("t3", f.getText3Field().getValue());
-    Assert.assertEquals("t4", f.getText4Field().getValue());
-    Assert.assertEquals("g1t1", f.getG1Box().getText1Field().getValue());
-    Assert.assertEquals("g1t2", f.getG1Box().getText2Field().getValue());
-    Assert.assertEquals("g2t1", f.getG2Box().getText1Field().getValue());
-    Assert.assertEquals("g3g2", f.getG3G4Text2Field().getValue());
-    Assert.assertEquals("g1L", f.getG1Box().getTestListBox().getValue()[0]);
-    Assert.assertEquals("g2L", f.getG2Box().getTestListBox().getValue()[0]);
+    assertEquals("t1", f.getText1Field().getValue());
+    assertEquals("t3", f.getText3Field().getValue());
+    assertEquals("t4", f.getText4Field().getValue());
+    assertEquals("g1t1", f.getG1Box().getText1Field().getValue());
+    assertEquals("g1t2", f.getG1Box().getText2Field().getValue());
+    assertEquals("g2t1", f.getG2Box().getText1Field().getValue());
+    assertEquals("g3g2", f.getG3G4Text2Field().getValue());
+    assertEquals("g1L", f.getG1Box().getTestListBox().getValue()[0]);
+    assertEquals("g2L", f.getG2Box().getTestListBox().getValue()[0]);
   }
 
   @Test
@@ -127,17 +128,17 @@ public class StoreAndLoadXml3FormTest {
     f = new TestForm();
     f.loadXML(xml);
 
-    Assert.assertEquals("t3", f.getText3Field().getValue());
+    assertEquals("t3", f.getText3Field().getValue());
 
     String text1FieldVal = StringUtility.nvl(f.getText1Field().getValue(), "")
         + StringUtility.nvl(f.getG1Box().getText1Field().getValue(), "")
         + StringUtility.nvl(f.getG2Box().getText1Field().getValue(), "");
-    Assert.assertEquals("g2t1", text1FieldVal);
+    assertEquals("g2t1", text1FieldVal);
 
     String text2FieldVal = StringUtility.nvl(f.getG3G4Text2Field().getValue(), "")
         + StringUtility.nvl(f.getG1Box().getText2Field().getValue(), "")
         + StringUtility.nvl(f.getG2Box().getText2Field().getValue(), "");
-    Assert.assertEquals("g3g2", text2FieldVal);
+    assertEquals("g3g2", text2FieldVal);
   }
 
   private void checkFieldXml(IFormField field, String expectedFieldId, EnclosingField... expectedEnclosingFieldPath) throws ProcessingException {
@@ -145,15 +146,15 @@ public class StoreAndLoadXml3FormTest {
     field.storeXML(xml);
     assertXmlIds(expectedFieldId, field.getClass().getName(), xml);
     ArrayList<SimpleXmlElement> enclosingFieldPath = xml.getChildren("enclosingField");
-    Assert.assertEquals(expectedEnclosingFieldPath.length, enclosingFieldPath.size());
+    assertEquals(expectedEnclosingFieldPath.length, enclosingFieldPath.size());
     for (int i = 0; i < expectedEnclosingFieldPath.length; i++) {
       assertXmlIds(expectedEnclosingFieldPath[i].getXmlFieldId(), expectedEnclosingFieldPath[i].getXmlFieldQname(), enclosingFieldPath.get(i));
     }
   }
 
   private static void assertXmlIds(String expectedXmlFieldId, String expectedFqcn, SimpleXmlElement xml) {
-    Assert.assertEquals(expectedXmlFieldId, xml.getAttribute("fieldId"));
-    Assert.assertEquals(expectedFqcn, xml.getAttribute("fieldQname"));
+    assertEquals(expectedXmlFieldId, xml.getAttribute("fieldId"));
+    assertEquals(expectedFqcn, xml.getAttribute("fieldQname"));
   }
 
   public static class EnclosingField {

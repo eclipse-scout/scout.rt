@@ -18,7 +18,7 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientTest;
 import org.eclipse.scout.testing.client.runner.fixture.LoginTestSessionProvider;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,31 +84,31 @@ public class ScoutClientTestRunnerLoginTest {
   }
 
   private static void checkBeforeClass() {
-    Assert.assertNotNull(TestEnvironmentClientSession.get());
+    assertNotNull(TestEnvironmentClientSession.get());
     if (s_beforeClassClientSession == null) {
-      Assert.assertSame(LoginTestSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
-      Assert.assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getBeforeStartRunAs());
-      Assert.assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getAfterStartRunAs());
+      assertSame(LoginTestSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
+      assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getAfterStartRunAs());
       s_beforeClassClientSession = TestEnvironmentClientSession.get();
       LoginTestSessionProvider.clearProtocol();
     }
     else {
-      Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-      Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
-      Assert.assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
+      assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+      assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
     }
   }
 
   private static void checkAfterClass() {
-    Assert.assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
-    Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-    Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+    assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
+    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
   }
 
   private void checkBeforeAfterAndTest() {
-    Assert.assertNotNull(TestEnvironmentClientSession.get());
-    Assert.assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
-    Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-    Assert.assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+    assertNotNull(TestEnvironmentClientSession.get());
+    assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
+    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
   }
 }

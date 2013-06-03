@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -19,7 +23,6 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,19 +66,19 @@ public class FormDataStatementBuilderTest {
   @Test
   public void testFieldData() throws ProcessingException {
     m_builder.setBasicDefinition(FormData.Text.class, "TEXT", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND TEXT=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(TEXT, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND TEXT=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(TEXT, m_builder.getBindMap().get("__a1"));
   }
 
   @Test
   public void testPropertyData() throws ProcessingException {
     m_builder.setBasicDefinition(FormData.Prop.class, "PROP", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND PROP=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(PROPERTY, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND PROP=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(PROPERTY, m_builder.getBindMap().get("__a1"));
   }
 
   @Test(expected = ProcessingException.class)
@@ -87,10 +90,10 @@ public class FormDataStatementBuilderTest {
   @Test
   public void testTemplate1FieldData_temlateValueDefinition() throws ProcessingException {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
   }
 
   @Test(expected = ProcessingException.class)
@@ -102,10 +105,10 @@ public class FormDataStatementBuilderTest {
   @Test
   public void testTemplate1PropertyData_temlateValueDefinition() throws ProcessingException {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateProp.class), "TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(TEMPLATE1_PROPERTY, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(TEMPLATE1_PROPERTY, m_builder.getBindMap().get("__a1"));
   }
 
   @Test(expected = ProcessingException.class)
@@ -118,10 +121,10 @@ public class FormDataStatementBuilderTest {
   public void testMasterTemplate1FieldData_temlateValueDefinition() throws ProcessingException {
     m_builder.setBasicDefinition(
         new ClassIdentifier(FormData.Template1GroupBox.class, AbstractTemplateFieldData.MasterTemplateGroupBox.class, AbstractMasterTemplateFieldData.MasterTemplateText.class), "MASTER_TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND MASTER_TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(MASTER_TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND MASTER_TEMPLATE1_TEXT=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(MASTER_TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
   }
 
   @Test(expected = ProcessingException.class)
@@ -137,10 +140,10 @@ public class FormDataStatementBuilderTest {
             FormData.Template1GroupBox.class,
             FormData.Template1GroupBox.MasterTemplateGroupBox.class,
             FormData.Template1GroupBox.MasterTemplateGroupBox.MasterTemplateProp.class), "MASTER_TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
-    Assert.assertEquals("  AND MASTER_TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(1, m_builder.getBindMap().size());
-    Assert.assertEquals(MASTER_TEMPLATE1_PROPERTY, m_builder.getBindMap().get("__a1"));
+    assertEquals("  AND MASTER_TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(1, m_builder.getBindMap().size());
+    assertEquals(MASTER_TEMPLATE1_PROPERTY, m_builder.getBindMap().get("__a1"));
   }
 
   @Test(expected = ProcessingException.class)
@@ -154,11 +157,11 @@ public class FormDataStatementBuilderTest {
   public void testTemplate1andTemplate2FieldData_temlateValueDefinition() throws ProcessingException {
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class), "TEMPLATE1_TEXT", DataModelConstants.OPERATOR_EQ);
     m_builder.setBasicDefinition(new ClassIdentifier(FormData.Template2GroupBox.class, FormData.Template2GroupBox.TemplateText.class), "TEMPLATE2_TEXT", DataModelConstants.OPERATOR_LE);
-    Assert.assertEquals("  AND TEMPLATE1_TEXT=:__a1  AND TEMPLATE2_TEXT<=:__a2", m_builder.build(m_formData));
-    Assert.assertNotNull(m_builder.getBindMap());
-    Assert.assertEquals(2, m_builder.getBindMap().size());
-    Assert.assertEquals(TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
-    Assert.assertEquals(TEMPLATE2_TEXT, m_builder.getBindMap().get("__a2"));
+    assertEquals("  AND TEMPLATE1_TEXT=:__a1  AND TEMPLATE2_TEXT<=:__a2", m_builder.build(m_formData));
+    assertNotNull(m_builder.getBindMap());
+    assertEquals(2, m_builder.getBindMap().size());
+    assertEquals(TEMPLATE1_TEXT, m_builder.getBindMap().get("__a1"));
+    assertEquals(TEMPLATE2_TEXT, m_builder.getBindMap().get("__a2"));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -174,27 +177,27 @@ public class FormDataStatementBuilderTest {
   @Test
   public void createSelectStatementStatementNull() throws Exception {
     m_builder.build(m_formData);
-    Assert.assertNull(m_builder.createSelectStatement(null));
+    assertNull(m_builder.createSelectStatement(null));
   }
 
   @Test
   public void createSelectStatementContributionNull() throws Exception {
     m_builder.build(m_formData);
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE);
-    Assert.assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
     //
     actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE, (EntityContribution[]) null);
-    Assert.assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
     //
     actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE, (EntityContribution) null);
-    Assert.assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
   }
 
   @Test
   public void createSelectStatementContributionNullContributions() throws Exception {
     m_builder.build(m_formData);
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE, null, null);
-    Assert.assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
   }
 
   @Test
@@ -202,7 +205,7 @@ public class FormDataStatementBuilderTest {
     m_builder.build(m_formData);
     m_builder.addWhere(" AND 0=0 ");
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE);
-    Assert.assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1 AND 0=0", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1 AND 0=0", StringUtility.cleanup(actual));
   }
 
   @Test
@@ -214,7 +217,7 @@ public class FormDataStatementBuilderTest {
     contrib.addWhereConstraint("MA.PERSON_NR != P.MAIN_ACCOUNT_NR");
     m_builder.addWhere(" AND 0=0 ");
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE, contrib);
-    Assert.assertEquals("SELECT P.PERSON_NR, MA.NAME FROM ORS_PERSON P, ORS_PERSON MA WHERE 1=1 AND MA.PERSON_NR != P.MAIN_ACCOUNT_NR AND 0=0", StringUtility.cleanup(actual));
+    assertEquals("SELECT P.PERSON_NR, MA.NAME FROM ORS_PERSON P, ORS_PERSON MA WHERE 1=1 AND MA.PERSON_NR != P.MAIN_ACCOUNT_NR AND 0=0", StringUtility.cleanup(actual));
   }
 
   public static class AbstractMasterTemplateFieldData extends AbstractFormFieldData {

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -23,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,8 +52,8 @@ public class BookmarkToInvisibleOutlineTest {
     catch (Exception e) {
       err = e;
     }
-    Assert.assertNotNull(err);
-    Assert.assertEquals(desktop.findOutline(AdminOutline.class), desktop.getOutline());
+    assertNotNull(err);
+    assertEquals(desktop.findOutline(AdminOutline.class), desktop.getOutline());
   }
 
   public static class CockpitOutline extends AbstractOutline {

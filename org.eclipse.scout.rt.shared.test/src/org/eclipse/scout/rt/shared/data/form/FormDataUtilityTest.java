@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 
 /**
@@ -22,17 +24,17 @@ public class FormDataUtilityTest {
 
   @Test
   public void testGetFieldDataId() {
-    Assert.assertNull(FormDataUtility.getFieldDataId(null));
-    Assert.assertNull(FormDataUtility.getFieldDataId(""));
-    Assert.assertNull(FormDataUtility.getFieldDataId("   "));
-    Assert.assertEquals("Test", FormDataUtility.getFieldDataId("Test"));
-    Assert.assertEquals("Test", FormDataUtility.getFieldDataId("  Test  "));
-    Assert.assertEquals("Name", FormDataUtility.getFieldDataId("NameField"));
-    Assert.assertEquals("Name", FormDataUtility.getFieldDataId("NameField  "));
-    Assert.assertEquals("Name", FormDataUtility.getFieldDataId("  NameField  "));
-    Assert.assertEquals("1234", FormDataUtility.getFieldDataId("1234"));
-    Assert.assertEquals("1234", FormDataUtility.getFieldDataId("1234Field"));
-    Assert.assertEquals("TopBox", FormDataUtility.getFieldDataId("TopBox"));
-    Assert.assertEquals("Ok", FormDataUtility.getFieldDataId("OkButton"));
+    assertNull(FormDataUtility.getFieldDataId(null));
+    assertNull(FormDataUtility.getFieldDataId(""));
+    assertNull(FormDataUtility.getFieldDataId("   "));
+    assertEquals("Test", FormDataUtility.getFieldDataId("Test"));
+    assertEquals("Test", FormDataUtility.getFieldDataId("  Test  "));
+    assertEquals("Name", FormDataUtility.getFieldDataId("NameField"));
+    assertEquals("Name", FormDataUtility.getFieldDataId("NameField  "));
+    assertEquals("Name", FormDataUtility.getFieldDataId("  NameField  "));
+    assertEquals("1234", FormDataUtility.getFieldDataId("1234"));
+    assertEquals("1234", FormDataUtility.getFieldDataId("1234Field"));
+    assertEquals("TopBox", FormDataUtility.getFieldDataId("TopBox"));
+    assertEquals("Ok", FormDataUtility.getFieldDataId("OkButton"));
   }
 }

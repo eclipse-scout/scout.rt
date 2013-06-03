@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.Serializable;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -23,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -210,14 +211,14 @@ public class StoreAndLoadXml2FormTest {
     TestForm f = new TestForm();
     try {
       f.startModify();
-      Assert.assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
+      assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
       //store xml and clear
       String xml = f.getXML("UTF-8");
       f.getTableField().getTable().discardAllRows();
-      Assert.assertArrayEquals(new Object[0][0], f.getTableField().getTable().getTableData());
+      assertArrayEquals(new Object[0][0], f.getTableField().getTable().getTableData());
       //load xml
       f.setXML(xml);
-      Assert.assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
+      assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
     }
     finally {
       f.doClose();

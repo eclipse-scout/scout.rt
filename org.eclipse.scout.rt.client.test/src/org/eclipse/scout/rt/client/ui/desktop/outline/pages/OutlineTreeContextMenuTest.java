@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -32,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMe
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuTest.PageWithTable.Table.PageWithTableRowMenu;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,18 +49,18 @@ public class OutlineTreeContextMenuTest {
   @Test
   public void testEmptySpaceAndRowMenus() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    Assert.assertNotNull(desktop);
+    assertNotNull(desktop);
 
     desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();
-    Assert.assertNotNull(outline);
-    Assert.assertSame(PageWithTableOutline.class, outline.getClass());
+    assertNotNull(outline);
+    assertSame(PageWithTableOutline.class, outline.getClass());
 
     IPage page = outline.getActivePage();
-    Assert.assertNotNull(page);
-    Assert.assertSame(PageWithTable.class, page.getClass());
+    assertNotNull(page);
+    assertSame(PageWithTable.class, page.getClass());
 
     assertEmptySpaceMenusExistOnTablePageParent(outline);
     assertRowMenusExistOnTablePageNode(outline);
@@ -73,8 +76,8 @@ public class OutlineTreeContextMenuTest {
     @SuppressWarnings("unchecked")
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableEmptySpaceMenu.class, PageWithTableEmptySpace2Menu.class);
 
-    Assert.assertTrue(actualMenus.containsAll(requiredMenus));
-    Assert.assertTrue(actualMenus.size() == (requiredMenus.size()));
+    assertTrue(actualMenus.containsAll(requiredMenus));
+    assertTrue(actualMenus.size() == (requiredMenus.size()));
   }
 
   private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
@@ -89,8 +92,8 @@ public class OutlineTreeContextMenuTest {
     IMenu[] menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
     List<IMenu> actualMenus = Arrays.asList(menus);
 
-    Assert.assertTrue(actualMenus.containsAll(requiredMenus));
-    Assert.assertTrue(actualMenus.size() == (requiredMenus.size()));
+    assertTrue(actualMenus.containsAll(requiredMenus));
+    assertTrue(actualMenus.size() == (requiredMenus.size()));
   }
 
   private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {
@@ -99,7 +102,7 @@ public class OutlineTreeContextMenuTest {
 
     for (Class<? extends IMenu> menuClass : menuClasses) {
       IMenu menu = activePage.getTable().getMenu(menuClass);
-      Assert.assertNotNull(menu);
+      assertNotNull(menu);
 
       resolvedMenus.add(menu);
     }

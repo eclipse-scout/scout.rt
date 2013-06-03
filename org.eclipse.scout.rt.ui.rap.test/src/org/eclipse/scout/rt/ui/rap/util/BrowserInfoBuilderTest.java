@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
@@ -38,7 +39,7 @@ public class BrowserInfoBuilderTest {
         createdBrowserInfo.setSystemVersion(null);
       }
 
-      Assert.assertEquals(expectedBrowserInfo, createdBrowserInfo);
+      assertEquals(expectedBrowserInfo, createdBrowserInfo);
     }
   }
 

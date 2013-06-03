@@ -10,6 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +31,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.fixture.A;
 import org.eclipse.scout.commons.fixture.AbstractC;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -36,8 +43,8 @@ public class ConfigurationUtilityTest {
   @Test
   public void sortByOrder() {
     // null and empty
-    Assert.assertNull(ConfigurationUtility.sortByOrder(null));
-    Assert.assertTrue(ConfigurationUtility.sortByOrder(Collections.emptyList()).isEmpty());
+    assertNull(ConfigurationUtility.sortByOrder(null));
+    assertTrue(ConfigurationUtility.sortByOrder(Collections.emptyList()).isEmpty());
     //
     OrderStatic10 static10 = new OrderStatic10();
     OrderStatic20Dynamic0 static20Dynamic0 = new OrderStatic20Dynamic0();
@@ -45,42 +52,42 @@ public class ConfigurationUtilityTest {
     //
     List<Object> orderedElements = Arrays.asList(dynamic30, static20Dynamic0, static10);
     Collection<Object> sorted = ConfigurationUtility.sortByOrder(orderedElements);
-    Assert.assertArrayEquals(new Object[]{static10, static20Dynamic0, dynamic30}, sorted.toArray());
+    assertArrayEquals(new Object[]{static10, static20Dynamic0, dynamic30}, sorted.toArray());
     //
     ReplaceOrderStatic10 replaceOrderStatic10 = new ReplaceOrderStatic10();
     orderedElements = Arrays.<Object> asList(dynamic30, static20Dynamic0, replaceOrderStatic10);
     sorted = ConfigurationUtility.sortByOrder(orderedElements);
-    Assert.assertArrayEquals(new Object[]{replaceOrderStatic10, static20Dynamic0, dynamic30}, sorted.toArray());
+    assertArrayEquals(new Object[]{replaceOrderStatic10, static20Dynamic0, dynamic30}, sorted.toArray());
   }
 
   @Test
   public void getEnclosingContainerType() {
     // null
-    Assert.assertNull(ConfigurationUtility.getEnclosingContainerType(null));
+    assertNull(ConfigurationUtility.getEnclosingContainerType(null));
     // objects
-    Assert.assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A()));
-    Assert.assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b));
-    Assert.assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1));
-    Assert.assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d));
-    Assert.assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d.e));
-    Assert.assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2));
-    Assert.assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d));
-    Assert.assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d.e));
+    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A()));
+    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b));
+    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1));
+    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d));
+    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d.e));
+    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2));
+    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d));
+    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d.e));
     // primitive values
-    Assert.assertSame(Integer.class, ConfigurationUtility.getEnclosingContainerType(42));
-    Assert.assertSame(Double.class, ConfigurationUtility.getEnclosingContainerType(42d));
+    assertSame(Integer.class, ConfigurationUtility.getEnclosingContainerType(42));
+    assertSame(Double.class, ConfigurationUtility.getEnclosingContainerType(42d));
   }
 
   @Test
   public void getEnclosingContainerTypeAbstractInnerClasses() {
-    Assert.assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA()));
-    Assert.assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b));
-    Assert.assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1));
-    Assert.assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d));
-    Assert.assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d.e));
-    Assert.assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2));
-    Assert.assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d));
-    Assert.assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d.e));
+    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA()));
+    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b));
+    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1));
+    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d));
+    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d.e));
+    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2));
+    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d));
+    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d.e));
   }
 
   @Test(expected = NullPointerException.class)
@@ -92,92 +99,92 @@ public class ConfigurationUtilityTest {
   public void removeReplacedClassesEmpty() {
     Class<?>[] classes = new Class<?>[0];
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertSame(classes, actual);
-    Assert.assertArrayEquals(new Class[0], actual);
+    assertNotNull(actual);
+    assertSame(classes, actual);
+    assertArrayEquals(new Class[0], actual);
   }
 
   @Test
   public void removeReplacedClassesNoReplacements() {
     Class<?>[] classes = new Class<?>[]{Original.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Original.class}, actual);
+    assertNotNull(actual);
+    assertSame(classes, actual);
+    assertArrayEquals(new Class[]{Original.class}, actual);
     //
     classes = new Class<?>[]{Original.class, String.class};
     actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Original.class, String.class}, actual);
+    assertNotNull(actual);
+    assertSame(classes, actual);
+    assertArrayEquals(new Class[]{Original.class, String.class}, actual);
     //
     classes = new Class<?>[]{Original.class, String.class, Long.class};
     actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Original.class, String.class, Long.class}, actual);
+    assertNotNull(actual);
+    assertSame(classes, actual);
+    assertArrayEquals(new Class[]{Original.class, String.class, Long.class}, actual);
   }
 
   @Test
   public void removeReplacedClasses() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement.class}, actual);
     //
     classes = new Class<?>[]{Replacement.class, Original.class};
     actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement.class}, actual);
   }
 
   @Test
   public void removeReplacedClassesReplacementHierarchy() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class, Replacement2.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement2.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement2.class}, actual);
     //
     classes = new Class<?>[]{Replacement3.class, Replacement.class, Original.class, Replacement2.class};
     actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement3.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement3.class}, actual);
   }
 
   @Test
   public void removeReplacedClassesMultyReplacementHierarchy() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class, OtherReplacement.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
     Set<Class<?>> expectedContents = new HashSet<Class<?>>();
     expectedContents.add(Replacement.class);
     expectedContents.add(OtherReplacement.class);
-    Assert.assertEquals(2, actual.length);
-    Assert.assertTrue(expectedContents.contains(actual[0]));
-    Assert.assertTrue(expectedContents.contains(actual[1]));
+    assertEquals(2, actual.length);
+    assertTrue(expectedContents.contains(actual[0]));
+    assertTrue(expectedContents.contains(actual[1]));
   }
 
   @Test
   public void removeReplacedClassesPreserveOrder() {
     Class<?>[] classes = new Class<?>[]{Original.class, String.class, Replacement.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement.class, String.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement.class, String.class}, actual);
   }
 
   @Test
   public void removeReplacedClassesReplacementHierarchyNotCompletelyPartOfOriginalList() {
     Class<?>[] classes = new Class<?>[]{Original.class, String.class, Replacement3.class};
     Class<? extends Object>[] actual = ConfigurationUtility.removeReplacedClasses(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotSame(classes, actual);
-    Assert.assertArrayEquals(new Class[]{Replacement3.class, String.class}, actual);
+    assertNotNull(actual);
+    assertNotSame(classes, actual);
+    assertArrayEquals(new Class[]{Replacement3.class, String.class}, actual);
   }
 
   @Test(expected = NullPointerException.class)
@@ -189,90 +196,90 @@ public class ConfigurationUtilityTest {
   public void getReplacementMappingEmpty() {
     Class<?>[] classes = new Class<?>[0];
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual.isEmpty());
+    assertNotNull(actual);
+    assertTrue(actual.isEmpty());
   }
 
   @Test
   public void getReplacementMappingNoReplacements() {
     Class<?>[] classes = new Class<?>[]{Original.class};
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual.isEmpty());
+    assertNotNull(actual);
+    assertNotNull(actual);
+    assertTrue(actual.isEmpty());
     //
     classes = new Class<?>[]{Original.class, String.class};
     actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual.isEmpty());
+    assertNotNull(actual);
+    assertNotNull(actual);
+    assertTrue(actual.isEmpty());
     //
     classes = new Class<?>[]{Original.class, String.class, Long.class};
     actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual.isEmpty());
+    assertNotNull(actual);
+    assertNotNull(actual);
+    assertTrue(actual.isEmpty());
   }
 
   @Test
   public void getReplacementMapping() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class};
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(1, actual.size());
-    Assert.assertSame(Replacement.class, actual.get(Original.class));
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
+    assertSame(Replacement.class, actual.get(Original.class));
     //
     classes = new Class<?>[]{Replacement.class, Original.class};
     actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(1, actual.size());
-    Assert.assertSame(Replacement.class, actual.get(Original.class));
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
+    assertSame(Replacement.class, actual.get(Original.class));
     //
     classes = new Class<?>[]{Original.class, String.class, Replacement.class};
     actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(1, actual.size());
-    Assert.assertSame(Replacement.class, actual.get(Original.class));
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
+    assertSame(Replacement.class, actual.get(Original.class));
   }
 
   @Test
   public void getReplacementMappingReplacementHierarchy() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class, Replacement2.class};
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(2, actual.size());
-    Assert.assertSame(Replacement2.class, actual.get(Original.class));
-    Assert.assertSame(Replacement2.class, actual.get(Replacement.class));
+    assertNotNull(actual);
+    assertEquals(2, actual.size());
+    assertSame(Replacement2.class, actual.get(Original.class));
+    assertSame(Replacement2.class, actual.get(Replacement.class));
     //
     classes = new Class<?>[]{Replacement3.class, Replacement.class, Original.class, Replacement2.class};
     actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(3, actual.size());
-    Assert.assertSame(Replacement3.class, actual.get(Original.class));
-    Assert.assertSame(Replacement3.class, actual.get(Replacement.class));
-    Assert.assertSame(Replacement3.class, actual.get(Replacement2.class));
+    assertNotNull(actual);
+    assertEquals(3, actual.size());
+    assertSame(Replacement3.class, actual.get(Original.class));
+    assertSame(Replacement3.class, actual.get(Replacement.class));
+    assertSame(Replacement3.class, actual.get(Replacement2.class));
   }
 
   @Test
   public void getReplacementMappingMultyReplacementHierarchy() {
     Class<?>[] classes = new Class<?>[]{Original.class, Replacement.class, OtherReplacement.class};
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(1, actual.size());
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
     Class<?> replacedClass = actual.get(Original.class);
-    Assert.assertNotNull(replacedClass);
-    Assert.assertTrue(replacedClass == Replacement.class || replacedClass == OtherReplacement.class);
+    assertNotNull(replacedClass);
+    assertTrue(replacedClass == Replacement.class || replacedClass == OtherReplacement.class);
   }
 
   @Test
   public void getReplacementMappingReplacementHierarchyNotCompletelyPartOfOriginalList() {
     Class<?>[] classes = new Class<?>[]{Original.class, String.class, Replacement3.class};
     Map<Class<?>, Class<?>> actual = ConfigurationUtility.getReplacementMapping(classes);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(3, actual.size());
-    Assert.assertSame(Replacement3.class, actual.get(Original.class));
-    Assert.assertSame(Replacement3.class, actual.get(Replacement.class));
-    Assert.assertSame(Replacement3.class, actual.get(Replacement2.class));
+    assertNotNull(actual);
+    assertEquals(3, actual.size());
+    assertSame(Replacement3.class, actual.get(Original.class));
+    assertSame(Replacement3.class, actual.get(Replacement.class));
+    assertSame(Replacement3.class, actual.get(Replacement2.class));
   }
 
   public static class InnerA {

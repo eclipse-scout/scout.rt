@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -17,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNode
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageModifier;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,8 +64,8 @@ public class PageModificationExtensionTest {
   public void testCreatePageModifier() throws Exception {
     PageModificationExtension pageModification = new PageModificationExtension(P_Page.class, P_PageModifier.class);
     IPageModifier<? extends IPage> pageModifier = pageModification.createPageModifier();
-    Assert.assertNotNull(pageModifier);
-    Assert.assertEquals(P_PageModifier.class, pageModifier.getClass());
+    assertNotNull(pageModifier);
+    assertEquals(P_PageModifier.class, pageModifier.getClass());
   }
 
   @Test
@@ -80,12 +84,12 @@ public class PageModificationExtensionTest {
   public void testAcceptWithoutContext() {
     PageModificationExtension pageModification = new PageModificationExtension(P_Page.class, P_PageModifier.class);
 
-    Assert.assertFalse(pageModification.accept(null, null, null));
-    Assert.assertTrue(pageModification.accept(null, null, m_page));
-    Assert.assertTrue(pageModification.accept(m_outline, null, m_page));
-    Assert.assertTrue(pageModification.accept(m_outline, m_otherPage, m_page));
+    assertFalse(pageModification.accept(null, null, null));
+    assertTrue(pageModification.accept(null, null, m_page));
+    assertTrue(pageModification.accept(m_outline, null, m_page));
+    assertTrue(pageModification.accept(m_outline, m_otherPage, m_page));
 
-    Assert.assertFalse(pageModification.accept(null, null, m_otherPage));
+    assertFalse(pageModification.accept(null, null, m_otherPage));
   }
 
   public static class P_PageModifier implements IPageModifier<P_Page> {

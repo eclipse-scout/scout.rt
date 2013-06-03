@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.test.ui.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -23,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -45,8 +47,8 @@ public class ImportFormDataWithFiltersTest {
     data.getTestSubString().setValue("test");
     data.getTestString().setValue("test1");
     form.importFormData(data, true, null, null);
-    Assert.assertEquals(data.getTestString().getValue(), form.getTestStringField().getValue());
-    Assert.assertEquals(data.getTestSubString().getValue(), form.getTestSubStringField().getValue());
+    assertEquals(data.getTestString().getValue(), form.getTestStringField().getValue());
+    assertEquals(data.getTestSubString().getValue(), form.getTestSubStringField().getValue());
   }
 
   /**
@@ -63,8 +65,8 @@ public class ImportFormDataWithFiltersTest {
     data.getTestSubString().setValue("test1");
     ExcludeFormFieldFilter exclusionFilter = new ExcludeFormFieldFilter(form.getTestStringField());
     form.importFormData(data, true, null, exclusionFilter);
-    Assert.assertNull(form.getTestStringField().getValue());
-    Assert.assertEquals(data.getTestSubString().getValue(), form.getTestSubStringField().getValue());
+    assertNull(form.getTestStringField().getValue());
+    assertEquals(data.getTestSubString().getValue(), form.getTestSubStringField().getValue());
   }
 
   /**
@@ -82,7 +84,7 @@ public class ImportFormDataWithFiltersTest {
     data.getTestString().setValue("test");
     ExcludeFormFieldFilter exclusionFilter = new ExcludeFormFieldFilter(form.getTestStringField());
     form.importFormData(data, true, null, exclusionFilter);
-    Assert.assertEquals("init", form.getTestStringField().getValue());
+    assertEquals("init", form.getTestStringField().getValue());
   }
 
   /**
@@ -98,7 +100,7 @@ public class ImportFormDataWithFiltersTest {
     data.getTestString().setValue("test");
     ExcludeFormFieldFilter exclusionFilter = new ExcludeFormFieldFilter();
     form.importFormData(data, true, null, exclusionFilter);
-    Assert.assertEquals(data.getTestString().getValue(), form.getTestStringField().getValue());
+    assertEquals(data.getTestString().getValue(), form.getTestStringField().getValue());
   }
 
   class FilterImportTestForm extends AbstractForm {

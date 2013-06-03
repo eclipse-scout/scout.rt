@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.concurrency;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -34,15 +36,15 @@ public class SwingLoopDetectionTest {
     for (int i = 0; i < 200; i++) {
       det.addSample();
       ts.set(ts.get() + 1000 / 90);
-      Assert.assertFalse(det.isArmed());
+      assertFalse(det.isArmed());
     }
     //remove 70/second
     for (int i = 0; i < 200; i++) {
       det.addSample();
       ts.set(ts.get() + 1000 / 70);
-      Assert.assertFalse(det.isArmed());
+      assertFalse(det.isArmed());
     }
-    Assert.assertFalse(det.isArmed());
+    assertFalse(det.isArmed());
   }
 
   @Test
@@ -59,10 +61,10 @@ public class SwingLoopDetectionTest {
       det.addSample();
       ts.set(ts.get() + 1000 / 110);
       if (i < 100) {
-        Assert.assertFalse(det.isArmed());
+        assertFalse(det.isArmed());
       }
       else {
-        Assert.assertTrue(det.isArmed());
+        assertTrue(det.isArmed());
       }
     }
     //add additional at 2/second
@@ -70,13 +72,13 @@ public class SwingLoopDetectionTest {
       det.addSample();
       ts.set(ts.get() + 1000 / 2);
       if (i < 2) {
-        Assert.assertTrue(det.isArmed());
+        assertTrue(det.isArmed());
       }
       else {
-        Assert.assertFalse(det.isArmed());
+        assertFalse(det.isArmed());
       }
     }
-    Assert.assertFalse(det.isArmed());
+    assertFalse(det.isArmed());
   }
 
 }

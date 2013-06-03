@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -17,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test1Column;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test2Column;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,8 +55,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test1Column col1 = table.getTest1Column();
 
-    Assert.assertTrue(col1.isDisplayable());
-    Assert.assertTrue(col1.isVisible());
+    assertTrue(col1.isDisplayable());
+    assertTrue(col1.isVisible());
   }
 
   /**
@@ -67,8 +69,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test2Column col2 = table.getTest2Column();
 
-    Assert.assertTrue(col2.isDisplayable());
-    Assert.assertTrue(col2.isVisible());
+    assertTrue(col2.isDisplayable());
+    assertTrue(col2.isVisible());
   }
 
   /**
@@ -87,8 +89,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test1Column col1 = table.getTest1Column();
 
-    Assert.assertTrue(col1.isDisplayable());
-    Assert.assertFalse(col1.isVisible());
+    assertTrue(col1.isDisplayable());
+    assertFalse(col1.isVisible());
   }
 
   /**
@@ -107,8 +109,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test2Column col2 = table.getTest2Column();
 
-    Assert.assertTrue(col2.isDisplayable());
-    Assert.assertFalse(col2.isVisible());
+    assertTrue(col2.isDisplayable());
+    assertFalse(col2.isVisible());
   }
 
   /**
@@ -128,8 +130,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test1Column col1 = table.getTest1Column();
 
-    Assert.assertTrue(col1.isDisplayable());
-    Assert.assertTrue(col1.isVisible());
+    assertTrue(col1.isDisplayable());
+    assertTrue(col1.isVisible());
   }
 
   /**
@@ -149,8 +151,8 @@ public class ColumnVisibilityTest {
     table.initTable();
     Test2Column col2 = table.getTest2Column();
 
-    Assert.assertTrue(col2.isDisplayable());
-    Assert.assertTrue(col2.isVisible());
+    assertTrue(col2.isDisplayable());
+    assertTrue(col2.isVisible());
   }
 
   public class TestTable extends AbstractTable {

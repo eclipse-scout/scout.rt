@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class LookupRowTest {
@@ -36,10 +39,10 @@ public class LookupRowTest {
     Object obj = oin.readObject();
     oin.close();
 
-    Assert.assertNotNull(obj);
-    Assert.assertTrue(obj instanceof LookupRow);
+    assertNotNull(obj);
+    assertTrue(obj instanceof LookupRow);
     LookupRow deserializedRow = (LookupRow) obj;
-    Assert.assertEquals("key", deserializedRow.getKey());
-    Assert.assertEquals("text", deserializedRow.getText());
+    assertEquals("key", deserializedRow.getKey());
+    assertEquals("text", deserializedRow.getText());
   }
 }

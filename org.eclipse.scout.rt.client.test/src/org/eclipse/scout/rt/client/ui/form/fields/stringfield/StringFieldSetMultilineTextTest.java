@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -19,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.StringFieldSetMult
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.StringFieldSetMultilineTextTest.MyForm.MainBox.GroupBox.Text1Field;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,7 +36,7 @@ public class StringFieldSetMultilineTextTest {
     try {
       f.startForm();
       f.getText1Field().getUIFacade().setTextFromUI("ABC\nDEF\nGHI");
-      Assert.assertEquals(f.getText1Field().getValue(), "ABC DEF GHI");
+      assertEquals(f.getText1Field().getValue(), "ABC DEF GHI");
     }
     finally {
       f.doClose();
