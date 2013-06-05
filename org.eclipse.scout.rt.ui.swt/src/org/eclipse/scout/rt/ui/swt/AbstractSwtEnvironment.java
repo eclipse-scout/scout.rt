@@ -136,7 +136,14 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
-  private static boolean IS_E4 = Platform.getBundle("org.eclipse.platform").getVersion() != null ? Platform.getBundle("org.eclipse.platform").getVersion().getMajor() >= 4 : false;
+  private static boolean IS_E4 = false;
+
+  static {
+    Object bundleVersion = Platform.getBundle("org.eclipse.platform").getHeaders().get("Bundle-Version");
+    if (bundleVersion instanceof String) {
+      IS_E4 = CompareUtility.compareTo((String) bundleVersion, "4.0") >= 0;
+    }
+  }
 
   private final Bundle m_applicationBundle;
 
