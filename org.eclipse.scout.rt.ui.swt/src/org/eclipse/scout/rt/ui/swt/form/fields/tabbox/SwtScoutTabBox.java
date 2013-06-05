@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
@@ -25,6 +26,8 @@ import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -64,6 +67,20 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
     tabFolder.addListener(SWT.Selection, m_uiTabFocusListener);
     tabFolder.addListener(SWT.FocusIn, m_uiTabFocusListener);
     tabFolder.addListener(SWT.FocusOut, m_uiTabFocusListener);
+
+    //dispose tab items when disposing container
+    getSwtContainer().addDisposeListener(new DisposeListener() {
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        if (m_tabs != null) {
+          for (Entry<CTabItem, SwtScoutTabItem> tabEntry : m_tabs.entrySet()) {
+            tabEntry.getKey().dispose();
+            tabEntry.getValue().dispose();
+          }
+        }
+      }
+    });
   }
 
   protected void buildItems() {
