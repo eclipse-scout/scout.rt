@@ -455,81 +455,54 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     }
   }
 
-  private class P_ShiftDayUpKeyStroke extends RwtKeyStroke {
+  private abstract class P_AbstractShiftDateKeyStroke extends AbstractShiftKeyStroke {
+    public P_AbstractShiftDateKeyStroke(int keyCode, int level, int value) {
+      super(keyCode, SWT.NONE, level, value);
+    }
+
+    public P_AbstractShiftDateKeyStroke(int keyCode, int stateMask, int level, int value) {
+      super(keyCode, stateMask, level, value);
+    }
+
+    @Override
+    protected void shift(final int level, final int value) {
+      shiftDate(level, value);
+    }
+  }
+
+  private class P_ShiftDayUpKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftDayUpKeyStroke() {
-      super(SWT.ARROW_UP);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 0;
-      int value = 1;
-      shiftDate(level, value);
+      super(SWT.ARROW_UP, 0, 1);
     }
   }
 
-  private class P_ShiftDayDownKeyStroke extends RwtKeyStroke {
+  private class P_ShiftDayDownKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftDayDownKeyStroke() {
-      super(SWT.ARROW_DOWN);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 0;
-      int value = -1;
-      shiftDate(level, value);
+      super(SWT.ARROW_DOWN, 0, -1);
     }
   }
 
-  private class P_ShiftMonthUpKeyStroke extends RwtKeyStroke {
+  private class P_ShiftMonthUpKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftMonthUpKeyStroke() {
-      super(SWT.ARROW_UP, SWT.SHIFT);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 1;
-      int value = 1;
-      shiftDate(level, value);
+      super(SWT.ARROW_UP, SWT.SHIFT, 1, 1);
     }
   }
 
-  private class P_ShiftMonthDownKeyStroke extends RwtKeyStroke {
+  private class P_ShiftMonthDownKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftMonthDownKeyStroke() {
-      super(SWT.ARROW_DOWN, SWT.SHIFT);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 1;
-      int value = -1;
-      shiftDate(level, value);
+      super(SWT.ARROW_DOWN, SWT.SHIFT, 1, -1);
     }
   }
 
-  private class P_ShiftYearUpKeyStroke extends RwtKeyStroke {
+  private class P_ShiftYearUpKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftYearUpKeyStroke() {
-      super(SWT.ARROW_UP, SWT.CONTROL);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 2;
-      int value = 1;
-      shiftDate(level, value);
+      super(SWT.ARROW_UP, SWT.CONTROL, 2, 1);
     }
   }
 
-  private class P_ShiftYearDownKeyStroke extends RwtKeyStroke {
+  private class P_ShiftYearDownKeyStroke extends P_AbstractShiftDateKeyStroke {
     public P_ShiftYearDownKeyStroke() {
-      super(SWT.ARROW_DOWN, SWT.CONTROL);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 2;
-      int value = -1;
-      shiftDate(level, value);
+      super(SWT.ARROW_DOWN, SWT.CONTROL, 2, -1);
     }
   }
 
