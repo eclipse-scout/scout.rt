@@ -468,55 +468,42 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     }
   }
 
-  private class P_ShiftNextQuarterHourKeyStroke extends RwtKeyStroke {
+  private abstract class P_AbstractShiftTimeKeyStroke extends AbstractShiftKeyStroke {
+    public P_AbstractShiftTimeKeyStroke(int keyCode, int level, int value) {
+      super(keyCode, SWT.NONE, level, value);
+    }
+
+    public P_AbstractShiftTimeKeyStroke(int keyCode, int stateMask, int level, int value) {
+      super(keyCode, stateMask, level, value);
+    }
+
+    @Override
+    protected void shift(final int level, final int value) {
+      shiftTime(level, value);
+    }
+  }
+
+  private class P_ShiftNextQuarterHourKeyStroke extends P_AbstractShiftTimeKeyStroke {
     public P_ShiftNextQuarterHourKeyStroke() {
-      super(SWT.ARROW_UP);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 0;
-      int value = 1;
-      shiftTime(level, value);
+      super(SWT.ARROW_UP, 0, 1);
     }
   }
 
-  private class P_ShiftPreviousQuarterHourKeyStroke extends RwtKeyStroke {
+  private class P_ShiftPreviousQuarterHourKeyStroke extends P_AbstractShiftTimeKeyStroke {
     public P_ShiftPreviousQuarterHourKeyStroke() {
-      super(SWT.ARROW_DOWN);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 0;
-      int value = -1;
-      shiftTime(level, value);
+      super(SWT.ARROW_DOWN, 0, -1);
     }
   }
 
-  private class P_ShiftNextHourKeyStroke extends RwtKeyStroke {
+  private class P_ShiftNextHourKeyStroke extends P_AbstractShiftTimeKeyStroke {
     public P_ShiftNextHourKeyStroke() {
-      super(SWT.ARROW_UP, SWT.SHIFT);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 1;
-      int value = 1;
-      shiftTime(level, value);
+      super(SWT.ARROW_UP, SWT.SHIFT, 1, 1);
     }
   }
 
-  private class P_ShiftPreviousHourKeyStroke extends RwtKeyStroke {
+  private class P_ShiftPreviousHourKeyStroke extends P_AbstractShiftTimeKeyStroke {
     public P_ShiftPreviousHourKeyStroke() {
-      super(SWT.ARROW_DOWN, SWT.SHIFT);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      int level = 1;
-      int value = -1;
-      shiftTime(level, value);
+      super(SWT.ARROW_DOWN, SWT.SHIFT, 1, -1);
     }
   }
 
