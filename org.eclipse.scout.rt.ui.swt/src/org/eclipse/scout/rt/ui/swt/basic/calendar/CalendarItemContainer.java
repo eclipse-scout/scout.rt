@@ -47,7 +47,7 @@ public class CalendarItemContainer implements Comparable {
     //
     m_fullDay = model.isFullDay(item);
     //
-    m_fromRelative = AbstractCell.getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * CalendarConstants.DAY_TIMELINE_START_TIME;
+    m_fromRelative = AbstractCell.getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * cell.getCalendar().getStartHour();
     if (m_fromRelative < 0) {
       m_fromRelative = 0;
     }

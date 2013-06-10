@@ -410,7 +410,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
         for (int hour = m_startHour; hour <= m_endHour; hour = hour + step) {
           int y = timedView.y + (hour - m_startHour) * (timedView.height) / (m_endHour + 1 - m_startHour);
           boolean majorHour = (hour == 12 || hour == 13);
-          if (majorHour) {
+          if (majorHour && m_dateChooser.getMarkNoonHour()) {
             g.setColor(darkLineCol);
           }
           else {
@@ -418,27 +418,12 @@ public class LargeCalendarCell extends AbstractCalendarCell {
           }
           g.drawLine(0, y, w, y);
           if (drawLabel) {
-            String s;
-            if (hour == m_startHour && hour != 0) {
-              s = SwingUtility.getNlsText("Calendar_earlier");
-            }
-            else if (hour == m_endHour && hour != 23) {
-              s = SwingUtility.getNlsText("Calendar_later");
-            }
-            else if (hour == 0) {
-              s = formatHour(0);
-            }
-            else if (hour < 10) {
-              s = formatHour(hour);
-            }
-            else {
-              s = formatHour(hour);
-            }
+            String label = getFormattedLabel(hour);
             //
             g.setColor(textCol);
-            g.drawString(s, 1, y + ascent);
+            g.drawString(label, 1, y + ascent);
             //
-            maxLabelWidth = Math.max(maxLabelWidth, fm.stringWidth(s) + 4);
+            maxLabelWidth = Math.max(maxLabelWidth, fm.stringWidth(label) + 4);
           }
         }
         if (drawLabel) {
@@ -453,6 +438,26 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       //see in paintAfter
     }
     return subView;
+  }
+
+  private String getFormattedLabel(int hour) {
+    String s;
+    if (hour == m_startHour && hour != 0 && m_useOverflowCells) {
+      s = SwingUtility.getNlsText("Calendar_earlier");
+    }
+    else if (hour == m_endHour && hour != 23 && m_useOverflowCells) {
+      s = SwingUtility.getNlsText("Calendar_later");
+    }
+    else if (hour == 0) {
+      s = formatHour(0);
+    }
+    else if (hour < 10) {
+      s = formatHour(hour);
+    }
+    else {
+      s = formatHour(hour);
+    }
+    return s;
   }
 
   protected void paintAfter(Graphics g) {
