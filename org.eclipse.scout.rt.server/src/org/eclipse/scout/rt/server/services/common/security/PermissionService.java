@@ -89,17 +89,16 @@ public class PermissionService extends AbstractService implements IPermissionSer
 
   /**
    * Checks whether the given class name is a potential permission class. This default implementation checks whether the
-   * class name contains <em>Permission</em> and that the class's package path contains an segment called
-   * <em>security</em>.
+   * class name contains <em>Permission</em>.
    * 
-   * @deprecated replaced by {@link #acceptClassName(Bundle, String)}
+   * @deprecated replaced by {@link #acceptClassName(Bundle, String)}. Will be removed in Release 3.10.
    * @param className
    *          The class name to check.
    * @return Returns <code>true</code> if the given class looks like a permission. Otherwise <code>false</code>.
    */
   @Deprecated
   protected boolean isCandidate(String className) {
-    return className.indexOf("Permission") >= 0 && className.indexOf(".security.") >= 0;
+    return className.indexOf("Permission") >= 0;
   }
 
   /**
@@ -117,8 +116,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
   /**
    * Checks whether the given class name is a potential permission class. Class names that do not meet the
    * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
-   * The default implementation checks whether the class name contains <code>"Permission"</code> and that the class's
-   * package path contains an segment called <code>"security"</code>.
+   * The default implementation checks whether the class name contains <code>"Permission"</code>.
    * 
    * @param bundle
    *          The class's hosting bundle
