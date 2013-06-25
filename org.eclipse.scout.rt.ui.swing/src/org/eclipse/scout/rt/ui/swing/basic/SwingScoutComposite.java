@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -487,7 +487,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     @Override
     public void hierarchyChanged(HierarchyEvent e) {
       if (e.getID() == HierarchyEvent.HIERARCHY_CHANGED) {
-        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+        if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
           if (e.getComponent().isDisplayable()) {
             handleSwingAddNotify();
           }
