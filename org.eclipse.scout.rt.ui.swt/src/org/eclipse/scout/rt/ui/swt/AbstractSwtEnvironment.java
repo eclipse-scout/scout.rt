@@ -690,9 +690,15 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   // icon handling
+
   @Override
   public Image getIcon(String name) {
-    return m_iconLocator.getIcon(name);
+    return getIcon(name, ICON_DECORATION_NONE);
+  }
+
+  @Override
+  public Image getIcon(String name, int iconDecoration) {
+    return m_iconLocator.getIcon(name, iconDecoration);
   }
 
   @Override
