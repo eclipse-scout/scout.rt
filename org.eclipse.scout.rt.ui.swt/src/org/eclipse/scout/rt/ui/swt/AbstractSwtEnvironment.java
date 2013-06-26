@@ -139,9 +139,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   private static boolean IS_E4 = false;
 
   static {
-    Object bundleVersion = Platform.getBundle("org.eclipse.platform").getHeaders().get("Bundle-Version");
-    if (bundleVersion instanceof String) {
-      IS_E4 = CompareUtility.compareTo((String) bundleVersion, "4.0") >= 0;
+    Bundle bundle = Platform.getBundle("org.eclipse.platform");
+    if (bundle != null) {
+      Object bundleVersion = bundle.getHeaders().get("Bundle-Version");
+      if (bundleVersion instanceof String) {
+        IS_E4 = CompareUtility.compareTo((String) bundleVersion, "4.0") >= 0;
+      }
     }
   }
 
