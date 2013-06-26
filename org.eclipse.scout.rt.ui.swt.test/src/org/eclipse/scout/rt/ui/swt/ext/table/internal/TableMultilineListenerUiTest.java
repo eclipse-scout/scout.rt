@@ -45,7 +45,7 @@ public class TableMultilineListenerUiTest {
       }
 
       @Override
-      public Image getIcon(String name) {
+      public Image getIcon(String name, int iconDecoration) {
         return null;
       }
 

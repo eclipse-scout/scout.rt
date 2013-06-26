@@ -22,7 +22,7 @@ public interface ISwtIconLocator {
 
   ImageDescriptor getImageDescriptor(String name);
 
-  Image getIcon(String name);
+  Image getIcon(String name, int iconDecoration);
 
   void dispose();
 

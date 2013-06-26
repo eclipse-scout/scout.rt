@@ -47,6 +47,9 @@ import org.eclipse.ui.IEditorInput;
 
 public interface ISwtEnvironment {
 
+  int ICON_DECORATION_NONE = 0;
+  int ICON_DECORATION_EDITABLE_CELL = 1;
+
   // ui properties
   String PROP_BUTTON_HEIGHT = "Button.height";
   String PROP_ACTIVATION_BUTTON_WIDTH = "ActivationButton.width";
@@ -107,6 +110,8 @@ public interface ISwtEnvironment {
   void removeEnvironmentListener(ISwtEnvironmentListener listener);
 
   Image getIcon(String name);
+
+  Image getIcon(String name, int iconDecoration);
 
   ImageDescriptor getImageDescriptor(String iconId);
 

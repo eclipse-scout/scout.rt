@@ -11,10 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.basic.table;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -28,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
@@ -36,7 +32,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
@@ -45,21 +40,14 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   private final ISwtEnvironment m_environment;
   private final SwtScoutTable m_swtTable;
   private final TableColumnManager m_columnManager;
-  private final Image m_imgCheckboxFalse;
-  private final Image m_imgCheckboxTrue;
   private final Color m_disabledForegroundColor;
-  private final int m_markerIconWith;
 
   public SwtScoutTableModel(ITable table, SwtScoutTable swtTable, ISwtEnvironment environment, TableColumnManager columnManager) {
     m_table = table;
     m_swtTable = swtTable;
     m_environment = environment;
     m_columnManager = columnManager;
-    m_imgCheckboxTrue = Activator.getIcon(SwtIcons.CheckboxYes);
-    m_imgCheckboxFalse = Activator.getIcon(SwtIcons.CheckboxNo);
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
-    Image markerIcon = Activator.getIcon(SwtIcons.CellEditable);
-    m_markerIconWith = (markerIcon != null) ? markerIcon.getBounds().width : 0;
   }
 
   public boolean isMultiline() {
@@ -113,47 +101,38 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   public Image getColumnImage(Object element, int columnIndex) {
     int[] columnOrder = m_swtTable.getSwtField().getColumnOrder();
     if (columnOrder.length > 1) {
-      Image image = null;
-
+      String iconId = null;
       ICell cell = getCell(element, columnIndex);
       IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
       if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
         if (((ITableRow) element).isChecked()) {
-          image = m_imgCheckboxTrue;
+          iconId = SwtIcons.CheckboxYes;
         }
         else {
-          image = m_imgCheckboxFalse;
+          iconId = SwtIcons.CheckboxNo;
         }
       }
       else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
         Boolean b = (Boolean) cell.getValue();
         if (b != null && b.booleanValue()) {
-          image = m_imgCheckboxTrue;
+          iconId = SwtIcons.CheckboxYes;
         }
         else {
-          image = m_imgCheckboxFalse;
+          iconId = SwtIcons.CheckboxNo;
         }
       }
       else if (cell != null && cell.getIconId() != null) {
-        image = m_environment.getIcon(cell.getIconId());
+        iconId = cell.getIconId();
       }
       else if (columnOrder[1] == columnIndex) {
         ITableRow row = (ITableRow) element;
-        image = m_environment.getIcon(row.getIconId());
+        iconId = row.getIconId();
       }
-
+      int iconDecoration = ISwtEnvironment.ICON_DECORATION_NONE;
       if (col != null && col.isEditable()) {
-        Display display = m_environment.getDisplay();
-        if (image != null) {
-          //make sure there is some space for the editable marker
-          int origHeight = image.getBounds().height;
-          int origWidth = image.getBounds().width;
-          int emptyImageHeight = origHeight / origWidth * (origWidth + m_markerIconWith) - origHeight;
-          Image emptyImage = getEmptyImage(display, m_markerIconWith, emptyImageHeight);
-          return combine(display, emptyImage, image);
-        }
+        iconDecoration = ISwtEnvironment.ICON_DECORATION_EDITABLE_CELL;
       }
-      return image;
+      return m_environment.getIcon(iconId, iconDecoration);
     }
     return null;
   }
@@ -163,30 +142,19 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
       return null;
     }
     Image emptyImage = new Image(display, width, height);
-    ImageData imageData = emptyImage.getImageData();
+    ImageData imageData;
+    try {
+      imageData = emptyImage.getImageData();
+    }
+    finally {
+      emptyImage.dispose();
+    }
     for (int i = 0; i < imageData.width; i++) {
       for (int j = 0; j < imageData.height; j++) {
         imageData.setAlpha(i, j, 0);
       }
     }
     return new Image(display, imageData);
-  }
-
-  private static Image combine(Display display, Image image1, Image image2) {
-    if (image1 == null) {
-      return image2;
-    }
-    else if (image2 == null) {
-      return image1;
-    }
-    Rectangle bounds1 = image1.getBounds();
-    Rectangle bounds2 = image2.getBounds();
-    Image emptyImage = getEmptyImage(display, bounds1.width + bounds2.width, Math.max(bounds1.height, bounds2.height));
-    ImageDescriptor desc = ImageDescriptor.createFromImage(image1);
-    ImageDescriptor desc2 = ImageDescriptor.createFromImage(image2);
-    DecorationOverlayIcon icon = new DecorationOverlayIcon(emptyImage, desc, IDecoration.TOP_LEFT);
-    DecorationOverlayIcon icon2 = new DecorationOverlayIcon(icon.createImage(), desc2, IDecoration.BOTTOM_RIGHT);
-    return icon2.createImage(display);
   }
 
   @Override
