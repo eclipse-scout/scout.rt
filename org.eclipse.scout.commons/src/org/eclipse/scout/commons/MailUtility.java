@@ -13,11 +13,9 @@ package org.eclipse.scout.commons;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -366,16 +364,14 @@ public final class MailUtility {
     String txt = null;
     File plainTextFile = new File(dir, simpleName + "." + fileType);
     if (plainTextFile.exists() && plainTextFile.canRead()) {
-      Reader reader = new FileReader(plainTextFile);
-      txt = IOUtility.getContent(reader);
-      reader.close();
+      txt = getContentFromFile(plainTextFile, "UTF-8");
     }
     return txt;
   }
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   * 
+   *
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -384,7 +380,7 @@ public final class MailUtility {
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   * 
+   *
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -453,9 +449,7 @@ public final class MailUtility {
       String plainTextMessage = null;
       boolean hasPlainText = false;
       if (plainTextFile.exists()) {
-        Reader reader = new FileReader(plainTextFile);
-        plainTextMessage = IOUtility.getContent(new InputStreamReader(new FileInputStream(plainTextFile), "UTF-8"));
-        reader.close();
+        plainTextMessage = getContentFromFile(plainTextFile, "UTF-8");
         hasPlainText = StringUtility.hasText(plainTextMessage);
       }
 
@@ -484,9 +478,7 @@ public final class MailUtility {
       String htmlMessage = null;
       boolean hasHtml = false;
       if (htmlFile.exists()) {
-        Reader reader = new FileReader(htmlFile);
-        htmlMessage = IOUtility.getContent(new InputStreamReader(new FileInputStream(htmlFile), "UTF-8"));
-        reader.close();
+        htmlMessage = getContentFromFile(htmlFile, "UTF-8");
         // replace directory entry
         // replace all paths to the 'files directory' with the root directory
         htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
@@ -556,11 +548,37 @@ public final class MailUtility {
       }
       return mimeMessage;
     }
-    catch (IOException e) {
-      throw new ProcessingException("Error occured while accessing files", e);
-    }
     catch (MessagingException e) {
       throw new ProcessingException("Error occured while creating MIME-message", e);
+    }
+  }
+
+  /**
+   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
+   * If no encoding is provided, the system default encoding is used
+   */
+  String getContentFromFile(File htmlFile, String encoding) throws ProcessingException {
+    try {
+      FileInputStream in = null;
+      String content = null;
+      try {
+        in = new FileInputStream(htmlFile);
+        if (StringUtility.hasText(encoding)) {
+          content = IOUtility.getContent(new InputStreamReader(in, encoding));
+        }
+        else {
+          content = IOUtility.getContent(new InputStreamReader(in));
+        }
+      }
+      finally {
+        if (in != null) {
+          in.close();
+        }
+      }
+      return content;
+    }
+    catch (IOException e) {
+      throw new ProcessingException(e.getMessage(), e);
     }
   }
 
