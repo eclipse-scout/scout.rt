@@ -956,7 +956,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     if (d != null) {
       if (df instanceof SimpleDateFormat) {
         String pattern = ((SimpleDateFormat) df).toPattern();
-        if (pattern.matches(".*[hHM].*")) {
+        if (pattern.matches(".*[hHm].*")) {
           includesTime.setValue(true);
         }
       }

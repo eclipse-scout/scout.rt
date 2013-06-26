@@ -48,10 +48,28 @@ public interface IDateField extends IValueField<Date> {
 
   void setHasTime(boolean b);
 
+  /**
+   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
+   * <b>NOTE:</b> in case of 0l the current time will be taken.
+   * 
+   * @param l
+   */
   void setAutoTimeMillis(long l);
 
+  /**
+   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
+   * <b>NOTE:</b> in case of 0l the current time will be taken.
+   * 
+   * @param l
+   */
   void setAutoTimeMillis(int hour, int minute, int second);
 
+  /**
+   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
+   * <b>NOTE:</b> in case of 0l the current time will be taken.
+   * 
+   * @param l
+   */
   long getAutoTimeMillis();
 
   /**
