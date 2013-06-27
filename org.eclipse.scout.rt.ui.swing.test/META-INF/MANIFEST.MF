@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout RT UI.SWING Test
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.swing.test;singleton:=true
-Bundle-Version: 3.9.0.qualifier
+Bundle-Version: 3.10.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: org.eclipse.scout.rt.ui.swing
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
