@@ -228,7 +228,7 @@ public final class TableUtility {
         format = ((ILongColumn) col).getFormat();
       }
       else if (col instanceof IBigDecimalColumn) {
-        type = Long.class;
+        type = Double.class;
         byValue = true;
         format = ((IBigDecimalColumn) col).getFormat();
       }
