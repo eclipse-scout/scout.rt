@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.rap"
       label="%featureName"
-      version="3.9.0.qualifier"
+      version="3.9.1.qualifier"
       provider-name="%providerName">
 
    <description url="http://www.eclipse.org/scout/">
@@ -24,7 +24,7 @@
 
    <requires>
       <import feature="org.eclipse.rap.feature" version="2.0.0" match="compatible"/>
-      <import feature="org.eclipse.scout.rt.client" version="3.9.0" match="compatible"/>
+      <import feature="org.eclipse.scout.rt.client" version="3.9.1" match="compatible"/>
    </requires>
 
    <plugin
