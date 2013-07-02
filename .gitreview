@@ -2,6 +2,6 @@
 host=git.eclipse.org
 port=29418
 project=scout/org.eclipse.scout.rt.git
-defaultbranch=master
+defaultbranch=release/3.9.1
 defaultremote=origin
 defaultrebase=0
