@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.InputStream;
 
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.junit.Test;
@@ -32,8 +31,8 @@ public class FileUtilityTest {
     File zipFile = null;
     File noZipFile = null;
     try {
-      zipFile = getFile("/zip.zip");
-      noZipFile = getFile("/nozip.zip");
+      zipFile = TestUtility.createTempFileFromFilename("/zip.zip", getClass());
+      noZipFile = TestUtility.createTempFileFromFilename("/nozip.zip", getClass());
       assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(zipFile));
       assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(noZipFile));
     }
@@ -41,10 +40,5 @@ public class FileUtilityTest {
       TestUtility.deleteTempFile(zipFile);
       TestUtility.deleteTempFile(noZipFile);
     }
-  }
-
-  private File getFile(String fileName) {
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
-    return TestUtility.createTempFileFromResource(inputStream);
   }
 }

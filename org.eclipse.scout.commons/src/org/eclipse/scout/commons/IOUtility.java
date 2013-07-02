@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -86,6 +87,35 @@ public final class IOUtility {
     }
     catch (FileNotFoundException e) {
       throw new ProcessingException("filename: " + filename, e);
+    }
+  }
+
+  /**
+   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
+   * If no encoding is provided, the system default encoding is used
+   */
+  public static String getContentInEncoding(String filepath, String encoding) throws ProcessingException {
+    try {
+      FileInputStream in = null;
+      String content = null;
+      try {
+        in = new FileInputStream(filepath);
+        if (StringUtility.hasText(encoding)) {
+          content = getContent(new InputStreamReader(in, encoding));
+        }
+        else {
+          content = getContent(new InputStreamReader(in));
+        }
+      }
+      finally {
+        if (in != null) {
+          in.close();
+        }
+      }
+      return content;
+    }
+    catch (IOException e) {
+      throw new ProcessingException(e.getMessage(), e);
     }
   }
 

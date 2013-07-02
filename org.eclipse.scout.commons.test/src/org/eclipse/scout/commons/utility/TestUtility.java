@@ -52,6 +52,11 @@ public final class TestUtility {
     }
   }
 
+  public static File createTempFileFromFilename(String fileName, Class clazz) {
+    InputStream inputStream = clazz.getClassLoader().getResourceAsStream(fileName);
+    return createTempFileFromResource(inputStream);
+  }
+
   private TestUtility() {
     //empty hidden constructor
   }
