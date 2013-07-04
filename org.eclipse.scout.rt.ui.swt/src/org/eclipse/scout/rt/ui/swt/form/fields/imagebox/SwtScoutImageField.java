@@ -21,14 +21,18 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
+import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
+import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -40,6 +44,8 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -52,33 +58,70 @@ import org.eclipse.swt.widgets.Menu;
 public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> implements ISwtScoutImageBox {
 
   private Image m_image;
+  private ImageViewer m_imageViewer;
+  private ScrolledFormEx m_scrolledForm;
 
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    ImageViewer imgViewer = getEnvironment().getFormToolkit().createImageViewer(container);
+    Composite body = null;
+    // scrollable handling
+    if (getScoutObject().isScrollBarEnabled()) {
+      m_scrolledForm = getEnvironment().getFormToolkit().createScrolledFormEx(container, SWT.H_SCROLL | SWT.V_SCROLL);
+      setSwtField(m_scrolledForm);
+      m_scrolledForm.setBackground(m_scrolledForm.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+      body = m_scrolledForm.getBody();
+      m_scrolledForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());
+    }
+    else {
+      body = getEnvironment().getFormToolkit().createComposite(container);
+      GridData bodyData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
+      bodyData.horizontalIndent = 0;
+      bodyData.verticalIndent = 0;
+      body.setLayoutData(bodyData);
+      setSwtField(body);
+    }
+
+    body.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(body) {
+      @Override
+      public void validate() {
+        super.validate();
+        if (m_scrolledForm != null) {
+          if (!m_scrolledForm.isDisposed()) {
+            m_scrolledForm.reflow(true);
+          }
+        }
+      }
+    });
+
+    m_imageViewer = getEnvironment().getFormToolkit().createImageViewer(body);
     setSwtContainer(container);
     setSwtLabel(label);
-    setSwtField(imgViewer);
 
-    imgViewer.addDisposeListener(new DisposeListener() {
+    m_imageViewer.addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }
     });
-    imgViewer.addMenuDetectListener(new P_RwtMenuDetectListener());
+    m_imageViewer.addMenuDetectListener(new P_RwtMenuDetectListener());
 
     // layout
-    getSwtContainer().setLayout(new LogicalGridLayout(1, 0));
+    body.setLayout(new FillLayout());
+    LogicalGridLayout layout = new LogicalGridLayout(1, 0);
+    getSwtContainer().setLayout(layout);
+  }
+
+  public ImageViewer getImageViewer() {
+    return m_imageViewer;
   }
 
   private void freeResources() {
     if (m_image != null && !m_image.isDisposed()) {
       if (getSwtField() != null && !getSwtField().isDisposed()) {
-        getSwtField().setImage(null);
+        getImageViewer().setImage(null);
       }
       m_image.dispose();
       m_image = null;
@@ -86,15 +129,10 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
   }
 
   @Override
-  public ImageViewer getSwtField() {
-    return (ImageViewer) super.getSwtField();
-  }
-
-  @Override
   protected void attachScout() {
     super.attachScout();
-    getSwtField().setAlignmentX(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
-    getSwtField().setAlignmentY(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().verticalAlignment));
+    getImageViewer().setAlignmentX(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
+    getImageViewer().setAlignmentY(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().verticalAlignment));
     updateAutoFitFromScout();
     updateImageFromScout();
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
@@ -104,20 +142,20 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     freeResources();
     if (getScoutObject().getImage() instanceof byte[]) {
       m_image = new Image(getSwtField().getDisplay(), new ByteArrayInputStream((byte[]) getScoutObject().getImage()));
-      getSwtField().setImage(m_image);
+      getImageViewer().setImage(m_image);
     }
     else if (getScoutObject().getImage() instanceof ImageData) {
       m_image = new Image(getSwtField().getDisplay(), (ImageData) getScoutObject().getImage());
-      getSwtField().setImage(m_image);
+      getImageViewer().setImage(m_image);
     }
     else if (!StringUtility.isNullOrEmpty(getScoutObject().getImageId())) {
-      getSwtField().setImage(getEnvironment().getIcon(getScoutObject().getImageId()));
+      getImageViewer().setImage(getEnvironment().getIcon(getScoutObject().getImageId()));
     }
     getSwtField().redraw();
   }
 
   protected void updateAutoFitFromScout() {
-    getSwtField().setAutoFit(getScoutObject().isAutoFit());
+    getImageViewer().setAutoFit(getScoutObject().isAutoFit());
   }
 
   @Override
