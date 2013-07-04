@@ -74,7 +74,6 @@ public class SwtIconLocator implements ISwtIconLocator {
     return desc;
 
   }
-
   /**
    * Find icon in plugin dependency path starting with root bundle {@link Platform#getProduct#getDefiningBundle}
    */

@@ -31,8 +31,6 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
   private transient ListenerList listenerList = null;
@@ -128,33 +126,9 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
         ITableRow row = (ITableRow) element;
         iconId = row.getIconId();
       }
-      int iconDecoration = ISwtEnvironment.ICON_DECORATION_NONE;
-      if (col != null && col.isEditable()) {
-        iconDecoration = ISwtEnvironment.ICON_DECORATION_EDITABLE_CELL;
-      }
-      return m_environment.getIcon(iconId, iconDecoration);
+      return m_environment.getIcon(iconId);
     }
     return null;
-  }
-
-  private static Image getEmptyImage(Display display, int width, int height) {
-    if (width == 0 || height == 0) {
-      return null;
-    }
-    Image emptyImage = new Image(display, width, height);
-    ImageData imageData;
-    try {
-      imageData = emptyImage.getImageData();
-    }
-    finally {
-      emptyImage.dispose();
-    }
-    for (int i = 0; i < imageData.width; i++) {
-      for (int j = 0; j < imageData.height; j++) {
-        imageData.setAlpha(i, j, 0);
-      }
-    }
-    return new Image(display, imageData);
   }
 
   @Override
