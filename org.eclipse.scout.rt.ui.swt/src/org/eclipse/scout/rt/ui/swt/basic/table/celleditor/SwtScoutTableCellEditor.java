@@ -240,7 +240,7 @@ public class SwtScoutTableCellEditor {
       public void doSetFocus() {
         ISwtScoutForm swtScoutForm = formFieldDialog.getInnerSwtScoutForm();
         if (swtScoutForm != null) {
-            requestFocus(swtScoutForm.getSwtContainer());
+          requestFocus(swtScoutForm.getSwtContainer());
         }
       }
     });
@@ -392,7 +392,7 @@ public class SwtScoutTableCellEditor {
     if (control.setFocus()) {
       return true;
     }
-  
+
     if (control instanceof Composite) {
       for (Control child : ((Composite) control).getChildren()) {
         if (requestFocus(child)) {
@@ -613,29 +613,29 @@ public class SwtScoutTableCellEditor {
               switch (e.detail) {
                 case SWT.TRAVERSE_ESCAPE:
                 case SWT.TRAVERSE_RETURN: {
-                e.doit = false;
-                break;
-              }
-              case SWT.TRAVERSE_TAB_NEXT: {
-                e.doit = false;
-                ITableRow scoutRow = m_editScoutRow;
-                IColumn<?> scoutCol = m_editScoutCol;
-                fireApplyEditorValue();
-                deactivate();
-                enqueueEditNextTableCell(scoutRow, scoutCol, true);
-                break;
-              }
-              case SWT.TRAVERSE_TAB_PREVIOUS: {
-                e.doit = false;
-                ITableRow scoutRow = m_editScoutRow;
-                IColumn<?> scoutCol = m_editScoutCol;
-                fireApplyEditorValue();
-                deactivate();
-                enqueueEditNextTableCell(scoutRow, scoutCol, false);
-                break;
+                  e.doit = false;
+                  break;
+                }
+                case SWT.TRAVERSE_TAB_NEXT: {
+                  e.doit = false;
+                  ITableRow scoutRow = m_editScoutRow;
+                  IColumn<?> scoutCol = m_editScoutCol;
+                  fireApplyEditorValue();
+                  deactivate();
+                  enqueueEditNextTableCell(scoutRow, scoutCol, true);
+                  break;
+                }
+                case SWT.TRAVERSE_TAB_PREVIOUS: {
+                  e.doit = false;
+                  ITableRow scoutRow = m_editScoutRow;
+                  IColumn<?> scoutCol = m_editScoutCol;
+                  fireApplyEditorValue();
+                  deactivate();
+                  enqueueEditNextTableCell(scoutRow, scoutCol, false);
+                  break;
+                }
               }
             }
-          }
           });
         }
         getFocusLostListener().resume(); // because listener was suspended after activation

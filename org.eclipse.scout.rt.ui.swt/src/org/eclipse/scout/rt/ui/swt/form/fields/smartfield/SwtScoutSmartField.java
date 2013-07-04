@@ -590,7 +590,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
           return;
         }
       }
-      if (getSwtField().isFocusControl()) {
+      if (!getSwtField().isDisposed() && getSwtField().isFocusControl()) {
         Runnable t = new Runnable() {
           @Override
           public void run() {

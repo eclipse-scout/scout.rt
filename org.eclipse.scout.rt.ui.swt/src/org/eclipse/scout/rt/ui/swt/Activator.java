@@ -78,7 +78,7 @@ public class Activator extends AbstractUIPlugin {
     if (m_iconLocator == null) {
       m_iconLocator = new SwtIconLocator(new SwtBundleIconLocator());
     }
-    return m_iconLocator.getIcon(name, ISwtEnvironment.ICON_DECORATION_NONE);
+    return m_iconLocator.getIcon(name);
   }
 
   private ImageDescriptor getImageDescriptorImpl(String name) {

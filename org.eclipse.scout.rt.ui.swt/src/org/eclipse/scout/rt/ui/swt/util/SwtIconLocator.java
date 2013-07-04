@@ -16,19 +16,15 @@ import java.util.Set;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -77,114 +73,31 @@ public class SwtIconLocator {
   /**
    * Find icon in plugin dependency path starting with root bundle {@link Platform#getProduct#getDefiningBundle}
    */
-  public Image getIcon(String name, int iconDecoration) {
-    Image img = null;
-    String iconName = name;
-    if (iconName == null) {
-      iconName = "";
-    }
-    switch (iconDecoration) {
-      case ISwtEnvironment.ICON_DECORATION_EDITABLE_CELL:
-        iconName = iconName + "__" + ISwtEnvironment.ICON_DECORATION_EDITABLE_CELL;
-        break;
-    }
-    if (StringUtility.isNullOrEmpty(iconName) || AbstractIcons.Null.equals(iconName)) {
+  public Image getIcon(String name) {
+    if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
     }
-    if (m_missingImages.contains(iconName)) {
+
+    if (m_missingImages.contains(name)) {
       return null;
     }
-    // try to get decorated icon
-    img = imageRegistry.get(iconName);
-    if (img != null) {
-      return img;
-    }
-    // load image
-    // get undecorated image
-    Image undecoratedImg = null;
-    if (StringUtility.hasText(name) && !AbstractIcons.Null.equals(name)) {
-      if (!m_missingImages.contains(name)) {
-        undecoratedImg = imageRegistry.get(name);
-        if (undecoratedImg == null) {
-          ImageDescriptor desc = createImageDescriptor(name);
-          if (desc != null) {
-            imageRegistry.put(name, desc);
-            undecoratedImg = imageRegistry.get(name);
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("image found '" + name + "'.");
-            }
-          }
-          else {
-            LOG.warn("image '" + name + "' could not be found!");
-            m_missingImages.add(name);
-          }
+    Image image = imageRegistry.get(name);
+    if (image == null) {
+      ImageDescriptor desc = createImageDescriptor(name);
+      if (desc != null) {
+        imageRegistry.put(name, desc);
+        image = imageRegistry.get(name);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("image found '" + name + "'.");
         }
       }
-    }
-    String decorationId = null;
-    switch (iconDecoration) {
-      case ISwtEnvironment.ICON_DECORATION_EDITABLE_CELL:
-        decorationId = SwtIcons.CellEditable;
-        break;
-    }
-    Image decorationImg = null;
-    if (StringUtility.hasText(decorationId) && !AbstractIcons.Null.equals(decorationId)) {
-      if (!m_missingImages.contains(decorationId)) {
-        decorationImg = imageRegistry.get(decorationId);
-        if (decorationImg == null) {
-          ImageDescriptor desc = createImageDescriptor(decorationId);
-          if (desc != null) {
-            imageRegistry.put(decorationId, desc);
-            decorationImg = imageRegistry.get(decorationId);
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("image found '" + decorationId + "'.");
-            }
-          }
-          else {
-            LOG.warn("image '" + decorationId + "' could not be found!");
-            m_missingImages.add(decorationId);
-          }
-        }
+      else {
+        LOG.warn("image '" + name + "' could not be found!");
+        m_missingImages.add(name);
       }
     }
-    if (decorationImg != null) {
-      img = createCombinedImageDescriptor(undecoratedImg, decorationImg);
 
-    }
-    else {
-      img = undecoratedImg;
-    }
-    return img;
-  }
-
-  /**
-   * @param undecoratedImg
-   * @param decorationImg
-   * @return
-   */
-  protected Image createCombinedImageDescriptor(Image undecoratedImg, Image decorationImg) {
-
-    if (undecoratedImg == null) {
-      return decorationImg;
-    }
-    else if (decorationImg == null) {
-      return undecoratedImg;
-    }
-    Rectangle undecoratedImgBounds = undecoratedImg.getBounds();
-    Rectangle decorationImgBounds = decorationImg.getBounds();
-    Image img = new Image(m_display, new Rectangle(0, 0, decorationImgBounds.width + undecoratedImgBounds.width, Math.max(decorationImgBounds.height, undecoratedImgBounds.height)));
-    GC gc = null;
-    try {
-      gc = new GC(img);
-      gc.drawImage(decorationImg, 0, 0);
-      gc.drawImage(undecoratedImg, decorationImgBounds.width, 0);
-    }
-    finally {
-      if (gc != null) {
-        gc.dispose();
-      }
-    }
-    return img;
+    return image;
   }
 
   protected ImageDescriptor createImageDescriptor(String name) {
@@ -200,7 +113,6 @@ public class SwtIconLocator {
       LOG.warn("image '" + name + "' could not be found!");
       m_missingImages.add(name);
     }
-
     return desc;
   }
 
