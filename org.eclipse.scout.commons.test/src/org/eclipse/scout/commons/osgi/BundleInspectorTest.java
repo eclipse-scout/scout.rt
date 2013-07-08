@@ -11,9 +11,11 @@
 package org.eclipse.scout.commons.osgi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.Test;
@@ -170,6 +172,22 @@ public class BundleInspectorTest extends AbstractBundleTest {
       fragment = installFragment("a.fragment", "1.0.0", "a.bundle");
       resolveBundles(bundle, fragment);
       assertSame(bundle, BundleInspector.getHostBundle(fragment));
+    }
+    finally {
+      uninstallBundles(bundle, fragment);
+    }
+  }
+
+  @Test
+  public void testIsFragment() throws Exception {
+    Bundle bundle = null;
+    Bundle fragment = null;
+    try {
+      assertNull(BundleInspector.getHostBundle(null));
+      bundle = installBundle("a.bundle", "1.0.0");
+      assertFalse(BundleInspector.isFragment(bundle));
+      fragment = installFragment("a.fragment", "1.0.0", "a.bundle");
+      assertTrue(BundleInspector.isFragment(fragment));
     }
     finally {
       uninstallBundles(bundle, fragment);

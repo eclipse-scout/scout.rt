@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -15,14 +15,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.eclipse.osgi.framework.internal.core.BundleFragment;
+import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.jaxws.Activator;
 import org.osgi.framework.Bundle;
 
 /**
  * Finds sun-jaxws.xml
  */
-@SuppressWarnings("restriction")
 public class SunJaxWsXmlFinder {
 
   /**
@@ -33,7 +32,7 @@ public class SunJaxWsXmlFinder {
     for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
       // exclude fragments as their content is searched by their host bundles.
       // Furthermore, fragments do not have a classloader and therefore cannot load classes.
-      if (!(bundle instanceof BundleFragment)) {
+      if (!(BundleInspector.isFragment(bundle))) {
         list.addAll(getConfigurations(bundle, "/WEB-INF"));
       }
     }
