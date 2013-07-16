@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -284,10 +284,16 @@ public final class CollectionUtility {
   }
 
   public static <T, U> U lastElement(SortedMap<T, U> m) {
+    if (m == null || m.isEmpty()) {
+      return null;
+    }
     return m.get(m.lastKey());
   }
 
   public static <T, U> U firstElement(SortedMap<T, U> m) {
+    if (m == null || m.isEmpty()) {
+      return null;
+    }
     return m.get(m.firstKey());
   }
 
@@ -296,8 +302,10 @@ public final class CollectionUtility {
    */
   public static <T> HashSet<T> hashSet(T... values) {
     HashSet<T> set = new HashSet<T>();
-    for (T v : values) {
-      set.add(v);
+    if (values != null) {
+      for (T v : values) {
+        set.add(v);
+      }
     }
     return set;
   }
