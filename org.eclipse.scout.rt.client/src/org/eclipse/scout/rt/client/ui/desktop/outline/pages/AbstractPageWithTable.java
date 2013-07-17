@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -194,6 +195,32 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
+   * Fetches data and loads them into the page's table.
+   * <p/>
+   * Typically subclasses override this method if this table page is using a bean-based table page data (i.e. an
+   * {@link PageData} annotation is present on this class):
+   * 
+   * <pre>
+   * AbstractTablePageData pageData = service.loadPageData(...);
+   * getTable().importFromTableBeanData(pageData);
+   * </pre>
+   * <p/>
+   * This default implementation invokes {@link #execLoadTableData(SearchFilter)} to fetch the tabular data and loads it
+   * into the table using {@link ITable#replaceRowsByMatrix(Object)}.
+   * 
+   * @param filter
+   *          a search filter, guaranteed not to be {@code null}
+   * @throws ProcessingException
+   * @since 3.10.0-M1 (backported)
+   */
+  @ConfigOperation
+  @Order(85)
+  protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
+    getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(filter)));
+  }
+
+  /**
    * Fetches and returns tabular data to be displayed in this page's table.
    * Typically this method will query a (backend) service for the data. Make
    * sure the returned content (including type definitions) matches the table columns.
@@ -222,10 +249,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * ITable.addRows} because in the former case the outline tree structure below the changing rows is not discarded but
    * only marked as dirty. The subtree is lazily reloaded when the user clicks next time on a child node.
    * <p>
-   * Subclasses can override this method. In most cases it is sufficient to override
-   * {@link #execLoadTableData(SearchFilter)} instead.<br/>
+   * Subclasses can override this method. In most cases it is sufficient to override {@link #execLoadData(SearchFilter)}
+   * or {@link #execLoadTableData(SearchFilter)} instead.<br/>
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
-   * {@link #isSearchRequired()} and then calls {@code execLoadTableData} if appropriate.
+   * {@link #isSearchRequired()} and then calls {@link #execLoadData(SearchFilter)} if appropriate.
    * 
    * @throws ProcessingException
    */
@@ -238,14 +265,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         // create a copy of the filter, just in case the subprocess is modifying
         // or extending the filter
         filter = (SearchFilter) filter.clone();
-        //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
-        getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(filter)));
+        execLoadData(filter);
       }
     }
     else {
       // searchFilter should never be null
-      //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
-      getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(new SearchFilter())));
+      execLoadData(new SearchFilter());
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
