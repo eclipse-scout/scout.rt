@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -58,6 +61,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
@@ -1213,6 +1217,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     target.setValueSet(true);
   }
 
+  private Object shiftDateTimeToTimeZone(IColumn column, Object value) {
+    if (column instanceof AbstractDateColumn && ((AbstractDateColumn) column).isHasTime() && value != null && value instanceof Date) {
+      return ClientSessionThreadLocal.get().server2ClientDate(((Date) value));
+/*      IClientSession clientSession = ClientSessionThreadLocal.get();
+      Date shiftedDate = new Date(((Date) value).getTime() + clientSession.getServerClientTimeZoneDifference());
+      return shiftedDate;*/
+    }
+    else {
+      return value;
+    }
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public void updateTable(AbstractTableFieldData source) throws ProcessingException {
@@ -1225,11 +1241,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (importState != AbstractTableFieldData.STATUS_DELETED) {
           ITableRow newTableRow = new TableRow(getColumnSet());
           for (int j = 0, nj = source.getColumnCount(); j < nj; j++) {
+            Object value = source.getValueAt(i, j);
             if (j < getColumnCount()) {
-              getColumnSet().getColumn(j).setValue(newTableRow, source.getValueAt(i, j));
+              value = shiftDateTimeToTimeZone(getColumnSet().getColumn(j), value);
+              getColumnSet().getColumn(j).setValue(newTableRow, value);
             }
             else {
-              newTableRow.setCellValue(j, source.getValueAt(i, j));
+              newTableRow.setCellValue(j, value);
             }
           }
           newTableRow.setStatus(importState);
@@ -3963,6 +3981,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return new TableRow(getColumnSet());
     }
 
+    @Override
+    public ITableRow createRow(Object rowValues) throws ProcessingException {
+      if (!rowValues.getClass().isArray()) {
+        throw new IllegalArgumentException("argument must be an array value []");
+      }
+      ITableRow row = createEmptyTableRow();
+      for (int c = 0, nc = Array.getLength(rowValues); c < nc; c++) {
+        Object value = Array.get(rowValues, c);
+        value = shiftDateTimeToTimeZone(getColumns()[c], value);
+        row.setCellValue(c, value);
+      }
+      return row;
+    }
   }
 
   private class P_TableListener extends TableAdapter {

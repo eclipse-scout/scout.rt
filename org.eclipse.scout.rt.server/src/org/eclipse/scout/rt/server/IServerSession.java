@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -55,4 +56,12 @@ public interface IServerSession {
    * @return used to foce sync execution of server jobs
    */
   boolean isWebSession();
+
+  /**
+   * passes the time zone of the server to the client
+   * 
+   * @return
+   */
+  TimeZone getServerTimeZone();
+
 }

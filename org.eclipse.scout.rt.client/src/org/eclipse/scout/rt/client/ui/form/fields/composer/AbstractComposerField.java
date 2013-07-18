@@ -20,9 +20,9 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -252,6 +252,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     AttributeNode node = new AttributeNode(this, a);
     node.setAggregationType(aggregationType);
     node.setOp(op);
+    values = node.shiftDateTimeFromTimeZone(a, values);
     node.setValues(values);
     node.setTexts(texts);
     node.setStatus(ITreeNode.STATUS_INSERTED);

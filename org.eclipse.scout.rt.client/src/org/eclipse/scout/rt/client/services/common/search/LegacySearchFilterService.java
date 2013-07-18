@@ -10,15 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.search;
 
+import java.util.Date;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.LegacyComposerStatementBuilder;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractUTCDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -92,11 +96,21 @@ public class LegacySearchFilterService extends DefaultSearchFilterService {
     if (field instanceof AbstractValueField<?>) {
       AbstractValueField<?> valueField = (AbstractValueField<?>) field;
       if (valueField.getValue() != null && valueField.getLegacySearchTerm() != null) {
-        search.addWhereToken(valueField.getLegacySearchTerm(), valueField.getValue());
+        // shift date
+        search.addWhereToken(valueField.getLegacySearchTerm(), shiftDateTimeFromTimeZone(valueField));
       }
       return true;
     }
     return false;
+  }
+
+  private Object shiftDateTimeFromTimeZone(AbstractValueField<?> valueField) {
+    if (valueField.getValue() != null && valueField instanceof AbstractUTCDateField && ((AbstractUTCDateField) valueField).isHasTime()) {
+      return ClientSessionThreadLocal.get().client2ServerDate(((Date) valueField.getValue()));
+    }
+    else {
+      return valueField.getValue();
+    }
   }
 
 }

@@ -15,6 +15,8 @@ import java.util.Date;
 import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 
 /**
@@ -28,4 +30,14 @@ public abstract class AbstractUTCDateField extends AbstractDateField implements 
     return super.getHolderType();
   }
 
+  @Override
+  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+    AbstractUTCFieldData v = (AbstractUTCFieldData) target;
+    if (this.getValue() == null) {
+      v.setValue(null);
+    }
+    else {
+      v.setValue(new UTCDate(this.getValue().getTime()));
+    }
+  }
 }

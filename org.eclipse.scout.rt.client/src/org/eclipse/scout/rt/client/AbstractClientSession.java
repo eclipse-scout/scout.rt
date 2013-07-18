@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.security.auth.Subject;
 
@@ -77,6 +79,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private final HashMap<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
+  private int m_serverClientTimeZoneDifference;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -225,7 +228,46 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  @Override
+  public TimeZone getServerTimeZone() {
+    return getSharedContextVariable("serverTimeZone", TimeZone.class);
+  }
+
+  protected void setServerClientTimeZoneDifference(int timezoneDiff) {
+    m_serverClientTimeZoneDifference = timezoneDiff;
+  }
+
+  @Override
+  public int getServerClientTimeZoneDifference() {
+    return m_serverClientTimeZoneDifference;
+  }
+
+  @Override
+  public Date client2ServerDate(Date clientDate) {
+    if (getSharedContextVariable("applyTimeZoneShift", Boolean.class)) {
+      return new Date(clientDate.getTime() - getServerClientTimeZoneDifference());
+    }
+    else {
+      return clientDate;
+    }
+  }
+
+  @Override
+  public Date server2ClientDate(Date serverDate) {
+    if (getSharedContextVariable("applyTimeZoneShift", Boolean.class)) {
+      return new Date(serverDate.getTime() + getServerClientTimeZoneDifference());
+    }
+    else {
+      return serverDate;
+    }
+  }
+
   private void updateSharedVariableMap(SharedVariableMap newMap) {
+    TimeZone timeZone = (TimeZone) newMap.get("serverTimeZone");
+    if (timeZone != null) {
+      int timezoneDiff = TimeZone.getDefault().getRawOffset() - timeZone.getRawOffset();
+      setServerClientTimeZoneDifference(timezoneDiff);
+    }
     m_sharedVariableMap.updateInternal(newMap);
   }
 

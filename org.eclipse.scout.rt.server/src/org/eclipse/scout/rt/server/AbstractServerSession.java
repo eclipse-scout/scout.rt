@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -170,6 +171,20 @@ public abstract class AbstractServerSession implements IServerSession {
     return m_bundle;
   }
 
+  protected void assignServerTimeZone() {
+    setServerTimeZoneInternal(TimeZone.getDefault());
+    setSharedContextVariable("applyTimeZoneShift", Boolean.class, false);
+  }
+
+  @Override
+  public final TimeZone getServerTimeZone() {
+    return getSharedContextVariable("serverTimeZone", TimeZone.class);
+  }
+
+  private void setServerTimeZoneInternal(TimeZone newValue) {
+    setSharedContextVariable("serverTimeZone", TimeZone.class, newValue);
+  }
+
   @Override
   public final void loadSession(Bundle bundle) throws ProcessingException {
     if (isActive()) {
@@ -183,6 +198,7 @@ public abstract class AbstractServerSession implements IServerSession {
     m_scoutTexts = new ScoutTexts();
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
     TextsThreadLocal.set(m_scoutTexts);
+    assignServerTimeZone();
     assignUserId();
     execLoadSession();
   }

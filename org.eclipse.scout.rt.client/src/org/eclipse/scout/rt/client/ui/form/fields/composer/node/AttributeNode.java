@@ -10,18 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
+import java.util.Date;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 
+@SuppressWarnings("deprecation")
 public class AttributeNode extends AbstractComposerNode {
   private IDataModelAttribute m_attribute;
   private Integer m_aggregationType;
@@ -125,6 +130,33 @@ public class AttributeNode extends AbstractComposerNode {
     m_aggregationType = a;
   }
 
+  public Object[] shiftDateTimeToTimeZone(IDataModelAttribute a, Object[] values) {
+    if (a != null && a instanceof AbstractComposerAttribute && ((AbstractComposerAttribute) a).getType() == IDataModelAttribute.TYPE_DATE_TIME && values != null && values.length > 0) {
+      Object[] newValues = new Object[values.length];
+      for (int i = 0; i < values.length; i++) {
+        newValues[i] = values[i];
+        if (values[i] != null && values[i] instanceof Date) {
+          newValues[i] = ClientSessionThreadLocal.get().server2ClientDate(((Date) values[i]));
+        }
+      }
+      return newValues;
+    }
+    else {
+      return values;
+    }
+  }
+
+  public Object[] shiftDateTimeFromTimeZone(IDataModelAttribute a, Object[] values) {
+    if (a != null && a instanceof AbstractComposerAttribute && ((AbstractComposerAttribute) a).getType() == IDataModelAttribute.TYPE_DATE_TIME && values != null && values.length > 0) {
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] != null && values[i] instanceof Date) {
+          values[i] = ClientSessionThreadLocal.get().client2ServerDate(((Date) values[i]));
+        }
+      }
+    }
+    return values;
+  }
+
   @Order(1)
   public class EditAttributeMenu extends AbstractMenu {
 
@@ -145,14 +177,14 @@ public class AttributeNode extends AbstractComposerNode {
       }
       form.setSelectedAttribute(getAttribute());
       form.setSelectedOp(getOp());
-      form.setSelectedValues(getValues());
+      form.setSelectedValues(shiftDateTimeToTimeZone(getAttribute(), getValues()));
       form.setSelectedDisplayValues(getTexts());
       form.startModify();
       form.waitFor();
       if (form.isFormStored()) {
         setAttribute(form.getSelectedAttribute());
         setOp(form.getSelectedOp());
-        setValues(form.getSelectedValues());
+        setValues(shiftDateTimeFromTimeZone(form.getSelectedAttribute(), form.getSelectedValues()));
         setTexts(form.getSelectedDisplayValues());
         if (!isStatusInserted()) {
           setStatusInternal(ITreeNode.STATUS_UPDATED);

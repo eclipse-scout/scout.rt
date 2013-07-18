@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.security.auth.Subject;
 
@@ -187,4 +189,34 @@ public interface IClientSession {
    * @param l
    */
   void setLocale(Locale l);
+
+  /**
+   * needed for time zone shift, if the client is not in the same as the server
+   * 
+   * @return TimeZone
+   */
+  TimeZone getServerTimeZone();
+
+  /**
+   * needed for time zone shift, if the client is not in the same as the server
+   * 
+   * @return the difference in hours
+   */
+  int getServerClientTimeZoneDifference();
+
+  /**
+   * converts a client date to a server date
+   * 
+   * @param clientDate
+   * @return
+   */
+  Date client2ServerDate(Date clientDate);
+
+  /**
+   * converts a server date to a client date
+   * 
+   * @param serverDate
+   * @return
+   */
+  Date server2ClientDate(Date serverDate);
 }
