@@ -95,6 +95,7 @@ public final class SwingUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingUtility.class);
 
   public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
+  public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
   public static final boolean DO_RESET_COMPONENT_BOUNDS = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.layout.resetBoundsOnInvalidate"), true);
   public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.verifyInputOnWindowClosed"), false);
 
