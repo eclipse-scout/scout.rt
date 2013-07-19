@@ -133,9 +133,14 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
 
   @Override
   public void removeView(JInternalFrameEx f) {
-    getSwingDesktopPane().getDesktopManager().closeFrame(f);
     f.setVisible(false);
+    f.dispose();
+    getSwingDesktopPane().getDesktopManager().closeFrame(f);
     getSwingDesktopPane().remove(f);
+    if (SwingUtility.IS_JAVA_7_OR_LESS) {
+      //Workaround JRE Bug #4759312; See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4759312 for details
+      getSwingDesktopPane().selectFrame(true);
+    }
   }
 
   protected IMultiSplitStrategy createMultiSplitStrategy() {
