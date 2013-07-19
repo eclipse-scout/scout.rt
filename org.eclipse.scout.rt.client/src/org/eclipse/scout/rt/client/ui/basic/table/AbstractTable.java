@@ -3987,7 +3987,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         throw new IllegalArgumentException("argument must be an array value []");
       }
       ITableRow row = createEmptyTableRow();
-      for (int c = 0, nc = Array.getLength(rowValues); c < nc; c++) {
+      for (int c = 0, nc = Array.getLength(rowValues); c < nc && getColumns() != null && c < getColumns().length; c++) {
         Object value = Array.get(rowValues, c);
         value = shiftDateTimeToTimeZone(getColumns()[c], value);
         row.setCellValue(c, value);
