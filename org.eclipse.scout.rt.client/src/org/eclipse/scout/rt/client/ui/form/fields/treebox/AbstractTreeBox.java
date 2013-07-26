@@ -60,6 +60,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   private Class<? extends ICodeType> m_codeTypeClass;
   private boolean m_valueTreeSyncActive;
   private boolean m_autoExpandAll;
+  private boolean m_autoCheckChildNodes;
   private boolean m_loadIncremental;
   private ITreeBoxUIFacade m_uiFacade;
   private ITreeNodeFilter m_activeNodesFilter;
@@ -182,6 +183,24 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return false;
   }
 
+  /**
+   * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
+   * <p>
+   * Makes only sense if
+   * 
+   * <pre>
+   * {@link #getConfiguredCheckable()}
+   * </pre>
+   * 
+   * is set to true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(310)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredAutoCheckChildNodes() {
+    return false;
+  }
+
   @Override
   @ConfigPropertyValue("1.0")
   protected double getConfiguredGridWeightY() {
@@ -259,6 +278,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     setFilterCheckedNodes(getConfiguredFilterCheckedNodes());
     setFilterCheckedNodesValue(getConfiguredFilterCheckedNodes());
     setAutoExpandAll(getConfiguredAutoExpandAll());
+    setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setLoadIncremental(getConfiguredLoadIncremental());
     try {
       m_tree = ConfigurationUtility.newInnerInstance(this, getConfiguredTree());
@@ -282,6 +302,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
                 }
                 case TreeEvent.TYPE_NODES_UPDATED: {
                   if (getTree().isCheckable()) {
+                    if (isAutoCheckChildNodes() && e.getNodes() != null) {
+                      for (ITreeNode node : e.getNodes()) {
+                        execAutoCheckChildNodes(node, node.isChecked());
+                      }
+                    }
                     syncTreeToValue();
                   }
                   break;
@@ -766,6 +791,16 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     m_autoExpandAll = b;
   }
 
+  @Override
+  public boolean isAutoCheckChildNodes() {
+    return m_autoCheckChildNodes;
+  }
+
+  @Override
+  public void setAutoCheckChildNodes(boolean b) {
+    m_autoCheckChildNodes = b;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public boolean isNodeActive(ITreeNode node) {
@@ -881,6 +916,15 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     finally {
       getTree().setTreeChanging(false);
       m_valueTreeSyncActive = false;
+    }
+  }
+
+  protected void execAutoCheckChildNodes(ITreeNode node, boolean value) {
+    for (ITreeNode childNode : node.getFilteredChildNodes()) {
+      if (childNode.isEnabled() && childNode.isVisible()) {
+        childNode.setChecked(value);
+      }
+      execAutoCheckChildNodes(childNode, value);
     }
   }
 
