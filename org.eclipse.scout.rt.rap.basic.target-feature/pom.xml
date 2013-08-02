@@ -27,8 +27,8 @@
   <name>Eclipse Scout Runtime RAP Basic Target Feature</name>
 
   <properties>
-    <target-platform>eclipse-staging</target-platform>
-    <platform-version>[3.9,3.10)</platform-version>
+    <target-platform>${rap-repo-target-platform}</target-platform>
+    <platform-version>${rap-repo-platform-version}</platform-version>
   </properties>
 
   <build>
