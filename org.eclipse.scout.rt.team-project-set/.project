@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+    <name>org.eclipse.scout.rt.team-project-set</name>
+    <comment></comment>
+    <projects>
+    </projects>
+    <buildSpec>
+    </buildSpec>
+    <natures>
+    </natures>
+        <linkedResources>
+        <link>
+            <name>.settings/de.loskutov.anyedit.AnyEditTools.prefs</name>
+            <type>1</type>
+            <locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt-feature/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
+        </link>
+        <link>
+            <name>.settings/org.eclipse.core.resources.prefs</name>
+            <type>1</type>
+            <locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt-feature/.settings/org.eclipse.core.resources.prefs</locationURI>
+        </link>
+    </linkedResources>
+</projectDescription>
