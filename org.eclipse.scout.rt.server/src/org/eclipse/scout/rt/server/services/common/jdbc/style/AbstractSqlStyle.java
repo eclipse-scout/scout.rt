@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 
-public abstract class AbstractSqlStyle implements ISqlStyle {
+public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
 
@@ -384,7 +384,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   public Object readBind(ResultSet rs, ResultSetMetaData meta, int type, int jdbcBindIndex) throws SQLException {
     Object o = null;
     switch (type) {
-      // General Number
+    // General Number
       case Types.DECIMAL:
       case Types.NUMERIC: {
         BigDecimal bd = rs.getBigDecimal(jdbcBindIndex);
@@ -398,7 +398,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         }
         break;
       }
-        // Long
+      // Long
       case Types.BIT:
       case Types.BIGINT:
       case Types.SMALLINT:
@@ -407,20 +407,20 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = new Long(rs.getLong(jdbcBindIndex));
         break;
       }
-        // Double
+      // Double
       case Types.DOUBLE:
       case Types.FLOAT:
       case Types.REAL: {
         o = new Double(rs.getDouble(jdbcBindIndex));
         break;
       }
-        // String
+      // String
       case Types.VARCHAR:
       case Types.CHAR: {
         o = rs.getString(jdbcBindIndex);
         break;
       }
-        // Date
+      // Date
       case Types.DATE: {
         // Build 154: changed from getDate to getTimestamp()
         // o=result.getDate(i+1);
@@ -435,7 +435,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = rs.getTimestamp(jdbcBindIndex);
         break;
       }
-        // Raw
+      // Raw
       case Types.LONGVARCHAR: {
         try {
           o = rs.getString(jdbcBindIndex);
@@ -1023,5 +1023,13 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   protected String adaptBindNameTimeDateOp(String bindName) {
     return adaptBindName(bindName);
+  }
+
+  @Override
+  public void commit() {
+  }
+
+  @Override
+  public void rollback() {
   }
 }
