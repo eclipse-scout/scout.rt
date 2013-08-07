@@ -3,7 +3,7 @@
 <target name="scout-3.9-staging.target" sequenceNumber="9">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_staging" location="http://download.eclipse.org/releases/staging/"/>
+      <repository id="eclipse_maintenance" location="http://download.eclipse.org/releases/maintenance/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
