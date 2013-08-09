@@ -23,7 +23,7 @@ public interface ServiceConstants {
    * The value is of type String (may be a classname) and is used by the corresponding service factory to filter the
    * service usage based on the scope.
    */
-  String SERVICE_SCOPE = "service.scope";
+  String SERVICE_SCOPE = "service.sessionScope";
 
   /**
    * osgi service init parameter that acts as hint for the service factory to start the service automatically (as soon

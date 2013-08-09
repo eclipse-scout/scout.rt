@@ -95,7 +95,7 @@ The service factory must provide one of the following constructors (the first in
 Typical sessions include IClientSession and IServerSession and subclasses of it.
 This attribute can only be used together with a service factory.
 
-The session is provided to the osgi service by the init parameter with the name &quot;service.scope&quot; ( ServiceConstants.SERVICE_SCOPE )
+The session is provided to the osgi service by the init parameter with the name &quot;service.sessionScope&quot; ( ServiceConstants.SERVICE_SCOPE )
                </documentation>
                <appInfo>
                   <meta.attribute kind="java"/>
@@ -178,7 +178,7 @@ The service factory must provide one of the following constructors (the first in
 Typical sessions include IClientSession and IServerSession and subclasses of it.
 This attribute can only be used together with a service factory.
 
-The session is provided to the osgi service by the init parameter with the name &quot;service.scope&quot; ( ServiceConstants.SERVICE_SCOPE )
+The session is provided to the osgi service by the init parameter with the name &quot;sessionScope&quot; ( ServiceConstants.SERVICE_SCOPE )
                </documentation>
                <appInfo>
                   <meta.attribute kind="java"/>
