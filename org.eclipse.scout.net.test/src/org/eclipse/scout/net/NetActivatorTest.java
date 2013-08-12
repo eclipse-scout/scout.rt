@@ -10,7 +10,7 @@ import org.junit.Test;
  */
 public class NetActivatorTest {
 
-  private static final String TEST_URL = "http://www.google.ch";
+  private static final String TEST_URL = "http://www.eclipse.org";
 
   /**
    * Test connecting to an url using {@link NetActivator}
