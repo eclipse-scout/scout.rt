@@ -155,7 +155,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
         public void run() {
           IMenu[] scoutMenus = getScoutObject().getUIFacade().fireComponentPopupFromUI();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -169,7 +169,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
         public void run() {
           IMenu[] scoutMenus = getScoutObject().getUIFacade().fireNewPopupFromUI();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
