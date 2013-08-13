@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -194,32 +194,32 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
             case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
             case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
             case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
-            Runnable t = new Runnable() {
-              @Override
-              public void run() {
-                switch (e.getType()) {
-                  case ActivityMapEvent.TYPE_ACTIVITIES_DELETED:
-                  case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
-                  case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
-                  case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
-                  try {
-                    getUpdateSwingFromScoutLock().acquire();
-                    //
-                    handleActivitiesChangedFromScout();
+              Runnable t = new Runnable() {
+                @Override
+                public void run() {
+                  switch (e.getType()) {
+                    case ActivityMapEvent.TYPE_ACTIVITIES_DELETED:
+                    case ActivityMapEvent.TYPE_ACTIVITIES_INSERTED:
+                    case ActivityMapEvent.TYPE_ACTIVITIES_UPDATED:
+                    case ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED: {
+                      try {
+                        getUpdateSwingFromScoutLock().acquire();
+                        //
+                        handleActivitiesChangedFromScout();
+                      }
+                      finally {
+                        getUpdateSwingFromScoutLock().release();
+                      }
+                      break;
+                    }
                   }
-                  finally {
-                    getUpdateSwingFromScoutLock().release();
-                  }
-                  break;
                 }
-              }
+              };
+              getSwingEnvironment().invokeSwingLater(t);
+              break;
             }
-            };
-            getSwingEnvironment().invokeSwingLater(t);
-            break;
           }
         }
-      }
       };
       getScoutActivityMap().addActivityMapListener(m_scoutListener);
     }
@@ -407,7 +407,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
       public void run() {
         IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireNewActivityPopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -425,7 +425,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
       public void run() {
         IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireEditActivityPopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);

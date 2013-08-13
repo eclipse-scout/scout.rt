@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -135,7 +135,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
         public void run() {
           IMenu[] scoutMenus = getScoutObject().getUIFacade().fireComponentPopupFromUI();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -149,7 +149,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
         public void run() {
           IMenu[] scoutMenus = getScoutObject().getUIFacade().fireNewPopupFromUI();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -298,7 +298,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       if (e.isPopupTrigger()) {
         handleSwingCalendarPopup(e);
       }
-      if(fix!=null) {
+      if (fix != null) {
         fix.mouseReleased(this, e);
       }
     }
