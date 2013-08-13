@@ -411,7 +411,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       public void run() {
         IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireNewActivityPopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -429,7 +429,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       public void run() {
         IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireEditActivityPopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
