@@ -193,6 +193,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
    * </pre>
    * 
    * is set to true.
+   * 
+   * @since 3.10-M1 (backported to 3.8 / 3.9)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
