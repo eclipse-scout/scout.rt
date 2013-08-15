@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -82,7 +83,8 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   /**
    * Used for mutable tables to keep last valid value per row and column.
    */
-  private Map<ITableRow, T> m_validatedValues;
+  // TODO: Move cache to AbstractTable with bug 414646
+  private Map<InternalTableRow, T> m_validatedValues = new HashMap<InternalTableRow, T>();
 
   public AbstractColumn() {
     m_headerCell = new HeaderCell();
@@ -99,12 +101,26 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
         }
       }
     });
-
-    clearValidatedValues();
   }
 
   public final void clearValidatedValues() {
-    m_validatedValues = new HashMap<ITableRow, T>();
+    m_validatedValues.clear();
+  }
+
+  public final T clearValidatedValue(ITableRow row) {
+    return m_validatedValues.remove(row);
+  }
+
+  private void storeValidatedValue(ITableRow row, T validatedValue) {
+    if (row instanceof InternalTableRow) {
+      m_validatedValues.put((InternalTableRow) row, validatedValue);
+    }
+  }
+
+  private void removeValidatedValue(ITableRow row) {
+    if (row instanceof InternalTableRow) {
+      m_validatedValues.remove((InternalTableRow) row);
+    }
   }
 
   protected Map<String, Object> getPropertiesMap() {
@@ -883,8 +899,8 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     T validatedValue = m_validatedValues.get(r);
     if (validatedValue == null) {
       validatedValue = getValueInternal(r);
+      storeValidatedValue(r, validatedValue);
     }
-    m_validatedValues.put(r, validatedValue);
     return validatedValue;
   }
 
@@ -909,18 +925,14 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   private void setValueInternal(ITableRow row, T value, IFormField editingField) throws ProcessingException {
+    T newValue = validateValue(row, value);
+    row.setCellValue(getColumnIndex(), newValue);
     /*
      * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
      * If the passed value is valid, it will be stored in the validated value cache. Otherwise, the old validated
      * value is used.
      */
     validateColumnValue(row, editingField, true, value);
-    ICell cell = row.getCell(this);
-    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
-      m_validatedValues.put(row, value);
-    }
-    T newValue = validateValue(row, value);
-    row.setCellValue(getColumnIndex(), newValue);
   }
 
   @Override
@@ -1554,6 +1566,11 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       LOG.error("validateColumnValue called with row=null");
       return;
     }
+    if (!(row instanceof InternalTableRow)) {
+      LOG.info("validateColumnValue called with row not of type " + InternalTableRow.class);
+      return;
+    }
+
     if (isCellEditable(row)) {
       try {
         if (editor == null) {
@@ -1583,6 +1600,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
               cell.setErrorStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
               cell.setText("");
             }
+            return;
           }
           else {
             /*
@@ -1603,7 +1621,13 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       }
       catch (Throwable t) {
         LOG.error("validating " + getTable().getClass().getSimpleName() + " for new row for column " + getClass().getSimpleName(), t);
+        return;
       }
+    }
+
+    ICell cell = row.getCell(this);
+    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
+      removeValidatedValue(row);
     }
 
   }
