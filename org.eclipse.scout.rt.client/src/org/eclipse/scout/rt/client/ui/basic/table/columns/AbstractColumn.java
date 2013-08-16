@@ -1570,6 +1570,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       LOG.info("validateColumnValue called with row not of type " + InternalTableRow.class);
       return;
     }
+    if (m_isValidating) {
+      LOG.warn("validateColumnValue called during running validation. Value " + String.valueOf(value) + " will not be set.");
+      Cell cell = row.getCellForUpdate(this);
+      cell.setErrorStatus(ScoutTexts.get("RunningColumnValidation"));
+      return;
+    }
 
     if (isCellEditable(row)) {
       try {
