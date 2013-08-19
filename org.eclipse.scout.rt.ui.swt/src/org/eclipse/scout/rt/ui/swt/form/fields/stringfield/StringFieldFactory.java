@@ -28,12 +28,12 @@ public class StringFieldFactory implements IFormFieldFactory {
     if (field instanceof IStringField) {
       IStringField s = (IStringField) field;
       if (s.isInputMasked()) {
-        SwtScoutStringPlainTextField ui = new SwtScoutStringPlainTextField();
+        AbstractSwtScoutStringField ui = new SwtScoutStringPlainTextField();
         ui.createField(parent, s, environment);
         return ui;
       }
       else {
-        SwtScoutStringField ui = new SwtScoutStringField();
+        AbstractSwtScoutStringField ui = new SwtScoutStringField();
         ui.createField(parent, s, environment);
         return ui;
       }
