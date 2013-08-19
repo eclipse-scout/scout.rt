@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
@@ -136,17 +135,6 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
-  private static boolean IS_E4 = false;
-
-  static {
-    Bundle bundle = Platform.getBundle("org.eclipse.platform");
-    if (bundle != null) {
-      Object bundleVersion = bundle.getHeaders().get("Bundle-Version");
-      if (bundleVersion instanceof String) {
-        IS_E4 = CompareUtility.compareTo((String) bundleVersion, "4.0") >= 0;
-      }
-    }
-  }
 
   private final Bundle m_applicationBundle;
 
@@ -1134,19 +1122,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
     final ISwtScoutPart part = m_openForms.remove(form);
     if (part != null && part.getForm().equals(form)) {
-      // Workaround for bugzilla 385618 & 408741
-      if (IS_E4) {
-        getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            closePart(part);
-          }
-        });
-      }
-      // Workaround end
-      else {
-        closePart(part);
-      }
+      closePart(part);
     }
   }
 
