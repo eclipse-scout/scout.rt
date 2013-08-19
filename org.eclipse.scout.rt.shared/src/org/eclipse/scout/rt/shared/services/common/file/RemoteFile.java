@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -38,6 +39,7 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 // content encoded in utf-8 and then compressed!!!
 
 public class RemoteFile implements Serializable {
+  private static final int ONE_HUNDRED_KILO_BYTE = 102400;
   public static final long DEFAULT_MAX_BLOCK_SIZE = 20000000; // 20MB
   private static final String DEFAULT_CHARSETNAME = "UTF-8";
   private static final long serialVersionUID = 1L;
@@ -212,7 +214,7 @@ public class RemoteFile implements Serializable {
    *         next block of the large server file.
    */
   public boolean hasMoreParts() {
-    return getContentLength() == RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
+    return getContentLength() > RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
   }
 
   public int getPartStartPosition() {
@@ -278,7 +280,7 @@ public class RemoteFile implements Serializable {
     try {
       in = getDecompressedReader();
       out = new BufferedWriter(w);
-      char[] b = new char[102400];
+      char[] b = new char[ONE_HUNDRED_KILO_BYTE];
       int len;
       while ((len = in.read(b)) > 0) {
         out.write(b, 0, len);
@@ -302,7 +304,7 @@ public class RemoteFile implements Serializable {
     try {
       in = getDecompressedInputStream();
       out = new BufferedOutputStream(os);
-      byte[] b = new byte[102400];
+      byte[] b = new byte[ONE_HUNDRED_KILO_BYTE];
       int len;
       while ((len = in.read(b)) > 0) {
         out.write(b, 0, len);
@@ -330,7 +332,7 @@ public class RemoteFile implements Serializable {
     try {
       in = new BufferedReader(r);
       out = getCompressedWriter();
-      char[] b = new char[102400];
+      char[] b = new char[ONE_HUNDRED_KILO_BYTE];
       int len;
       while ((len = in.read(b)) > 0) {
         out.write(b, 0, len);
@@ -362,7 +364,7 @@ public class RemoteFile implements Serializable {
       is.skip(startPosition);
       in = new BufferedInputStream(is);
       out = getCompressedOutputStream();
-      int bufferSize = 102400;
+      int bufferSize = ONE_HUNDRED_KILO_BYTE;
       byte[] b = new byte[bufferSize];
       int len;
       int maxBufferBoundary;
@@ -435,7 +437,7 @@ public class RemoteFile implements Serializable {
    * 
    * @since 2.7
    */
-  private static final HashMap<String, String> FILE_EXTENSION_TO_MIME_TYPE_MAP;
+  private static final Map<String, String> FILE_EXTENSION_TO_MIME_TYPE_MAP;
   static {
     FILE_EXTENSION_TO_MIME_TYPE_MAP = new HashMap<String, String>();
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ai", "application/postscript");
