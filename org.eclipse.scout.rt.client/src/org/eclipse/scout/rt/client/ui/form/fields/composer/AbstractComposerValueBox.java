@@ -262,6 +262,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
+      setFilterActiveRowsValue(TriState.TRUE);
       setFilterActiveRows(attribute.isActiveFilterEnabled());
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
@@ -345,6 +346,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
+      setFilterActiveNodesValue(TriState.TRUE);
       setFilterActiveNodes(attribute.isActiveFilterEnabled());
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
