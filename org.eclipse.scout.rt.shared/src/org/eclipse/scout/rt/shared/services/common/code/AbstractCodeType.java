@@ -38,6 +38,7 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCodeType.class);
   private static final long serialVersionUID = 1L;
 
+  private boolean m_initialized;
   private String m_text;
   private String m_iconId;
   private boolean m_hierarchy;
@@ -46,7 +47,20 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
   private ArrayList<ICode> m_rootCodeList = new ArrayList<ICode>();
 
   public AbstractCodeType() {
-    initConfig();
+    this(true);
+  }
+
+  public AbstractCodeType(boolean callInitializer) {
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
+
+  protected void callInitializer() {
+    if (!m_initialized) {
+      initConfig();
+      m_initialized = true;
+    }
   }
 
   public AbstractCodeType(String label, boolean hierarchy) {
