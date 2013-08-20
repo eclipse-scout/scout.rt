@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.internal.legacy.LegacySt
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionPool;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle2;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -788,6 +789,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   public void commit() throws ProcessingException {
     try {
       getTransaction().commit();
+      ISqlStyle style = getSqlStyle();
+      if (style instanceof ISqlStyle2) {
+        ((ISqlStyle2) style).commit();
+      }
     }
     catch (SQLException e) {
       throw new ProcessingException("unexpected exception", e);
@@ -837,6 +842,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   public void rollback() throws ProcessingException {
     try {
       getTransaction().rollback();
+      ISqlStyle style = getSqlStyle();
+      if (style instanceof ISqlStyle2) {
+        ((ISqlStyle2) style).rollback();
+      }
     }
     catch (SQLException e) {
       throw new ProcessingException("unexpected exception", e);

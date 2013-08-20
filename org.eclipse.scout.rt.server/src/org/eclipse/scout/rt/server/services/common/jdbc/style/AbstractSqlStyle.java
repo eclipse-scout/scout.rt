@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 
-public abstract class AbstractSqlStyle implements ISqlStyle {
+public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
 
@@ -1051,5 +1051,13 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   protected String adaptBindNameTimeDateOp(String bindName) {
     return adaptBindName(bindName);
+  }
+
+  @Override
+  public void commit() {
+  }
+
+  @Override
+  public void rollback() {
   }
 }
