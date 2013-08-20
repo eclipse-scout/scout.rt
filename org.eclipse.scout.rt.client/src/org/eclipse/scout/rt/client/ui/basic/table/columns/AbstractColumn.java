@@ -926,13 +926,19 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   private void setValueInternal(ITableRow row, T value, IFormField editingField) throws ProcessingException {
     T newValue = validateValue(row, value);
-    row.setCellValue(getColumnIndex(), newValue);
+
     /*
      * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
-     * If the passed value is valid, it will be stored in the validated value cache. Otherwise, the old validated
-     * value is used.
+     * If the passed value is valid, it will be removed from the validated value cache and stored when getValue()
+     * is called next time. Otherwise, the old validated value will be left in the cache.
      */
-    validateColumnValue(row, editingField, true, value);
+    validateColumnValue(row, editingField, true, newValue);
+
+    // set newValue into the cell only if there's no error.
+    ICell cell = row.getCell(this);
+    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
+      row.setCellValue(getColumnIndex(), newValue);
+    }
   }
 
   @Override
