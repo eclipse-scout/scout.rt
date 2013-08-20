@@ -443,6 +443,10 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
         updateTreeStructureAndKeepSelection(getScoutObject().getRootNode());
         setExpansionFromScout(getScoutObject().getRootNode());
+        // ensure first filtered item is shown.
+        if (getSwtField().getSelectionCount() == 0) {
+          getSwtField().showItem(getSwtField().getItem(0));
+        }
         break;
       }
       case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED: {
