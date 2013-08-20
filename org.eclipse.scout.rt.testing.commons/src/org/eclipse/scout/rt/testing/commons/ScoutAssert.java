@@ -101,6 +101,10 @@ public final class ScoutAssert {
       }
       throw e;
     }
+    // if there is no exception, but job result is not ok
+    if (job.getResult() != null && !job.getResult().isOK()) {
+      Assert.fail(job.getResult().getMessage());
+    }
   }
 
 }
