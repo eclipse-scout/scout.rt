@@ -249,4 +249,8 @@ public interface ISmartField<T> extends IValueField<T> {
   LookupRow[] callSubTreeLookup(T parentKey, TriState activeState) throws ProcessingException;
 
   ISmartFieldUIFacade getUIFacade();
+
+  void setProposalFormHeight(int proposalFormHeight);
+
+  int getProposalFormHeight();
 }

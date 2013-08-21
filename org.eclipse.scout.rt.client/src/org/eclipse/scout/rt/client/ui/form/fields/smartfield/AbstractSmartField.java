@@ -89,6 +89,8 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private boolean m_loadIncremental;
   private boolean m_allowCustomText;
 
+  private int m_proposalFormHeight;
+
   public AbstractSmartField() {
     this(true);
   }
@@ -223,6 +225,17 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @ConfigPropertyValue("false")
   protected boolean getConfiguredActiveFilterEnabled() {
     return false;
+  }
+
+  /**
+   * @return
+   *         default height: 280
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(280)
+  @ConfigPropertyValue("280")
+  protected Integer getConfiguredProposalFormHeight() {
+    return 280;
   }
 
   /**
@@ -409,6 +422,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
     setAllowCustomText(getConfiguredAllowCustomText());
+    setProposalFormHeight(getConfiguredProposalFormHeight());
     setProposalFormProvider(createProposalFormProvider());
     // code type
     if (getConfiguredCodeType() != null) {
@@ -1624,4 +1638,13 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
+  public void setProposalFormHeight(int proposalFormHeight) {
+    m_proposalFormHeight = proposalFormHeight;
+  }
+
+  @Override
+  public int getProposalFormHeight() {
+    return m_proposalFormHeight;
+  }
 }
