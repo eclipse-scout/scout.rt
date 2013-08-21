@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -480,6 +481,7 @@ public final class BookmarkUtility {
         }
         table.sort();
       }
+      ClientUIPreferences.getInstance().setAllTableColumnPreferences(table);
     }
   }
 
@@ -601,8 +603,8 @@ public final class BookmarkUtility {
       byte[] curData = tc.getSerializedData();
       if (!CompareUtility.equals(curData, newData)) {
         tc.removeAllColumns();
-        tc.setSerializedData(tablePageState.getTableCustomizerData());
-        tablePage.getTable().resetColumnConfiguration();
+        tc.setSerializedData(newData);
+        table.resetColumnConfiguration();
         tablePage.setChildrenLoaded(false);
       }
     }
