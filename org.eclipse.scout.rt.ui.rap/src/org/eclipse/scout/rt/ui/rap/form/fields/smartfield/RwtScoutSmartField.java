@@ -304,7 +304,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     // show new
     m_proposalPopup = new RwtScoutDropDownPopup();
     m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
-    m_proposalPopup.setMaxHeightHint(280);
+    m_proposalPopup.setMaxHeightHint(getScoutObject().getProposalFormHeight());
     m_proposalPopup.addRwtScoutPartListener(new RwtScoutPartListener() {
       @Override
       public void partChanged(RwtScoutPartEvent e) {

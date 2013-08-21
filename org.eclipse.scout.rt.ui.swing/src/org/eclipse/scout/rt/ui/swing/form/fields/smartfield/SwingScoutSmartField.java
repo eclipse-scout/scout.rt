@@ -405,7 +405,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       });
     }
     //set size to initial width and default height
-    m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), 200));
+    m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), getScoutObject().getProposalFormHeight()));
     if (proposalTree != null || proposalTable != null) {
       //add a listener whenever the form changes
       form.addFormListener(
