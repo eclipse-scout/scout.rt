@@ -259,6 +259,7 @@ public class OracleSqlStyle extends AbstractSqlStyle {
           // NOP: free whatever possible, otherwise go on
         }
       }
+      lobs.clear();
     }
 
     @Override
