@@ -75,6 +75,7 @@ import org.eclipse.scout.rt.ui.swt.util.ISwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
+import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
@@ -126,7 +127,6 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 /**
  * <h3>SwtEnvironment</h3> ...
@@ -1165,9 +1165,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             }
             case IProcessingStatus.CANCEL: {
               //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-              Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-              if (frameworkVersion.getMajor() == 3
-                  && frameworkVersion.getMinor() <= 4) {
+              if (VersionUtility.isEclipseVersionLessThan35()) {
                 iconId = SWT.ICON_INFORMATION;
               }
               else {

@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
-import org.osgi.framework.Version;
 
 public final class SwtLayoutUtility {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
@@ -65,9 +64,7 @@ public final class SwtLayoutUtility {
         StyledText styledText = (StyledText) control;
 
         //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-        Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-        if (frameworkVersion.getMajor() == 3
-            && frameworkVersion.getMinor() <= 4) {
+        if (VersionUtility.isEclipseVersionLessThan35()) {
           trimW = trimW + 4;
         }
         else {

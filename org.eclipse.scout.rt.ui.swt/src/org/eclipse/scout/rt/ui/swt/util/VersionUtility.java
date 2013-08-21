@@ -21,9 +21,12 @@ public class VersionUtility {
    */
   public static boolean isEclipseVersionLessThan35() {
 
-    Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-    if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() <= 5) {
-      return true;
+    String versionProperty = Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version");
+    if (versionProperty != null) {
+      Version frameworkVersion = new Version(versionProperty);
+      if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() <= 5) {
+        return true;
+      }
     }
 
     return false;
