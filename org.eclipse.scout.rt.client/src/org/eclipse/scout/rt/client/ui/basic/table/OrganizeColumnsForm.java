@@ -1045,6 +1045,7 @@ public class OrganizeColumnsForm extends AbstractForm {
   private void updateColumnVisibilityAndOrder() {
     IColumn<?>[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getVisibleColumn().findRows(true));
     m_table.getColumnSet().setVisibleColumns(visibleColumns);
+    ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
   private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
@@ -1061,7 +1062,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     if (row != null && targetIndex >= 0) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
-
     updateColumnVisibilityAndOrder();
   }
 
