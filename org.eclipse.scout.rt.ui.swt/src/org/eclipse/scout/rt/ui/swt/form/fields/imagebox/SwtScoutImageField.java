@@ -45,7 +45,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -77,10 +76,6 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     }
     else {
       body = getEnvironment().getFormToolkit().createComposite(container);
-      GridData bodyData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
-      bodyData.horizontalIndent = 0;
-      bodyData.verticalIndent = 0;
-      body.setLayoutData(bodyData);
       setSwtField(body);
     }
 
@@ -151,7 +146,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     else if (!StringUtility.isNullOrEmpty(getScoutObject().getImageId())) {
       getImageViewer().setImage(getEnvironment().getIcon(getScoutObject().getImageId()));
     }
-    getSwtField().redraw();
+    getImageViewer().redraw();
   }
 
   protected void updateAutoFitFromScout() {
