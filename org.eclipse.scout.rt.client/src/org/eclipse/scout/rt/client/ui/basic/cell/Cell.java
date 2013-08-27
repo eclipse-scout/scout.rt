@@ -17,11 +17,9 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -29,6 +27,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  * <p>
  * This implementation shares graphical aspects with other cell instances and uses a {@link CellExtension} to store
  * rarely used properties.
+ * </p>
  */
 public class Cell implements ICell {
 
@@ -49,13 +48,9 @@ public class Cell implements ICell {
   private String m_text;
   private ICellSpecialization m_cellSpecialization = DEFAULT_CELL_STYLE;
 
-  private IProcessingStatus m_errorStatus;
-
-  private String m_validIconId;
+  private IProcessingStatus m_errorStatus = null;
 
   public Cell() {
-    super();
-    clearErrorStatus();
   }
 
   public Cell(ICell c) {
@@ -91,6 +86,7 @@ public class Cell implements ICell {
       setText(c.getText());
       setValue(c.getValue());
       setEnabled(c.isEnabled());
+      setErrorStatus(c.getErrorStatus());
       //do not reset observer
     }
   }
@@ -298,21 +294,15 @@ public class Cell implements ICell {
     return m_errorStatus;
   }
 
-  public void setErrorStatus(String message) {
-    setErrorStatus(new ProcessingStatus(message, null, 0, IProcessingStatus.ERROR));
-  }
-
+  /**
+   * Set the error status of the cell or <code>null</code> in case of no error.
+   **/
   public void setErrorStatus(IProcessingStatus status) {
-    if (getErrorStatus() == null) {
-      m_validIconId = getIconId();
-      setIconId(AbstractIcons.StatusError);
-    }
     m_errorStatus = status;
   }
 
   public void clearErrorStatus() {
-    setIconId(m_validIconId);
-    m_errorStatus = null;
+    setErrorStatus(null);
   }
 
   @Override

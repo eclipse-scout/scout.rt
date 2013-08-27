@@ -56,6 +56,9 @@ public interface ICell {
 
   ICellObserver getObserver();
 
+  /**
+   * the error status of the cell or <code>null</code> in case of no error.
+   */
   IProcessingStatus getErrorStatus();
 
 }
