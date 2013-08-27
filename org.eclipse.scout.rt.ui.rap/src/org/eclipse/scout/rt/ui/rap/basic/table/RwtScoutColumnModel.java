@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.rap.basic.table;
 
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -13,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
@@ -129,9 +131,13 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         checkBoxImage = m_imgCheckboxFalse;
       }
     }
+
     //deco
     String iconId = null;
-    if (cell != null && cell.getIconId() != null) {
+    if (cell != null && cell.getErrorStatus() != null && cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
+      iconId = AbstractIcons.StatusError;
+    }
+    else if (cell != null && cell.getIconId() != null) {
       iconId = cell.getIconId();
     }
     else if (columnOrder[1] == columnIndex) {

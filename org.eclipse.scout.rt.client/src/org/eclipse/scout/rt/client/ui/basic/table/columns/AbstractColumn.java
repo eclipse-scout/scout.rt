@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -1579,7 +1580,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     if (m_isValidating) {
       LOG.warn("validateColumnValue called during running validation. Value " + String.valueOf(value) + " will not be set.");
       Cell cell = row.getCellForUpdate(this);
-      cell.setErrorStatus(ScoutTexts.get("RunningColumnValidation"));
+      cell.setErrorStatus(new ProcessingStatus(ScoutTexts.get("RunningColumnValidation"), IProcessingStatus.ERROR));
       return;
     }
 
@@ -1602,14 +1603,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
               //column should become visible
               setVisible(true);
             }
-            if (errorStatus != null) {
-              cell.setErrorStatus(errorStatus);
-              if (errorStatus instanceof ParsingFailedStatus) {
-                cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
-              }
+            cell.setErrorStatus(errorStatus);
+            if (errorStatus instanceof ParsingFailedStatus) {
+              cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
             }
             else {
-              cell.setErrorStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
+              cell.setErrorStatus(new ProcessingStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"), IProcessingStatus.ERROR));
               cell.setText("");
             }
             return;

@@ -17,12 +17,19 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.easymock.EasyMock;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * JUnit tests for {@link Cell}
+ */
+/**
+ *
  */
 public class CellTest {
 
@@ -283,5 +290,55 @@ public class CellTest {
     EasyMock.replay(observer);
     c.setObserver(observer);
     return observer;
+  }
+
+  /**
+   * When creating a cell. The errorstatus should not be set.
+   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.exception.IProcessingStatus)}
+   */
+  @Test
+  public void testInitialErrorStatus() {
+    Cell c = new Cell();
+    Assert.assertNull(c.getErrorStatus());
+  }
+
+  /**
+   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.exception.IProcessingStatus)}
+   */
+  @Test
+  public void testSetErrorStatus() {
+    Cell c = new Cell();
+    c.setErrorStatus(new ProcessingStatus("error", IStatus.ERROR));
+    Assert.assertEquals(IProcessingStatus.ERROR, c.getErrorStatus().getSeverity());
+  }
+
+  /**
+   * When creating a cell. The errorstatus should not be set.
+   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.exception.IProcessingStatus)}
+   */
+  @Test
+  public void testClearErrorStatus() {
+    Cell c = new Cell();
+    c.setErrorStatus(new ProcessingStatus("error", IStatus.ERROR));
+    c.clearErrorStatus();
+    Assert.assertNull(c.getErrorStatus());
+  }
+
+  /**
+   * When creating a cell. The errorstatus should not be set.
+   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.exception.IProcessingStatus)}
+   */
+  @Test
+  public void testIconCellSetErrorStatus() {
+    final String testIconId = "";
+    Cell c = new Cell();
+    c.setIconId(testIconId);
+    c.setErrorStatus(new ProcessingStatus("error", IStatus.ERROR));
+    c.setErrorStatus(new ProcessingStatus("error2", IStatus.ERROR));
+    c.clearErrorStatus();
+    c.setErrorStatus(new ProcessingStatus("error3", IStatus.ERROR));
+    c.clearErrorStatus();
+    Assert.assertNull(c.getErrorStatus());
+    Assert.assertEquals(testIconId, c.getIconId());
   }
 }
