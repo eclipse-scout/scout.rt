@@ -19,8 +19,8 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
-      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/kepler"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/luna"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/luna"/>
    </url>
 
    <includes
