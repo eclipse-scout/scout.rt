@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.ui.swing.extension.ISwingApplicationExtension;
 /**
  * <p>
  * Extends the AbstractSwingApplication and provides support for multiple Swing-Scout applications in a single Eclipse
- * application. This class cannot be extended. Use the ISwingApplicationExtension capabilities instead.
+ * application. Use the ISwingApplicationExtension capabilities instead.
  * </p>
  * <p>
  * Use the ranking attribute of the extension point <code>org.eclipse.scout.rt.ui.swing.appextensions</code> to
@@ -44,33 +44,15 @@ import org.eclipse.scout.rt.ui.swing.extension.ISwingApplicationExtension;
  * 
  * @author awe
  */
-final public class ExtensibleSwingApplication extends BaseSwingApplication {
-
-  private static class P_RankedExtension implements Comparable<P_RankedExtension> {
-
-    int ranking;
-
-    ISwingApplicationExtension extension;
-
-    public P_RankedExtension(int ranking, ISwingApplicationExtension extension) {
-      this.ranking = ranking;
-      this.extension = extension;
-    }
-
-    @Override
-    public int compareTo(P_RankedExtension o) {
-      return o.ranking - ranking;
-    }
-
-  }
+public class ExtensibleSwingApplication extends BaseSwingApplication {
 
   private static final String EXTENSION_POINT = Activator.PLUGIN_ID + ".appextensions";
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensibleSwingApplication.class);
 
-  private List<ISwingApplicationExtension> m_extensions = new ArrayList<ISwingApplicationExtension>();
+  protected List<ISwingApplicationExtension> m_extensions = new ArrayList<ISwingApplicationExtension>();
 
-  private ISwingApplicationExtension defaultExtension;
+  protected ISwingApplicationExtension defaultExtension;
 
   public ExtensibleSwingApplication() {
     readExtensionPoint();
@@ -87,7 +69,7 @@ final public class ExtensibleSwingApplication extends BaseSwingApplication {
   }
 
   private void readExtensionPoint() {
-    List<P_RankedExtension> rankedExtensions = new ArrayList<P_RankedExtension>();
+    List<RankedExtension> rankedExtensions = new ArrayList<RankedExtension>();
     Set<String> extensionIdSet = new HashSet<String>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -106,7 +88,7 @@ final public class ExtensibleSwingApplication extends BaseSwingApplication {
             if (rankingString != null) {
               ranking = Integer.parseInt(rankingString);
             }
-            rankedExtensions.add(new P_RankedExtension(ranking, swingAppExtension));
+            rankedExtensions.add(new RankedExtension(ranking, swingAppExtension));
             LOG.debug("Added swing application extension " + swingAppExtension + " (ranking=" + ranking + ")");
           }
         }
@@ -120,7 +102,11 @@ final public class ExtensibleSwingApplication extends BaseSwingApplication {
     }
     Collections.sort(rankedExtensions); // order by configured ranking
     LOG.info("Registered " + rankedExtensions.size() + " swing application extensions:");
-    for (P_RankedExtension re : rankedExtensions) {
+    setExtensionsToRun(rankedExtensions);
+  }
+
+  protected void setExtensionsToRun(List<RankedExtension> rankedExtensions) {
+    for (RankedExtension re : rankedExtensions) {
       m_extensions.add(re.extension);
       LOG.info("- " + re.extension);
     }
