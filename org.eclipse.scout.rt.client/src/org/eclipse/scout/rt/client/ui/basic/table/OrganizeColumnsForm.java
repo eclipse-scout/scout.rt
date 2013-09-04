@@ -1045,6 +1045,7 @@ public class OrganizeColumnsForm extends AbstractForm {
   private void updateColumnVisibilityAndOrder() {
     IColumn<?>[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getVisibleColumn().findRows(true));
     m_table.getColumnSet().setVisibleColumns(visibleColumns);
+    ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
   private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
@@ -1061,7 +1062,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     if (row != null && targetIndex >= 0) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
-
     updateColumnVisibilityAndOrder();
   }
 
@@ -1157,6 +1157,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
     private byte[] m_tableCustomizerData;
     private List<TableColumnState> m_oldColumns;
+    private Object[][] m_oldData;
 
     @Override
     protected void execLoad() throws ProcessingException {
@@ -1166,6 +1167,7 @@ public class OrganizeColumnsForm extends AbstractForm {
         m_tableCustomizerData = m_table.getTableCustomizer().getSerializedData();
       }
       m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
+      m_oldData = m_table.getTableData();
       getColumnsTableField().reloadTableData();
     }
 
@@ -1186,14 +1188,14 @@ public class OrganizeColumnsForm extends AbstractForm {
         // revert to original state
         try {
           m_table.setTableChanging(true);
-          Object[][] tableData = m_table.getTableData();
           if (m_table.getTableCustomizer() != null) {
             m_table.getTableCustomizer().removeAllColumns();
             m_table.getTableCustomizer().setSerializedData(m_tableCustomizerData);
+            ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
           }
           m_table.resetColumnConfiguration();
           BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
-          m_table.addRowsByMatrix(tableData);
+          m_table.addRowsByMatrix(m_oldData);
         }
         finally {
           m_table.setTableChanging(false);
