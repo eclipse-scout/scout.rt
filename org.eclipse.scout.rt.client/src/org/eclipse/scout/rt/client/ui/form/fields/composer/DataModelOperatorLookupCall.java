@@ -50,11 +50,8 @@ public class DataModelOperatorLookupCall extends LocalLookupCall {
         if (text != null && text.indexOf("{0}") >= 0) {
           text = text.replace("{0}", "n");
         }
-        else if (text != null && text.indexOf("{1}") >= 0) {
+        if (text != null && text.indexOf("{1}") >= 0) {
           text = text.replace("{1}", "m");
-        }
-        else if (text != null && text.indexOf("<>") >= 0) {
-          text = text.replace("<>", "" + '\u2260');
         }
         result.add(new LookupRow(op, text));
       }
