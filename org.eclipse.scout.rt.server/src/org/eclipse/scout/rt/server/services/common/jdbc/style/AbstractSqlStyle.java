@@ -619,7 +619,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
 
   @Override
   public String createDateTimeBetween(String attribute, String bindName1, String bindName2) {
-    return attribute + " BETWEEN TRUNC(" + adaptBindNameTimeDateOp(bindName1) + ",'MI') AND (TRUNC(" + adaptBindNameTimeDateOp(bindName2) + ",'MI')+(59/1440)) ";
+    return attribute + " BETWEEN TRUNC(" + adaptBindNameTimeDateOp(bindName1) + ",'MI') AND (TRUNC(" + adaptBindNameTimeDateOp(bindName2) + ",'MI')+(59/86400)) ";
   }
 
   @Override
@@ -904,7 +904,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
 
   @Override
   public String createDateTimeLE(String attribute, String bindName) {
-    return attribute + "<=(TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')+(59/1440))";
+    return attribute + "<=(TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')+(59/86400))";
   }
 
   @Override
