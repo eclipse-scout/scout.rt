@@ -249,4 +249,15 @@ public interface ISmartField<T> extends IValueField<T> {
   LookupRow[] callSubTreeLookup(T parentKey, TriState activeState) throws ProcessingException;
 
   ISmartFieldUIFacade getUIFacade();
+
+  /**
+   * Sets the height of the proposal form in pixel. (The proposal form is smaller if there are not enought values to fill the proposal.)
+   * @param proposalFormHeight height in pixel
+   */
+  void setProposalFormHeight(int proposalFormHeight);
+
+  /**
+   * @return the height of the proposal form in pixel
+   */
+  int getProposalFormHeight();
 }

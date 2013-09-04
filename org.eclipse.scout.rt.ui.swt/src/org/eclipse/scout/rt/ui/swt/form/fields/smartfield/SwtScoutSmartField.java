@@ -267,7 +267,8 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     if (form != null) {
       if (getSwtField().isFocusControl()) {
         m_proposalPopup = new SwtScoutDropDownPopup(getEnvironment(), getSwtField(), getSwtField(), SWT.RESIZE);
-        m_proposalPopup.setMaxHeightHint(280);
+
+        m_proposalPopup.setMaxHeightHint(getScoutObject().getProposalFormHeight());
         m_proposalPopup.addSwtScoutPartListener(new SwtScoutPartListener() {
           @Override
           public void partChanged(SwtScoutPartEvent e) {
