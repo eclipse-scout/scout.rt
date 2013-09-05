@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,8 +20,11 @@ import javax.swing.SwingUtilities;
  * Reflect wrapper to SwingUtilities2 in order to prevent incompatibility issues
  * when upgrading to higher java versions before 1.6
  * com.sun.java.swing.SwingUtilities2 with 1.6 sun.swing.SwingUtilities2
+ * 
+ * @deprecated Will be removed in Release 3.11
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public final class SwingUtilities2Wrapper {
   private static Class SwingUtilities2Class;
   private static Method drawStringUnderlineCharAtMethod;
