@@ -16,7 +16,6 @@ import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -243,23 +242,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
 
   @Override
   public void clearCacheOfUserIds(String... userIds) {
-    if (userIds == null || userIds.length == 0) {
-      return;
-    }
-    String[] users = m_accessControlStore.getUserIds();
-    ArrayList<String> toDelete = new ArrayList<String>();
-    for (String name : userIds) {
-      if (name != null) {
-        name = name.toLowerCase();
-        for (String p : users) {
-          if (p.equals(name)) {
-            toDelete.add(p);
-            break;
-          }
-        }
-      }
-    }
-    m_accessControlStore.clearCacheOfUserIds(toDelete.toArray(new String[toDelete.size()]));
+    m_accessControlStore.clearCacheOfUserIds(userIds);
   }
 
   @SuppressWarnings("deprecation")

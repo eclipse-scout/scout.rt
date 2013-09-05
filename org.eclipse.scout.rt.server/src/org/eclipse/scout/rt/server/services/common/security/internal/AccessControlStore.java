@@ -123,12 +123,15 @@ public class AccessControlStore {
   }
 
   /**
-   * clears the cache for a set of userIds
+   * Clears the cache for a set of userIds and sends a notification for these users.
    * 
    * @param userIds
    *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
   public void clearCacheOfUserIds(String... userIds) {
+    if (userIds == null || userIds.length == 0) {
+      return;
+    }
     synchronized (m_storeLock) {
       for (String userId : userIds) {
         if (userId != null) {
