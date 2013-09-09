@@ -210,11 +210,11 @@ public class RemoteFile implements Serializable {
 
   /**
    * @return true if this is a large file that could not be transfered in one
-   *         block. Use RemoteFileService.getRemoteFilePart(spec,1) to get the
+   *         block. Use {@link IRemoteFileService#getRemoteFilePart(RemoteFile, long)} to get the
    *         next block of the large server file.
    */
   public boolean hasMoreParts() {
-    return getContentLength() > RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
+    return getContentLength() == RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
   }
 
   public int getPartStartPosition() {
