@@ -104,6 +104,10 @@ public class ServiceTunnelServlet extends HttpServletEx {
   @SuppressWarnings("unchecked")
   protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
     if (m_serverSessionClass == null) {
+      m_serverSessionClass = locateServerSessionClass(req, res);
+    }
+
+    if (m_serverSessionClass == null) {
       String qname = getServletConfig().getInitParameter("session");
       if (qname != null) {
         int i = qname.lastIndexOf('.');
@@ -130,6 +134,10 @@ public class ServiceTunnelServlet extends HttpServletEx {
     if (m_serverSessionClass == null) {
       throw new ServletException("Expected init-param \"session\"");
     }
+  }
+
+  protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
+    return null;
   }
 
   /**
@@ -193,7 +201,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_contentHandler;
   }
 
-  private Bundle[] getOrderedBundleList() {
+  protected Bundle[] getOrderedBundleList() {
     synchronized (m_orderedBundleListLock) {
       if (m_orderedBundleList == null) {
         String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
