@@ -479,7 +479,7 @@ public final class StringUtility {
     return text;
   }
 
-  public static final Pattern MNEMONIC_PATTERN = Pattern.compile("\\&([-?_.,a-zA-Z0-9])", Pattern.DOTALL);
+  public static final Pattern MNEMONIC_PATTERN = Pattern.compile("&([\\S])");
 
   public static char getMnemonic(String text) {
     if (text == null) {

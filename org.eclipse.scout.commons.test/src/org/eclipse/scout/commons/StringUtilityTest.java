@@ -112,6 +112,20 @@ public class StringUtilityTest {
     s = "test &";
     assertEquals(0x00, StringUtility.getMnemonic(s));
     assertEquals(s, StringUtility.removeMnemonic(s));
+
+    assertEquals('a', StringUtility.getMnemonic("&a"));
+    assertEquals('a', StringUtility.getMnemonic("&abc"));
+    assertEquals(0x00, StringUtility.getMnemonic(null));
+    assertEquals(0x00, StringUtility.getMnemonic("sometext"));
+    assertEquals('1', StringUtility.getMnemonic("&1"));
+    assertEquals('1', StringUtility.getMnemonic("\\&1"));
+    assertEquals('á', StringUtility.getMnemonic("&á"));
+    assertEquals("á", StringUtility.removeMnemonic("&á"));
+    assertEquals('&', StringUtility.getMnemonic("&&"));
+    assertEquals(null, StringUtility.removeMnemonic(null));
+    s = "A & B T&Êxt";
+    assertEquals('Ê', StringUtility.getMnemonic(s));
+    assertEquals("A & B TÊxt", StringUtility.removeMnemonic(s));
   }
 
   // UTF-8 length is 13 to avoid accidental buffer size matches
