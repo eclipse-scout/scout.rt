@@ -638,7 +638,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   @Override
   public void setEnabledFromScout(boolean enabledFromScout) {
-    getUiField().setEnabled(!enabledFromScout);
+    getUiField().setEnabled(true);
     // <Workaround>
     // Because RAP seems to ignore the default ":disabled" state,
     // we apply a custom variant to all header cells. Otherwise
