@@ -99,25 +99,24 @@ public class BookmarkService extends AbstractService implements IBookmarkService
         };
         getBookmarkData().getUserBookmarks().visit(visitor);
         getBookmarkData().getGlobalBookmarks().visit(visitor);
-        if (list.size() > 0) {
-          IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-          if (desktop != null) {
-            ArrayList<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
-            for (IKeyStroke k : desktop.getKeyStrokes()) {
-              if (k instanceof ActivateBookmarkKeyStroke) {
-                //remove
-              }
-              else {
-                newKeyStrokes.add(k);
-              }
+
+        IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+        if (desktop != null) {
+          ArrayList<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
+          for (IKeyStroke k : desktop.getKeyStrokes()) {
+            if (k instanceof ActivateBookmarkKeyStroke) {
+              //remove
             }
-            for (Bookmark b : list) {
-              ActivateBookmarkKeyStroke k = new ActivateBookmarkKeyStroke(b);
-              k.prepareAction();
+            else {
               newKeyStrokes.add(k);
             }
-            desktop.setKeyStrokes(newKeyStrokes.toArray(new IKeyStroke[newKeyStrokes.size()]));
           }
+          for (Bookmark b : list) {
+            ActivateBookmarkKeyStroke k = new ActivateBookmarkKeyStroke(b);
+            k.prepareAction();
+            newKeyStrokes.add(k);
+          }
+          desktop.setKeyStrokes(newKeyStrokes.toArray(new IKeyStroke[newKeyStrokes.size()]));
         }
         break;
       }
