@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
   <extension point="org.eclipse.scout.service.services">
-    <service class="org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
+    <service class="org.eclipse.scout.rt.client.services.common.bookmark.BookmarkService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.platform.PlatformService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.file.FileService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>

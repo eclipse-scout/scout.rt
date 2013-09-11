@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.services.common.bookmark.internal;
+package org.eclipse.scout.rt.client.services.common.bookmark;
 
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -22,9 +22,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
-import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
-import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
