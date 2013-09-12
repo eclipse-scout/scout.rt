@@ -81,13 +81,29 @@ public final class DateUtility {
     }
   }
 
+  public static Date addMilliseconds(Date d, int milliseconds) {
+    return addTime(d, Calendar.MILLISECOND, milliseconds);
+  }
+
+  public static Date addSeconds(Date d, int seconds) {
+    return addTime(d, Calendar.SECOND, seconds);
+  }
+
+  public static Date addMinutes(Date d, int minutes) {
+    return addTime(d, Calendar.MINUTE, minutes);
+  }
+
   public static Date addHours(Date d, int hours) {
+    return addTime(d, Calendar.HOUR_OF_DAY, hours);
+  }
+
+  public static Date addTime(Date d, int field, int amount) {
     if (d == null) {
       return null;
     }
     Calendar cal = Calendar.getInstance();
     cal.setTime(d);
-    cal.add(Calendar.HOUR_OF_DAY, hours);
+    cal.add(field, amount);
     return cal.getTime();
   }
 

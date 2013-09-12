@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -75,6 +76,58 @@ public class DateUtilityTest {
 
   static final String DATE_TIME_PATTERN = "dd-MM-yyyy HH:mm";
   static final String YEAR_DATE_TIME_PATTERN = "yyyy-MM-dd_HH:mm:ss.SSS";
+
+  @Test
+  public void testAddMilliseconds() {
+    double minutes = 600 * 24;
+    Calendar cal = Calendar.getInstance();
+    for (int i = 0; i < minutes; i++) {
+      cal.set(Calendar.DATE, 1);
+      cal.set(Calendar.HOUR_OF_DAY, 0);
+      cal.set(Calendar.MINUTE, 0);
+      cal.set(Calendar.SECOND, 0);
+      cal.set(Calendar.MILLISECOND, 0);
+      SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
+      String result = sdf.format(DateUtility.addMilliseconds(cal.getTime(), i));
+      cal.set(Calendar.MILLISECOND, i);
+      String expected = sdf.format(cal.getTime());
+      assertEquals(expected, result);
+    }
+  }
+
+  @Test
+  public void testAddSeconds() {
+    double minutes = 600 * 24;
+    Calendar cal = Calendar.getInstance();
+    for (int i = 0; i < minutes; i++) {
+      cal.set(Calendar.DATE, 1);
+      cal.set(Calendar.HOUR_OF_DAY, 0);
+      cal.set(Calendar.MINUTE, 0);
+      cal.set(Calendar.SECOND, 0);
+      SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      String result = sdf.format(DateUtility.addSeconds(cal.getTime(), i));
+      cal.set(Calendar.SECOND, i);
+      String expected = sdf.format(cal.getTime());
+      assertEquals(expected, result);
+    }
+  }
+
+  @Test
+  public void testAddMinutes() {
+    double minutes = 600 * 24;
+    Calendar cal = Calendar.getInstance();
+    for (int i = 0; i < minutes; i++) {
+      cal.set(Calendar.DATE, 1);
+      cal.set(Calendar.HOUR_OF_DAY, 0);
+      cal.set(Calendar.MINUTE, 0);
+      cal.set(Calendar.SECOND, 0);
+      SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      String result = sdf.format(DateUtility.addMinutes(cal.getTime(), i));
+      cal.set(Calendar.MINUTE, i);
+      String expected = sdf.format(cal.getTime());
+      assertEquals(expected, result);
+    }
+  }
 
   @Test
   public void testIsInDateRange() {
