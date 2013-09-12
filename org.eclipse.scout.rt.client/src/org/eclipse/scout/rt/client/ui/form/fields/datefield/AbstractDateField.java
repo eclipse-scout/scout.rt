@@ -100,8 +100,8 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     super(callInitializer);
   }
 
-  /*
-   * Configuration
+  /**
+   * The date/time format, for a description see {@link SimpleDateFormat}
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(230)
