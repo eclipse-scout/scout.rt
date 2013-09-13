@@ -12,8 +12,10 @@ package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,64 +26,184 @@ import org.junit.Test;
  * JUnit tests for {@link DateUtility}
  */
 public class DateUtilityTest {
-  static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01_00:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01_00:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_010000 = "1970-01-01_01:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_013000 = "1970-01-01_01:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_020000 = "1970-01-01_02:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_023000 = "1970-01-01_02:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_030000 = "1970-01-01_03:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_033000 = "1970-01-01_03:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_040000 = "1970-01-01_04:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_043000 = "1970-01-01_04:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_050000 = "1970-01-01_05:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_053000 = "1970-01-01_05:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_060000 = "1970-01-01_06:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_063000 = "1970-01-01_06:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_070000 = "1970-01-01_07:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_073000 = "1970-01-01_07:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_080000 = "1970-01-01_08:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_083000 = "1970-01-01_08:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_090000 = "1970-01-01_09:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_093000 = "1970-01-01_09:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_100000 = "1970-01-01_10:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_103000 = "1970-01-01_10:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_110000 = "1970-01-01_11:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_113000 = "1970-01-01_11:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_120000 = "1970-01-01_12:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_123000 = "1970-01-01_12:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_130000 = "1970-01-01_13:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_133000 = "1970-01-01_13:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_140000 = "1970-01-01_14:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_143000 = "1970-01-01_14:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_150000 = "1970-01-01_15:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_153000 = "1970-01-01_15:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_160000 = "1970-01-01_16:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_163000 = "1970-01-01_16:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_170000 = "1970-01-01_17:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_173000 = "1970-01-01_17:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_180000 = "1970-01-01_18:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_183000 = "1970-01-01_18:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_190000 = "1970-01-01_19:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_193000 = "1970-01-01_19:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_200000 = "1970-01-01_20:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_203000 = "1970-01-01_20:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_210000 = "1970-01-01_21:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_213000 = "1970-01-01_21:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_220000 = "1970-01-01_22:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_223000 = "1970-01-01_22:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_230000 = "1970-01-01_23:00:00.000";
-  static final String EXPEC_DATE_1970_01_01_233000 = "1970-01-01_23:30:00.000";
-  static final String EXPEC_DATE_1970_01_01_235959 = "1970-01-01_23:59:59.000";
+  private static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01_00:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01_00:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_010000 = "1970-01-01_01:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_013000 = "1970-01-01_01:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_020000 = "1970-01-01_02:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_023000 = "1970-01-01_02:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_030000 = "1970-01-01_03:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_033000 = "1970-01-01_03:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_040000 = "1970-01-01_04:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_043000 = "1970-01-01_04:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_050000 = "1970-01-01_05:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_053000 = "1970-01-01_05:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_060000 = "1970-01-01_06:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_063000 = "1970-01-01_06:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_070000 = "1970-01-01_07:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_073000 = "1970-01-01_07:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_080000 = "1970-01-01_08:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_083000 = "1970-01-01_08:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_090000 = "1970-01-01_09:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_093000 = "1970-01-01_09:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_100000 = "1970-01-01_10:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_103000 = "1970-01-01_10:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_110000 = "1970-01-01_11:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_113000 = "1970-01-01_11:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_120000 = "1970-01-01_12:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_123000 = "1970-01-01_12:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_130000 = "1970-01-01_13:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_133000 = "1970-01-01_13:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_140000 = "1970-01-01_14:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_143000 = "1970-01-01_14:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_150000 = "1970-01-01_15:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_153000 = "1970-01-01_15:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_160000 = "1970-01-01_16:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_163000 = "1970-01-01_16:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_170000 = "1970-01-01_17:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_173000 = "1970-01-01_17:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_180000 = "1970-01-01_18:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_183000 = "1970-01-01_18:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_190000 = "1970-01-01_19:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_193000 = "1970-01-01_19:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_200000 = "1970-01-01_20:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_203000 = "1970-01-01_20:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_210000 = "1970-01-01_21:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_213000 = "1970-01-01_21:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_220000 = "1970-01-01_22:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_223000 = "1970-01-01_22:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_230000 = "1970-01-01_23:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_233000 = "1970-01-01_23:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_235959 = "1970-01-01_23:59:59.000";
 
-  static final String DATE_TIME_PATTERN = "dd-MM-yyyy HH:mm";
-  static final String YEAR_DATE_TIME_PATTERN = "yyyy-MM-dd_HH:mm:ss.SSS";
+  private static final String DATE_TIME_PATTERN = "dd-MM-yyyy HH:mm";
+  private static final String YEAR_DATE_TIME_PATTERN = "yyyy-MM-dd_HH:mm:ss.SSS";
+  private static final int HOURS_IN_DAY = 24;
 
+  /**
+   * Test for {@link DateUtility#addDays(Date, double)}
+   * 
+   * @throws ParseException
+   */
+  @Test
+  public void testAddDaysFull() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
+    Date date1 = sdf.parse("2013-09-30_10:10:10.111");
+    Date date2 = sdf.parse("2013-10-01_10:10:10.111");
+    assertEquals(date2.getTime(), DateUtility.addDays(date1, 1).getTime());
+    assertEquals(date1.getTime(), DateUtility.addDays(date2, -1).getTime());
+  }
+
+  /**
+   * Test for {@link DateUtility#addDays(Date, double)} for a larger day period
+   * 
+   * @throws ParseException
+   */
+  @Test
+  public void testAddDaysLarge() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
+    Date testDate = sdf.parse("1990-01-01_0:0:0.000");
+    Date expectedDate = sdf.parse("2030-12-31_0:0:0.000");
+    Date res = DateUtility.addDays(testDate, 14974);
+    assertEquals(expectedDate.getTime(), res.getTime());
+  }
+
+  /**
+   * Test for {@link DateUtility#addDays(Date, double)}
+   * 
+   * @throws ParseException
+   */
+  @Test
+  public void testAddDatetoNullFull() throws ParseException {
+    assertNull(DateUtility.addDays(null, -1));
+  }
+
+  /**
+   * Tests for all seconds in a day, if adding this fraction of the day is the same as setting the seconds directly.
+   * {@link DateUtility#addDays(Date, double)}
+   */
+  @Test
+  public void testAddDays() {
+    double secondsInDay = 3600 * HOURS_IN_DAY;
+    for (int sec = 0; sec < secondsInDay; sec++) {
+      double d = sec / secondsInDay;
+      Calendar cal = getCalendar(1, 0);
+
+      SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      String result = sdf.format(DateUtility.addDays(cal.getTime(), d));
+
+      cal.set(Calendar.SECOND, sec);
+
+      String expected = sdf.format(cal.getTime());
+      assertEquals(expected, result);
+    }
+  }
+
+  /**
+   * Tests for all seconds in a day, if subtracting this fraction of the day is the same as setting the seconds
+   * directly. {@link DateUtility#addDays(Date, double)}
+   */
+  @Test
+  public void testSubtractDays() {
+    double secondsInDay = 3600 * HOURS_IN_DAY;
+    for (int sec = 0; sec < secondsInDay; sec++) {
+      double d = -sec / secondsInDay;
+      Calendar cal = getCalendar(1, 0);
+
+      SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      String result = sdf.format(DateUtility.addDays(cal.getTime(), d));
+
+      cal.set(Calendar.SECOND, -sec);
+
+      String expected = sdf.format(cal.getTime());
+      assertEquals(expected, result);
+    }
+  }
+
+  private Calendar getCalendar(int hour, int minute) {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.HOUR, hour);
+    cal.set(Calendar.MINUTE, minute);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    return cal;
+  }
+
+  /**
+   * Test for {@link DateUtility#addDays(Date, double)} using {@link DateUtility#convertDateToDoubleTime(Date)}
+   */
+  @Test
+  public void testDuration() {
+    final Calendar _15_00 = getCalendar(15, 0);
+    final Calendar _15_15 = getCalendar(15, 15);
+    final Calendar _14_45 = getCalendar(14, 45);
+    final Calendar _15_30 = getCalendar(15, 30);
+    final Calendar _16_00 = getCalendar(16, 00);
+    final Calendar _17_00 = getCalendar(17, 0);
+    assertCorrectDuration(_15_00, _15_00);
+    assertCorrectDuration(_15_00, _15_15);
+    assertCorrectDuration(_15_00, _14_45);
+    assertCorrectDuration(_15_00, _15_30);
+    assertCorrectDuration(_15_00, _16_00);
+    assertCorrectDuration(_15_00, _17_00);
+    assertCorrectDuration(_17_00, _15_00);
+  }
+
+  public void assertCorrectDuration(Calendar start, Calendar end) {
+    Date startDate = start.getTime();
+    Date endDate = end.getTime();
+    Double duration = (DateUtility.convertDateToDoubleTime(endDate) - DateUtility.convertDateToDoubleTime(startDate));
+    assertEquals(endDate, DateUtility.addDays(startDate, duration));
+  }
+
+  /**
+   * Test for {@link DateUtility#addMilliseconds(Date, int)}
+   */
   @Test
   public void testAddMilliseconds() {
-    double minutes = 600 * 24;
-    Calendar cal = Calendar.getInstance();
+    double minutes = 600 * HOURS_IN_DAY;
     for (int i = 0; i < minutes; i++) {
+      Calendar cal = Calendar.getInstance();
       cal.set(Calendar.DATE, 1);
       cal.set(Calendar.HOUR_OF_DAY, 0);
       cal.set(Calendar.MINUTE, 0);
@@ -95,9 +217,12 @@ public class DateUtilityTest {
     }
   }
 
+  /**
+   * Test for {@link DateUtility#addSeconds(Date, int)}
+   */
   @Test
   public void testAddSeconds() {
-    double minutes = 600 * 24;
+    double minutes = 600 * HOURS_IN_DAY;
     Calendar cal = Calendar.getInstance();
     for (int i = 0; i < minutes; i++) {
       cal.set(Calendar.DATE, 1);
@@ -112,9 +237,12 @@ public class DateUtilityTest {
     }
   }
 
+  /**
+   * Test for {@link DateUtility#addMinutes(Date, int)}
+   */
   @Test
   public void testAddMinutes() {
-    double minutes = 600 * 24;
+    double minutes = 600 * HOURS_IN_DAY;
     Calendar cal = Calendar.getInstance();
     for (int i = 0; i < minutes; i++) {
       cal.set(Calendar.DATE, 1);
@@ -459,4 +587,5 @@ public class DateUtilityTest {
 
     assertEquals(message + "(DATE)", expected, value);
   }
+
 }
