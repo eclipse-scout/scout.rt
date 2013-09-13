@@ -127,6 +127,8 @@
                   </enumeration>
                   <enumeration value="table.multilineTooltipSupport.enabled">
                   </enumeration>
+                  <enumeration value="color.background.disabled">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

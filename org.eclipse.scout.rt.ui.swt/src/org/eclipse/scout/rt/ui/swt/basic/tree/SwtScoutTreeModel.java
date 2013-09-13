@@ -39,6 +39,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   private Image m_imgCheckboxTrue;
   private Image m_imgCheckboxFalse;
   private Color m_disabledForegroundColor;
+  private Color m_disabledBackgroundColor;
 
   public SwtScoutTreeModel(ITree tree, ISwtEnvironment environment, TreeViewer treeViewer) {
     m_tree = tree;
@@ -47,6 +48,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     m_imgCheckboxTrue = Activator.getIcon(SwtIcons.CheckboxYes);
     m_imgCheckboxFalse = Activator.getIcon(SwtIcons.CheckboxNo);
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_disabledBackgroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorBackgroundDisabled());
   }
 
   @Override
@@ -134,7 +136,11 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   public Color getBackground(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     if (scoutNode.getCell().getBackgroundColor() != null) {
-      return m_environment.getColor(scoutNode.getCell().getBackgroundColor());
+      Color col = m_environment.getColor(scoutNode.getCell().getBackgroundColor());
+      if (col == null && !scoutNode.isEnabled()) {
+        col = m_disabledBackgroundColor;
+      }
+      return col;
     }
     return null;
   }

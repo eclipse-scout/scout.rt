@@ -50,6 +50,8 @@ public interface IUiDecoration {
 
   String getColorForegroundDisabled();
 
+  String getColorBackgroundDisabled();
+
   int getFormFieldLabelAlignment();
 
   int getMessageBoxMinHeight();
