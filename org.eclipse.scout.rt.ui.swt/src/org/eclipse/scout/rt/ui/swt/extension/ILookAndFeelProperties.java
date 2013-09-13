@@ -28,6 +28,7 @@ public interface ILookAndFeelProperties {
   String PROP_DIALOG_MIN_WIDTH = "dialog.minWidth";
   String PROP_DIALOG_MIN_HEIGHT = "dialog.minHeight";
   String PROP_COLOR_FOREGROUND_DISABLED = "color.forground.disabled";
+  String PROP_COLOR_BACKGROUND_DISABLED = "color.background.disabled";
   String PROP_MESSAGE_BOX_MIN_WIDTH = "messageBox.minWidth";
   String PROP_MESSAGE_BOX_MIN_HEIGHT = "messageBox.minHeight";
   String PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED = "table.mouseMoveSelectionSupport.enabled";

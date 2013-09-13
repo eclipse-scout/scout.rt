@@ -39,6 +39,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   private final SwtScoutTable m_swtTable;
   private final TableColumnManager m_columnManager;
   private final Color m_disabledForegroundColor;
+  private final Color m_disabledBackgroundColor;
 
   public SwtScoutTableModel(ITable table, SwtScoutTable swtTable, ISwtEnvironment environment, TableColumnManager columnManager) {
     m_table = table;
@@ -46,6 +47,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     m_environment = environment;
     m_columnManager = columnManager;
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_disabledBackgroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorBackgroundDisabled());
   }
 
   public boolean isMultiline() {
@@ -68,9 +70,13 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public Color getBackground(Object element, int columnIndex) {
     if (columnIndex > 0) {
-      ICell cell = getCell(element, columnIndex);
-      if (cell != null) {
-        return m_environment.getColor(cell.getBackgroundColor());
+      ICell scoutCell = getCell(element, columnIndex);
+      if (scoutCell != null) {
+        Color col = m_environment.getColor(scoutCell.getBackgroundColor());
+        if (col == null && !scoutCell.isEnabled()) {
+          col = m_disabledBackgroundColor;
+        }
+        return col;
       }
     }
     return null;
