@@ -11,6 +11,9 @@
 package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.InputStream;
 
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.junit.Test;
@@ -571,5 +574,154 @@ public class HTMLUtilityTest {
     defaultFont.setSizeUnit("pt");
     defaultFont.setFamilies(fontFamilies);
     return defaultFont;
+  }
+
+  /**
+   * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}.
+   * 
+   * @see Bug 415316
+   */
+  @Test
+  public void testToPlainTextWithTable() {
+    testToPlainTextWithTableConversion("htmlExample.html");
+    testToPlainTextWithTableConversion("htmlExample_headTagMissing.html");
+    testToPlainTextWithTableConversion("htmlExample_bodyTagMissing.html");
+    testToPlainTextWithTableConversion("htmlExample_bodyAndHeadTagMissing.html");
+  }
+
+  /**
+   * @param fileName
+   */
+  private void testToPlainTextWithTableConversion(String fileName) {
+    String htmlString = readFileFromClasspath(fileName);
+    String plainExpected = readFileFromClasspath("htmlToPlain_expectedResult.txt").trim();
+    String plaintext = HTMLUtility.toPlainTextWithTable(htmlString).trim();
+    assertEquals(fileName + " was not converted to plaintext as expected.", plainExpected, plaintext);
+  }
+
+  /**
+   * @param fileName
+   * @return
+   */
+  private String readFileFromClasspath(String fileName) {
+    String packageName = getClass().getPackage().getName();
+    packageName = packageName.replaceAll("\\.", "/");
+    fileName = StringUtility.join("/", packageName, "fixture", fileName);
+
+    InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+    try {
+      return new String(IOUtility.getContent(in), "UTF-8");
+    }
+    catch (Exception e) {
+      fail("could not read input file: " + fileName);
+      return null;
+    }
+  }
+
+  /**
+   * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)} with comments.
+   * 
+   * @See Bug 415316
+   */
+  @Test
+  public void testToPlainTextWithTableWithComments() {
+    String input;
+
+    //HTML comments in the body
+    input = "<html>" +
+        "<head><title>Title</title></head>" +
+        "<body>my <!-- comment --> body <!-- second comment --></body>" +
+        "</html>";
+    assertEquals("my body", HTMLUtility.toPlainTextWithTable(input));
+
+    //HTML comments in the body (incl. the empty comment form) and in title
+    input = "<html>" +
+        "<head><title>Title <!-- comment --></title></head>" +
+        "<body><!---->my body<!-- comment --></body>" +
+        "</html>";
+    assertEquals("my body", HTMLUtility.toPlainTextWithTable(input));
+
+    //HTML comments in the body (incl. new lines) and in title
+    input = "<html>" +
+        "<head><title><!-- \n Title \n comment --> A title</title></head>" +
+        "<body><!--\nfoo\nbar-->my <!-- \n x \n --> body<!-- comment --></body>" +
+        "</html>";
+    assertEquals("my body", HTMLUtility.toPlainTextWithTable(input));
+
+    //The document contains a comment containing <body>..</body>. This comment needs to be skiped
+    input = "<html>" +
+        "<head>" +
+        "<title>Title</title>" +
+        "</head>" +
+        "<!--<body>commented body</body> -->" +
+        "<body>normal body</body>" +
+        "</html>";
+    assertEquals("normal body", HTMLUtility.toPlainTextWithTable(input));
+  }
+
+  /**
+   * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}:
+   * ensure that the line breaks in table cell will be ignored.
+   * 
+   * @See Bug 415316
+   */
+  @Test
+  public void testToPlainTextWithTableParagraphInTable() throws Exception {
+    String input = "<table border=\"1\">\n" +
+        "  <tr>\n" +
+        "    <th class=\"xxx\">My <p>Header 1</th>\n" +
+        "    <th>My <p>Header</p> 2</th >\n" +
+        "  </tr>\n" +
+        "  <tr>\n" +
+        "    <td>row 1 p,<p> column</ P> 1</td>\n" +
+        "    <td>\nrow 1,< P> column\n < p >2</td>\n" +
+        "  </tr>\n" +
+        "  <tr>\n" +
+        "    <td >row td 2,<p/> column 1</td>\n" +
+        "    <td valign=\"top\"><p >row 2, </p   >column 2</td>\n" +
+        "  </tr>\n" +
+        "  <tr>\n" +
+        "    <td>row <P>3th,</p> column 1</td>\n" +
+        "    <td>row 3th, <p>column </p> 2</td>\n" +
+        "  </tr>\n" +
+        "</table>";
+
+    String expected = "My Header 1 | My Header 2 |\n" +
+        "row 1 p, column 1 | row 1, column 2 |\n" +
+        "row td 2, column 1 | row 2, column 2 |\n" +
+        "row 3th, column 1 | row 3th, column 2 |";
+
+    assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
+  }
+
+  /**
+   * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}: test different lines breaks (p, br, table)
+   * 
+   * @See Bug 415316
+   */
+  @Test
+  public void testToPlainTextWithTableLineBreaks() throws Exception {
+    String input;
+    String expected;
+
+    input = "Lorem<br>Ipsum<p>Dolor</p>Cosec<BR/><p>Adipi<br >Sagit\n</p>Sallu";
+    expected = "Lorem\n" +
+        "Ipsum\n" +
+        "Dolor\n" +
+        "Cosec\n\n" +
+        "Adipi\n" +
+        "Sagit\n" +
+        "Sallu";
+    assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
+
+    input = "<p>Lorem<br>Ipsum\n</p>\n<TABLE class=\"atable\"><tr><td>Dolor</td><td>Cosec</td></tr></table><p>Adipi<BR>Sagit\n</p><table><tr><td>Sallu</td></tr></table>";
+    expected = "Lorem\n" +
+        "Ipsum\n" +
+        "Dolor | " +
+        "Cosec |" + "\n\n" +
+        "Adipi\n" +
+        "Sagit\n" +
+        "Sallu |";
+    assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
   }
 }

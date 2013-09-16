@@ -264,4 +264,57 @@ public class StringUtilityTest {
     assertEquals(original, decoded);
   }
 
+  /**
+   * Tests for {@link StringUtility#getTag(String, String)}.
+   */
+  @Test
+  public void testGetTag() throws Exception {
+    String input;
+
+    //simple case:
+    input = "Lorem ipsum dolor sit amet, <strong>consetetur sadipscing elitr</strong>, sed diam voluptua.";
+    assertEquals("consetetur sadipscing elitr", StringUtility.getTag(input, "strong"));
+
+    //with HTML attribute:
+    input = "<table>\n" +
+        "<tr id=\"a_tr_id\">\n" +
+        "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>\n" +
+        "</tr>\n" +
+        "</table>\n";
+
+    assertEquals("Claritas: *", StringUtility.getTag(input, "strong"));
+    assertEquals("Lorem <strong>Claritas: *</strong> ipsum", StringUtility.getTag(input, "td"));
+    assertEquals("<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>", StringUtility.getTag(input, "tr"));
+  }
+
+  /**
+   * Test for {@link StringUtility#replaceTags(String, String, String)}
+   */
+  @Test
+  public void testReplaceTags() throws Exception {
+    String input;
+
+    //HTML attributes:
+    input = "<table>" +
+        "<tr id=\"a_tr_id\">" +
+        "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>" +
+        "</tr>" +
+        "</table>";
+
+    assertEquals("X", StringUtility.replaceTags(input, "table", "X"));
+    assertEquals("<table>X</table>", StringUtility.replaceTags(input, "tr", "X"));
+    assertEquals("<table><tr id=\"a_tr_id\">X</tr></table>", StringUtility.replaceTags(input, "td", "X"));
+    assertEquals("<table><tr id=\"a_tr_id\"><td class=\"a_td_class\" valign=\"top\">Lorem X ipsum</td></tr></table>", StringUtility.replaceTags(input, "strong", "X"));
+    assertEquals(input, StringUtility.replaceTags(input, "em", "X"));
+
+    //multiple replacement
+    input = "Lorem <em>ipsum</em> dolore <em>satis</em> est!";
+    assertEquals("Lorem  dolore  est!", StringUtility.replaceTags(input, "em", ""));
+
+    //multiple replacement
+    input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n" +
+        "<meta name=\"date.modified\" content=\"20130314\"/>";
+    assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
+
+  }
 }

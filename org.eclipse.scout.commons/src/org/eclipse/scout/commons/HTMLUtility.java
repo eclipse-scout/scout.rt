@@ -84,13 +84,13 @@ public final class HTMLUtility {
     HTMLEditorKit kit = new HTMLEditorKit();
     // remove meta tags (see JavaDoc of @{link HTMLDocument#parseDocument(String)} for more information)
     Pattern[] metaPatterns = new Pattern[]{
-          Pattern.compile("<meta\\s+[^>]*>"),
-          Pattern.compile("<Meta\\s+[^>]*>"),
-          Pattern.compile("<META\\s+[^>]*>"),
-          Pattern.compile("</\\s*meta\\s*>"),
-          Pattern.compile("</\\s*Meta\\s*>"),
-          Pattern.compile("</\\s*META\\s*>"),
-        };
+        Pattern.compile("<meta\\s+[^>]*>"),
+        Pattern.compile("<Meta\\s+[^>]*>"),
+        Pattern.compile("<META\\s+[^>]*>"),
+        Pattern.compile("</\\s*meta\\s*>"),
+        Pattern.compile("</\\s*Meta\\s*>"),
+        Pattern.compile("</\\s*META\\s*>"),
+    };
     for (Pattern p : metaPatterns) {
       htmlText = p.matcher(htmlText).replaceAll("");
     }
@@ -509,6 +509,64 @@ public final class HTMLUtility {
     //newlines
     s = s.replaceAll("\n", " ");
     s = s.replaceAll("<br>|<br/>|</p>|<p/>|</tr>|</table>", "\n");
+    //remove tags
+    s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
+    //remove multiple spaces
+    s = s.replaceAll("[ ]+", " ");
+    //remove spaces at the beginning and end of each line
+    s = s.replaceAll("[ ]+\n", "\n");
+    s = s.replaceAll("\n[ ]+", "\n");
+    s = StringUtility.htmlDecode(s);
+    s = s.trim();
+    return s;
+  }
+
+  /**
+   * Conversion of html text to plain text without parsing and building of a html model.
+   * <p>
+   * Rule based conversion:
+   * <ul>
+   * <li>br, p, closing tr, closing table tags create newlines</li>
+   * <li>p tags in table cells will be ignored</li>
+   * <li>table columns are rendered with a pipe character (|)</li>
+   * </ul>
+   * 
+   * @param html
+   *          input HTML code as string.
+   * @return plain text as string
+   */
+  public static String toPlainTextWithTable(String html) {
+    String s = html;
+    //escape comments:
+    s = Pattern.compile("<!\\-\\-(.*?)\\-\\->", Pattern.DOTALL).matcher(s).replaceAll("");
+
+    //find body or sanitize head:
+    String body = StringUtility.getTag(s, "body");
+    if (body == null || body.length() == 0) {
+      s = StringUtility.replaceTags(s, "head", "");
+      s = StringUtility.replaceTags(s, "title", "");
+      s = StringUtility.replaceTags(s, "meta", "");
+      s = StringUtility.replaceTags(s, "link", "");
+    }
+    else {
+      s = body;
+    }
+
+    //replace newlines:
+    s = s.replaceAll("\n", " ");
+
+    //strip <p> and <br> from table cells (td, th):
+    Pattern pattern = Pattern.compile("(<t[dh][^>]*>((?!</?\\s*(p|t[dh])).)*)</?\\s*p[^>]*>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    Matcher matcher = pattern.matcher(s);
+    while (matcher.find()) {
+      s = matcher.replaceFirst("$1");
+      matcher = pattern.matcher(s);
+    }
+
+    //create new lines:
+    s = Pattern.compile("<br\\s*/?\\s*>|</?p/?[^>]*>|</tr\\s*>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll("\n");
+    //table column
+    s = Pattern.compile("</t[hd]\\s*>", Pattern.CASE_INSENSITIVE).matcher(s).replaceAll(" | ");
     //remove tags
     s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
     //remove multiple spaces
