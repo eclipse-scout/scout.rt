@@ -1201,7 +1201,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       ITableRow row = getRow(i);
       int newRowIndex = target.addRow();
       for (int j = 0, nj = row.getCellCount(); j < nj; j++) {
-        target.setValueAt(newRowIndex, j, row.getCellValue(j));
+        Object value = shiftDateTimeFromTimeZone(getColumns()[j], row.getCellValue(j));
+        target.setValueAt(newRowIndex, j, value);
       }
       target.setRowState(newRowIndex, row.getStatus());
     }
@@ -1210,7 +1211,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       ITableRow row = deletedRows[i];
       int newRowIndex = target.addRow();
       for (int j = 0, nj = row.getCellCount(); j < nj; j++) {
-        target.setValueAt(newRowIndex, j, row.getCellValue(j));
+        Object value = shiftDateTimeFromTimeZone(getColumns()[j], row.getCellValue(j));
+        target.setValueAt(newRowIndex, j, value);
       }
       target.setRowState(newRowIndex, AbstractTableFieldData.STATUS_DELETED);
     }
@@ -1218,11 +1220,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private Object shiftDateTimeToTimeZone(IColumn column, Object value) {
-    if (column instanceof AbstractDateColumn && ((AbstractDateColumn) column).isHasTime() && value != null && value instanceof Date) {
+    if (column instanceof AbstractDateColumn && ((AbstractDateColumn) column).isHasTime() && value instanceof Date) {
       return ClientSessionThreadLocal.get().server2ClientDate(((Date) value));
-/*      IClientSession clientSession = ClientSessionThreadLocal.get();
-      Date shiftedDate = new Date(((Date) value).getTime() + clientSession.getServerClientTimeZoneDifference());
-      return shiftedDate;*/
+    }
+    else {
+      return value;
+    }
+  }
+
+  private Object shiftDateTimeFromTimeZone(IColumn column, Object value) {
+    if (column instanceof AbstractDateColumn && ((AbstractDateColumn) column).isHasTime() && value instanceof Date) {
+      return ClientSessionThreadLocal.get().client2ServerDate(((Date) value));
     }
     else {
       return value;
