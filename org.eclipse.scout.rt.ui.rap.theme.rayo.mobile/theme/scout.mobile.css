@@ -716,6 +716,10 @@ Composite.listboxDisabled {
 
 Composite.formbarContainer { background-color:#ddebf4; }
 
+Composite.labelfield { padding:6px 0px 0px 0px; }
+
+Composite.htmlfield { padding:6px 0px 0px 0px; }
+
 Button.formButton {
   background-image:none;
   color:#000000;
@@ -1240,8 +1244,6 @@ Label-SeparatorLine {
 Label-SeparatorLine[SHADOW_IN] { border:1px inset; }
 
 Label-SeparatorLine[SHADOW_OUT] { border:1px outset; }
-
-Composite.labelfield { padding:4px 0px 0px 0px; }
 
 Button.menuButton {
   background-image:url(theme/img/button/icon_menu.png);

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.labelfield;
 
 import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
@@ -38,9 +39,13 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     m_fieldPanel = new JPanelEx(new SingleLayout());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData());
     fieldData.topInset = SwingLayoutUtility.getTextFieldTopInset();
+
     m_fieldPanel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, fieldData);
     JLabelEx labelField = new JLabelEx();
+
     m_fieldPanel.add(labelField);
+    setTopMarginForField();
+
     container.add(m_fieldPanel);
     //
     setSwingContainer(container);
@@ -49,6 +54,18 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     // layout
     LogicalGridLayout layout = new LogicalGridLayout(getSwingEnvironment(), 1, 0);
     getSwingContainer().setLayout(layout);
+  }
+
+  /**
+   * Creates a border to have correct alignment for customized look and feel (e.g. Rayo)
+   * 
+   * @since 3.10.0-M2
+   */
+  protected void setTopMarginForField() {
+    int topMargin = SwingUtility.getTopMarginForField();
+    if (topMargin > 0) {
+      m_fieldPanel.setBorder(new EmptyBorder(topMargin, 0, 0, 0));
+    }
   }
 
   @Override
@@ -90,6 +107,11 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   @Override
   protected void setHorizontalAlignmentFromScout(int scoutAlign) {
     getSwingLabelField().setHorizontalAlignment(SwingUtility.createHorizontalAlignment(scoutAlign));
+  }
+
+  @Override
+  protected void setVerticalAlignmentFromScout(int scoutAlign) {
+    getSwingLabelField().setVerticalAlignment(SwingUtility.createVerticalAlignment(scoutAlign));
   }
 
   /**
