@@ -33,7 +33,7 @@ import org.junit.Test;
  * 
  * @since 3.10.0-M2
  */
-public class SwingScoutClipboardTest {
+public class SwingScoutClipboardUiTest {
 
   private static final String clipboardText = "some Text";
 
@@ -44,7 +44,7 @@ public class SwingScoutClipboardTest {
     Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
     DataFlavor[] flavors = transferable.getTransferDataFlavors();
     assertTrue(flavors.length > 0);
-    DataFlavor bestTextFlavor = new DataFlavor().selectBestTextFlavor(flavors);
+    DataFlavor bestTextFlavor = DataFlavor.selectBestTextFlavor(flavors);
     Object content = transferable.getTransferData(bestTextFlavor);
     if (content instanceof String) {
       assertEquals(clipboardText, content);
