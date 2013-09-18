@@ -66,7 +66,32 @@ public class TextTransferable implements Transferable {
     if (!isDataFlavorSupported(flavor)) {
       throw new UnsupportedFlavorException(flavor);
     }
-    return m_flavorMap.get(flavor);
+    Object result = m_flavorMap.get(flavor);
+    if (result instanceof InputStream) {
+      resetInputStreamToStartFromBeginning((InputStream) result);
+    }
+    return result;
+  }
+
+  /**
+   * This method resets the InputStream by setting its 'pos' attribute to 0.
+   * When the paste command is called e.g. on a textfield and a InputStream is returned,
+   * the InputStream's content is pasted to the textfield. If paste is called
+   * again, the same InputStream is returned, however the 'pos' attribute is now at the
+   * end of the content. The paste command doesn't seem to work anymore. Thus we
+   * have to reset the start position of the InputStream to 0.
+   * 
+   * @since 3.10.0-M2
+   */
+  private void resetInputStreamToStartFromBeginning(InputStream is) {
+    if (is != null) {
+      try {
+        is.reset();
+      }
+      catch (IOException e) {
+        LOG.error("failed to reset the InputStream", e);
+      }
+    }
   }
 
   private InputStream toInputStream(String value, String encoding) {
