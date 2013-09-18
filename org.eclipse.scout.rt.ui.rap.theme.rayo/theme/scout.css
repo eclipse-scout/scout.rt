@@ -747,6 +747,19 @@ Composite.listboxDisabled {
 Composite.formbarContainer {
   background-color: #ddebf4;
 }
+
+Composite.labelfield {
+  /* a little padding to make sure the label is on the same line as the field's label */
+
+  padding: 4px 0px 0px 0px;
+}
+
+Composite.htmlfield {
+  /* a little padding to make sure the content is on the same line as the field's label */
+
+  padding: 4px 0px 0px 0px;
+}
+
 Button.formButton {
   background-image: none;
   color: #000000;
@@ -1116,11 +1129,6 @@ Label-SeparatorLine[SHADOW_IN] {
 }
 Label-SeparatorLine[SHADOW_OUT] {
   border: 1px outset;
-}
-Composite.labelfield {
-  /* a little padding to make sure the label is on the same line as the field's label */
-
-  padding: 4px 0px 0px 0px;
 }
 /* Label end */
 Button.menuButton {

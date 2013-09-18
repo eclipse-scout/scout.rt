@@ -17,16 +17,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.browser.BrowserExtension;
+import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -34,10 +38,12 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> implements IRwtScoutHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutHtmlField.class);
+  private static final String VARIANT_HTMLFIELD = "htmlfield";
 
   private BrowserExtension m_browserExtension;
 
@@ -52,7 +58,14 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
 
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
+    //browserContainer is necessary to align the browser with the label
+    final Composite browserContainer = getUiEnvironment().getFormToolkit().createComposite(container);
+    browserContainer.setLayout(new FillLayout());
+    LogicalGridData layoutData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
+    browserContainer.setLayoutData(layoutData);
+    browserContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_HTMLFIELD);
+
+    Browser browser = getUiEnvironment().getFormToolkit().createBrowser(browserContainer, SWT.NONE);
     m_browserExtension = new BrowserExtension(browser);
     m_browserExtension.attach();
     browser.addDisposeListener(new DisposeListener() {
@@ -95,6 +108,11 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
 
+  }
+
+  @Override
+  protected boolean isAutoSetLayoutData() {
+    return false;
   }
 
   @Override

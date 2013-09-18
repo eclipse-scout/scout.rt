@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -44,6 +45,8 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
+import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
@@ -62,6 +65,8 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   private JPanelEx m_htmlViewPanel;
   private String m_originalText;
   private File m_tempFolder;
+
+  private LogicalGridData fieldData;
 
   @Override
   protected void initializeSwing() {
@@ -99,7 +104,10 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     //
     m_htmlViewPanel = new JPanelEx(new SingleLayout());
     m_htmlView.setName(getScoutObject().getClass().getSimpleName() + ".htmlViewPanel");
-    m_htmlViewPanel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData()));
+    fieldData = LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData());
+    fieldData.topInset = SwingLayoutUtility.getTextFieldTopInset();
+    m_htmlViewPanel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, fieldData);
+
     if (getScoutObject().isScrollBarEnabled()) {
       m_scrollPane = new JScrollPaneEx(m_htmlView);
       m_htmlViewPanel.add(m_scrollPane);
@@ -107,6 +115,9 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     else {
       m_htmlViewPanel.add(m_htmlView);
     }
+
+    setTopMarginForField();
+
     container.add(m_htmlViewPanel);
     //
     setSwingContainer(container);
@@ -114,6 +125,18 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     setSwingField(m_htmlView);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+  }
+
+  /**
+   * Creates a border to have correct alignment for customized look and feel (e.g. Rayo)
+   * 
+   * @since 3.10.0-M2 (backported)
+   */
+  protected void setTopMarginForField() {
+    int topMargin = SwingUtility.getTopMarginForField();
+    if (topMargin > 0) {
+      m_htmlViewPanel.setBorder(new EmptyBorder(topMargin, 0, 0, 0));
+    }
   }
 
   @Override

@@ -88,6 +88,8 @@ import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.FileListTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.JVMLocalObjectTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.TextTransferable;
+import org.eclipse.scout.rt.ui.swing.form.fields.htmlfield.SwingScoutHtmlField;
+import org.eclipse.scout.rt.ui.swing.form.fields.labelfield.SwingScoutLabelField;
 import org.eclipse.scout.rt.ui.swing.simulator.SimulatorAction;
 import org.eclipse.scout.rt.ui.swing.simulator.SwingScoutSimulator;
 
@@ -98,6 +100,8 @@ public final class SwingUtility {
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
   public static final boolean DO_RESET_COMPONENT_BOUNDS = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.layout.resetBoundsOnInvalidate"), true);
   public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.verifyInputOnWindowClosed"), false);
+
+  private static Integer topMarginForField = null;
 
   private SwingUtility() {
   }
@@ -1244,6 +1248,26 @@ public final class SwingUtility {
       useLafFrameAndDialog = Boolean.parseBoolean(useScoutLafFrameAndDialog);
     }
     return useLafFrameAndDialog;
+  }
+
+  /**
+   * This method is used to get a top margin for {@link SwingScoutLabelField} and {@link SwingScoutHtmlField} in order
+   * to have correct alignment for customized look and feel (e.g. Rayo)
+   * 
+   * @since 3.10.0-M2 (backported)
+   */
+  public static int getTopMarginForField() {
+    if (topMarginForField == null) {
+      String topMarginForFieldProperty = System.getProperty("scout.laf.topMarginForField");
+      if (topMarginForFieldProperty != null) {
+        topMarginForField = Integer.parseInt(topMarginForFieldProperty);
+      }
+      else {
+        topMarginForField = Integer.valueOf(0);
+      }
+    }
+
+    return topMarginForField;
   }
 
   public static void setDefaultImageIcons(Window window) {
