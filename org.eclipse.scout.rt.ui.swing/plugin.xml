@@ -3,6 +3,7 @@
 <plugin>
   <extension-point id="org.eclipse.scout.rt.ui.swing.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
   <extension-point id="org.eclipse.scout.rt.ui.swing.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
+  <extension-point id="org.eclipse.scout.rt.ui.swing.lafconfigurator" name="Swing Look and Feel Configurator" schema="schema/swingLafConfigurator.exsd"/>
   <extension
         point="org.eclipse.scout.rt.ui.swing.formfields">
      <formField
