@@ -3,7 +3,8 @@
 <plugin>
   <extension-point id="org.eclipse.scout.rt.ui.swing.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
   <extension-point id="org.eclipse.scout.rt.ui.swing.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
-  <extension-point schema="schema/appextensions.exsd" name="Swing Application Extensions" id="org.eclipse.scout.rt.ui.swing.appextensions"/>
+  <extension-point id="org.eclipse.scout.rt.ui.swing.appextensions" name="Swing Application Extensions" schema="schema/appextensions.exsd"/>
+  <extension-point id="org.eclipse.scout.rt.ui.swing.lafconfigurator" name="Swing Look and Feel Configurator" schema="schema/swingLafConfigurator.exsd"/>
   <extension
         point="org.eclipse.scout.rt.ui.swing.formfields">
      <formField
