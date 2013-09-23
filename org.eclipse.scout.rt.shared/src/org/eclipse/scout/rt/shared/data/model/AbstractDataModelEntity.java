@@ -191,7 +191,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public void setVisiblePermission(Permission p) {
-    m_visiblePermission = p;
+    setVisiblePermissionInternal(p);
     boolean b;
     if (p != null) {
       b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
@@ -200,6 +200,10 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       b = true;
     }
     setVisibleGranted(b);
+  }
+
+  protected void setVisiblePermissionInternal(Permission p) {
+    m_visiblePermission = p;
   }
 
   @Override
@@ -220,8 +224,16 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public void setVisible(boolean b) {
-    m_visibleProperty = b;
+    setVisibleProperty(b);
     calculateVisible();
+  }
+
+  protected void setVisibleProperty(boolean b) {
+    m_visibleProperty = b;
+  }
+
+  protected boolean isVisibleProperty() {
+    return m_visibleProperty;
   }
 
   @Override
