@@ -239,6 +239,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   }
 
   protected void setIconIdFromScout(String s) {
+    boolean iconVisible = s != null;
+    if (m_browseButton.getLayoutData() instanceof GridData) {
+      GridData layoutData = (GridData) m_browseButton.getLayoutData();
+      layoutData.exclude = !iconVisible;
+    }
     m_browseButton.setData(RWT.CUSTOM_VARIANT, s);
   }
 

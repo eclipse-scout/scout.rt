@@ -34,6 +34,8 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   private Region m_cursorOverRegion = Region.TEXTAREA;
   private Cursor m_defaultCursor;
   private int m_insetsRight = 0;
+  private int m_originalMarginRight = -1;
+  private boolean m_dropDownButtonVisible;
 
   private Collection<IDropDownButtonListener> m_listeners = new ArrayList<IDropDownButtonListener>();
 
@@ -42,6 +44,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
     setTextFieldMargin();
     m_defaultCursor = getCursor();
     m_dropDownButton = new DropDownButtonIcon(env);
+    m_dropDownButtonVisible = true;
   }
 
   public void setIconGroup(IconGroup iconGroup) {
@@ -65,7 +68,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        if(fix!=null) {
+        if (fix != null) {
           fix.mouseReleased(this, e);
         }
       }
@@ -159,6 +162,9 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   }
 
   protected Region getRegionTouchedByCursor(Point cursorPosition) {
+    if (!isDropDownButtonVisible()) {
+      return Region.TEXTAREA;
+    }
     int menuSize = 7;
     if (cursorPosition.x >= getWidth() - menuSize - m_insetsRight &&
         cursorPosition.y <= getY() + menuSize) {
@@ -171,20 +177,20 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   }
 
   /**
-   * This method may be called multiple times. The impl. of SynthBorder does always return the border AND
-   * margin width for textfields. Since this method sets a new margin on the textfield, we have to subtract
-   * the margin from the insets to avoid that the margin gets wider and wider every time setTextFieldMargin()
-   * is called.
+   * This method may be called multiple times.
    */
   private void setTextFieldMargin() {
     Insets marginAndBorderInsets = getInsets();
     Insets marginInsets = getMargin();
+    if (m_originalMarginRight == -1) {
+      m_originalMarginRight = marginInsets.right;
+    }
     m_insetsRight = marginAndBorderInsets.right - marginInsets.right;
     int iconWidth = 0;
-    if (m_dropDownButton != null) {
+    if (m_dropDownButton != null && isDropDownButtonVisible()) {
       iconWidth = m_dropDownButton.getIconWidth();
     }
-    setMargin(new Insets(0, 0, 0, iconWidth + m_insetsRight));
+    setMargin(new Insets(0, 0, 0, m_originalMarginRight + iconWidth));
   }
 
   @Override
@@ -194,6 +200,9 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   }
 
   private void paintIcon(Graphics g) {
+    if (!isDropDownButtonVisible()) {
+      return;
+    }
     if (m_dropDownButton != null) {
       int x = getWidth() - m_dropDownButton.getIconWidth() - 6/*- m_insetsRight*/;
       int y = (getHeight() - m_dropDownButton.getIconHeight()) / 2;
@@ -215,6 +224,15 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
   public void setDropDownButtonEnabled(boolean iconEnabled) {
     m_dropDownButton.setIconEnabled(iconEnabled);
+  }
+
+  public boolean isDropDownButtonVisible() {
+    return m_dropDownButtonVisible;
+  }
+
+  public void setDropDownButtonVisible(boolean iconVisible) {
+    m_dropDownButtonVisible = iconVisible;
+    setTextFieldMargin();
   }
 
   public void setMenuEnabled(boolean menuEnabled) {

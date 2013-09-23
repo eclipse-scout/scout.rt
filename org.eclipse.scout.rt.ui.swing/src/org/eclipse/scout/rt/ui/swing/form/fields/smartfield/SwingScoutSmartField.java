@@ -217,7 +217,14 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
 
   protected void setIconIdFromScout(String iconId) {
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingField()).setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
+      JTextFieldWithDropDownButton textField = (JTextFieldWithDropDownButton) getSwingField();
+      if (iconId == null) {
+        textField.setDropDownButtonVisible(false);
+      }
+      else {
+        textField.setDropDownButtonVisible(true);
+        textField.setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
+      }
     }
   }
 

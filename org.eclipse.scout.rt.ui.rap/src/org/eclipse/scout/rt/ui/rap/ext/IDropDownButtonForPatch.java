@@ -61,6 +61,8 @@ public interface IDropDownButtonForPatch {
 
   void setLayoutData(Object layoutData);
 
+  Object getLayoutData();
+
   void setData(String key, Object value);
 
   boolean isEnabled();

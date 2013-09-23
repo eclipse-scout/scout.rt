@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
@@ -65,7 +66,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutSmartField</h3> ...
- * 
+ *
  * @since 1.0.0 10.04.2008
  */
 public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<?>> implements ISwtScoutSmartField, IPopupSupport {
@@ -192,7 +193,16 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   }
 
   protected void setIconIdFromScout(String s) {
+    boolean iconVisible = s != null;
+    boolean invalidateLayout = false;
+    if (m_browseButton.isVisible() != iconVisible) {
+      invalidateLayout = true;
+    }
+    m_browseButton.setVisible(iconVisible);
     m_browseButton.setImage(getEnvironment().getIcon(s));
+    if (invalidateLayout && isConnectedToScout()) {
+      SwtLayoutUtility.invalidateLayout(m_browseButton);
+    }
   }
 
   @Override
