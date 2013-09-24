@@ -180,7 +180,9 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       }
 
       //In case of on field labels it is necessary to recompute the label visibility if the mandatory status changes.
-      setLabelVisibleFromScout();
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+        setLabelVisibleFromScout();
+      }
     }
   }
 

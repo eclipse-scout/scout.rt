@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.ui.rap.form.fields.sequencebox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -96,9 +99,13 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
     setUiField(fieldContainer);
 
     // layout
-    fieldContainer.setLayout(new LogicalGridLayout(6, 0));
+    fieldContainer.setLayout(new LogicalGridLayout(getGridColumnGapInPixel(), 0));
     container.setLayout(new LogicalGridLayout(1, 0));
     setChildMandatoryFromScout();
+  }
+
+  protected int getGridColumnGapInPixel() {
+    return 6;
   }
 
   private boolean removeLabelCompletely(IRwtScoutFormField rwtScoutFormField) {
@@ -130,14 +137,11 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
 
   protected void setChildMandatoryFromScout() {
     boolean inheritedMandatory = false;
-    for (IFormField f : getScoutObject().getFields()) {
-      if (f.isVisible()) {
-        if (f instanceof IValueField) {
-          inheritedMandatory = ((IValueField) f).isMandatory();
-          if (inheritedMandatory == true) {
-            break;
-          }
-        }
+    List<IValueField<?>> visibleFields = findVisibleValueFields(getScoutObject());
+    for (IValueField<?> field : visibleFields) {
+      if (field.isMandatory()) {
+        inheritedMandatory = true;
+        break;
       }
     }
     setMandatoryFromScout(inheritedMandatory);
@@ -145,16 +149,28 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
 
   protected void setChildErrorStatusFromScout() {
     IProcessingStatus inheritedErrorStatus = null;
-    for (IFormField f : getScoutObject().getFields()) {
-      if (f.isVisible()) {
-        if (f instanceof IValueField) {
-          inheritedErrorStatus = ((IValueField) f).getErrorStatus();
-          // bsh 2010-10-01: always break (don't inherit error status from other fields than the first visible field)
-          break;
-        }
-      }
+    List<IValueField<?>> visibleFields = findVisibleValueFields(getScoutObject());
+    if (visibleFields.size() > 0) {
+      // bsh 2010-10-01: don't inherit error status from other fields than the first visible field
+      inheritedErrorStatus = visibleFields.get(0).getErrorStatus();
     }
     setErrorStatusFromScout(inheritedErrorStatus);
+  }
+
+  protected List<IValueField<?>> findVisibleValueFields(ICompositeField parent) {
+    List<IValueField<?>> valueFields = new LinkedList<IValueField<?>>();
+    for (IFormField field : parent.getFields()) {
+      if (!field.isVisible()) {
+        continue;
+      }
+      if (field instanceof IValueField) {
+        valueFields.add((IValueField<?>) field);
+      }
+      else if (field instanceof ICompositeField) {
+        valueFields.addAll(findVisibleValueFields((ICompositeField) field));
+      }
+    }
+    return valueFields;
   }
 
   @Override

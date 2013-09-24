@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -103,9 +104,13 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     setSwingLabel(label);
     setSwingField(innerFieldsContainer);
     setSwingContainer(container);
-    innerFieldsContainer.setLayout(new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), 0));
+    innerFieldsContainer.setLayout(new LogicalGridLayout(getSwingEnvironment(), getGridColumnGapInPixel(), 0));
     container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
     setChildMandatoryFromScout();
+  }
+
+  protected int getGridColumnGapInPixel() {
+    return getSwingEnvironment().getFormColumnGap();
   }
 
   private boolean removeLabelCompletely(ISwingScoutFormField swingScoutFormField) {
@@ -138,31 +143,40 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
 
   protected void setChildMandatoryFromScout() {
     boolean inheritedMandatory = false;
-    for (IFormField f : getScoutObject().getFields()) {
-      if (f.isVisible()) {
-        if (f instanceof IValueField) {
-          inheritedMandatory = ((IValueField) f).isMandatory();
-          // bsh 2010-10-01: always break (don't inherit mandatory flag from other fields than the first visible field)
-          // Old code: if (inheritedMandatory == true) { break; }
-          break;
-        }
-      }
+    IValueField<?> firstVisibleValueField = findFirstVisibleValueField(getScoutObject());
+    if (firstVisibleValueField != null) {
+      // bsh 2010-10-01: don't inherit mandatory flag from other fields than the first visible field
+      inheritedMandatory = firstVisibleValueField.isMandatory();
     }
     setMandatoryFromScout(inheritedMandatory);
   }
 
   protected void setChildErrorStatusFromScout() {
     IProcessingStatus inheritedErrorStatus = null;
-    for (IFormField f : getScoutObject().getFields()) {
-      if (f.isVisible()) {
-        if (f instanceof IValueField) {
-          inheritedErrorStatus = ((IValueField) f).getErrorStatus();
-          // bsh 2010-10-01: always break (don't inherit error status from other fields than the first visible field)
-          break;
+    IValueField<?> firstVisibleValueField = findFirstVisibleValueField(getScoutObject());
+    if (firstVisibleValueField != null) {
+      // bsh 2010-10-01: don't inherit error status from other fields than the first visible field
+      inheritedErrorStatus = firstVisibleValueField.getErrorStatus();
+    }
+    setErrorStatusFromScout(inheritedErrorStatus);
+  }
+
+  protected IValueField<?> findFirstVisibleValueField(ICompositeField parent) {
+    for (IFormField field : parent.getFields()) {
+      if (!field.isVisible()) {
+        continue;
+      }
+      if (field instanceof IValueField) {
+        return (IValueField<?>) field;
+      }
+      else if (field instanceof ICompositeField) {
+        IValueField<?> valueField = findFirstVisibleValueField((ICompositeField) field);
+        if (valueField != null) {
+          return valueField;
         }
       }
     }
-    setErrorStatusFromScout(inheritedErrorStatus);
+    return null;
   }
 
   @Override
