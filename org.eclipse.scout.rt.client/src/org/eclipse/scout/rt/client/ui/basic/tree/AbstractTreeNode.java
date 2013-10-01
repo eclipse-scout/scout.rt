@@ -140,7 +140,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 

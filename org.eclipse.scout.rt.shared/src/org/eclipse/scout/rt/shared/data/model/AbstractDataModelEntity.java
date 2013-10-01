@@ -104,13 +104,15 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   private Class<? extends IDataModelAttribute>[] getConfiguredAttributes() {
-    Class[] c = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(c, IDataModelAttribute.class);
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class);
   }
 
   private Class<? extends IDataModelEntity>[] getConfiguredEntities() {
-    Class[] c = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(c, IDataModelEntity.class);
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class);
   }
 
   protected void initConfig() {

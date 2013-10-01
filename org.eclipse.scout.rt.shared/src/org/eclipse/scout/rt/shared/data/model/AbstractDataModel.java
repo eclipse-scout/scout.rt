@@ -47,7 +47,8 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
   protected IDataModelAttribute[] createAttributes() {
     ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(all, IDataModelAttribute.class)) {
+    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
+    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
       try {
         IDataModelAttribute a = ConfigurationUtility.newInnerInstance(this, c);
         attributes.add(a);
@@ -62,7 +63,8 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
   protected IDataModelEntity[] createEntities() {
     ArrayList<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    for (Class<? extends IDataModelEntity> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(all, IDataModelEntity.class)) {
+    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
+    for (Class<? extends IDataModelEntity> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
       try {
         IDataModelEntity e = ConfigurationUtility.newInnerInstance(this, c);
         entities.add(e);

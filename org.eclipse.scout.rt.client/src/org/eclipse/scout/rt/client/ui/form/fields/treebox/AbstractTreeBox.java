@@ -200,7 +200,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
 
   private Class<? extends IFormField>[] getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IFormField.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IFormField.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IFormField.class);
   }
 
   /**

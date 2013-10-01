@@ -146,7 +146,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @SuppressWarnings("unchecked")
   private Class<? extends IWizardStep<? extends IForm>>[] getConfiguredAvailableSteps() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return (Class<? extends IWizardStep<? extends IForm>>[]) ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IWizardStep.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IWizardStep.class);
+    return (Class<? extends IWizardStep<? extends IForm>>[]) ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IWizardStep.class);
   }
 
   /**

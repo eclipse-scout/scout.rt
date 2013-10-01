@@ -233,7 +233,8 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
 
   private Class<? extends IWorkflowStep>[] getConfiguredSteps() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IWorkflowStep.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IWorkflowStep.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IWorkflowStep.class);
   }
 
   @ConfigProperty(ConfigProperty.TEXT)

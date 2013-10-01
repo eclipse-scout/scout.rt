@@ -187,6 +187,16 @@ public class ConfigurationUtilityTest {
     assertArrayEquals(new Class[]{Replacement3.class, String.class}, actual);
   }
 
+  @Test
+  public void getDeclaredPublicClasses() {
+    Class<?>[] result = ConfigurationUtility.getDeclaredPublicClasses(InnerA.class);
+    assertSame(result[0], InnerA.InnerB.class);
+
+    result = ConfigurationUtility.getDeclaredPublicClasses(PublicRoot.class);
+    assertEquals(result.length, 4);
+    assertArrayEquals(new Class[]{PublicRoot.AbstractClass1.class, PublicRoot.AbstractClass2.class, PublicRoot.PublicClass1.class, PublicRoot.PublicClass2.class}, result);
+  }
+
   @Test(expected = NullPointerException.class)
   public void getReplacementMappingNull() {
     ConfigurationUtility.getReplacementMapping(null);
@@ -352,5 +362,19 @@ public class ConfigurationUtilityTest {
 
   @Replace
   public static class OtherReplacement extends Original {
+  }
+
+  public class PublicRoot {
+    public class PublicClass1 {
+    }
+
+    public class PublicClass2 {
+    }
+
+    public abstract class AbstractClass1 {
+    }
+
+    public abstract class AbstractClass2 {
+    }
   }
 }

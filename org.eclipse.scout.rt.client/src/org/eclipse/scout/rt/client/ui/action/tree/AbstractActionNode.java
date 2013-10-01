@@ -38,7 +38,8 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    */
   private Class<? extends IActionNode>[] getConfiguredChildActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IActionNode>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IActionNode.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, IActionNode.class);
+    Class<IActionNode>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IActionNode.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 

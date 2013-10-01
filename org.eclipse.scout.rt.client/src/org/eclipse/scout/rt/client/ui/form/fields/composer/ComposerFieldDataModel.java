@@ -38,7 +38,8 @@ public class ComposerFieldDataModel extends AbstractDataModel {
   protected IDataModelAttribute[] createAttributes() {
     ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     Class<?>[] all = ConfigurationUtility.getDeclaredPublicClasses(m_field.getClass());
-    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(all, IDataModelAttribute.class)) {
+    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
+    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
       try {
         IDataModelAttribute a = ConfigurationUtility.newInnerInstance(m_field, c);
         attributes.add(a);
@@ -54,7 +55,8 @@ public class ComposerFieldDataModel extends AbstractDataModel {
   protected IDataModelEntity[] createEntities() {
     ArrayList<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
     Class<?>[] all = ConfigurationUtility.getDeclaredPublicClasses(m_field.getClass());
-    for (Class<? extends IDataModelEntity> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(all, IDataModelEntity.class)) {
+    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
+    for (Class<? extends IDataModelEntity> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
       try {
         IDataModelEntity e = ConfigurationUtility.newInnerInstance(m_field, c);
         entities.add(e);

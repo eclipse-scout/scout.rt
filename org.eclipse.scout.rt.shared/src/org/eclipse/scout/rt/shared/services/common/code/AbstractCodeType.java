@@ -69,7 +69,8 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
 
   private Class<? extends ICode>[] getConfiguredCodes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, ICode.class);
+    Class[] filtered = ConfigurationUtility.filterClasses(dca, ICode.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, ICode.class);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
