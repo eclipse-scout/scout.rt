@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
@@ -26,7 +25,6 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   private FORM m_form;
   private boolean m_previousSelectionState = false;
 
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredToggleAction() {
     return true;

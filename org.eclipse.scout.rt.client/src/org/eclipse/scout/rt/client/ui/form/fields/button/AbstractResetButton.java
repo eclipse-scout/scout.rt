@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractResetButton extends AbstractButton implements IButton {
@@ -27,19 +26,16 @@ public abstract class AbstractResetButton extends AbstractButton implements IBut
    * Configuration
    */
   @Override
-  @ConfigPropertyValue("SYSTEM_TYPE_RESET")
   protected int getConfiguredSystemType() {
     return SYSTEM_TYPE_RESET;
   }
 
   @Override
-  @ConfigPropertyValue("\"ResetButton\"")
   protected String getConfiguredLabel() {
     return ScoutTexts.get("ResetButton");
   }
 
   @Override
-  @ConfigPropertyValue("\"ResetButtonTooltip\"")
   protected String getConfiguredTooltipText() {
     return ScoutTexts.get("ResetButtonTooltip");
   }

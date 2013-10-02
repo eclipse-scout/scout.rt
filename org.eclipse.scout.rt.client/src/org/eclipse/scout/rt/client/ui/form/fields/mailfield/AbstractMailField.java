@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -47,49 +46,42 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMailEditor() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollBarEnabled() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(260)
-  @ConfigPropertyValue("\"From\"")
   protected String getConfiguredLabelFrom() {
     return ScoutTexts.get("EmailFrom");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(270)
-  @ConfigPropertyValue("\"To\"")
   protected String getConfiguredLabelTo() {
     return ScoutTexts.get("EmailTo");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(280)
-  @ConfigPropertyValue("\"CC\"")
   protected String getConfiguredLabelCc() {
     return ScoutTexts.get("EmailCc");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(290)
-  @ConfigPropertyValue("\"Subject\"")
   protected String getConfiguredLabelSubject() {
     return ScoutTexts.get("EmailSubject");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(300)
-  @ConfigPropertyValue("\"Sent\"")
   protected String getConfiguredLabelSent() {
     return ScoutTexts.get("EmailSent");
   }

@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -70,7 +69,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigProperty(ConfigProperty.BUTTON_SYSTEM_TYPE)
   @Order(200)
-  @ConfigPropertyValue("SYSTEM_TYPE_NONE")
   protected int getConfiguredSystemType() {
     return SYSTEM_TYPE_NONE;
   }
@@ -86,7 +84,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(220)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredProcessButton() {
     return true;
   }
@@ -101,7 +98,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigProperty(ConfigProperty.BUTTON_DISPLAY_STYLE)
   @Order(210)
-  @ConfigPropertyValue("DISPLAY_STYLE_DEFAULT")
   protected int getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_DEFAULT;
   }
@@ -110,7 +106,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * {@inheritDoc} Default for buttons is false because they usually should only take as much place as is needed to
    * display the button label, but not necessarily more. See also {@link #getConfiguredGridUseUiWidth()}.
    */
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredFillHorizontal() {
     return false;
@@ -120,7 +115,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * {@inheritDoc} Default for buttons is false because they usually should only take as much place as is needed to
    * display the button label, but not necessarily more.
    */
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredFillVertical() {
     return false;
@@ -130,7 +124,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * {@inheritDoc} Default for buttons is true because they usually should only take as much place as is needed to
    * display the button label, but not necessarily more.
    */
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredGridUseUiWidth() {
     return true;
@@ -139,7 +132,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /**
    * {@inheritDoc}
    */
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return false;
@@ -158,7 +150,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected Object getConfiguredRadioValue() {
     return null;
   }
@@ -176,7 +167,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(190)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }

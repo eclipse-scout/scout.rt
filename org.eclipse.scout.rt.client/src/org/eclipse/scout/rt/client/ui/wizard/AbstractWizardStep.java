@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -58,49 +57,42 @@ public abstract class AbstractWizardStep<T extends IForm> extends AbstractProper
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredEnabled() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTooltipText() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(35)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitleHtml() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(38)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDescriptionHtml() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

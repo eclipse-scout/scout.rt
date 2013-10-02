@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -47,7 +46,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(130)
-  @ConfigPropertyValue("4000")
   protected int getConfiguredMaxLength() {
     return 4000;
   }
@@ -63,7 +61,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredInputMasked() {
     return false;
   }
@@ -77,7 +74,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(150)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDisplayFormat() {
     return null;
   }
@@ -92,21 +88,18 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredTextWrap() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(170)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFormat() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredSelectAllOnEdit() {
     return true;
   }
@@ -118,7 +111,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredValidateOnAnyKey() {
     return false;
   }

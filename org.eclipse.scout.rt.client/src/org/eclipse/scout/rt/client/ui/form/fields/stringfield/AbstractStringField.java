@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -48,35 +47,30 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredDecorationLink() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(240)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFormat() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredInputMasked() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFormatLower() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
-  @ConfigPropertyValue("4000")
   @ValidationRule(ValidationRule.MAX_LENGTH)
   protected int getConfiguredMaxLength() {
     return 4000;
@@ -84,14 +78,12 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(230)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMultilineText() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFormatUpper() {
     return false;
   }
@@ -103,42 +95,36 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredValidateOnAnyKey() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(320)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredWrapText() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(330)
-  @ConfigPropertyValue("null")
   protected String getConfiguredValueFormat() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(340)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredSelectAllOnFocus() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDropType() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(410)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDragType() {
     return 0;
   }

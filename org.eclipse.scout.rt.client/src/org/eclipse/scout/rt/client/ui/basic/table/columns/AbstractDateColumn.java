@@ -17,7 +17,6 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -55,7 +54,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(140)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFormat() {
     return null;
   }
@@ -70,7 +68,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredHasDate() {
     return true;
   }
@@ -85,7 +82,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(151)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredHasTime() {
     return false;
   }
@@ -95,7 +91,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(152)
-  @ConfigPropertyValue("0")
   protected long getConfiguredAutoTimeMillis() {
     return 0;
   }

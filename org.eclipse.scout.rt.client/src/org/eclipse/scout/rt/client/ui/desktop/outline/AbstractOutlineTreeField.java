@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -34,7 +33,6 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField {
     super(callInitializer);
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredLabelVisible() {
     return false;

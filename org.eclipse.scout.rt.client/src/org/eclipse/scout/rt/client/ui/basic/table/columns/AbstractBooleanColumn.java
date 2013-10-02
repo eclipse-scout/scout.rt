@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -100,7 +99,6 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(200)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredVerticalAlignment() {
     return -1; // top position
   }

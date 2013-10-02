@@ -18,7 +18,6 @@ import java.util.HashSet;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -75,7 +74,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredEnabled() {
     return true;
   }
@@ -89,7 +87,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredVisible() {
     return true;
   }
@@ -105,7 +102,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
-  @ConfigPropertyValue("0")
   @Deprecated
   protected int getConfiguredSortNo() {
     return 0;
@@ -121,7 +117,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigProperty(ConfigProperty.DOC)
   @Order(110)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

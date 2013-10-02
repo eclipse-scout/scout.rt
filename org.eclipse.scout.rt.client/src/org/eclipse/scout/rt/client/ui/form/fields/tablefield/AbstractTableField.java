@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -248,7 +247,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredTableStatusVisible() {
     return false;
   }
@@ -269,7 +267,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
-  @ConfigPropertyValue("1")
   @Override
   protected double getConfiguredGridWeightY() {
     return 1;

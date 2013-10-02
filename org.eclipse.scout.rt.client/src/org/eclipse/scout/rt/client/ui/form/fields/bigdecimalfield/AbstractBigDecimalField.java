@@ -18,7 +18,6 @@ import java.text.ParsePosition;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -43,7 +42,6 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(300)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MIN_VALUE)
   protected Double getConfiguredMinValue() {
     return null;
@@ -51,7 +49,6 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
 
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(310)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected Double getConfiguredMaxValue() {
     return null;

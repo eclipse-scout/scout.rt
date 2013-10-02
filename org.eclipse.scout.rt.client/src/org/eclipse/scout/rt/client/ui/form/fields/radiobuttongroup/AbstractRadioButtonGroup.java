@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -85,7 +84,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
@@ -99,7 +97,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
@@ -389,7 +386,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  @ConfigPropertyValue("0")
   protected double getConfiguredGridWeightY() {
     return 0;
   }

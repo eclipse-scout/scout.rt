@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -56,7 +55,6 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
   @Override
   @ConfigProperty(ConfigProperty.TEXT)
-  @ConfigPropertyValue("ScoutTexts.get(\"BookmarksMainMenu\")")
   @Order(10)
   protected String getConfiguredText() {
     return ScoutTexts.get("BookmarksMainMenu");
@@ -79,7 +77,6 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
   @ConfigProperty(ConfigProperty.FORM)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
     return BookmarkForm.class;
   }

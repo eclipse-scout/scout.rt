@@ -22,7 +22,6 @@ import javax.mail.Store;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.AbstractService;
@@ -46,7 +45,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHost() {
     return null;
   }
@@ -61,7 +59,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(20)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredPort() {
     return -1;
   }
@@ -76,7 +73,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(25)
-  @ConfigPropertyValue("null")
   protected String getConfiguredSslProtocols() {
     return null;
   }
@@ -91,7 +87,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredMailbox() {
     return null;
   }
@@ -106,7 +101,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredUserName() {
     return null;
   }
@@ -121,7 +115,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredPassword() {
     return null;
   }

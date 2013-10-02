@@ -37,7 +37,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
@@ -184,7 +183,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
@@ -199,7 +197,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDefaultIconId() {
     return null;
   }
@@ -213,7 +210,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredMultiSelect() {
     return true;
   }
@@ -228,7 +224,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(32)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredMultiCheck() {
     return true;
   }
@@ -242,7 +237,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.MENU_CLASS)
   @Order(35)
-  @ConfigPropertyValue("null")
   protected Class<? extends IMenu> getConfiguredDefaultMenu() {
     return null;
   }
@@ -266,7 +260,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoDiscardOnDelete() {
     return false;
   }
@@ -282,7 +275,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredSortEnabled() {
     return true;
   }
@@ -296,7 +288,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredHeaderVisible() {
     return true;
   }
@@ -312,7 +303,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoResizeColumns() {
     return false;
   }
@@ -330,7 +320,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMultilineText() {
     return false;
   }
@@ -354,7 +343,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(92)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredRowHeightHint() {
     return -1;
   }
@@ -368,7 +356,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredCheckable() {
     return false;
   }
@@ -383,7 +370,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.TABLE_COLUMN)
   @Order(102)
-  @ConfigPropertyValue("false")
   protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn() {
     return null;
   }
@@ -399,7 +385,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDropType() {
     return 0;
   }
@@ -415,7 +400,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDragType() {
     return 0;
   }
@@ -430,7 +414,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredKeyboardNavigation() {
     return true;
   }
@@ -445,7 +428,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(230)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollToSelection() {
     return false;
   }

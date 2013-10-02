@@ -15,7 +15,6 @@ import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -42,14 +41,12 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
-  @ConfigPropertyValue("null")
   protected Integer getConfiguredMaxValue() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
-  @ConfigPropertyValue("null")
   protected Integer getConfiguredMinValue() {
     return null;
   }

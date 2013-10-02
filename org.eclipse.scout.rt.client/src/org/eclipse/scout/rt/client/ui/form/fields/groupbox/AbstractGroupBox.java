@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 import java.util.ArrayList;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke;
@@ -52,7 +51,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * {@inheritDoc} Default for group boxes is true.
    */
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return true;
@@ -69,7 +67,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(200)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredGridColumnCount() {
     return -1;
   }
@@ -92,7 +89,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(230)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredBorderVisible() {
     return true;
   }
@@ -109,7 +105,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(231)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredExpandable() {
     return false;
   }
@@ -125,7 +120,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(232)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredExpanded() {
     return true;
   }
@@ -142,7 +136,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.BORDER_DECORATION)
   @Order(233)
-  @ConfigPropertyValue("BORDER_DECORATION_AUTO")
   protected String getConfiguredBorderDecoration() {
     return BORDER_DECORATION_AUTO;
   }
@@ -157,7 +150,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(240)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBackgroundImageName() {
     return null;
   }
@@ -173,7 +165,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
   @Order(250)
-  @ConfigPropertyValue("0")
   protected int getConfiguredBackgroundImageHorizontalAlignment() {
     return 0;
   }
@@ -189,7 +180,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
   @Order(260)
-  @ConfigPropertyValue("0")
   protected int getConfiguredBackgroundImageVerticalAlignment() {
     return 0;
   }
@@ -204,7 +194,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollable() {
     return false;
   }
@@ -224,7 +213,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * @return the number of columns to span
    */
   @Override
-  @ConfigPropertyValue("FULL_WIDTH")
   protected int getConfiguredGridW() {
     return FULL_WIDTH;
   }

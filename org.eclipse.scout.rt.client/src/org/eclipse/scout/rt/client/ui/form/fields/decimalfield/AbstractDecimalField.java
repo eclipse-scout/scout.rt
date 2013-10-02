@@ -16,7 +16,6 @@ import java.text.NumberFormat;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -52,55 +51,47 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFormat() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
-  @ConfigPropertyValue("2")
   protected int getConfiguredFractionDigits() {
     return 2;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(240)
-  @ConfigPropertyValue("2")
   protected int getConfiguredMinFractionDigits() {
     return 2;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(250)
-  @ConfigPropertyValue("2")
   protected int getConfiguredMaxFractionDigits() {
     return 2;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredGroupingUsed() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredPercent() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(280)
-  @ConfigPropertyValue("1")
   protected int getConfiguredMultiplier() {
     return 1;
   }
 
   @Override
-  @ConfigPropertyValue("1")
   protected int getConfiguredHorizontalAlignment() {
     return 1;
   }

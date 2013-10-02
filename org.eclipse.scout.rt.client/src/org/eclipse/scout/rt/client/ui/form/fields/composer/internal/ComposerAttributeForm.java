@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.internal;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -115,7 +114,6 @@ public class ComposerAttributeForm extends AbstractForm {
   }
 
   @Override
-  @ConfigPropertyValue("\"ExtendedSearchAddAttribute\"")
   protected String getConfiguredTitle() {
     return ScoutTexts.get("ExtendedSearchAddAttribute");
   }
@@ -164,7 +162,6 @@ public class ComposerAttributeForm extends AbstractForm {
   public class MainBox extends AbstractGroupBox {
 
     @Override
-    @ConfigPropertyValue("2")
     protected int getConfiguredGridColumnCount() {
       return 2;
     }

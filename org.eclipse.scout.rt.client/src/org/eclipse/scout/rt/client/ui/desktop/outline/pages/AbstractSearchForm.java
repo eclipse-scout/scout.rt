@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
@@ -41,13 +40,11 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     execInitForm();
   }
 
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredMinimizeEnabled() {
     return true;
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredAskIfNeedSave() {
     return false;

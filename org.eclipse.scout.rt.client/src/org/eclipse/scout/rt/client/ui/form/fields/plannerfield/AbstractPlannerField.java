@@ -19,7 +19,6 @@ import java.util.HashSet;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -69,14 +68,12 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(10)
-  @ConfigPropertyValue("2")
   protected int getConfiguredMiniCalendarCount() {
     return 2;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
-  @ConfigPropertyValue("168")
   protected int getConfiguredSplitterPosition() {
     return 168;
   }

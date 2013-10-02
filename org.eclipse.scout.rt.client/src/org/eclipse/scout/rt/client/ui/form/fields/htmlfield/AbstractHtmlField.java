@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -60,7 +59,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(230)
-  @ConfigPropertyValue("Integer.MAX_VALUE")
   @ValidationRule(ValidationRule.MAX_LENGTH)
   protected int getConfiguredMaxLength() {
     return Integer.MAX_VALUE;
@@ -68,14 +66,12 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredHtmlEditor() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollBarEnabled() {
     return false;
   }

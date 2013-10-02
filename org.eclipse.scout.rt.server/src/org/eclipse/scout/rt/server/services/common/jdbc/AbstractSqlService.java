@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -140,35 +139,30 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredDirectJdbcConnection() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredUsername() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredPassword() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.NLS_PROVIDER)
   @Order(70)
-  @ConfigPropertyValue("null")
   protected Class<? extends ScoutTexts> getConfiguredNlsProvider() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.SQL_STYLE)
   @Order(80)
-  @ConfigPropertyValue("null")
   protected Class<? extends ISqlStyle> getConfiguredSqlStyle() {
     return null;
   }
@@ -183,84 +177,72 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(90)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTransactionMemberId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(100)
-  @ConfigPropertyValue("\"oracle.jdbc.OracleDriver\"")
   protected String getConfiguredJdbcDriverName() {
     return "oracle.jdbc.OracleDriver";
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(110)
-  @ConfigPropertyValue("\"jdbc:oracle:thin:@localhost:1521:ORCL\"")
   protected String getConfiguredJdbcMappingName() {
     return "jdbc:oracle:thin:@localhost:1521:ORCL";
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(120)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJdbcProperties() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(130)
-  @ConfigPropertyValue("25")
   protected int getConfiguredJdbcPoolSize() {
     return 25;
   }
 
   @ConfigProperty(ConfigProperty.LONG)
   @Order(140)
-  @ConfigPropertyValue("300000L")
   protected long getConfiguredJdbcPoolConnectionLifetime() {
     return 300000L;
   }
 
   @ConfigProperty(ConfigProperty.LONG)
   @Order(150)
-  @ConfigPropertyValue("21600000L")
   protected long getConfiguredJdbcPoolConnectionBusyTimeout() {
     return 21600000L;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
-  @ConfigPropertyValue("25")
   protected int getConfiguredJdbcStatementCacheSize() {
     return 25;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(170)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJndiName() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(180)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJndiInitialContextFactory() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(190)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJndiProviderUrl() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(200)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJndiUrlPkgPrefixes() {
     return null;
   }

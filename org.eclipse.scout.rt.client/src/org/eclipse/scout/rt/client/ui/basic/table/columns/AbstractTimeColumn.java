@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 
 /**
  * convenience subclass of {@link AbstractDateColumn} with hasDate=false and hasTime=true
@@ -21,13 +20,11 @@ public abstract class AbstractTimeColumn extends AbstractDateColumn {
     super();
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredHasDate() {
     return false;
   }
 
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredHasTime() {
     return true;

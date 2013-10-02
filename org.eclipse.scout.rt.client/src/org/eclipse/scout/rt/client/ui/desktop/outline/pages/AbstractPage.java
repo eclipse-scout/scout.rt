@@ -15,7 +15,6 @@ import java.util.HashSet;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -120,7 +119,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(35)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredTableVisible() {
     return true;
   }
@@ -135,7 +133,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
@@ -151,7 +148,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
@@ -166,7 +162,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    */
   @ConfigProperty(ConfigProperty.DOC)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

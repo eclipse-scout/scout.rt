@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 
 public abstract class AbstractRadioButton extends AbstractButton implements IButton {
 
@@ -26,7 +25,6 @@ public abstract class AbstractRadioButton extends AbstractButton implements IBut
    * Configuration
    */
   @Override
-  @ConfigPropertyValue("DISPLAY_STYLE_RADIO")
   protected int getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_RADIO;
   }

@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -39,7 +38,6 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
     super(callInitializer);
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredLabelVisible() {
     return false;

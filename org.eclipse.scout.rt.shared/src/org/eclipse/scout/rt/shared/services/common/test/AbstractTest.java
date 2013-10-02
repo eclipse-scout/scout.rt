@@ -4,46 +4,44 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.test;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.service.AbstractService;
 
 /**
- * 
  * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
  *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
- *
- * Abstract test implementation. <br>
- * Implements the abstract methods and add a test status (or even multiple ones)
- * using one of the create..Status(String) methods and {@link #addStatus(TestStatus)} <br>
- * <p>
- * Normally the following methods are implemented in sublcasses <br>
- * {@link #getConfiguredProduct()} <br>
- * {@link #getConfiguredTitle()} default value is the class simple name without suffixes "UnitTest" and "Test" <br>
- * {@link #getConfiguredSubTitle()} default value is null <br>
- * {@link #run()}
- * <p>
- * Normally the following methods are called from within {@link #run()} <br>
- * {@link #addOkStatus(String)} <br>
- * {@link #addWarningStatus(String, Throwable)} <br>
- * {@link #addErrorStatus(String, Throwable)} <br>
- * {@link #addFatalStatus(String, Throwable)}
- * <p>
- * Often also the following methods are called from within {@link #run()} <br>
- * {@link #startTiming()} <br>
- * {@link #stopTiming()}
- * <p>
- * In tests which contain multiple stati also the following methods are normally called to have different test titles
- * per status <br>
- * {@link #setSubTitle(String)} </pre>
+ *             Abstract test implementation. <br>
+ *             Implements the abstract methods and add a test status (or even multiple ones)
+ *             using one of the create..Status(String) methods and {@link #addStatus(TestStatus)} <br>
+ *             <p>
+ *             Normally the following methods are implemented in sublcasses <br>
+ *             {@link #getConfiguredProduct()} <br>
+ *             {@link #getConfiguredTitle()} default value is the class simple name without suffixes "UnitTest" and
+ *             "Test" <br>
+ *             {@link #getConfiguredSubTitle()} default value is null <br>
+ *             {@link #run()}
+ *             <p>
+ *             Normally the following methods are called from within {@link #run()} <br>
+ *             {@link #addOkStatus(String)} <br>
+ *             {@link #addWarningStatus(String, Throwable)} <br>
+ *             {@link #addErrorStatus(String, Throwable)} <br>
+ *             {@link #addFatalStatus(String, Throwable)}
+ *             <p>
+ *             Often also the following methods are called from within {@link #run()} <br>
+ *             {@link #startTiming()} <br>
+ *             {@link #stopTiming()}
+ *             <p>
+ *             In tests which contain multiple stati also the following methods are normally called to have different
+ *             test titles per status <br>
+ *             {@link #setSubTitle(String)} </pre>
  */
 @Deprecated
 @SuppressWarnings("deprecation")
@@ -61,21 +59,18 @@ public abstract class AbstractTest extends AbstractService implements ITest {
 
   @Order(10)
   @ConfigProperty(ConfigProperty.STRING)
-  @ConfigPropertyValue("null")
   protected String getConfiguredProduct() {
     return null;
   }
 
   @Order(10)
   @ConfigProperty(ConfigProperty.STRING)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @Order(10)
   @ConfigProperty(ConfigProperty.STRING)
-  @ConfigPropertyValue("null")
   protected String getConfiguredSubTitle() {
     return null;
   }

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.pagefield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -43,7 +42,6 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
   }
 
   @Override
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredBorderVisible() {
     return false;
   }

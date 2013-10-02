@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -64,7 +63,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAutoDisplayText() {
     return true;
   }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractSaveButton extends AbstractButton implements IButton {
@@ -27,19 +26,16 @@ public abstract class AbstractSaveButton extends AbstractButton implements IButt
    * Configuration
    */
   @Override
-  @ConfigPropertyValue("SYSTEM_TYPE_SAVE")
   protected int getConfiguredSystemType() {
     return SYSTEM_TYPE_SAVE;
   }
 
   @Override
-  @ConfigPropertyValue("\"SaveButton\"")
   protected String getConfiguredLabel() {
     return ScoutTexts.get("SaveButton");
   }
 
   @Override
-  @ConfigPropertyValue("\"SaveButtonTooltip\"")
   protected String getConfiguredTooltipText() {
     return ScoutTexts.get("SaveButtonTooltip");
   }

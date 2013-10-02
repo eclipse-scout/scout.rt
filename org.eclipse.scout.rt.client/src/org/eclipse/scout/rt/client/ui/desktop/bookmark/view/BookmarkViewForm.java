@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -64,7 +63,6 @@ public class BookmarkViewForm extends AbstractForm {
 
   @ConfigProperty(ConfigProperty.FORM)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
     return BookmarkForm.class;
   }

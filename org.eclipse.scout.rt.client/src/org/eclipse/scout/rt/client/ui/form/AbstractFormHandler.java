@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
@@ -26,7 +25,6 @@ public abstract class AbstractFormHandler implements IFormHandler {
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredGuiLess() {
     return false;
   }
@@ -37,7 +35,6 @@ public abstract class AbstractFormHandler implements IFormHandler {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredOpenExclusive() {
     return false;
   }

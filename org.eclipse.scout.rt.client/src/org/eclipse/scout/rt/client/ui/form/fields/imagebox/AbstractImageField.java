@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -47,13 +46,11 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     super(callInitializer);
   }
 
-  @ConfigPropertyValue("0")
   @Override
   protected int getConfiguredVerticalAlignment() {
     return 0;
   }
 
-  @ConfigPropertyValue("0")
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return 0;
@@ -61,35 +58,30 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(300)
-  @ConfigPropertyValue("null")
   protected String getConfiguredImageId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredFocusVisible() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(320)
-  @ConfigPropertyValue("null")
   protected boolean getConfiguredAutoFit() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(330)
-  @ConfigPropertyValue("1.25")
   protected double getConfiguredZoomDelta() {
     return 1.25;
   }
 
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(340)
-  @ConfigPropertyValue("10")
   protected double getConfiguredPanDelta() {
     return 10;
   }
@@ -99,28 +91,24 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(350)
-  @ConfigPropertyValue("10")
   protected double getConfiguredRotateDelta() {
     return 10;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(360)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollBarEnabled() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDropType() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(410)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDragType() {
     return 0;
   }

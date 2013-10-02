@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.entity;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -37,7 +36,6 @@ public abstract class AbstractComposerEntity extends AbstractDataModelEntity imp
   @Deprecated
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredId() {
     return null;
   }

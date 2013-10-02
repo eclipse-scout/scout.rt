@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -57,14 +56,12 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAutoLoad() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoExpandAll() {
     return false;
   }

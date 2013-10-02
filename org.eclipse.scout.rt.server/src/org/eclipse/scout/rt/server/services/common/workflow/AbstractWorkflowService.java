@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -239,21 +238,18 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDefinitionText() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredDefinitionActive() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

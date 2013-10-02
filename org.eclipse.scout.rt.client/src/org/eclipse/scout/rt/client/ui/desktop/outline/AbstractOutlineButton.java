@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -42,7 +41,6 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * 
    * @return {@code IButton.DISPLAY_STYLE_TOGGLE}
    */
-  @ConfigPropertyValue("DISPLAY_STYLE_TOGGLE")
   @Override
   protected int getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_TOGGLE;
@@ -67,7 +65,6 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * @see IOutline
    */
   @ConfigProperty(ConfigProperty.OUTLINE)
-  @ConfigPropertyValue("null")
   protected Class<? extends IOutline> getConfiguredOutline() {
     return null;
   }

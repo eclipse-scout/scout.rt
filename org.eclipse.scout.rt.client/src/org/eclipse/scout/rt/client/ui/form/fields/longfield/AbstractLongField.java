@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.longfield;
 import java.text.ParsePosition;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -38,7 +37,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
    */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MIN_VALUE)
   protected Long getConfiguredMinimumValue() {
     return null;
@@ -46,7 +44,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
 
   @ConfigProperty(ConfigProperty.LONG)
   @Order(260)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaximumValue() {
     return null;

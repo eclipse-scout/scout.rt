@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -117,7 +116,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
@@ -125,7 +123,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
@@ -133,28 +130,24 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAutoLoad() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredLoadIncremental() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoExpandAll() {
     return false;
   }
@@ -166,7 +159,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(290)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredFilterActiveNodes() {
     return false;
   }
@@ -178,7 +170,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFilterCheckedNodes() {
     return false;
   }
@@ -198,13 +189,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoCheckChildNodes() {
     return false;
   }
 
   @Override
-  @ConfigPropertyValue("1.0")
   protected double getConfiguredGridWeightY() {
     return 1.0;
   }
@@ -1144,19 +1133,16 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   @Order(10000)
   public class DefaultTreeBoxTree extends AbstractTree {
 
-    @ConfigPropertyValue("false")
     @Override
     protected boolean getConfiguredMultiSelect() {
       return false;
     }
 
-    @ConfigPropertyValue("true")
     @Override
     protected boolean getConfiguredCheckable() {
       return true;
     }
 
-    @ConfigPropertyValue("false")
     @Override
     protected boolean getConfiguredRootNodeVisible() {
       return false;

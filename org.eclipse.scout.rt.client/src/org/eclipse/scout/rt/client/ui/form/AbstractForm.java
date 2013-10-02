@@ -36,7 +36,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StoppableThread;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
@@ -172,112 +171,96 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(11)
-  @ConfigPropertyValue("null")
   protected String getConfiguredSubTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
-  @ConfigPropertyValue("0")
   protected int/* seconds */getConfiguredCloseTimer() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(40)
-  @ConfigPropertyValue("0")
   protected int/* seconds */getConfiguredCustomTimer() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(90)
-  @ConfigPropertyValue("ScoutTexts.get(\"FormSaveChangesQuestion\")")
   protected String getConfiguredCancelVerificationText() {
     return ScoutTexts.get("FormSaveChangesQuestion");
   }
 
   @ConfigProperty(ConfigProperty.FORM_DISPLAY_HINT)
   @Order(100)
-  @ConfigPropertyValue("DISPLAY_HINT_DIALOG")
   protected int getConfiguredDisplayHint() {
     return DISPLAY_HINT_DIALOG;
   }
 
   @ConfigProperty(ConfigProperty.FORM_VIEW_ID)
   @Order(105)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDisplayViewId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(108)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMinimizeEnabled() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(109)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMaximizeEnabled() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(110)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMinimized() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(112)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMaximized() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(120)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredModal() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredCacheBounds() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAskIfNeedSave() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(160)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
@@ -2099,8 +2082,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code> is
-   *         returned if no form fields are replaced. Do not use this internal method.
+   * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code>
+   *         is returned if no form fields are replaced. Do not use this internal method.
    * @since 3.8.2
    */
   public Map<Class<?>, Class<? extends IFormField>> getFormFieldReplacementsInternal() {

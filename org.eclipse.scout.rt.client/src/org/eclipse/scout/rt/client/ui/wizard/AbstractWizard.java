@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -92,63 +91,54 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @ConfigProperty(ConfigProperty.FORM_DISPLAY_HINT)
   @Order(100)
-  @ConfigPropertyValue("DISPLAY_HINT_DIALOG")
   protected int getConfiguredDisplayHint() {
     return DISPLAY_HINT_DIALOG;
   }
 
   @ConfigProperty(ConfigProperty.FORM_VIEW_ID)
   @Order(105)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDisplayViewId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(106)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredModal() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitleHtml() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTooltipText() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredWizardNo() {
     return null;
   }

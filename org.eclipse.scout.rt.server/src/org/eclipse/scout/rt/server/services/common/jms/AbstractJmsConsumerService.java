@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.jms;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -33,7 +32,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredContextFactory() {
     return null;
   }
@@ -48,7 +46,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredProviderUrl() {
     return null;
   }
@@ -63,7 +60,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredConnectionFactoryJndiName() {
     return null;
   }
@@ -78,7 +74,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJndiName() {
     return null;
   }
@@ -93,7 +88,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJmsUsername() {
     return null;
   }
@@ -108,7 +102,6 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredJmsPassword() {
     return null;
   }

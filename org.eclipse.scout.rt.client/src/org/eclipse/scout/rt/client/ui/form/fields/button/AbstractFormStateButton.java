@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -30,7 +29,6 @@ public abstract class AbstractFormStateButton extends AbstractButton implements 
    * Configuration
    */
   @Override
-  @ConfigPropertyValue("\"FormStateLoad\"")
   protected String getConfiguredLabel() {
     return ScoutTexts.get("FormStateLoad");
   }

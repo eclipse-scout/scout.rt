@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
@@ -105,21 +104,18 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFormat() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredHasDate() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(241)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredHasTime() {
     return false;
   }
@@ -129,7 +125,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(270)
-  @ConfigPropertyValue("0")
   protected long getConfiguredAutoTimeMillis() {
     return 0;
   }

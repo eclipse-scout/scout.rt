@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -105,70 +104,60 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoTitle() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMultiSelect() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(42)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredMultiCheck() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredCheckable() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(46)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredNodeHeightHint() {
     return -1;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredDragEnabled() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(51)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDragType() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(52)
-  @ConfigPropertyValue("0")
   protected int getConfiguredDropType() {
     return 0;
   }
@@ -180,21 +169,18 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAutoDiscardOnDelete() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredRootNodeVisible() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(71)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredRootHandlesVisible() {
     return true;
   }
@@ -210,7 +196,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredScrollToSelection() {
     return false;
   }
@@ -228,7 +213,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredSaveAndRestoreScrollbars() {
     return false;
   }

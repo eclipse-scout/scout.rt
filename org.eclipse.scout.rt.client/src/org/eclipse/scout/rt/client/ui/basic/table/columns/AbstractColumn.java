@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
@@ -142,7 +141,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredVisible() {
     return true;
   }
@@ -156,7 +154,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHeaderText() {
     return null;
   }
@@ -170,7 +167,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHeaderTooltipText() {
     return null;
   }
@@ -184,7 +180,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHeaderForegroundColor() {
     return null;
   }
@@ -198,7 +193,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHeaderBackgroundColor() {
     return null;
   }
@@ -212,7 +206,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHeaderFont() {
     return null;
   }
@@ -229,7 +222,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(70)
-  @ConfigPropertyValue("60")
   protected int getConfiguredWidth() {
     return 60;
   }
@@ -242,7 +234,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(75)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFixedWidth() {
     return false;
   }
@@ -257,7 +248,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredDisplayable() {
     return true;
   }
@@ -274,7 +264,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredPrimaryKey() {
     return false;
   }
@@ -289,7 +278,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(95)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredEditable() {
     return false;
   }
@@ -305,7 +293,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredSummary() {
     return false;
   }
@@ -320,7 +307,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(110)
-  @ConfigPropertyValue("null")
   protected String getConfiguredForegroundColor() {
     return null;
   }
@@ -335,7 +321,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(120)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBackgroundColor() {
     return null;
   }
@@ -350,7 +335,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(130)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFont() {
     return null;
   }
@@ -366,7 +350,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(140)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredSortIndex() {
     return -1;
   }
@@ -382,7 +365,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(145)
-  @ConfigPropertyValue("-1")
   protected double getConfiguredViewOrder() {
     return -1;
   }
@@ -397,7 +379,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredSortAscending() {
     return true;
   }
@@ -412,7 +393,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAlwaysIncludeSortAtBegin() {
     return false;
   }
@@ -427,7 +407,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(170)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAlwaysIncludeSortAtEnd() {
     return false;
   }
@@ -441,7 +420,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(180)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredHorizontalAlignment() {
     return -1;
   }
@@ -460,7 +438,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAutoOptimizeWidth() {
     return false;
   }
@@ -475,7 +452,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.DOC)
   @Order(200)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }
@@ -490,7 +466,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(210)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredMandatory() {
     return false;
   }

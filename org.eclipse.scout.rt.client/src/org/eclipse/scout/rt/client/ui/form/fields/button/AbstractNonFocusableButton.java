@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 
 public abstract class AbstractNonFocusableButton extends AbstractButton implements IButton {
 
@@ -25,7 +24,6 @@ public abstract class AbstractNonFocusableButton extends AbstractButton implemen
   /*
    * Configuration
    */
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredFocusable() {
     return false;

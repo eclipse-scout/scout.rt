@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -144,21 +143,18 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredGlobalBookmarkLabel() {
     return ScoutTexts.get("GlobalBookmarks");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredPrivateBookmarkLabel() {
     return ScoutTexts.get("PrivateBookmarks");
   }
 
   @ConfigProperty(ConfigProperty.FORM)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
     return BookmarkForm.class;
   }

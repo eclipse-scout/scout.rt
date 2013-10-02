@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
@@ -81,7 +80,6 @@ public class LookupCall implements Cloneable, Serializable {
    * Configurator is implementing this method
    */
   @ConfigProperty(ConfigProperty.LOOKUP_SERVICE)
-  @ConfigPropertyValue("null")
   @Order(10)
   protected Class<? extends ILookupService> getConfiguredService() {
     return null;
@@ -91,7 +89,6 @@ public class LookupCall implements Cloneable, Serializable {
    * @return true if a master value is required for lookups by {@link #getDataByText()} and {@link #getDataByAll()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @ConfigPropertyValue("false")
   @Order(20)
   protected boolean getConfiguredMasterRequired() {
     return false;
@@ -99,7 +96,6 @@ public class LookupCall implements Cloneable, Serializable {
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(30)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

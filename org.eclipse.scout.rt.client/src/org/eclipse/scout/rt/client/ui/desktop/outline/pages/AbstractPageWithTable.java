@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -129,7 +128,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigProperty(ConfigProperty.SEARCH_FORM)
   @Order(90)
-  @ConfigPropertyValue("null")
   protected Class<? extends ISearchForm> getConfiguredSearchForm() {
     return null;
   }
@@ -149,7 +147,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredSearchRequired() {
     return false;
   }
@@ -170,7 +167,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(110)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredShowEmptySpaceMenus() {
     return true;
   }
@@ -189,7 +185,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(120)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredShowTableRowMenus() {
     return true;
   }

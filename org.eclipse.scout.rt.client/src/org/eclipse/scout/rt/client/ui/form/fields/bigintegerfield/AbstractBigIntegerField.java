@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.text.ParsePosition;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -39,7 +38,6 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
    */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MIN_VALUE)
   protected Long getConfiguredMinValue() {
     return null;
@@ -47,7 +45,6 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
 
   @ConfigProperty(ConfigProperty.LONG)
   @Order(260)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaxValue() {
     return null;

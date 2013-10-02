@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -28,7 +27,6 @@ public abstract class AbstractDateTimeField extends AbstractDateField {
     super(callInitializer);
   }
 
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredHasTime() {
     return true;

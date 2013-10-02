@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -102,14 +101,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(270)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBrowseIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(230)
-  @ConfigPropertyValue("AbstractIcons.SmartFieldBrowse")
   protected String getConfiguredIconId() {
     return AbstractIcons.SmartFieldBrowse;
   }
@@ -119,7 +116,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredBrowseAutoExpandAll() {
     return true;
   }
@@ -131,7 +127,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(290)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAllowCustomText() {
     return false;
   }
@@ -142,7 +137,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
-  @ConfigPropertyValue("true")
   @ValidationRule(ValidationRule.ZERO_NULL_EQUALITY)
   protected boolean getConfiguredTreat0AsNull() {
     return true;
@@ -153,7 +147,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredBrowseLoadIncremental() {
     return false;
   }
@@ -164,7 +157,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredBrowseHierarchy() {
     return false;
   }
@@ -177,7 +169,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(315)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBrowseNewText() {
     return null;
   }
@@ -187,7 +178,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(260)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?>> getConfiguredCodeType() {
     return null;
@@ -201,7 +191,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
@@ -209,7 +198,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(265)
-  @ConfigPropertyValue("100")
   protected int getConfiguredBrowseMaxRowCount() {
     return 100;
   }
@@ -220,7 +208,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredActiveFilterEnabled() {
     return false;
   }
@@ -353,7 +340,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
 
   // override to freeze
   @Override
-  @ConfigPropertyValue("true")
   protected final boolean getConfiguredAutoDisplayText() {
     return true;
   }

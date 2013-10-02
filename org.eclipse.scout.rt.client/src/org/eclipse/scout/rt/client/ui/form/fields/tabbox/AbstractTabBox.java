@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
@@ -41,14 +40,12 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
    * Configuration
    */
 
-  @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return true;
   }
 
   @Override
-  @ConfigPropertyValue("FULL_WIDTH")
   protected int getConfiguredGridW() {
     return FULL_WIDTH;
   }
@@ -59,7 +56,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
-  @ConfigPropertyValue("MARK_STRATEGY_EMPTY")
   protected int getConfiguredMarkStrategy() {
     return MARK_STRATEGY_EMPTY;
   }

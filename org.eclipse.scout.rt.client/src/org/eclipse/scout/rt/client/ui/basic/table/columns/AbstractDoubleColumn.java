@@ -15,7 +15,6 @@ import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -42,14 +41,12 @@ public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double>
 
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(200)
-  @ConfigPropertyValue("null")
   protected Double getConfiguredMaxValue() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(210)
-  @ConfigPropertyValue("null")
   protected Double getConfiguredMinValue() {
     return null;
   }

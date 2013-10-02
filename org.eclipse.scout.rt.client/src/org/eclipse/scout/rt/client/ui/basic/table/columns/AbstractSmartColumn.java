@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -56,7 +55,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(140)
-  @ConfigPropertyValue("null")
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
   }
@@ -71,7 +69,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(150)
-  @ConfigPropertyValue("null")
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
   }
@@ -87,7 +84,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredBrowseHierarchy() {
     return false;
   }
@@ -97,7 +93,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredBrowseAutoExpandAll() {
     return true;
   }
@@ -113,14 +108,12 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredSortCodesByDisplayText() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(265)
-  @ConfigPropertyValue("100")
   protected int getConfiguredBrowseMaxRowCount() {
     return 100;
   }
@@ -133,7 +126,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(315)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBrowseNewText() {
     return null;
   }
@@ -144,7 +136,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredActiveFilterEnabled() {
     return false;
   }
@@ -154,7 +145,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredBrowseLoadIncremental() {
     return false;
   }
@@ -166,7 +156,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(290)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredAllowCustomText() {
     return false;
   }

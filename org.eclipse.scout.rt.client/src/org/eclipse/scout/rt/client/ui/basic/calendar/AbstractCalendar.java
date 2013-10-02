@@ -32,7 +32,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -87,49 +86,42 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTitle() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(500)
-  @ConfigPropertyValue("6")
   protected int getConfiguredStartHour() {
     return 6;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(510)
-  @ConfigPropertyValue("19")
   protected int getConfiguredEndHour() {
     return 19;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(520)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredUseOverflowCells() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(530)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredShowDisplayModeSelection() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(540)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredMarkNoonHour() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(550)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredMarkOutOfMonthDays() {
     return true;
   }

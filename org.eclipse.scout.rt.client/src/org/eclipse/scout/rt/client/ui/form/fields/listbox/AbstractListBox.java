@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -86,7 +85,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
@@ -94,7 +92,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
@@ -102,14 +99,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredAutoLoad() {
     return true;
   }
@@ -122,7 +117,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFilterActiveRows() {
     return false;
   }
@@ -135,13 +129,11 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFilterCheckedRows() {
     return false;
   }
 
   @Override
-  @ConfigPropertyValue("1.0")
   protected double getConfiguredGridWeightY() {
     return 1.0;
   }
@@ -934,25 +926,21 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   public class DefaultListBoxTable extends AbstractTable {
-    @ConfigPropertyValue("true")
     @Override
     protected boolean getConfiguredAutoResizeColumns() {
       return true;
     }
 
-    @ConfigPropertyValue("false")
     @Override
     protected boolean getConfiguredHeaderVisible() {
       return false;
     }
 
-    @ConfigPropertyValue("false")
     @Override
     protected boolean getConfiguredMultiSelect() {
       return false;
     }
 
-    @ConfigPropertyValue("true")
     @Override
     protected boolean getConfiguredCheckable() {
       return true;

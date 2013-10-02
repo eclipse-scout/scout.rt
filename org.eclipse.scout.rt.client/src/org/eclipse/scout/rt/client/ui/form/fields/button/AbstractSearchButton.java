@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractSearchButton extends AbstractButton implements IButton {
@@ -27,19 +26,16 @@ public abstract class AbstractSearchButton extends AbstractButton implements IBu
    * Configuration
    */
   @Override
-  @ConfigPropertyValue("SYSTEM_TYPE_SAVE_SEARCH")
   protected int getConfiguredSystemType() {
     return SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE;
   }
 
   @Override
-  @ConfigPropertyValue("\"SearchButton\"")
   protected String getConfiguredLabel() {
     return ScoutTexts.get("SearchButton");
   }
 
   @Override
-  @ConfigPropertyValue("\"SearchButtonTooltip\"")
   protected String getConfiguredTooltipText() {
     return ScoutTexts.get("SearchButtonTooltip");
   }

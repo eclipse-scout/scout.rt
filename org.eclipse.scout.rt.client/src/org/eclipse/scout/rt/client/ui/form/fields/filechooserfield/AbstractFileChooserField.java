@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -56,28 +55,24 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredFolderMode() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredShowDirectory() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredShowFileName() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredShowFileExtension() {
     return true;
   }
@@ -92,35 +87,30 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredTypeLoad() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.FILE_EXTENSIONS)
   @Order(230)
-  @ConfigPropertyValue("null")
   protected String[] getConfiguredFileExtensions() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(290)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDirectory() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(300)
-  @ConfigPropertyValue("AbstractIcons.FileChooserFieldFile")
   protected String getConfiguredFileIconId() {
     return AbstractIcons.FileChooserFieldFile;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(310)
-  @ConfigPropertyValue("4000")
   @ValidationRule(ValidationRule.MAX_LENGTH)
   protected int getConfiguredMaxLength() {
     return 4000;

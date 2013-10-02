@@ -21,7 +21,6 @@ import javax.mail.internet.MimeMessage;
 import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -51,63 +50,54 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredHost() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredPort() {
     return -1;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredUseAuthentication() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredUsername() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredPassword() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredSubjectPrefix() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(70)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDefaultFromEmail() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredUseSmtps() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(90)
-  @ConfigPropertyValue("null")
   protected String getConfiguredSslProtocols() {
     return null;
   }

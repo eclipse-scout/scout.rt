@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -41,7 +40,6 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     super(callInitializer);
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredLabelVisible() {
     return false;
@@ -49,19 +47,16 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
 
   @ConfigProperty(ConfigProperty.FORM)
   @Order(200)
-  @ConfigPropertyValue("null")
   protected Class<? extends IForm> getConfiguredInnerForm() {
     return null;
   }
 
-  @ConfigPropertyValue("1")
   @Override
   protected double getConfiguredGridWeightY() {
     return 1;
   }
 
   @Override
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredGridUseUiHeight() {
     return true;
   }

@@ -14,7 +14,6 @@ import java.util.EventListener;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
@@ -40,7 +39,6 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
    */
   @ConfigProperty(ConfigProperty.CHART_QNAME)
   @Order(190)
-  @ConfigPropertyValue("null")
   protected String getConfiguredChartQName() {
     return null;
   }

@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -366,7 +365,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigProperty(ConfigProperty.OUTLINES)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected Class<? extends IOutline>[] getConfiguredOutlines() {
     return null;
   }

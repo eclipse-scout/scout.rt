@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
@@ -75,35 +74,30 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredIsHierarchy() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(30)
-  @ConfigPropertyValue("Integer.MAX_VALUE")
   protected int getConfiguredMaxLevel() {
     return Integer.MAX_VALUE;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(40)
-  @ConfigPropertyValue("null")
   protected String getConfiguredText() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredIconId() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(110)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

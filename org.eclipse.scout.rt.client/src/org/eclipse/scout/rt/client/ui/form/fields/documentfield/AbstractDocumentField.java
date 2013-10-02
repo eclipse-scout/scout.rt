@@ -4,7 +4,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -50,13 +49,11 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredRulersVisible() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredStatusBarVisible() {
     return false;
   }

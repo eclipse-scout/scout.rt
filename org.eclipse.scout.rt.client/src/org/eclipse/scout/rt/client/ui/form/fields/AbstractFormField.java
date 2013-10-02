@@ -23,7 +23,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
@@ -151,7 +150,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  @ConfigPropertyValue("null")
   protected String getConfiguredLabel() {
     return null;
   }
@@ -164,7 +162,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.LABEL_POSITION)
   @Order(15)
-  @ConfigPropertyValue("LABEL_POSITION_DEFAULT")
   protected int getConfiguredLabelPosition() {
     return LABEL_POSITION_DEFAULT;
   }
@@ -176,7 +173,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(16)
-  @ConfigPropertyValue("LABEL_WIDTH_DEFAULT")
   protected int getConfiguredLabelWidthInPixel() {
     return LABEL_WIDTH_DEFAULT;
   }
@@ -188,14 +184,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
   @Order(17)
-  @ConfigPropertyValue("LABEL_HORIZONTAL_ALIGNMENT_DEFAULT")
   protected int getConfiguredLabelHorizontalAlignment() {
     return LABEL_HORIZONTAL_ALIGNMENT_DEFAULT;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredLabelVisible() {
     return true;
   }
@@ -206,7 +200,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredEnabled() {
     return true;
   }
@@ -217,7 +210,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredVisible() {
     return true;
   }
@@ -228,7 +220,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
-  @ConfigPropertyValue("false")
   @ValidationRule(ValidationRule.MANDATORY)
   protected boolean getConfiguredMandatory() {
     return false;
@@ -236,28 +227,24 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(50)
-  @ConfigPropertyValue("null")
   protected String getConfiguredTooltipText() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredForegroundColor() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(70)
-  @ConfigPropertyValue("null")
   protected String getConfiguredBackgroundColor() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.FONT)
   @Order(80)
-  @ConfigPropertyValue("null")
   protected String getConfiguredFont() {
     return null;
   }
@@ -271,7 +258,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(60)
-  @ConfigPropertyValue("null")
   protected String getConfiguredLabelForegroundColor() {
     return null;
   }
@@ -285,7 +271,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(70)
-  @ConfigPropertyValue("null")
   protected String getConfiguredLabelBackgroundColor() {
     return null;
   }
@@ -299,7 +284,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.FONT)
   @Order(80)
-  @ConfigPropertyValue("null")
   protected String getConfiguredLabelFont() {
     return null;
   }
@@ -316,7 +300,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
   @Order(85)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredHorizontalAlignment() {
     return -1;
   }
@@ -333,7 +316,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
   @Order(86)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredVerticalAlignment() {
     return -1;
   }
@@ -353,7 +335,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(87)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredFillHorizontal() {
     return true;
   }
@@ -372,7 +353,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(88)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredFillVertical() {
     return true;
   }
@@ -393,7 +373,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(90)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredGridX() {
     return -1;
   }
@@ -413,7 +392,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(95)
-  @ConfigPropertyValue("-1")
   protected int getConfiguredGridY() {
     return -1;
   }
@@ -446,7 +424,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
-  @ConfigPropertyValue("1")
   protected int getConfiguredGridW() {
     return 1;
   }
@@ -479,7 +456,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(105)
-  @ConfigPropertyValue("1")
   protected int getConfiguredGridH() {
     return 1;
   }
@@ -511,7 +487,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(130)
-  @ConfigPropertyValue("-1")
   protected double getConfiguredGridWeightX() {
     return -1;
   }
@@ -545,7 +520,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(140)
-  @ConfigPropertyValue("-1")
   protected double getConfiguredGridWeightY() {
     return -1;
   }
@@ -563,7 +537,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredGridUseUiWidth() {
     return false;
   }
@@ -581,7 +554,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
-  @ConfigPropertyValue("false")
   protected boolean getConfiguredGridUseUiHeight() {
     return false;
   }
@@ -597,7 +569,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(150)
-  @ConfigPropertyValue("0")
   protected int getConfiguredWidthInPixel() {
     return 0;
   }
@@ -613,14 +584,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
-  @ConfigPropertyValue("0")
   protected int getConfiguredHeightInPixel() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.MASTER_FIELD)
   @Order(170)
-  @ConfigPropertyValue("null")
   @ValidationRule(ValidationRule.MASTER_VALUE_FIELD)
   protected Class<? extends IValueField> getConfiguredMasterField() {
     return null;
@@ -628,7 +597,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
-  @ConfigPropertyValue("false")
   @ValidationRule(ValidationRule.MASTER_VALUE_REQUIRED)
   protected boolean getConfiguredMasterRequired() {
     return false;
@@ -636,14 +604,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
-  @ConfigPropertyValue("true")
   protected boolean getConfiguredFocusable() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.DOC)
   @Order(20)
-  @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
   }

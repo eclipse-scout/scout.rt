@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 
@@ -24,7 +23,6 @@ public abstract class AbstractSmartFieldProposalForm extends AbstractForm implem
     callInitializer();
   }
 
-  @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredAskIfNeedSave() {
     return false;
