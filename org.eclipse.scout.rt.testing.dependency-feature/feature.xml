@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.testing.dependency"
       label="%featureName"
-      version="3.9.1.qualifier"
+      version="3.9.2.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.rt.feature.about">
 
@@ -32,7 +32,7 @@ BSI Business Systems Integration AG - initial API and implementation
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.rt" version="3.9.1" match="compatible"/>
+      <import feature="org.eclipse.scout.rt" version="3.9.2" match="compatible"/>
       <import plugin="org.junit" version="4.9.0" match="compatible"/>
    </requires>
 
