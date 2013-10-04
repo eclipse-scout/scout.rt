@@ -12,12 +12,20 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -365,6 +373,39 @@ public class DataModelAttributeTest {
     att.setCodeTypeClass(AttributeTestCodeType.class);
     assertEquals("First", att.formatValue(1L));
     assertEquals("Second", att.formatValue(2L));
+  }
+
+  @Test
+  public void testDataModelAttributeSerializable() {
+    try {
+      File tmpFile = IOUtility.createTempFile("DynamicDataModelAttribute", "tmp", null);
+      IDataModelAttribute dataModelAttribute = new DynamicDataModelAttribute(DataModelConstants.TYPE_NONE);
+      writeObjectToFile(dataModelAttribute, tmpFile);
+      Object readObject = readObjectFromFile(tmpFile);
+      tmpFile.delete();
+      assertTrue(readObject instanceof IDataModelAttribute);
+      assertEquals(((IDataModelAttribute) readObject).getType(), DataModelConstants.TYPE_NONE);
+    }
+    catch (Throwable t) {
+      fail(t.toString());
+    }
+  }
+
+  private void writeObjectToFile(Object input, File file) throws Throwable {
+    FileOutputStream fos = new FileOutputStream(file);
+    ObjectOutputStream oos = new ObjectOutputStream(fos);
+    oos.writeObject(input);
+    oos.close();
+    fos.close();
+  }
+
+  private Object readObjectFromFile(File file) throws Exception {
+    FileInputStream fis = new FileInputStream(file);
+    ObjectInputStream ois = new ObjectInputStream(fis);
+    Object result = ois.readObject();
+    ois.close();
+    fis.close();
+    return result;
   }
 
   public static class DynamicDataModelAttribute extends AbstractDataModelAttribute {
