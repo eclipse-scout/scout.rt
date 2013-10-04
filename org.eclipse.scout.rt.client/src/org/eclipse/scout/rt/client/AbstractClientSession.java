@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.IconLocator;
@@ -56,6 +57,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 public abstract class AbstractClientSession implements IClientSession {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
 
   // context
@@ -68,7 +70,7 @@ public abstract class AbstractClientSession implements IClientSession {
   // model
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
-  private IServiceTunnel m_serviceTunnel;
+  private IClientServiceTunnel m_serviceTunnel;
   private Subject m_offlineSubject;
   private Subject m_subject;
   private final SharedVariableMap m_sharedVariableMap;
@@ -383,12 +385,20 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   @Override
-  public IServiceTunnel getServiceTunnel() {
+  public IClientServiceTunnel getServiceTunnel() {
     return m_serviceTunnel;
   }
 
-  protected void setServiceTunnel(IServiceTunnel tunnel) {
+  protected void setServiceTunnel(IClientServiceTunnel tunnel) {
     m_serviceTunnel = tunnel;
+  }
+
+  /**
+   * @Deprecated: use setServiceTunnel(IClientServiceTunnel) instead
+   */
+  @Deprecated
+  protected void setServiceTunnel(IServiceTunnel tunnel) {
+    setServiceTunnel((IClientServiceTunnel) tunnel);
   }
 
   @Override

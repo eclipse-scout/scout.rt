@@ -1,0 +1,16 @@
+03.04.2013 awe
+Bugzilla ticket: 405353
+Problem:
+When two Scout servers must communicate with each other, we'd like to use Scout services with the same proxying mechanism as a
+Scout client (ClientProxyServiceFactory). A real-life example is when a local (or offline) server must call a service-method on
+a remote scout server.
+
+Solution:
+Provide a ServerProxyServiceFactory, which works like the ClientProxyServiceFactory. To avoid code duplication we move common
+classes to a new plugin 'org.eclipse.scout.rt.servicetunnel'. The existing plugin 'org.eclipse.scout.rt.client' has a dependency
+to this plugin. The ClientProxyServiceFactory extends the new base class BaseProxyServiceFactory. A Scout server plugin may
+have an optional dependecy to the new servicetunnel plugin when server-2-server communication is required.
+
+Migration:
+None
+

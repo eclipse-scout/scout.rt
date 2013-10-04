@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.services.lookup;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
+import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;

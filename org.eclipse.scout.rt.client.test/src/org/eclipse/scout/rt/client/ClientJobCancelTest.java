@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
 import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
-import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
-import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
+import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -48,7 +48,7 @@ public class ClientJobCancelTest {
 
   private List<ServiceRegistration> m_serviceReg;
   private TestEnvironmentClientSession m_session;
-  private static IServiceTunnel oldServiceTunnel;
+  private static IClientServiceTunnel oldServiceTunnel;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {

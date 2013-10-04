@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 
 /**
@@ -49,7 +49,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    * export method as public setter
    */
   @Override
-  public void setServiceTunnel(IServiceTunnel tunnel) {
+  public void setServiceTunnel(IClientServiceTunnel tunnel) {
     super.setServiceTunnel(tunnel);
   }
 }

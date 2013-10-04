@@ -22,18 +22,19 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
+import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
+import org.eclipse.scout.rt.servicetunnel.http.HttpUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 
-public class MockServiceTunnel extends HttpServiceTunnel {
+public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
   private final HashMap<Long, Thread> m_runningMap = new HashMap<Long, Thread>();
 
   public MockServiceTunnel(IClientSession session) throws Exception {
-    super(session, "http://mock/process");
+    super(session, HttpUtility.createURL("http://mock/process"));
     resetRequestSequenceGenerator();
   }
 

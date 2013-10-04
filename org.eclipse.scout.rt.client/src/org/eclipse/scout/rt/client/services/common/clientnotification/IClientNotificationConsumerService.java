@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.services.common.clientnotification;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.service.IService;
 

@@ -34,6 +34,7 @@
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.net</module>
 
+    <module>../org.eclipse.scout.rt.servicetunnel</module>
     <module>../org.eclipse.scout.rt.shared</module>
     <module>../org.eclipse.scout.rt.shared.legacy.texts.fragment</module>
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.servicetunnel;
+package org.eclipse.scout.rt.servicetunnel.http.internal;
 
-import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
- * @Deprecated: use {@link IClientServiceTunnel} instead
- *              To be removed with the K-Release
+ * This interface is required because http background job must be executed in client or server jobs.
+ * 
+ * @author awe
  */
-@Deprecated
-public interface IServiceTunnel extends IClientServiceTunnel {
+public interface IHttpBackgroundExecutor {
+
+  JobEx getJob();
+
+  ServiceTunnelResponse getResponse();
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.servicetunnel.http.internal;
+package org.eclipse.scout.rt.servicetunnel.http.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -20,46 +20,51 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.Activator;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
+import org.eclipse.scout.rt.servicetunnel.Activator;
+import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-public class HttpBackgroundJob extends ClientAsyncJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundJob.class);
+/**
+ * A runnable which is executed by a Job, the run() method performs an HTTP request and returns the response.
+ * 
+ * @author awe (refactoring)
+ */
+public class HttpBackgroundExecutable {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundExecutable.class);
 
   private final Object m_callerLock;
   private final ServiceTunnelRequest m_req;
   private ServiceTunnelResponse m_res;
-  private final InternalHttpServiceTunnel m_tunnel;
+  private final AbstractInternalHttpServiceTunnel m_tunnel;
   private URLConnection m_urlConn;
   private boolean m_debug;
 
-  /**
-   * @param name
-   */
-  public HttpBackgroundJob(String name, ServiceTunnelRequest req, Object callerLock, InternalHttpServiceTunnel tunnel) {
-    super(name, tunnel.getClientSession(), true);
+  public HttpBackgroundExecutable(ServiceTunnelRequest req, Object callerLock, AbstractInternalHttpServiceTunnel tunnel) {
     m_req = req;
     m_callerLock = callerLock;
     m_tunnel = tunnel;
+    m_debug = isDebug();
+  }
+
+  private static boolean isDebug() {
     String text = null;
     if (Activator.getDefault() != null) {
-      text = Activator.getDefault().getBundle().getBundleContext().getProperty(HttpServiceTunnel.HTTP_DEBUG_PARAM);
+      text = Activator.getDefault().getBundle().getBundleContext().getProperty(AbstractHttpServiceTunnel.HTTP_DEBUG_PARAM);
     }
     if (text != null && text.equalsIgnoreCase("true")) {
-      m_debug = true;
+      return true;
     }
+    return false;
   }
 
   public ServiceTunnelResponse getResponse() {
     return m_res;
   }
 
-  @Override
-  protected IStatus runStatus(IProgressMonitor monitor) {
+  public IStatus run(IProgressMonitor monitor) {
     InputStream httpin = null;
     try {
       delayForDebug(m_req, 0);
@@ -91,8 +96,6 @@ public class HttpBackgroundJob extends ClientAsyncJob {
       httpin = null;
       if (m_debug) {
         time2 = System.nanoTime();
-      }
-      if (m_debug) {
         LOG.debug("TIME " + m_req.getServiceInterfaceClassName() + "." + m_req.getOperation() + " " + (time2 - time1) / 1000000L + "ms " + callData.length + " bytes");
       }
       return Status.OK_STATUS;

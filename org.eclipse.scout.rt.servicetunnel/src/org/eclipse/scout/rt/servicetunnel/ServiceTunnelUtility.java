@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,32 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.servicetunnel;
+package org.eclipse.scout.rt.servicetunnel;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 
-import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * @Deprecated: use {@link org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility} instead
- *              To be removed with the K-Release
+ * Creates a service proxy through a tunnel.
  */
-@Deprecated
 public final class ServiceTunnelUtility {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelUtility.class);
 
   private ServiceTunnelUtility() {
   }
 
   public static <T> T createProxy(Class<T> serviceInterfaceClass, IServiceTunnel tunnel) {
-    return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, tunnel);
-  }
-
-  public static <T> T createProxy(Class<T> serviceInterfaceClass, IClientServiceTunnel tunnel) {
-    return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, tunnel);
+    if (tunnel == null) {
+      throw new IllegalArgumentException("tunnel is null");
+    }
+    return createProxy(serviceInterfaceClass, new ServiceTunnelInvocationHandler(serviceInterfaceClass, tunnel));
   }
 
   @SuppressWarnings("unchecked")
   public static <T> T createProxy(Class<T> serviceInterfaceClass, InvocationHandler handler) {
-    return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, handler);
+    if (handler == null) {
+      throw new IllegalArgumentException("handler is null");
+    }
+    return (T) Proxy.newProxyInstance(
+        serviceInterfaceClass.getClassLoader(),
+        new Class[]{serviceInterfaceClass},
+        handler
+        );
   }
+
 }

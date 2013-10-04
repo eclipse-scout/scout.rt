@@ -10,29 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.IClientSessionProvider;
-import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
-import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
-import org.eclipse.scout.rt.shared.TierState;
+import org.eclipse.scout.rt.services.CommonProxyServiceFactory;
+import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.TierState.Tier;
-import org.eclipse.scout.service.CreateServiceImmediatelySchedulingRule;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
-import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.ServiceConstants;
-import org.eclipse.scout.service.ServiceUtility;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Service factory handling client proxy services based on a {@link IClientSession}. The service exists once per osgi
@@ -50,113 +38,33 @@ import org.osgi.framework.ServiceRegistration;
  * call, but it also can be used on an implementation, where it is similar to the {@link ClientServiceFactory} but
  * scopes as a proxy. This is useful when creating "pseudo" proxies as in AccessControlClientProxy etc.
  */
-public class ClientProxyServiceFactory implements IServiceFactory {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientProxyServiceFactory.class);
-
-  private Bundle m_bundle;
-  private final Class<?> m_serviceClass;
-  private String m_sessionType;
-  private Class<? extends IClientSession> m_sessionClass;
-  // lazy creation
-  private Object m_serviceImpl;
-  private final Object m_serviceLock = new Object();
+public class ClientProxyServiceFactory extends CommonProxyServiceFactory<IClientSession> {
 
   public ClientProxyServiceFactory(Class<?> serviceClass) {
-    if (serviceClass == null) {
-      throw new IllegalArgumentException("service type must not be null");
-    }
-    m_serviceClass = serviceClass;
+    super(serviceClass);
   }
 
   @Override
-  public void serviceRegistered(final ServiceRegistration registration) throws Throwable {
-    if (!m_serviceClass.isInterface()) {
-      Boolean createImmediately = (Boolean) registration.getReference().getProperty(ServiceConstants.SERVICE_CREATE_IMMEDIATELY);
-      if (createImmediately != null && createImmediately) {
-        Job job = new Job("create service " + m_serviceClass.getSimpleName()) {
-          @Override
-          protected IStatus run(IProgressMonitor monitor) {
-            updateClassCache(registration);
-            updateInstanceCache(registration);
-            return Status.OK_STATUS;
-          }
-        };
-        job.setRule(new CreateServiceImmediatelySchedulingRule());
-        job.schedule();
-      }
-    }
+  protected Tier getTier() {
+    return Tier.FrontEnd;
   }
 
   @Override
-  public Object getService(Bundle bundle, ServiceRegistration registration) {
-    updateClassCache(registration);
-    IClientSession session = ClientJob.getCurrentSession(m_sessionClass);
-    if (session != null) {
-      if (TierState.get() == Tier.FrontEnd || TierState.get() == Tier.Undefined) {
-        updateInstanceCache(registration);
-        if (m_serviceClass.isInterface()) {
-          Object service = ServiceTunnelUtility.createProxy(m_serviceClass, session.getServiceTunnel());
-          return service;
-        }
-        else {
-          return m_serviceImpl;
-        }
-      }
-    }
-    return ServiceUtility.NULL_SERVICE;
+  protected Class<IClientSession> getDefaultSessionClass() {
+    return IClientSession.class;
   }
 
   @Override
-  public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+  protected boolean isCreateServiceTunnelPossible() {
+    return getCurrentSession() != null;
   }
 
-  @SuppressWarnings("unchecked")
-  private void updateClassCache(ServiceRegistration registration) {
-    synchronized (m_serviceLock) {
-      if (m_bundle == null) {
-        m_bundle = registration.getReference().getBundle();
-      }
-      if (m_sessionType == null) {
-        m_sessionType = (String) registration.getReference().getProperty(ServiceConstants.SERVICE_SCOPE);
-      }
-      try {
-        if (m_sessionClass == null) {
-          if (m_sessionType == null) {
-            m_sessionClass = IClientSession.class;
-          }
-          else {
-            m_sessionClass = (Class<? extends IClientSession>) m_bundle.loadClass(m_sessionType);
-            if (!IClientSession.class.isAssignableFrom(m_sessionClass)) {
-              throw new IllegalArgumentException("session type must be a subtype of " + IClientSession.class + ": " + m_sessionType);
-            }
-          }
-        }
-      }
-      catch (Throwable t) {
-        LOG.error("Failed creating proxy class for " + m_serviceClass, t);
-      }
-    }
+  @Override
+  protected IServiceTunnel createServiceTunnel() {
+    return getCurrentSession().getServiceTunnel();
   }
 
-  private void updateInstanceCache(ServiceRegistration registration) {
-    synchronized (m_serviceLock) {
-      if (m_serviceImpl == null) {
-        try {
-          if (!m_serviceClass.isInterface()) {
-            m_serviceImpl = m_serviceClass.newInstance();
-            if (m_serviceImpl instanceof IService2) {
-              ((IService2) m_serviceImpl).initializeService(registration);
-            }
-            else if (m_serviceImpl instanceof IService) {
-              ((IService) m_serviceImpl).initializeService();
-            }
-
-          }
-        }
-        catch (Throwable t) {
-          LOG.error("Failed creating proxy instance for " + m_serviceClass, t);
-        }
-      }
-    }
+  private IClientSession getCurrentSession() {
+    return ClientJob.getCurrentSession(getSessionClass());
   }
 }

@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -38,6 +40,7 @@ import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractServerSession implements IServerSession {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
 
   private Bundle m_bundle;
@@ -50,6 +53,8 @@ public abstract class AbstractServerSession implements IServerSession {
   private boolean m_singleThreadSession;
   private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
+  private String m_virtualSessionId;
+  private Subject m_subject;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
@@ -239,6 +244,26 @@ public abstract class AbstractServerSession implements IServerSession {
   @Override
   public void setUserAgent(UserAgent userAgent) {
     m_userAgent = userAgent;
+  }
+
+  @Override
+  public String getVirtualSessionId() {
+    return m_virtualSessionId;
+  }
+
+  @Override
+  public void setVirtualSessionId(String sessionId) {
+    m_virtualSessionId = sessionId;
+  }
+
+  @Override
+  public Subject getSubject() {
+    return m_subject;
+  }
+
+  @Override
+  public void setSubject(Subject subject) {
+    m_subject = subject;
   }
 
 }

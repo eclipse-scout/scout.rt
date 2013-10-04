@@ -1,36 +1,39 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.servicetunnel.http.internal;
+package org.eclipse.scout.commons.xmlparser;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlParser;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
-public class TestSoapXml {
+/**
+ * Soap round trip as JUnit test, using {@link ScoutXmlDocument}, {@link ScoutXmlParser} and {@link ScoutXmlElement}
+ */
+public class ScoutXmlSoapTest {
 
-  public void run() throws Exception {
+  @Test
+  public void testName() throws Exception {
     String a = "Hello World";
-    System.out.println("a:\n" + a);
     byte[] msg = send(a);
-    System.out.println("msg:\n" + new String(msg, "UTF-8"));
     String b = receive(msg);
-    System.out.println("b:\n" + b);
+    assertEquals("Hello World", b);
   }
 
-  public byte[] send(String text) throws Exception {
+  private byte[] send(String text) throws Exception {
     ScoutXmlDocument doc = new ScoutXmlDocument();
     doc.setXmlVersion("1.0");
     doc.setXmlEncoding("UTF-8");
@@ -50,7 +53,7 @@ public class TestSoapXml {
     return out.toByteArray();
   }
 
-  public String/* text */receive(byte[] msg) throws IOException, SAXException {
+  private String/* text */receive(byte[] msg) throws IOException, SAXException {
     ScoutXmlDocument doc = new ScoutXmlParser().parse(new ByteArrayInputStream(msg));
     ScoutXmlElement env = doc.getChild("{http://schemas.xmlsoap.org/soap/envelope/}Envelope");
     ScoutXmlElement body = env.getChild("{http://schemas.xmlsoap.org/soap/envelope/}Body");
@@ -60,9 +63,5 @@ public class TestSoapXml {
     String info = infoPart.getText();
     System.out.println("Info: " + info);
     return text;
-  }
-
-  public static void main(String[] args) throws Exception {
-    new TestSoapXml().run();
   }
 }
