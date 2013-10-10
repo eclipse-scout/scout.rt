@@ -246,8 +246,8 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
       // LINEAR TIME LINE
       final int minutes = ((hour - START_HOUR) * 60) + minute;
       final int totalMinutes = (END_HOUR - START_HOUR) * 60;
-      final float timeHeight = container.height - (2 * ELEMENT_HEIGHT);
-      return ELEMENT_HEIGHT + (minutes * timeHeight / totalMinutes);
+      final float timeHeight = container.height - (3 * ELEMENT_HEIGHT);
+      return (2 * ELEMENT_HEIGHT) + (minutes * timeHeight / totalMinutes);
     }
   }
 
