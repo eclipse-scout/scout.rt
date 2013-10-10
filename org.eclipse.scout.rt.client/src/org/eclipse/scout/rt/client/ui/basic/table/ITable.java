@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 /**
@@ -851,5 +853,26 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * UI interface
    */
   ITableUIFacade getUIFacade();
+
+  /**
+   * Exports the contents of this table into the given {@link AbstractTableFieldBeanData}. The mapping from
+   * {@link IColumn}s to {@link AbstractTableRowData} properties is based on the property name and the
+   * {@link IColumn#getColumnId()}.
+   * 
+   * @param target
+   * @throws ProcessingException
+   * @since 3.10.0-M3
+   */
+  void exportToTableBeanData(AbstractTableFieldBeanData target) throws ProcessingException;
+
+  /**
+   * Imports the contents of the given {@link AbstractTableFieldBeanData}. The mapping from {@link AbstractTableRowData}
+   * properties to {@link IColumn}s is based on the property name and the {@link IColumn#getColumnId()}.
+   * 
+   * @param source
+   * @throws ProcessingException
+   * @since 3.10.0-M3
+   */
+  void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException;
 
 }

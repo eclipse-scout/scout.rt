@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 /**
- * Interface extension to {@link ITable} that provides additional methods for importing and exporting the table's
- * contents into {@link AbstractTableFieldBeanData}s.
+ * Interface extension to {@link ITable} that was used with version [3.8.2, 3.10.0) to provide additional methods for
+ * importing and exporting the table's contents into {@link AbstractTableFieldBeanData}s.
+ * Was merged with 3.10.0-M3 to the ITable interface.
  * 
  * @since 3.8.2
+ * @deprecated will be removed with M-Release. Use {@link ITable} instead.
  */
+@Deprecated
 public interface ITable2 extends ITable {
-
-  /**
-   * Exports the contents of this table into the given {@link AbstractTableFieldBeanData}. The mapping from
-   * {@link IColumn}s to {@link AbstractTableRowData} properties is based on the property name and the
-   * {@link IColumn#getColumnId()}.
-   * 
-   * @param target
-   * @throws ProcessingException
-   */
-  void exportToTableBeanData(AbstractTableFieldBeanData target) throws ProcessingException;
-
-  /**
-   * Imports the contents of the given {@link AbstractTableFieldBeanData}. The mapping from {@link AbstractTableRowData}
-   * properties to {@link IColumn}s is based on the property name and the {@link IColumn#getColumnId()}.
-   * 
-   * @param source
-   * @throws ProcessingException
-   */
-  void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException;
 }
