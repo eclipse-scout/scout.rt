@@ -647,7 +647,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   /**
    * Indicates if the result displayed in the table is the whole result or if there is more data in the server (that
-   * was'nt sent to the client).
+   * wasn't sent to the client).
    * Is set if {@link #importPageData(AbstractTablePageData)} was used.
    * 
    * @since 3.10.0-M3
