@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.holders.fixture;
+package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

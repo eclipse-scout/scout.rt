@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.holders;
+package org.eclipse.scout.rt.server.services.common.jdbc;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,13 +17,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 
-import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
-import org.eclipse.scout.commons.holders.fixture.VerboseMock;
+import org.eclipse.scout.commons.holders.LongHolder;
+import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.VerboseMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.junit.Test;
 
 /**
- * Test for bind (see {@link NVPair}), requiring a server for database stuff
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
+ * Use {@link NVPair} to test different configuration of binds.
  */
 public class BindValueTest {
   protected SqlServiceMock sqlService = new SqlServiceMock();

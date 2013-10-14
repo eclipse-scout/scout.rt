@@ -8,16 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.holders;
+package org.eclipse.scout.rt.server.services.common.jdbc;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
+import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * test requiring a server for database stuff
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
+ * Methods under test {@link ISqlService#selectInto(String, Object...)}.
  */
 public class SelectIntoTest {
 

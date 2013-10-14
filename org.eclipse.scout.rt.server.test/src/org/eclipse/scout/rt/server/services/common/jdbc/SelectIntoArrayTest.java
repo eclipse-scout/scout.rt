@@ -8,20 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.holders;
+package org.eclipse.scout.rt.server.services.common.jdbc;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.scout.commons.holders.fixture.SqlServiceMock;
+import org.eclipse.scout.commons.holders.BeanArrayHolder;
+import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.junit.Test;
 
 /**
- * Test bean array and form data array binds, requiring a server for database stuff
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
+ * Methods under test:
+ * - {@link ISqlService#select(String, Object...)}.
+ * - {@link ISqlService#selectInto(String, Object...)}.
+ * With different types of arrays.
  */
 public class SelectIntoArrayTest {
 
