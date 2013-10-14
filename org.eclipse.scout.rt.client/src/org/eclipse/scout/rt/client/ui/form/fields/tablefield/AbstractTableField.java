@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable2;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -378,9 +377,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         AbstractTableFieldData tableFieldData = (AbstractTableFieldData) target;
         m_table.extractTableData(tableFieldData);
       }
-      else if (m_table instanceof ITable2 && target instanceof AbstractTableFieldBeanData) {
+      else if (target instanceof AbstractTableFieldBeanData) {
         AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
-        ((ITable2) m_table).exportToTableBeanData(tableBeanData);
+        m_table.exportToTableBeanData(tableBeanData);
         target.setValueSet(true);
       }
     }
@@ -398,9 +397,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
             AbstractTableFieldData tableFieldData = (AbstractTableFieldData) source;
             m_table.updateTable(tableFieldData);
           }
-          else if (m_table instanceof ITable2 && source instanceof AbstractTableFieldBeanData) {
+          else if (source instanceof AbstractTableFieldBeanData) {
             AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
-            ((ITable2) m_table).importFromTableBeanData(tableBeanData);
+            m_table.importFromTableBeanData(tableBeanData);
           }
           if (m_table.isCheckable()
               && m_table.getCheckableColumn() != null) {

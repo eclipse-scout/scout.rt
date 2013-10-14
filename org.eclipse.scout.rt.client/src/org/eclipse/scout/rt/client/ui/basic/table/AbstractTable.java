@@ -96,7 +96,7 @@ import org.eclipse.scout.service.SERVICES;
  * for every inner column class there is a generated getXYColumn method directly
  * on the table
  */
-public abstract class AbstractTable extends AbstractPropertyObserver implements ITable2 {
+public abstract class AbstractTable extends AbstractPropertyObserver implements ITable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTable.class);
 
   private boolean m_initialized;
