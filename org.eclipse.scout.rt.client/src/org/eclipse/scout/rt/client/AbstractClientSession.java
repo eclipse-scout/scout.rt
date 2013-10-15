@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
-import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
@@ -397,7 +396,8 @@ public abstract class AbstractClientSession implements IClientSession {
    * @Deprecated: use setServiceTunnel(IClientServiceTunnel) instead
    */
   @Deprecated
-  protected void setServiceTunnel(IServiceTunnel tunnel) {
+  @SuppressWarnings("deprecation")
+  protected void setServiceTunnel(org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel tunnel) {
     setServiceTunnel((IClientServiceTunnel) tunnel);
   }
 

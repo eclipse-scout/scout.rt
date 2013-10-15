@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  *              To be removed with the K-Release
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalHttpServiceTunnel.class);

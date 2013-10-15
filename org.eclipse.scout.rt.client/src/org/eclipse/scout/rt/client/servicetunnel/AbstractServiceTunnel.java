@@ -33,6 +33,7 @@ public abstract class AbstractServiceTunnel extends org.eclipse.scout.rt.client.
     return super.getSession();
   }
 
+  @Override
   protected abstract ServiceTunnelResponse tunnelOnline(ServiceTunnelRequest call);
 
   @Override

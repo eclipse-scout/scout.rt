@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.IClientSession;
  *              To be removed with the K-Release
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class HttpServiceTunnel extends ClientHttpServiceTunnel implements org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel {
 
   public HttpServiceTunnel(IClientSession session, String url) throws ProcessingException {

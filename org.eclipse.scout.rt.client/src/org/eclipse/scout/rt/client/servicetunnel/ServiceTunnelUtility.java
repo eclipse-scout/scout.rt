@@ -24,6 +24,7 @@ public final class ServiceTunnelUtility {
   private ServiceTunnelUtility() {
   }
 
+  @SuppressWarnings("deprecation")
   public static <T> T createProxy(Class<T> serviceInterfaceClass, IServiceTunnel tunnel) {
     return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, tunnel);
   }
@@ -32,7 +33,6 @@ public final class ServiceTunnelUtility {
     return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, tunnel);
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> T createProxy(Class<T> serviceInterfaceClass, InvocationHandler handler) {
     return org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility.createProxy(serviceInterfaceClass, handler);
   }
