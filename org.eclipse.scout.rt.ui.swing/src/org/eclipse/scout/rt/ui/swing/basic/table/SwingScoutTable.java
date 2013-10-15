@@ -103,7 +103,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableHeaderEx;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
-import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 /**
@@ -1324,10 +1324,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
      */
     private Icon getCheckboxIcon(boolean firstCellOfCheckableTable, IColumn scoutCol, ITableRow scoutRow, JLabel label) {
       boolean booleanColumn = scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null);
-      CheckboxWithMarginIcon checkboxIcon = null;
+      CheckboxIcon checkboxIcon = null;
       if (firstCellOfCheckableTable) {
         // top inset is used to ensure the checkbox to be on the same position as the label text displayed
-        checkboxIcon = new CheckboxWithMarginIcon(new Insets(FONT_PADDING_TOP, 0, 0, 5));
+        checkboxIcon = getSwingEnvironment().createCheckboxWithMarginIcon(new Insets(FONT_PADDING_TOP, 0, 0, 5));
         checkboxIcon.setSelected(scoutRow.isChecked());
         checkboxIcon.setEnabled(label.isEnabled());
       }
@@ -1337,7 +1337,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         if (label.getVerticalAlignment() == SwingConstants.TOP) {
           fontPaddingTop = FONT_PADDING_TOP;
         }
-        checkboxIcon = new CheckboxWithMarginIcon(new Insets(fontPaddingTop, 0, 0, 0));
+        checkboxIcon = getSwingEnvironment().createCheckboxWithMarginIcon(new Insets(fontPaddingTop, 0, 0, 0));
         ICell cell = scoutRow.getCell(scoutCol);
         Boolean b = (Boolean) cell.getValue();
         checkboxIcon.setSelected(b != null && b.booleanValue());

@@ -16,6 +16,7 @@ import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -89,6 +90,8 @@ import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabItem;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
 import org.eclipse.scout.rt.ui.swing.inject.ActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.AppendActionsInjector;
 import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
@@ -1204,6 +1207,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public SwingTableColumn createColumn(int swingModelIndex, IColumn scoutColumn) {
     return new SwingTableColumn(swingModelIndex, scoutColumn);
+  }
+
+  @Override
+  public CheckboxIcon createCheckboxWithMarginIcon(Insets insets) {
+    return new CheckboxWithMarginIcon(insets);
   }
 
 }

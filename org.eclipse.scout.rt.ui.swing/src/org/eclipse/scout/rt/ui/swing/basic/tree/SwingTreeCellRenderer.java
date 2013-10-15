@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
-import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTreeCellRenderer implements TreeCellRenderer {
@@ -66,10 +66,10 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     label.setEnabled(scoutTree.isEnabled() && node.isEnabled() && cell.isEnabled());
     // icon
     String iconName = cell.getIconId();
-    CheckboxWithMarginIcon checkboxIcon = null;
+    CheckboxIcon checkboxIcon = null;
     if (scoutTree != null && scoutTree.isCheckable()) {
       // top inset is used to ensure the checkbox to be on the same position as the label text displayed
-      checkboxIcon = new CheckboxWithMarginIcon(new Insets(0, 0, 0, 5));
+      checkboxIcon = m_env.createCheckboxWithMarginIcon(new Insets(0, 0, 0, 5));
       checkboxIcon.setSelected(node.isChecked());
       checkboxIcon.setEnabled(label.isEnabled());
     }

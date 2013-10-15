@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.beans.PropertyChangeListener;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutDesktop;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
@@ -421,5 +423,16 @@ public interface ISwingEnvironment {
    * @since 3.9.0
    */
   SwingTableColumn createColumn(int swingModelIndex, IColumn scoutColumn);
+
+  /**
+   * Creates the checkbox Icon used to display boolean values in a Scout table. The default implementation returns a
+   * <code>CheckboxWithMarginIcon</code>.
+   * 
+   * @param insets
+   *          insets applied on the icon
+   * @return a checkbox Icon
+   * @since 3.10.0-M3
+   */
+  CheckboxIcon createCheckboxWithMarginIcon(Insets insets);
 
 }
