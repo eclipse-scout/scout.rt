@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Access control permissions received from backend (JAAS permissions), cached for convenience and performance.
@@ -63,10 +64,9 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     return data;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void initializeService() {
-    super.initializeService();
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
     // add client notification listener
     SERVICES.getService(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
       @Override

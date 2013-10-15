@@ -112,9 +112,7 @@ public final class FormFieldInjectionThreadLocal {
       return;
     }
     for (IFormFieldInjection i : m_stack) {
-      if (i instanceof IFormFieldInjection2) {
-        ((IFormFieldInjection2) i).filterFields(container, fieldList);
-      }
+      i.filterFields(container, fieldList);
     }
   }
 }

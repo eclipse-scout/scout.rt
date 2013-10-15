@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.icon;
 
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 import org.osgi.framework.Bundle;
 
 /**
  *
  */
-public interface IIconProviderService extends IService2 {
+public interface IIconProviderService extends IService {
 
   /**
    * the icon lookup can be called with a full icon name (with extension) e.g. 'myIcon.gif' or with a simple icon name

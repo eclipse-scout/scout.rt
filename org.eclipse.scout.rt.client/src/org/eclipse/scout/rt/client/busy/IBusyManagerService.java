@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 
 /**
  * The busy manager service is global and is the primary place to register/unregister {@link IBusyHandler}s per
@@ -20,7 +20,7 @@ import org.eclipse.scout.service.IService2;
  * @author imo
  * @since 3.8
  */
-public interface IBusyManagerService extends IService2 {
+public interface IBusyManagerService extends IService {
 
   void register(IClientSession session, IBusyHandler handler);
 

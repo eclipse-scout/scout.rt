@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.shared.TierState;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 import org.eclipse.scout.service.CreateServiceImmediatelySchedulingRule;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.ServiceConstants;
 import org.eclipse.scout.service.ServiceUtility;
@@ -138,13 +137,9 @@ public abstract class CommonProxyServiceFactory<T extends ISession> implements I
         try {
           if (!m_serviceClass.isInterface()) {
             m_serviceImpl = createServiceInstance(m_serviceClass);
-            if (m_serviceImpl instanceof IService2) {
-              ((IService2) m_serviceImpl).initializeService(registration);
+            if (m_serviceImpl instanceof IService) {
+              ((IService) m_serviceImpl).initializeService(registration);
             }
-            else if (m_serviceImpl instanceof IService) {
-              ((IService) m_serviceImpl).initializeService();
-            }
-
           }
         }
         catch (Throwable t) {

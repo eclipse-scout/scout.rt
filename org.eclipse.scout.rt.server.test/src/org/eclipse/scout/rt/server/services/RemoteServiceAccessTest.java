@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -36,7 +35,7 @@ public class RemoteServiceAccessTest {
   public void testAnnotations() throws Exception {
     DefaultTransactionDelegateMock bo = new DefaultTransactionDelegateMock();
     //
-    assertNonAccessible(bo, IMockProcessService.class, IService.class.getMethod("initializeService"), IMockProcessService.class);
+    assertNonAccessible(bo, IMockProcessService.class, IService.class.getMethod("initializeService", org.osgi.framework.ServiceRegistration.class), IMockProcessService.class);
     assertNonAccessible(bo, IMockProcessService.class, Object.class.getMethod("hashCode"), IMockProcessService.class);
     //
     assertAccessible(bo, IMockProcessService.class, IMockProcessService.class.getMethod("hello"), IMockProcessService.class);
@@ -107,7 +106,7 @@ public class RemoteServiceAccessTest {
     }
   }
 
-  static interface IMockProcessService extends IService2 {
+  static interface IMockProcessService extends IService {
     void hello();
 
     @RemoteServiceAccessDenied

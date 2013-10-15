@@ -120,7 +120,7 @@ public class SmartFieldTest {
 
   public static class StyleLookupService extends TestingLookupService {
     @Override
-    public void initializeService() {
+    public void initializeService(ServiceRegistration registration) {
       setRows(new LookupRow[]{
           new LookupRow(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")),
           new LookupRow(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")),

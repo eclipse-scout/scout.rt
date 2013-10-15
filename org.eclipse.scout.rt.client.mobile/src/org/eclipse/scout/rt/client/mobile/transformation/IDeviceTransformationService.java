@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 
 /**
  * @since 3.9.0
  */
-public interface IDeviceTransformationService extends IService2 {
+public interface IDeviceTransformationService extends IService {
 
   void install();
 

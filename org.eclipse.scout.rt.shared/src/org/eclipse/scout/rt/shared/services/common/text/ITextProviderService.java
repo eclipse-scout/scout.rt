@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.shared.services.common.text;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 
 /**
  * Interface for Scout Text Providers.
  */
-public interface ITextProviderService extends IService2 {
+public interface ITextProviderService extends IService {
   /**
    * Gets the text for the given key and language.<br>
    * if there are parameters in the translation, they are replaced with the given list.

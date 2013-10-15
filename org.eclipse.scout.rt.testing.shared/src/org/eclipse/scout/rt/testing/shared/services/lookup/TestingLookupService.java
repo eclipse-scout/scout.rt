@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Lookup service for testing purposes (Implementation of {@link ILookupService}).
@@ -32,7 +33,7 @@ public class TestingLookupService implements ILookupService {
   }
 
   @Override
-  public void initializeService() {
+  public void initializeService(ServiceRegistration registration) {
   }
 
   public LookupRow[] getRows() {

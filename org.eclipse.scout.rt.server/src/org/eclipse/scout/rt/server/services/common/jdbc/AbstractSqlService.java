@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IServiceInventory;
 import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.ServiceRegistration;
 
 public abstract class AbstractSqlService extends AbstractService implements ISqlService, ILegacySqlQueryService, IAdaptable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
@@ -89,8 +90,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   @SuppressWarnings("deprecation")
   @Override
-  public void initializeService() {
-    super.initializeService();
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
 
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();

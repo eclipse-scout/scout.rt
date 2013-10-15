@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceRegistration;
  * The service exists once per osgi environment and is cached persistent.
  * <p>
  * The factory supports {@link ServiceConstants#SERVICE_CREATE_IMMEDIATELY} and calls
- * {@link IService#initializeService()} on {@link IService} instances.
+ * {@link IService#initializeService(ServiceRegistration registration)} on {@link IService} instances.
  */
 public class DefaultServiceFactory implements IServiceFactory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultServiceFactory.class);
@@ -84,11 +84,8 @@ public class DefaultServiceFactory implements IServiceFactory {
       if (m_service == null) {
         try {
           m_service = m_serviceClass.newInstance();
-          if (m_service instanceof IService2) {
-            ((IService2) m_service).initializeService(registration);
-          }
-          else if (m_service instanceof IService) {
-            ((IService) m_service).initializeService();
+          if (m_service instanceof IService) {
+            ((IService) m_service).initializeService(registration);
           }
         }
         catch (Throwable t) {

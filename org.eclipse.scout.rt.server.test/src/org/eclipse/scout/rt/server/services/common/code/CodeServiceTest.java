@@ -103,11 +103,6 @@ public class CodeServiceTest {
       super();
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void initializeService() {
-    }
-
     @Override
     public void initializeService(ServiceRegistration registration) {
     }

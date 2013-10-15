@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * 
  * @since 3.8.2
  */
-public class DefaultFormFieldInjection implements IFormFieldInjection2 {
+public class DefaultFormFieldInjection implements IFormFieldInjection {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultFormFieldInjection.class);
 
   private final Map<IFormField, Set<Class<? extends IFormField>>> m_replacingFormFieldsByContainer;

@@ -12,14 +12,14 @@ package org.eclipse.scout.testing.client;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 
 /**
  * This interface is used to support gui testing with an abstraction layer.
  * <p>
  * Therefore swt and swing gui tests can be programmed just once in the client and run with both guis.
  */
-public interface IGuiMockService extends IService2 {
+public interface IGuiMockService extends IService {
 
   UserAgent initUserAgent();
 

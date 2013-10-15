@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.shared.services.common.session;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 
 /**
  * @since 3.8.0
  */
 @Priority(-3)
-public interface ISessionService extends IService2 {
+public interface ISessionService extends IService {
 
   /**
    * Returns the session which is assigned to the current client respectively server job.

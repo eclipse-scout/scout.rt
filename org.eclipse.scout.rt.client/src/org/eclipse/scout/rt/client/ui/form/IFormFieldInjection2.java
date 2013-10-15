@@ -10,24 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * Interface extension to {@link IFormFieldInjection} that provides additional methods for filtering form fields before
- * they are initialized.
+ * Interface extension to {@link IFormFieldInjection} that was used with version [3.8.2, 3.10.0) to provide additional
+ * methods for filtering form fields before they are initialized.
  * 
  * @since 3.8.2
+ * @deprecated will be removed with M-Release. Use {@link IFormFieldInjection} instead.
  */
+@Deprecated
 public interface IFormFieldInjection2 extends IFormFieldInjection {
-
-  /**
-   * @param container
-   *          is the container field the given field classes are created for
-   * @param fieldList
-   *          live and mutable list of configured field classes (i.e. yet not instantiated)
-   * @since 3.8.2
-   */
-  void filterFields(IFormField container, List<Class<? extends IFormField>> fieldList);
 }

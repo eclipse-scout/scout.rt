@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.service;
+
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Convenience service interface for services that are interested in beeing
@@ -155,9 +157,11 @@ public abstract interface IService {
    * The method is called by the framework just after the service was lazily
    * created by the service factory (not when it was registered!). The service
    * exists once per osgi and is cached by the {@link IServiceFactory} The
-   * default implementation in {@link AbstractService} calls {@link
-   * ServiceUtility#injectConfigProperties(this)}.
+   * default implementation in {@link AbstractService} calls {@link ServiceUtility#injectConfigProperties(this)}.
+   * 
+   * @param registration
+   *          the service registration
+   * @since 3.10.0-M3 (moved from IService2 to IService)
    */
-  void initializeService();
-
+  void initializeService(ServiceRegistration registration);
 }

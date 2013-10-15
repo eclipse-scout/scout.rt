@@ -15,10 +15,10 @@ import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.ext.IDropDownFileUploadForPatch;
 import org.eclipse.scout.rt.ui.rap.window.desktop.nonmodalFormBar.IRwtScoutFormButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.IRwtScoutToolButtonForPatch;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 import org.eclipse.swt.widgets.Composite;
 
-public interface IPatchedClassService extends IService2 {
+public interface IPatchedClassService extends IService {
 
   IRwtScoutTableForPatch createRwtScoutTable();
 

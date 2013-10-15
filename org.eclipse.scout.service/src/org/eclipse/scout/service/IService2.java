@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
-import org.osgi.framework.ServiceRegistration;
-
 /**
  * Convenience service interface for services that are interested in beeing
  * notified when they are lazily created.
@@ -151,19 +149,8 @@ import org.osgi.framework.ServiceRegistration;
  * </p>
  * 
  * @since 1.0.0 see also {@link org.eclipse.scout.commons.annotations.Priority} for defining service ranking
+ * @deprecated will be removed with M-Release. Use {@link IService} instead.
  */
+@Deprecated
 public abstract interface IService2 extends IService {
-
-  /**
-   * The method is called by the framework just after the service was lazily
-   * created by the service factory (not when it was registered!). The service
-   * exists once per osgi and is cached by the {@link IServiceFactory} The
-   * default implementation in {@link AbstractService} calls {@link
-   * ServiceUtility#injectConfigProperties(this)}.
-   * 
-   * @param registration
-   *          the service registration
-   */
-  void initializeService(ServiceRegistration registration);
-
 }

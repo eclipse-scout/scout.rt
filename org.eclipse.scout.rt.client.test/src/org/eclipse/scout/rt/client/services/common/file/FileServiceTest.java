@@ -172,7 +172,7 @@ public class FileServiceTest {
     }
 
     @Override
-    public void initializeService() {
+    public void initializeService(ServiceRegistration registration) {
     }
 
   }

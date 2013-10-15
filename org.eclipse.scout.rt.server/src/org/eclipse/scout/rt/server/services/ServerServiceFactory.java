@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.shared.TierState;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 import org.eclipse.scout.service.CreateServiceImmediatelySchedulingRule;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.ServiceConstants;
 import org.eclipse.scout.service.ServiceUtility;
@@ -132,11 +131,8 @@ public class ServerServiceFactory implements IServiceFactory {
       if (m_service == null) {
         try {
           m_service = m_serviceClass.newInstance();
-          if (m_service instanceof IService2) {
-            ((IService2) m_service).initializeService(registration);
-          }
-          else if (m_service instanceof IService) {
-            ((IService) m_service).initializeService();
+          if (m_service instanceof IService) {
+            ((IService) m_service).initializeService(registration);
           }
         }
         catch (Throwable t) {

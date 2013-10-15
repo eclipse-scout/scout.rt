@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
+import org.osgi.framework.ServiceRegistration;
 
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {
   private long m_idleTrigger;
@@ -46,7 +47,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
   }
 
   @Override
-  public void initializeService() {
+  public void initializeService(ServiceRegistration registration) {
     // nop
   }
 

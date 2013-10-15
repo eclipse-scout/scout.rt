@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
@@ -71,11 +70,8 @@ public final class TestingUtility {
       if (Proxy.isProxyClass(service.getClass())) {
         //nop
       }
-      else if (service instanceof IService2) {
-        ((IService2) service).initializeService(reg);
-      }
       else if (service instanceof IService) {
-        ((IService) service).initializeService();
+        ((IService) service).initializeService(reg);
       }
     }
     return result;

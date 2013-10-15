@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceRegistration;
  * Convenience {@link IService} implementation with support for config.ini
  * variable injection. see {@link ServiceUtility#injectConfigProperties(IService)}
  */
-public abstract class AbstractService implements IService2 {
+public abstract class AbstractService implements IService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractService.class);
 
   public AbstractService() {
@@ -34,13 +34,12 @@ public abstract class AbstractService implements IService2 {
 
   /**
    * This default implementation calls the default initializer {@link DefaultServiceInitializer} which calls
-   * {@link org.eclipse.scout.service.ServiceUtility#injectConfigParams}(this)
-   * 
-   * @deprecated use {@link AbstractService#initializeService(ServiceRegistration)} instead.
+   * {@link org.eclipse.scout.service.ServiceUtility#injectConfigParams}(this).
+   * It ensures that properties are getting initialized. This method can be overwritten by
+   * implementers. Implementers should aware the property injection is only done if the super call is made.
    */
   @Override
-  @Deprecated
-  public void initializeService() {
+  public void initializeService(ServiceRegistration registration) {
     Activator activator = Activator.getDefault();
     if (activator == null || activator.getServicesExtensionManager() == null) {
       LOG.error("Could not initialize service. " + getClass().getName());
@@ -73,18 +72,6 @@ public abstract class AbstractService implements IService2 {
         break;
       }
     }
-
-  }
-
-  /**
-   * calls the "old" initialization method to ensure properties getting initialized. This method can be overwritten by
-   * implementers. Implementers should aware the property injection is only done if the super call is made.
-   * 
-   * @see AbstractService#initializeService()
-   */
-  @Override
-  public void initializeService(ServiceRegistration registration) {
-    initializeService();
   }
 
   /**

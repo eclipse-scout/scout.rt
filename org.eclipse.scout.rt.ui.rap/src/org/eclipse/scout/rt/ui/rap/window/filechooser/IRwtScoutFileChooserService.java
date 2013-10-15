@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.ui.rap.window.filechooser;
 
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.scout.service.IService;
 import org.eclipse.swt.widgets.Shell;
 
-public interface IRwtScoutFileChooserService extends IService2 {
+public interface IRwtScoutFileChooserService extends IService {
 
   IRwtScoutFileChooser createFileChooser(Shell parentShell, IFileChooser fileChooser);
 }

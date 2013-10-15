@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageServ
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Client side service for bookmark support
@@ -66,10 +67,9 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     return data;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void initializeService() {
-    super.initializeService();
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
     addBookmarkServiceListener(new BookmarkServiceListener() {
       @Override
       public void bookmarksChanged(BookmarkServiceEvent e) {

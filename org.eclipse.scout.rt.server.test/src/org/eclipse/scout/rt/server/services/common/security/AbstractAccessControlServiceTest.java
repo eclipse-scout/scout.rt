@@ -35,7 +35,7 @@ public class AbstractAccessControlServiceTest {
   @Test
   public void testClientNotificationSentForClearCache() {
     AbstractAccessControlService accessControlService = new TestAccessControlService();
-    accessControlService.initializeService();
+    accessControlService.initializeService(null);
 
     TestClientNotificationQueueListener listener = new TestClientNotificationQueueListener();
     SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(listener);
@@ -81,7 +81,7 @@ public class AbstractAccessControlServiceTest {
 
   private void verifyNoNotificationSentForClearCache(String... userIds) {
     AbstractAccessControlService accessControlService = new TestAccessControlService();
-    accessControlService.initializeService();
+    accessControlService.initializeService(null);
 
     TestClientNotificationQueueListener listener = new TestClientNotificationQueueListener();
     SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(listener);

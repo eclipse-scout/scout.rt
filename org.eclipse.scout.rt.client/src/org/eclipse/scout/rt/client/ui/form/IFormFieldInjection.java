@@ -33,4 +33,13 @@ public interface IFormFieldInjection {
    */
   void injectFields(IFormField container, List<IFormField> fieldList);
 
+  /**
+   * @param container
+   *          is the container field the given field classes are created for
+   * @param fieldList
+   *          live and mutable list of configured field classes (i.e. yet not instantiated)
+   * @since 3.8.2 (moved to IFormFieldInjection in 3.10.0-M3)
+   */
+  void filterFields(IFormField container, List<Class<? extends IFormField>> fieldList);
+
 }
