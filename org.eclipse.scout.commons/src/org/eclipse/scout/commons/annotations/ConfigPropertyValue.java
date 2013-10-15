@@ -16,7 +16,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated will be removed in 3.11.0
+ * @deprecated will be removed in 3.11.0. Optional Migration: Remove occurrences of {@link ConfigPropertyValue}. It is
+ *             obsolete, Scout SDK gets the value from the java code.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
