@@ -275,7 +275,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
           newValue = (int) (f * 100);
         }
         // text
-        newText = h.getJobTaskName();
+        newText = h.getJobFullName();
         if (newText == null || newText.length() == 0) {
           if (m_swingProgressBar.getValue() > 0) {
             newText = null;// auto-display of '%'

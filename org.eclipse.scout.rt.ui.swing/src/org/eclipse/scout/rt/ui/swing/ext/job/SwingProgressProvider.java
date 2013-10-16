@@ -26,24 +26,31 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 
 /**
- * Job observer. Whenever a registered monitor
- * changes, the property {@link #PROP_ACTIVE_MONITOR} is changed.
+ * Job observer.
+ * Whenever a registered monitor or its properties changes, the property {@link #PROP_MONITOR_PROPERTIES} is changed.
  * <p>
- * This leads to the behaviour that always the most recently changed monitor is displayed as active monitor.
+ * This leads to the behavior that always the most recently changed monitor is displayed as active monitor.
  */
 public class SwingProgressProvider extends ProgressProvider implements IPropertyObserver {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingProgressProvider.class);
 
   /**
-   * {@link SwingProgressMonitor}
+   * @deprecated replaced by {@link #PROP_MONITOR_PROPERTIES}. Will be removed with M-Release.
    */
+  @Deprecated
   public static final String PROP_ACTIVE_MONITOR = "activeMonitor";
+
+  /**
+   * Key for property to indicate that {@link MonitorProperties} have changed.
+   */
+  public static final String PROP_MONITOR_PROPERTIES = "monitorProps";
 
   private final Object m_listLock;
   private final LinkedList<SwingProgressMonitor> m_list;
   private final PropertyChangeSupport m_propertySupport;
   private final PropertyChangeListener m_jobListener;
   private SwingProgressMonitor m_activeMonitor;
+  private MonitorProperties m_monitorProps;
 
   public SwingProgressProvider() {
     m_listLock = new Object();
@@ -131,10 +138,30 @@ public class SwingProgressProvider extends ProgressProvider implements IProperty
     setActiveMonitor(next);
   }
 
-  private synchronized void setActiveMonitor(SwingProgressMonitor newValue) {
-    SwingProgressMonitor oldValue = m_activeMonitor;
-    m_activeMonitor = newValue;
-    m_propertySupport.firePropertyChange(PROP_ACTIVE_MONITOR, oldValue, newValue);
+  /**
+   * This method fires when one of the properties of the active monitor have changed (worked, task-name, sub-task-name).
+   * 
+   * @param newMonitor
+   */
+  final synchronized void setActiveMonitor(SwingProgressMonitor newMonitor) {
+    fireActiveMonitor(newMonitor);
+    fireMonitorProps(newMonitor);
+  }
+
+  private void fireActiveMonitor(SwingProgressMonitor newMonitor) {
+    SwingProgressMonitor oldMonitor = m_activeMonitor;
+    m_activeMonitor = newMonitor;
+    m_propertySupport.firePropertyChange(PROP_ACTIVE_MONITOR, oldMonitor, newMonitor);
+  }
+
+  private void fireMonitorProps(SwingProgressMonitor newMonitor) {
+    MonitorProperties oldProps = m_monitorProps;
+    MonitorProperties newProps = null;
+    if (newMonitor != null) {
+      newProps = newMonitor.createMonitorProperties();
+    }
+    m_monitorProps = newProps;
+    m_propertySupport.firePropertyChange(PROP_MONITOR_PROPERTIES, oldProps, newProps);
   }
 
   public SwingProgressMonitor getActiveMonitor() {

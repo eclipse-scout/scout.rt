@@ -48,43 +48,37 @@ public class SwingProgressHandler {
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private boolean m_jobRunning;
-  private String m_taskName;
-  private String m_subTaskName;
-  private double m_worked;
+  private MonitorProperties m_monitorProps;
 
   protected SwingProgressHandler() {
     SwingProgressProvider p = new SwingProgressProvider();
     Job.getJobManager().setProgressProvider(p);
-    p.addPropertyChangeListener(SwingProgressProvider.PROP_ACTIVE_MONITOR, new PropertyChangeListener() {
-      @Override
-      public synchronized void propertyChange(PropertyChangeEvent evt) {
-        final SwingProgressMonitor monitor = (SwingProgressMonitor) evt.getNewValue();
-        SwingUtilities.invokeLater(new Runnable() {
+    p.addPropertyChangeListener(SwingProgressProvider.PROP_MONITOR_PROPERTIES,
+        new PropertyChangeListener() {
           @Override
-          public void run() {
-            propertyChangeInSwing(monitor);
+          public synchronized void propertyChange(final PropertyChangeEvent evt) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                propertyChangeInSwing((MonitorProperties) evt.getNewValue());
+              }
+            });
           }
         });
-      }
-    });
   }
 
   private void dispose() {
     Job.getJobManager().setProgressProvider(null);
   }
 
-  private void propertyChangeInSwing(SwingProgressMonitor monitor) {
-    if (monitor == null) {
+  private void propertyChangeInSwing(MonitorProperties monitorProps) {
+    if (monitorProps == null) {
       m_jobRunning = false;
-      m_taskName = null;
-      m_subTaskName = null;
-      m_worked = 0;
+      m_monitorProps = MonitorProperties.NULL_INSTANCE;
     }
     else {
       m_jobRunning = true;
-      m_taskName = monitor.getTaskName();
-      m_subTaskName = monitor.getSubTaskName();
-      m_worked = monitor.getWorked();
+      m_monitorProps = monitorProps;
     }
     fireStateChanged();
   }
@@ -122,11 +116,37 @@ public class SwingProgressHandler {
   }
 
   public double getJobWorked() {
-    return m_worked;
+    return m_monitorProps.getWorked();
   }
 
+  /**
+   * Returns the task name of the active job.
+   * 
+   * @since 3.10.0-M3.
+   *        In earlier versions this method returned {@link #getJobFullName()}. This has been changed, since in earlier
+   *        versions it was not possible to access "task" and "sub task" separately.
+   * @return task name
+   */
   public String getJobTaskName() {
-    return StringUtility.concatenateTokens(m_taskName, " - ", m_subTaskName);
+    return m_monitorProps.getTaskName();
+  }
+
+  /**
+   * Returns the sub task name of the active job.
+   * 
+   * @return sub task name
+   */
+  public String getJobSubTaskName() {
+    return m_monitorProps.getSubTaskName();
+  }
+
+  /**
+   * Returns a concatenated string with "[task-name] - [subtask-name]" of the active job.
+   * 
+   * @return full name
+   */
+  public String getJobFullName() {
+    return StringUtility.concatenateTokens(getJobTaskName(), " - ", getJobSubTaskName());
   }
 
   /**
