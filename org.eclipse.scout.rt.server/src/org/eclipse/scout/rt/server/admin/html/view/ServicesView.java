@@ -65,7 +65,6 @@ public class ServicesView extends DefaultView {
           try {
             ArrayList<ServiceInspector> list = new ArrayList<ServiceInspector>(refs.length);
             for (ServiceReference ref : refs) {
-              @SuppressWarnings("unchecked")
               Object s = context.getService(ref);
               if (s != null) {
                 list.add(new ServiceInspector(s));

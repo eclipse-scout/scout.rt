@@ -125,7 +125,6 @@ public class FilterConfigImpl implements FilterConfig {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Enumeration getInitParameterNames() {
     return new Vector<String>(m_initParams.keySet()).elements();
   }

@@ -62,7 +62,6 @@ public class UserPreferences extends EclipsePreferences {
     // ONLY in case the property set is empty load fom legacy instance scope
     if (keys().length == 0) {
       try {
-        @SuppressWarnings("deprecation")
         //needed for backward compatibility to Eclipse 3.4 Ganymede
         IEclipsePreferences oldPrefs = new InstanceScope().getNode(name());
         for (String key : oldPrefs.keys()) {

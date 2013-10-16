@@ -50,7 +50,6 @@ public class Activator extends Plugin {
     super.start(context);
     plugin = this;
     ServiceReference ref = context.getServiceReference(IExtensionRegistry.class.getName());
-    @SuppressWarnings("unchecked")
     IExtensionRegistry reg = (IExtensionRegistry) context.getService(ref);
     context.ungetService(ref);
     m_servicesExtensionManager = new ServicesExtensionManager(reg, PLUGIN_ID + ".services");

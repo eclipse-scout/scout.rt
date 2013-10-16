@@ -175,7 +175,6 @@ public class FilterConfigInjection {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Enumeration getInitParameterNames() {
       TreeSet<String> names = new TreeSet<String>(m_injectedMap.keySet());
       for (Enumeration en = m_config.getInitParameterNames(); en.hasMoreElements();) {

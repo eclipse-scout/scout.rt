@@ -109,7 +109,6 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     return null;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void initializeService(ServiceRegistration registration) {
     m_accessControlStore = new AccessControlStore();

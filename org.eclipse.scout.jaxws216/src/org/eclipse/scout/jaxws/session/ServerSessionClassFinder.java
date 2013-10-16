@@ -63,7 +63,6 @@ public class ServerSessionClassFinder {
     return serverSessionClass;
   }
 
-  @SuppressWarnings("unchecked")
   private static Bundle findServletContributorBundle() {
     try {
       BundleContext context = Activator.getDefault().getBundle().getBundleContext();

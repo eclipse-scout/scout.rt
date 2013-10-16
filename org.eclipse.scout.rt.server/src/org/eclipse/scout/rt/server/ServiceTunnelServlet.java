@@ -359,7 +359,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     ServiceReference ref = context.getServiceReference(IExtensionRegistry.class.getName());
     Bundle bundle = null;
     if (ref != null) {
-      @SuppressWarnings("unchecked")
       IExtensionRegistry reg = (IExtensionRegistry) context.getService(ref);
       if (reg != null) {
         IExtensionPoint xpServlet = reg.getExtensionPoint("org.eclipse.equinox.http.registry.servlets");

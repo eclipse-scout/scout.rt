@@ -25,7 +25,6 @@ public class InternalEclipseAuthenticator extends Authenticator {
   public InternalEclipseAuthenticator() {
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected PasswordAuthentication getPasswordAuthentication() {
     PasswordAuthentication result = null;

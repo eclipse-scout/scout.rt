@@ -48,6 +48,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
+@SuppressWarnings("restriction")
 public final class MailUtility {
 
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(MailUtility.class);

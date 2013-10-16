@@ -88,7 +88,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     initConfig();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);

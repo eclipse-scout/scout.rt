@@ -107,7 +107,6 @@ public class Activator extends Plugin {
 
   private IExtensionRegistry getExtensionRegistry(BundleContext context) {
     ServiceReference ref = context.getServiceReference(IExtensionRegistry.class.getName());
-    @SuppressWarnings("unchecked")
     IExtensionRegistry reg = (IExtensionRegistry) context.getService(ref);
     context.ungetService(ref);
     return reg;
