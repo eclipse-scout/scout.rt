@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.holders.ITableBeanHolder;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
@@ -35,7 +36,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
  * 
  * @since 3.8.2
  */
-public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
+public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData implements ITableBeanHolder {
   private static final long serialVersionUID = 1L;
 
   private List<AbstractTableRowData> m_rowList = new ArrayList<AbstractTableRowData>();
@@ -51,6 +52,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
   /**
    * @return Returns the number of available table row data.
    */
+  @Override
   public int getRowCount() {
     return m_rowList.size();
   }
@@ -58,6 +60,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
   /**
    * @return Returns all rows.
    */
+  @Override
   public AbstractTableRowData[] getRows() {
     return m_rowList.toArray((AbstractTableRowData[]) Array.newInstance(getRowType(), m_rowList.size()));
   }
@@ -99,6 +102,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
    * @return Creates, adds and returns a new {@link AbstractTableRowData}. Its row state is initialized with
    *         {@link AbstractTableRowData#STATUS_NON_CHANGED} and its type is the one returned by {@link #getRowType()}.
    */
+  @Override
   public AbstractTableRowData addRow() {
     return addRow(AbstractTableRowData.STATUS_NON_CHANGED);
   }
@@ -126,6 +130,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
   /**
    * @return Returns the type of the rows managed by this {@link AbstractTableFieldData}.
    */
+  @Override
   public abstract Class<? extends AbstractTableRowData> getRowType();
 
   /**
@@ -133,6 +138,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData {
    * 
    * @param index
    */
+  @Override
   public void removeRow(int index) {
     m_rowList.remove(index);
     setValueSet(true);

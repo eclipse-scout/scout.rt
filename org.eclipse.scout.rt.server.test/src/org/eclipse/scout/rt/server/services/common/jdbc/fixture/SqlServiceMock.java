@@ -89,8 +89,13 @@ public class SqlServiceMock extends AbstractSqlService {
   }
 
   @Override
+  public int update(String s, Object... bindBases) throws ProcessingException {
+    createPlainTextLog(s, bindBases);
+    return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), new PreparedStatementCache(1), null);
+  }
+
+  @Override
   protected Connection getTransaction() throws ProcessingException {
     return new ConnectionMock(m_protocol, getResultData()).getConnection();
   }
-
 }

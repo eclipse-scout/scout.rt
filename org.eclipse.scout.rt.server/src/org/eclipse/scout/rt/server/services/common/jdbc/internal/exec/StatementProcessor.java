@@ -32,8 +32,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BeanArrayHolderFilter;
 import org.eclipse.scout.commons.holders.IBeanArrayHolder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.holders.ITableBeanHolder;
 import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
 import org.eclipse.scout.commons.holders.TableHolderFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -922,6 +924,12 @@ public class StatementProcessor implements IStatementProcessor {
         else if (o instanceof TableHolderFilter) {
           return new TableHolderInput(((TableHolderFilter) o).getTableHolder(), ((TableHolderFilter) o).getFilteredRows(), path[1], bindToken);
         }
+        else if (o instanceof ITableBeanHolder) {
+          return new TableBeanHolderInput((ITableBeanHolder) o, null, path[1], bindToken);
+        }
+        else if (o instanceof TableBeanHolderFilter) {
+          return new TableBeanHolderInput(((TableBeanHolderFilter) o).getTableBeanHolder(), ((TableBeanHolderFilter) o).getFilteredRows(), path[1], bindToken);
+        }
         else if (o instanceof IBeanArrayHolder) {
           return new BeanArrayHolderInput((IBeanArrayHolder) o, null, path[1], bindToken);
         }
@@ -951,6 +959,12 @@ public class StatementProcessor implements IStatementProcessor {
         }
         else if (o instanceof TableHolderFilter) {
           return new TableHolderInput(((TableHolderFilter) o).getTableHolder(), ((TableHolderFilter) o).getFilteredRows(), path[1], bindToken);
+        }
+        else if (o instanceof ITableBeanHolder) {
+          return new TableBeanHolderInput((ITableBeanHolder) o, null, path[1], bindToken);
+        }
+        else if (o instanceof TableBeanHolderFilter) {
+          return new TableBeanHolderInput(((TableBeanHolderFilter) o).getTableBeanHolder(), ((TableBeanHolderFilter) o).getFilteredRows(), path[1], bindToken);
         }
         else if (o instanceof IBeanArrayHolder) {
           return new BeanArrayHolderInput((IBeanArrayHolder) o, null, path[1], bindToken);
@@ -994,6 +1008,37 @@ public class StatementProcessor implements IStatementProcessor {
         if (m != null) {
           found = true;
           return new TableHolderInput(table, filter.getFilteredRows(), path[0], bindToken);
+        }
+      }
+      catch (Throwable t) {
+        // nop
+        found = false;
+      }
+    }
+    else if (bindBase instanceof ITableBeanHolder) {
+      // handle all terminal cases for table holder
+      ITableBeanHolder table = (ITableBeanHolder) bindBase;
+      try {
+        Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
+        if (m != null) {
+          found = true;
+          return new TableBeanHolderInput(table, null, path[0], bindToken);
+        }
+      }
+      catch (Throwable t) {
+        found = false;
+        // nop
+      }
+    }
+    else if (bindBase instanceof TableBeanHolderFilter) {
+      // handle all terminal cases for table holder filter
+      TableBeanHolderFilter filter = (TableBeanHolderFilter) bindBase;
+      ITableBeanHolder table = filter.getTableBeanHolder();
+      try {
+        Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
+        if (m != null) {
+          found = true;
+          return new TableBeanHolderInput(table, filter.getFilteredRows(), path[0], bindToken);
         }
       }
       catch (Throwable t) {
@@ -1154,6 +1199,10 @@ public class StatementProcessor implements IStatementProcessor {
           ITableHolder table = (ITableHolder) o;
           return new TableHolderOutput(table, path[1], bindToken);
         }
+        if (o instanceof ITableBeanHolder) {
+          ITableBeanHolder table = (ITableBeanHolder) o;
+          return new TableBeanHolderOutput(table, path[1], bindToken);
+        }
         else if (o instanceof IBeanArrayHolder) {
           IBeanArrayHolder holder = (IBeanArrayHolder) o;
           return new BeanArrayHolderOutput(holder, path[1], bindToken);
@@ -1191,6 +1240,10 @@ public class StatementProcessor implements IStatementProcessor {
           ITableHolder table = (ITableHolder) o;
           return new TableHolderOutput(table, path[1], bindToken);
         }
+        else if (o instanceof ITableBeanHolder) {
+          ITableBeanHolder table = (ITableBeanHolder) o;
+          return new TableBeanHolderOutput(table, path[1], bindToken);
+        }
         else if (o instanceof IBeanArrayHolder) {
           IBeanArrayHolder holder = (IBeanArrayHolder) o;
           return new BeanArrayHolderOutput(holder, path[1], bindToken);
@@ -1221,6 +1274,21 @@ public class StatementProcessor implements IStatementProcessor {
         if (m != null) {
           found = true;
           return new TableHolderOutput(table, path[0], bindToken);
+        }
+      }
+      catch (Throwable t) {
+        // nop
+        found = false;
+      }
+    }
+    else if (bindBase instanceof ITableBeanHolder) {
+      // handle all terminal cases for table holder
+      ITableBeanHolder table = (ITableBeanHolder) bindBase;
+      try {
+        Method m = table.getRowType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
+        if (m != null) {
+          found = true;
+          return new TableBeanHolderOutput(table, path[0], bindToken);
         }
       }
       catch (Throwable t) {
@@ -1273,6 +1341,9 @@ public class StatementProcessor implements IStatementProcessor {
               o = getter.invoke(bindBase, (Object[]) null);
               if (o instanceof ITableHolder) {
                 throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table and should not be a terminal");
+              }
+              else if (o instanceof ITableBeanHolder) {
+                throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table bean and should not be a terminal");
               }
               else if (o instanceof IBeanArrayHolder) {
                 throw new ProcessingException("output bind '" + bindToken.getName() + "' is a bean array and should not be a terminal");

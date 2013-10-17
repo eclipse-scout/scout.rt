@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.holders.ITableHolder;
+import org.eclipse.scout.commons.holders.ITableBeanRowHolder;
 
 /**
  * Bean that stores the contents of a scout table row. This class is intended to be extended for every table type and
@@ -22,28 +22,8 @@ import org.eclipse.scout.commons.holders.ITableHolder;
  * 
  * @since 3.8.2
  */
-public abstract class AbstractTableRowData implements Serializable {
+public abstract class AbstractTableRowData implements ITableBeanRowHolder, Serializable {
   private static final long serialVersionUID = 1L;
-
-  /**
-   * same value as {@link ITableHolder#STATUS_NON_CHANGED}.
-   */
-  public static final int STATUS_NON_CHANGED = ITableHolder.STATUS_NON_CHANGED;
-
-  /**
-   * same value as {@link ITableHolder#STATUS_INSERTED}.
-   */
-  public static final int STATUS_INSERTED = ITableHolder.STATUS_INSERTED;
-
-  /**
-   * same value as {@link ITableHolder#STATUS_UPDATED}.
-   */
-  public static final int STATUS_UPDATED = ITableHolder.STATUS_UPDATED;
-
-  /**
-   * same value as {@link ITableHolder#STATUS_DELETED}.
-   */
-  public static final int STATUS_DELETED = ITableHolder.STATUS_DELETED;
 
   private int m_rowState;
   private Map<String, Object> m_customColumnValues;
@@ -55,6 +35,7 @@ public abstract class AbstractTableRowData implements Serializable {
    * @see #STATUS_UPDATED
    * @see #STATUS_DELETED
    */
+  @Override
   public int getRowState() {
     return m_rowState;
   }
