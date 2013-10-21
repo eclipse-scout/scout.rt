@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -50,6 +51,8 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   protected void attachScout() {
     super.attachScout();
+
+    setTitleFromScout(getScoutObject().getTitle());
   }
 
   @Override
@@ -157,5 +160,23 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   public IViewArea getViewArea() {
     return m_viewArea;
+  }
+
+  protected void setTitleFromScout(String title) {
+    if (title == null) {
+      title = "";
+    }
+    JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
+    if (executor != null) {
+      executor.execute("window.document.title=\"" + title + "\"");
+    }
+  }
+
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (IDesktop.PROP_TITLE.equals(name)) {
+      setTitleFromScout((String) newValue);
+    }
   }
 }
