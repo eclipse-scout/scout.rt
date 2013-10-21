@@ -28,6 +28,7 @@ public interface IAction extends IPropertyObserver {
 
   String PROP_ICON_ID = "iconId";
   String PROP_TEXT = "text";
+  String PROP_TEXT_WITH_MNEMONIC = "&text";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_ENABLED = "enabled";
   String PROP_SELECTED = "selected";
@@ -72,6 +73,12 @@ public interface IAction extends IPropertyObserver {
   String getText();
 
   void setText(String text);
+
+  /**
+   * @return returns the text with mnemonic, e.g. "&File";
+   * @since 3.10.0-M3
+   */
+  String getTextWithMnemonic();
 
   /**
    * Key stroke with format lowercase [shift-] [control-] [alternate-] key

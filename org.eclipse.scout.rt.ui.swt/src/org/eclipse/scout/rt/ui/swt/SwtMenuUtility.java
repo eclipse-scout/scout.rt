@@ -91,7 +91,7 @@ public final class SwtMenuUtility {
     }
 
     if (scoutAction.hasChildActions()) {
-      IMenuManager manager = new MenuManager(scoutAction.getText(), scoutAction.getActionId());
+      IMenuManager manager = new MenuManager(scoutAction.getTextWithMnemonic(), scoutAction.getActionId());
       //Disable children since menuManager itself can't be disabled
       boolean disableChilds = !scoutAction.isEnabled() || disableItem;
       fillMenuManager(scoutAction.getChildActions().toArray(new IActionNode<?>[scoutAction.getChildActionCount()]), manager, environment, disableChilds);

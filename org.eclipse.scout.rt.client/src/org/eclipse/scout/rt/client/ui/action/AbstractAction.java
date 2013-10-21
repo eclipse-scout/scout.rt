@@ -299,13 +299,20 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
+  public String getTextWithMnemonic() {
+    return propertySupport.getPropertyString(PROP_TEXT_WITH_MNEMONIC);
+  }
+
+  @Override
   public void setText(String text) {
     if (text != null) {
       propertySupport.setPropertyString(PROP_TEXT, StringUtility.removeMnemonic(text));
+      propertySupport.setPropertyString(PROP_TEXT_WITH_MNEMONIC, text);
       propertySupport.setProperty(PROP_MNEMONIC, StringUtility.getMnemonic(text));
     }
     else {
       propertySupport.setPropertyString(PROP_TEXT, null);
+      propertySupport.setPropertyString(PROP_TEXT_WITH_MNEMONIC, null);
       propertySupport.setProperty(PROP_MNEMONIC, (char) 0x0);
     }
   }

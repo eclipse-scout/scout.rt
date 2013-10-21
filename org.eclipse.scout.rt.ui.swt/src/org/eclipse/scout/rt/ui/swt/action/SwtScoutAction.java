@@ -43,7 +43,7 @@ public class SwtScoutAction {
     m_swtAction = new P_SwtAction(style);
     // init
     String keyStroke = m_scoutAction.getKeyStroke();
-    m_swtAction.setText(m_scoutAction.getText());
+    m_swtAction.setText(m_scoutAction.getTextWithMnemonic());
     m_swtAction.setToolTipText(m_scoutAction.getTooltipText());
     m_swtAction.setImageDescriptor(m_environment.getImageDescriptor(m_scoutAction.getIconId()));
     m_swtAction.setEnabled(m_scoutAction.isEnabled());

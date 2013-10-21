@@ -147,6 +147,11 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
+  public String getTextWithMnemonic() {
+    return m_menu.getTextWithMnemonic();
+  }
+
+  @Override
   public void setText(String text) {
     m_menu.setText(text);
   }

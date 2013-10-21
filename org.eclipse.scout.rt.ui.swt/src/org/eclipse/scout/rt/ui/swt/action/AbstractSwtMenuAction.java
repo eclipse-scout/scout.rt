@@ -107,9 +107,8 @@ public class AbstractSwtMenuAction {
   protected void applyScoutProperties() {
     IAction scoutAction = getScoutAction();
     setEnabledFromScout(scoutAction.isEnabled());
-    setTextFromScout(scoutAction.getText());
+    setTextFromScout(scoutAction.getTextWithMnemonic());
     setTooltipTextFromScout(scoutAction.getTooltipText());
-    // setMnemonicFromScout(scoutAction.getMnemonic());
     setIconFromScout(scoutAction.getIconId());
     updateKeyStrokeFromScout();
   }
