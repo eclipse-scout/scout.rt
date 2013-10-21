@@ -53,7 +53,7 @@ public class SwtScoutSynchronizer {
     }
     //send job
     final long deadLine = cancelTimeout > 0 ? System.currentTimeMillis() + cancelTimeout : -1;
-    ClientSyncJob eclipseJob = new ClientSyncJob("Swing post::" + j, m_env.getClientSession()) {
+    ClientSyncJob eclipseJob = new ClientSyncJob("Swt post::" + j, m_env.getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         if (deadLine < 0 || deadLine > System.currentTimeMillis()) {

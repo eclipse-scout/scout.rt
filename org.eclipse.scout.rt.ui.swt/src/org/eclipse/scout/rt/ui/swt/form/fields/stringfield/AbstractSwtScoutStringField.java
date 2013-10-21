@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 
 /**
- * 
+ *
  */
 public abstract class AbstractSwtScoutStringField extends SwtScoutValueFieldComposite<IStringField> {
 
@@ -340,27 +340,43 @@ public abstract class AbstractSwtScoutStringField extends SwtScoutValueFieldComp
   }
 
   @Override
-  protected void setDisplayTextFromScout(String s) {
-    //loop detection
-    if (m_validateOnAnyKey && getSwtField().isFocusControl()) {
-      return;
-    }
-    if (s == null) {
-      s = "";
+  protected void setDisplayTextFromScout(String newText) {
+    if (newText == null) {
+      newText = "";
     }
     String oldText = getText();
     if (oldText == null) {
       oldText = "";
     }
-    if (oldText.equals(s)) {
+    if (oldText.equals(newText)) {
       return;
     }
     //
-    int startIndex = getSelection().x;
-    int endIndex = -getSelection().y;
-    int caretOffset = getCaretOffset();
-    setText(s);
-    restoreSelectionAndCaret(startIndex, endIndex, caretOffset);
+    try {
+      getUpdateSwtFromScoutLock().acquire();
+      int startIndex = getSelection().x;
+      int endIndex = getSelection().y;
+      int caretOffset = getCaretOffset();
+      if (startIndex == endIndex && startIndex == caretOffset && newText.length() != oldText.length()) {
+        //No selection, just a cursor position and text length has changed.
+        if (startIndex >= oldText.length()) {
+          //cursor was at the end, put it at the end of the new text:
+          startIndex = newText.length();
+        }
+        else if (newText.endsWith(oldText.substring(startIndex))) {
+          //cursor was in the middle of the old text. If both end matches, the new cursor position is before the common suffix.
+          startIndex = newText.length() - oldText.substring(startIndex).length();
+        }
+        //else: in the else case, let the startIndex as it was.
+        endIndex = startIndex;
+        caretOffset = startIndex;
+      }
+      setText(newText);
+      restoreSelectionAndCaret(startIndex, endIndex, caretOffset);
+    }
+    finally {
+      getUpdateSwtFromScoutLock().release();
+    }
   }
 
   /**

@@ -187,38 +187,53 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   }
 
   @Override
-  protected void setDisplayTextFromScout(String s) {
-    //loop detection
-    if (m_validateOnAnyKey && getSwingField().isFocusOwner()) {
-      return;
-    }
+  protected void setDisplayTextFromScout(String newText) {
     JTextComponent swingField = getSwingTextComponent();
     String oldText = swingField.getText();
-    if (s == null) {
-      s = "";
+    if (newText == null) {
+      newText = "";
     }
     if (oldText == null) {
       oldText = "";
     }
-    if (oldText.equals(s)) {
+    if (oldText.equals(newText)) {
       return;
     }
-    //
-    int startIndex = -1;
-    int endIndex = -1;
-    Caret caret = swingField.getCaret();
-    if (caret != null) {
-      startIndex = caret.getMark();
-      endIndex = caret.getDot();
+    try {
+      getUpdateSwingFromScoutLock().acquire();
+      //
+      int startIndex = -1;
+      int endIndex = -1;
+      Caret caret = swingField.getCaret();
+      if (caret != null) {
+        startIndex = caret.getMark();
+        endIndex = caret.getDot();
+      }
+      if (startIndex == endIndex && newText.length() != oldText.length()) {
+        //No selection, just a cursor position and text length has changed.
+        if (startIndex >= oldText.length()) {
+          //cursor was at the end, put it at the end of the new text:
+          startIndex = newText.length();
+        }
+        else if (newText.endsWith(oldText.substring(startIndex))) {
+          //cursor was in the middle of the old text. If both end matches, the new cursor position is before the common suffix.
+          startIndex = newText.length() - oldText.substring(startIndex).length();
+        }
+        //else: in the else case, let the startIndex as it was.
+        endIndex = startIndex;
+      }
+      swingField.setText(newText);
+      // restore selection and caret
+      int textLength = swingField.getText().length();
+      if (caret != null) {
+        startIndex = Math.min(Math.max(startIndex, -1), textLength);
+        endIndex = Math.min(Math.max(endIndex, 0), textLength);
+        swingField.setCaretPosition(startIndex);
+        swingField.moveCaretPosition(endIndex);
+      }
     }
-    swingField.setText(s);
-    // restore selection and caret
-    int textLength = swingField.getText().length();
-    if (caret != null) {
-      startIndex = Math.min(Math.max(startIndex, -1), textLength);
-      endIndex = Math.min(Math.max(endIndex, 0), textLength);
-      swingField.setCaretPosition(startIndex);
-      swingField.moveCaretPosition(endIndex);
+    finally {
+      getUpdateSwingFromScoutLock().release();
     }
   }
 

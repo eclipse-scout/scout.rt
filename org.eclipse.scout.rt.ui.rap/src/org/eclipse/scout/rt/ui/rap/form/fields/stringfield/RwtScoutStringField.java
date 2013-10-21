@@ -235,40 +235,47 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     */
   }
 
-  @SuppressWarnings("unused")
   @Override
-  protected void setDisplayTextFromScout(String s) {
-    //loop detection
-    if (m_validateOnAnyKey && getUiField().isFocusControl()) {
-      return;
-    }
+  protected void setDisplayTextFromScout(String newText) {
     StyledText field = getUiField();
     String oldText = field.getText();
-    if (s == null) {
-      s = "";
+    if (newText == null) {
+      newText = "";
     }
     if (oldText == null) {
       oldText = "";
     }
-    if (oldText.equals(s)) {
+    if (oldText.equals(newText)) {
       return;
     }
-    //
-    int startIndex = field.getSelection().x;
-    //XXX rap     int caretOffset = field.getCaretOffset();
-    int endIndex = -field.getSelection().y;
-    field.setText(s);
-    // restore selection and caret
-    int textLength = field.getText().length();
-    //XXX rap
-    /*
-    if (caretOffset > 0) {
+    try {
+      getUpdateUiFromScoutLock().acquire();
+      int startIndex = field.getSelection().x;
+      int endIndex = field.getSelection().y;
+      if (startIndex == endIndex && newText.length() != oldText.length()) {
+        //No selection, just a cursor position and text length has changed.
+        if (startIndex >= oldText.length()) {
+          //cursor was at the end, put it at the end of the new text:
+          startIndex = newText.length();
+        }
+        else if (newText.endsWith(oldText.substring(startIndex))) {
+          //cursor was in the middle of the old text. If both end matches, the new cursor position is before the common suffix.
+          startIndex = newText.length() - oldText.substring(startIndex).length();
+        }
+        //else: in the else case, let the startIndex as it was.
+        endIndex = startIndex;
+      }
+      field.setText(newText);
+
+      // restore selection and caret
+      int textLength = field.getText().length();
       startIndex = Math.min(Math.max(startIndex, 0), textLength);
       endIndex = Math.min(Math.max(endIndex, 0), textLength);
-      field.setCaretOffset(caretOffset);
       field.setSelection(startIndex, endIndex);
     }
-    */
+    finally {
+      getUpdateUiFromScoutLock().release();
+    }
   }
 
   protected void setValidateOnAnyKeyFromScout(boolean b) {
