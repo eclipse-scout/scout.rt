@@ -438,7 +438,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     HttpSession httpSession = RWT.getUISession().getHttpSession();
     IClientSession clientSession = (IClientSession) httpSession.getAttribute(IClientSession.class.getName());
     if (clientSession != null) {
-      if (!userAgent.equals(clientSession.getUserAgent())) {
+      //If the subject has changed always create a new clientSession
+      //Also create a new clientSession if the userAgent changed (f.e. switch from /web to /mobile)
+      if (!getSubject().equals(clientSession.getSubject()) || !userAgent.equals(clientSession.getUserAgent())) {
         //Force client session shutdown
         httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), null);
         //Make sure a new client session will be initialized
