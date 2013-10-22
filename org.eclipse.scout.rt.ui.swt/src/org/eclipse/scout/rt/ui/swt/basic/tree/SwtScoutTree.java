@@ -444,7 +444,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         updateTreeStructureAndKeepSelection(getScoutObject().getRootNode());
         setExpansionFromScout(getScoutObject().getRootNode());
         // ensure first filtered item is shown.
-        if (getSwtField().getSelectionCount() == 0) {
+        if (getSwtField().getSelectionCount() == 0 && getSwtField().getItemCount() > 0) {
           getSwtField().showItem(getSwtField().getItem(0));
         }
         break;
