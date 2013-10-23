@@ -78,6 +78,35 @@ public final class ScoutAssert {
     }
   }
 
+  /**
+   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
+   * This can be useful when two {@link java.math.BigDecimal} are compared.
+   * 
+   * @since 3.10.0-M3
+   */
+  public static <T extends Comparable<T>> void assertComparableEquals(T expected, T actual) {
+    assertComparableEquals(null, expected, actual);
+  }
+
+  /**
+   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
+   * This can be useful when two {@link java.math.BigDecimal} are compared.
+   * 
+   * @since 3.10.0-M3
+   */
+  public static <T extends Comparable<T>> void assertComparableEquals(String message, T expected, T actual) {
+    if (expected == null && actual == null) {
+      return;
+    }
+    else if (expected == null || actual == null) {
+      Assert.fail();
+    }
+    else if (expected.compareTo(actual) == 0) {
+      return;
+    }
+    Assert.fail(format(message, expected, actual));
+  }
+
   private static String format(String message, Object expected, Object actual) {
     String s = "";
     if (message != null) {

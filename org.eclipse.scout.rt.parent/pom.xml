@@ -106,6 +106,7 @@
         <module>../org.eclipse.scout.rt.testing.client.test</module>
         <module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
         <module>../org.eclipse.scout.rt.testing.commons</module>
+        <module>../org.eclipse.scout.rt.testing.commons.test</module>
         <module>../org.eclipse.scout.rt.testing.server</module>
         <module>../org.eclipse.scout.rt.testing.server.test</module>
         <module>../org.eclipse.scout.rt.testing.shared</module>
