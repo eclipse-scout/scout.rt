@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.swt.form.fields.checkbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.ext.ILabelComposite;
+import org.eclipse.scout.rt.ui.swt.ext.MultilineCheckbox;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.swt.widgets.Button;
 
 /**
  * <h3>ISwtScoutCheckbox</h3> ...
@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Button;
 public interface ISwtScoutCheckbox extends ISwtScoutFormField<IBooleanField> {
 
   @Override
-  Button getSwtField();
+  MultilineCheckbox getSwtField();
 
   ILabelComposite getPlaceholderLabel();
 }

@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 import org.eclipse.scout.rt.ui.swing.ext.JButtonEx;
 import org.eclipse.scout.rt.ui.swing.ext.JDropDownButton;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JRadioButtonEx;
 import org.eclipse.scout.rt.ui.swing.ext.JToggleButtonEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
@@ -66,7 +67,7 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     AbstractButton swingFieldAsButton = null;
     switch (getScoutButton().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        JRadioButton swingButton = new JRadioButton();
+        JRadioButton swingButton = new JRadioButtonEx();
         swingButton.setOpaque(false);
         swingButton.setRolloverEnabled(false);
         swingButton.addItemListener(new P_SwingSelectionListener());

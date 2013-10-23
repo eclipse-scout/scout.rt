@@ -16,11 +16,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.ILabelComposite;
+import org.eclipse.scout.rt.ui.swt.ext.MultilineCheckbox;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -46,7 +46,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     getEnvironment().getFormToolkit().getFormToolkit().adapt(m_labelPlaceholder, false, false);
     m_labelPlaceholder.setLayoutData(LogicalGridDataBuilder.createLabel(getScoutObject().getGridData()));
 
-    Button checkbox = getEnvironment().getFormToolkit().createButton(container, "", SWT.CHECK);
+    MultilineCheckbox checkbox = getEnvironment().getFormToolkit().createMultilineCheckBox(container);
 
     LogicalGridData checkboxData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
     checkboxData.fillHorizontal = false;
@@ -123,8 +123,8 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
   }
 
   @Override
-  public Button getSwtField() {
-    return (Button) super.getSwtField();
+  public MultilineCheckbox getSwtField() {
+    return (MultilineCheckbox) super.getSwtField();
   }
 
   @Override

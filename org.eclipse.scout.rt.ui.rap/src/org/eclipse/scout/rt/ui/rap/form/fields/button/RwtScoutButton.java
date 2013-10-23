@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.MenuSizeEstimator;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
+import org.eclipse.scout.rt.ui.rap.ext.MultilineButton;
+import org.eclipse.scout.rt.ui.rap.ext.MultilineRadioButton;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
@@ -70,11 +72,11 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     setUiContainer(container);
-    ButtonEx uiFieldAsButton = null;
+    Control uiFieldAsButton = null;
     Hyperlink uiFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        ButtonEx uiButton = getUiEnvironment().getFormToolkit().createButtonEx(container, SWT.LEFT | SWT.RADIO);
+        MultilineRadioButton uiButton = getUiEnvironment().getFormToolkit().createMultilineRadioButton(container);
         uiFieldAsButton = uiButton;
         break;
       }
@@ -187,6 +189,10 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
         Button b = (Button) comp;
         b.setImage(icon);
       }
+      else if (comp instanceof MultilineButton) {
+        MultilineButton b = (MultilineButton) comp;
+        b.setImage(icon);
+      }
       else if (comp instanceof Hyperlink) {
       }
     }
@@ -205,6 +211,10 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
       String label = StringUtility.removeMnemonic(s);
       t.setText(label == null ? "" : label);
     }
+    else if (comp instanceof MultilineRadioButton) {
+      MultilineRadioButton b = (MultilineRadioButton) comp;
+      b.setText(s == null ? "" : s);
+    }
   }
 
   protected void setSelectionFromScout(boolean b) {
@@ -216,6 +226,12 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
             Control comp = getUiField();
             if (comp instanceof Button) {
               Button but = (Button) comp;
+              if (b != but.getSelection()) {
+                but.setSelection(b);
+              }
+            }
+            else if (comp instanceof MultilineRadioButton) {
+              MultilineRadioButton but = (MultilineRadioButton) comp;
               if (b != but.getSelection()) {
                 but.setSelection(b);
               }
@@ -276,6 +292,10 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
       Control comp = getUiField();
       if (comp instanceof Button) {
         Button b = (Button) comp;
+        b.setImage((Image) img);
+      }
+      else if (comp instanceof MultilineButton) {
+        MultilineButton b = (MultilineButton) comp;
         b.setImage((Image) img);
       }
       else if (comp instanceof Hyperlink) {
@@ -372,7 +392,12 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
           switch (getScoutObject().getDisplayStyle()) {
             case IButton.DISPLAY_STYLE_RADIO:
             case IButton.DISPLAY_STYLE_TOGGLE: {
-              setSelectionFromUi(((Button) getUiField()).getSelection());
+              if (getUiField() instanceof Button) {
+                setSelectionFromUi(((Button) getUiField()).getSelection());
+              }
+              else if (getUiField() instanceof MultilineRadioButton) {
+                setSelectionFromUi(((MultilineRadioButton) getUiField()).getSelection());
+              }
               break;
             }
             default: {

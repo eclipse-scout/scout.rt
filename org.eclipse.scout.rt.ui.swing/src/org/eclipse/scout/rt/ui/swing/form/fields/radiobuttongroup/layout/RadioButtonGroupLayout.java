@@ -96,7 +96,6 @@ public class RadioButtonGroupLayout extends AbstractLayoutManager2 {
       int h = parent.getHeight();
       int rowCount = m_buttons.length;
       int colCount = (rowCount > 0 ? m_buttons[0].length : 0);
-      int hWithoutGaps = h - Math.max(0, rowCount - 1) * m_vgap;
       //
       if (colCount > 0) {
         // check if some radio columns need more space
@@ -108,9 +107,15 @@ public class RadioButtonGroupLayout extends AbstractLayoutManager2 {
           for (int c = 0; c < colCount; c++) {
             if (m_sizes[r][c] != null) {
               minWidths[c] = Math.max(minWidths[c], m_sizes[r][c].width);
+
+              if (r == 0) {
+                y[r] = 0;
+              }
+              else {
+                y[r] = y[r - 1] + m_sizes[r - 1][c].height + m_vgap;
+              }
             }
           }
-          y[r] = r * hWithoutGaps / rowCount + r * m_vgap;
         }
         int excess = 0;
         for (int c = 0; c < colCount; c++) {

@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.swt.basic.comp.HyperlinkEx;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
+import org.eclipse.scout.rt.ui.swt.ext.MultilineCheckbox;
+import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
 import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.SectionContent;
 import org.eclipse.scout.rt.ui.swt.ext.SnapButtonMaximized;
@@ -163,6 +165,24 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
   public ButtonEx createButtonEx(Composite parent, int style) {
     ButtonEx button = new ButtonEx(parent, style | SWT.FLAT);
+    adapt(button, false, false);
+    return button;
+  }
+
+  /**
+   * @since 3.10.0-M4
+   */
+  public MultilineRadioButton createMultilineRadioButton(Composite container) {
+    MultilineRadioButton button = new MultilineRadioButton(container, SWT.LEFT);
+    adapt(button, false, false);
+    return button;
+  }
+
+  /**
+   * @since 3.10.0-M4
+   */
+  public MultilineCheckbox createMultilineCheckBox(Composite container) {
+    MultilineCheckbox button = new MultilineCheckbox(container, SWT.CHECK);
     adapt(button, false, false);
     return button;
   }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
 
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
@@ -61,5 +62,18 @@ public class JCheckBoxEx extends JCheckBox implements FocusListener {
   @Override
   public Point getToolTipLocation(MouseEvent e) {
     return SwingUtility.getAdjustedToolTipLocation(e, this, getTopLevelAncestor());
+  }
+
+  // override for mutiline texts
+  @Override
+  public void setText(String text) {
+    if (SwingUtility.isMultilineLabelText(text)) {
+      setVerticalTextPosition(SwingConstants.TOP);
+      text = SwingUtility.createHtmlLabelText(text, false);
+    }
+    else {
+      setVerticalTextPosition(SwingConstants.CENTER);
+    }
+    super.setText(text);
   }
 }
