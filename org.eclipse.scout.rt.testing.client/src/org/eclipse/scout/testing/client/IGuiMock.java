@@ -250,9 +250,25 @@ public interface IGuiMock {
   void gotoField(FieldType type, int index);
 
   /**
-   * place the mouse over the center of a field that represents a scout model with that (class) name
+   * place the mouse over the center of a field that represents a scout field.
+   * This correspond to {@link #gotoScoutField(String, float, float)} with x=0.5 and y=0.5
+   * 
+   * @param name
+   *          (class) name of the scout field (scout client model)
    */
   void gotoScoutField(String name);
+
+  /**
+   * place the mouse over the field that represents a scout field at the position described by the x and y parameter
+   * 
+   * @param name
+   *          (class) name of the scout field (scout client model)
+   * @param x
+   *          position of the cursor in percent on the horizontal axis (set to 0.5 to be in the center)
+   * @param y
+   *          position of the cursor in percent on the vertical axis (set to 0.5 to be in the center)
+   */
+  void gotoScoutField(String name, double x, double y);
 
   /**
    * place the mouse over the center of a table cell

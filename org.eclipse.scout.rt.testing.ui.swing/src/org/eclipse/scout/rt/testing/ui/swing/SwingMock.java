@@ -317,12 +317,23 @@ public class SwingMock implements IGuiMock {
 
   @Override
   public void gotoScoutField(String name) {
+    gotoScoutField(name, 0.5, 0.5);
+  }
+
+  @Override
+  public void gotoScoutField(String name, final double x, final double y) {
+    if (x < 0 || x > 1) {
+      throw new IllegalArgumentException("x should be in [0, 1] range.");
+    }
+    if (y < 0 || y > 1) {
+      throw new IllegalArgumentException("y should be in [0, 1] range.");
+    }
     final JComponent c = waitForScoutField(name);
     syncExec(new MockRunnable<Object>() {
       @Override
       public Object run() throws Throwable {
         Point p = c.getLocationOnScreen();
-        gotoPoint(p.x + c.getWidth() / 2, p.y + c.getHeight() / 2);
+        gotoPoint(p.x + (int) (x * c.getWidth()), p.y + (int) (y * c.getHeight()));
         return null;
       }
     });

@@ -454,6 +454,17 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void gotoScoutField(String name) {
+    gotoScoutField(name, 0.5, 0.5);
+  }
+
+  @Override
+  public void gotoScoutField(String name, double x, double y) {
+    if (x < 0 || x > 1) {
+      throw new IllegalArgumentException("x should be in [0, 1] range.");
+    }
+    if (y < 0 || y > 1) {
+      throw new IllegalArgumentException("y should be in [0, 1] range.");
+    }
     final Control c = waitForScoutField(name);
     setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
     if (c instanceof Text) {
