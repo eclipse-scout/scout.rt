@@ -276,13 +276,24 @@ public final class IOUtility {
     }
   }
 
+  /**
+   * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
+   * deleted when the virtual machine terminates.
+   * 
+   * @param fileName
+   *          If no or an empty filename is given, a random fileName will be created.
+   * @param content
+   *          If no content is given, an empty file will be created
+   * @return A new temporary file with specified content
+   * @throws ProcessingException
+   */
   public static File createTempFile(String fileName, byte[] content) throws ProcessingException {
     try {
       if (fileName != null) {
         fileName = fileName.replaceAll("[\\\\/:*?\\\"<>|]*", "");
       }
       if (fileName == null || fileName.length() == 0) {
-        fileName = getTempFileName("tmp");
+        fileName = getTempFileName(".tmp");
       }
       File f = File.createTempFile("tmp", ".tmp");
       File f2 = new File(f.getParentFile(), new File(fileName).getName());
@@ -307,6 +318,19 @@ public final class IOUtility {
     }
   }
 
+  /**
+   * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
+   * deleted when the virtual machine terminates. The temporary file will look like this:
+   * <i>prefix</i>2093483323922923<i>.suffix</i>
+   * 
+   * @param prefix
+   *          The prefix of the temporary file
+   * @param suffix
+   *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
+   * @param content
+   * @return A new temporary file with the specified content
+   * @throws ProcessingException
+   */
   public static File createTempFile(String prefix, String suffix, byte[] content) throws ProcessingException {
     File f = null;
     try {
