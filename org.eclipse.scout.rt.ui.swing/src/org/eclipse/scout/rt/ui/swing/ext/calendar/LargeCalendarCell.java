@@ -323,9 +323,11 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    setBackground(m_yesMajorColor);
     if (!m_isMajor && m_dateChooser.getMarkOutOfMonthDays()) {
       setBackground(m_notMajorColor);
+    }
+    else {
+      setBackground(m_yesMajorColor);
     }
     Insets insets = getInsets();
     Rectangle view;
