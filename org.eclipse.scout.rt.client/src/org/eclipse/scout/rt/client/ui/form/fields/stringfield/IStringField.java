@@ -4,16 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
-public interface IStringField extends IValueField<String>, IDNDSupport {
+public interface IStringField extends IBasicField<String>, IDNDSupport {
 
   /**
    * @see IDNDSupport
@@ -26,7 +26,6 @@ public interface IStringField extends IValueField<String>, IDNDSupport {
   String PROP_FORMAT = "format";
   String PROP_MAX_LENGTH = "maxLength";
   String PROP_INSERT_TEXT = "insertText";
-  String PROP_VALIDATE_ON_ANY_KEY = "validateOnAnyKey";
   String PROP_SELECTION_START = "selectionStart";
   String PROP_SELECTION_END = "selectionEnd";
 
@@ -68,18 +67,6 @@ public interface IStringField extends IValueField<String>, IDNDSupport {
 
   void insertText(String s);
 
-  /**
-   * Causes the ui to send a validate event every time the text field content is changed.
-   * <p>
-   * Be careful when using this property since this can influence performance and the charateristics of text input.
-   */
-  void setValidateOnAnyKey(boolean b);
-
-  /**
-   * @return whether the ui to sends a validate event every time the text field content is changed
-   */
-  boolean isValidateOnAnyKey();
-
   int getSelectionStart();
 
   int getSelectionEnd();
@@ -90,6 +77,7 @@ public interface IStringField extends IValueField<String>, IDNDSupport {
 
   void setSelectAllOnFocus(boolean b);
 
+  @Override
   IStringFieldUIFacade getUIFacade();
 
   /**

@@ -36,6 +36,7 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
   private int m_multiplier;
   private T m_minValue;
   private T m_maxValue;
+  private boolean m_validateOnAnyKey;
 
   public AbstractDecimalColumn() {
     super();
@@ -145,6 +146,17 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     return 2;
   }
 
+  /**
+   * Causes the ui to send a validate event every time the text field content is changed.
+   * <p>
+   * Be careful when using this property since this can influence performance and the characteristics of text input.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  protected boolean getConfiguredValidateOnAnyKey() {
+    return false;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -155,6 +167,7 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     setPercent(getConfiguredPercent());
     setFractionDigits(getConfiguredFractionDigits());
     setMultiplier(getConfiguredMultiplier());
+    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
   }
 
   /*
@@ -274,6 +287,16 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     return m_minValue;
   }
 
+  @Override
+  public void setValidateOnAnyKey(boolean b) {
+    m_validateOnAnyKey = b;
+  }
+
+  @Override
+  public boolean isValidateOnAnyKey() {
+    return m_validateOnAnyKey;
+  }
+
   protected abstract AbstractDecimalField<T> getEditorField();
 
   @Override
@@ -288,6 +311,7 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     f.setPercent(isPercent());
     f.setMinValue(getMinValue());
     f.setMaxValue(getMaxValue());
+    f.setValidateOnAnyKey(isValidateOnAnyKey());
     return f;
   }
 

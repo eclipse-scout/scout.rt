@@ -53,5 +53,9 @@ public interface IDecimalColumn<T extends Number> extends IColumn<T> {
 
   int getMultiplier();
 
+  void setValidateOnAnyKey(boolean b);
+
+  boolean isValidateOnAnyKey();
+
   NumberFormat getNumberFormat();
 }

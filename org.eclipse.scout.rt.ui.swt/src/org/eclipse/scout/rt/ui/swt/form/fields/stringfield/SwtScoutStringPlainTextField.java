@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Rene Eigenheer - Patch from Bug 359677
  ******************************************************************************/
@@ -20,9 +20,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * A string field implementation that uses SWT Text Widget to implement masked input fields (password)
  */
-public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
-
-  protected Point m_backupSelection = null;
+public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -37,7 +35,7 @@ public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
     int style = getSwtStyle(getScoutObject());
     Text textField = getEnvironment().getFormToolkit().createText(container, style);
     setSwtField(textField);
-    textField.addModifyListener(new P_SwtTextListener());
+    addModifyListenerForBasicField(textField);
     textField.addSelectionListener(new P_SwtTextSelectionListener());
     textField.addVerifyListener(new P_TextVerifyListener());
   }
@@ -48,7 +46,6 @@ public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
     IStringField f = getScoutObject();
     setFormatFromScout(f.getFormat());
     setMaxLengthFromScout(f.getMaxLength());
-    setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
     setSelectionFromScout(f.getSelectionStart(), f.getSelectionEnd());
 
     // dnd support
@@ -56,46 +53,13 @@ public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
   }
 
   @Override
-  protected void restoreSelectionAndCaret(int startIndex, int endIndex, int caretOffset) {
-    int textLength = getText().length();
-    if (caretOffset > 0) {
-      startIndex = Math.min(Math.max(startIndex, 0), textLength);
-      endIndex = Math.min(Math.max(endIndex, 0), textLength);
-      selectField(startIndex, endIndex);
-    }
-  }
-
-  @Override
-  protected void scheduleSelectAll() {
-    getSwtField().setSelection(0, getSwtField().getText().length());
-  }
-
-  @Override
-  protected void restoreSelection() {
-    if (m_backupSelection == null) {
-      m_backupSelection = new Point(0, 0);
-    }
-    getSwtField().setSelection(m_backupSelection);
-  }
-
-  @Override
-  protected void selectField(int startIndex, int endIndex) {
-    // swt sets the caret itself. If startIndex > endIndex it is placed at the beginning.
-    m_backupSelection = new Point(startIndex, endIndex);
+  protected void setSelection(int startIndex, int endIndex) {
     getSwtField().setSelection(startIndex, endIndex);
   }
 
   @Override
   protected Point getSelection() {
     return getSwtField().getSelection();
-  }
-
-  @Override
-  protected void clearSelection() {
-    m_backupSelection = getSelection();
-    if (getSwtField().getSelectionCount() > 0) {
-      getSwtField().setSelection(0, 0);
-    }
   }
 
   @Override
@@ -109,7 +73,7 @@ public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
   }
 
   @Override
-  protected TextFieldEditableSupport getEditableSupport() {
+  protected TextFieldEditableSupport createEditableSupport() {
     return new TextFieldEditableSupport(getSwtField());
   }
 
@@ -128,4 +92,8 @@ public class SwtScoutStringPlainTextField extends AbstractSwtScoutStringField {
     return getSwtField().getCaretPosition();
   }
 
+  @Override
+  protected void setCaretOffset(int caretPosition) {
+    //nothing to do: SWT sets the caret itself. If startIndex > endIndex it is placed at the beginning.
+  }
 }

@@ -10,18 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.numberfield;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -29,9 +26,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @since 1.0.0 14.04.2008
  */
-public class SwtScoutNumberField extends SwtScoutValueFieldComposite<INumberField<?>> implements ISwtScoutNumberField {
-
-  private TextFieldEditableSupport m_editableSupport;
+public class SwtScoutNumberField extends SwtScoutBasicFieldComposite<INumberField<?>> implements ISwtScoutNumberField {
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -47,6 +42,8 @@ public class SwtScoutNumberField extends SwtScoutValueFieldComposite<INumberFiel
     setSwtContainer(container);
     setSwtLabel(label);
     setSwtField(text);
+    //listeners
+    addModifyListenerForBasicField(text);
     // layout
     getSwtContainer().setLayout(new LogicalGridLayout(1, 0));
   }
@@ -57,58 +54,37 @@ public class SwtScoutNumberField extends SwtScoutValueFieldComposite<INumberFiel
   }
 
   @Override
-  protected void setFieldEnabled(Control swtField, boolean enabled) {
-    if (m_editableSupport == null) {
-      m_editableSupport = new TextFieldEditableSupport(getSwtField());
-    }
-    m_editableSupport.setEditable(enabled);
+  protected String getText() {
+    return getSwtField().getText();
   }
 
   @Override
-  protected void setDisplayTextFromScout(String s) {
-    if (s == null) {
-      s = "";
-    }
-    getSwtField().setText(s);
+  protected void setText(String text) {
+    getSwtField().setText(text);
   }
 
   @Override
-  protected boolean handleSwtInputVerifier() {
-    final String text = getSwtField().getText();
-    // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
-      return true;
-    }
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
-        result.setValue(b);
-      }
-    };
-    JobEx job = getEnvironment().invokeScoutLater(t, 0);
-    try {
-      job.join(2345);
-    }
-    catch (InterruptedException e) {
-      //nop
-    }
-    getEnvironment().dispatchImmediateSwtJobs();
-    // end notify
-    return true;// continue always
+  protected Point getSelection() {
+    return getSwtField().getSelection();
   }
 
   @Override
-  protected void handleSwtFocusGained() {
-    super.handleSwtFocusGained();
-    getSwtField().setSelection(0, getSwtField().getText().length());
+  protected void setSelection(int startIndex, int endIndex) {
+    getSwtField().setSelection(startIndex, endIndex);
   }
 
   @Override
-  protected void handleSwtFocusLost() {
-    getSwtField().setSelection(0, 0);
+  protected TextFieldEditableSupport createEditableSupport() {
+    return new TextFieldEditableSupport(getSwtField());
   }
 
+  @Override
+  protected int getCaretOffset() {
+    return getSwtField().getCaretPosition();
+  }
+
+  @Override
+  protected void setCaretOffset(int caretPosition) {
+    //nothing to do: SWT sets the caret itself. If startIndex > endIndex it is placed at the beginning.
+  }
 }

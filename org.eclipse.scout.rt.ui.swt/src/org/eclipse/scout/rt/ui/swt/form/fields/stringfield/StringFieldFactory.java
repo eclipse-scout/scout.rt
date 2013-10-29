@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  *     Rene Eigenheer - Patch from Bug 359677
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * 
+ *
  */
 public class StringFieldFactory implements IFormFieldFactory {
 
@@ -28,12 +28,12 @@ public class StringFieldFactory implements IFormFieldFactory {
     if (field instanceof IStringField) {
       IStringField s = (IStringField) field;
       if (s.isInputMasked()) {
-        AbstractSwtScoutStringField ui = new SwtScoutStringPlainTextField();
+        SwtScoutStringPlainTextField ui = new SwtScoutStringPlainTextField();
         ui.createField(parent, s, environment);
         return ui;
       }
       else {
-        AbstractSwtScoutStringField ui = new SwtScoutStringField();
+        SwtScoutStringField ui = new SwtScoutStringField();
         ui.createField(parent, s, environment);
         return ui;
       }

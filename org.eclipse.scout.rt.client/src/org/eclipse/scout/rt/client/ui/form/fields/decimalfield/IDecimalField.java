@@ -4,19 +4,19 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
 /**
  * Field type representing a fractional, decimal number such as Float, Double,
  * BigDecimal
  */
-public interface IDecimalField<T extends Number> extends IValueField<T> {
+public interface IDecimalField<T extends Number> extends IBasicField<T> {
 
   void setFormat(String s);
 
@@ -54,6 +54,13 @@ public interface IDecimalField<T extends Number> extends IValueField<T> {
 
   int getMultiplier();
 
+  /**
+   * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
+   *             Will be removed with the M-Release
+   */
+  @SuppressWarnings("deprecation")
+  @Override
+  @Deprecated
   IDecimalFieldUIFacade getUIFacade();
 
 }

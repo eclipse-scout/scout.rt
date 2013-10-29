@@ -23,10 +23,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
-public abstract class AbstractStringField extends AbstractValueField<String> implements IStringField {
+public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
@@ -85,17 +85,6 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
   protected boolean getConfiguredFormatUpper() {
-    return false;
-  }
-
-  /**
-   * Causes the ui to send a validate event every time the text field content is changed.
-   * <p>
-   * Be careful when using this property since this can influence performance and the charateristics of text input.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(310)
-  protected boolean getConfiguredValidateOnAnyKey() {
     return false;
   }
 
@@ -168,7 +157,6 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     setWrapText(getConfiguredWrapText());
     setMultilineText(getConfiguredMultilineText());
     setSelectAllOnFocus(getConfiguredSelectAllOnFocus() && !getConfiguredMultilineText());
-    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
     int configuredDragType = getConfiguredDragType();
     if (IDNDSupport.TYPE_TEXT_TRANSFER == configuredDragType) {
       LOG.warn("Drag and drop TextTransfer is default behaviour (Configuration will not be considered).");
@@ -306,16 +294,6 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   @Override
   public void setSelectAllOnFocus(boolean b) {
     propertySupport.setPropertyBool(PROP_SELECT_ALL_ON_FOCUS, b);
-  }
-
-  @Override
-  public void setValidateOnAnyKey(boolean b) {
-    propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
-  }
-
-  @Override
-  public boolean isValidateOnAnyKey() {
-    return propertySupport.getPropertyBool(PROP_VALIDATE_ON_ANY_KEY);
   }
 
   @Override

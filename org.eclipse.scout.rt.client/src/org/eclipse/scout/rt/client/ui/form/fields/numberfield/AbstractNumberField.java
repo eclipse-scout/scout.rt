@@ -21,12 +21,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public abstract class AbstractNumberField<T extends Number> extends AbstractValueField<T> implements INumberField<T> {
+public abstract class AbstractNumberField<T extends Number> extends AbstractBasicField<T> implements INumberField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractNumberField.class);
 
+  @SuppressWarnings("deprecation")
   private INumberFieldUIFacade m_uiFacade;
   private String m_format;
   private boolean m_groupingUsed;
@@ -198,11 +199,16 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     return fmt;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public INumberFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  /**
+   * When {@link INumberFieldUIFacade} is removed, this class will implements IBasicFieldUIFacade.
+   */
+  @SuppressWarnings("deprecation")
   private class P_UIFacade implements INumberFieldUIFacade {
     @Override
     public boolean setTextFromUI(String newText) {

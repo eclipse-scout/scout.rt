@@ -4,14 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
-public interface INumberFieldUIFacade {
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
-  boolean setTextFromUI(String newText);
-
+/**
+ * @Deprecated Use {@link IBasicFieldUIFacade} instead
+ *             Will be removed with the M-Release
+ */
+@Deprecated
+public interface INumberFieldUIFacade extends IBasicFieldUIFacade {
 }

@@ -33,5 +33,9 @@ public interface INumberColumn<T extends Number> extends IColumn<T> {
 
   T getMaxValue();
 
+  void setValidateOnAnyKey(boolean b);
+
+  boolean isValidateOnAnyKey();
+
   NumberFormat getNumberFormat();
 }

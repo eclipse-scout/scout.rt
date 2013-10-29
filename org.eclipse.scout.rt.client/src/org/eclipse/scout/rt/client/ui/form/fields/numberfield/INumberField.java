@@ -4,13 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 
 /**
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
  * 
  * @see IDecimalField for floating point numbers
  */
-public interface INumberField<T extends Number> extends IValueField<T> {
+public interface INumberField<T extends Number> extends IBasicField<T> {
 
   void setFormat(String s);
 
@@ -37,6 +37,13 @@ public interface INumberField<T extends Number> extends IValueField<T> {
 
   T getMaxValue();
 
+  /**
+   * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
+   *             Will be removed with the M-Release
+   */
+  @SuppressWarnings("deprecation")
+  @Override
+  @Deprecated
   INumberFieldUIFacade getUIFacade();
 
 }

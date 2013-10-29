@@ -33,13 +33,11 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Typical string field (see {@link SwtScoutStringPlainTextField} for masked input fields)
  */
-public class SwtScoutStringField extends AbstractSwtScoutStringField implements ISwtScoutStringField {
+public class SwtScoutStringField extends SwtScoutStringFieldComposite implements ISwtScoutStringField {
   private MouseListener m_linkTrigger;
 
   private boolean m_linkDecoration;
   private StyledTextFieldUndoRedoSupport m_undoRedoSupport;
-
-  private Point m_backupSelection = null;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -93,7 +91,7 @@ public class SwtScoutStringField extends AbstractSwtScoutStringField implements 
   }
 
   protected void addDefaultUiListeners(StyledText textField) {
-    textField.addModifyListener(new P_SwtTextListener());
+    addModifyListenerForBasicField(textField);
     textField.addSelectionListener(new P_SwtTextSelectionListener());
     textField.addVerifyListener(new P_TextVerifyListener());
   }
@@ -107,7 +105,6 @@ public class SwtScoutStringField extends AbstractSwtScoutStringField implements 
     setSelectionFromScout(f.getSelectionStart(), f.getSelectionEnd());
 
     setDecorationLinkFromScout(f.isDecorationLink());
-    setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
     setTextWrapFromScout(f.isWrapText());
 
     // dnd support
@@ -166,25 +163,16 @@ public class SwtScoutStringField extends AbstractSwtScoutStringField implements 
   }
 
   @Override
-  protected void restoreSelectionAndCaret(int startIndex, int endIndex, int caretOffset) {
-    int textLength = getText().length();
-    if (caretOffset > 0) {
-      startIndex = Math.min(Math.max(startIndex, 0), textLength);
-      endIndex = Math.min(Math.max(endIndex, 0), textLength);
-      getSwtField().setCaretOffset(caretOffset);
-      selectField(startIndex, endIndex);
-    }
+  protected void setCaretOffset(int caretPosition) {
+    getSwtField().setCaretOffset(caretPosition);
   }
 
   /**
    * select the swt field, if it has the focus
    */
   @Override
-  protected void selectField(int startIndex, int endIndex) {
-    m_backupSelection = new Point(startIndex, endIndex);
-    if (getSwtField().isFocusControl()) {
-      getSwtField().setSelection(startIndex, endIndex);
-    }
+  protected void setSelection(int startIndex, int endIndex) {
+    getSwtField().setSelection(startIndex, endIndex);
   }
 
   protected void setTextWrapFromScout(boolean booleanValue) {
@@ -220,41 +208,6 @@ public class SwtScoutStringField extends AbstractSwtScoutStringField implements 
     // end notify
   }
 
-  /**
-   * restore selection, but only if there is one to not move the cursor accidentally (this is done automatically by swt)
-   */
-  @Override
-  protected void restoreSelection() {
-    if (m_backupSelection != null && m_backupSelection.x != m_backupSelection.y) {
-      getSwtField().setSelection(m_backupSelection);
-    }
-  }
-
-  @Override
-  protected void scheduleSelectAll() {
-    getEnvironment().getDisplay().asyncExec(new Runnable() {
-
-      @Override
-      public void run() {
-        if (getSwtField().isDisposed()) {
-          return;
-        }
-
-        getSwtField().setSelection(0, getSwtField().getText().length());
-      }
-
-    });
-
-  }
-
-  @Override
-  protected void clearSelection() {
-    m_backupSelection = getSelection();
-    if (getSwtField().getSelectionCount() > 0) {
-      getSwtField().setSelection(0, 0);
-    }
-  }
-
   @Override
   protected String getText() {
     return getSwtField().getText();
@@ -268,7 +221,7 @@ public class SwtScoutStringField extends AbstractSwtScoutStringField implements 
   } // end class P_SwtLinkTrigger
 
   @Override
-  protected TextFieldEditableSupport getEditableSupport() {
+  protected TextFieldEditableSupport createEditableSupport() {
     return new TextFieldEditableSupport(getSwtField());
   }
 

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
@@ -107,7 +108,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   /**
    * Causes the ui to send a validate event every time the text field content is changed.
    * <p>
-   * Be careful when using this property since this can influence performance and the charateristics of text input.
+   * Be careful when using this property since this can influence performance and the characteristics of text input.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
@@ -171,13 +172,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   }
 
   @Override
-  public void setValidateOnAnyKey(boolean b) {
-    propertySupport.setPropertyBool(IStringField.PROP_VALIDATE_ON_ANY_KEY, b);
+  public boolean isValidateOnAnyKey() {
+    return propertySupport.getPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY);
   }
 
   @Override
-  public boolean isValidateOnAnyKey() {
-    return propertySupport.getPropertyBool(IStringField.PROP_VALIDATE_ON_ANY_KEY);
+  public void setValidateOnAnyKey(boolean b) {
+    propertySupport.setPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY, b);
   }
 
   @Override

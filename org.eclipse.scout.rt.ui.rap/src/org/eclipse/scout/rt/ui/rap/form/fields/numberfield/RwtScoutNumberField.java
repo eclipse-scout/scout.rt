@@ -10,14 +10,11 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.numberfield;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
-import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
@@ -30,7 +27,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @since 3.7.0 June 2011
  */
-public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
+public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
 
   private TextFieldEditableSupport m_editableSupport;
 
@@ -54,11 +51,6 @@ public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberFiel
   }
 
   @Override
-  public Text getUiField() {
-    return (Text) super.getUiField();
-  }
-
-  @Override
   protected void setFieldEnabled(Control field, boolean enabled) {
     if (m_editableSupport == null) {
       m_editableSupport = new TextFieldEditableSupport(getUiField());
@@ -71,51 +63,4 @@ public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberFiel
     super.setEnabledFromScout(b);
     getUiField().setEnabled(b);
   }
-
-  @Override
-  protected void setDisplayTextFromScout(String s) {
-    if (s == null) {
-      s = "";
-    }
-    getUiField().setText(s);
-  }
-
-  @Override
-  protected void handleUiInputVerifier(boolean doit) {
-    if (!doit) {
-      return;
-    }
-    final String text = getUiField().getText();
-    // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
-      return;
-    }
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
-        result.setValue(b);
-      }
-    };
-    JobEx job = getUiEnvironment().invokeScoutLater(t, 0);
-    try {
-      job.join(2345);
-    }
-    catch (InterruptedException e) {
-      //nop
-    }
-    getUiEnvironment().dispatchImmediateUiJobs();
-  }
-
-  @Override
-  protected void handleUiFocusGained() {
-    super.handleUiFocusGained();
-
-    if (isSelectAllOnFocusEnabled()) {
-      getUiField().setSelection(0, getUiField().getText().length());
-    }
-  }
-
 }
