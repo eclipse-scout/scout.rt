@@ -23,6 +23,13 @@ public interface IRwtScoutTable extends IRwtScoutComposite<ITable> {
   String KEY_SCOUT_COLUMN = "scoutColumn";
 
   /**
+   * Corresponds to RWT.WRAPPED_COLUMN of the patched RAP 2.2 branch
+   * (@see https://github.com/BSI-Business-Systems-Integration-AG/rap.git -> branch patches/2.2/bsiPatches).
+   * To be compatible with the official RAP branch the constant is copied.
+   */
+  String WRAPPED_COLUMN = "org.eclipse.rap.rwt.wrappedColumn";
+
+  /**
    * Special variant for disabled table columns (as :disabled seems to by ignored by RAP).
    */
   String VARIANT_TABLE_COLUMN_DISABLED = "customDisabled";

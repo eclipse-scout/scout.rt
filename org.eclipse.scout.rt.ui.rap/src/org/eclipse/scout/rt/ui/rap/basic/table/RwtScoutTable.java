@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.RowIndexComparator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -244,6 +245,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         TableViewerColumn rwtViewerCol = new TableViewerColumn(getUiTableViewer(), rwtCol);
         rwtViewerCol.setLabelProvider(getUiColumnModel());
         rwtCol.setData(KEY_SCOUT_COLUMN, scoutColumn);
+        if (scoutColumn instanceof IStringColumn) {
+          rwtCol.setData(WRAPPED_COLUMN, ((IStringColumn) scoutColumn).isTextWrap());
+        }
         rwtCol.setMoveable(true);
         rwtCol.setToolTipText(cell.getTooltipText());
         updateHeaderText(rwtCol, scoutColumn);
