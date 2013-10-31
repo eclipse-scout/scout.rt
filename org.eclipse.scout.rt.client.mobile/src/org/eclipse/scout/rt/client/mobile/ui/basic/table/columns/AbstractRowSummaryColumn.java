@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
@@ -43,6 +45,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   private String m_htmlCellTemplate;
   private String m_htmlDrillDown;
   private String m_htmlDrillDownButton;
+  private int m_maxCellDetailColumns;
 
   public AbstractRowSummaryColumn() {
     try {
@@ -140,7 +143,9 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   public void initializeDecorationConfiguration(ITable table, int maxCellDetailColumns) {
     m_cellHeaderColumn = null;
     m_cellDetailColumns = new ArrayList<IColumn<?>>(maxCellDetailColumns);
+    m_maxCellDetailColumns = maxCellDetailColumns;
 
+    int columnVisibleIndex = 0;
     for (IColumn<?> column : table.getColumnSet().getVisibleColumns()) {
       if (m_cellDetailColumns.size() >= maxCellDetailColumns) {
         break;
@@ -149,16 +154,19 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       if (m_cellHeaderColumn == null && useColumnForCellHeader(table, column)) {
         m_cellHeaderColumn = column;
       }
-      else if (useColumnForCellDetail(table, column)) {
+      else if (useColumnForCellDetail(table, column, columnVisibleIndex)) {
         m_cellDetailColumns.add(column);
       }
-
+      columnVisibleIndex++;
     }
 
     m_initialized = true;
   }
 
   private boolean useColumnForCellHeader(ITable table, IColumn<?> column) {
+    if (isCheckBoxColumn(column)) {
+      return false;
+    }
     //Only use the given column if there are no summary columns defined
     if (table.getColumnSet().getSummaryColumns().length == 0) {
       return true;
@@ -167,9 +175,20 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return false;
   }
 
-  private boolean useColumnForCellDetail(ITable table, IColumn<?> column) {
+  private boolean useColumnForCellDetail(ITable table, IColumn<?> column, int columnVisibleIndex) {
     boolean columnEmpty = true;
     int maxRowsToConsider = 10;
+
+    if (isCheckBoxColumn(column)) {
+      return false;
+    }
+
+    //Always use column if there is enough space left in m_cellDetailColumns for every remaining column
+    int freeSlots = m_maxCellDetailColumns - m_cellDetailColumns.size();
+    int remainingColumns = table.getColumnSet().getVisibleColumns().length - (columnVisibleIndex + 1);
+    if (remainingColumns < freeSlots) {
+      return true;
+    }
 
     for (int row = 0; row < Math.min(maxRowsToConsider, table.getRowCount()); row++) {
       ITableRow tableRow = table.getRow(row);
@@ -177,6 +196,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       if (StringUtility.hasText(columnDisplayText)) {
         columnEmpty = false;
 
+        //If column contains similar data to the header column, don't use it
         String cellHeaderText = getCellHeaderText(tableRow);
         if (cellHeaderText != null && cellHeaderText.contains(columnDisplayText)) {
           return false;
@@ -307,17 +327,19 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
 
     String iconId = null;
     if (row.getTable().isCheckable()) {
-      if (row.isChecked()) {
-        iconId = Icons.CheckboxYes;
-      }
-      else {
-        iconId = Icons.CheckboxNo;
-      }
+      iconId = computeCheckboxIconId(row.isChecked());
     }
     else {
       iconId = row.getIconId();
+      IColumn<?> firstVisibleColumn = row.getTable().getColumnSet().getFirstVisibleColumn();
       if (iconId == null) {
-        iconId = row.getCell(0).getIconId();
+        iconId = row.getCell(firstVisibleColumn).getIconId();
+      }
+      if (iconId == null) {
+        if (isCheckBoxColumn(firstVisibleColumn)) {
+          IBooleanColumn booleanColumn = (IBooleanColumn) firstVisibleColumn;
+          iconId = computeCheckboxIconId(BooleanUtility.nvl(booleanColumn.getValue(row)));
+        }
       }
     }
 
@@ -326,6 +348,22 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
     else {
       return "<img width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+    }
+  }
+
+  /**
+   * @return true if the column should display a checkbox icon rather than a text
+   */
+  private boolean isCheckBoxColumn(IColumn<?> column) {
+    return column.getDataType() == Boolean.class && (!(column instanceof ISmartColumn) || ((ISmartColumn) column).getLookupCall() == null);
+  }
+
+  private String computeCheckboxIconId(boolean checked) {
+    if (checked) {
+      return Icons.CheckboxYes;
+    }
+    else {
+      return Icons.CheckboxNo;
     }
   }
 
@@ -387,7 +425,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
 
     String content = "";
     int col = 0;
-    for (IColumn column : m_cellDetailColumns) {
+    for (IColumn<?> column : m_cellDetailColumns) {
       String displayText = extractCellDisplayText(column, row);
 
       if (StringUtility.hasText(displayText)) {
@@ -445,7 +483,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return text.replaceAll("\\s", "&#160;");
   }
 
-  private String extractCellDisplayText(IColumn column, ITableRow row) {
+  private String extractCellDisplayText(IColumn<?> column, ITableRow row) {
     String displayText = column.getDisplayText(row);
 
     displayText = cleanupText(displayText);
@@ -453,7 +491,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return displayText;
   }
 
-  private String extractColumnHeader(IColumn column) {
+  private String extractColumnHeader(IColumn<?> column) {
     String header = column.getHeaderCell().getText();
 
     header = cleanupText(header);
@@ -464,7 +502,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   /**
    * Columns with a reasonable text don't need the header description.
    */
-  private boolean isHeaderDescriptionNeeded(ITableRow row, IColumn column) {
+  private boolean isHeaderDescriptionNeeded(ITableRow row, IColumn<?> column) {
     if (column instanceof ISmartColumn<?>) {
       return column.getValue(row) instanceof Boolean;
     }
