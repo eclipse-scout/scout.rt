@@ -55,6 +55,17 @@ public class TabForm extends AbstractForm {
 
         fieldList.addAll(Arrays.asList(m_tabGroupBox.getFields()));
       }
+
+      /**
+       * Returns the field id of the actual tab groupBox.<br>
+       * This is necessary to make the things work properly which rely on the fieldId.<br>
+       * One example is the formData import/export: It uses the fieldId to find the matching formField and also has to
+       * consider group boxes if template fields are used (see FindFieldByFormDataIdVisitor).
+       */
+      @Override
+      public String getFieldId() {
+        return m_tabGroupBox.getFieldId();
+      }
     }
 
     @Order(10)
