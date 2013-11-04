@@ -168,6 +168,12 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
+    List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormTransformationHooks(form.getClass());
+    if (hooks != null) {
+      for (IDeviceTransformationHook hook : hooks) {
+        hook.beforeFormTransformation(form);
+      }
+    }
 
     m_gridDataDirty = false;
 
@@ -271,6 +277,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected void transformFormField(IFormField field) {
+    List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormFieldTransformationHooks(field.getClass());
+    if (hooks != null) {
+      for (IDeviceTransformationHook hook : hooks) {
+        hook.beforeFormFieldTransformation(field);
+      }
+    }
+
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP, field)) {
       moveLabelToTop(field);
     }
