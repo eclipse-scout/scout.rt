@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowFormProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
 /**
@@ -24,6 +25,7 @@ public interface IMobileTable extends ITable {
   String PROP_PAGING_ENABLED = "pagingEnabled";
   String PROP_PAGE_SIZE = "pageSize";
   String PROP_PAGE_INDEX = "pageIndex";
+  String PROP_TABLE_ROW_FORM_PROVIDER = "tableRowFormProvider";
 
   String DRILL_DOWN_STYLE_NONE = IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
   String DRILL_DOWN_STYLE_ICON = IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
@@ -54,6 +56,10 @@ public interface IMobileTable extends ITable {
   int getPageIndex();
 
   int getPageCount();
+
+  ITableRowFormProvider getTableRowFormProvider();
+
+  void setTableRowFormProvider(ITableRowFormProvider provider);
 
   @Override
   IMobileTableUiFacade getUIFacade();

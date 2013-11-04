@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowFormProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
 /**
@@ -51,6 +52,9 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<ITable,
     if (getSender().hasProperty(IMobileTable.PROP_PAGE_INDEX)) {
       getReceiver().setPageIndex((Integer) getSender().getProperty(IMobileTable.PROP_PAGE_INDEX));
     }
+    if (getSender().hasProperty(IMobileTable.PROP_TABLE_ROW_FORM_PROVIDER)) {
+      getReceiver().setTableRowFormProvider((ITableRowFormProvider) getSender().getProperty(IMobileTable.PROP_TABLE_ROW_FORM_PROVIDER));
+    }
   }
 
   @Override
@@ -71,6 +75,9 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<ITable,
     }
     else if (name.equals(IMobileTable.PROP_PAGE_INDEX)) {
       getReceiver().setPageIndex((Integer) newValue);
+    }
+    else if (name.equals(IMobileTable.PROP_TABLE_ROW_FORM_PROVIDER)) {
+      getReceiver().setTableRowFormProvider((ITableRowFormProvider) newValue);
     }
   }
 }

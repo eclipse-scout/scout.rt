@@ -15,7 +15,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.DefaultTableRowFormProvider;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowForm;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowFormProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -47,6 +49,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     setPageSize(getConfiguredPageSize());
     setAutoCreateTableRowForm(execIsAutoCreateTableRowForm());
     setDefaultDrillDownStyle(execComputeDefaultDrillDownStyle());
+    setTableRowFormProvider(createTableRowFormProvider());
   }
 
   @Override
@@ -85,6 +88,16 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
       return 1;
     }
     return new Double(Math.ceil((double) getRowCount() / (double) getPageSize())).intValue();
+  }
+
+  @Override
+  public ITableRowFormProvider getTableRowFormProvider() {
+    return (ITableRowFormProvider) propertySupport.getProperty(PROP_TABLE_ROW_FORM_PROVIDER);
+  }
+
+  @Override
+  public void setTableRowFormProvider(ITableRowFormProvider provider) {
+    propertySupport.setProperty(PROP_TABLE_ROW_FORM_PROVIDER, provider);
   }
 
   @Override
@@ -129,6 +142,10 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
 
   public void setTableRowFormDisplayViewId(String tableRowFormDisplayViewId) {
     m_tableRowFormDisplayViewId = tableRowFormDisplayViewId;
+  }
+
+  protected ITableRowFormProvider createTableRowFormProvider() {
+    return new DefaultTableRowFormProvider();
   }
 
   @Override
@@ -196,6 +213,14 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     table.setProperty(IMobileTable.PROP_PAGE_INDEX, index);
   }
 
+  public static ITableRowFormProvider getTableRowFormProvider(ITable table) {
+    return (ITableRowFormProvider) table.getProperty(PROP_TABLE_ROW_FORM_PROVIDER);
+  }
+
+  public static void setTableRowFormProvider(ITable table, ITableRowFormProvider provider) {
+    table.setProperty(PROP_TABLE_ROW_FORM_PROVIDER, provider);
+  }
+
   protected boolean getConfiguredPagingEnabled() {
     return true;
   }
@@ -221,7 +246,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   protected void startTableRowForm(ITableRow row) throws ProcessingException {
-    TableRowForm form = new TableRowForm(row);
+    ITableRowForm form = getTableRowFormProvider().createTableRowForm(row);
     form.setDisplayHint(getTableRowFormDisplayHint());
     form.setDisplayViewId(getTableRowFormDisplayViewId());
     form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
