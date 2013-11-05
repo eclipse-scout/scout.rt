@@ -1031,7 +1031,7 @@ public class ColumnSet {
 
   private void checkMultiline() {
     if (m_table != null) {
-      if (!m_table.isInitialMultilineText() && !ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "getConfiguredMultilineText", null, this.getClass())) {
+      if (!m_table.isInitialMultilineText() && !ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "getConfiguredMultilineText", null, m_table.getClass())) {
         //do automatic check for wrapping columns
         boolean m = false;
         for (IColumn<?> col : getVisibleColumns()) {
