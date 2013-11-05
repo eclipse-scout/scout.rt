@@ -62,6 +62,19 @@ public final class HtmlTextUtility {
    *          preserved using &nbsp;.
    */
   public static String transformPlainTextToHtml(String plainText) {
+    return transformPlainTextToHtml(plainText, true);
+  }
+
+  /**
+   * @param plainText
+   *          is text not containing any html tags.
+   * @param replaceBreakableChars
+   *          defines if breakable characters (spaces and hyphens) should be replaced with non-breakable ones.
+   * @returns styled html text without "html", "head" and "body" tags. Newlines are replaced by br tags, spaces are
+   *          preserved using &nbsp;.
+   * @since 3.10.0-M3 (backported)
+   */
+  public static String transformPlainTextToHtml(String plainText, boolean replaceBreakableChars) {
     if (plainText == null) {
       return null;
     }
@@ -72,7 +85,10 @@ public final class HtmlTextUtility {
     s = s.replaceAll("[<]", "&lt;");
     s = s.replaceAll("[>]", "&gt;");
     s = s.replaceAll("[\\n]", "<br/>");
-    s = s.replaceAll("[\\s]", "&nbsp;");
+    if (replaceBreakableChars) {
+      s = s.replaceAll("[\\s]", "&nbsp;");
+      s = s.replaceAll("[-]", "&#8209;");
+    }
     return s;
   }
 
