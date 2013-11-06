@@ -248,7 +248,7 @@ public abstract class AbstractScheduler implements IScheduler {
   public Collection<ISchedulerJob> getRunningJobs(String groupId, String jobId) {
     synchronized (m_queueLock) {
       ArrayList<ISchedulerJob> jobs = new ArrayList<ISchedulerJob>();
-      for (ISchedulerJob job : m_availableJobs) {
+      for (ISchedulerJob job : m_runningJobs) {
         if (matches(job, groupId, jobId)) {
           jobs.add(job);
         }
