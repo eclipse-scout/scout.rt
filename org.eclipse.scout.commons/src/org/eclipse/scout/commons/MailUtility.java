@@ -37,6 +37,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -371,7 +372,7 @@ public final class MailUtility {
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   *
+   * 
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -380,7 +381,7 @@ public final class MailUtility {
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   *
+   * 
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -692,13 +693,17 @@ public final class MailUtility {
   }
 
   public static MimeMessage createMessageFromBytes(byte[] bytes) throws ProcessingException {
-    return instance.createMessageFromBytesImpl(bytes);
+    return createMessageFromBytes(bytes, null);
   }
 
-  private MimeMessage createMessageFromBytesImpl(byte[] bytes) throws ProcessingException {
+  public static MimeMessage createMessageFromBytes(byte[] bytes, Session session) throws ProcessingException {
+    return instance.createMessageFromBytesImpl(bytes, session);
+  }
+
+  private MimeMessage createMessageFromBytesImpl(byte[] bytes, Session session) throws ProcessingException {
     try {
       ByteArrayInputStream st = new ByteArrayInputStream(bytes);
-      return new MimeMessage(null, st);
+      return new MimeMessage(session, st);
     }
     catch (Throwable t) {
       throw new ProcessingException("Unexpected: ", t);
