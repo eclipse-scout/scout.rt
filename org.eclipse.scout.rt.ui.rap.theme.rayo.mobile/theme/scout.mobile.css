@@ -65,6 +65,7 @@ Widget-ToolTip {
   color:#4a4a4a;
   opacity:1;
   animation:fadeIn 200ms linear,fadeOut 600ms ease-out;
+  text-align:left;
 }
 
 Display {
