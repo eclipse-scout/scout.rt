@@ -360,14 +360,18 @@ public abstract class AbstractScheduler implements IScheduler {
       if (LOG.isInfoEnabled()) {
         LOG.info("scheduler started");
       }
+      TickSignal signal = m_ticker.waitForNextTick();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("tick " + signal);
+      }
       while (!isStopSignal()) {
         try {
           if (isActive()) {
-            TickSignal signal = m_ticker.waitForNextTick();
+            visitAllJobs(signal);
+            signal = m_ticker.waitForNextTick();
             if (LOG.isDebugEnabled()) {
               LOG.debug("tick " + signal);
             }
-            visitAllJobs(signal);
           }
           else {
             if (LOG.isDebugEnabled()) {
