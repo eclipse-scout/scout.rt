@@ -40,7 +40,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
 
   @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    ServerJob serverJob = new ServerJob("Scheduler", m_serverSession, m_subject) {
+    ServerJob serverJob = new ServerJob("Scheduler." + job.getGroupId() + "." + job.getJobId(), m_serverSession, m_subject) {
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
         job.run(Scheduler.this, signal);
@@ -55,5 +55,4 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
       throw new ProcessingException("Interrupted", ie);
     }
   }
-
 }

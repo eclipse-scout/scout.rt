@@ -14,6 +14,7 @@ import java.util.Calendar;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.testenvironment.TestEnvironmentServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
@@ -45,7 +46,20 @@ public class SchedulerTest {
     Assert.assertEquals("No running job left", 0, scheduler.getRunningJobs(null, null).size());
     Assert.assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getAllJobs().size());
     Assert.assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getJobCount());
+  }
+
+  @Test
+  public void testServerJobName() throws Throwable {
+    IScheduler scheduler = new Scheduler(new Subject(), TestEnvironmentServerSession.class, new Ticker(Calendar.SECOND));
+    scheduler.start();
+    JobAcceptTick job = new JobAcceptTick("groupId", "jobIdAccept");
+    TickSignal tick = scheduler.getTicker().waitForNextTick();
+    JobFinderThread jobFinderThread = new JobFinderThread();
+    jobFinderThread.start();
+    scheduler.handleJobExecution(job, tick);
     scheduler.stop();
+    jobFinderThread.join();
+    Assert.assertTrue("The 'Scheduler.groupId.jobIdAccept' Job wasn't found", jobFinderThread.foundJob());
   }
 }
 
@@ -81,5 +95,30 @@ class JobDontAcceptTick extends AbstractSchedulerJob {
   @Override
   public boolean acceptTick(TickSignal signal) {
     return false;
+  }
+}
+
+class JobFinderThread extends Thread {
+  private boolean m_foundJob = false;
+
+  boolean foundJob() {
+    return m_foundJob;
+  }
+
+  @Override
+  public void run() {
+    try {
+      Thread.sleep(500); //wait a little bit until JobAcceptTick is running
+    }
+    catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    Job[] allJobs = Job.getJobManager().find(null);
+
+    for (Job job : allJobs) {
+      if (job.getName().equals("Scheduler.groupId.jobIdAccept")) {
+        m_foundJob = true;
+      }
+    }
   }
 }
