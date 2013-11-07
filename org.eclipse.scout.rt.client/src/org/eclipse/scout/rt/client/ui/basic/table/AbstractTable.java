@@ -1458,8 +1458,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given {@link AbstractTableRowData}
-   * type.
+   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
+   * {@link AbstractTableRowData} type.
    * 
    * @param rowType
    * @return
@@ -2567,11 +2567,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     InternalTableRow newIRow = new InternalTableRow(this, newRow);
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
+      int newIndex = m_rows.size();
+      newIRow.setRowIndex(newIndex);
+      newIRow.setTableInternal(this);
+      m_rows.add(newIRow);
     }
-    int newIndex = m_rows.size();
-    newIRow.setRowIndex(newIndex);
-    newIRow.setTableInternal(this);
-    m_rows.add(newIRow);
     enqueueDecorationTasks(newIRow);
     return newIRow;
   }
@@ -2621,9 +2621,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (targetIndex != sourceIndex) {
       synchronized (m_cachedRowsLock) {
         m_cachedRows = null;
+        ITableRow row = m_rows.remove(sourceIndex);
+        m_rows.add(targetIndex, row);
       }
-      ITableRow row = m_rows.remove(sourceIndex);
-      m_rows.add(targetIndex, row);
       // update row indexes
       int min = Math.min(sourceIndex, targetIndex);
       int max = Math.max(sourceIndex, targetIndex);
@@ -2693,8 +2693,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //peformance quick-check
         if (rows == existingRows) {
           //remove all of them
-          m_rows.clear();
           synchronized (m_cachedRowsLock) {
+            m_rows.clear();
             m_cachedRows = null;
           }
           for (int i = deletedRows.length - 1; i >= 0; i--) {
@@ -2709,11 +2709,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             ITableRow candidateRow = deletedRows[i];
             if (candidateRow != null) {
               // delete regardless if index is right
-              boolean removed = m_rows.remove(candidateRow);
-              if (removed) {
-                synchronized (m_cachedRowsLock) {
+              boolean removed = false;
+              synchronized (m_cachedRowsLock) {
+                removed = m_rows.remove(candidateRow);
+                if (removed) {
                   m_cachedRows = null;
                 }
+              }
+              if (removed) {
                 deleteRowImpl(candidateRow);
               }
             }
