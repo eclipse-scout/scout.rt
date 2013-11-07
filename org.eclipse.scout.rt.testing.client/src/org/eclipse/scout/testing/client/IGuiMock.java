@@ -122,6 +122,7 @@ public interface IGuiMock {
     public int height;
     public boolean focus;
     public String text;
+    public boolean visible;
   }
 
   void initializeMock();

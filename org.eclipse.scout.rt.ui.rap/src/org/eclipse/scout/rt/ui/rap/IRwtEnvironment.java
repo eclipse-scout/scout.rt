@@ -87,7 +87,7 @@ public interface IRwtEnvironment {
   ScoutFormToolkit getFormToolkit();
 
   /**
-   * Called from scout job/thread to post an immediate swt job into the waiting queue.
+   * Called from scout job/thread to post an immediate rwt job into the waiting queue.
    * <p>
    * These jobs are run when calling {@link #dispatchImmediateUiJobs()}. Normally this kind of code is only used to
    * early apply visible and enabled properties in {@link RwtScoutFieldComposite#handleUiInputVerifier()} in order to
@@ -135,6 +135,12 @@ public interface IRwtEnvironment {
    * @see IKeyStrokeManager#removeKeyStrokes(Widget)
    */
   boolean removeKeyStrokes(Control control);
+
+  /**
+   * @see IKeyStrokeManager#hasKeyStroke(Widget, IRwtKeyStroke)
+   * @since 3.10.0-M3
+   */
+  boolean hasKeyStroke(Control control, IRwtKeyStroke stroke);
 
   /**
    * @return a font based on templateFont with style, name and size from scoutFont (if not null).

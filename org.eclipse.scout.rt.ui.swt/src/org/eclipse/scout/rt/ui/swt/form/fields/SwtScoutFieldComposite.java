@@ -111,9 +111,11 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
 
   protected void setVisibleFromScout(boolean b) {
     boolean updateLayout = false;
-    if (getSwtContainer() != null && getSwtContainer().getVisible() != b) {
-      updateLayout = true;
-      getSwtContainer().setVisible(b);
+    if (getSwtContainer() != null) {
+      if (getSwtContainer().getVisible() != b) {
+        updateLayout = true;
+        getSwtContainer().setVisible(b);
+      }
     }
     else if (getSwtField() != null && getSwtField().getVisible() != b) {
       updateLayout = true;

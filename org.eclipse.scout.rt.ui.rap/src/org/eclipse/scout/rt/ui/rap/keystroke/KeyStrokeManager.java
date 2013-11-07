@@ -191,6 +191,18 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   }
 
   @Override
+  public boolean hasKeyStroke(Control control, IRwtKeyStroke stroke) {
+    if (control != null && !control.isDisposed()) {
+      @SuppressWarnings("unchecked")
+      List<IRwtKeyStroke> keyStrokes = (List<IRwtKeyStroke>) control.getData(DATA_KEY_STROKES);
+      if (keyStrokes != null) {
+        return keyStrokes.contains(stroke);
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean removeKeyStrokes(Control control) {
     boolean retVal = false;
     if (control != null && !control.isDisposed()) {

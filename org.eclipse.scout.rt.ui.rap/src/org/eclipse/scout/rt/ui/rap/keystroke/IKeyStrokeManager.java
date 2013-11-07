@@ -69,4 +69,16 @@ public interface IKeyStrokeManager {
    * @return true if all the key strokes has been removed false otherwise
    */
   boolean removeKeyStrokes(Control control);
+
+  /**
+   * Commodity to check for an available key stroke on a control
+   * 
+   * @param control
+   *          the widget
+   * @param stroke
+   *          keystroke on the widget
+   * @return <code>true</code> if the key stroke is available, <code>false</code> otherwise
+   * @since 3.10.0-M3
+   */
+  boolean hasKeyStroke(Control control, IRwtKeyStroke stroke);
 }

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -452,8 +451,13 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     if (m_shiftTabKeyListener == null) {
       m_shiftTabKeyListener = new P_KeyListener(SWT.TAB, SWT.SHIFT);
     }
-    getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
-    getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
+
+    if (!getUiEnvironment().hasKeyStroke(getUiField(), m_tabKeyListener)) {
+      getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
+    }
+    if (!getUiEnvironment().hasKeyStroke(getUiField(), m_shiftTabKeyListener)) {
+      getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
+    }
   }
 
   protected void requestProposalSupportFromUi(String text, boolean selectCurrentValue, long initialDelay) {
@@ -519,13 +523,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       }
     }
     final String text = getUiField().getText();
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
-        result.setValue(b);
+        getScoutObject().getUIFacade().setTextFromUI(text);
       }
     };
     JobEx job = getUiEnvironment().invokeScoutLater(t, 0);

@@ -735,12 +735,16 @@ public class SwingMock implements IGuiMock {
     state.scoutName = getScoutNameOf(c);
     //focus
     state.focus = c.isFocusOwner();
+    // visibility
+    state.visible = c.isShowing();
     //bounds
-    Point p = c.getLocationOnScreen();
-    state.x = p.x;
-    state.y = p.y;
-    state.width = c.getWidth();
-    state.height = c.getHeight();
+    if (c.isShowing()) {
+      Point p = c.getLocationOnScreen();
+      state.x = p.x;
+      state.y = p.y;
+      state.width = c.getWidth();
+      state.height = c.getHeight();
+    }
     //text
     if (c instanceof JLabel) {
       state.text = ((JLabel) c).getText();
@@ -751,6 +755,7 @@ public class SwingMock implements IGuiMock {
     if (c instanceof AbstractButton) {
       state.text = ((AbstractButton) c).getText();
     }
+
     return state;
   }
 
