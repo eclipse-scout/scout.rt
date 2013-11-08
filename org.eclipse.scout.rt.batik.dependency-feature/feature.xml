@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.rt.core"
+      id="org.eclipse.scout.rt.batik.dependency"
       label="%featureName"
       version="3.10.0.qualifier"
       provider-name="%providerName">
@@ -22,117 +22,116 @@
       <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/luna"/>
    </url>
 
-   <includes
-         id="org.eclipse.scout.rt.batik.dependency"
-         version="0.0.0"/>
-
-   <requires>
-      <import plugin="javax.xml"/>
-      <import plugin="org.apache.xerces"/>
-      <import plugin="org.apache.xml.resolver"/>
-      <import plugin="org.apache.xml.serializer"/>
-      <import plugin="org.eclipse.equinox.http.servletbridge"/>
-      <import plugin="org.eclipse.equinox.servletbridge"/>
-      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
-   </requires>
-
    <plugin
-         id="org.eclipse.scout.commons"
+         id="org.apache.batik.bridge"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.http.servletfilter"
+         id="org.apache.batik.dom"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.net"
+         id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.server"
+         id="org.apache.batik.ext.awt"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.shared"
+         id="org.apache.batik.parser"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.service"
+         id="org.apache.batik.svggen"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.jdbc.derby"
+         id="org.apache.batik.swing"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201302011158"
          unpack="false"/>
 
    <plugin
-         id="org.apache.derby.jdbc_1091.fragment"
+         id="org.apache.batik.transcoder"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.jaxws216"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.shared.legacy.texts.fragment"
+         id="org.apache.batik.xml"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         fragment="true"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="javax.xml"
+         id="org.apache.batik.css"
          download-size="0"
          install-size="0"
-         version="1.3.4.v201005080400"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.apache.xerces"
+         id="org.apache.batik.util.gui"
          download-size="0"
          install-size="0"
-         version="2.9.0.v201101211617"
+         version="1.7.0.v200903091627"
          unpack="false"/>
 
    <plugin
-         id="org.apache.xml.resolver"
+         id="org.apache.batik.util"
          download-size="0"
          install-size="0"
-         version="1.2.0.v201005080400"
+         version="1.7.0.v201011041433"
          unpack="false"/>
 
    <plugin
-         id="org.apache.xml.serializer"
+         id="org.w3c.css.sac"
          download-size="0"
          install-size="0"
-         version="2.7.1.v201005080400"
+         version="1.3.1.v200903091627"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.smil"
+         download-size="0"
+         install-size="0"
+         version="1.0.1.v200903091627"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.svg"
+         download-size="0"
+         install-size="0"
+         version="1.1.0.v201011041433"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.events"
+         download-size="0"
+         install-size="0"
+         version="3.0.0.draft20060413_v201105210656"
          unpack="false"/>
 
 </feature>

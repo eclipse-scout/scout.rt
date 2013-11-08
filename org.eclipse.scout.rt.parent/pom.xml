@@ -61,6 +61,7 @@
     <module>../org.eclipse.scout.rt.feature.about</module>
     <module>../org.eclipse.scout.rt.core-feature</module>
     <module>../org.eclipse.scout.rt-feature</module>
+    <module>../org.eclipse.scout.rt.batik.dependency-feature</module>
   </modules>
 
   <profiles>
