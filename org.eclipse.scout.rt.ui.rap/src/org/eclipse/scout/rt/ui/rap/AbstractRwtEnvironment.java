@@ -679,6 +679,14 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     return m_keyStrokeManager.removeKeyStrokes(control);
   }
 
+  @Override
+  public boolean hasKeyStroke(Control control, IRwtKeyStroke stroke) {
+    if (m_keyStrokeManager == null) {
+      return false;
+    }
+    return m_keyStrokeManager.hasKeyStroke(control, stroke);
+  }
+
   /**
    * @return the keyStrokeManager
    */

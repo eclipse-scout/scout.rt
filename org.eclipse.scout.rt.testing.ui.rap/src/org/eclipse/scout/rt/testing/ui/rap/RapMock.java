@@ -877,6 +877,9 @@ public class RapMock implements IGuiMock {
     if (c instanceof Button) {
       state.text = ((Button) c).getText();
     }
+    // visibility
+    state.visible = c.isVisible();
+
     return state;
   }
 
