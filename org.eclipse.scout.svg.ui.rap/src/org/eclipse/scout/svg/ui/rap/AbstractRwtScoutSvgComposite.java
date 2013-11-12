@@ -42,9 +42,6 @@ import org.w3c.dom.svg.SVGDocument;
 public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends RwtScoutFieldComposite<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutSvgComposite.class);
 
-  /* because the scroll-bar layout of IE is different: add an offset to ensure the full svg element can be shown without scrollbars */
-  protected static final int SVG_ELEMENT_INNER_SPACE = 7;
-
   private static final String DOCUMENT_ENCODING = "UTF-8";
 
   private BrowserExtension m_browserExtension;
@@ -145,7 +142,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
       String svgText = getBrowserExtension().adaptLocalHyperlinks(getSvgContentFromDocument(doc));
 
       // bugfix for SVG fields to ensure all context menus are closed when the user clicks into the svg field
-      String contextMenuHideScript = "parent.parent.org.eclipse.rwt.MenuManager.getInstance().update(null, 'mousedown');";
+      String contextMenuHideScript = "parent.parent.rwt.widgets.util.MenuManager.getInstance().update(null, 'mousedown');";
 
       // bugfix so that the svg field inherits the color of the parent container. otherwise it is always defined white.
       String backgroundColorInheritScript = null;
@@ -163,7 +160,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
       }
 
       // set the html content to the browser
-      getUiField().setText("<html><body width=\"100%\" height=\"100%\" onload=\"" + backgroundColorInheritScript + "\" onclick=\"" + contextMenuHideScript + "\">" + svgText + "</body></html>");
+      getUiField().setText("<html><body style=\"overflow: hidden;\" width=\"100%\" height=\"100%\" onload=\"" + backgroundColorInheritScript + "\" onclick=\"" + contextMenuHideScript + "\">" + svgText + "</body></html>");
     }
     catch (Exception e) {
       LOG.error("preparing svg browser content", e);
@@ -173,7 +170,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
 
   protected Rectangle getAbsoluteBrowserBounds() {
     Point pt = getUiField().getDisplay().map(getUiField(), null, new Point(0, 0));
-    return new Rectangle(pt.x, pt.y, getUiField().getBounds().width - SVG_ELEMENT_INNER_SPACE, getUiField().getBounds().height);
+    return new Rectangle(pt.x, pt.y, getUiField().getBounds().width, getUiField().getBounds().height);
   }
 
   @Override
