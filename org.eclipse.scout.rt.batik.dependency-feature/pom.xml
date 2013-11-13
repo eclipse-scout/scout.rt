@@ -51,6 +51,11 @@
             <goals>
               <goal>source-feature</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <plugin id="org.w3c.dom.svg.fragment" />
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
