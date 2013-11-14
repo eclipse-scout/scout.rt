@@ -76,7 +76,7 @@ public final class UserAgentUtility {
     }
 
     ISession session = service.getCurrentSession();
-    if (service.getCurrentSession() == null) {
+    if (session == null) {
       LOG.warn("No session found! Returning default user agent object.");
       return UserAgent.createDefault();
     }

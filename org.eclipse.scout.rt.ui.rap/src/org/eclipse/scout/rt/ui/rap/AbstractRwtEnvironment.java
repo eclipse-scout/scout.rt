@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +23,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
@@ -34,7 +32,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
@@ -78,6 +75,7 @@ import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.servletfilter.LogoutFilter;
+import org.eclipse.scout.rt.ui.rap.servletfilter.LogoutHandler;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
@@ -290,13 +288,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   public void logout() {
-    HttpServletResponse response = RWT.getResponse();
-    String logoutUri = response.encodeRedirectURL(getLogoutLocation());
-    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
-    JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
-    if (executor != null) {
-      executor.execute(browserText);
-    }
+    createLogoutHandler().logout();
+  }
+
+  protected LogoutHandler createLogoutHandler() {
+    return new LogoutHandler();
   }
 
   @Override
