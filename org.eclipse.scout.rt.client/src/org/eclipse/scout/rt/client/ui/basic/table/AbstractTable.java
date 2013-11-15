@@ -1846,7 +1846,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       //
       updateRows(updatedRows);
       deleteRows(deletedRows);
-      addRows(insertedRows, false, insertedRowIndexes);
+      addRows(insertedRows, true, insertedRowIndexes);
     }
     finally {
       setTableChanging(false);
