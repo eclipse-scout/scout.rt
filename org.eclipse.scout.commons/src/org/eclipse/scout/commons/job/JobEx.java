@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -60,7 +61,7 @@ public abstract class JobEx extends Job {
     if (status == null) {
       status = m_statusOfRunNow;
     }
-    if (status != null && status.getException() != null) {
+    if (status != null && status.getSeverity() == Status.ERROR) {
       Throwable t = status.getException();
       if (t instanceof ProcessingException) {
         throw (ProcessingException) t;
