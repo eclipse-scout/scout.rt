@@ -102,6 +102,9 @@ public class ProcessingException extends Exception implements Serializable {
 
   @Override
   public String toString() {
+    if (m_status.getCause() == this) {
+      return "";
+    }
     return getClass().getSimpleName() + "[" + m_status.toString() + "]";
   }
 
