@@ -706,13 +706,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     setInitialAlwaysIncludeSortAtBegin(getConfiguredAlwaysIncludeSortAtBegin());
     setInitialAlwaysIncludeSortAtEnd(getConfiguredAlwaysIncludeSortAtEnd());
     //
-    double viewOrder = getConfiguredViewOrder();
-    if (viewOrder < 0) {
-      if (getClass().isAnnotationPresent(Order.class)) {
-        Order order = (Order) getClass().getAnnotation(Order.class);
-        viewOrder = order.value();
-      }
-    }
+    double viewOrder = calculateViewOrder();
     setViewOrder(viewOrder);
     //
     setWidth(getConfiguredWidth());
@@ -731,6 +725,27 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     if (getConfiguredFont() != null) {
       setFont(FontSpec.parse(getConfiguredFont()));
     }
+  }
+
+  /**
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
+   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * 
+   * @since 3.10.0-M4
+   */
+  protected double calculateViewOrder() {
+    double viewOrder = getConfiguredViewOrder();
+    Class<?> cls = getClass();
+    if (viewOrder < 0) {
+      while (cls != null && IColumn.class.isAssignableFrom(cls)) {
+        if (cls.isAnnotationPresent(Order.class)) {
+          Order order = (Order) cls.getAnnotation(Order.class);
+          return order.value();
+        }
+        cls = cls.getSuperclass();
+      }
+    }
+    return viewOrder;
   }
 
   /*

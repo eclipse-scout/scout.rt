@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -953,27 +954,31 @@ public class ColumnSet {
    * mapping int array functions
    */
   private void reorganizeIndexes() {
-    int n = getColumnCount();
-    int viewIndex;
-    TreeMap<CompositeObject, Integer> sortMap;
-    // displayable map
-    viewIndex = 0;
-    sortMap = new TreeMap<CompositeObject, Integer>();
-    for (int modelIndex = 0; modelIndex < n; modelIndex++) {
+    calculateDisplayableIndexes();
+    calculateVisibleIndexes();
+    calculateKeyIndexes();
+  }
+
+  private void calculateDisplayableIndexes() {
+    int viewIndex = 0;
+    Map<CompositeObject, Integer> displayableMap = new TreeMap<CompositeObject, Integer>();
+    for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable()) {
-        sortMap.put(new CompositeObject(modelIndex), modelIndex);
+        displayableMap.put(new CompositeObject(modelIndex), modelIndex);
       }
     }
-    m_displayableIndexes = new int[sortMap.size()];
+    m_displayableIndexes = new int[displayableMap.size()];
     viewIndex = 0;
-    for (int modelIndex : sortMap.values()) {
+    for (int modelIndex : displayableMap.values()) {
       m_displayableIndexes[viewIndex++] = modelIndex;
     }
-    // visible map
-    viewIndex = 0;
-    sortMap = new TreeMap<CompositeObject, Integer>();
-    for (int modelIndex = 0; modelIndex < n; modelIndex++) {
+  }
+
+  private void calculateVisibleIndexes() {
+    int viewIndex = 0;
+    Map<CompositeObject, Integer> visibleMap = new TreeMap<CompositeObject, Integer>();
+    for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable() && col.isVisible()) {
         double viewHint = col.getVisibleColumnIndexHint();
@@ -983,27 +988,27 @@ public class ColumnSet {
         if (viewHint < 0) {
           viewHint = viewIndex;
         }
-        sortMap.put(new CompositeObject(viewHint, viewIndex), modelIndex);
-        // next
+        visibleMap.put(new CompositeObject(viewHint, viewIndex), modelIndex);
         viewIndex++;
       }
     }
-    m_visibleIndexes = new int[sortMap.size()];
+    m_visibleIndexes = new int[visibleMap.size()];
     viewIndex = 0;
-    for (int modelIndex : sortMap.values()) {
+    for (int modelIndex : visibleMap.values()) {
       m_visibleIndexes[viewIndex++] = modelIndex;
     }
-    // key map
-    n = getColumnCount();
-    ArrayList<Integer> keyIndexes = new ArrayList<Integer>();
-    for (int modelIndex = 0; modelIndex < n; modelIndex++) {
+  }
+
+  private void calculateKeyIndexes() {
+    List<Integer> keyIndexes = new ArrayList<Integer>();
+    for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isPrimaryKey()) {
         keyIndexes.add(modelIndex);
       }
     }
     m_keyIndexes = new int[keyIndexes.size()];
-    viewIndex = 0;
+    int viewIndex = 0;
     for (int modelIndex : keyIndexes) {
       m_keyIndexes[viewIndex++] = modelIndex;
     }
