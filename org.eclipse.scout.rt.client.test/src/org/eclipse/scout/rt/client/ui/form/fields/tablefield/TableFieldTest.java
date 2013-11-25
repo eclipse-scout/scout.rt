@@ -20,7 +20,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.junit.Test;
 
@@ -93,6 +95,12 @@ public class TableFieldTest {
 
   private void assertRowCount(int expectedRowCount, P_TableField tableField) {
     assertEquals(expectedRowCount, tableField.getTable().getRowCount());
+  }
+
+  private void assertRowStates(int rowState, P_TableField tableField) {
+    assertEquals(rowState, tableField.getTable().getRow(0).getStatus());
+    assertEquals(rowState, tableField.getTable().getRow(1).getStatus());
+    assertEquals(rowState, tableField.getTable().getRow(2).getStatus());
   }
 
   @Test
@@ -256,6 +264,171 @@ public class TableFieldTest {
     return tableData;
   }
 
+  private P_TableBean createTableBeanData(boolean r1_value, boolean r2_value, boolean r3_value, int state) {
+    P_TableBean tableData = new P_TableBean();
+    org.eclipse.scout.rt.client.ui.form.fields.tablefield.TableFieldTest.P_TableBean.TableBeanRowData row = tableData.addRow();
+    row.setRowState(state);
+    row.setKey(1);
+    row.setString("Lorem");
+    row.setHidden(r1_value);
+
+    org.eclipse.scout.rt.client.ui.form.fields.tablefield.TableFieldTest.P_TableBean.TableBeanRowData row2 = tableData.addRow();
+    row2.setRowState(state);
+    row2.setKey(2);
+    row2.setString("Ipsu,");
+    row2.setHidden(r2_value);
+
+    org.eclipse.scout.rt.client.ui.form.fields.tablefield.TableFieldTest.P_TableBean.TableBeanRowData row3 = tableData.addRow();
+    row3.setRowState(state);
+    row3.setKey(3);
+    row3.setString("Dolor");
+    row3.setHidden(r3_value);
+
+    return tableData;
+  }
+
+  @Test
+  public void testImportFormFieldDataWithAllRowStates() throws Exception {
+    P_TableField tableField1 = createTableField(false);
+    runImportFormFieldDataWithAllRowStates(tableField1);
+
+    P_TableField tableField2 = createTableField(true);
+    runImportFormFieldDataWithAllRowStates(tableField2);
+
+    P_TableField tableField3 = createTableField(false);
+    runImportFormFieldBeanDataWithAllRowStates(tableField3);
+
+    P_TableField tableField4 = createTableField(true);
+    runImportFormFieldBeanDataWithAllRowStates(tableField4);
+
+  }
+
+  private void runImportFormFieldDataWithAllRowStates(P_TableField tableField) throws ProcessingException {
+    P_Table tableData1 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    tableField.importFormFieldData(tableData1, false);
+
+    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData2 = createTableData(true, false, false, ITableHolder.STATUS_UPDATED);
+    tableField.importFormFieldData(tableData2, false);
+
+    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData3 = createTableData(true, false, false, ITableHolder.STATUS_INSERTED);
+    tableField.importFormFieldData(tableData3, false);
+
+    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData4 = createTableData(true, false, false, ITableHolder.STATUS_DELETED);
+    tableField.importFormFieldData(tableData4, false);
+
+    assertEquals(0, tableField.getTable().getRowCount());
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData5 = createTableData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    tableField.importFormFieldData(tableData5, true);
+
+    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData6 = createTableData(true, false, false, ITableHolder.STATUS_UPDATED);
+    tableField.importFormFieldData(tableData6, true);
+
+    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData7 = createTableData(true, false, false, ITableHolder.STATUS_INSERTED);
+    tableField.importFormFieldData(tableData7, true);
+
+    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_Table tableData8 = createTableData(true, false, false, ITableHolder.STATUS_DELETED);
+    tableField.importFormFieldData(tableData8, false);
+
+    assertEquals(0, tableField.getTable().getRowCount());
+  }
+
+  private void runImportFormFieldBeanDataWithAllRowStates(P_TableField tableField) throws ProcessingException {
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    tableField.importFormFieldData(tableData1, false);
+
+    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    tableField.importFormFieldData(tableData2, false);
+
+    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData3 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    tableField.importFormFieldData(tableData3, false);
+
+    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData4 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    tableField.importFormFieldData(tableData4, false);
+
+    assertEquals(0, tableField.getTable().getRowCount());
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData5 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    tableField.importFormFieldData(tableData5, true);
+
+    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData6 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    tableField.importFormFieldData(tableData6, true);
+
+    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData7 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    tableField.importFormFieldData(tableData7, true);
+
+    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+
+    tableField.getTable().deleteAllRows();
+    tableField.getTable().discardAllDeletedRows();
+    tableField.getTable().discardAllRows();
+    P_TableBean tableData8 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    tableField.importFormFieldData(tableData8, false);
+
+    assertEquals(0, tableField.getTable().getRowCount());
+  }
+
   private static class P_TableField extends AbstractTableField<P_TableField.Table> {
 
     private final boolean m_configuredDiplayable;
@@ -385,4 +558,85 @@ public class TableFieldTest {
     }
   }
 
+  /**
+   * Corresponding part as TableFieldBeanData of the formData:
+   */
+  private static class P_TableBean extends AbstractTableFieldBeanData {
+    private static final long serialVersionUID = 1L;
+
+    public P_TableBean() {
+    }
+
+    @Override
+    public TableBeanRowData addRow() {
+      return (TableBeanRowData) super.addRow();
+    }
+
+    @Override
+    public TableBeanRowData addRow(int rowState) {
+      return (TableBeanRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public TableBeanRowData createRow() {
+      return new TableBeanRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return TableBeanRowData.class;
+    }
+
+    @Override
+    public TableBeanRowData[] getRows() {
+      return (TableBeanRowData[]) super.getRows();
+    }
+
+    @Override
+    public TableBeanRowData rowAt(int index) {
+      return (TableBeanRowData) super.rowAt(index);
+    }
+
+    public void setRows(TableBeanRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class TableBeanRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String key = "key";
+      public static final String string = "string";
+      public static final String hidden = "hidden";
+      private Integer m_key;
+      private String m_string;
+      private Boolean m_hidden;
+
+      public TableBeanRowData() {
+      }
+
+      public Integer getKey() {
+        return m_key;
+      }
+
+      public void setKey(Integer key) {
+        m_key = key;
+      }
+
+      public String getString() {
+        return m_string;
+      }
+
+      public void setString(String string) {
+        m_string = string;
+      }
+
+      public Boolean getHidden() {
+        return m_hidden;
+      }
+
+      public void setHidden(Boolean hidden) {
+        m_hidden = hidden;
+      }
+    }
+  }
 }
