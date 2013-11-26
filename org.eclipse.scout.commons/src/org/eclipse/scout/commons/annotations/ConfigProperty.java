@@ -28,7 +28,10 @@ public @interface ConfigProperty {
    * Double
    */
   String DOUBLE = "DOUBLE";
-
+  /**
+   * BigDecimal
+   */
+  String BIG_DECIMAL = "BIG_DECIMAL";
   /**
    * String
    */
@@ -41,6 +44,10 @@ public @interface ConfigProperty {
    * Long
    */
   String LONG = "LONG";
+  /**
+   * BigInteger
+   */
+  String BIG_INTEGER = "BIG_INTEGER";
   /**
    * Plain-String
    */
@@ -200,4 +207,8 @@ public @interface ConfigProperty {
    * Border decoration enumeration according to the BORDER_DECORATION_* constants
    */
   String BORDER_DECORATION = "BORDER_DECORATION";
+  /**
+   * int
+   */
+  String ROUNDING_MODE = "ROUNDING_MODE";
 }

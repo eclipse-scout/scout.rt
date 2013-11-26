@@ -17,7 +17,11 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 public final class NumberUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NumberUtility.class);
   private static final Random RANDOMIZER = new Random();
 
   private NumberUtility() {
@@ -48,6 +52,26 @@ public final class NumberUtility {
       return null;
     }
     return n.longValue();
+  }
+
+  /**
+   * Converts a Number into a BigDecimal. If <code>number</code> is not a valid representation of a BigDecimal this
+   * method returns <code>null</code>.
+   * 
+   * @param number
+   */
+  public static BigDecimal numberToBigDecimal(Number number) {
+    if (number == null) {
+      return null;
+    }
+    BigDecimal retVal = null;
+    try {
+      retVal = new BigDecimal(number.toString());
+    }
+    catch (NumberFormatException e) {
+      LOG.warn("converting to BigDecimal failed for Number: " + number.toString());
+    }
+    return retVal;
   }
 
   public static BigDecimal toBigDecimal(Double d) {

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.ParsePosition;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger> implements IBigIntegerField {
@@ -36,43 +35,31 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   /*
    * Configuration
    */
-  @ConfigProperty(ConfigProperty.LONG)
+  @ConfigProperty(ConfigProperty.BIG_INTEGER)
   @Order(250)
   @ValidationRule(ValidationRule.MIN_VALUE)
-  protected Long getConfiguredMinValue() {
-    return null;
-  }
-
-  @ConfigProperty(ConfigProperty.LONG)
-  @Order(260)
-  @ValidationRule(ValidationRule.MAX_VALUE)
-  protected Long getConfiguredMaxValue() {
-    return null;
+  @Override
+  protected BigInteger getConfiguredMinValue() {
+    return new BigInteger("-999999999999999999999999999999999999999999999999999999999999");
   }
 
   @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMinValue(getConfiguredMinValue() != null ? BigInteger.valueOf(getConfiguredMinValue()) : null);
-    setMaxValue(getConfiguredMaxValue() != null ? BigInteger.valueOf(getConfiguredMaxValue()) : null);
+  @ConfigProperty(ConfigProperty.BIG_INTEGER)
+  @Order(260)
+  @ValidationRule(ValidationRule.MAX_VALUE)
+  protected BigInteger getConfiguredMaxValue() {
+    return new BigInteger("999999999999999999999999999999999999999999999999999999999999");
   }
 
+  /**
+   * uses {@link #parseToBigDecimalInternal(String)} to parse text and returns the result as BigInteger
+   */
   @Override
   protected BigInteger parseValueInternal(String text) throws ProcessingException {
     BigInteger retVal = null;
-    if (text == null) {
-      text = "";
-    }
-    else {
-      text = text.trim();
-    }
-    if (text.length() > 0) {
-      ParsePosition p = new ParsePosition(0);
-      Number n = createNumberFormat().parse(text, p);
-      if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
-      }
-      retVal = new BigInteger("" + n.toString());
+    BigDecimal parsedVal = parseToBigDecimalInternal(text);
+    if (parsedVal != null) {
+      retVal = parsedVal.toBigIntegerExact();
     }
     return retVal;
   }

@@ -40,7 +40,6 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     style |= RwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
     Text text = new StyledTextEx(container, style);
-    text.setTextLimit(32);
     attachFocusListener(text, true);
     //
     setUiContainer(container);

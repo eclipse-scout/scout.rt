@@ -40,7 +40,6 @@ public class RwtScoutDecimalField extends RwtScoutBasicFieldComposite<IDecimalFi
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     StyledText text = new StyledTextEx(container, style);
-    text.setTextLimit(32);
     attachFocusListener(text, true);
     //
     setUiContainer(container);

@@ -38,7 +38,6 @@ public class SwtScoutDecimalField extends SwtScoutBasicFieldComposite<IDecimalFi
     style |= SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
 
     Text text = getEnvironment().getFormToolkit().createText(container, style);
-    text.setTextLimit(32);
     //
     setSwtContainer(container);
     setSwtLabel(label);

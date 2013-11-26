@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
+import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberFieldUIFacade;
 
 /**
  * @Deprecated Use {@link IBasicFieldUIFacade} instead
  *             Will be removed with the M-Release
  */
+@SuppressWarnings("deprecation")
 @Deprecated
-public interface IDecimalFieldUIFacade extends IBasicFieldUIFacade {
+public interface IDecimalFieldUIFacade extends INumberFieldUIFacade {
 }

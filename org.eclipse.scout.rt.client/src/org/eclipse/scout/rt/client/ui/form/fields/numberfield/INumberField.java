@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 
@@ -21,6 +24,24 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
  */
 public interface INumberField<T extends Number> extends IBasicField<T> {
 
+  // Rounding Modes
+  /** corresponds to {@link BigDecimal#ROUND_UP} */
+  int ROUND_UP = BigDecimal.ROUND_UP;
+  /** corresponds to {@link BigDecimal#ROUND_DOWN} */
+  int ROUND_DOWN = BigDecimal.ROUND_DOWN;
+  /** corresponds to {@link BigDecimal#ROUND_CEILING} */
+  int ROUND_CEILING = BigDecimal.ROUND_CEILING;
+  /** corresponds to {@link BigDecimal#ROUND_FLOOR} */
+  int ROUND_FLOOR = BigDecimal.ROUND_FLOOR;
+  /** corresponds to {@link BigDecimal#ROUND_HALF_UP} */
+  int ROUND_HALF_UP = BigDecimal.ROUND_HALF_UP;
+  /** corresponds to {@link BigDecimal#ROUND_HALF_DOWN} */
+  int ROUND_HALF_DOWN = BigDecimal.ROUND_HALF_DOWN;
+  /** corresponds to {@link BigDecimal#ROUND_HALF_EVEN} */
+  int ROUND_HALF_EVEN = BigDecimal.ROUND_HALF_EVEN;
+  /** corresponds to {@link BigDecimal#ROUND_UNNECESSARY} */
+  int ROUND_UNNECESSARY = BigDecimal.ROUND_UNNECESSARY;
+
   void setFormat(String s);
 
   String getFormat();
@@ -29,13 +50,30 @@ public interface INumberField<T extends Number> extends IBasicField<T> {
 
   boolean isGroupingUsed();
 
+  /**
+   * Set the minimum value for this field. Value <code>null</code> means no limitation if supported by generic type else
+   * the smallest possible value for the type.
+   */
   void setMinValue(T value);
 
   T getMinValue();
 
+  /**
+   * Set the maximum value for this field. Value <code>null</code> means no limitation if supported by generic type else
+   * the biggest possible value for the type.
+   */
   void setMaxValue(T value);
 
   T getMaxValue();
+
+  /**
+   * set the rounding mode used for formatting and parsing
+   * 
+   * @param roundingMode
+   */
+  void setRoundingMode(RoundingMode roundingMode);
+
+  RoundingMode getRoundingMode();
 
   /**
    * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.

@@ -11,19 +11,13 @@
 package org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal> implements IBigDecimalField {
@@ -40,65 +34,28 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   /*
    * Configuration
    */
-  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Override
+  @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(300)
   @ValidationRule(ValidationRule.MIN_VALUE)
-  protected Double getConfiguredMinValue() {
-    return null;
+  protected BigDecimal getConfiguredMinValue() {
+    return new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
   }
 
-  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Override
+  @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(310)
   @ValidationRule(ValidationRule.MAX_VALUE)
-  protected Double getConfiguredMaxValue() {
-    return null;
+  protected BigDecimal getConfiguredMaxValue() {
+    return new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
   }
 
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMinValue(getConfiguredMinValue() != null ? BigDecimal.valueOf(getConfiguredMinValue()) : null);
-    setMaxValue(getConfiguredMaxValue() != null ? BigDecimal.valueOf(getConfiguredMaxValue()) : null);
-  }
-
-  // convert string to a real long
+  /**
+   * uses {@link #parseToBigDecimalInternal(String)} to parse text
+   */
   @Override
   protected BigDecimal parseValueInternal(String text) throws ProcessingException {
-    BigDecimal retVal = null;
-    if (text == null) {
-      text = "";
-    }
-    else {
-      text = text.trim();
-    }
-    if (text.length() > 0) {
-      NumberFormat numberFormat = createNumberFormat();
-      if (isPercent()) {
-        if (text.endsWith("%")) {
-          text = StringUtility.trim(text.substring(0, text.length() - 1));
-        }
-        String suffix = "%";
-        if (numberFormat instanceof DecimalFormat) {
-          suffix = ((DecimalFormat) numberFormat).getPositiveSuffix();
-        }
-        text = StringUtility.concatenateTokens(text, suffix);
-      }
-      ParsePosition p = new ParsePosition(0);
-      Number n = numberFormat.parse(text, p);
-      if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
-      }
-      NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
-      /* add/preserve fraction digits for multiplier */
-      int npc = ("" + Math.abs(getMultiplier())).length() - 1;
-      fmt.setMaximumFractionDigits(getFractionDigits() + npc);
-      p = new ParsePosition(0);
-      String fmtText = fmt.format(n.doubleValue());
-      retVal = BigDecimal.valueOf(fmt.parse(fmtText, p).doubleValue());
-      if (p.getErrorIndex() >= 0 || p.getIndex() != fmtText.length()) {
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", fmtText));
-      }
-    }
-    return retVal;
+    return parseToBigDecimalInternal(text);
   }
+
 }

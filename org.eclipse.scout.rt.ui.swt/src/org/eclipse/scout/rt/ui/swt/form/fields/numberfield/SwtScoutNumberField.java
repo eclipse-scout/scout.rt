@@ -37,7 +37,6 @@ public class SwtScoutNumberField extends SwtScoutBasicFieldComposite<INumberFiel
     style |= SwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
     Text text = getEnvironment().getFormToolkit().createText(container, style);
-    text.setTextLimit(32);
     //
     setSwtContainer(container);
     setSwtLabel(label);

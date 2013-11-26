@@ -12,14 +12,12 @@ package org.eclipse.scout.rt.ui.swing.form.fields.numberfield;
 
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
-import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
@@ -36,9 +34,6 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     container.add(label);
     JTextFieldEx textField = new JTextFieldEx();
     Document doc = textField.getDocument();
-    if (doc instanceof AbstractDocument) {
-      ((AbstractDocument) doc).setDocumentFilter(new BasicDocumentFilter(60));
-    }
     addInputListenersForBasicField(textField, doc);
     //
     container.add(textField);

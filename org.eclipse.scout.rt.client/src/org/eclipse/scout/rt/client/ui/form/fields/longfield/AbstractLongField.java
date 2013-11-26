@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.longfield;
 
-import java.text.ParsePosition;
+import java.math.BigDecimal;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractLongField extends AbstractNumberField<Long> implements ILongField {
@@ -35,18 +34,42 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   /*
    * Configuration
    */
+  /**
+   * @deprecated Will be removed with scout 3.11, use {@link #getConfiguredMinValue()}.<br>
+   *             As long as this deprecated version is overridden in subclasses. This setting wins over
+   *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
+   */
+  @Deprecated
+  @ValidationRule(ValidationRule.MIN_VALUE)
+  protected Long getConfiguredMinimumValue() {
+    return getConfiguredMinValue();
+  }
+
+  /**
+   * @deprecated Will be removed with scout 3.11, use {@link #getConfiguredMaxValue()}.<br>
+   *             As long as this deprecated version is overridden in subclasses. This setting wins over
+   *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
+   */
+  @Deprecated
+  @ValidationRule(ValidationRule.MAX_VALUE)
+  protected Long getConfiguredMaximumValue() {
+    return getConfiguredMaxValue();
+  }
+
+  @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(250)
   @ValidationRule(ValidationRule.MIN_VALUE)
-  protected Long getConfiguredMinimumValue() {
-    return null;
+  protected Long getConfiguredMinValue() {
+    return Long.MIN_VALUE;
   }
 
+  @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(260)
   @ValidationRule(ValidationRule.MAX_VALUE)
-  protected Long getConfiguredMaximumValue() {
-    return null;
+  protected Long getConfiguredMaxValue() {
+    return Long.MAX_VALUE;
   }
 
   @Override
@@ -56,22 +79,31 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
     setMaxValue(getConfiguredMaximumValue());
   }
 
+  /**
+   * Set the minimum value for this field. If value is <code>null</code>, it is replaced by Long.MIN_VALUE.
+   */
+  @Override
+  public void setMinValue(Long value) {
+    super.setMinValue(value == null ? Long.MIN_VALUE : value);
+  }
+
+  /**
+   * Set the maximum value for this field. If value is <code>null</code>, it is replaced by Long.MAX_VALUE.
+   */
+  @Override
+  public void setMaxValue(Long value) {
+    super.setMaxValue(value == null ? Long.MAX_VALUE : value);
+  }
+
+  /**
+   * uses {@link #parseToBigDecimalInternal(String)} to parse text and returns the result as Long
+   */
   @Override
   protected Long parseValueInternal(String text) throws ProcessingException {
     Long retVal = null;
-    if (text == null) {
-      text = "";
-    }
-    else {
-      text = text.trim();
-    }
-    if (text.length() > 0) {
-      ParsePosition p = new ParsePosition(0);
-      Number n = createNumberFormat().parse(text, p);
-      if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
-      }
-      retVal = new Long(n.longValue());
+    BigDecimal parsedVal = parseToBigDecimalInternal(text);
+    if (parsedVal != null) {
+      retVal = Long.valueOf(parsedVal.longValueExact());
     }
     return retVal;
   }

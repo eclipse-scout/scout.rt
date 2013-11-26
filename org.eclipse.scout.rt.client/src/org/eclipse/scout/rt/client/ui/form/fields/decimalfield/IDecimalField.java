@@ -10,17 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
+import java.text.DecimalFormat;
+
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 
 /**
  * Field type representing a fractional, decimal number such as Float, Double,
  * BigDecimal
  */
-public interface IDecimalField<T extends Number> extends IBasicField<T> {
-
-  void setFormat(String s);
-
-  String getFormat();
+@SuppressWarnings("deprecation")
+public interface IDecimalField<T extends Number> extends INumberField<T> {
 
   void setMinFractionDigits(int i);
 
@@ -30,10 +31,11 @@ public interface IDecimalField<T extends Number> extends IBasicField<T> {
 
   int getMaxFractionDigits();
 
-  void setGroupingUsed(boolean b);
-
-  boolean isGroupingUsed();
-
+  /**
+   * When set to true, a percentage format (depending on {@link LocaleThreadLocal#get()}) is used for parsing and
+   * formatting.<br>
+   * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}
+   */
   void setPercent(boolean b);
 
   boolean isPercent();
@@ -42,15 +44,12 @@ public interface IDecimalField<T extends Number> extends IBasicField<T> {
 
   int getFractionDigits();
 
-  void setMinValue(T d);
-
-  T getMinValue();
-
-  void setMaxValue(T d);
-
-  T getMaxValue();
-
-  void setMultiplier(int b);
+  /**
+   * Sets multiplier for parsing and formatting. Corresponds to {@link DecimalFormat#setMultiplier(int)}<br>
+   * <b>Note:</b> For correct behavior the {@link IDecimalField} default implementations expect the multiplier to be a
+   * power of ten.
+   */
+  void setMultiplier(int i);
 
   int getMultiplier();
 
@@ -58,7 +57,6 @@ public interface IDecimalField<T extends Number> extends IBasicField<T> {
    * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
    *             Will be removed with the M-Release
    */
-  @SuppressWarnings("deprecation")
   @Override
   @Deprecated
   IDecimalFieldUIFacade getUIFacade();
