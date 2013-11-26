@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -23,6 +24,7 @@ import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -704,7 +706,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /**
    * load table data
    */
-  private void loadTableDataImpl() throws ProcessingException {
+  protected void loadTableDataImpl() throws ProcessingException {
     if (m_table != null) {
       try {
         m_table.setTableChanging(true);
@@ -726,7 +728,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("SearchWasCanceled"), ProcessingStatus.CANCEL));
         }
         else {
-          setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("ErrorWhileLoadingData"), ProcessingStatus.CANCEL));
+          String message = null;
+          if (pe instanceof VetoException) {
+            message = pe.getMessage();
+          }
+          if (StringUtility.isNullOrEmpty(message)) {
+            message = ScoutTexts.get("ErrorWhileLoadingData");
+          }
+          setPagePopulateStatus(new ProcessingStatus(message, ProcessingStatus.CANCEL));
         }
         throw pe;
       }
