@@ -327,7 +327,7 @@
               value="250">
         </property>
         <property
-              name="color.forground.disabled"
+              name="color.foreground.disabled"
               value="2A5A76">
         </property>
         <property

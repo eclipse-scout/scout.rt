@@ -102,7 +102,7 @@ If no value is specified the properties are valid for all device types.
                <restriction base="string">
                   <enumeration value="browserHistory.enabled">
                   </enumeration>
-                  <enumeration value="color.forground.disabled">
+                  <enumeration value="color.foreground.disabled">
                   </enumeration>
                   <enumeration value="dialog.minWidth">
                   </enumeration>
