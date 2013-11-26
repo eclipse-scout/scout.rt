@@ -23,8 +23,18 @@ public final class Base64Utility {
   private Base64Utility() {
   }
 
-  private static final String ALPHABET =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  private static final char[] BYTE_TO_CHAR;
+  private static final int[] CHAR_TO_BYTE;
+
+  static {
+    BYTE_TO_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
+
+    int[] charToByte = new int[128];
+    for (int i = 0; i < BYTE_TO_CHAR.length; i++) {
+      charToByte[(int) BYTE_TO_CHAR[i]] = i;
+    }
+    CHAR_TO_BYTE = charToByte;
+  }
 
   /**
    * Base-64 encodes the supplied block of data. Line wrapping is not applied on
@@ -39,8 +49,7 @@ public final class Base64Utility {
     if (length == 0) {
       return "";
     }
-    StringBuffer buffer =
-        new StringBuffer((int) Math.ceil(length / 3d) * 4);
+    StringBuilder buffer = new StringBuilder((int) Math.ceil(length / 3d) * 4);
     int remainder = length % 3;
     length -= remainder;
     int block;
@@ -48,25 +57,25 @@ public final class Base64Utility {
     while (i < length) {
       block = ((bytes[i++] & 0xff) << 16) | ((bytes[i++] & 0xff) << 8) |
           (bytes[i++] & 0xff);
-      buffer.append(ALPHABET.charAt(block >>> 18));
-      buffer.append(ALPHABET.charAt((block >>> 12) & 0x3f));
-      buffer.append(ALPHABET.charAt((block >>> 6) & 0x3f));
-      buffer.append(ALPHABET.charAt(block & 0x3f));
+      buffer.append(BYTE_TO_CHAR[block >>> 18]);
+      buffer.append(BYTE_TO_CHAR[(block >>> 12) & 0x3f]);
+      buffer.append(BYTE_TO_CHAR[(block >>> 6) & 0x3f]);
+      buffer.append(BYTE_TO_CHAR[block & 0x3f]);
     }
     if (remainder == 0) {
       return buffer.toString();
     }
     if (remainder == 1) {
       block = (bytes[i] & 0xff) << 4;
-      buffer.append(ALPHABET.charAt(block >>> 6));
-      buffer.append(ALPHABET.charAt(block & 0x3f));
+      buffer.append(BYTE_TO_CHAR[block >>> 6]);
+      buffer.append(BYTE_TO_CHAR[block & 0x3f]);
       buffer.append("==");
       return buffer.toString();
     }
     block = (((bytes[i++] & 0xff) << 8) | ((bytes[i]) & 0xff)) << 2;
-    buffer.append(ALPHABET.charAt(block >>> 12));
-    buffer.append(ALPHABET.charAt((block >>> 6) & 0x3f));
-    buffer.append(ALPHABET.charAt(block & 0x3f));
+    buffer.append(BYTE_TO_CHAR[block >>> 12]);
+    buffer.append(BYTE_TO_CHAR[(block >>> 6) & 0x3f]);
+    buffer.append(BYTE_TO_CHAR[block & 0x3f]);
     buffer.append("=");
     return buffer.toString();
   }
@@ -94,10 +103,10 @@ public final class Base64Utility {
       c4 = is.read();
       while (c1 >= 0 || c2 >= 0 || c3 >= 0 || c4 >= 0) {
         int block;
-        block = (ALPHABET.indexOf((char) c1) & 0xff) << 18 |
-            (ALPHABET.indexOf((char) c2) & 0xff) << 12 |
-            (ALPHABET.indexOf((char) c3) & 0xff) << 6 |
-            (ALPHABET.indexOf((char) c4) & 0xff);
+        block = ((c1 != -1 ? CHAR_TO_BYTE[c1] : -1) & 0xff) << 18 |
+            ((c2 != -1 ? CHAR_TO_BYTE[c2] : -1) & 0xff) << 12 |
+            ((c3 != -1 ? CHAR_TO_BYTE[c3] : -1) & 0xff) << 6 |
+            ((c4 != -1 ? CHAR_TO_BYTE[c4] : -1) & 0xff);
         buffer.write((byte) (block >>> 16));
         if (c3 != -1) {
           buffer.write((byte) ((block >>> 8) & 0xff));
@@ -114,6 +123,16 @@ public final class Base64Utility {
     catch (IOException e) {
       LOG.error("IOException in Base64Utility.decode()", e);
       return new byte[0];
+    }
+    finally {
+      try {
+        if (is != null) {
+          is.close();
+        }
+      }
+      catch (IOException e) {
+        LOG.warn("P_Base64InputStream couldn't be closed.", e);
+      }
     }
     return buffer.toByteArray();
   }
