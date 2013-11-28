@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -22,6 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.internal.service.ContextProvider;
+import org.eclipse.rap.rwt.internal.service.ServiceManagerImpl;
+import org.eclipse.rap.rwt.internal.service.UISessionImpl;
+import org.eclipse.rap.rwt.internal.service.UrlParameters;
 import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -67,8 +73,36 @@ public class RwtScoutDownloadHandler implements ServiceHandler {
   }
 
   protected String getURL() {
-    String url = RWT.getServiceManager().getServiceHandlerUrl(m_requestId);
-    String encodedURL = RWT.getResponse().encodeURL(url);
+    /* inline implementation of RWT.getServiceManager().getServiceHandlerUrl(m_requestId) and remove the following 3 lines:
+     *  HttpServletRequest request = ContextProvider.getRequest();
+     *  url.append( request.getContextPath() );
+     *  url.append( request.getServletPath() );
+     * since setting context and servlet path are wrong if the server is behind a (reverse) proxy.
+     * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=388915 for more details.
+     */
+
+    // >> inlined implementation start
+    StringBuilder url = new StringBuilder();
+    url.append("?");
+    url.append(ServiceManagerImpl.REQUEST_PARAM);
+    url.append("=");
+    try {
+      url.append(URLEncoder.encode(m_requestId, "UTF-8").replace("+", "%20"));
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    String connectionId = ((UISessionImpl) ContextProvider.getUISession()).getConnectionId();
+    if (connectionId != null) {
+      url.append('&');
+      url.append(UrlParameters.PARAM_CONNECTION_ID);
+      url.append('=');
+      url.append(connectionId);
+    }
+    String decodedURL = ContextProvider.getResponse().encodeURL(url.toString());
+    // << inlined implementation end
+
+    String encodedURL = RWT.getResponse().encodeURL(decodedURL);
     return encodedURL;
   }
 
