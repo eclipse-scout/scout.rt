@@ -36,7 +36,6 @@
 
     <module>../org.eclipse.scout.rt.servicetunnel</module>
     <module>../org.eclipse.scout.rt.shared</module>
-    <module>../org.eclipse.scout.rt.shared.legacy.texts.fragment</module>
 
     <module>../org.eclipse.scout.rt.client</module>
     <module>../org.eclipse.scout.rt.client.mobile</module>
