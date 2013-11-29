@@ -668,18 +668,18 @@ public final class RwtUtility {
         return "ARROW_RIGHT";
       case SWT.ARROW_DOWN:
         return "ARROW_DOWN";
-//      case SWT.KEYPAD_MULTIPLY:
-//        return "multiply";
-//      case SWT.KEYPAD_ADD:
-//        return "add";
+      case SWT.KEYPAD_MULTIPLY:
+        return "NUMPAD_MULTIPLY";
+      case SWT.KEYPAD_ADD:
+        return "NUMPAD_ADD";
       case SWT.KEYPAD_CR:
         return "ENTER";
-//      case SWT.KEYPAD_SUBTRACT:
-//        return "subtract";
-//      case SWT.KEYPAD_DECIMAL:
-//        return "decimal";
-//      case SWT.KEYPAD_DIVIDE:
-//        return "divide";
+      case SWT.KEYPAD_SUBTRACT:
+        return "NUMPAD_SUBTRACT";
+      case SWT.KEYPAD_DECIMAL:
+        return "NUMPAD_DECIMAL";
+      case SWT.KEYPAD_DIVIDE:
+        return "NUMPAD_DIVIDE";
       case SWT.DEL:
         return "DELETE";
 //      case SWT.NUM_LOCK:
