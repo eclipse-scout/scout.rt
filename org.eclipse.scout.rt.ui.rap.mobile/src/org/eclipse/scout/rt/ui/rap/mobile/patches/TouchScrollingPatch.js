@@ -16,6 +16,18 @@
       orgFunc.apply( this, arguments );
       setOverflowScrolling( this._clientArea, "touch" );
     };
+    var orgOnScroll = proto._onscroll;
+    var mouseTimer = new rwt.client.Timer( 200 );
+    proto._onscroll = function() {
+      orgOnScroll.apply( this, arguments );
+      // give empty object as original event, otherwise faking mouse events won't work
+      rwt.runtime.MobileWebkitSupport._disableMouse( {} );
+      mouseTimer.restart(); // re-enable mouse in 200ms
+    };
+    mouseTimer.addEventListener( "interval", function() {
+      rwt.runtime.MobileWebkitSupport._enableMouse( {} );
+      mouseTimer.stop();
+    } );
 
     // fix render render gitches:
     var style = document.createElement( "style");
