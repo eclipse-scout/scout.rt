@@ -48,7 +48,9 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
   private SwingScoutActivityMap m_activityMapComposite;
   private DateChooser[] m_miniDateChooser;
   private JPanel m_miniCalPanel;
+  private JSplitPane m_hsplit;
   private P_SwingMiniCalendarChangeListener m_swingMiniCalendarChangeListener;
+  private static final String SPLITTER_PROPERTY_NAME = "dividerLocation";
 
   public SwingScoutPlannerField() {
   }
@@ -76,11 +78,14 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     }
     m_activityMapComposite = new SwingScoutActivityMap(m_resourceTableComposite.getSwingTable());
     m_activityMapComposite.createField(getScoutObject().getActivityMap(), getSwingEnvironment());
-    JSplitPane hsplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_resourceTableComposite.getSwingScrollPane(), m_activityMapComposite.getSwingScrollPane());
-    hsplit.setBorder(null);
-    hsplit.setDividerLocation(getScoutObject().getSplitterPosition());
-    hsplit.setDividerSize(3);
-    container.add(hsplit, new PlannerFieldLayoutConstraints(PlannerFieldLayoutConstraints.PLANNER));
+    m_hsplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_resourceTableComposite.getSwingScrollPane(), m_activityMapComposite.getSwingScrollPane());
+    m_hsplit.setBorder(null);
+    m_hsplit.setDividerLocation(getScoutObject().getSplitterPosition());
+    m_hsplit.setDividerSize(3);
+
+    m_hsplit.addPropertyChangeListener(new P_SplitterChangeListener());
+
+    container.add(m_hsplit, new PlannerFieldLayoutConstraints(PlannerFieldLayoutConstraints.PLANNER));
     // mediate v-scrolling
     JScrollBar resourceTableScrollBar = m_resourceTableComposite.getSwingScrollPane().getVerticalScrollBar();
     JScrollBar activityMapScrollBar = m_activityMapComposite.getSwingScrollPane().getVerticalScrollBar();
@@ -177,14 +182,21 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     }
   }
 
+  protected void setSplitterLocation(int splitterLocation) {
+    m_hsplit.setDividerLocation(splitterLocation);
+  }
+
   /**
    * scout property handler override
    */
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(IPlannerField.PROP_MINI_CALENDAR_COUNT)) {
+    if (IPlannerField.PROP_MINI_CALENDAR_COUNT.equals(name)) {
       setMiniCalendarCountFromScout((Integer) newValue);
+    }
+    if (IPlannerField.PROP_SPLITTER_POSITION.equals(name)) {
+      setSplitterLocation((Integer) newValue);
     }
   }
 
@@ -260,4 +272,20 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
       }
     }
   }// end private class
+
+  private class P_SplitterChangeListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+      if (SPLITTER_PROPERTY_NAME.equals(event.getPropertyName())) {
+        final Integer splitterLocation = (Integer) event.getNewValue();
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().setSplitterPositionFromUI(splitterLocation);
+          }
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
+      }
+    }
+  }
 }
