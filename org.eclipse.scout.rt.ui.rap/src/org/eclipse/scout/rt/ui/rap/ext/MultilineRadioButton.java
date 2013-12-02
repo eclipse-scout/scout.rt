@@ -26,7 +26,7 @@ public class MultilineRadioButton extends MultilineButton {
   public MultilineRadioButton(Composite parent, int style) {
     super(parent, style | SWT.RADIO);
 
-    label.addMouseListener(new P_LabelMouseListener());
+    m_label.addMouseListener(new P_LabelMouseListener());
   }
 
   /**
@@ -46,7 +46,7 @@ public class MultilineRadioButton extends MultilineButton {
     @Override
     public void mouseUp(MouseEvent e) {
       if (leftMouseButtonClicked(e)) {
-        btn.setSelection(true);
+        m_btn.setSelection(true);
       }
     }
 

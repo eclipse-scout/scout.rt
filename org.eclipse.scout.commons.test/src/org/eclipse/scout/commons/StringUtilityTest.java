@@ -11,6 +11,8 @@
 package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
@@ -316,5 +318,20 @@ public class StringUtilityTest {
         "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
 
+  }
+
+  /**
+   * Test for {@link StringUtility#containsNewLines(String)}
+   */
+  @Test
+  public void testNewLines() {
+    String text = "lorem " + '\n' + "ipsum";
+    assertTrue(StringUtility.containsNewLines(text));
+    text = "lorem" + System.getProperty("line.separator") + "ipsum";
+    assertTrue(StringUtility.containsNewLines(text));
+    text = "";
+    assertFalse(StringUtility.containsNewLines(text));
+    text = null;
+    assertFalse(StringUtility.containsNewLines(text));
   }
 }

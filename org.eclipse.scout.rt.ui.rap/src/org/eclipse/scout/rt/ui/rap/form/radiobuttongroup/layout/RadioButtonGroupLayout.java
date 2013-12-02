@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.radiobuttongroup.layout;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.graphics.Point;
@@ -93,20 +95,14 @@ public class RadioButtonGroupLayout extends Layout {
       int[] widths = new int[colCount];
       int[] minWidths = new int[colCount];
       int[] y = new int[rowCount + 1];
-      y[y.length - 1] = h + m_vgap;
-      for (int r = 0; r < rowCount; r++) {
-        for (int c = 0; c < colCount; c++) {
-          if (m_sizes[r][c] != null) {
-            minWidths[c] = Math.max(minWidths[c], m_sizes[r][c].x);
-            if (r == 0) {
-              y[r] = 0;
-            }
-            else {
-              y[r] = y[r - 1] + m_sizes[r - 1][c].y + m_vgap;
-            }
-          }
-        }
+
+      if (m_scoutField.getGridData().useUiHeight && hasMultilineButtons()) {
+        calculateYValuesDynamicHeight(y, h, rowCount, colCount, minWidths);
       }
+      else {
+        calculateYValuesSameHeight(y, h, rowCount, colCount, minWidths);
+      }
+
       int excess = 0;
       for (int c = 0; c < colCount; c++) {
         int candidateWidth = (c + 1) * w / colCount - c * w / colCount;
@@ -146,6 +142,54 @@ public class RadioButtonGroupLayout extends Layout {
           Rectangle bounds = new Rectangle(x[c], y[r], x[c + 1] - x[c], y[r + 1] - y[r] - m_vgap);
           if (m_buttons[r][c] != null) {
             m_buttons[r][c].setBounds(bounds);
+          }
+        }
+      }
+    }
+  }
+
+  private boolean hasMultilineButtons() {
+    for (IButton button : m_scoutField.getButtons()) {
+      if (StringUtility.containsNewLines(button.getLabel())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * This algorithm will be used to calculate Y-Values if RadioButtons contain singleline text
+   */
+  private void calculateYValuesSameHeight(int[] y, int h, int rowCount, int colCount, int[] minWidths) {
+    int hWithoutGaps = h - Math.max(0, rowCount - 1) * m_vgap;
+    y[y.length - 1] = h + m_vgap;
+
+    for (int r = 0; r < rowCount; r++) {
+      for (int c = 0; c < colCount; c++) {
+        if (m_sizes[r][c] != null) {
+          minWidths[c] = Math.max(minWidths[c], m_sizes[r][c].x);
+        }
+      }
+      y[r] = r * hWithoutGaps / rowCount + r * m_vgap;
+
+    }
+  }
+
+  /**
+   * This algorithm will be used to calculate Y-Values if RadioButtons contain multiline text
+   */
+  private void calculateYValuesDynamicHeight(int[] y, int h, int rowCount, int colCount, int[] minWidths) {
+    y[y.length - 1] = h + m_vgap;
+    for (int r = 0; r < rowCount; r++) {
+      for (int c = 0; c < colCount; c++) {
+        if (m_sizes[r][c] != null) {
+          minWidths[c] = Math.max(minWidths[c], m_sizes[r][c].x);
+
+          if (r == 0) {
+            y[r] = 0;
+          }
+          else {
+            y[r] = y[r - 1] + m_sizes[r - 1][c].y + m_vgap;
           }
         }
       }

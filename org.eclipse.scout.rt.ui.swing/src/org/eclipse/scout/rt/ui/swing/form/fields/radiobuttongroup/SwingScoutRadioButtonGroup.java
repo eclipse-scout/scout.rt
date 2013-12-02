@@ -41,7 +41,7 @@ public class SwingScoutRadioButtonGroup extends SwingScoutValueFieldComposite<IR
       buttonPanel.setLayout(new RadioButtonGroupLayout(getScoutObject(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap()));
     }
     else {
-      buttonPanel.setLayout(new RadioButtonGroupLayout(getScoutObject(), 0, 6));
+      buttonPanel.setLayout(new RadioButtonGroupLayout(getScoutObject(), 0, 0));
     }
     // add all radio buttons
     IFormField[] scoutFields = getScoutObject().getFields();

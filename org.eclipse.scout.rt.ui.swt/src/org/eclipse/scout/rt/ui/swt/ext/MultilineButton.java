@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Menu;
  */
 public abstract class MultilineButton extends Composite {
 
-  protected Label label;
-  protected ButtonEx btn;
+  protected Label m_label;
+  protected ButtonEx m_btn;
 
   public MultilineButton(Composite parent, int style) {
     super(parent, style);
@@ -28,8 +28,8 @@ public abstract class MultilineButton extends Composite {
   }
 
   protected void createContent(Composite parent, int style) {
-    this.btn = new ButtonEx(parent, style);
-    this.label = new Label(parent, 0);
+    this.m_btn = new ButtonEx(parent, style);
+    this.m_label = new Label(parent, 0);
   }
 
   protected void createLayout() {
@@ -41,76 +41,76 @@ public abstract class MultilineButton extends Composite {
 
     GridData labelData = new GridData(SWT.FILL, SWT.FILL, false, false);
     labelData.verticalIndent = 3;
-    label.setLayoutData(labelData);
+    m_label.setLayoutData(labelData);
 
     GridData buttonData = new GridData(SWT.FILL, SWT.TOP, false, false);
     buttonData.verticalIndent = 3;
-    btn.setLayoutData(buttonData);
+    m_btn.setLayoutData(buttonData);
 
     setLayout(containerLayout);
   }
 
   public void setText(String text) {
-    label.setText(text);
+    m_label.setText(text);
   }
 
   @Override
   public void setFont(org.eclipse.swt.graphics.Font font) {
-    label.setFont(font);
-    btn.setFont(font);
+    m_label.setFont(font);
+    m_btn.setFont(font);
   }
 
   @Override
   public void setForeground(org.eclipse.swt.graphics.Color color) {
     super.setForeground(color);
-    label.setForeground(color);
-    btn.setForeground(color);
+    m_label.setForeground(color);
+    m_btn.setForeground(color);
   }
 
   @Override
   public void setBackground(org.eclipse.swt.graphics.Color color) {
     super.setBackground(color);
-    label.setBackground(color);
-    btn.setBackground(color);
+    m_label.setBackground(color);
+    m_btn.setBackground(color);
   }
 
   @Override
   public void removeListener(int eventType, Listener listener) {
     super.removeListener(eventType, listener);
-    btn.removeListener(eventType, listener);
-    label.removeListener(eventType, listener);
+    m_btn.removeListener(eventType, listener);
+    m_label.removeListener(eventType, listener);
   }
 
   public void setSelection(boolean selected) {
-    btn.setSelection(selected);
+    m_btn.setSelection(selected);
   }
 
   public boolean getSelection() {
-    return btn.getSelection();
+    return m_btn.getSelection();
   }
 
   @Override
   public void addListener(int eventType, Listener listener) {
     super.addListener(eventType, listener);
-    btn.addListener(eventType, listener);
-    label.addListener(eventType, listener);
+    m_btn.addListener(eventType, listener);
+    m_label.addListener(eventType, listener);
   }
 
   @Override
   public void setMenu(Menu menu) {
     super.setMenu(menu);
-    btn.setMenu(menu);
-    label.setMenu(menu);
+    m_btn.setMenu(menu);
+    m_label.setMenu(menu);
   }
 
   @Override
   public void setToolTipText(String string) {
     super.setToolTipText(string);
-    btn.setToolTipText(string);
-    label.setToolTipText(string);
+    m_btn.setToolTipText(string);
+    m_label.setToolTipText(string);
   }
 
   public void setImage(Image icon) {
-    btn.setImage(icon);
+    m_btn.setImage(icon);
   }
 }

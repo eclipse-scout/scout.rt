@@ -898,6 +898,20 @@ public final class StringUtility {
   }
 
   /**
+   * Returns true if the given String contains a NewLine character, e.g. \n
+   * 
+   * @since 3.10.0-M4
+   */
+  public static boolean containsNewLines(String s) {
+    if (s != null) {
+      if (s.indexOf('\n') >= 0 || s.indexOf('\r') >= 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * converts all non-allowed characters in the text to the text contained in
    * replacementText
    * <p>

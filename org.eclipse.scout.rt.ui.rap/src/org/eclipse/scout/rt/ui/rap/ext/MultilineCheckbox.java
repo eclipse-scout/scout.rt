@@ -26,7 +26,7 @@ public class MultilineCheckbox extends MultilineButton {
   public MultilineCheckbox(Composite parent, int style) {
     super(parent, style | SWT.CHECK);
 
-    label.addMouseListener(new P_LabelMouseListener());
+    m_label.addMouseListener(new P_LabelMouseListener());
   }
 
   /**
@@ -46,7 +46,7 @@ public class MultilineCheckbox extends MultilineButton {
     @Override
     public void mouseUp(MouseEvent e) {
       if (leftMouseButtonClicked(e)) {
-        btn.setSelection(!btn.getSelection());
+        m_btn.setSelection(!m_btn.getSelection());
       }
     }
 
