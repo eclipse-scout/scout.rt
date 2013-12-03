@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.internal.widgets.IBrowserAdapter;
 
 /**
  * <h3>BrowserSupport</h3> adding hyperlink callback support as in normal swt to the rwt browser
@@ -63,18 +64,19 @@ public class BrowserExtension {
       @Override
       public Object function(Object[] arguments) {
         String localUrl = m_hyperlinkMap.get(arguments[0]);
+        final String browserText = m_browser.getAdapter(IBrowserAdapter.class).getText();
         if (localUrl == null) {
           LOG.error("Hyperlink could not be activated. No url specified.");
-          return null;
+          return browserText;
         }
         if (m_hyperlinkCallback == null) {
           LOG.error("Hyperlink could not be activated. Please specify the runnable to be executed.");
-          return null;
+          return browserText;
         }
 
         m_hyperlinkCallback.execute(localUrl);
 
-        return null;
+        return browserText;
       }
     };
   }
