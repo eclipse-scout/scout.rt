@@ -41,7 +41,6 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
    *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Double getConfiguredMinimumValue() {
     return getConfiguredMinValue();
   }
@@ -52,7 +51,6 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
    *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Double getConfiguredMaximumValue() {
     return getConfiguredMaxValue();
   }

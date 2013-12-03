@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -19,7 +22,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
-import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 
 public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalField.class);
@@ -45,10 +47,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
    */
 
   /**
-   * @deprecated Will be removed with scout 3.11, use {@link #getConfiguredMaxFractionDigits()} and
-   *             {@link #getConfiguredMinFractionDigits()}.
+   * Default for {@link IDecimalField#setFractionDigits(int)}
    */
-  @Deprecated
+  @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
   protected int getConfiguredFractionDigits() {
     return 2;
@@ -115,7 +116,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   protected int getConfiguredRoundingMode() {
-    return INumberField.ROUND_HALF_EVEN;
+    return BigDecimal.ROUND_HALF_EVEN;
   }
 
   @Override
@@ -196,11 +197,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     return m_percent;
   }
 
-  /**
-   * @deprecated Will be removed with scout 3.11, use {@link #setMaxFractionDigits()} and
-   *             {@link #setMinFractionDigits()}.
-   */
-  @Deprecated
   @Override
   public void setFractionDigits(int i) {
     m_fractionDigits = i;
@@ -209,11 +205,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     }
   }
 
-  /**
-   * @deprecated Will be removed with scout 3.11, use {@link #getMaxFractionDigits()} and
-   *             {@link #getMinFractionDigits()}.
-   */
-  @Deprecated
   @Override
   public int getFractionDigits() {
     return m_fractionDigits;
@@ -266,7 +257,23 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       fmt.setMaximumFractionDigits(getMaxFractionDigits());
       fmt.setGroupingUsed(isGroupingUsed());
     }
+    fmt.setRoundingMode(getRoundingMode());
     return fmt;
+  }
+
+  /**
+   * Rounds the parsed value according {@link #getRoundingMode()} and {@link #getParsingFractionDigits()}. (The maximum
+   * fraction digits used for parsing is adapted to {@link #getMultiplier()} if needed.)
+   * 
+   * @throws ArithmeticException
+   *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
+   */
+  @Override
+  protected BigDecimal roundParsedValue(BigDecimal valBeforeRounding) {
+    // multiplier requirements for fraction digits are considered
+    int additionalFractionDigits = ("" + Math.abs(getMultiplier())).length() - 1;
+    int precision = valBeforeRounding.toBigInteger().toString().length() + getFractionDigits() + additionalFractionDigits;
+    return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
   }
 
   /**

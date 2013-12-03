@@ -23,10 +23,20 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 @SuppressWarnings("deprecation")
 public interface IDecimalField<T extends Number> extends INumberField<T> {
 
+  /**
+   * Sets the minimum fraction digits used for formatting. If value has less fraction digits '0' are appended.
+   * Corresponds to {@link DecimalFormat#setMinimumFractionDigits(int)}.<br>
+   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   */
   void setMinFractionDigits(int i);
 
   int getMinFractionDigits();
 
+  /**
+   * Sets the maximum fraction digits used for formatting. Corresponds to
+   * {@link DecimalFormat#setMaximumFractionDigits(int)}.<br>
+   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   */
   void setMaxFractionDigits(int i);
 
   int getMaxFractionDigits();
@@ -40,6 +50,14 @@ public interface IDecimalField<T extends Number> extends INumberField<T> {
 
   boolean isPercent();
 
+  /**
+   * Sets the number of fraction digits used for parsing. If the text represents a number with more fraction digits the
+   * value is rounded according to {@link #getRoundingMode()}<br>
+   * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value over
+   * {@link #setValue(Object)}.
+   * 
+   * @param i
+   */
   void setFractionDigits(int i);
 
   int getFractionDigits();

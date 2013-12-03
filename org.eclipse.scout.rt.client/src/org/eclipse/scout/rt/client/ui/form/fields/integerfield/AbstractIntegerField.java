@@ -40,7 +40,6 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
    *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Integer getConfiguredMinimumValue() {
     return getConfiguredMinValue();
   }
@@ -51,7 +50,6 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
    *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Integer getConfiguredMaximumValue() {
     return getConfiguredMaxValue();
   }

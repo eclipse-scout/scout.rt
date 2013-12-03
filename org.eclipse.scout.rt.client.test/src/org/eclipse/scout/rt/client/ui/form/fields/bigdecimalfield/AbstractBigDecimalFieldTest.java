@@ -29,7 +29,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
   @Test
   public void testParseValueInternalInRange() throws ProcessingException {
-    setMaxFractionDigits(5);
+    setFractionDigits(5);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42), parseValueInternal("42"));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42), parseValueInternal("-42"));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0), parseValueInternal("0"));
@@ -42,7 +42,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
   @Test
   public void testParseValueInternalMaxMin() throws ProcessingException {
-    setMaxFractionDigits(80);
+    setFractionDigits(80);
     // expect default for maxValue=999999999999999999999999999999999999999999999999999999999999 and minValue=-999999999999999999999999999999999999999999999999999999999999
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "98765432109876543210987654321098765432109876543210987654321098765432109876543210");
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-98765432109876543210987654321098765432109876543210987654321098765432109876543210");
@@ -101,27 +101,27 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
   @Test
   public void testParseValueInternalMultiplier() throws ProcessingException {
-    setMaxFractionDigits(0);
+    setFractionDigits(0);
     setMultiplier(10);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(5.9d), parseValueInternal("59"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(1);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88d), parseValueInternal("59.88"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(10);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(5.988d), parseValueInternal("59.88"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(100);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988d), parseValueInternal("59.88"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(1000);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.05988d), parseValueInternal("59.88"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(1000000000);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.00000005988d), parseValueInternal("59.88"));
 

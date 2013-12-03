@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractNumberField<T extends Number> extends AbstractBasicField<T> implements INumberField<T> {
@@ -72,14 +73,14 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * for decimal number fields.
    * <p>
    * When set to an invalid value, an {@link IllegalArgumentException} is thrown during {@link #initConfig()} Valid
-   * values are {@link INumberField#ROUND_DOWN}, {@link INumberField#ROUND_CEILING}, {@link INumberField#ROUND_FLOOR},
-   * {@link INumberField#ROUND_HALF_UP}, {@link INumberField#ROUND_HALF_DOWN}, {@link INumberField#ROUND_HALF_EVEN},
-   * {@link INumberField#ROUND_UNNECESSARY}
+   * values are {@link BigDecimal#ROUND_DOWN}, {@link BigDecimal#ROUND_CEILING}, {@link BigDecimal#ROUND_FLOOR},
+   * {@link BigDecimal#ROUND_HALF_UP}, {@link BigDecimal#ROUND_HALF_DOWN}, {@link BigDecimal#ROUND_HALF_EVEN},
+   * {@link BigDecimal#ROUND_UNNECESSARY}
    */
   @ConfigProperty(ConfigProperty.ROUNDING_MODE)
   @Order(250)
   protected int getConfiguredRoundingMode() {
-    return INumberField.ROUND_UNNECESSARY;
+    return BigDecimal.ROUND_UNNECESSARY;
   }
 
   /**
@@ -241,14 +242,11 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * create a DecimalFormat instance for formatting and parsing
    */
   protected DecimalFormat createDecimalFormat() {
-    DecimalFormat fmt = null;
+    DecimalFormat fmt = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
     if (getFormat() != null) {
-      DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-      x.applyPattern(getFormat());
-      fmt = x;
+      fmt.applyPattern(getFormat());
     }
     else {
-      fmt = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
       fmt.setGroupingUsed(isGroupingUsed());
     }
     fmt.setMinimumFractionDigits(0);
@@ -287,8 +285,9 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * Parses text input into a BigDecimal.
    * <p>
    * Callers can expect the resulting BigDecimal to lie in the range {@link #getMinValue()} --> {@link #getMaxValue()}
-   * and to respect {@link #createDecimalFormat()}'s {@link #getMaximumFractionDigits()}. (The maximum fraction digits
-   * used for parsing is adapted to {@link #createDecimalFormat()}'s {@link DecimalFormat#getMultiplier()} if needed.)
+   * and for subclasses of {@link AbstractDecimalField} to respect
+   * {@link AbstractDecimalField#getParsingFractionDigits()}. (The maximum fraction digits used for parsing is adapted
+   * to {@link AbstractDecimalField#getMultiplier()} if needed.)
    * <p>
    * If the parsing cannot be done complying these rules and considering {@link #getRoundingMode()} an exception is
    * thrown.
@@ -310,11 +309,8 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
       }
-      // rounding (multiplier requirements for fraction digits are considered)
-      int additionalFractionDigits = ("" + Math.abs(df.getMultiplier())).length() - 1;
       try {
-        int precision = valBeforeRounding.toBigInteger().toString().length() + df.getMaximumFractionDigits() + additionalFractionDigits;
-        retVal = valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
+        retVal = roundParsedValue(valBeforeRounding);
       }
       catch (ArithmeticException e) {
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
@@ -328,6 +324,17 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       }
     }
     return retVal;
+  }
+
+  /**
+   * Rounds the parsed value according {@link #getRoundingMode()}.
+   * 
+   * @throws ArithmeticException
+   *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
+   */
+  protected BigDecimal roundParsedValue(BigDecimal valBeforeRounding) {
+    int precision = valBeforeRounding.toBigInteger().toString().length();
+    return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
   }
 
   private String ensureSuffix(String text) {

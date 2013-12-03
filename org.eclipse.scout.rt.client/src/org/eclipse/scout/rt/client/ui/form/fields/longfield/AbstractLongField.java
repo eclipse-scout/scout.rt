@@ -40,7 +40,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
    *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Long getConfiguredMinimumValue() {
     return getConfiguredMinValue();
   }
@@ -51,7 +50,6 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
    *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
    */
   @Deprecated
-  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaximumValue() {
     return getConfiguredMaxValue();
   }

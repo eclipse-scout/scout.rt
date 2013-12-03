@@ -299,7 +299,6 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
 
   protected abstract AbstractDecimalField<T> getEditorField();
 
-  @SuppressWarnings("deprecation")
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractDecimalField<T> f = getEditorField();

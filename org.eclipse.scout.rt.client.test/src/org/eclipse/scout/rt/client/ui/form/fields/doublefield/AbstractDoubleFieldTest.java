@@ -35,7 +35,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
 
   @Test
   public void testParseValueInternalInRange() throws ProcessingException {
-    setMaxFractionDigits(50);
+    setFractionDigits(50);
     assertEquals("parsing failed", Double.valueOf(42), parseValueInternal("42"));
     assertEquals("parsing failed", Double.valueOf(-42), parseValueInternal("-42"));
     assertEquals("parsing failed", Double.valueOf(0), parseValueInternal("0"));
@@ -78,7 +78,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
 
     setMaxValue(99d);
     setMinValue(-99d);
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "99.04");
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-99.9");
     assertEquals("parsing failed", Double.valueOf(99), parseValueInternal("99"));
@@ -110,23 +110,23 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
   public void testParseValueInternalRounding() throws ProcessingException {
     // expecting RoundingMode.HALF_EVEN as default
     LocaleThreadLocal.get();
-    setMaxFractionDigits(1);
+    setFractionDigits(1);
     assertEquals("parsing failed", Double.valueOf(123.5d), parseValueInternal("123.457"));
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.55"));
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.65"));
 
-    setMaxFractionDigits(3);
+    setFractionDigits(3);
     assertEquals("parsing failed", Double.valueOf(123.456d), parseValueInternal("123.456"));
     assertEquals("parsing failed", Double.valueOf(123.456d), parseValueInternal("123.45645688"));
     assertEquals("parsing failed", Double.valueOf(123.457d), parseValueInternal("123.4565000007"));
 
-    setMaxFractionDigits(0);
+    setFractionDigits(0);
     assertEquals("parsing failed", Double.valueOf(123d), parseValueInternal("123"));
     assertEquals("parsing failed", Double.valueOf(123d), parseValueInternal("123.456"));
     assertEquals("parsing failed", Double.valueOf(124d), parseValueInternal("123.75645688"));
 
     setRoundingMode(RoundingMode.HALF_UP);
-    setMaxFractionDigits(1);
+    setFractionDigits(1);
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.55"));
     assertEquals("parsing failed", Double.valueOf(12.7d), parseValueInternal("12.65"));
   }
@@ -134,7 +134,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
   @Test
   public void testParseValueInternalRoundingModeUnnecessary() throws ProcessingException {
     setRoundingMode(RoundingMode.UNNECESSARY);
-    setMaxFractionDigits(0);
+    setFractionDigits(0);
 
     boolean exceptionOccured = false;
     try {
@@ -147,7 +147,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
     Assert.assertEquals("parsing failed", Double.valueOf(12), parseValueInternal("12.0"));
     Assert.assertEquals("parsing failed", Double.valueOf(12), parseValueInternal("12"));
 
-    setMaxFractionDigits(5);
+    setFractionDigits(5);
     exceptionOccured = false;
     try {
       parseValueInternal("12.123456");
@@ -163,11 +163,11 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
 
   @Test
   public void testParseValueInternalMultiplier() throws ProcessingException {
-    setMaxFractionDigits(0);
+    setFractionDigits(0);
     setMultiplier(10);
     assertEquals("parsing failed", Double.valueOf(5.9d), parseValueInternal("59"));
 
-    setMaxFractionDigits(2);
+    setFractionDigits(2);
     setMultiplier(1);
     assertEquals("parsing failed", Double.valueOf(59.88d), parseValueInternal("59.88"));
 

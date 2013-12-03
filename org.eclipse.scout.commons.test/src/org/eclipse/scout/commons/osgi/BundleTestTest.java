@@ -16,9 +16,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.eclipse.core.runtime.Platform;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
+@Ignore
 public class BundleTestTest extends AbstractBundleTest {
 
   private static final String PLUGIN_ID_1 = "a.bundle1";

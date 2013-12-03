@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
@@ -19,33 +19,28 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 /**
  * Field type representing a non-fractional number such as Integer, Long,
  * BigInteger
- * 
+ *
  * @see IDecimalField for floating point numbers
+ */
+/**
+ * @param <T>
  */
 public interface INumberField<T extends Number> extends IBasicField<T> {
 
-  // Rounding Modes
-  /** corresponds to {@link BigDecimal#ROUND_UP} */
-  int ROUND_UP = BigDecimal.ROUND_UP;
-  /** corresponds to {@link BigDecimal#ROUND_DOWN} */
-  int ROUND_DOWN = BigDecimal.ROUND_DOWN;
-  /** corresponds to {@link BigDecimal#ROUND_CEILING} */
-  int ROUND_CEILING = BigDecimal.ROUND_CEILING;
-  /** corresponds to {@link BigDecimal#ROUND_FLOOR} */
-  int ROUND_FLOOR = BigDecimal.ROUND_FLOOR;
-  /** corresponds to {@link BigDecimal#ROUND_HALF_UP} */
-  int ROUND_HALF_UP = BigDecimal.ROUND_HALF_UP;
-  /** corresponds to {@link BigDecimal#ROUND_HALF_DOWN} */
-  int ROUND_HALF_DOWN = BigDecimal.ROUND_HALF_DOWN;
-  /** corresponds to {@link BigDecimal#ROUND_HALF_EVEN} */
-  int ROUND_HALF_EVEN = BigDecimal.ROUND_HALF_EVEN;
-  /** corresponds to {@link BigDecimal#ROUND_UNNECESSARY} */
-  int ROUND_UNNECESSARY = BigDecimal.ROUND_UNNECESSARY;
-
+  /**
+   * Sets the pattern used for formatting. Corresponds to {@link DecimalFormat#applyPattern(String)}. <br>
+   * <b>Note:</b> If a format is set, the formatting properties (e.g. {@link #setGroupingUsed(boolean)},
+   * {@link IDecimalField#setMinFractionDigits(int) and {@link IDecimalField#setMaxFractionDigits(int)})are ignoered.
+   */
   void setFormat(String s);
 
   String getFormat();
 
+  /**
+   * Sets whether or not grouping will be used for formatting. Corresponds to
+   * {@link DecimalFormat#setGroupingUsed(boolean)}.<br>
+   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   */
   void setGroupingUsed(boolean b);
 
   boolean isGroupingUsed();
