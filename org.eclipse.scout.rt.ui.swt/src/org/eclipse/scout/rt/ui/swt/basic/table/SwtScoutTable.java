@@ -766,6 +766,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           getSwtField().setSortColumn(col);
           getSwtField().setSortDirection(cell.isSortAscending() ? SWT.UP : SWT.DOWN);
         }
+        updateHeaderText(col);
       }
     }
   }

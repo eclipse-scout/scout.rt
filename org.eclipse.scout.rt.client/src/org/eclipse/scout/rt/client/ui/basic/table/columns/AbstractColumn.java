@@ -1312,6 +1312,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     decorateHeaderCellInternal(cell);
     try {
       execDecorateHeaderCell(cell);
+
+      if (getTable() != null && getTable().getColumnSet() != null) {
+        getTable().getColumnSet().updateColumn(this);
+      }
     }
     catch (ProcessingException e) {
       LOG.warn(null, e);

@@ -763,6 +763,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           minUiSortColumn = col;
           minScoutSortColumn = cell;
         }
+        updateHeaderText(col);
       }
     }
 
