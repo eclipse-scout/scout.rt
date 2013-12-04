@@ -24,30 +24,37 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 public interface IDecimalField<T extends Number> extends INumberField<T> {
 
   /**
-   * Sets the minimum fraction digits used for formatting. If value has less fraction digits '0' are appended.
-   * Corresponds to {@link DecimalFormat#setMinimumFractionDigits(int)}.<br>
-   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   * Sets the minimum fraction digits used for formatting. If value has less fraction digits '0' are appended. Delegates
+   * to {@link DecimalFormat#setMinimumFractionDigits(int)} of the internal {@link DecimalFormat} instance.
+   * <p>
+   * If new value is bigger than {@link #getMaxFractionDigits()} maxFractionDigits is set to the same new value.
    */
   void setMinFractionDigits(int i);
 
   int getMinFractionDigits();
 
   /**
-   * Sets the maximum fraction digits used for formatting. Corresponds to
-   * {@link DecimalFormat#setMaximumFractionDigits(int)}.<br>
-   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   * Sets the maximum fraction digits used for formatting. Delegates to
+   * {@link DecimalFormat#setMaximumFractionDigits(int)} of the internal {@link DecimalFormat} instance.<br>
+   * <p>
+   * If new value is smaller than {@link #getMinFractionDigits()} minFractionDigits is set to the same new value.
    */
   void setMaxFractionDigits(int i);
 
   int getMaxFractionDigits();
 
   /**
-   * When set to true, a percentage format (depending on {@link LocaleThreadLocal#get()}) is used for parsing and
-   * formatting.<br>
-   * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}
+   * When set to true, the local specific (depending on {@link LocaleThreadLocal#get()}) positive and negative
+   * percentage suffixes are set to the internal {@link DecimalFormat}.<br>
+   * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}. For example if the parsed value for
+   * "18 %" should be 0.18, set the multiplier to 100.
    */
   void setPercent(boolean b);
 
+  /**
+   * @return true when both positive and negative suffixes correspond to the local specific (depending on
+   *         {@link LocaleThreadLocal#get()}) percentage symbol
+   */
   boolean isPercent();
 
   /**

@@ -36,11 +36,9 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @SuppressWarnings("deprecation")
   private INumberFieldUIFacade m_uiFacade;
-  private String m_format;
-  private boolean m_groupingUsed;
+  private DecimalFormat m_format;
   private T m_minValue;
   private T m_maxValue;
-  private RoundingMode m_roundingMode;
 
   public AbstractNumberField() {
     this(true);
@@ -53,12 +51,27 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   /*
    * Configuration
    */
-  @ConfigProperty(ConfigProperty.STRING)
+  /**
+   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
+   * about the expected format.
+   * <p>
+   * If this configuration is not null, the pattern overrides other configurations that are delegated to the internal
+   * {@link DecimalFormat} like for example {@link #setGroupingUsed(boolean)}
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @deprecated Will be removed with scout 3.11. For setting the format override {@link #initConfig()} and call
+   *             {@link #setFormat(DecimalFormat)}.
+   */
+  @Deprecated
   @Order(230)
   protected String getConfiguredFormat() {
     return null;
   }
 
+  /**
+   * Default used for {@link INumberField#setGroupingUsed(boolean)}
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
   protected boolean getConfiguredGroupingUsed() {
@@ -102,26 +115,43 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
-    setFormat(getConfiguredFormat());
-    setGroupingUsed(getConfiguredGroupingUsed());
+    initFormat();
     setRoundingMode(RoundingMode.valueOf(getConfiguredRoundingMode()));
+    setGroupingUsed(getConfiguredGroupingUsed());
+    if (getConfiguredFormat() != null) {
+      m_format.applyPattern(getConfiguredFormat());
+    }
     setMinValue(getConfiguredMinValue());
     setMaxValue(getConfiguredMaxValue());
   }
 
+  protected void initFormat() {
+    m_format = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
+    m_format.setParseBigDecimal(true);
+    m_format.setMinimumFractionDigits(0);
+    m_format.setMaximumFractionDigits(0);
+  }
+
   @Override
   public void setRoundingMode(RoundingMode roundingMode) {
-    m_roundingMode = roundingMode;
+    m_format.setRoundingMode(roundingMode);
   }
 
   @Override
   public RoundingMode getRoundingMode() {
-    return m_roundingMode;
+    return m_format.getRoundingMode();
   }
 
   @Override
-  public void setFormat(String s) {
-    m_format = s;
+  public void setFormat(DecimalFormat format) {
+    if (format == null) {
+      throw new IllegalArgumentException("Format may not be null.");
+    }
+
+    DecimalFormat newFormat = (DecimalFormat) format.clone();
+    newFormat.setParseBigDecimal(true);
+
+    m_format = newFormat;
     if (isInitialized()) {
       if (isAutoDisplayText()) {
         setDisplayText(execFormatValue(getValue()));
@@ -130,13 +160,20 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   @Override
-  public String getFormat() {
+  public DecimalFormat getFormat() {
+    return (DecimalFormat) m_format.clone();
+  }
+
+  /**
+   * @return the internal {@link DecimalFormat} instance.
+   */
+  protected DecimalFormat getFormatInternal() {
     return m_format;
   }
 
   @Override
   public void setGroupingUsed(boolean b) {
-    m_groupingUsed = b;
+    m_format.setGroupingUsed(b);
     if (isInitialized()) {
       if (isAutoDisplayText()) {
         setDisplayText(execFormatValue(getValue()));
@@ -146,7 +183,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @Override
   public boolean isGroupingUsed() {
-    return m_groupingUsed;
+    return m_format.isGroupingUsed();
   }
 
   @Override
@@ -226,33 +263,16 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     if (validValue == null) {
       return "";
     }
-    String displayValue = createDecimalFormat().format(validValue);
+    String displayValue = m_format.format(validValue);
     return displayValue;
   }
 
   /**
-   * @deprecated Will be removed with scout 3.11, use {@link #createDecimalFormat()}.
+   * @deprecated Will be removed with scout 3.11, use {@link #getFormat()}.
    */
   @Deprecated
   protected NumberFormat createNumberFormat() {
-    return createDecimalFormat();
-  }
-
-  /**
-   * create a DecimalFormat instance for formatting and parsing
-   */
-  protected DecimalFormat createDecimalFormat() {
-    DecimalFormat fmt = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-    if (getFormat() != null) {
-      fmt.applyPattern(getFormat());
-    }
-    else {
-      fmt.setGroupingUsed(isGroupingUsed());
-    }
-    fmt.setMinimumFractionDigits(0);
-    fmt.setMaximumFractionDigits(0);
-    fmt.setRoundingMode(getRoundingMode());
-    return fmt;
+    return getFormat();
   }
 
   @SuppressWarnings("deprecation")
@@ -301,10 +321,8 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     text = StringUtility.nvl(text, "").trim();
     if (text.length() > 0) {
       text = ensureSuffix(text);
-      DecimalFormat df = createDecimalFormat();
-      df.setParseBigDecimal(true);
       ParsePosition p = new ParsePosition(0);
-      BigDecimal valBeforeRounding = (BigDecimal) df.parse(text, p);
+      BigDecimal valBeforeRounding = (BigDecimal) m_format.parse(text, p);
       // check for bad syntax
       if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
@@ -338,9 +356,8 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   private String ensureSuffix(String text) {
-    DecimalFormat df = createDecimalFormat();
-    String positiveSuffix = df.getPositiveSuffix();
-    String negativeSuffix = df.getNegativeSuffix();
+    String positiveSuffix = m_format.getPositiveSuffix();
+    String negativeSuffix = m_format.getNegativeSuffix();
 
     if (positiveSuffix.equals(negativeSuffix)) {
       String trimmedSuffix = StringUtility.trim(positiveSuffix);

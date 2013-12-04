@@ -14,32 +14,34 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
-import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 
 /**
- * Field type representing a non-fractional number such as Integer, Long,
- * BigInteger
- *
- * @see IDecimalField for floating point numbers
- */
-/**
+ * Field type representing a number
+ * 
  * @param <T>
  */
 public interface INumberField<T extends Number> extends IBasicField<T> {
 
   /**
-   * Sets the pattern used for formatting. Corresponds to {@link DecimalFormat#applyPattern(String)}. <br>
-   * <b>Note:</b> If a format is set, the formatting properties (e.g. {@link #setGroupingUsed(boolean)},
-   * {@link IDecimalField#setMinFractionDigits(int) and {@link IDecimalField#setMaxFractionDigits(int)})are ignoered.
+   * Sets the format used for formatting and parsing. (The properties of the provided format are applied to the internal
+   * DecimalFormat instance. Therefore changes on the provided formats instance after this method returns have no
+   * influence to the field.)
+   * 
+   * @param format
+   * @throws IllegalArgumentException
+   *           if format is null
    */
-  void setFormat(String s);
-
-  String getFormat();
+  void setFormat(DecimalFormat format);
 
   /**
-   * Sets whether or not grouping will be used for formatting. Corresponds to
-   * {@link DecimalFormat#setGroupingUsed(boolean)}.<br>
-   * <b>Note:</b> If a format is set over {@link #setFormat(String)}, this property is ignoered.
+   * @return A copy of the internal DecimalFormat instance. Changes on the returned instance have no effect on the
+   *         behavior of the field.
+   */
+  DecimalFormat getFormat();
+
+  /**
+   * Sets whether or not grouping will be used for formatting. Delegates to
+   * {@link DecimalFormat#setGroupingUsed(boolean)} of the internal {@link DecimalFormat} instance
    */
   void setGroupingUsed(boolean b);
 

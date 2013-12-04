@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 
@@ -39,23 +34,18 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
    * Configuration
    */
 
+  @Override
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
   protected Integer getConfiguredMaxValue() {
     return null;
   }
 
+  @Override
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
   protected Integer getConfiguredMinValue() {
     return null;
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMaxValue(getConfiguredMaxValue());
-    setMinValue(getConfiguredMinValue());
   }
 
   /*
@@ -83,44 +73,7 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
   @Override
   protected AbstractIntegerField getEditorField() {
     return new AbstractIntegerField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractIntegerColumn.this.propertySupport.getPropertiesMap());
-      }
     };
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    if (cell.getValue() != null) {
-      cell.setText(getNumberFormat().format(((Integer) cell.getValue()).intValue()));
-    }
-    else {
-      cell.setText("");
-    }
-  }
-
-  @Override
-  public NumberFormat getNumberFormat() {
-    if (super.getNumberFormat() == null) {
-      if (getFormat() != null) {
-        DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-        x.applyPattern(getFormat());
-        x.setMinimumFractionDigits(0);
-        x.setMaximumFractionDigits(0);
-        setNumberFormat(x);
-      }
-      else {
-        NumberFormat y = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
-        y.setMinimumFractionDigits(0);
-        y.setMaximumFractionDigits(0);
-        y.setGroupingUsed(isGroupingUsed());
-        setNumberFormat(y);
-      }
-    }
-    return super.getNumberFormat();
   }
 
 }

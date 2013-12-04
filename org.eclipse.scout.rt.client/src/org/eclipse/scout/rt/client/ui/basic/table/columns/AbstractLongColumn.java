@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 
@@ -34,23 +29,18 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
    * Configuration
    */
 
+  @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(160)
   protected Long getConfiguredMaxValue() {
     return null;
   }
 
+  @Override
   @ConfigProperty(ConfigProperty.LONG)
   @Order(170)
   protected Long getConfiguredMinValue() {
     return null;
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMaxValue(getConfiguredMaxValue());
-    setMinValue(getConfiguredMinValue());
   }
 
   /*
@@ -78,44 +68,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
   @Override
   protected AbstractLongField getEditorField() {
     return new AbstractLongField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractLongColumn.this.propertySupport.getPropertiesMap());
-      }
     };
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    if (cell.getValue() != null) {
-      cell.setText(getNumberFormat().format(((Long) cell.getValue()).longValue()));
-    }
-    else {
-      cell.setText("");
-    }
-  }
-
-  @Override
-  public NumberFormat getNumberFormat() {
-    if (super.getNumberFormat() == null) {
-      if (getFormat() != null) {
-        DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-        x.applyPattern(getFormat());
-        x.setMinimumFractionDigits(0);
-        x.setMaximumFractionDigits(0);
-        setNumberFormat(x);
-      }
-      else {
-        NumberFormat y = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
-        y.setMinimumFractionDigits(0);
-        y.setMaximumFractionDigits(0);
-        y.setGroupingUsed(isGroupingUsed());
-        setNumberFormat(y);
-      }
-    }
-    return super.getNumberFormat();
   }
 
 }

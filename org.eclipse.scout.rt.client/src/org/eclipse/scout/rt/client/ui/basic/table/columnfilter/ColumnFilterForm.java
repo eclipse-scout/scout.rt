@@ -150,6 +150,7 @@ public class ColumnFilterForm extends AbstractForm {
     if (obj instanceof IDoubleColumn) {
       IDoubleColumn col = (IDoubleColumn) obj;
       f.setFormat(col.getFormat());
+
       f.setGroupingUsed(col.isGroupingUsed());
       f.setMaxFractionDigits(col.getMaxFractionDigits());
       f.setMinFractionDigits(col.getMinFractionDigits());

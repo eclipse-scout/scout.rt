@@ -14,13 +14,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
+
+  @Before
+  public void setup() {
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+  }
 
   @Test
   public void testParseValueInternalNull() throws ProcessingException {
@@ -68,39 +76,8 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalPercent() throws ProcessingException {
-    boolean exceptionOccured = false;
-    try {
-      parseValueInternal("59.88%");
-    }
-    catch (ProcessingException e) {
-      exceptionOccured = true;
-    }
-    assertTrue("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", exceptionOccured);
-
-    setPercent(true);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88%"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
-
-    setMultiplier(100);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88%"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88"));
-
-  }
-
-  @Test
-  public void testParseValuePrefixSuffix() throws ProcessingException {
-    setFormat("#,##0.00 SUF");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999 SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999      SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999SUF"));
-  }
-
-  @Test
   public void testParseValueInternalMultiplier() throws ProcessingException {
+
     setFractionDigits(0);
     setMultiplier(10);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(5.9d), parseValueInternal("59"));

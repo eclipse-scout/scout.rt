@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class NumberUtilityTest {
@@ -32,12 +34,25 @@ public class NumberUtilityTest {
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-25d), NumberUtility.numberToBigDecimal(BigDecimal.valueOf(-25d)));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-25d), NumberUtility.numberToBigDecimal(BigInteger.valueOf(-25)));
 
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.NEGATIVE_INFINITY)));
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.POSITIVE_INFINITY)));
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.NaN)));
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NEGATIVE_INFINITY)));
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.POSITIVE_INFINITY)));
-    Assert.assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NaN)));
+    assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.NEGATIVE_INFINITY)));
+    assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.POSITIVE_INFINITY)));
+    assertNull(NumberUtility.numberToBigDecimal(Double.valueOf(Double.NaN)));
+    assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NEGATIVE_INFINITY)));
+    assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.POSITIVE_INFINITY)));
+    assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NaN)));
   }
 
+  @Test
+  public void testSumNumbers() {
+    assertEquals(new BigDecimal("1000000000000000000000000000000000000000000000000000148.225"),
+        NumberUtility.sum(Long.valueOf(100),
+            new BigInteger("1000000000000000000000000000000000000000000000000000000"),
+            BigDecimal.ONE,
+            BigDecimal.ZERO,
+            Double.valueOf(2.225d),
+            Float.NaN,
+            Float.NEGATIVE_INFINITY,
+            Double.POSITIVE_INFINITY,
+            Integer.valueOf(45)));
+  }
 }

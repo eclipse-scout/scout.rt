@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -23,20 +24,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalFi
 /**
  * Column holding Decimal number
  */
-public abstract class AbstractDecimalColumn<T extends Number> extends AbstractColumn<T> implements IDecimalColumn<T> {
+public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNumberColumn<T> implements IDecimalColumn<T> {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
-  private String m_format;
-  private boolean m_groupingUsed;
-  private NumberFormat m_fmt;
-  private int m_maxFractionDigits;
-  private int m_minFractionDigits;
   private int m_fractionDigits;
-  private boolean m_percent;
-  private int m_multiplier;
-  private T m_minValue;
-  private T m_maxValue;
-  private boolean m_validateOnAnyKey;
 
   public AbstractDecimalColumn() {
     super();
@@ -47,38 +38,14 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     return 1;
   }
 
+  @Override
+  protected int getConfiguredRoundingMode() {
+    return BigDecimal.ROUND_HALF_EVEN;
+  }
+
   /*
    * Configuration
    */
-
-  /**
-   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
-   * about the expected format.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   * 
-   * @return Format of this column.
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(140)
-  protected String getConfiguredFormat() {
-    return null;
-  }
-
-  /**
-   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
-   * group separator.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   * 
-   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(150)
-  protected boolean getConfiguredGroupingUsed() {
-    return true;
-  }
-
   /**
    * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.
@@ -146,102 +113,70 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
     return 2;
   }
 
-  /**
-   * Causes the ui to send a validate event every time the text field content is changed.
-   * <p>
-   * Be careful when using this property since this can influence performance and the characteristics of text input.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(210)
-  protected boolean getConfiguredValidateOnAnyKey() {
-    return false;
-  }
-
+  @SuppressWarnings("deprecation")
   @Override
   protected void initConfig() {
     super.initConfig();
-    setFormat(getConfiguredFormat());
-    setGroupingUsed(getConfiguredGroupingUsed());
     setMinFractionDigits(getConfiguredMinFractionDigits());
     setMaxFractionDigits(getConfiguredMaxFractionDigits());
     setPercent(getConfiguredPercent());
     setFractionDigits(getConfiguredFractionDigits());
     setMultiplier(getConfiguredMultiplier());
-    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
+    if (getConfiguredFormat() != null) {
+      getFormatInternal().applyPattern(getConfiguredFormat());
+    }
   }
 
   /*
    * Runtime
    */
   @Override
-  public void setFormat(String s) {
-    m_format = s;
-    setNumberFormat(null);
-  }
-
-  protected final void setNumberFormat(NumberFormat fmt) {
-    m_fmt = fmt;
-    validateColumnValues();
-  }
-
-  @Override
-  public NumberFormat getNumberFormat() {
-    return m_fmt;
-  }
-
-  @Override
-  public String getFormat() {
-    return m_format;
-  }
-
-  @Override
-  public void setGroupingUsed(boolean b) {
-    m_groupingUsed = b;
-    setNumberFormat(null);
-  }
-
-  @Override
-  public boolean isGroupingUsed() {
-    return m_groupingUsed;
-  }
-
-  @Override
   public void setMinFractionDigits(int i) {
     if (i > getMaxFractionDigits()) {
-      m_maxFractionDigits = i;
+      getFormatInternal().setMaximumFractionDigits(i);
     }
-    m_minFractionDigits = i;
-    setNumberFormat(null);
+    getFormatInternal().setMinimumFractionDigits(i);
   }
 
   @Override
   public int getMinFractionDigits() {
-    return m_minFractionDigits;
+    return getFormatInternal().getMinimumFractionDigits();
   }
 
   @Override
   public void setMaxFractionDigits(int i) {
     if (i < getMinFractionDigits()) {
-      m_minFractionDigits = i;
+      getFormatInternal().setMinimumFractionDigits(i);
     }
-    m_maxFractionDigits = i;
-    setNumberFormat(null);
+    getFormatInternal().setMaximumFractionDigits(i);
   }
 
   @Override
   public int getMaxFractionDigits() {
-    return m_maxFractionDigits;
+    return getFormatInternal().getMaximumFractionDigits();
   }
 
   @Override
   public void setPercent(boolean b) {
-    m_percent = b;
-    setNumberFormat(null);
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat internalDF = getFormatInternal();
+    if (b) {
+      internalDF.setPositiveSuffix(percentDF.getPositiveSuffix());
+      internalDF.setNegativeSuffix(percentDF.getNegativeSuffix());
+    }
+    else {
+      if (isPercent()) {
+        internalDF.setPositiveSuffix("");
+        internalDF.setNegativeSuffix("");
+      }
+    }
   }
 
   @Override
   public boolean isPercent() {
-    return m_percent;
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat internalDF = getFormatInternal();
+    return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }
 
   @Override
@@ -256,63 +191,26 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractCo
 
   @Override
   public void setMultiplier(int i) {
-    m_multiplier = i;
-    setNumberFormat(null);
+    getFormatInternal().setMultiplier(i);
   }
 
   @Override
   public int getMultiplier() {
-    return m_multiplier;
+    return getFormatInternal().getMultiplier();
   }
 
   @Override
-  public void setMaxValue(T value) {
-    m_maxValue = value;
-    validateColumnValues();
-  }
-
-  @Override
-  public T getMaxValue() {
-    return m_maxValue;
-  }
-
-  @Override
-  public void setMinValue(T value) {
-    m_minValue = value;
-    validateColumnValues();
-  }
-
-  @Override
-  public T getMinValue() {
-    return m_minValue;
-  }
-
-  @Override
-  public void setValidateOnAnyKey(boolean b) {
-    m_validateOnAnyKey = b;
-  }
-
-  @Override
-  public boolean isValidateOnAnyKey() {
-    return m_validateOnAnyKey;
-  }
-
   protected abstract AbstractDecimalField<T> getEditorField();
 
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractDecimalField<T> f = getEditorField();
-    f.setFormat(getFormat());
-    f.setMaxFractionDigits(getMaxFractionDigits());
-    f.setMinFractionDigits(getMinFractionDigits());
-    f.setFractionDigits(getNumberFormat().getMaximumFractionDigits());
-    f.setMultiplier(getMultiplier());
-    f.setGroupingUsed(isGroupingUsed());
-    f.setPercent(isPercent());
-    f.setMinValue(getMinValue());
-    f.setMaxValue(getMaxValue());
-    f.setValidateOnAnyKey(isValidateOnAnyKey());
+    mapEditorFieldProperties(f);
     return f;
   }
 
+  protected void mapEditorFieldProperties(AbstractDecimalField<T> f) {
+    super.mapEditorFieldProperties(f);
+    f.setFractionDigits(getFractionDigits());
+  }
 }

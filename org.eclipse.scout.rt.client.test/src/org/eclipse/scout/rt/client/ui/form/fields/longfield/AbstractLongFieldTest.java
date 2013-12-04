@@ -15,16 +15,21 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- */
 public class AbstractLongFieldTest extends AbstractLongField {
+
+  @Before
+  public void setup() {
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+  }
 
   @Test
   public void testParseValueInternalNull() throws ProcessingException {

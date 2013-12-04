@@ -25,7 +25,6 @@ public class BigDecimalColumnFieldPropertyDelegator extends ColumnFieldPropertyD
   @Override
   public void init() {
     super.init();
-
     getReceiver().setFormat(getSender().getFormat());
     getReceiver().setMinFractionDigits(getSender().getMinFractionDigits());
     getReceiver().setMaxFractionDigits(getSender().getMaxFractionDigits());

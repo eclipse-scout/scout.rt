@@ -10,14 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 
@@ -38,24 +33,18 @@ public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double>
   /*
    * Configuration
    */
-
+  @Override
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(200)
   protected Double getConfiguredMaxValue() {
     return null;
   }
 
+  @Override
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(210)
   protected Double getConfiguredMinValue() {
     return null;
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMaxValue(getConfiguredMaxValue());
-    setMinValue(getConfiguredMinValue());
   }
 
   /*
@@ -83,54 +72,7 @@ public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double>
   @Override
   protected AbstractDoubleField getEditorField() {
     return new AbstractDoubleField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractDoubleColumn.this.propertySupport.getPropertiesMap());
-      }
     };
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    if (cell.getValue() != null) {
-      cell.setText(getNumberFormat().format(((Double) cell.getValue()).doubleValue()));
-    }
-    else {
-      cell.setText("");
-    }
-  }
-
-  @Override
-  public NumberFormat getNumberFormat() {
-    if (super.getNumberFormat() == null) {
-      NumberFormat fmt;
-      if (isPercent()) {
-        fmt = NumberFormat.getPercentInstance(LocaleThreadLocal.get());
-      }
-      else {
-        fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
-      }
-      if (fmt instanceof DecimalFormat) {
-        ((DecimalFormat) fmt).setMultiplier(getMultiplier());
-        if (getFormat() != null) {
-          ((DecimalFormat) fmt).applyPattern(getFormat());
-        }
-        else {
-          fmt.setMinimumFractionDigits(getMinFractionDigits());
-          fmt.setMaximumFractionDigits(getMaxFractionDigits());
-          fmt.setGroupingUsed(isGroupingUsed());
-        }
-      }
-      else {
-        fmt.setMinimumFractionDigits(getMinFractionDigits());
-        fmt.setMaximumFractionDigits(getMaxFractionDigits());
-        fmt.setGroupingUsed(isGroupingUsed());
-      }
-      setNumberFormat(fmt);
-    }
-    return super.getNumberFormat();
   }
 
 }

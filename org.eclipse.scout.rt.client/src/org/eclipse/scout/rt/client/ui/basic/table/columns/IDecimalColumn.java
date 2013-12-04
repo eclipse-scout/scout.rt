@@ -10,16 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.text.NumberFormat;
-
 /**
  *
  */
-public interface IDecimalColumn<T extends Number> extends IColumn<T> {
-
-  void setFormat(String s);
-
-  String getFormat();
+public interface IDecimalColumn<T extends Number> extends INumberColumn<T> {
 
   void setMinFractionDigits(int i);
 
@@ -29,10 +23,6 @@ public interface IDecimalColumn<T extends Number> extends IColumn<T> {
 
   int getMaxFractionDigits();
 
-  void setGroupingUsed(boolean b);
-
-  boolean isGroupingUsed();
-
   void setPercent(boolean b);
 
   boolean isPercent();
@@ -41,21 +31,8 @@ public interface IDecimalColumn<T extends Number> extends IColumn<T> {
 
   int getFractionDigits();
 
-  void setMinValue(T d);
-
-  T getMinValue();
-
-  void setMaxValue(T d);
-
-  T getMaxValue();
-
   void setMultiplier(int b);
 
   int getMultiplier();
 
-  void setValidateOnAnyKey(boolean b);
-
-  boolean isValidateOnAnyKey();
-
-  NumberFormat getNumberFormat();
 }

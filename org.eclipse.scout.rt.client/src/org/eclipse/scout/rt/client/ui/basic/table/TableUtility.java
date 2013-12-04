@@ -215,22 +215,22 @@ public final class TableUtility {
       else if (col instanceof IDoubleColumn) {
         type = Double.class;
         byValue = true;
-        format = ((IDoubleColumn) col).getFormat();
+        format = ((IDoubleColumn) col).getFormat().toPattern();
       }
       else if (col instanceof IIntegerColumn) {
         type = Integer.class;
         byValue = true;
-        format = ((IIntegerColumn) col).getFormat();
+        format = ((IIntegerColumn) col).getFormat().toPattern();
       }
       else if (col instanceof ILongColumn) {
         type = Long.class;
         byValue = true;
-        format = ((ILongColumn) col).getFormat();
+        format = ((ILongColumn) col).getFormat().toPattern();
       }
       else if (col instanceof IBigDecimalColumn) {
         type = Double.class;
         byValue = true;
-        format = ((IBigDecimalColumn) col).getFormat();
+        format = ((IBigDecimalColumn) col).getFormat().toPattern();
       }
       else if (col instanceof ISmartColumn<?>) {
         type = String.class;

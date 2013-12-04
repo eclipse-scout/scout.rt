@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.NumberUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -44,11 +43,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidateFormFieldDescriptor;
@@ -123,39 +119,16 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         statusText.append(", " + ScoutTexts.get("XSelected", NumberUtility.format(nSel)));
         // show sums of numeric columns
         for (IColumn<?> c : table.getColumnSet().getVisibleColumns()) {
-          NumberFormat fmt = null;
-          Object sum = null;
-          if (c instanceof IBigDecimalColumn) {
-            fmt = ((IBigDecimalColumn) c).getNumberFormat();
-            double d = NumberUtility.sum(TypeCastUtility.castValue(c.getSelectedValues(), double[].class));
-            if (d != 0.0) {
-              sum = d;
+          if (c instanceof INumberColumn) {
+            NumberFormat fmt = null;
+            Object sum = null;
+            fmt = ((INumberColumn) c).getFormat();
+            @SuppressWarnings("unchecked")
+            INumberColumn<? extends Number> numberColumn = (INumberColumn) c;
+            sum = NumberUtility.sum(numberColumn.getSelectedValues());
+            if (fmt != null && sum != null) {
+              statusText.append(", " + c.getHeaderCell().getText() + ": " + fmt.format(sum));
             }
-          }
-          else if (c instanceof IDoubleColumn) {
-            fmt = ((IDoubleColumn) c).getNumberFormat();
-            double d = NumberUtility.sum(TypeCastUtility.castValue(c.getSelectedValues(), double[].class));
-            if (d != 0.0) {
-              sum = d;
-            }
-          }
-          else if (c instanceof ILongColumn) {
-            fmt = ((ILongColumn) c).getNumberFormat();
-            long d = NumberUtility.sum(TypeCastUtility.castValue(c.getSelectedValues(), long[].class));
-            if (d != 0) {
-              sum = d;
-            }
-          }
-          else if (c instanceof IIntegerColumn) {
-            fmt = ((IIntegerColumn) c).getNumberFormat();
-            long d = NumberUtility.sum(TypeCastUtility.castValue(c.getSelectedValues(), long[].class));
-            if (d != 0) {
-              sum = d;
-            }
-          }
-          //
-          if (fmt != null && sum != null) {
-            statusText.append(", " + c.getHeaderCell().getText() + ": " + fmt.format(sum));
           }
         }
       }

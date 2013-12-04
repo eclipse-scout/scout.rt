@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -29,10 +28,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   @SuppressWarnings("deprecation")
   private IDecimalFieldUIFacade m_uiFacade;
   private int m_fractionDigits;
-  private int m_minFractionDigits;
-  private int m_maxFractionDigits;
-  private int m_multiplier;
-  private boolean m_percent;
 
   public AbstractDecimalField() {
     this(true);
@@ -119,17 +114,20 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     return BigDecimal.ROUND_HALF_EVEN;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
-    setFormat(getConfiguredFormat());
     setMinFractionDigits(getConfiguredMinFractionDigits());
     setMaxFractionDigits(getConfiguredMaxFractionDigits());
     setGroupingUsed(getConfiguredGroupingUsed());
     setPercent(getConfiguredPercent());
     setFractionDigits(getConfiguredFractionDigits());
     setMultiplier(getConfiguredMultiplier());
+    if (getConfiguredFormat() != null) {
+      getFormatInternal().applyPattern(getConfiguredFormat());
+    }
   }
 
   @Override
@@ -138,9 +136,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setFieldChanging(true);
       //
       if (i > getMaxFractionDigits()) {
-        m_maxFractionDigits = i;
+        getFormatInternal().setMaximumFractionDigits(i);
       }
-      m_minFractionDigits = i;
+      getFormatInternal().setMinimumFractionDigits(i);
       if (isInitialized()) {
         if (isAutoDisplayText()) {
           setDisplayText(execFormatValue(getValue()));
@@ -154,7 +152,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public int getMinFractionDigits() {
-    return m_minFractionDigits;
+    return getFormatInternal().getMinimumFractionDigits();
   }
 
   @Override
@@ -163,9 +161,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setFieldChanging(true);
       //
       if (i < getMinFractionDigits()) {
-        m_minFractionDigits = i;
+        getFormatInternal().setMinimumFractionDigits(i);
       }
-      m_maxFractionDigits = i;
+      getFormatInternal().setMaximumFractionDigits(i);
       if (isInitialized()) {
         if (isAutoDisplayText()) {
           setDisplayText(execFormatValue(getValue()));
@@ -179,12 +177,24 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public int getMaxFractionDigits() {
-    return m_maxFractionDigits;
+    return getFormatInternal().getMaximumFractionDigits();
   }
 
   @Override
   public void setPercent(boolean b) {
-    m_percent = b;
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat internalDF = getFormatInternal();
+    if (b) {
+      internalDF.setPositiveSuffix(percentDF.getPositiveSuffix());
+      internalDF.setNegativeSuffix(percentDF.getNegativeSuffix());
+    }
+    else {
+      if (isPercent()) {
+        internalDF.setPositiveSuffix("");
+        internalDF.setNegativeSuffix("");
+      }
+    }
+
     if (isInitialized()) {
       if (isAutoDisplayText()) {
         setDisplayText(execFormatValue(getValue()));
@@ -194,7 +204,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public boolean isPercent() {
-    return m_percent;
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat internalDF = getFormatInternal();
+    return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }
 
   @Override
@@ -212,7 +224,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public void setMultiplier(int i) {
-    m_multiplier = i;
+    getFormatInternal().setMultiplier(i);
     if (isInitialized()) {
       setValue(getValue());
     }
@@ -220,45 +232,13 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public int getMultiplier() {
-    return m_multiplier;
+    return getFormatInternal().getMultiplier();
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public IDecimalFieldUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  /**
-   * @deprecated Will be removed with scout 3.11, use {@link #createDecimalFormat()}.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  protected NumberFormat createNumberFormat() {
-    return createDecimalFormat();
-  }
-
-  @Override
-  protected DecimalFormat createDecimalFormat() {
-    DecimalFormat fmt;
-    if (isPercent()) {
-      fmt = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
-    }
-    else {
-      fmt = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-    }
-    fmt.setMultiplier(getMultiplier());
-    if (getFormat() != null) {
-      fmt.applyPattern(getFormat());
-    }
-    else {
-      fmt.setMinimumFractionDigits(getMinFractionDigits());
-      fmt.setMaximumFractionDigits(getMaxFractionDigits());
-      fmt.setGroupingUsed(isGroupingUsed());
-    }
-    fmt.setRoundingMode(getRoundingMode());
-    return fmt;
   }
 
   /**

@@ -55,8 +55,9 @@ public final class NumberUtility {
   }
 
   /**
-   * Converts a Number into a BigDecimal. If <code>number</code> is not a valid representation of a BigDecimal this
-   * method returns <code>null</code>.
+   * Converts a Number into a BigDecimal using it's String representation. If the <code>number</code>'s String
+   * representation cannot be converted to a BigDecimal this method returns <code>null</code> (E.g. for Double and
+   * Floats special values: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY).
    * 
    * @param number
    */
@@ -136,6 +137,25 @@ public final class NumberUtility {
     double sum = 0;
     for (double d : a) {
       sum += d;
+    }
+    return sum;
+  }
+
+  /**
+   * Calculates the sum over an array of numbers. Array elements that have no valid BigDecimal representation (e.g.
+   * Double.NaN) are treated as BigDecimal.ZERO.
+   */
+  public static BigDecimal sum(Number... a) {
+    if (a == null) {
+      return BigDecimal.ZERO;
+    }
+    if (a.length == 0) {
+      return BigDecimal.ZERO;
+    }
+    BigDecimal sum = BigDecimal.ZERO;
+    for (Number d : a) {
+      BigDecimal augend = numberToBigDecimal(d);
+      sum = sum.add(augend == null ? BigDecimal.ZERO : augend);
     }
     return sum;
   }
