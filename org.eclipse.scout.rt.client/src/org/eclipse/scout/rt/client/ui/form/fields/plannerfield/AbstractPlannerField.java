@@ -365,6 +365,10 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
       }
     }
 
+    @Override
+    public void setSplitterPositionFromUI(Integer value) {
+      propertySupport.setPropertyNoFire(PROP_SPLITTER_POSITION, value);
+    }
   }
 
   private class P_ResourceTableListener extends TableAdapter {
