@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.RunnableWithException;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -51,7 +52,6 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   private Shell m_swtShell;
   private Browser m_swtBrowser;
   private File m_tempDir;
-  private String m_currentLocation;
   //
   private final List<RunnableWithException<?>> m_swtCommandQueue;
   private final Object m_swtCommandQueueLock;
@@ -96,6 +96,13 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   @Override
   protected void attachScout() {
     super.attachScout();
+    // Super call invokes setValueFromScout.
+    // If both value and location are null we don't initialize it a second time.
+    // If location is set, it will win over value.
+    if (getScoutObject().getLocation() != null) {
+      setLocationFromScout();
+    }
+
     if (m_hierarchyListener == null) {
       m_hierarchyListener = new P_HierarchyListener();
       m_canvas.addHierarchyListener(m_hierarchyListener);
@@ -150,7 +157,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
             installMouseListener();
           }
           catch (Exception e) {
-            LOG.error("Unexpected error occured while attaching Microsoft Word. All resources safely disposed.", e);
+            LOG.error("Unexpected error occured while attaching SWT Browser. All resources safely disposed.", e);
             detachSwtSafe();
           }
           finally {
@@ -248,15 +255,15 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     }
   }
 
-  @Override
-  protected void setValueFromScout(Object o) {
-    setLocationFromScout();
+  protected void setLocationFromScout() {
+    setLocationInternal(getScoutObject().getLocation());
   }
 
-  protected void setLocationFromScout() {
-    String location = getScoutObject().getLocation();
-    RemoteFile r = getScoutObject().getValue();
-    if (location == null && r != null && r.exists()) {
+  @Override
+  protected void setValueFromScout(Object o) {
+    RemoteFile remoteFile = getScoutObject().getValue();
+    String location = null;
+    if (remoteFile != null && remoteFile.exists()) {
       try {
         if (m_tempDir == null) {
           try {
@@ -266,9 +273,9 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
             LOG.error("create temporary folder", e);
           }
         }
-        if (r.getName().matches(".*\\.(zip|jar)")) {
-          r.writeZipContentToDirectory(m_tempDir);
-          String simpleName = r.getName().replaceAll("\\.(zip|jar)", ".htm");
+        if (remoteFile.getName().matches(".*\\.(zip|jar)")) {
+          remoteFile.writeZipContentToDirectory(m_tempDir);
+          String simpleName = remoteFile.getName().replaceAll("\\.(zip|jar)", ".htm");
           for (File f : m_tempDir.listFiles()) {
             if (f.getName().startsWith(simpleName)) {
               location = f.toURI().toURL().toExternalForm();
@@ -277,22 +284,25 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
           }
         }
         else {
-          File f = new File(m_tempDir, r.getName());
-          r.writeData(f);
+          File f = new File(m_tempDir, remoteFile.getName());
+          remoteFile.writeData(f);
           location = f.toURI().toURL().toExternalForm();
         }
       }
       catch (Throwable t) {
-        LOG.error("preparing html content for " + r, t);
+        LOG.error("preparing html content for " + remoteFile, t);
       }
     }
-    m_currentLocation = location;
+    setLocationInternal(location);
+  }
+
+  protected void setLocationInternal(final String location) {
     //post the document to swt
     swtAsyncExec(new RunnableWithException<Object>() {
       @Override
       public Object run() throws Throwable {
-        if (m_currentLocation != null) {
-          getSwtBrowser().setUrl(m_currentLocation);
+        if (StringUtility.hasText(location)) {
+          getSwtBrowser().setUrl(location);
         }
         else {
           getSwtBrowser().setText("");

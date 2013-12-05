@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -34,13 +35,23 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutBrowserField.class);
 
   private File m_tempDir;
-  private String m_currentLocation;
 
   public SwtScoutBrowserField() {
   }
 
   private void deleteCache(File file) {
     IOUtility.deleteDirectory(file);
+  }
+
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    // Super call invokes setValueFromScout.
+    // If both value and location are null we don't initialize it a second time.
+    // If location is set, it will win over value.
+    if (getScoutObject().getLocation() != null) {
+      setLocationFromScout();
+    }
   }
 
   @Override
@@ -99,15 +110,15 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
     }
   }
 
-  @Override
-  protected void setValueFromScout() {
-    setLocationFromScout();
+  protected void setLocationFromScout() {
+    setLocationInternal(getScoutObject().getLocation());
   }
 
-  protected void setLocationFromScout() {
-    String location = getScoutObject().getLocation();
-    RemoteFile r = getScoutObject().getValue();
-    if (location == null && r != null && r.exists()) {
+  @Override
+  protected void setValueFromScout() {
+    RemoteFile remoteFile = getScoutObject().getValue();
+    String location = null;
+    if (remoteFile != null && remoteFile.exists()) {
       try {
         if (m_tempDir == null) {
           try {
@@ -117,9 +128,9 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
             LOG.error("create temporary folder", e);
           }
         }
-        if (r.getName().matches(".*\\.(zip|jar)")) {
-          r.writeZipContentToDirectory(m_tempDir);
-          String simpleName = r.getName().replaceAll("\\.(zip|jar)", ".htm");
+        if (remoteFile.getName().matches(".*\\.(zip|jar)")) {
+          remoteFile.writeZipContentToDirectory(m_tempDir);
+          String simpleName = remoteFile.getName().replaceAll("\\.(zip|jar)", ".htm");
           for (File f : m_tempDir.listFiles()) {
             if (f.getName().startsWith(simpleName)) {
               location = f.toURI().toURL().toExternalForm();
@@ -128,18 +139,21 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
           }
         }
         else {
-          File f = new File(m_tempDir, r.getName());
-          r.writeData(f);
+          File f = new File(m_tempDir, remoteFile.getName());
+          remoteFile.writeData(f);
           location = f.toURI().toURL().toExternalForm();
         }
       }
       catch (Throwable t) {
-        LOG.error("preparing html content for " + r, t);
+        LOG.error("preparing html content for " + remoteFile, t);
       }
     }
-    m_currentLocation = location;
-    if (m_currentLocation != null) {
-      getSwtField().setUrl(m_currentLocation);
+    setLocationInternal(location);
+  }
+
+  protected void setLocationInternal(String location) {
+    if (StringUtility.hasText(location)) {
+      getSwtField().setUrl(location);
     }
     else {
       getSwtField().setText("");

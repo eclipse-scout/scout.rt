@@ -17,9 +17,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -41,10 +43,20 @@ import org.eclipse.swt.widgets.Composite;
 public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserField> implements IRwtScoutBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutBrowserField.class);
 
-  private String m_currentLocation;
   private BrowserExtension m_browserExtension;
 
   public RwtScoutBrowserField() {
+  }
+
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    // Super call invokes setValueFromScout.
+    // If both value and location are null we don't initialize it a second time.
+    // If location is set, it will win over value.
+    if (getScoutObject().getLocation() != null) {
+      setLocationFromScout();
+    }
   }
 
   @Override
@@ -55,29 +67,19 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
     setUiField(browser);
 
-    m_browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
-
-      @Override
-      public void execute(String url) {
-        getUiField().setUrl(url);
-      }
-
-    });
-    m_browserExtension.attach();
-    browser.addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        m_browserExtension.detach();
-      }
-    });
     browser.addLocationListener(new LocationAdapter() {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void changing(LocationEvent event) {
-        event.doit = fireBeforeLocationChangedFromUi(event.location);
+        boolean changeAccepted = fireBeforeLocationChangedFromUi(event.location);
+        if (changeAccepted) {
+          // check: from local to external location?
+          if (m_browserExtension != null && isExternalUrl(event.location)) {
+            detachBrowserExtension();
+          }
+        }
+        event.doit = changeAccepted;
       }
 
       @Override
@@ -93,6 +95,46 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
   }
 
+  protected boolean isExternalUrl(String location) {
+    boolean externalUrl = false;
+    try {
+      String host = new URL(location).getHost();
+      externalUrl = StringUtility.hasText(host) && StringUtility.notEequalsIgnoreCase("local", host);
+    }
+    catch (Throwable t) {
+      // nop: externalUrl == false
+    }
+    return externalUrl;
+  }
+
+  protected void attachBrowserExtension(Browser browser) {
+    detachBrowserExtension();
+    final BrowserExtension browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
+
+      @Override
+      public void execute(String url) {
+        setLocationInternal(url);
+      }
+    });
+    browserExtension.attach();
+    browser.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        browserExtension.detach();
+      }
+    });
+    m_browserExtension = browserExtension;
+  }
+
+  protected void detachBrowserExtension() {
+    if (m_browserExtension != null) {
+      m_browserExtension.detach();
+      m_browserExtension = null;
+    }
+  }
+
   @Override
   public Browser getUiField() {
     return (Browser) super.getUiField();
@@ -106,25 +148,31 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     }
   }
 
-  @Override
-  protected void setValueFromScout() {
-    setLocationFromScout();
+  protected void setLocationFromScout() {
+    setLocationInternal(getScoutObject().getLocation());
   }
 
-  protected void setLocationFromScout() {
-    m_browserExtension.clearResourceCache();
-    m_browserExtension.clearLocalHyperlinkCache();
-    String location = getScoutObject().getLocation();
-    RemoteFile r = getScoutObject().getValue();
-    if (location == null && r != null && r.exists()) {
+  @Override
+  protected void setValueFromScout() {
+    RemoteFile remoteFile = getScoutObject().getValue();
+    String location = null;
+    if (remoteFile != null && remoteFile.exists()) {
+      if (m_browserExtension != null) {
+        m_browserExtension.clearResourceCache();
+        m_browserExtension.clearLocalHyperlinkCache();
+      }
+      else {
+        attachBrowserExtension(getUiField());
+      }
+
       try {
-        if (r.getName().matches(".*\\.(zip|jar)")) {
-          location = registerResourcesInZip(r);
+        if (remoteFile.getName().matches(".*\\.(zip|jar)")) {
+          location = registerResourcesInZip(m_browserExtension, remoteFile);
         }
         else {
-          String content = IOUtility.getContent(r.getDecompressedReader());
+          String content = IOUtility.getContent(remoteFile.getDecompressedReader());
           content = m_browserExtension.adaptLocalHyperlinks(content);
-          location = m_browserExtension.addResource(r.getName(), new ByteArrayInputStream(content.getBytes("UTF-8")));
+          location = m_browserExtension.addResource(remoteFile.getName(), new ByteArrayInputStream(content.getBytes("UTF-8")));
         }
         //Prevent caching by making the request unique
         if (location != null) {
@@ -132,19 +180,13 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
         }
       }
       catch (Throwable t) {
-        LOG.error("preparing html content for " + r, t);
+        LOG.error("preparing html content for " + remoteFile, t);
       }
     }
-    m_currentLocation = location;
-    if (m_currentLocation != null) {
-      getUiField().setUrl(m_currentLocation);
-    }
-    else {
-      getUiField().setText("");
-    }
+    setLocationInternal(location);
   }
 
-  private String registerResourcesInZip(RemoteFile zipFile) throws ProcessingException, IOException, UnsupportedEncodingException, FileNotFoundException {
+  private String registerResourcesInZip(BrowserExtension browserExtension, RemoteFile zipFile) throws ProcessingException, IOException, UnsupportedEncodingException, FileNotFoundException {
     String location = null;
     File tempDir = IOUtility.createTempDirectory("browser");
     try {
@@ -157,22 +199,22 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
           String path = f.getAbsolutePath().substring(prefixLen);
           if (path.toLowerCase().matches(".*\\.(htm|html)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-            content = m_browserExtension.adaptLocalHyperlinks(content);
+            content = browserExtension.adaptLocalHyperlinks(content);
             if (location == null && path.startsWith(simpleName)) {
               //this is the index.html
-              location = m_browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
+              location = browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
             }
             else {
-              m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
+              browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
             }
           }
           else if (path.toLowerCase().matches(".*\\.(svg)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
-            content = m_browserExtension.adaptLocalHyperlinks(content);
-            m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
+            content = browserExtension.adaptLocalHyperlinks(content);
+            browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
           }
           else {
-            m_browserExtension.addResource(path, new FileInputStream(f));
+            browserExtension.addResource(path, new FileInputStream(f));
           }
         }
       }
@@ -183,6 +225,15 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
       }
     }
     return location;
+  }
+
+  protected void setLocationInternal(String location) {
+    if (StringUtility.hasText(location)) {
+      getUiField().setUrl(location);
+    }
+    else {
+      getUiField().setText("");
+    }
   }
 
   @Override
