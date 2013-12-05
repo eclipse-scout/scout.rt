@@ -18,7 +18,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.Collator;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -172,19 +174,55 @@ public final class StringUtility {
     return returnValue;
   }
 
+  private static final Set<String> booleanTrue = new HashSet<String>(3);
+  static {
+    booleanTrue.add("true");
+    booleanTrue.add("yes");
+    booleanTrue.add("1");
+  }
+  private static final Set<String> booleanFalse = new HashSet<String>(3);
+  static {
+    booleanFalse.add("false");
+    booleanFalse.add("no");
+    booleanFalse.add("0");
+  }
+
+  /**
+   * This method parses a string and returns the associated boolean value.
+   * If the string does not represent a valid boolean value, the defaultValue will be returned.
+   * If no defaultValue is given, Boolean.False will be returned.
+   * The Strings "true", "1", "yes" (case insensitive) are considered true whereas the strings "false", "0", "no" are
+   * considered false.
+   * <p>
+   * Examples:
+   * <ul>
+   * <li>parseBoolean("true") -> Boolean.True
+   * <li>parseBoolean("1") -> Boolean.True
+   * <li>parseBoolean("yes") -> Boolean.True
+   * <li>parseBoolean("False") -> Boolean.False
+   * <li>parseBoolean("0") -> Boolean.False
+   * <li>parseBoolean("test") -> Boolean.False
+   * <li>parseBoolean("test", true) -> Boolean.True
+   * </ul>
+   */
   public static boolean parseBoolean(String s, boolean defaultValue) {
     if (s == null || s.length() == 0) {
       return defaultValue;
     }
     s = s.toLowerCase().trim();
     if (defaultValue) {
-      return !("0,false,no".indexOf(s) >= 0);
+      return !booleanFalse.contains(s);
     }
     else {
-      return "1,true,yes".indexOf(s) >= 0;
+      return booleanTrue.contains(s);
     }
   }
 
+  /**
+   * This method parses a string and returns the associated boolean value.
+   * 
+   * @see #parseBoolean(String, boolean)
+   */
   public static boolean parseBoolean(String s) {
     return parseBoolean(s, false);
   }

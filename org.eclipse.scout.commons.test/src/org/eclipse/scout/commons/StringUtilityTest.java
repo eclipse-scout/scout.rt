@@ -334,4 +334,37 @@ public class StringUtilityTest {
     text = null;
     assertFalse(StringUtility.containsNewLines(text));
   }
+
+  /**
+   * Test for {@link StringUtility#parseBoolean(String)}
+   * 
+   * @since 3.10.0-M4
+   */
+  @Test
+  public void testParseBoolean() {
+    assertEquals(false, StringUtility.parseBoolean("false"));
+    assertEquals(false, StringUtility.parseBoolean("False"));
+    assertEquals(false, StringUtility.parseBoolean("FALSE"));
+    assertEquals(false, StringUtility.parseBoolean("no"));
+    assertEquals(false, StringUtility.parseBoolean("0"));
+    assertEquals(false, StringUtility.parseBoolean("x", false));
+    assertEquals(false, StringUtility.parseBoolean("", false));
+    assertEquals(false, StringUtility.parseBoolean(null));
+    assertEquals(false, StringUtility.parseBoolean(null, false));
+    assertEquals(true, StringUtility.parseBoolean("true"));
+    assertEquals(true, StringUtility.parseBoolean("True"));
+    assertEquals(true, StringUtility.parseBoolean("TRUE"));
+    assertEquals(true, StringUtility.parseBoolean("yes"));
+    assertEquals(true, StringUtility.parseBoolean("yes", true));
+    assertEquals(true, StringUtility.parseBoolean("x", true));
+    assertEquals(true, StringUtility.parseBoolean("", true));
+    assertEquals(true, StringUtility.parseBoolean(null, true));
+    assertEquals(false, StringUtility.parseBoolean("lse"));
+    assertEquals(false, StringUtility.parseBoolean(","));
+    assertEquals(true, StringUtility.parseBoolean(",", true));
+    assertEquals(true, StringUtility.parseBoolean("alse", true));
+    assertEquals(true, StringUtility.parseBoolean("rue", true));
+    assertEquals(false, StringUtility.parseBoolean("false", true));
+    assertEquals(true, StringUtility.parseBoolean("true", false));
+  }
 }
