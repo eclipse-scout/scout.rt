@@ -874,3 +874,14 @@ Solution:
 Although in the table page, the table in the column is displayed as a table, in the column filter dialog, the rows are displayed without table, therefore fitting into one cell. The display in the column filter dialog is the same as if it is not chosen to be displayed as table (in the add column dialog).
 Migration:
 None
+
+02.12.2013 eba, tsw
+Bugzilla: 422935
+Problem:
+For the PlannerField it is possible to set the splitter position at the initialization of the field. See https://bugs.eclipse.org/bugs/show_bug.cgi?id=365227
+There is already a method in AbstractPlannerField to set the splitter position (setSplitterPosition(int)) but there is no action in the property change listener in the SwingScoutPlannerField.handleScoutPropertyChange(...) for the splitter position property. So the UI does nothing.
+Solution:
+The solution is to add some action to the handleScoutPropertyChange method that sets the new value to the JSplitPane which is used to implement the splitter.
+It is also necessary to refresh the splitter position property in the model when the splitter is moved by mouse.
+Migration (optional):
+If you implemented IPlannerUiFacade yourself, you have to implement setSplitterPositionFromUi too.
