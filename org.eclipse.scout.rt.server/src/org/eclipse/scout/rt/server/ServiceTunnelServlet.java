@@ -203,7 +203,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
+  protected IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     synchronized (req.getSession()) {
       IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());

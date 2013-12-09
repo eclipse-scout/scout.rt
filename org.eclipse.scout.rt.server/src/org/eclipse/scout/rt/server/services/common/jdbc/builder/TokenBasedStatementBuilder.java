@@ -240,7 +240,7 @@ public class TokenBasedStatementBuilder {
     //default
     String s = getTokenMapping(key);
     if (s == null && !hasTokenMapping(key)) {
-      LOG.warn("null BsiCrmFieldMapping for key " + key);
+      LOG.warn("null FieldMapping for key " + key);
     }
     if (s != null && s.length() > 0 && !"1=1".equals(s)) {
       Object sValue = (args != null && args.length > 0 ? args[0] : null);

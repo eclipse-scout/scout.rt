@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,7 @@ import org.eclipse.equinox.app.IApplicationContext;
  * osgi.console=
  * eclipse.consoleLog=true
  * org.eclipse.equinox.http.jetty.http.port=8080
- * org.eclipse.equinox.http.jetty.context.path=/bsicrm
+ * org.eclipse.equinox.http.jetty.context.path=/scoutapp
  * osgi.bundles=org.eclipse.equinox.common@2:start, org.eclipse.update.configurator@start, org.eclipse.equinox.http.jetty@start, org.eclipse.equinox.http.registry@start, org.eclipse.core.runtime@start
  * osgi.bundles.defaultStartLevel=4
  * osgi.noShutdown=true

@@ -14,13 +14,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.scout.commons.StoppableThread;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
+import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 
-public abstract class AbstractScheduler implements IScheduler {
+public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(Scheduler.class);
   private P_Dispatcher m_dispatcher;
   private final Object m_queueLock;
@@ -39,6 +42,8 @@ public abstract class AbstractScheduler implements IScheduler {
     m_runningJobs = new HashSet<ISchedulerJob>();
     m_queueLock = new Object();
     m_ticker = ticker;
+
+    DiagnosticFactory.addDiagnosticStatusProvider(this);
   }
 
   @Override
@@ -395,4 +400,29 @@ public abstract class AbstractScheduler implements IScheduler {
     }
   }
 
+  /*
+   * Diagnostics
+   */
+  @Override
+  public void addDiagnosticItemToList(List<List<String>> result) {
+    DiagnosticFactory.addDiagnosticItemToList(result, "Scheduler", "", this.isActive() ? DiagnosticFactory.STATUS_ACTIVE : DiagnosticFactory.STATUS_INACTIVE);
+    if (this.isActive()) {
+      DiagnosticFactory.addDiagnosticItemToList(result, "Scheduler Jobs", "Total jobs: " + this.getJobCount() + ", Running: " + this.getRunningJobCount(), DiagnosticFactory.STATUS_INFO);
+    }
+  }
+
+  @Override
+  public String[] getPossibleActions() {
+    return null;
+  }
+
+  @Override
+  public void addSubmitButtonsHTML(List<List<String>> result, String formStartHtml, String submitHtml, String formEndHtml) {
+    //NOP
+  }
+
+  @Override
+  public void call(String action, Object[] value) {
+    //NOP
+  }
 }
