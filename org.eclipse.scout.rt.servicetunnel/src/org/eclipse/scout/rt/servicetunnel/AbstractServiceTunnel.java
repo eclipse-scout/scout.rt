@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 import org.eclipse.scout.service.ServiceUtility;
-import org.xml.sax.ErrorHandler;
 
 /**
  * Service tunnel is Thread-Safe.
@@ -106,7 +105,6 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         ProcessingException pe;
         if (t instanceof VersionMismatchException) {
           VersionMismatchException ve = (VersionMismatchException) t;
-          handleVersionMismatch(ve);
           pe = ve;
         }
         else if (t instanceof ProcessingException) {
@@ -149,12 +147,4 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   }
 
   protected abstract ServiceTunnelResponse tunnel(final ServiceTunnelRequest call);
-
-  /**
-   * @deprecated version mismatch is handled in the {@link ErrorHandler}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected void handleVersionMismatch(final VersionMismatchException ve) {
-  }
-
 }

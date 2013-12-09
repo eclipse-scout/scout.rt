@@ -142,14 +142,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return false;
   }
 
-  /**
-   * @deprecated obsolete, not used anymore. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected boolean getConfiguredNonSelectionAction() {
-    return false;
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   protected boolean getConfiguredEmptySpaceAction() {

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNo
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
 /**
- * @deprecated use {@link DataModelAttributePartDefinition}
+ * @deprecated use {@link DataModelAttributePartDefinition}. Will be removed in the 3.11.0 Release
  */
 @Deprecated
 public class ComposerAttributePartDefinition extends DataModelAttributePartDefinition {

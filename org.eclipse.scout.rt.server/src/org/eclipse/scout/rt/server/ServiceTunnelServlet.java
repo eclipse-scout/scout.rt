@@ -174,14 +174,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * @deprecated use {@link #createContentHandler(Class)}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected IServiceTunnelContentHandler createMessageEncoder(Class<? extends IServerSession> sessionClass) {
-    return createContentHandler(sessionClass);
-  }
-
-  /**
    * create the (reusable) content handler (soap, xml, binary) for marshalling scout/osgi remote service calls
    * <p>
    * This method is part of the protected api and can be overridden.
@@ -195,7 +187,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private IServiceTunnelContentHandler getServiceTunnelContentHandler() {
     synchronized (m_msgEncoderLock) {
       if (m_contentHandler == null) {
-        m_contentHandler = createMessageEncoder(m_serverSessionClass);
+        m_contentHandler = createContentHandler(m_serverSessionClass);
       }
     }
     return m_contentHandler;

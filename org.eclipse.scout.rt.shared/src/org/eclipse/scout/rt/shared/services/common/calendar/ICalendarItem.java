@@ -35,23 +35,6 @@ public interface ICalendarItem {
    */
   boolean isIntersecting(Date minDate, Date maxDate);
 
-  /**
-   * @return the internal id (as long if it is a number)
-   * @throws UnsupportedOperationException
-   *           if internal id is <code>null</code> or not a number
-   * @deprecated use {@link #getItemId()}. method will be removed in 3.10
-   */
-  @Deprecated
-  long getId();
-
-  /**
-   * set the internal id
-   * 
-   * @deprecated use {@link #setItemId(Object)}. method will be removed in 3.10
-   */
-  @Deprecated
-  void setId(long id);
-
   String getSubject();
 
   void setSubject(String a);

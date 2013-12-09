@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.transaction;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -24,7 +25,7 @@ public class BasicTransaction implements ITransaction {
   private final long m_transactionSequence;
   private final Object m_memberMapLock = new Object();
   private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<String, ITransactionMember>();
-  private ArrayList<Throwable> m_failures = new ArrayList<Throwable>();
+  private List<Throwable> m_failures = new ArrayList<Throwable>();
   private boolean m_commitPhase;
   private boolean m_cancelled;
 
@@ -43,17 +44,6 @@ public class BasicTransaction implements ITransaction {
   @Override
   public long getTransactionSequence() {
     return m_transactionSequence;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void registerResource(ITransactionMember member) {
-    try {
-      registerMember(member);
-    }
-    catch (ProcessingException e) {
-      throw new IllegalStateException("Interrupted");
-    }
   }
 
   @Override

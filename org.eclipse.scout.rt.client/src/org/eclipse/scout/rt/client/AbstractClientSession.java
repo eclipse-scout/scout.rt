@@ -93,14 +93,6 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
-  /**
-   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected boolean getConfiguredWebSession() {
-    return getConfiguredSingleThreadSession();
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredSingleThreadSession() {
@@ -443,12 +435,6 @@ public abstract class AbstractClientSession implements IClientSession {
     m_offlineSubject = new Subject();
     m_offlineSubject.getPrincipals().add(new SimplePrincipal(offlineUser));
     OfflineState.setOfflineDefault(true);
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean isWebSession() {
-    return isSingleThreadSession();
   }
 
   @Override

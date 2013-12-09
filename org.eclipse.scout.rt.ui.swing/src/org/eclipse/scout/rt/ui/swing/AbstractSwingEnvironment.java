@@ -64,7 +64,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -83,7 +82,6 @@ import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelTop;
 import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler;
-import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.SwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
@@ -480,27 +478,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public IClientSession getScoutSession() {
     return m_scoutSession;
-  }
-
-  /**
-   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public boolean isBusy() {
-    //replaced by SwingBusyHandler
-    return false;
-  }
-
-  /**
-   * @deprecated replaced by {@link SwingBusyHandler}. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public void setBusyFromSwing(boolean b) {
-    //replaced by SwingBusyHandler
   }
 
   @Override
@@ -1050,26 +1027,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
-  /**
-   * @return true if component can realistically gain focus
-   */
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean acceptAsFocusTarget(Component comp) {
-    checkThread();
-    return new SwingScoutFocusTraversalPolicy().accept(comp);
-  }
-
-  /**
-   * @deprecated use {@link #createStatusLabel(IFormField)} instead. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public JStatusLabelEx createStatusLabel() {
-    return createStatusLabel(null);
-  }
-
   @Override
   public JStatusLabelEx createStatusLabel(IFormField formField) {
     JStatusLabelEx ui = null;
@@ -1161,16 +1118,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     if (!SwingUtilities.isEventDispatchThread()) {
       throw new IllegalStateException("Must be called in swing thread");
     }
-  }
-
-  /**
-   * @deprecated use {@link IForm#getEventHistory()}. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public FormEvent[] fetchPendingPrintEvents(IForm form) {
-    return new FormEvent[0];
   }
 
   /**

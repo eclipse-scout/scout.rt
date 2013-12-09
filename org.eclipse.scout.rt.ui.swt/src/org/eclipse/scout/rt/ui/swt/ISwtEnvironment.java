@@ -18,12 +18,10 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
@@ -67,15 +65,6 @@ public interface ISwtEnvironment {
   String PROP_GROUP_BOX_LAYOUT_FIELD_MIN_WIDTH = "GroupBoxLayout.FieldMinWidth";
   String PROP_DISABLED_FOREGROUND_COLOR = "FormField.diabledForegroundColor";
 
-  /**
-   * {@link Boolean} busy/idle handling Use positive edge from swt 0->1 and
-   * negative edge from scout 1->0
-   * 
-   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  String PROP_BUSY = "busy";
-
   Display getDisplay();
 
   /**
@@ -94,12 +83,6 @@ public interface ISwtEnvironment {
    * Must be called in display thread
    */
   void ensureInitialized();
-
-  /**
-   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  boolean isBusy();
 
   void addPropertyChangeListener(PropertyChangeListener listener);
 
@@ -255,12 +238,6 @@ public interface ISwtEnvironment {
   String getPerspectiveId();
 
   /**
-   * @deprecated replaced by {@link SwtBusyHandler}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  void setBusyFromSwt(boolean b);
-
-  /**
    * @return the popupOwner for the (next) popup that is displayed
    */
   Control getPopupOwner();
@@ -288,11 +265,4 @@ public interface ISwtEnvironment {
    * sheet settings based on a {@link Control}s font and color
    */
   String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml);
-
-  /**
-   * @deprecated use {@link IForm#getEventHistory()} Will be removed in Release 3.10.
-   */
-  @Deprecated
-  FormEvent[] fetchPendingPrintEvents(IForm form);
-
 }

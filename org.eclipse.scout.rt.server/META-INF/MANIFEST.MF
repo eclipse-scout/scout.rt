@@ -39,12 +39,9 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.services.common.security,
  org.eclipse.scout.rt.server.services.common.session,
  org.eclipse.scout.rt.server.services.common.smtp,
- org.eclipse.scout.rt.server.services.common.test,
  org.eclipse.scout.rt.server.services.common.useractivity,
  org.eclipse.scout.rt.server.services.common.workflow,
  org.eclipse.scout.rt.server.services.lookup,
- org.eclipse.scout.rt.server.servlet.filter,
- org.eclipse.scout.rt.server.servlet.test,
  org.eclipse.scout.rt.server.transaction
 Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

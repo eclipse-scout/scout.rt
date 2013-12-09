@@ -93,23 +93,6 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public long getId() {
-    if (m_itemId instanceof Number) {
-      return ((Number) m_itemId).longValue();
-    }
-    else {
-      throw new UnsupportedOperationException("Id is not a number.");
-    }
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setId(long newId) {
-    m_itemId = Long.valueOf(newId);
-  }
-
-  @Override
   public Object getItemId() {
     return m_itemId;
   }

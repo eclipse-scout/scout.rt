@@ -26,13 +26,11 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
@@ -172,10 +170,7 @@ public class DefaultTransactionDelegate {
       callInspector = sessionInspector.requestCallInspector(serviceReq);
     }
     ServiceTunnelResponse serviceRes = null;
-    boolean backupIsWebClientCurrentThread = WebClientState.isWebClientInCurrentThread();
     try {
-      String virtualSessionId = serviceReq.getVirtualSessionId();
-      WebClientState.setWebClientInCurrentThread(virtualSessionId != null);
       //do checks
       Class<?> serviceInterfaceClass = null;
       for (Bundle b : m_loaderBundles) {
@@ -258,7 +253,6 @@ public class DefaultTransactionDelegate {
           LOG.warn(null, t);
         }
       }
-      WebClientState.setWebClientInCurrentThread(backupIsWebClientCurrentThread);
     }
   }
 
@@ -306,10 +300,6 @@ public class DefaultTransactionDelegate {
       }
       if (m != null) {
         for (Annotation ann : m.getAnnotations()) {
-          //legacy
-          if (ann.annotationType() == ServiceTunnelAccessDenied.class) {
-            throw new SecurityException("access denied (code 2a).");
-          }
           if (ann.annotationType() == RemoteServiceAccessDenied.class) {
             throw new SecurityException("access denied (code 2b).");
           }

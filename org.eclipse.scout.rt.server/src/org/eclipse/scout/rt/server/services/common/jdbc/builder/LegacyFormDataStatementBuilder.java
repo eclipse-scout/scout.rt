@@ -18,6 +18,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
+/**
+ * @deprecated Will be removed in the 3.11.0 Release
+ */
 @Deprecated
 @SuppressWarnings("deprecation")
 public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {

@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -58,16 +57,6 @@ import org.eclipse.scout.rt.ui.swing.window.messagebox.ISwingScoutMessageBox;
  * methods of this interface also run in swing thread
  */
 public interface ISwingEnvironment {
-
-  /**
-   * {@link Boolean} busy/idle handling Use positive edge from swing 0->1 and
-   * negative edge from scout 1->0
-   * 
-   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler} Will be
-   *             removed in Release 3.10.
-   */
-  @Deprecated
-  String PROP_BUSY = "busy";
 
   /**
    * This method should be called prior to using any methods in the environment
@@ -179,13 +168,6 @@ public interface ISwingEnvironment {
   void interceptUIDefaults(UIDefaults defaults);
 
   /**
-   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler}. Will be
-   *             removed in Release 3.10.
-   */
-  @Deprecated
-  void setBusyFromSwing(boolean b);
-
-  /**
    * start up the gui
    */
   void showGUI(IClientSession session);
@@ -205,13 +187,6 @@ public interface ISwingEnvironment {
   IClientSession getScoutSession();
 
   IFormField findFocusOwnerField();
-
-  /**
-   * @deprecated replaced by {@link org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler SwingBusyHandler}. Will be
-   *             removed in Release 3.10.
-   */
-  @Deprecated
-  boolean isBusy();
 
   /**
    * This method may be called from showGUI
@@ -338,18 +313,6 @@ public interface ISwingEnvironment {
    */
   void invokeSwingLater(Runnable j);
 
-  /**
-   * @deprecated Will be removed in Release 3.10
-   */
-  @Deprecated
-  boolean acceptAsFocusTarget(Component comp);
-
-  /**
-   * @deprecated use {@link #createStatusLabel(IFormField)} instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  JStatusLabelEx createStatusLabel();
-
   JStatusLabelEx createStatusLabel(IFormField formField);
 
   OnFieldLabelDecorator createOnFieldLabelDecorator(JComponent c, boolean mandatory);
@@ -379,12 +342,6 @@ public interface ISwingEnvironment {
    * current style sheet settings based on a {@link component}s font and color.
    */
   String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml);
-
-  /**
-   * @deprecated use {@link IForm#getEventHistory()}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  FormEvent[] fetchPendingPrintEvents(IForm form);
 
   /**
    * Enables customization of JDialogEx by returning subtypes.

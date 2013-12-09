@@ -673,26 +673,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated use {@link #getPagePopulateStatus()}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public IProcessingStatus getTablePopulateStatus() {
-    return getPagePopulateStatus();
-  }
-
-  /**
-   * @deprecated use {@link #setPagePopulateStatus(IProcessingStatus)}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setTablePopulateStatus(IProcessingStatus status) {
-    setPagePopulateStatus(status);
-  }
-
-  /**
    * Import the content of the tablePageData in the table of the page.
    * 
    * @param tablePageData

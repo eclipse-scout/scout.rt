@@ -124,29 +124,6 @@ public class TablePageState extends AbstractPageState implements Serializable, C
     m_searchFilterState = state;
   }
 
-  /**
-   * @deprecated use {@link #getAvailableColumns()} and filter by visible property. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("unchecked")
-  @Deprecated
-  public List<TableColumnState> getVisibleColumns() {
-    return Collections.unmodifiableList(m_visibleColumns != null ? m_visibleColumns : Collections.EMPTY_LIST);
-  }
-
-  /**
-   * @deprecated use {@link #setAvailableColumns()} and set all available columns (with sort index, dispayable, visible
-   *             and width property), not just the visible ones. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  public void setVisibleColumns(List<TableColumnState> cols) {
-    if (cols == null) {
-      m_visibleColumns = null;
-    }
-    else {
-      m_visibleColumns = new ArrayList<TableColumnState>(cols);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public List<TableColumnState> getAvailableColumns() {
     return Collections.unmodifiableList(m_availableColumns != null ? m_availableColumns : Collections.EMPTY_LIST);

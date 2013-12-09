@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -197,35 +197,4 @@ public class JActivityMapHeader extends JComponent {
     }
     g.setClip(oldShape);
   }
-
-  /**
-   * Deprecated: Use @see{JActivityMapHeaderValidator} will be removed in scout 3.10
-   * checks available space for texts When a text is null or empty, the previous
-   * text gets the space
-   * 
-   * @param validatedRects
-   *          is an out parameter
-   */
-  @Deprecated
-  private boolean validateTextSizes(FontMetrics fm, List<String> texts, List<Rectangle> rects, List<Rectangle> validatedRects) {
-    validatedRects.clear();
-    validatedRects.addAll(rects);
-    boolean fits = true;
-    for (int i = 0; i < validatedRects.size(); i++) {
-      String text = texts.get(i);
-      if (text != null && text.length() > 0) {
-        int k = i + 1;
-        while (k < validatedRects.size() && (texts.get(k) == null || texts.get(k).length() == 0)) {
-          validatedRects.get(i).width += validatedRects.get(k).width;
-          validatedRects.get(k).width = 0;
-          k++;
-        }
-        if (fm.stringWidth(text) > validatedRects.get(i).width - 4) {
-          fits = false;
-        }
-      }
-    }
-    return fits;
-  }
-
 }

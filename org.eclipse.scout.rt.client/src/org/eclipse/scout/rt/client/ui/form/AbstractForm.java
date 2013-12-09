@@ -1787,18 +1787,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return m_blockingCondition.isBlocking();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Object getCustomProperty(String propName) {
-    return getProperty(propName);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setCustomProperty(String propName, Object o) {
-    setProperty(propName, o);
-  }
-
   @Override
   public Object getProperty(String name) {
     return propertySupport.getProperty(name);

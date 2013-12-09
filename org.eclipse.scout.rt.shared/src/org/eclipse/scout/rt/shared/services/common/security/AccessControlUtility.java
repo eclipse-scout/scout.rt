@@ -38,22 +38,6 @@ public final class AccessControlUtility {
    * @param matrix
    *          is expected to contain the columns PERMISSION_CLASS (String),
    *          PERMISSION_LEVEL (Integer)
-   * @param classLoaderBundle
-   *          bundle used to load the permission classes.
-   * @deprecated this method does not work if permission classes are defined in different bundles. Use
-   *             {@link AccessControlUtility#createPermissions(Object[][])} instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  public static Permissions createPermissions(Object[][] permissionData, Bundle classLoaderBundle) {
-    return createPermissions(permissionData);
-  }
-
-  /**
-   * Convenience to create permissions using a raw data matrix containing rows, columns
-   * 
-   * @param matrix
-   *          is expected to contain the columns PERMISSION_CLASS (String),
-   *          PERMISSION_LEVEL (Integer)
    */
   public static Permissions createPermissions(Object[][] permissionData) {
     HashMap<String, BundleClassDescriptor> permissionNameToBundleClassDesc;

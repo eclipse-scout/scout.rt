@@ -44,12 +44,6 @@ public interface ITransaction {
   long getTransactionSequence();
 
   /**
-   * @deprecated use {@link #registerMember(ITransactionMember)} instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  void registerResource(ITransactionMember member);
-
-  /**
    * register the member (even if the transaction is canceled)
    * 
    * @throws ProcessingException

@@ -2867,16 +2867,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return (IColumn<?>) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
   }
 
-  /**
-   * @deprecated use {@link #discardAllDeletedRows()} instead. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void clearDeletedRows() {
-    discardAllDeletedRows();
-  }
-
   @Override
   public Object[] getRowKeys(int rowIndex) {
     ITableRow row = getRow(rowIndex);

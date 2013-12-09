@@ -88,20 +88,6 @@ public class PermissionService extends AbstractService implements IPermissionSer
   }
 
   /**
-   * Checks whether the given class name is a potential permission class. This default implementation checks whether the
-   * class name contains <em>Permission</em>.
-   * 
-   * @deprecated replaced by {@link #acceptClassName(Bundle, String)}. Will be removed in Release 3.10.
-   * @param className
-   *          The class name to check.
-   * @return Returns <code>true</code> if the given class looks like a permission. Otherwise <code>false</code>.
-   */
-  @Deprecated
-  protected boolean isCandidate(String className) {
-    return className.indexOf("Permission") >= 0;
-  }
-
-  /**
    * Checks whether the given bundle should be scanned for permission classes. The default implementations accepts
    * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
    * bundle).
@@ -126,7 +112,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
    *         class. <code>false</code> otherwise.
    */
   protected boolean acceptClassName(Bundle bundle, String className) {
-    return isCandidate(className);
+    return className.indexOf("Permission") >= 0;
   }
 
   /**

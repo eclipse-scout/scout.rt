@@ -114,26 +114,6 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public Long getPersonId() {
-    if (m_person instanceof Number) {
-      return ((Number) m_person).longValue();
-    }
-    else if (m_person == null) {
-      return null;
-    }
-    else {
-      throw new UnsupportedOperationException("Person id is not a number.");
-    }
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setPersonId(Long n) {
-    m_person = n;
-  }
-
-  @Override
   public Object getPerson() {
     return m_person;
   }

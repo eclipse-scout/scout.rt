@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.Permission;
@@ -230,24 +229,8 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     m_accessControlStore.clearCache();
   }
 
-  /**
-   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public void clearCacheOfPrincipals(String... userIds) {
-    clearCacheOfUserIds(userIds);
-  }
-
   @Override
   public void clearCacheOfUserIds(String... userIds) {
     m_accessControlStore.clearCacheOfUserIds(userIds);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean checkServiceTunnelAccess(Class serviceInterfaceClass, Method method, Object[] args) {
-    return false;
   }
 }

@@ -14,21 +14,6 @@ import java.util.Date;
 
 public interface ICalendarTask extends ICalendarItem {
 
-  /**
-   * @return the internal responsible id (as {@link Long} if it is a number)
-   * @throws UnsupportedOperationException
-   *           if internal responsible id is not <code>null</code> or a number
-   * @deprecated use {@link #getResponsible()}. method will be removed in 3.10
-   */
-  @Deprecated
-  Long getResponsibleId();
-
-  /**
-   * @deprecated use {@link #setResponsible(Object)}. method will be removed in 3.10.
-   */
-  @Deprecated
-  void setResponsibleId(Long n);
-
   void setResponsible(Object responsible);
 
   Object getResponsible();

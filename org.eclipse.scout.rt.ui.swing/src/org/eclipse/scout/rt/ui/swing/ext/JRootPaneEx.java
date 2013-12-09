@@ -73,9 +73,9 @@ public class JRootPaneEx extends JRootPane {
     if (d.width > 0 && d.height > 0) {
       Dimension[] sizes = SwingLayoutUtility.getValidatedSizes(JRootPaneEx.this);
       Dimension minMaxSize = new Dimension(
-                        Math.min(Math.max(d.width, sizes[0].width), sizes[2].width),
-                        Math.min(Math.max(d.height, sizes[0].height), sizes[2].height)
-                        );
+          Math.min(Math.max(d.width, sizes[0].width), sizes[2].width),
+          Math.min(Math.max(d.height, sizes[0].height), sizes[2].height)
+          );
       int dw = minMaxSize.width - d.width;
       int dh = minMaxSize.height - d.height;
       int dwPref = sizes[1].width - d.width;
@@ -83,7 +83,7 @@ public class JRootPaneEx extends JRootPane {
       //OLD: if (dw != 0 || dh != 0 || dwPref != 0 || dhPref != 0) {
       //NEW: only force re-pack when min/max or at least prefHeight is not met, forcing preferred size breaks the bugs https://bugs.eclipse.org/bugs/show_bug.cgi?id=363148 and tickets 107768, 106554
       if (dw != 0 || dh != 0 || dhPref > 0) {
-        correctRootPaneSize(dw, dh, dwPref, dhPref);
+        reflow();
       }
     }
   }
@@ -92,26 +92,6 @@ public class JRootPaneEx extends JRootPane {
   public void validate() {
     SwingLayoutUtility.invalidateSubtree(this);
     super.validate();
-  }
-
-  /**
-   * @deprecated use {@link #reflow()} instead
-   * @param widthDelta
-   *          is the width correction (existingWidth+widthDelta=correctWidth) to
-   *          meet min/max sizes
-   * @param heightDelta
-   *          is the height correction
-   *          (existingHeight+heightDelta=correctHeight) to meet min/max sizes
-   * @param preferredWidthDelta
-   *          is the width correction (existingWidth+widthDelta=prefWidth) to
-   *          meet preferred size
-   * @param preferredHeightDelta
-   *          is the height correction (existingHeight+heightDelta=prefHeight)
-   *          to meet preferred size
-   */
-  @Deprecated
-  protected void correctRootPaneSize(int widthDelta, int heightDelta, int preferredWidthDelta, int preferredHeightDelta) {
-    reflow();
   }
 
   protected void reflow() {

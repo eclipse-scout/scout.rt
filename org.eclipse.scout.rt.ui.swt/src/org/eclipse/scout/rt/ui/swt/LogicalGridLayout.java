@@ -252,14 +252,6 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     out.flush();
   }
 
-  /**
-   * @deprecated use {@link #validateLayout(Composite, int, boolean)}. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected void validateLayout(Composite parent) {
-    validateLayout(parent, SWT.DEFAULT, false);
-  }
-
   protected void validateLayout(Composite parent, int wHint, boolean flushCache) {
     CompositeObject newKey = new CompositeObject(parent.getSize(), wHint == SWT.DEFAULT ? (m_infoCacheKey != null ? m_infoCacheKey.getComponent(1) : wHint) : wHint);
     //check cache key

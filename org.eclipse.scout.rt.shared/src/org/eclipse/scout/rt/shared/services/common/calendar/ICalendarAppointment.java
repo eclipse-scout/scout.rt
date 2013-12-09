@@ -20,21 +20,6 @@ public interface ICalendarAppointment extends ICalendarItem {
   int STATUS_BUSY = 2;
   int STATUS_OUTOFOFFICE = 3;
 
-  /**
-   * @return the internal person id (as {@link Long} if it is a number)
-   * @throws UnsupportedOperationException
-   *           if internal person id is not <code>null</code> or a number
-   * @deprecated use {@link #getPerson()}. method will be removed in 3.10
-   */
-  @Deprecated
-  Long getPersonId();
-
-  /**
-   * @deprecated use {@link #setPerson(Object)}. method will be removed in 3.10
-   */
-  @Deprecated
-  void setPersonId(Long n);
-
   void setPerson(Object person);
 
   Object getPerson();

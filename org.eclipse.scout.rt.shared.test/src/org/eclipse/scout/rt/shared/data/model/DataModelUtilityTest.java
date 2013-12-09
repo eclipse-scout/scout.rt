@@ -30,48 +30,7 @@ import org.junit.Test;
 public class DataModelUtilityTest {
 
   @Test
-  public void testStructureOld() throws Exception {
-    CustomDataModelExtension.ENABLED = false;
-    CustomDataModel dataModel = new CustomDataModel();
-    dataModel.init();
-    //
-    IDataModelVisitor v = new IDataModelVisitor() {
-      @SuppressWarnings("deprecation")
-      @Override
-      public void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf) {
-        buf.append(prefix);
-        buf.append("[" + o.getClass().getName() + "] ");
-        if (o instanceof IDataModel) {
-          buf.append("DataModel");
-        }
-        else if (o instanceof IDataModelAttribute) {
-          IDataModelAttribute x = (IDataModelAttribute) o;
-          buf.append(x.getText() + " (type-" + x.getType() + ") " + DataModelUtility.attributeToExternalId(x));
-        }
-        else if (o instanceof IDataModelEntity) {
-          IDataModelEntity x = (IDataModelEntity) o;
-          buf.append(x.getText() + " " + DataModelUtility.entityToExternalId(x));
-        }
-        buf.append("\n");
-      }
-    };
-    String s;
-    //
-    s = visit(dataModel, v, 2);
-    //System.out.println(s);
-    assertEquals(readFile("fixture/level2-old.txt").trim(), s.trim());
-    //
-    s = visit(dataModel, v, 3);
-    //System.out.println(s);
-    assertEquals(readFile("fixture/level3-old.txt").trim(), s.trim());
-    //
-    s = visit(dataModel, v, 4);
-    //System.out.println(s);
-    assertEquals(readFile("fixture/level4-old.txt").trim(), s.trim());
-  }
-
-  @Test
-  public void testStructureNew() throws Exception {
+  public void testStructure() throws Exception {
     CustomDataModelExtension.ENABLED = false;
     CustomDataModel dataModel = new CustomDataModel();
     dataModel.init();
@@ -111,48 +70,7 @@ public class DataModelUtilityTest {
   }
 
   @Test
-  public void testExternalIdOld() {
-    CustomDataModelExtension.ENABLED = true;
-    CustomDataModel dataModel = new CustomDataModel();
-    dataModel.init();
-    final AtomicInteger counter = new AtomicInteger();
-    final HashSet<Object> refSet = new HashSet<Object>();
-    final HashSet<String> externaIdSet = new HashSet<String>();
-    //
-    IDataModelVisitor v = new IDataModelVisitor() {
-      @SuppressWarnings("deprecation")
-      @Override
-      public void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf) {
-        if (o instanceof IDataModel) {
-        }
-        else if (o instanceof IDataModelAttribute) {
-          counter.incrementAndGet();
-          IDataModelAttribute x = (IDataModelAttribute) o;
-          refSet.add(x);
-          String extId = DataModelUtility.attributeToExternalId(x);
-          externaIdSet.add(extId);
-          IDataModelAttribute a2 = DataModelUtility.externalIdToAttribute(m, extId, null);
-          assertSame(x, a2);//must be SAME
-        }
-        else if (o instanceof IDataModelEntity) {
-          counter.incrementAndGet();
-          IDataModelEntity x = (IDataModelEntity) o;
-          refSet.add(x);
-          String extId = DataModelUtility.entityToExternalId(x);
-          externaIdSet.add(extId);
-          IDataModelEntity e2 = DataModelUtility.externalIdToEntity(m, extId, null);
-          assertSame(x, e2);//must be SAME
-        }
-      }
-    };
-    visit(dataModel, v, 7);
-    assertEquals(3545, counter.get());
-    assertEquals(143, refSet.size());
-    assertEquals(143, externaIdSet.size());
-  }
-
-  @Test
-  public void testExternalIdNew() {
+  public void testExternalId() {
     CustomDataModelExtension.ENABLED = true;
     CustomDataModel dataModel = new CustomDataModel();
     dataModel.init();
@@ -192,46 +110,6 @@ public class DataModelUtilityTest {
     assertEquals(3545, counter.get());
     assertEquals(143, refSet.size());
     assertEquals(3545, externaIdSet.size());
-  }
-
-  @Test
-  public void testExternalIdMixed() {
-    CustomDataModelExtension.ENABLED = true;
-    CustomDataModel dataModel = new CustomDataModel();
-    dataModel.init();
-    final AtomicInteger counter = new AtomicInteger();
-    //
-    IDataModelVisitor v = new IDataModelVisitor() {
-      @SuppressWarnings("deprecation")
-      @Override
-      public void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf) {
-        if (o instanceof IDataModel) {
-        }
-        else if (o instanceof IDataModelAttribute) {
-          counter.incrementAndGet();
-          IDataModelAttribute x = (IDataModelAttribute) o;
-          AttributePath aPath = ePath.addToEnd(x);
-          String extIdOld = DataModelUtility.attributeToExternalId(x);
-          String extIdNew = DataModelUtility.attributePathToExternalId(m, aPath);
-          AttributePath aPath2 = DataModelUtility.externalIdToAttributePath(m, extIdOld);
-          IDataModelAttribute x2 = DataModelUtility.externalIdToAttribute(m, extIdNew, null);
-          assertSame(x, aPath2.getAttribute());
-          assertSame(x, x2);
-        }
-        else if (o instanceof IDataModelEntity) {
-          counter.incrementAndGet();
-          IDataModelEntity x = (IDataModelEntity) o;
-          String extIdOld = DataModelUtility.entityToExternalId(x);
-          String extIdNew = DataModelUtility.entityPathToExternalId(m, ePath);
-          EntityPath ePath2 = DataModelUtility.externalIdToEntityPath(m, extIdOld);
-          IDataModelEntity x2 = DataModelUtility.externalIdToEntity(m, extIdNew, null);
-          assertSame(x, ePath2.lastElement());
-          assertSame(x, x2);
-        }
-      }
-    };
-    visit(dataModel, v, 7);
-    assertEquals(3545, counter.get());
   }
 
   private String readFile(String name) throws UnsupportedEncodingException, ProcessingException {

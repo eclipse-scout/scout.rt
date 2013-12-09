@@ -331,18 +331,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     m_pagePopulateStatus = status;
   }
 
-  /**
-   * @deprecated use {@link #getUserPreferenceContext()} instead. Will be removed in Release 3.10.
-   */
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @ConfigOperation
-  @Order(95)
-  public String getBookmarkIdentifier() {
-    return getUserPreferenceContext();
-  }
-
   @Override
   @ConfigOperation
   @Order(95)

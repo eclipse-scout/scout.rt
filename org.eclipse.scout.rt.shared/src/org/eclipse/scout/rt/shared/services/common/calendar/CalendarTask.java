@@ -111,26 +111,6 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public Long getResponsibleId() {
-    if (m_responsibleIdObject instanceof Number) {
-      return ((Number) m_responsibleIdObject).longValue();
-    }
-    else if (m_responsibleIdObject == null) {
-      return null;
-    }
-    else {
-      throw new UnsupportedOperationException("Responsible id is not a number.");
-    }
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setResponsibleId(Long n) {
-    m_responsibleIdObject = n;
-  }
-
-  @Override
   public Object getResponsible() {
     return m_responsibleIdObject;
   }

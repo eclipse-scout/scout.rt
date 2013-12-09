@@ -167,14 +167,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return null;
   }
 
-  /**
-   * @deprecated use {@link #getConfiguredTransactionMemberId()} Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected String getConfiguredXAResourceId() {
-    return getConfiguredTransactionMemberId();
-  }
-
   @ConfigProperty(ConfigProperty.STRING)
   @Order(90)
   protected String getConfiguredTransactionMemberId() {

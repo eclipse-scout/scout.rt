@@ -325,7 +325,6 @@ public class BindParser {
     IToken token = null;
     int index = m_pos.getIndex();
     if ((token = parsePlainValueBind()) != null ||
-        (token = parsePlainSqlBind()) != null ||
         (token = parseFunctionBind()) != null ||
         (token = parseDatabaseSpecificToken()) != null ||
         (token = parseStdBind()) != null) {
@@ -349,37 +348,6 @@ public class BindParser {
       }
       else {
         return new ValueInputToken(m_str.substring(index, m_pos.getIndex()), name, true, false);
-      }
-    }
-    m_pos.setIndex(index);
-    return null;
-  }
-
-  /**
-   * @deprecated will be completely eliminated, potential sql injections
-   */
-  @Deprecated
-  private IToken parsePlainSqlBind() {
-    if (LOG.isTraceEnabled()) {
-      trace("parsePlainSqlBind");
-    }
-    int index = m_pos.getIndex();
-    String name;
-    if (matches("&") && (name = parseName()) != null && matches("&")) {
-      if (PLAIN_SQL_BIND_ENABLED == null) {
-        LOG.warn("using plain sql bind can cause sql injections: &" + name + "&. Set property " + PLAIN_SQL_BIND_PROPERTY_NAME + "=true when legacy logic is necessarily being used");
-      }
-      else if (PLAIN_SQL_BIND_ENABLED == Boolean.FALSE) {
-        String msg = "using plain sql bind: &" + name + "&. Property " + PLAIN_SQL_BIND_PROPERTY_NAME + " is set to false which causes this error";
-        LOG.error(msg);
-        throw new IllegalArgumentException(msg);
-      }
-      //
-      if (name.startsWith("[OUT]")) {
-        return new ValueOutputToken(m_str.substring(index, m_pos.getIndex()), name.substring(5), false);
-      }
-      else {
-        return new ValueInputToken(m_str.substring(index, m_pos.getIndex()), name, false, true);
       }
     }
     m_pos.setIndex(index);

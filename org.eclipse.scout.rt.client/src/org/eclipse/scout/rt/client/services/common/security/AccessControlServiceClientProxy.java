@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.security;
 
-import java.lang.reflect.Method;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
@@ -197,27 +196,8 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     //nop
   }
 
-  /**
-   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead. Will be removed in Release 3.10.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void clearCacheOfPrincipals(String... userIds) {
-    //nop
-  }
-
   private IAccessControlService getRemoteService() {
     return ServiceTunnelUtility.createProxy(IAccessControlService.class, ClientSyncJob.getCurrentSession().getServiceTunnel());
-  }
-
-  /**
-   * no service tunnel access on client side
-   */
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean checkServiceTunnelAccess(Class serviceInterface, Method method, Object[] args) {
-    return false;
   }
 
   private static class ServiceState {

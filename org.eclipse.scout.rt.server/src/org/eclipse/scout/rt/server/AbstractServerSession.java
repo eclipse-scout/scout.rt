@@ -66,14 +66,6 @@ public abstract class AbstractServerSession implements IServerSession {
     }
   }
 
-  /**
-   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected boolean getConfiguredWebSession() {
-    return getConfiguredSingleThreadSession();
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredSingleThreadSession() {
@@ -164,7 +156,7 @@ public abstract class AbstractServerSession implements IServerSession {
 
   protected void initConfig() {
     m_singleThreadSession = getConfiguredSingleThreadSession();
-    if (!isWebSession()) {
+    if (!isSingleThreadSession()) {
       m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent e) {
@@ -214,21 +206,6 @@ public abstract class AbstractServerSession implements IServerSession {
   @ConfigOperation
   @Order(10)
   protected void execLoadSession() throws ProcessingException {
-  }
-
-  /**
-   * @deprecated never called by the framework. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  protected void execLocaleChanged() throws ProcessingException {
-  }
-
-  /**
-   * @deprecated use #isSingleThreadSession instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  public boolean isWebSession() {
-    return isSingleThreadSession();
   }
 
   @Override

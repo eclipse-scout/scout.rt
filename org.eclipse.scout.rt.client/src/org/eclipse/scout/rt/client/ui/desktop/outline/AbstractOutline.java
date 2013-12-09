@@ -92,22 +92,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * This method is no longer used and has no effect.
-   * <p>
-   * Use {@link Order} annotations to define the sort ordering of the outlines on the desktop instead.
-   * <p>
-   * Subclasses can override this method. Default is 0. Will be removed in Release 3.10.
-   * 
-   * @return the sort order of this outline.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(100)
-  @Deprecated
-  protected int getConfiguredSortNo() {
-    return 0;
-  }
-
-  /**
    * Provides a documentation text or description of this outline. The text is intended to be included in external
    * documentation. This method is typically processed by a documentation generation tool or similar.
    * <p>

@@ -295,14 +295,6 @@ public class TreeEvent extends EventObject {
     m_dropObject = t;
   }
 
-  /**
-   * @deprecated Use {@link TreeUtility#calculateCommonParentNode(ITreeNode[])}; Will be removed in Release 3.10.
-   */
-  @Deprecated
-  public static ITreeNode calculateCommonParentNode(ITreeNode[] nodes) {
-    return TreeUtility.calculateCommonParentNode(nodes);
-  }
-
   public boolean isConsumed() {
     return m_consumed;
   }

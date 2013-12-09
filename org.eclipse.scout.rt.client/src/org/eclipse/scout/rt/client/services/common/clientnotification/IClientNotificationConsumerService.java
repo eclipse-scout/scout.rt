@@ -31,26 +31,6 @@ public interface IClientNotificationConsumerService extends IService {
   void dispatchClientNotifications(IClientNotification[] notifications, IClientSession session);
 
   /**
-   * A consumer of client notifications can add a listener to this service. The
-   * listener is notified immediately on new notifications, in whatever Thread
-   * 
-   * @deprecated use {@link #addClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
-   *             instead. Services that register in their {@link IService#initializeService()} phase normally use
-   *             {@link #addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener)}. Will be
-   *             removed in Release 3.10.
-   */
-  @Deprecated
-  void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
-
-  /**
-   * @deprecated use
-   *             {@link #removeClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
-   *             instead. Will be removed in Release 3.10.
-   */
-  @Deprecated
-  void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
-
-  /**
    * A consumer of client notifications can add a listener on this service. The
    * listener is notified immediately on new notifications, in whatever thread
    */

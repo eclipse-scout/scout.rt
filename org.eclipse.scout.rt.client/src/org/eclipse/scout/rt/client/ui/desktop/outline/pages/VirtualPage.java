@@ -41,12 +41,6 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public String getBookmarkIdentifier() {
-    return null;
-  }
-
-  @Override
   public String getUserPreferenceContext() {
     return null;
   }
