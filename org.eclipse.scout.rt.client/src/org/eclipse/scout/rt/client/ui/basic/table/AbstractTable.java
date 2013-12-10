@@ -1462,15 +1462,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     TableRowDataMapper rowMapper = execCreateTableRowDataMapper(target.getRowType());
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
-      AbstractTableRowData rowData = target.addRow();
-      rowMapper.exportTableRowData(row, rowData);
+      if (rowMapper.acceptExport(row)) {
+        AbstractTableRowData rowData = target.addRow();
+        rowMapper.exportTableRowData(row, rowData);
+      }
     }
     ITableRow[] deletedRows = getDeletedRows();
     for (int i = 0, ni = deletedRows.length; i < ni; i++) {
       ITableRow row = deletedRows[i];
-      AbstractTableRowData rowData = target.addRow();
-      rowMapper.exportTableRowData(row, rowData);
-      rowData.setRowState(AbstractTableRowData.STATUS_DELETED);
+      if (rowMapper.acceptExport(row)) {
+        AbstractTableRowData rowData = target.addRow();
+        rowMapper.exportTableRowData(row, rowData);
+        rowData.setRowState(AbstractTableRowData.STATUS_DELETED);
+      }
     }
   }
 
@@ -1484,7 +1488,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     TableRowDataMapper mapper = execCreateTableRowDataMapper(source.getRowType());
     for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
       AbstractTableRowData rowData = source.rowAt(i);
-      if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED) {
+      if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
         ITableRow newTableRow = new TableRow(getColumnSet());
         mapper.importTableRowData(newTableRow, rowData);
         newRows.add(newTableRow);
@@ -1500,7 +1504,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //
         for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
           AbstractTableRowData rowData = source.rowAt(i);
-          if (rowData.getRowState() == AbstractTableFieldData.STATUS_DELETED) {
+          if (rowData.getRowState() == AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
             ITableRow newTableRow = new TableRow(getColumnSet());
             mapper.importTableRowData(newTableRow, rowData);
             newTableRow.setStatus(ITableRow.STATUS_NON_CHANGED);

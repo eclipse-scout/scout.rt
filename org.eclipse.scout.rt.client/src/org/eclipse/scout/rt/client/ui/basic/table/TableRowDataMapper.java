@@ -147,6 +147,24 @@ public class TableRowDataMapper {
     rowData.setRowState(row.getStatus());
   }
 
+  /**
+   * Override to exclude certain rows from being exported.
+   * <p>
+   * As default every row is accepted.
+   */
+  public boolean acceptExport(ITableRow row) throws ProcessingException {
+    return true;
+  }
+
+  /**
+   * Override to exclude certain rows from being imported.
+   * <p>
+   * As default every row is accepted.
+   */
+  public boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException {
+    return true;
+  }
+
   public static class TableRowDataPropertyFilter implements IPropertyFilter {
     @Override
     public boolean accept(FastPropertyDescriptor descriptor) {
