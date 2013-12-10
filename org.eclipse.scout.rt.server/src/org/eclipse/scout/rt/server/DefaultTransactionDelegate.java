@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
@@ -227,9 +228,8 @@ public class DefaultTransactionDelegate {
       //
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       serviceRes.setSoapOperation(soapOperation);
-      // add accumulated client notifications as side-payload
-      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
-      serviceRes.setClientNotifications(na);
+
+      ThreadContext.getTransaction().registerMember(new P_ClientNotificationTransactionMember(serviceRes));
       return serviceRes;
     }
     finally {
@@ -506,6 +506,48 @@ public class DefaultTransactionDelegate {
    */
   protected Class<? extends IValidationStrategy> findOutputValidationStrategyByPolicy(Object serviceImpl, Method op) {
     return IValidationStrategy.NO_CHECK.class;
+  }
+
+  /**
+   * This transaction member ensures that the retrieval of client notifications is done at the last possible moment, and
+   * not during the normal duration of the transaction. Notifications are added to the global notification queue at
+   * commit-time, so this is in fact needed.
+   */
+  private static class P_ClientNotificationTransactionMember extends AbstractTransactionMember {
+
+    private static final String TRANSACTION_MEMBER_ID = P_ClientNotificationTransactionMember.class.getSimpleName();
+
+    private final ServiceTunnelResponse m_serviceTunnelResponse;
+
+    public P_ClientNotificationTransactionMember(ServiceTunnelResponse serviceRes) {
+      super(TRANSACTION_MEMBER_ID);
+      m_serviceTunnelResponse = serviceRes;
+    }
+
+    @Override
+    public boolean needsCommit() {
+      return true;
+    }
+
+    @Override
+    public boolean commitPhase1() {
+      return true;
+    }
+
+    @Override
+    public void commitPhase2() {
+    }
+
+    @Override
+    public void rollback() {
+    }
+
+    @Override
+    public void release() {
+      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
+      m_serviceTunnelResponse.setClientNotifications(na);
+    }
+
   }
 
 }
