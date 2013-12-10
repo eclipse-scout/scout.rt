@@ -35,7 +35,8 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
   private static final long serialVersionUID = 1L;
 
   @Override
-  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  protected void doPost(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    doGet(req, res);
   }
 
   @Override

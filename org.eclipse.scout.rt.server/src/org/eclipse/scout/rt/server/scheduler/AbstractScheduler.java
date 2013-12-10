@@ -417,7 +417,7 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
   }
 
   @Override
-  public void addSubmitButtonsHTML(List<List<String>> result, String formStartHtml, String submitHtml, String formEndHtml) {
+  public void addSubmitButtonsHTML(List<List<String>> result) {
     //NOP
   }
 

@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -26,7 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.osgi.framework.Version;
 
@@ -66,25 +69,41 @@ public class DiagnosticSession {
     out.println("</diagnosticsStatus>");
   }
 
-  private static final String FORM_START_HTML = "<form method='GET' action='diagnostics'>";
-  private static final String SUBMIT_HTML = "<input type='submit' value='submit'/>";
-  private static final String FORM_END_HTML = "</form>";
-
   private void doHtmlResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String errorMsg = "";
+
+    /* run garbage collection for better estimation of current memory usage */
+    String doGc = req.getParameter("gc");
+    if (StringUtility.hasText(doGc)) {
+      System.gc();
+      errorMsg = "<font color='blue'> System.gc() triggered.</font>";
+    }
+
     List<List<String>> result = getDiagnosticItems();
 
     IDiagnostic[] diagnosticServices = DiagnosticFactory.getDiagnosticProviders();
     for (IDiagnostic diagnosticService : diagnosticServices) {
-      diagnosticService.addSubmitButtonsHTML(result, FORM_START_HTML, SUBMIT_HTML, FORM_END_HTML);
+      if (ListUtility.length(diagnosticService.getPossibleActions()) > 0) {
+        diagnosticService.addSubmitButtonsHTML(result);
+      }
     }
+    DiagnosticFactory.addDiagnosticItemToList(result, "System.gc()", "", "<input type='checkbox' name='gc' value='yes'/>");
 
     String diagnosticHTML = getDiagnosticItemsHTML(result);
+
+    String title = "unknown";
+    Version version = Version.emptyVersion;
+    IProduct product = Platform.getProduct();
+    if (product != null) {
+      title = product.getName();
+      version = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
+    }
 
     resp.setContentType("text/html");
     ServletOutputStream out = resp.getOutputStream();
     out.println("<html>");
     out.println("<head>");
-    out.println("<title>Eclipse Scout</title>");
+    out.println("<title>" + title + "</title>");
     out.println("<style>");
     out.println("body {font-family: sans-serif; font-size: 12; background-color : #F6F6F6;}");
     out.println("a,a:VISITED {color: #6666ff;text-decoration: none;}");
@@ -92,12 +111,24 @@ public class DiagnosticSession {
     out.println("th {text-align: left;vertical-align: top; padding-left: 2; background-color : #cccccc;}");
     out.println("td {text-align: left;vertical-align: top; padding-left: 2;}");
     out.println("p {margin-top: 4; margin-bottom: 4; padding-top: 4; padding-bottom: 4;}");
+    out.println("dt {font-weight: bold;}");
+    out.println("dd {margin-left: 20px; margin-bottom: 3px;}");
     out.println(".copyright {font-size: 10;}");
     out.println("</style>");
+    out.println("<script type=\"text/javascript\">");
+    out.println("function toggle_visibility(id) {");
+    out.println("   var el = document.getElementById(id);");
+    out.println("   el.style.display = (el.style.display != 'none' ? 'none' : 'block');");
+    out.println("}");
+    out.println("</script>");
     out.println("</head>");
     out.println("<body>");
-    out.println("<h3>Eclipse Scout</h3>");
+    out.println("<h3>" + title + " " + version + "</h3>");
+    out.println("<form method='POST' action='" + StringUtility.join("?", req.getRequestURL().toString(), req.getQueryString()) + "'>");
     out.print(diagnosticHTML);
+    out.println("<p><input type='submit' value='submit'/></p>");
+    out.println("</form>");
+    out.print(errorMsg);
     out.println("<p class=\"copyright\">&copy; " + OfficialVersion.COPYRIGHT + "</p>");
     out.println("</body>");
     out.println("</html>");
@@ -105,11 +136,6 @@ public class DiagnosticSession {
 
   private List<List<String>> getDiagnosticItems() {
     List<List<String>> result = new ArrayList<List<String>>();
-
-    /* run garbage collection for better estimation of current memory usage */
-    if (DiagnosticFactory.runGC()) {
-      System.gc();
-    }
 
     /* system information from JVM */
     ArrayList<String> infos = getSystemInformation();
@@ -129,14 +155,60 @@ public class DiagnosticSession {
       diagnosticService.addDiagnosticItemToList(result);
     }
 
+    // system properties
+    List<String> properties = new ArrayList<String>();
+    for (Object property : System.getProperties().keySet()) {
+      properties.add(property + "");
+    }
+    Collections.sort(properties);
+    String sysprops = "";
+    sysprops += "<a href=\"#\" onClick=\"javascript:toggle_visibility('sysprops'); return false;\">(show / hide)</a>";
+    sysprops += "<div id=\"sysprops\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">";
+    sysprops += "<dl>";
+    for (String property : properties) {
+      sysprops += "<dt>" + property + ":</b></dt><dd>" + System.getProperty(property) + "</dd>";
+    }
+    sysprops += "</dl>";
+    sysprops += "</div>";
+    DiagnosticFactory.addDiagnosticItemToList(result, "System properties", sysprops, DiagnosticFactory.STATUS_INFO);
+
+    // environment
+    List<String> envKeys = new ArrayList<String>();
+    for (String envKey : System.getenv().keySet()) {
+      envKeys.add(envKey);
+    }
+    Collections.sort(envKeys);
+    String envList = "";
+    envList += "<a href=\"#\" onClick=\"javascript:toggle_visibility('env'); return false;\">(show / hide)</a>";
+    envList += "<div id=\"env\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">";
+    envList += "<dl>";
+    for (String envKey : envKeys) {
+      envList += "<dt>" + envKey + ":</b></dt><dd>" + System.getenv(envKey) + "</dd>";
+    }
+    envList += "</dl>";
+    envList += "</div>";
+    DiagnosticFactory.addDiagnosticItemToList(result, "Environment variables", envList, DiagnosticFactory.STATUS_INFO);
+
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
     Version v = Version.emptyVersion;
     IProduct product = Platform.getProduct();
+    String productId = "n/a";
+    String productName = "n/a";
+    String application = "n/a";
+    String definingBundle = "n/a";
     if (product != null) {
+      productId = product.getId();
+      productName = product.getName();
+      application = product.getApplication();
+      definingBundle = product.getDefiningBundle().getSymbolicName();
       v = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
     }
-    DiagnosticFactory.addDiagnosticItemToList(result, "Diagnostic Service Version", v.toString(), DiagnosticFactory.STATUS_INFO);
-    // only available if it is a direct JDBC connection
+    DiagnosticFactory.addDiagnosticItemToList(result, "Product ID", productId, DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Product Name", productName, DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Application", application, DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle", definingBundle, DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle Version", v.toString(), DiagnosticFactory.STATUS_INFO);
+
     DiagnosticFactory.addDiagnosticItemToList(result, "Change values", "", DiagnosticFactory.STATUS_TITLE);
     return result;
   }

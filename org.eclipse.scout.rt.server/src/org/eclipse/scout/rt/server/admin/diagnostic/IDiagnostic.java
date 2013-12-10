@@ -18,7 +18,7 @@ public interface IDiagnostic {
 
   String[] getPossibleActions();
 
-  void addSubmitButtonsHTML(List<List<String>> result, String formStartHtml, String submitHtml, String formEndHtml);
+  void addSubmitButtonsHTML(List<List<String>> result);
 
   void call(String action, Object[] values);
 

@@ -17,11 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.commons.holders.BooleanHolder;
-
 public final class DiagnosticFactory {
-  /* if true, garbage collector is run before showing server information */
-  private static final BooleanHolder RUN_GC;
 
   public static final String STATUS_TITLE = "TITLE";
   public static final String STATUS_INFO = "INFO";
@@ -34,8 +30,6 @@ public final class DiagnosticFactory {
   private static final Map<String/*action*/, IDiagnostic> DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP;
 
   static {
-    RUN_GC = new BooleanHolder(true);
-
     DIAGNOSTIC_STATUS_PROVIDERS = new ArrayList<IDiagnostic>();
     DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP = new HashMap<String, IDiagnostic>();
   }
@@ -86,14 +80,6 @@ public final class DiagnosticFactory {
       }
       return DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP.get(action);
     }
-  }
-
-  public static boolean runGC() {
-    return RUN_GC.getValue();
-  }
-
-  public static void runGC(boolean runGC) {
-    RUN_GC.setValue(runGC);
   }
 
   public static void addDiagnosticItemToList(List<List<String>> list, String attribute, String value, String status) {
