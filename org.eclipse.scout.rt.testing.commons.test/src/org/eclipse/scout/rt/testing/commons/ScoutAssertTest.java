@@ -64,7 +64,7 @@ public class ScoutAssertTest {
       fail("Was expecteting an AssertionError");
     }
     catch (AssertionError e) {
-      //nothing to do, it is ok
+      assertTrue(e.getMessage().contains("expected:<1> but was:<null>"));
     }
 
     //Compare null and not_null => Expect AssertionError
@@ -73,7 +73,7 @@ public class ScoutAssertTest {
       fail("Was expecteting an AssertionError");
     }
     catch (AssertionError e) {
-      //nothing to do, it is Ok
+      assertTrue(e.getMessage().contains("expected:<null> but was:<1>"));
     }
 
     //Compare 0 and 1 => Expect AssertionError
@@ -91,7 +91,8 @@ public class ScoutAssertTest {
       fail("Was expecteting an AssertionError");
     }
     catch (AssertionError e) {
-      assertTrue(e.getMessage().startsWith("MY_TEST expected"));
+      assertTrue(e.getMessage().startsWith("MY_TEST "));
+      assertTrue(e.getMessage().contains("expected:<0> but was:<1>"));
     }
   }
 

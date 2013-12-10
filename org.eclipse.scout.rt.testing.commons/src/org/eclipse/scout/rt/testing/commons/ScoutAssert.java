@@ -99,7 +99,7 @@ public final class ScoutAssert {
       return;
     }
     else if (expected == null || actual == null) {
-      Assert.fail();
+      Assert.fail(format(message, expected, actual));
     }
     else if (expected.compareTo(actual) == 0) {
       return;
