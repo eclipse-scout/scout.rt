@@ -148,15 +148,6 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField"
-            name="Decimal field"
-            scope="default">
-            <uiClass
-              class="org.eclipse.scout.rt.ui.rap.form.fields.decimalfield.RwtScoutDecimalField">
-            </uiClass>
-      </formField>
-      <formField
-            active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"
             name="Label field"
             scope="default">

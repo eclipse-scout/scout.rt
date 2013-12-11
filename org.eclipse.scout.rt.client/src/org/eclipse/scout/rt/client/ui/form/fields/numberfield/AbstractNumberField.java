@@ -297,9 +297,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   @Override
-  protected T parseValueInternal(String text) throws ProcessingException {
-    throw new ProcessingException("Not implemented");
-  }
+  protected abstract T parseValueInternal(String text) throws ProcessingException;
 
   /**
    * Parses text input into a BigDecimal.

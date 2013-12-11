@@ -45,15 +45,6 @@
      </formField>
      <formField
            active="true"
-           modelClass="org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField"
-           name="Decimal field"
-           scope="default">
-        <uiClass
-              class="org.eclipse.scout.rt.ui.swing.form.fields.decimalfield.SwingScoutDecimalField">
-        </uiClass>
-     </formField>
-     <formField
-           active="true"
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"
            name="Filechooser field"
            scope="default">
