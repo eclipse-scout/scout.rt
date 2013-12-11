@@ -7,7 +7,6 @@
 			<accessrule kind="accessible" pattern="org/eclipse/rap/rwt/internal/service/UrlParameters"/>
 			<accessrule kind="accessible" pattern="org/eclipse/rap/rwt/internal/service/ContextProvider"/>
 			<accessrule kind="accessible" pattern="org/eclipse/rap/rwt/internal/service/UISessionImpl"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swt/internal/widgets/IBrowserAdapter"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>

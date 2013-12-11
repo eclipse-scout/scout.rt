@@ -20,11 +20,11 @@ import java.util.regex.Pattern;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.service.ResourceManager;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
-import org.eclipse.swt.internal.widgets.IBrowserAdapter;
 
 /**
  * <h3>BrowserSupport</h3> adding hyperlink callback support as in normal swt to the rwt browser
@@ -37,6 +37,7 @@ public class BrowserExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserExtension.class);
   private static final Pattern LOCAL_URL_PATTERN = Pattern.compile("(['\"])(http://local[?/][^'\"]*)(['\"])", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
   private static final String HYPERLINK_FUNCTION_NAME = "scoutActivateLocalUrl";
+  private static final String HYPERLINK_FUNCTION_RETURN_TYPE = "void";
 
   private final Browser m_browser;
   private final HashMap<String, String> m_hyperlinkMap;
@@ -64,19 +65,18 @@ public class BrowserExtension {
       @Override
       public Object function(Object[] arguments) {
         String localUrl = m_hyperlinkMap.get(arguments[0]);
-        final String browserText = m_browser.getAdapter(IBrowserAdapter.class).getText();
         if (localUrl == null) {
           LOG.error("Hyperlink could not be activated. No url specified.");
-          return browserText;
+          return null;
         }
         if (m_hyperlinkCallback == null) {
           LOG.error("Hyperlink could not be activated. Please specify the runnable to be executed.");
-          return browserText;
+          return null;
         }
 
         m_hyperlinkCallback.execute(localUrl);
 
-        return browserText;
+        return null;
       }
     };
   }
@@ -131,7 +131,7 @@ public class BrowserExtension {
    * @see {@link BrowserFunction}
    */
   public String adaptLocalHyperlinks(String html) {
-    return rewriteLocalHyperlinks(html, m_hyperlinkMap, getLocalHyperlinkFunctionName());
+    return rewriteLocalHyperlinks(html, m_hyperlinkMap, getLocalHyperlinkFunctionName(), getLocalHyperlinkFunctionReturnType());
   }
 
   public void clearLocalHyperlinkCache() {
@@ -142,6 +142,10 @@ public class BrowserExtension {
     return HYPERLINK_FUNCTION_NAME;
   }
 
+  protected String getLocalHyperlinkFunctionReturnType() {
+    return HYPERLINK_FUNCTION_RETURN_TYPE;
+  }
+
   /**
    * Replaces all href="http://local/... references in the html file with a javascript callback function
    * 
@@ -150,7 +154,7 @@ public class BrowserExtension {
    *          is being filled up with the generated mappings
    * @return the rewritten html
    */
-  private static String rewriteLocalHyperlinks(String html, Map<String /*externalKey*/, String /*url*/> generatedMappings, String callbackFuncName) {
+  private static String rewriteLocalHyperlinks(String html, Map<String /*externalKey*/, String /*url*/> generatedMappings, String callbackFuncName, String callbackFuncReturnType) {
     if (html == null) {
       return html;
     }
@@ -160,7 +164,7 @@ public class BrowserExtension {
     while (m.find(nextFind)) {
       String localUrl = m.group(2);
       String externalKey = "" + generatedMappings.size();
-      String callableURL = "javascript:" + callbackFuncName + "('" + externalKey + "');";
+      String callableURL = "javascript:" + (StringUtility.hasText(callbackFuncReturnType) ? callbackFuncReturnType + " " : "") + callbackFuncName + "('" + externalKey + "');";
 
       buf.append(html.substring(nextFind, m.start()));
       buf.append(m.group(1));
