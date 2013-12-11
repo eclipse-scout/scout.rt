@@ -306,6 +306,13 @@ public final class BundleInspector {
     return filteredBundles.toArray(new Bundle[filteredBundles.size()]);
   }
 
+  public static boolean isFragment(Bundle bundle) {
+    if (bundle != null) {
+      return Platform.isFragment(bundle);
+    }
+    return false;
+  }
+
   private static final class P_BundleNamePrefixComparator implements Comparator<Bundle> {
     private final String[] prefixList;
 
