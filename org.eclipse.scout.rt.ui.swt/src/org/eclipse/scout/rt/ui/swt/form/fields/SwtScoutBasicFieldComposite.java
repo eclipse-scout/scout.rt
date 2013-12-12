@@ -181,7 +181,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setTextFromUI(text);
+        getScoutObject().getUIFacade().setTextFromUI(text, false);
       }
     };
     JobEx job = getEnvironment().invokeScoutLater(t, 0);
@@ -225,7 +225,8 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
       }
     }
 
-    /*
+    /**
+     * This method notify scout, with the information that we are during "ValidateOnAnyKey".
      * Do not call handleSwingInputVerifier(), this can lead to endless loops.
      */
     private void sendVerifyToScoutAndIgnoreResponses() {
@@ -234,7 +235,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          getScoutObject().getUIFacade().setTextFromUI(text);
+          getScoutObject().getUIFacade().setTextFromUI(text, true);
         }
       };
       getEnvironment().invokeScoutLater(t, 0);

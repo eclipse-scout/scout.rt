@@ -197,7 +197,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   public void setFormat(String s) {
     m_format = s;
     if (isInitialized()) {
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(false)) {
         setDisplayText(execFormatValue(getValue()));
       }
     }

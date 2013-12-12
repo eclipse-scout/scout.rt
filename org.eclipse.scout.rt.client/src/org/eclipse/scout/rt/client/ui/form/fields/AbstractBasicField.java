@@ -20,6 +20,8 @@ import org.eclipse.scout.commons.annotations.Order;
  */
 public abstract class AbstractBasicField<T> extends AbstractValueField<T> implements IBasicField<T> {
 
+  private boolean m_whileTyping;
+
   protected AbstractBasicField(boolean callInitializer) {
     super(callInitializer);
   }
@@ -42,8 +44,8 @@ public abstract class AbstractBasicField<T> extends AbstractValueField<T> implem
   }
 
   @Override
-  public void setValidateOnAnyKey(boolean b) {
-    propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
+  protected boolean shouldUpdateDisplayText(boolean validValueDiffersFromRawValue) {
+    return !(isWhileTyping() && !validValueDiffersFromRawValue) && super.shouldUpdateDisplayText(validValueDiffersFromRawValue);
   }
 
   @Override
@@ -51,4 +53,24 @@ public abstract class AbstractBasicField<T> extends AbstractValueField<T> implem
     return propertySupport.getPropertyBool(PROP_VALIDATE_ON_ANY_KEY);
   }
 
+  @Override
+  public void setValidateOnAnyKey(boolean b) {
+    propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
+  }
+
+  /**
+   * If {@link #isValidateOnAnyKey()} is true, the {@link #execParseValue(String)}, {@link #execValidateValue(Object)}
+   * and {@link #execFormatValue(Object)} will be called after each modification of the text in the field. This flag
+   * tells if the user is typing text or not.
+   * 
+   * @return true to indicate if the user is typing text or
+   *         false if the method is called on focus lost.
+   */
+  protected boolean isWhileTyping() {
+    return m_whileTyping;
+  }
+
+  protected void setWhileTyping(boolean whileTyping) {
+    m_whileTyping = whileTyping;
+  }
 }

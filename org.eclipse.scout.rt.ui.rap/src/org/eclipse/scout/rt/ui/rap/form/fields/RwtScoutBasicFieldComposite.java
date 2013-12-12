@@ -133,7 +133,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
+        boolean b = getScoutObject().getUIFacade().setTextFromUI(text, false);
         result.setValue(b);
       }
     };
@@ -174,7 +174,8 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
       }
     }
 
-    /*
+    /**
+     * This method notify scout, with the information that we are during "ValidateOnAnyKey".
      * Do not call handleUiInputVerifier(), this can lead to endless loops.
      */
     private void sendVerifyToScoutAndIgnoreResponses() {
@@ -183,7 +184,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          getScoutObject().getUIFacade().setTextFromUI(text);
+          getScoutObject().getUIFacade().setTextFromUI(text, true);
         }
       };
       getUiEnvironment().invokeScoutLater(t, 0);

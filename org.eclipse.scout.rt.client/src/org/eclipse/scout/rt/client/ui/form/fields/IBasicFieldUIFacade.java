@@ -17,6 +17,14 @@ package org.eclipse.scout.rt.client.ui.form.fields;
  */
 public interface IBasicFieldUIFacade {
 
-  boolean setTextFromUI(String newText);
+  /**
+   * @param newText
+   *          new value of the display text in the ui.
+   * @param whileTyping
+   *          true to indicate if the user is typing (e.g. {@link IBasicField#isValidateOnAnyKey()} is true) or
+   *          false if the method is called on focus lost.
+   * @return
+   */
+  boolean setTextFromUI(String newText, boolean whileTyping);
 
 }

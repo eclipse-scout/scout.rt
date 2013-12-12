@@ -153,7 +153,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
     m_format = newFormat;
     if (isInitialized()) {
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(false)) {
         setDisplayText(execFormatValue(getValue()));
       }
     }
@@ -175,7 +175,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   public void setGroupingUsed(boolean b) {
     m_format.setGroupingUsed(b);
     if (isInitialized()) {
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(false)) {
         setDisplayText(execFormatValue(getValue()));
       }
     }
@@ -287,11 +287,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   @SuppressWarnings("deprecation")
   private class P_UIFacade implements INumberFieldUIFacade {
     @Override
-    public boolean setTextFromUI(String newText) {
+    public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {
         newText = null;
       }
       // parse always, validity might change even if text is same
+      setWhileTyping(whileTyping);
       return parseValue(newText);
     }
   }

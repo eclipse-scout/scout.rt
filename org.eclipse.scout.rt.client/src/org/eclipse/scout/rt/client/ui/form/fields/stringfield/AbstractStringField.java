@@ -328,7 +328,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   public void setFormat(String s) {
     propertySupport.setPropertyString(PROP_FORMAT, s);
     if (isInitialized()) {
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(false)) {
         String t = execFormatValue(getValue());
         setDisplayText(t);
       }
@@ -382,11 +382,12 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   private class P_UIFacade implements IStringFieldUIFacade {
 
     @Override
-    public boolean setTextFromUI(String newText) {
+    public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {
         newText = null;
       }
       // parse always, validity might change even if text is same
+      setWhileTyping(whileTyping);
       return parseValue(newText);
     }
 

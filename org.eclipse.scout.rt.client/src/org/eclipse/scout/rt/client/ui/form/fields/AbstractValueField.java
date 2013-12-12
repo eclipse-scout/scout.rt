@@ -158,7 +158,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   public void refreshDisplayText() {
-    if (isAutoDisplayText()) {
+    if (shouldUpdateDisplayText(false)) {
       String t = execFormatValue(getValue());
       setDisplayText(t);
     }
@@ -291,7 +291,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       T oldValue = getValue();
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(CompareUtility.notEquals(rawValue, validatedValue))) {
         String t = execFormatValue(validatedValue);
         setDisplayText(t);
       }
@@ -316,6 +316,18 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setValueChanging(false);
       setFieldChanging(false);
     }
+  }
+
+  /**
+   * Computes if the displayText should be computed and displayed in the field.
+   * 
+   * @param validValueDiffersFromRawValue
+   *          indicates if there is business logic in {@link #validateValue(Object)} that changed the value of the field
+   *          (in comparison to what has been parsed).
+   * @return true if the displayText should be displayed, false if not.
+   */
+  protected boolean shouldUpdateDisplayText(boolean validValueDiffersFromRawValue) {
+    return isAutoDisplayText();
   }
 
   /**

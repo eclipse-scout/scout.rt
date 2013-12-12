@@ -140,7 +140,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       }
       getFormatInternal().setMinimumFractionDigits(i);
       if (isInitialized()) {
-        if (isAutoDisplayText()) {
+        if (shouldUpdateDisplayText(false)) {
           setDisplayText(execFormatValue(getValue()));
         }
       }
@@ -165,7 +165,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       }
       getFormatInternal().setMaximumFractionDigits(i);
       if (isInitialized()) {
-        if (isAutoDisplayText()) {
+        if (shouldUpdateDisplayText(false)) {
           setDisplayText(execFormatValue(getValue()));
         }
       }
@@ -196,7 +196,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     }
 
     if (isInitialized()) {
-      if (isAutoDisplayText()) {
+      if (shouldUpdateDisplayText(false)) {
         setDisplayText(execFormatValue(getValue()));
       }
     }
@@ -262,11 +262,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   @SuppressWarnings("deprecation")
   private class P_UIFacade implements IDecimalFieldUIFacade {
     @Override
-    public boolean setTextFromUI(String newText) {
+    public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {
         newText = null;
       }
       // parse always, validity might change even if text is same
+      setWhileTyping(whileTyping);
       return parseValue(newText);
     }
   }
