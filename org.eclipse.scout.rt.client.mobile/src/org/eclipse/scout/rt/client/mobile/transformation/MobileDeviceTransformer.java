@@ -88,7 +88,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected PageFormManager createPageFormManager(IDesktop desktop) {
-    return new PageFormManager(desktop, IForm.VIEW_ID_CENTER);
+    return new PageFormManager(desktop, getAcceptedViewIds().toArray(new String[getAcceptedViewIds().size()]));
   }
 
   public PageFormManager getPageFormManager() {

@@ -261,7 +261,17 @@ public class PageFormManager {
     }
   }
 
-  private IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
+  protected IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
+    PageFormConfig config = createMainPageFormConfig(page);
+    return new MainPageForm(page, this, config);
+  }
+
+  protected IPageForm createPageForm(IPage page) throws ProcessingException {
+    PageFormConfig config = createPageFormConfig(page);
+    return new PageForm(page, this, config);
+  }
+
+  protected PageFormConfig createMainPageFormConfig(IPage page) {
     PageFormConfig config = new PageFormConfig();
     config.setTablePageAllowed(true);
     config.setTableStatusVisible(true);
@@ -270,16 +280,15 @@ public class PageFormManager {
     }
     else {
       config.setKeepSelection(true);
+      config.setAutoSelectFirstChildPage(true);
     }
-
-    return new MainPageForm(page, this, config);
+    return config;
   }
 
-  private IPageForm createPageForm(IPage page) throws ProcessingException {
+  protected PageFormConfig createPageFormConfig(IPage page) {
     PageFormConfig config = new PageFormConfig();
     config.setDetailFormVisible(true);
-
-    return new PageForm(page, this, config);
+    return config;
   }
 
   private IDesktop getDesktop() {

@@ -14,6 +14,7 @@ public class PageFormConfig {
   private boolean m_tablePageAllowed;
   private boolean m_detailFormVisible;
   private boolean m_keepSelection;
+  private boolean m_autoSelectFirstChildPage;
   private boolean m_tableStatusVisible;
 
   public boolean isTablePageAllowed() {
@@ -46,5 +47,17 @@ public class PageFormConfig {
 
   public void setTableStatusVisible(boolean tableStatusVisible) {
     m_tableStatusVisible = tableStatusVisible;
+  }
+
+  public boolean isAutoSelectFirstChildPage() {
+    return m_autoSelectFirstChildPage;
+  }
+
+  /**
+   * True if the first child page should automatically be selected whenever a pageForm gets displayed and no child page
+   * has already been selected yet.
+   */
+  public void setAutoSelectFirstChildPage(boolean autoSelectFirstChildPage) {
+    m_autoSelectFirstChildPage = autoSelectFirstChildPage;
   }
 }
