@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.beans.IntrospectionException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -176,9 +175,6 @@ public class TableRowDataMapper {
         return false;
       }
       if (descriptor.getWriteMethod() == null) {
-        return false;
-      }
-      if ((!propertyType.isPrimitive()) && (!propertyType.isInterface()) && !Serializable.class.isAssignableFrom(propertyType)) {
         return false;
       }
       if ("rowState".equals(descriptor.getName())) {
