@@ -197,17 +197,17 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractDateField f = new AbstractDateField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractDateColumn.this.propertySupport.getPropertiesMap());
-      }
     };
+    mapEditorFieldProperties(f);
+    return f;
+  }
+
+  protected void mapEditorFieldProperties(AbstractDateField f) {
+    super.mapEditorFieldProperties(f);
     f.setFormat(getFormat());
     f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
     f.setAutoTimeMillis(getAutoTimeMillis());
-    return f;
   }
 
   @Override

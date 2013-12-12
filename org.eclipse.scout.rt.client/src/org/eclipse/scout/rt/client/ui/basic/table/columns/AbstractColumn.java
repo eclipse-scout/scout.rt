@@ -1248,13 +1248,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractValueField<T> f = new AbstractValueField<T>() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractColumn.this.propertySupport.getPropertiesMap());
-      }
     };
+    mapEditorFieldProperties(f);
     return f;
+  }
+
+  protected void mapEditorFieldProperties(IFormField f) {
+    f.setBackgroundColor(getBackgroundColor());
+    f.setForegroundColor(getForegroundColor());
+    f.setFont(getFont());
+    f.setMandatory(isMandatory());
   }
 
   /**

@@ -19,15 +19,13 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
+import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
 /**
  * Column holding Decimal number
  */
 public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNumberColumn<T> implements IDecimalColumn<T> {
-  // DO NOT init members, this has the same effect as if they were set AFTER
-  // initConfig()
-  private int m_fractionDigits;
 
   public AbstractDecimalColumn() {
     super();
@@ -132,10 +130,9 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
    */
   @Override
   public void setMinFractionDigits(int i) {
-    if (i > getMaxFractionDigits()) {
-      getFormatInternal().setMaximumFractionDigits(i);
-    }
-    getFormatInternal().setMinimumFractionDigits(i);
+    DecimalFormat format = getFormat();
+    format.setMinimumFractionDigits(i);
+    setFormat(format);
   }
 
   @Override
@@ -145,10 +142,9 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
 
   @Override
   public void setMaxFractionDigits(int i) {
-    if (i < getMinFractionDigits()) {
-      getFormatInternal().setMinimumFractionDigits(i);
-    }
-    getFormatInternal().setMaximumFractionDigits(i);
+    DecimalFormat format = getFormat();
+    format.setMaximumFractionDigits(i);
+    setFormat(format);
   }
 
   @Override
@@ -159,17 +155,18 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
   @Override
   public void setPercent(boolean b) {
     DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
-    DecimalFormat internalDF = getFormatInternal();
+    DecimalFormat format = getFormat();
     if (b) {
-      internalDF.setPositiveSuffix(percentDF.getPositiveSuffix());
-      internalDF.setNegativeSuffix(percentDF.getNegativeSuffix());
+      format.setPositiveSuffix(percentDF.getPositiveSuffix());
+      format.setNegativeSuffix(percentDF.getNegativeSuffix());
     }
     else {
       if (isPercent()) {
-        internalDF.setPositiveSuffix("");
-        internalDF.setNegativeSuffix("");
+        format.setPositiveSuffix("");
+        format.setNegativeSuffix("");
       }
     }
+    setFormat(format);
   }
 
   @Override
@@ -181,17 +178,19 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
 
   @Override
   public void setFractionDigits(int i) {
-    m_fractionDigits = i;
+    propertySupport.setPropertyInt(IDecimalValueContainer.PROP_PARSING_FRACTION_DIGITS, i);
   }
 
   @Override
   public int getFractionDigits() {
-    return m_fractionDigits;
+    return propertySupport.getPropertyInt(IDecimalValueContainer.PROP_PARSING_FRACTION_DIGITS);
   }
 
   @Override
   public void setMultiplier(int i) {
-    getFormatInternal().setMultiplier(i);
+    DecimalFormat format = getFormat();
+    format.setMultiplier(i);
+    setFormat(format);
   }
 
   @Override
@@ -200,16 +199,16 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
   }
 
   @Override
-  protected abstract AbstractDecimalField<T> getEditorField();
+  protected abstract IDecimalField<T> getEditorField();
 
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractDecimalField<T> f = getEditorField();
+    IDecimalField<T> f = getEditorField();
     mapEditorFieldProperties(f);
     return f;
   }
 
-  protected void mapEditorFieldProperties(AbstractDecimalField<T> f) {
+  protected void mapEditorFieldProperties(IDecimalField<T> f) {
     super.mapEditorFieldProperties(f);
     f.setFractionDigits(getFractionDigits());
   }

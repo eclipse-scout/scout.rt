@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
 
 public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal> implements IBigDecimalColumn {
 
@@ -63,7 +64,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
   }
 
   @Override
-  protected AbstractBigDecimalField getEditorField() {
+  protected IBigDecimalField getEditorField() {
     return new AbstractBigDecimalField() {
     };
   }

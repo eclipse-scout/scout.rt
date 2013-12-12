@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal> implements IBigDecimalField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigDecimalField.class);
+  private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
+  private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
 
   public AbstractBigDecimalField() {
     this(true);
@@ -39,7 +41,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Order(300)
   @ValidationRule(ValidationRule.MIN_VALUE)
   protected BigDecimal getConfiguredMinValue() {
-    return new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
@@ -47,7 +49,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Order(310)
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigDecimal getConfiguredMaxValue() {
-    return new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
+    return DEFAULT_MAX_VALUE;
   }
 
   /**

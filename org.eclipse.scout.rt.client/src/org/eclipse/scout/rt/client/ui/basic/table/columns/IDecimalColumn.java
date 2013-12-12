@@ -10,29 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-/**
- *
- */
-public interface IDecimalColumn<T extends Number> extends INumberColumn<T> {
+import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
-  void setMinFractionDigits(int i);
-
-  int getMinFractionDigits();
-
-  void setMaxFractionDigits(int i);
-
-  int getMaxFractionDigits();
-
-  void setPercent(boolean b);
-
-  boolean isPercent();
-
-  void setFractionDigits(int i);
-
-  int getFractionDigits();
-
-  void setMultiplier(int b);
-
-  int getMultiplier();
+public interface IDecimalColumn<T extends Number> extends INumberColumn<T>, IDecimalValueContainer<T> {
 
 }

@@ -23,6 +23,8 @@ import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger> implements IBigIntegerField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigIntegerField.class);
+  private static final BigInteger DEFAULT_MIN_VALUE = new BigInteger("-999999999999999999999999999999999999999999999999999999999999");
+  private static final BigInteger DEFAULT_MAX_VALUE = new BigInteger("999999999999999999999999999999999999999999999999999999999999");
 
   public AbstractBigIntegerField() {
     this(true);
@@ -40,7 +42,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @ValidationRule(ValidationRule.MIN_VALUE)
   @Override
   protected BigInteger getConfiguredMinValue() {
-    return new BigInteger("-999999999999999999999999999999999999999999999999999999999999");
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
@@ -48,7 +50,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @Order(260)
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigInteger getConfiguredMaxValue() {
-    return new BigInteger("999999999999999999999999999999999999999999999999999999999999");
+    return DEFAULT_MAX_VALUE;
   }
 
   /**

@@ -21,13 +21,13 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
+import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
 public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalField.class);
 
   @SuppressWarnings("deprecation")
   private IDecimalFieldUIFacade m_uiFacade;
-  private int m_fractionDigits;
 
   public AbstractDecimalField() {
     this(true);
@@ -134,11 +134,10 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   public void setMinFractionDigits(int i) {
     try {
       setFieldChanging(true);
+      DecimalFormat format = getFormat();
+      format.setMinimumFractionDigits(i);
+      setFormat(format);
       //
-      if (i > getMaxFractionDigits()) {
-        getFormatInternal().setMaximumFractionDigits(i);
-      }
-      getFormatInternal().setMinimumFractionDigits(i);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
           setDisplayText(execFormatValue(getValue()));
@@ -160,10 +159,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     try {
       setFieldChanging(true);
       //
-      if (i < getMinFractionDigits()) {
-        getFormatInternal().setMinimumFractionDigits(i);
-      }
-      getFormatInternal().setMaximumFractionDigits(i);
+      DecimalFormat format = getFormat();
+      format.setMaximumFractionDigits(i);
+      setFormat(format);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
           setDisplayText(execFormatValue(getValue()));
@@ -182,23 +180,29 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public void setPercent(boolean b) {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
-    DecimalFormat internalDF = getFormatInternal();
-    if (b) {
-      internalDF.setPositiveSuffix(percentDF.getPositiveSuffix());
-      internalDF.setNegativeSuffix(percentDF.getNegativeSuffix());
-    }
-    else {
-      if (isPercent()) {
-        internalDF.setPositiveSuffix("");
-        internalDF.setNegativeSuffix("");
+    try {
+      DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+      DecimalFormat format = getFormat();
+      if (b) {
+        format.setPositiveSuffix(percentDF.getPositiveSuffix());
+        format.setNegativeSuffix(percentDF.getNegativeSuffix());
       }
-    }
+      else {
+        if (isPercent()) {
+          format.setPositiveSuffix("");
+          format.setNegativeSuffix("");
+        }
+      }
+      setFormat(format);
 
-    if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+      if (isInitialized()) {
+        if (shouldUpdateDisplayText(false)) {
+          setDisplayText(execFormatValue(getValue()));
+        }
       }
+    }
+    finally {
+      setFieldChanging(false);
     }
   }
 
@@ -211,22 +215,34 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public void setFractionDigits(int i) {
-    m_fractionDigits = i;
-    if (isInitialized()) {
-      setValue(getValue());
+    try {
+      propertySupport.setPropertyInt(IDecimalValueContainer.PROP_PARSING_FRACTION_DIGITS, i);
+      if (isInitialized()) {
+        setValue(getValue());
+      }
+    }
+    finally {
+      setFieldChanging(false);
     }
   }
 
   @Override
   public int getFractionDigits() {
-    return m_fractionDigits;
+    return propertySupport.getPropertyInt(IDecimalValueContainer.PROP_PARSING_FRACTION_DIGITS);
   }
 
   @Override
   public void setMultiplier(int i) {
-    getFormatInternal().setMultiplier(i);
-    if (isInitialized()) {
-      setValue(getValue());
+    try {
+      DecimalFormat format = getFormat();
+      format.setMultiplier(i);
+      setFormat(format);
+      if (isInitialized()) {
+        setValue(getValue());
+      }
+    }
+    finally {
+      setFieldChanging(false);
     }
   }
 

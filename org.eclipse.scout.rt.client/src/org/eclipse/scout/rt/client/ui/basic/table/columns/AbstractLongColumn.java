@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
+import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
 
 /**
  * Column holding Long
@@ -66,7 +67,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
   }
 
   @Override
-  protected AbstractLongField getEditorField() {
+  protected ILongField getEditorField() {
     return new AbstractLongField() {
     };
   }

@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
@@ -227,8 +227,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return validValue;
   }
 
-  @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
+  protected IFormField prepareEditInternalOld(ITableRow row) throws ProcessingException {
     AbstractStringField f = new AbstractStringField() {
       @Override
       protected void initConfig() {
@@ -241,6 +240,27 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setMultilineText(multi);
     f.setWrapText(true); // avoid to have an horizontal scroll bar
     return f;
+  }
+
+  @Override
+  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
+    AbstractStringField f = new AbstractStringField() {
+    };
+    mapEditorFieldProperties(f);
+    return f;
+  }
+
+  protected void mapEditorFieldProperties(AbstractStringField f) {
+    super.mapEditorFieldProperties(f);
+    f.setInputMasked(isInputMasked());
+    f.setFormat(getDisplayFormat());
+    f.setWrapText(isTextWrap());
+    f.setSelectAllOnFocus(isSelectAllOnEdit());
+    f.setValidateOnAnyKey(isValidateOnAnyKey());
+    f.setMaxLength(getMaxLength());
+    boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
+    f.setMultilineText(multi);
+    f.setWrapText(true); // avoid to have an horizontal scroll bar
   }
 
   @Override

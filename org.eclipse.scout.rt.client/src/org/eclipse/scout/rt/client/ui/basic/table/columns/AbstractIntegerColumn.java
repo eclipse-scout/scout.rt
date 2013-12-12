@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 
 /**
  * Column holding Integer
@@ -71,7 +72,7 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
   }
 
   @Override
-  protected AbstractIntegerField getEditorField() {
+  protected IIntegerField getEditorField() {
     return new AbstractIntegerField() {
     };
   }

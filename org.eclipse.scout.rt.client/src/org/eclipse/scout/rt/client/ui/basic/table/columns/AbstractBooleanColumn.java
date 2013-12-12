@@ -69,12 +69,8 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
     AbstractBooleanField f = new AbstractBooleanField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractBooleanColumn.this.propertySupport.getPropertiesMap());
-      }
     };
+    super.mapEditorFieldProperties(f);
     return f;
   }
 

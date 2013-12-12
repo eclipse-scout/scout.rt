@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
+import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 
 /**
  * Column holding Double
@@ -70,7 +71,7 @@ public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double>
   }
 
   @Override
-  protected AbstractDoubleField getEditorField() {
+  protected IDoubleField getEditorField() {
     return new AbstractDoubleField() {
     };
   }
