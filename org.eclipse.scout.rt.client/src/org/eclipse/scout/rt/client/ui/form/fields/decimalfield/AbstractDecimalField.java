@@ -111,7 +111,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   protected int getConfiguredRoundingMode() {
-    return BigDecimal.ROUND_HALF_EVEN;
+    return BigDecimal.ROUND_HALF_UP;
   }
 
   @SuppressWarnings("deprecation")

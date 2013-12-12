@@ -111,12 +111,12 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
 
   @Test
   public void testParseValueInternalRounding() throws ProcessingException {
-    // expecting RoundingMode.HALF_EVEN as default
+    // expecting RoundingMode.HALF_UP as default
     LocaleThreadLocal.get();
     setFractionDigits(1);
     assertEquals("parsing failed", Double.valueOf(123.5d), parseValueInternal("123.457"));
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.55"));
-    assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.65"));
+    assertEquals("parsing failed", Double.valueOf(12.7d), parseValueInternal("12.65"));
 
     setFractionDigits(3);
     assertEquals("parsing failed", Double.valueOf(123.456d), parseValueInternal("123.456"));
@@ -128,10 +128,10 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
     assertEquals("parsing failed", Double.valueOf(123d), parseValueInternal("123.456"));
     assertEquals("parsing failed", Double.valueOf(124d), parseValueInternal("123.75645688"));
 
-    setRoundingMode(RoundingMode.HALF_UP);
+    setRoundingMode(RoundingMode.HALF_EVEN);
     setFractionDigits(1);
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.55"));
-    assertEquals("parsing failed", Double.valueOf(12.7d), parseValueInternal("12.65"));
+    assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal("12.65"));
   }
 
   @Test

@@ -40,7 +40,7 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
 
   @Override
   protected int getConfiguredRoundingMode() {
-    return BigDecimal.ROUND_HALF_EVEN;
+    return BigDecimal.ROUND_HALF_UP;
   }
 
   /*
