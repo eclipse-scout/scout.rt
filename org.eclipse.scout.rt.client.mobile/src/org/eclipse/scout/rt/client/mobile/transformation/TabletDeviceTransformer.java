@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IPageForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IPageChangeStrategy;
@@ -36,14 +35,6 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
 
   public TabletDeviceTransformer(IDesktop desktop) {
     super(desktop);
-  }
-
-  @Override
-  protected PageFormManager createPageFormManager(IDesktop desktop) {
-    PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
-    manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
-
-    return manager;
   }
 
   @Override

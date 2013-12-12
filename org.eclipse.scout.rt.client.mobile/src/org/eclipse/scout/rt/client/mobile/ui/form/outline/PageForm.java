@@ -325,7 +325,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   @Override
   public void pageSelectedNotify() throws ProcessingException {
     if (m_rowSelectionRequired) {
-      selectPageTableRowIfNecessary(getPageTableField().getTable());
+      selectFirstChildPageTableRowIfNecessary(getPageTableField().getTable());
       m_rowSelectionRequired = false;
     }
   }
@@ -394,7 +394,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   private void processSelectedTableRow() throws ProcessingException {
-    if (!m_pageFormConfig.isKeepSelection()) {
+    if (!m_pageFormConfig.isKeepSelection() && !m_pageFormConfig.isAutoSelectFirstChildPage()) {
       return;
     }
 
@@ -406,10 +406,14 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     ITableRow selectedRow = pageTable.getSelectedRow();
     if (!PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
       if (selectedRow != null) {
-        handleTableRowSelected(pageTable, selectedRow);
+        if (m_pageFormConfig.isKeepSelection()) {
+          handleTableRowSelected(pageTable, selectedRow);
+        }
       }
       else {
-        selectPageTableRowIfNecessary(pageTable);
+        if (m_pageFormConfig.isAutoSelectFirstChildPage()) {
+          selectFirstChildPageTableRowIfNecessary(pageTable);
+        }
       }
     }
   }
@@ -588,7 +592,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     if (tableRow == null) {
       //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefore the same table is on different pageForms
-      selectPageTableRowIfNecessary(table);
+      selectFirstChildPageTableRowIfNecessary(table);
       return;
     }
 
@@ -645,8 +649,8 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     setTableRowDrillDownStyle(table, tableRows);
   }
 
-  protected void selectPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
-    if (!m_pageFormConfig.isKeepSelection() || pageDetailTable == null || pageDetailTable.getRowCount() == 0) {
+  protected void selectFirstChildPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
+    if (!m_pageFormConfig.isAutoSelectFirstChildPage() || pageDetailTable == null || pageDetailTable.getRowCount() == 0) {
       return;
     }
 

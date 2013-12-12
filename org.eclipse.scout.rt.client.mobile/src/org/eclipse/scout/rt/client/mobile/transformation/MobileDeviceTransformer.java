@@ -89,10 +89,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected PageFormManager createPageFormManager(IDesktop desktop) {
-    PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER);
-    manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
-
-    return manager;
+    return new PageFormManager(desktop, getAcceptedViewIds().toArray(new String[getAcceptedViewIds().size()]));
   }
 
   public PageFormManager getPageFormManager() {
@@ -415,10 +412,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   protected boolean shouldPageDetailFormBeEmbedded() {
     return true;
-  }
-
-  protected boolean shouldPageTableStatusBeHidden() {
-    return false;
   }
 
   protected boolean shouldLabelBeMovedToTop() {

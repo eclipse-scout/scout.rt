@@ -49,7 +49,6 @@ public class PageFormManager {
 
   private String m_leftPageSlotViewId;
   private String m_middlePageSlotViewId;
-  private boolean m_tableStatusVisible;
   private IDesktop m_desktop;
 
   private List<IForm> m_blockedForms;
@@ -92,14 +91,6 @@ public class PageFormManager {
     if (pageSlotViewIds.length > 1) {
       m_middlePageSlotViewId = pageSlotViewIds[1];
     }
-  }
-
-  public void setTableStatusVisible(boolean tableStatusVisible) {
-    m_tableStatusVisible = tableStatusVisible;
-  }
-
-  public boolean isTableStatusVisible() {
-    return m_tableStatusVisible;
   }
 
   public String getLeftPageSlotViewId() {
@@ -274,25 +265,34 @@ public class PageFormManager {
     }
   }
 
-  private IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
+  protected IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
+    PageFormConfig config = createMainPageFormConfig(page);
+    return new MainPageForm(page, this, config);
+  }
+
+  protected IPageForm createPageForm(IPage page) throws ProcessingException {
+    PageFormConfig config = createPageFormConfig(page);
+    return new PageForm(page, this, config);
+  }
+
+  protected PageFormConfig createMainPageFormConfig(IPage page) {
     PageFormConfig config = new PageFormConfig();
     config.setTablePageAllowed(true);
-    config.setTableStatusVisible(isTableStatusVisible());
+    config.setTableStatusVisible(true);
     if (hasOnlyOnePageSlot()) {
       config.setDetailFormVisible(true);
     }
     else {
       config.setKeepSelection(true);
+      config.setAutoSelectFirstChildPage(true);
     }
-
-    return new MainPageForm(page, this, config);
+    return config;
   }
 
-  private IPageForm createPageForm(IPage page) throws ProcessingException {
+  protected PageFormConfig createPageFormConfig(IPage page) {
     PageFormConfig config = new PageFormConfig();
     config.setDetailFormVisible(true);
-
-    return new PageForm(page, this, config);
+    return config;
   }
 
   private IDesktop getDesktop() {
