@@ -7,9 +7,14 @@ import org.junit.Test;
 
 public class Base64UtilityTest {
 
+  /**
+   * This tests just a small set of byte lengths.
+   * {@link org.eclipse.scout.james.shared.tests.commons.utility.Base64UtilityTest} tests a substantially bigger set of
+   * lengths (0 - 25000).
+   */
   @Test
   public void testEncodeDecodeMultipleByteLength() throws Exception {
-    for (int i = 10; i < 15000; i++) {
+    for (int i = 0; i < 1000; i++) {
       byte[] byteArray = new byte[i];
       for (int j = 0; j < i; j++) {
         byteArray[j] = (byte) ((byte) i & 0xff);
