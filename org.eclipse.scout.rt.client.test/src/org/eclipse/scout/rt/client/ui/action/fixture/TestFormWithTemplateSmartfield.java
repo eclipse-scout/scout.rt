@@ -1,0 +1,44 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.ui.action.fixture;
+
+import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+
+/**
+ * A form containing two smartfields using a template with menus.
+ */
+public class TestFormWithTemplateSmartfield extends AbstractForm {
+  public static final String TEST_SMARTFIELD_ID_1 = "SMARTFIELD_ID1";
+  public static final String TEST_SMARTFIELD_ID_2 = "SMARTFIELD_ID2";
+
+  public TestFormWithTemplateSmartfield() throws ProcessingException {
+    super();
+  }
+
+  public class MainBox extends AbstractGroupBox {
+
+    @Order(10.0)
+    @ClassId(TEST_SMARTFIELD_ID_1)
+    public class SmartField1 extends SmartfieldTestTemplate {
+    }
+
+    @Order(20.0)
+    @ClassId(TEST_SMARTFIELD_ID_2)
+    public class SmartField2 extends SmartfieldTestTemplate {
+    }
+
+  }
+
+}

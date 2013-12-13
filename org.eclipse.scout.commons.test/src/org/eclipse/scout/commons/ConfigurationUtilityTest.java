@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -39,6 +40,7 @@ import org.junit.Test;
  * @since 3.8.0
  */
 public class ConfigurationUtilityTest {
+  private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
 
   @Test
   public void sortByOrder() {
@@ -290,6 +292,44 @@ public class ConfigurationUtilityTest {
     assertSame(Replacement3.class, actual.get(Original.class));
     assertSame(Replacement3.class, actual.get(Replacement.class));
     assertSame(Replacement3.class, actual.get(Replacement2.class));
+  }
+
+  /**
+   * For annotated classes the annotation value should be used as id.
+   */
+  @Test
+  public void testAnnotatedClassId() {
+    assertEquals(TEST_CLASS_ID, ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithClassId.class));
+    assertEquals(TEST_CLASS_ID, ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithClassId.class, true));
+  }
+
+  /**
+   * A replaced class should get the id of the class to be replaced
+   */
+  @Test
+  public void testReplacementClassId() {
+    assertEquals(TEST_CLASS_ID, ConfigurationUtility.getAnnotatedClassIdWithFallback(ReplacementClass.class));
+    assertEquals(TEST_CLASS_ID, ConfigurationUtility.getAnnotatedClassIdWithFallback(ReplacementClass.class, true));
+  }
+
+  /**
+   * If no annotation is available the correct fallback should be used.
+   */
+  @Test
+  public void testAnnotatedClassIdFallback() {
+    assertEquals(ClassWithoutClassId.class.getName(), ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithoutClassId.class));
+    assertEquals(ClassWithoutClassId.class.getSimpleName(), ConfigurationUtility.getAnnotatedClassIdWithFallback(ClassWithoutClassId.class, true));
+  }
+
+  @ClassId(TEST_CLASS_ID)
+  class ClassWithClassId {
+  }
+
+  class ClassWithoutClassId {
+  }
+
+  @Replace
+  class ReplacementClass extends ClassWithClassId {
   }
 
   public static class InnerA {

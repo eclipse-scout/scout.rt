@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,21 +57,12 @@ public class SmartFieldTest {
       super();
     }
 
-    @Override
-    protected String getConfiguredTitle() {
-      return "SmartField Form";
-    }
-
     public void startForm() throws ProcessingException {
       startInternal(new FormHandler());
     }
 
     public StyleField getStyleField() {
       return getFieldByClass(StyleField.class);
-    }
-
-    public MainBox getMainBox() {
-      return getFieldByClass(MainBox.class);
     }
 
     @Order(10)
@@ -221,18 +212,18 @@ public class SmartFieldTest {
   @Test
   public void testSmartfieldMenus() {
     IMenu[] smartfieldMenus = form.getStyleField().getMenus();
-    Assert.assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.length);
-    Assert.assertEquals("TestMenu1", smartfieldMenus[0].getText());
-    Assert.assertEquals("&TestMenu1", smartfieldMenus[0].getTextWithMnemonic());
-    Assert.assertEquals("alternate-2", smartfieldMenus[0].getKeyStroke());
+    assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.length);
+    assertEquals("TestMenu1", smartfieldMenus[0].getText());
+    assertEquals("&TestMenu1", smartfieldMenus[0].getTextWithMnemonic());
+    assertEquals("alternate-2", smartfieldMenus[0].getKeyStroke());
 
-    Assert.assertEquals("TestMenu2", smartfieldMenus[1].getText());
-    Assert.assertEquals("T&estMenu2", smartfieldMenus[1].getTextWithMnemonic());
-    Assert.assertEquals("control-alternate-f11", smartfieldMenus[1].getKeyStroke());
+    assertEquals("TestMenu2", smartfieldMenus[1].getText());
+    assertEquals("T&estMenu2", smartfieldMenus[1].getTextWithMnemonic());
+    assertEquals("control-alternate-f11", smartfieldMenus[1].getKeyStroke());
 
     IKeyStroke[] smartfieldKeyStrokes = form.getStyleField().getContributedKeyStrokes();
-    Assert.assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
-    Assert.assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.length);
+    assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
+    assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.length);
   }
 
   private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {
@@ -240,4 +231,5 @@ public class SmartFieldTest {
     String actualStyle = f.getTooltipText() + ", " + f.getBackgroundColor() + ", " + f.getForegroundColor() + ", " + (f.getFont() != null ? f.getFont().toPattern() : null);
     assertEquals(expectedStyle, actualStyle);
   }
+
 }

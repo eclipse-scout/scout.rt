@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -371,6 +372,14 @@ public abstract class AbstractWizardStep<T extends IForm> extends AbstractProper
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + getTitle() + "]";
+  }
+
+  /**
+   * Needs to be overridden for dynamically added steps.
+   */
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
   }
 
 }

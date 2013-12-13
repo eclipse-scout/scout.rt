@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -167,6 +168,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected void callInitializer() {
     initConfig();
+  }
+
+  @Override
+  public String classId() {
+    return getContainer().classId() + ITypeWithClassId.ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
   }
 
   /*
@@ -754,6 +760,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    //set container on menus
+    for (IMenu menu : menuList) {
+      menu.setContainerInternal(this);
+    }
+
     m_menus = menuList.toArray(new IMenu[menuList.size()]);
     // key strokes
     ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
@@ -2931,14 +2942,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public Object getContainer() {
-    return propertySupport.getProperty(PROP_CONTAINER);
+  public ITypeWithClassId getContainer() {
+    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   /**
    * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
    */
-  public void setContainerInternal(Object container) {
+  public void setContainerInternal(ITypeWithClassId container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 

@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -885,6 +886,15 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return s;
   }
 
+  /**
+   * Needs to consider the class id of the container to account for columns in templates.
+   */
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), false);
+    return getTable().classId() + ID_CONCAT_SYMBOL + simpleClassId;
+  }
+
   @Override
   public T getValue(ITableRow r) {
     T validatedValue = m_validatedValues.get(r);
@@ -1643,4 +1653,5 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     }
 
   }
+
 }

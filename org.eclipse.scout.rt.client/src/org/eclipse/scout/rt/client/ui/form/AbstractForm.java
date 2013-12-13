@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StoppableThread;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -918,6 +919,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public String getFormId() {
     return parseFormId(getClass().getName());
+  }
+
+  /**
+   * If the class is annotated with {@link ClassId}, the annotation value is returned.<br/>
+   * Otherwise the class name.
+   */
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    if (getOuterFormField() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getOuterFormField().classId();
+    }
+    return simpleClassId;
   }
 
   @Override

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.net.URL;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -39,7 +40,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
  * <p>
  */
-public interface ITable extends IPropertyObserver, IDNDSupport {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId {
 
   /**
    * String
@@ -780,7 +781,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * 
    * @since 3.8.1
    */
-  Object getContainer();
+  ITypeWithClassId getContainer();
 
   /**
    * Initialize and reset all columns. This operation removes all columns from the table and adds them as if the table

@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.List;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
@@ -324,5 +325,20 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   @Override
   public boolean isThisAndParentsVisible() {
     return m_menu.isThisAndParentsVisible();
+  }
+
+  @Override
+  public String classId() {
+    return m_menu.classId();
+  }
+
+  @Override
+  public ITypeWithClassId getContainer() {
+    return m_menu.getContainer();
+  }
+
+  @Override
+  public void setContainerInternal(ITypeWithClassId container) {
+    m_menu.setContainerInternal(container);
   }
 }

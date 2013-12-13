@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -992,6 +993,81 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       c = c.getSuperclass();
     }
     return c.getSimpleName();
+  }
+
+  /**
+   * Computes a unique class id.
+   * <p>
+   * If the class is annotated with {@link ClassId}, the annotation value is used. If the field is defined in a template
+   * (outside of its form class), the ids of the enclosing fields are appended, if necessary, to make the id unique.
+   * </p>
+   * <p>
+   * If the class is not annotated with {@link ClassId}, a unique id is computed using the simple class name.
+   * </p>
+   * <p>
+   * For dynamically injected fields this method (or {@link getSimpleClassId}) needs to be overridden to make sure it is
+   * unique.
+   * </p>
+   */
+  @Override
+  public String classId() {
+    String computedClassId = computeClassId();
+    boolean prependFormId = !getClass().isAnnotationPresent(ClassId.class);
+
+    if (prependFormId) {
+      String formClassId = getForm() != null ? getForm().classId() + ID_CONCAT_SYMBOL : "";
+      computedClassId = formClassId + computedClassId;
+    }
+    boolean duplicate = existsDuplicateClassId();
+    if (duplicate) {
+      LOG.warn("Found a duplicate classid for {}, adding field index. Override classId for dynamically injected fields.", computedClassId);
+      int fieldIndex = getParentField().getFieldIndex(this);
+      computedClassId += ID_CONCAT_SYMBOL + fieldIndex;
+    }
+
+    return computedClassId;
+  }
+
+  /**
+   * Computes a class id by considering the enclosing field list.
+   * <p>
+   * Does not consider the complete path for lenient support. For dynamically injected fields {@link #classid()} needs
+   * to be overriden.
+   * </p>
+   */
+  private String computeClassId() {
+    StringBuilder fieldId = new StringBuilder();
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
+    fieldId.append(simpleClassId);
+    for (ICompositeField enclosingField : getEnclosingFieldList()) {
+      String enclosingClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(enclosingField.getClass(), true);
+      fieldId.append(ID_CONCAT_SYMBOL).append(enclosingClassId);
+    }
+    return fieldId.toString();
+  }
+
+  /**
+   * Sanity check for class ids. Scans all fields in a form to find duplicate class ids.
+   * 
+   * @return <code>true</code>, if another field with the same id is found. <code>false</code> otherwise.
+   */
+  private boolean existsDuplicateClassId() {
+    IForm form = getForm();
+    String currentClassId = computeClassId();
+    if (form != null) {
+      IFormField[] allFields = form.getAllFields();
+      ArrayList<String> classIds = new ArrayList<String>();
+      for (IFormField f : allFields) {
+        if (f != this) {
+          String fClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(f.getClass(), true);
+          classIds.add(fClassId);
+        }
+      }
+      if (classIds.contains(currentClassId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /*

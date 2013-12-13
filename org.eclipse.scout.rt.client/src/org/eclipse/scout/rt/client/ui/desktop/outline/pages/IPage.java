@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -31,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
  * {@link IPageWithTable} In the outline, it is possible to drill down the content of the node (except if the page is
  * configured as a leaf)
  */
-public abstract interface IPage extends ITreeNode {
+public abstract interface IPage extends ITreeNode, ITypeWithClassId {
 
   void initPage() throws ProcessingException;
 

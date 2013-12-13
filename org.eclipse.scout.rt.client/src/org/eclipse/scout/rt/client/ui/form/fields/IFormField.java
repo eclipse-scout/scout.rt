@@ -15,6 +15,7 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -60,7 +61,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * 
  * @see IForm
  */
-public interface IFormField extends IPropertyObserver {
+public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   /*
    * Properties
    */

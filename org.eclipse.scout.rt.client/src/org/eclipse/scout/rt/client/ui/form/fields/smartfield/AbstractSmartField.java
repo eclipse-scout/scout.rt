@@ -450,6 +450,11 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    //set container on menus
+    for (IMenu menu : menuList) {
+      menu.setContainerInternal(this);
+    }
+
     m_menus = menuList.toArray(new IMenu[0]);
 
     // convenience check for allowCustomText=true

@@ -528,4 +528,9 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     }
     return this;
   }
+
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -560,6 +561,11 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void setTableVisible(boolean b) {
     m_tableVisible = b;
+  }
+
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
   }
 
 }
