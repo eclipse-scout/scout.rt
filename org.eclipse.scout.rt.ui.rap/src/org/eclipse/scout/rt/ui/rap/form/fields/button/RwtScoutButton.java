@@ -150,9 +150,6 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   protected void attachScout() {
     super.attachScout();
     IButton b = getScoutObject();
-    if (b.hasMenus()) {
-      // XXX button menus
-    }
     setIconIdFromScout(b.getIconId());
     setImageFromScout(b.getImage());
     setSelectionFromScout(b.isSelected());

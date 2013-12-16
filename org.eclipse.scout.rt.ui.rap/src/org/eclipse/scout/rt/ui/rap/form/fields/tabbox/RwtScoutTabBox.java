@@ -210,6 +210,11 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     }
   }
 
+  @Override
+  protected void updateKeyStrokesFromScout() {
+    // nop because the child fields also register the keystrokes of theirs parents
+  }
+
   /**
    * scout property observer
    */
@@ -265,4 +270,5 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
       }
     }
   }
+
 }

@@ -23,7 +23,9 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -129,6 +131,11 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
+  }
+
+  @Override
+  public IKeyStroke[] getContributedKeyStrokes() {
+    return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
   @Override

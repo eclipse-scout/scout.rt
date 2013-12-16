@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.CompositeLong;
@@ -33,7 +35,9 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
@@ -66,7 +70,7 @@ import org.eclipse.ui.PlatformUI;
 
 public final class SwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtUtility.class);
-  private static final HashMap<String, Integer> SCOUT_SWT_KEY_MAP;
+  private static final Map<String, Integer> SCOUT_SWT_KEY_MAP;
 
   private SwtUtility() {
   }
@@ -1087,4 +1091,36 @@ public final class SwtUtility {
     return MNEMONIC_PATTERN.matcher(text).replaceAll("\\&$1");
   }
 
+  /**
+   * Pretty printed version of the key stroke
+   * <p>
+   * Example:
+   * <ul>
+   * <li>control-alternate-f1 --> Ctrl+Alt+F1
+   * </ul>
+   * 
+   * @since 3.10.0-M4
+   */
+  public static String getKeyStrokePrettyPrinted(IAction scoutAction) {
+    if (scoutAction == null) {
+      return "";
+    }
+    return SwtUtility.getKeyStrokePrettyPrinted(scoutAction.getKeyStroke());
+  }
+
+  /**
+   * Pretty printed version of the key stroke.
+   * See {@link RwtUtility#getKeyStrokePrettyPrinted(IAction)}
+   * 
+   * @since 3.10.0-M4
+   */
+  public static String getKeyStrokePrettyPrinted(String s) {
+    if (!StringUtility.hasText(s)) {
+      return "";
+    }
+    KeyStroke ks = new KeyStroke(s);
+    int stateMask = getSwtStateMask(ks);
+    int keyCode = getSwtKeyCode(ks);
+    return LegacyActionTools.convertAccelerator(stateMask | keyCode);
+  }
 }

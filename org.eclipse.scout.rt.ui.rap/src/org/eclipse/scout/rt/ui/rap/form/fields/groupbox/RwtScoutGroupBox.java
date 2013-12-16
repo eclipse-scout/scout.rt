@@ -206,6 +206,11 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     }
   }
 
+  @Override
+  protected void updateKeyStrokesFromScout() {
+    // nop because the child fields also register the keystrokes of theirs parents
+  }
+
   protected Composite createContainer(Composite parent) {
     Composite rootPane;
     GridLayout layout = new GridLayout(1, true);

@@ -21,7 +21,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -121,6 +123,11 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
+  }
+
+  @Override
+  public IKeyStroke[] getContributedKeyStrokes() {
+    return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
   @Override

@@ -98,7 +98,10 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       m_globalKeyStrokes.add(stroke);
       if (exclusive) {
         if (stroke.isRegisterActiveKey()) {
-          m_globalCancelKeyList.add(resolveKeyString(stroke));
+          String cancelKey = resolveKeyString(stroke);
+          if (!m_globalCancelKeyList.contains(cancelKey)) {
+            m_globalCancelKeyList.add(cancelKey);
+          }
         }
       }
       updateGlobalKeys();
@@ -136,7 +139,10 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       widgetActiveKeys = new ArrayList<String>();
     }
     if (stroke.isRegisterActiveKey()) {
-      widgetActiveKeys.add(resolveKeyString(stroke));
+      String activeKey = resolveKeyString(stroke);
+      if (!widgetActiveKeys.contains(activeKey)) {
+        widgetActiveKeys.add(activeKey);
+      }
     }
     m_widgetActiveKeys.put(control, widgetActiveKeys);
 
@@ -146,7 +152,10 @@ public class KeyStrokeManager implements IKeyStrokeManager {
         widgetCancelKeys = new ArrayList<String>();
       }
       if (stroke.isRegisterActiveKey()) {
-        widgetCancelKeys.add(resolveKeyString(stroke));
+        String cancelKey = resolveKeyString(stroke);
+        if (!widgetCancelKeys.contains(cancelKey)) {
+          widgetCancelKeys.add(cancelKey);
+        }
       }
       m_widgetCancelKeys.put(control, widgetCancelKeys);
     }
@@ -237,9 +246,12 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     for (IRwtKeyStroke stroke : m_globalKeyStrokes) {
       if (stroke.isRegisterActiveKey()) {
         String activeKey = resolveKeyString(stroke);
-        activeKeys.add(activeKey);
+        if (!activeKeys.contains(activeKey)) {
+          activeKeys.add(activeKey);
+        }
       }
     }
+
     if (activeKeys.size() == 0) {
       m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, EMPTY_STRING_ARRAY);
     }

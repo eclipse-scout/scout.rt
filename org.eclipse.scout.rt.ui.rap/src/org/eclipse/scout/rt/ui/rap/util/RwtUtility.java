@@ -18,11 +18,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompositeLong;
@@ -36,7 +38,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
@@ -78,8 +82,8 @@ public final class RwtUtility {
   public static final String VARIANT_LISTBOX_DISABLED = "listboxDisabled";
   public static final String VARIANT_EMPTY = "empty";
 
-  private static final HashMap<String, Integer> SCOUT_RWT_KEY_MAP;
-  private static final HashMap<Integer, String> RWT_SCOUT_KEY_MAP;
+  private static final Map<String, Integer> SCOUT_RWT_KEY_MAP;
+  private static final Map<Integer, String> RWT_SCOUT_KEY_MAP;
 
   public static final String EXTENDED_STYLE = "extendedStyle";
 
@@ -541,7 +545,8 @@ public final class RwtUtility {
   /**
    * Converts {@link IKeyStroke} to a rwt keycode (This is a bitwise OR
    * of zero or more SWT key modifier masks (i.e. SWT.CTRL or SWT.ALT) and a
-   * character code).
+   * character code).<br>
+   * For example if the keyStroke is defined as 'control-alt-f1' the method will return SWT.F1
    * 
    * @param stroke
    * @return
@@ -556,6 +561,13 @@ public final class RwtUtility {
     return rwtKeyCode;
   }
 
+  /**
+   * Converts a scoutKey to an Rwt key. For example 'f11' will be converted to SWT.F11
+   * 
+   * @param scoutKey
+   *          must be lowercase, e.g. f11 instead of F11
+   * @return Rwt key
+   */
   public static int scoutToRwtKey(String scoutKey) {
     Integer i = SCOUT_RWT_KEY_MAP.get(scoutKey);
     if (i == null) {
@@ -673,7 +685,7 @@ public final class RwtUtility {
       case SWT.KEYPAD_ADD:
         return "NUMPAD_ADD";
       case SWT.KEYPAD_CR:
-        return "ENTER";
+        return "RETURN";
       case SWT.KEYPAD_SUBTRACT:
         return "NUMPAD_SUBTRACT";
       case SWT.KEYPAD_DECIMAL:
@@ -1497,5 +1509,38 @@ public final class RwtUtility {
     if (compositeOnWidget != null && compositeOnWidget instanceof RwtScoutValueFieldComposite) {
       ((RwtScoutValueFieldComposite) compositeOnWidget).verifyUiInput();
     }
+  }
+
+  /**
+   * Pretty printed version of the key stroke
+   * <p>
+   * Example:
+   * <ul>
+   * <li>control-alternate-f1 --> Ctrl+Alt+F1
+   * </ul>
+   * 
+   * @since 3.10.0-M4
+   */
+  public static String getKeyStrokePrettyPrinted(IAction scoutAction) {
+    if (scoutAction == null) {
+      return "";
+    }
+    return RwtUtility.getKeyStrokePrettyPrinted(scoutAction.getKeyStroke());
+  }
+
+  /**
+   * Pretty printed version of the key stroke.
+   * See {@link RwtUtility#getKeyStrokePrettyPrinted(IAction)}
+   * 
+   * @since 3.10.0-M4
+   */
+  public static String getKeyStrokePrettyPrinted(String s) {
+    if (!StringUtility.hasText(s)) {
+      return "";
+    }
+    KeyStroke ks = new KeyStroke(s);
+    int stateMask = getRwtStateMask(ks);
+    int keyCode = getRwtKeyCode(ks);
+    return LegacyActionTools.convertAccelerator(stateMask | keyCode);
   }
 }

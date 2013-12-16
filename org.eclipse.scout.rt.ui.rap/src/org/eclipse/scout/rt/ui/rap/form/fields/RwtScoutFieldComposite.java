@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
@@ -431,31 +434,73 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void updateKeyStrokesFromScout() {
-    // key strokes
-    Control widget = getUiContainer();
-    if (widget == null) {
-      widget = getUiField();
-    }
-    if (widget != null) {
+    unregisterKeyStrokes(getUiContainer());
+    unregisterKeyStrokes(getUiField());
 
-      // remove old
-      if (m_keyStrokes != null) {
-        for (IRwtKeyStroke uiKeyStroke : m_keyStrokes) {
-          getUiEnvironment().removeKeyStroke(widget, uiKeyStroke);
-        }
-      }
+    List<IRwtKeyStroke> newUiKeyStrokes = new ArrayList<IRwtKeyStroke>();
+    List<IKeyStroke> scoutKeyStrokes = new ArrayList<IKeyStroke>();
 
-      ArrayList<IRwtKeyStroke> newUiKeyStrokes = new ArrayList<IRwtKeyStroke>();
-      IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-      for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
-        IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
-        for (IRwtKeyStroke uiStroke : uiStrokes) {
-          getUiEnvironment().addKeyStroke(widget, uiStroke, false);
-          newUiKeyStrokes.add(uiStroke);
-        }
+    IFormField formField = getScoutObject();
+    while (formField != null) {
+      scoutKeyStrokes.addAll(Arrays.asList(formField.getKeyStrokes()));
+
+      //We need to register the parent keystrokes as well because rap only checks the focused control
+      //Seee https://bugs.eclipse.org/bugs/show_bug.cgi?id=424133
+      if (formField.getParentField() == null && formField.getForm() != null && formField.getForm().getOuterFormField() != null) {
+        //Necessary for wrapped form fields
+        formField = formField.getForm().getOuterFormField();
       }
-      m_keyStrokes = newUiKeyStrokes.toArray(new IRwtKeyStroke[newUiKeyStrokes.size()]);
+      else {
+        formField = formField.getParentField();
+      }
     }
+
+    for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
+      IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
+      for (IRwtKeyStroke uiStroke : uiStrokes) {
+        newUiKeyStrokes.add(uiStroke);
+      }
+    }
+    m_keyStrokes = newUiKeyStrokes.toArray(new IRwtKeyStroke[newUiKeyStrokes.size()]);
+
+    registerKeyStrokes(getUiContainer());
+    registerKeyStrokes(getUiField());
+  }
+
+  protected void registerKeyStrokes(Control control) {
+    if (m_keyStrokes == null || control == null || control.isDisposed()) {
+      return;
+    }
+    for (IRwtKeyStroke uiStroke : m_keyStrokes) {
+      getUiEnvironment().addKeyStroke(control, uiStroke, false);
+    }
+  }
+
+  protected void unregisterKeyStrokes(Control control) {
+    if (m_keyStrokes == null || control == null || control.isDisposed()) {
+      return;
+    }
+    for (IRwtKeyStroke uiKeyStroke : m_keyStrokes) {
+      getUiEnvironment().removeKeyStroke(control, uiKeyStroke);
+    }
+  }
+
+  @Override
+  protected void setUiContainer(Composite uiContainer) {
+    unregisterKeyStrokes(getUiContainer());
+
+    super.setUiContainer(uiContainer);
+
+    registerKeyStrokes(uiContainer);
+  }
+
+  @Override
+  protected void setUiField(Control uiField) {
+    unregisterKeyStrokes(getUiField());
+
+    super.setUiField(uiField);
+
+    registerKeyStrokes(uiField);
   }
 
   //runs in scout job

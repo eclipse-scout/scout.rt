@@ -114,9 +114,8 @@ public class AbstractRwtMenuAction {
   protected void applyScoutProperties() {
     IAction scoutAction = getScoutAction();
     setEnabledFromScout(scoutAction.isEnabled());
-    setTextFromScout(scoutAction.getText());
+    setTextFromScout(scoutAction.getTextWithMnemonic());
     setTooltipTextFromScout(scoutAction.getTooltipText());
-    // setMnemonicFromScout(scoutAction.getMnemonic());
     setIconFromScout(scoutAction.getIconId());
     updateKeyStrokeFromScout();
   }
@@ -142,6 +141,10 @@ public class AbstractRwtMenuAction {
       text = "";
     }
 
+    IAction action = getScoutAction();
+    if (action != null && StringUtility.hasText(action.getKeyStroke())) {
+      text += "\t" + RwtUtility.getKeyStrokePrettyPrinted(action);
+    }
     getUiMenuItem().setText(text);
   }
 

@@ -127,6 +127,10 @@ public class AbstractSwtMenuAction {
 
   protected void setTextFromScout(String text) {
     if (!getSwtMenuItem().isDisposed()) {
+      IAction action = getScoutAction();
+      if (action != null && StringUtility.hasText(action.getKeyStroke())) {
+        text += "\t" + SwtUtility.getKeyStrokePrettyPrinted(action);
+      }
       getSwtMenuItem().setText(text);
     }
   }

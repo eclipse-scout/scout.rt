@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -35,8 +34,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -667,17 +665,10 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public IKeyStroke[] getContributedKeyStrokes() {
-    HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
     if (getTable() != null) {
-      for (IMenu m : getTable().getMenus()) {
-        String s = m.getKeyStroke();
-        if (s != null && s.trim().length() > 0) {
-          KeyStroke ks = new KeyStroke(s, m);
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-        }
-      }
+      return MenuUtility.getKeyStrokesFromMenus(getTable().getMenus());
     }
-    return ksMap.values().toArray(new IKeyStroke[ksMap.size()]);
+    return new IKeyStroke[0];
   }
 
   private class P_ManagedTableListener extends TableAdapter {

@@ -52,7 +52,7 @@ public class RwtScoutSnapBox extends RwtScoutFieldComposite<ISnapBox> implements
   }
 
   @Override
-  public ISnapBox getScoutObject() {
-    return super.getScoutObject();
+  protected void updateKeyStrokesFromScout() {
+    // nop because the child fields also register the keystrokes of theirs parents
   }
 }

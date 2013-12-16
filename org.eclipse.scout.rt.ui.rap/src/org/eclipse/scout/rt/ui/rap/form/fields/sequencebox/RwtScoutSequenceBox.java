@@ -246,4 +246,9 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
 
     super.detachScout();
   }
+
+  @Override
+  protected void updateKeyStrokesFromScout() {
+    // nop because the child fields also register the keystrokes of theirs parents
+  }
 }
