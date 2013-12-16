@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 
 /**
- * @deprecated use {@link AbstractDataModelAttribute}
+ * @deprecated use {@link AbstractDataModelAttribute}. Will be removed in the M-Release.
  */
 @SuppressWarnings("deprecation")
 @Deprecated
@@ -37,7 +37,8 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
 
   /**
    * @deprecated the id must always by the class simple name
-   *             for dynamic attributes use {@link IComposerField#getMetaDataOfAttribute(IComposerAttribute)}
+   *             for dynamic attributes use {@link IComposerField#getMetaDataOfAttribute(IComposerAttribute)}.
+   *             Will be removed in the M-Release.
    */
   @Deprecated
   @ConfigProperty(ConfigProperty.STRING)
@@ -92,7 +93,7 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
   }
 
   /**
-   * @deprecated processing logic belongs to server
+   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
    */
   @Deprecated
   protected String getConfiguredStatement() {
@@ -100,7 +101,7 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
   }
 
   /**
-   * @deprecated processing logic belongs to server
+   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
    */
   @Deprecated
   public String getLegacyStatement() {

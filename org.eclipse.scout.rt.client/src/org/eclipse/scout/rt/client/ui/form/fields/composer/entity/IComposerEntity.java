@@ -13,20 +13,20 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.entity;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
- * @deprecated use {@link IDataModelEntity}
+ * @deprecated use {@link IDataModelEntity}. Will be removed in the M-Release.
  */
 
 @Deprecated
 public interface IComposerEntity extends IDataModelEntity {
 
   /**
-   * @deprecated the id must always by the class simple name
+   * @deprecated the id must always by the class simple name. Will be removed in the M-Release.
    */
   @Deprecated
   String getId();
 
   /**
-   * @deprecated the id must always by the class simple name
+   * @deprecated the id must always by the class simple name. Will be removed in the M-Release.
    */
   @Deprecated
   void setId(String s);

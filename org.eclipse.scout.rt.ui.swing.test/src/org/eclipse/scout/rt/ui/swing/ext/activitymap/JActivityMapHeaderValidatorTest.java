@@ -752,7 +752,7 @@ public class JActivityMapHeaderValidatorTest {
    *                                                    this class should be removed and replaced by a
    *                                                    real
    *                                                    mock.
-   * @deprecated will be replaced with Mockito mock in 3.10
+   * @deprecated will be replaced with Mockito mock in M-Release
    */
   @Deprecated
   class FontMetricsTest extends FontMetrics {

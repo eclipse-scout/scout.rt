@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.SERVICES;
 
+/**
+ * @deprecated Use {@link SearchFilter} instead. Will be removed in the M-Release.
+ */
+@Deprecated
 public class LegacySearchFilter extends SearchFilter implements Cloneable {
   private static final long serialVersionUID = 0L;
 

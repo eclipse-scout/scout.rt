@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
- * @deprecated Will be removed in the 3.11.0 Release
+ * @deprecated Use {@link FormDataStatementBuilder} instead. Will be removed in the M-Release.
  */
 @Deprecated
 @SuppressWarnings("deprecation")

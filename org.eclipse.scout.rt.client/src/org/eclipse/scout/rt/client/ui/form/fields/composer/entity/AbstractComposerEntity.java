@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 
 /**
- * @deprecated use {@link AbstractDataModelEntity}
+ * @deprecated use {@link AbstractDataModelEntity}. Will be removed in the M-Release.
  */
 @Deprecated
 @SuppressWarnings("deprecation")
@@ -62,7 +62,7 @@ public abstract class AbstractComposerEntity extends AbstractDataModelEntity imp
   }
 
   /**
-   * @deprecated processing logic belongs to server
+   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
    */
   @Deprecated
   protected String getConfiguredStatement() {
@@ -70,7 +70,7 @@ public abstract class AbstractComposerEntity extends AbstractDataModelEntity imp
   }
 
   /**
-   * @deprecated processing logic belongs to server
+   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
    */
   @Deprecated
   public String getLegacyStatement() {

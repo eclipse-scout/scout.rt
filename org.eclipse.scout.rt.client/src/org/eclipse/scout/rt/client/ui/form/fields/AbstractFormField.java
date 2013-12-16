@@ -134,13 +134,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * @deprecated processing logic belongs to server
+   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
    */
   @Deprecated
   protected String getConfiguredSearchTerm() {
     return null;
   }
 
+  /**
+   * @deprecated Will be removed in the M-Release.
+   */
   @Deprecated
   public final String getLegacySearchTerm() {
     return getConfiguredSearchTerm();

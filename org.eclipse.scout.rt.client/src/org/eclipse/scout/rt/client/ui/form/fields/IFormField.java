@@ -87,7 +87,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   String PROP_KEY_STROKES = "keyStrokes";
   /**
    * @deprecated since 3.8, sent via {@link org.eclipse.scout.rt.client.ui.form.FormEvent#TYPE_REQUEST_FOCUS
-   *             FormEvent#TYPE_REQUEST_FOCUS}
+   *             FormEvent#TYPE_REQUEST_FOCUS}. Will be removed in the M-Release.
    */
   @Deprecated
   String PROP_FOCUS_REQUESTED = "focusRequested";
@@ -595,7 +595,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   void requestFocus();
 
   /**
-   * @deprecated since 3.8
+   * @deprecated since 3.8. Use {@link IForm#requestFocus(IFormField)} instead. Will be removed in the M-Release.
    */
   @Deprecated
   boolean fetchFocusRequested();

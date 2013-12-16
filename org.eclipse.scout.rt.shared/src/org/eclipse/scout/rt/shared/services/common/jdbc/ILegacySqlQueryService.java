@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.shared.services.common.jdbc;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 /**
- * deprecated, do not use anymore
- * deprecation marker is set in next release
+ * @deprecated, do not use anymore. Use {@link ISqlService} on the server. Will be removed in the M-Release.
  */
+@Deprecated
 @Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface ILegacySqlQueryService extends IService {

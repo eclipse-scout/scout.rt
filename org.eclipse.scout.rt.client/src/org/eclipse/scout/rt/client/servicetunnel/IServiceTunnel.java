@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 
 /**
  * @Deprecated: use {@link IClientServiceTunnel} instead
- *              To be removed with the K-Release
+ *              To be removed with the M-Release
  */
 @Deprecated
 public interface IServiceTunnel extends IClientServiceTunnel {

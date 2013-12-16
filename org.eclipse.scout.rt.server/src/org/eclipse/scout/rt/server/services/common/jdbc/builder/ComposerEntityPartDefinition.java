@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeD
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
- * @deprecated use {@link DataModelEntityPartDefinition}. Will be removed in the 3.11.0 Release
+ * @deprecated use {@link DataModelEntityPartDefinition}. Will be removed in the M-Release
  */
 @Deprecated
 public class ComposerEntityPartDefinition extends DataModelEntityPartDefinition {

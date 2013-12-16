@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * @Deprecated: use {@link org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel} instead
- *              To be removed with the K-Release
+ *              To be removed with the M-Release
  */
 @Deprecated
 public abstract class AbstractServiceTunnel extends org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel {

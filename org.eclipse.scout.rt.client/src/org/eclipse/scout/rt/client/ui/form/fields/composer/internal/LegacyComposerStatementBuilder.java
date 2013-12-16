@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 
 /**
- * @deprecated processing logic belongs to server
+ * @deprecated processing logic belongs to server. Will be removed in the M-Release.
  */
 @Deprecated
 @SuppressWarnings("deprecation")

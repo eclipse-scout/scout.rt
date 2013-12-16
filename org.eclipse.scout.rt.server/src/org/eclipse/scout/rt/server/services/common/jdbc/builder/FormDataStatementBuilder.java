@@ -116,8 +116,9 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * That way non-existent matches are added to the result, which matches the expected behaviour.
  * 
  * @author imo
+ * @deprecated. Will be removed in the M-Release.
  */
-@SuppressWarnings("deprecation")
+@Deprecated
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");

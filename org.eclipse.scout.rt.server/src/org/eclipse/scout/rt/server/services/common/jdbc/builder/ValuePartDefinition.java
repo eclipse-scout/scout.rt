@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * Definition of a property-to-sql and valueField-to-sql mapping for {@link AbstractPropertyData} and
  * {@link AbstractValueFieldData}
  * 
- * @deprecated use the more general {@link BasicPartDefinition} instead. Will be removed in the 3.11.0 Release
+ * @deprecated use the more general {@link BasicPartDefinition} instead. Will be removed in the M-Release
  */
 @Deprecated
 public class ValuePartDefinition extends BasicPartDefinition {

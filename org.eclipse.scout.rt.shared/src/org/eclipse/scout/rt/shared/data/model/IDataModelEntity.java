@@ -53,17 +53,19 @@ public interface IDataModelEntity extends IPropertyObserver {
   IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz);
 
   /**
-   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
+   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure.
+   * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
    * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   * @deprecated will be removed in M-Release.
    */
   @Deprecated
   IDataModelEntity getParentEntity();
 
   /**
    * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
+   * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
    * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   * @deprecated will be removed in M-Release.
    */
   @Deprecated
   void setParentEntity(IDataModelEntity parent);
