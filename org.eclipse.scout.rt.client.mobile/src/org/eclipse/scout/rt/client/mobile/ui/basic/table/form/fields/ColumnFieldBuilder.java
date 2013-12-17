@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
@@ -102,6 +103,9 @@ public class ColumnFieldBuilder {
     }
     if (column instanceof IBigDecimalColumn) {
       return new BigDecimalColumnField((IBigDecimalColumn) column);
+    }
+    if (column instanceof IBigIntegerColumn) {
+      return new BigIntegerColumnField((IBigIntegerColumn) column);
     }
 
     return null;
