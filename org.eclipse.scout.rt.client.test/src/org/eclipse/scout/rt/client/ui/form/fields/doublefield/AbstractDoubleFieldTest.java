@@ -21,14 +21,24 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AbstractDoubleFieldTest extends AbstractDoubleField {
-  @Before
-  public void setup() {
+
+  private static Locale ORIGINAL_LOCALE;
+
+  @BeforeClass
+  public static void setupBeforeClass() {
+    ORIGINAL_LOCALE = LocaleThreadLocal.get();
     LocaleThreadLocal.set(new Locale("de", "CH"));
+  }
+
+  @AfterClass
+  public static void tearDownAfterClass() {
+    LocaleThreadLocal.set(ORIGINAL_LOCALE);
   }
 
   @Test

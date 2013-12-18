@@ -22,15 +22,24 @@ import java.util.Locale;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
-  @Before
-  public void setup() {
+  private static Locale ORIGINAL_LOCALE;
+
+  @BeforeClass
+  public static void setupBeforeClass() {
+    ORIGINAL_LOCALE = LocaleThreadLocal.get();
     LocaleThreadLocal.set(new Locale("de", "CH"));
+  }
+
+  @AfterClass
+  public static void tearDownAfterClass() {
+    LocaleThreadLocal.set(ORIGINAL_LOCALE);
   }
 
   @Override

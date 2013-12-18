@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.easymock.EasyMock;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
@@ -46,7 +47,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
   @Test
   public void testDecimalFormatHandling() {
     DecimalFormat format = getFormat();
-    String percentSuffix = ((DecimalFormat) NumberFormat.getPercentInstance()).getPositiveSuffix();
+    String percentSuffix = ((DecimalFormat) NumberFormat.getPercentInstance(LocaleThreadLocal.get())).getPositiveSuffix();
     assertTrue("expected groupingUsed-property set to true as default", format.isGroupingUsed());
     assertTrue("expected groupingUsed-property set to true as default", isGroupingUsed());
     assertEquals("expected minFractionDigits-property set to 2 as default", 2, getMinFractionDigits());
