@@ -208,7 +208,7 @@ public @interface ConfigProperty {
    */
   String BORDER_DECORATION = "BORDER_DECORATION";
   /**
-   * int
+   * java.math.RoundingMode
    */
   String ROUNDING_MODE = "ROUNDING_MODE";
 }

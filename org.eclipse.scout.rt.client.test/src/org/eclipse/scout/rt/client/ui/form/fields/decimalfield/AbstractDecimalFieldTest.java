@@ -55,8 +55,8 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   }
 
   @Override
-  protected int getConfiguredRoundingMode() {
-    return BigDecimal.ROUND_HALF_EVEN;
+  protected RoundingMode getConfiguredRoundingMode() {
+    return RoundingMode.HALF_EVEN;
   }
 
   @Override

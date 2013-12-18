@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -39,8 +39,8 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
   }
 
   @Override
-  protected int getConfiguredRoundingMode() {
-    return BigDecimal.ROUND_HALF_UP;
+  protected RoundingMode getConfiguredRoundingMode() {
+    return RoundingMode.HALF_UP;
   }
 
   /*

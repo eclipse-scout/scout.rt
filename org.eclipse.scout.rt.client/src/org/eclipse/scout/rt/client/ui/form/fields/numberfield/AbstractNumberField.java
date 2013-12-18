@@ -81,19 +81,14 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   /**
    * Default used for {@link INumberField#setRoundingMode(RoundingMode)}
    * <p>
-   * Sets the rounding mode used for formatting and parsing. When set to ROUND_UNNECESSARY the parsing accepts only
-   * values that can be assigned without rounding to the field's generic type and respect the maxFractionDigits property
-   * for decimal number fields.
-   * <p>
-   * When set to an invalid value, an {@link IllegalArgumentException} is thrown during {@link #initConfig()} Valid
-   * values are {@link BigDecimal#ROUND_DOWN}, {@link BigDecimal#ROUND_CEILING}, {@link BigDecimal#ROUND_FLOOR},
-   * {@link BigDecimal#ROUND_HALF_UP}, {@link BigDecimal#ROUND_HALF_DOWN}, {@link BigDecimal#ROUND_HALF_EVEN},
-   * {@link BigDecimal#ROUND_UNNECESSARY}
+   * Sets the rounding mode used for formatting and parsing. When set to UNNECESSARY the parsing accepts only values
+   * that can be assigned without rounding to the field's generic type and respect the maxFractionDigits property for
+   * decimal number fields.
    */
   @ConfigProperty(ConfigProperty.ROUNDING_MODE)
   @Order(250)
-  protected int getConfiguredRoundingMode() {
-    return BigDecimal.ROUND_UNNECESSARY;
+  protected RoundingMode getConfiguredRoundingMode() {
+    return RoundingMode.UNNECESSARY;
   }
 
   /**
@@ -116,7 +111,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     m_uiFacade = new P_UIFacade();
     super.initConfig();
     initFormat();
-    setRoundingMode(RoundingMode.valueOf(getConfiguredRoundingMode()));
+    setRoundingMode(getConfiguredRoundingMode());
     setGroupingUsed(getConfiguredGroupingUsed());
     if (getConfiguredFormat() != null) {
       m_format.applyPattern(getConfiguredFormat());
