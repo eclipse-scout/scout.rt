@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
@@ -33,18 +34,13 @@ public class StringColumnField extends AbstractStringField implements IColumnWra
   }
 
   @Override
+  protected void execDisposeField() throws ProcessingException {
+    m_propertyDelegator.dispose();
+  }
+
+  @Override
   public IStringColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 
-  @Override
-  protected int getConfiguredGridH() {
-    //If text wrap is set to true the field typically contains a lot of information.
-    //Therefore make it bigger so the user can read it.
-    if (getWrappedObject().isTextWrap()) {
-      return 2;
-    }
-
-    return super.getConfiguredGridH();
-  }
 }

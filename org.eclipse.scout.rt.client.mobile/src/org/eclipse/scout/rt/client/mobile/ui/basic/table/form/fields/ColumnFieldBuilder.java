@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
@@ -26,11 +30,23 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
+import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
 /**
  * @since 3.9.0
  */
 public class ColumnFieldBuilder {
+
+  private static final String PROP_PROPERTY_DELEGATOR = "propertyDelegator";
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColumnFieldBuilder.class);
 
   public Map<IColumn<?>, IFormField> build(IColumn<?>[] columns, ITableRow row) throws ProcessingException {
     Map<IColumn<?>, IFormField> fields = new HashMap<IColumn<?>, IFormField>();
@@ -43,6 +59,9 @@ public class ColumnFieldBuilder {
       if (field != null) {
         fields.put(column, field);
       }
+      else {
+        LOG.warn("No field mapping found for column " + column.getClass());
+      }
     }
 
     return fields;
@@ -53,7 +72,6 @@ public class ColumnFieldBuilder {
     if (column.isEditable()) {
       IFormField field = createEditableField(column, row);
       if (field != null) {
-        //Only
         return field;
       }
     }
@@ -86,6 +104,36 @@ public class ColumnFieldBuilder {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  protected ColumnFieldPropertyDelegator<? extends IColumn<?>, ? extends IFormField> createColumnFieldPropertyDelegator(IColumn<?> column, IFormField formField) {
+    if (column instanceof IStringColumn && formField instanceof IStringField) {
+      return new StringColumnFieldPropertyDelegator((IStringColumn) column, (IStringField) formField);
+    }
+    else if (column instanceof ISmartColumn && formField instanceof ISmartField) {
+      return new SmartColumnFieldPropertyDelegator((ISmartColumn) column, (ISmartField) formField);
+    }
+    else if (column instanceof IDoubleColumn && formField instanceof IDoubleField) {
+      return new DoubleColumnFieldPropertyDelegator((IDoubleColumn) column, (IDoubleField) formField);
+    }
+    else if (column instanceof IDateColumn && formField instanceof IDateField) {
+      return new DateColumnFieldPropertyDelegator((IDateColumn) column, (IDateField) formField);
+    }
+    else if (column instanceof IBooleanColumn && formField instanceof IBooleanField) {
+      return new ColumnFieldPropertyDelegator(column, formField);
+    }
+    else if (column instanceof ILongColumn && formField instanceof ILongField) {
+      return new LongColumnFieldPropertyDelegator((ILongColumn) column, (ILongField) formField);
+    }
+    else if (column instanceof IIntegerColumn && formField instanceof IIntegerField) {
+      return new IntegerColumnFieldPropertyDelegator((IIntegerColumn) column, (IIntegerField) formField);
+    }
+    else if (column instanceof IBigDecimalColumn && formField instanceof IBigDecimalField) {
+      return new BigDecimalColumnFieldPropertyDelegator((IBigDecimalColumn) column, (IBigDecimalField) formField);
+    }
+
+    return new ColumnFieldPropertyDelegator(column, formField);
+  }
+
   protected IFormField createEditableField(IColumn<?> column, ITableRow row) throws ProcessingException {
     IFormField field = column.prepareEdit(row);
     if (field != null) {
@@ -96,10 +144,31 @@ public class ColumnFieldBuilder {
       field.setGridDataHints(gd);
 
       //Set missing properties
-      field.setLabel(column.getHeaderCell().getText());
-      field.setTooltipText(column.getHeaderCell().getTooltipText());
+      ColumnFieldPropertyDelegator<? extends IColumn<?>, ? extends IFormField> propertyDelegator = createColumnFieldPropertyDelegator(column, field);
+      if (propertyDelegator != null) {
+        propertyDelegator.init();
+        field.setProperty(PROP_PROPERTY_DELEGATOR, propertyDelegator);
+      }
+
+      field.addPropertyChangeListener(new PropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
+            //Enforce setting cell value even if the value has been changed back to initial value (see AbstractColumn#execCompleteEdit
+            ((IValueField<?>) evt.getSource()).touch();
+          }
+        }
+      });
     }
 
     return field;
+  }
+
+  public void fieldDisposed(IFormField field) {
+    Object value = field.getProperty(PROP_PROPERTY_DELEGATOR);
+    if (value instanceof ColumnFieldPropertyDelegator) {
+      ((ColumnFieldPropertyDelegator) value).dispose();
+    }
   }
 }

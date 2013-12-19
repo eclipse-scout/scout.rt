@@ -134,7 +134,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
           return;
         }
 
-        m_mobileTable.dispose();
+        m_mobileTable.disposeTable();
         m_mobileTable = null;
       }
 

@@ -90,6 +90,7 @@
       <modules>
         <module>../org.eclipse.scout.commons.test</module>
         <module>../org.eclipse.scout.jaxws216.test</module>
+        <module>../org.eclipse.scout.rt.client.mobile.test</module>
         <module>../org.eclipse.scout.rt.client.test</module>
         <module>../org.eclipse.scout.rt.client.testenvironment</module>
         <module>../org.eclipse.scout.rt.extension.client.test</module>

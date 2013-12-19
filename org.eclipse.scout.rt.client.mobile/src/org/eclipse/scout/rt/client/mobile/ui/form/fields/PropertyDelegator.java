@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
 public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extends IPropertyObserver> {
@@ -54,10 +55,18 @@ public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extend
   public void init() {
   }
 
+  /**
+   * Removes registered listeners.
+   */
+  public void dispose() {
+    m_sender.removePropertyChangeListener(m_propertyChangeListener);
+    m_propertyChangeListener = null;
+  }
+
   protected void handlePropertyChange(String name, Object newValue) {
   }
 
-  private class P_PropertyChangeListener implements PropertyChangeListener {
+  private class P_PropertyChangeListener implements PropertyChangeListener, WeakEventListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyDelegator;
+import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -18,9 +21,20 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * @since 3.9.0
  */
 public class ColumnFieldPropertyDelegator<SENDER extends IColumn<?>, RECEIVER extends IFormField> extends PropertyDelegator<SENDER, RECEIVER> {
+  private P_TableListener m_tableListener;
 
   public ColumnFieldPropertyDelegator(SENDER sender, RECEIVER receiver) {
     super(sender, receiver);
+
+    m_tableListener = new P_TableListener();
+    getSender().getTable().addTableListener(m_tableListener);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    getSender().getTable().removeTableListener(m_tableListener);
+    m_tableListener = null;
   }
 
   @Override
@@ -29,9 +43,14 @@ public class ColumnFieldPropertyDelegator<SENDER extends IColumn<?>, RECEIVER ex
     if (!getSender().isVisible()) {
       getReceiver().setVisibleGranted(getSender().isVisibleGranted());
     }
-    getReceiver().setLabel(getSender().getHeaderCell().getText());
+
+    String label = getSender().getHeaderCell().getText();
+    if (isRemoveLabelLineBreaksEnabled()) {
+      label = StringUtility.removeNewLines(label);
+    }
+    getReceiver().setLabel(label);
     getReceiver().setTooltipText(getSender().getHeaderCell().getTooltipText());
-    getReceiver().setEnabled(false);
+    getReceiver().setEnabled(getSender().isCellEditable(getSender().getTable().getSelectedRow()));
   }
 
   @Override
@@ -42,6 +61,38 @@ public class ColumnFieldPropertyDelegator<SENDER extends IColumn<?>, RECEIVER ex
     if (name.equals(IColumn.PROP_EDITABLE)) {
       getReceiver().setEnabled(((Boolean) newValue).booleanValue());
     }
+  }
+
+  protected boolean isRemoveLabelLineBreaksEnabled() {
+    return true;
+  }
+
+  protected void handleColumnHeaderChanged(IColumn<?> column) {
+    String label = getSender().getHeaderCell().getText();
+    if (isRemoveLabelLineBreaksEnabled()) {
+      label = StringUtility.removeNewLines(label);
+    }
+    getReceiver().setLabel(label);
+    getReceiver().setTooltipText(column.getHeaderCell().getTooltipText());
+  }
+
+  protected void handleTableEvent(TableEvent event) {
+    if (TableEvent.TYPE_COLUMN_HEADERS_UPDATED == event.getType()) {
+      for (IColumn column : event.getColumns()) {
+        if (column.equals(getSender())) {
+          handleColumnHeaderChanged(column);
+        }
+      }
+    }
+  }
+
+  private class P_TableListener extends TableAdapter {
+
+    @Override
+    public void tableChanged(TableEvent e) {
+      handleTableEvent(e);
+    }
+
   }
 
 }

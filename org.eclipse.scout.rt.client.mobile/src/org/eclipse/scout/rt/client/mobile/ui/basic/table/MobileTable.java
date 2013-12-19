@@ -40,7 +40,7 @@ import org.eclipse.scout.service.SERVICES;
  * A table optimized for mobile devices which wraps another table.
  * <p>
  * It consists of a content column which displays the relevant information of the original table.
- *
+ * 
  * @since 3.9.0
  */
 public class MobileTable extends AbstractMobileTable implements IMobileTable {
@@ -94,8 +94,18 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
+  protected void execDisposeTable() throws ProcessingException {
+    super.execDisposeTable();
+    if (m_tableListener != null) {
+      getOriginalTable().removeTableListener(m_tableListener);
+      m_tableListener = null;
+    }
+    m_propertyDelegator.dispose();
+  }
+
+  @Override
   protected boolean execIsAutoCreateTableRowForm() {
-    if(getOriginalTable().hasProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM)) {
+    if (getOriginalTable().hasProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM)) {
       return isAutoCreateRowForm(getOriginalTable());
     }
 
@@ -108,7 +118,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   @Override
   protected String execComputeDefaultDrillDownStyle() {
-    if(getOriginalTable().hasProperty(PROP_DEFAULT_DRILL_DOWN_STYLE)) {
+    if (getOriginalTable().hasProperty(PROP_DEFAULT_DRILL_DOWN_STYLE)) {
       return getDefaultDrillDownStyle(getOriginalTable());
     }
 
@@ -134,15 +144,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     if (getPageIndex() >= getPageCount()) {
       setPageIndex(getOriginalTable(), getPageCount() - 1);
     }
-  }
-
-  public void dispose() {
-    if (m_tableListener == null) {
-      return;
-    }
-
-    getOriginalTable().removeTableListener(m_tableListener);
-    m_tableListener = null;
   }
 
   public ITable getOriginalTable() {

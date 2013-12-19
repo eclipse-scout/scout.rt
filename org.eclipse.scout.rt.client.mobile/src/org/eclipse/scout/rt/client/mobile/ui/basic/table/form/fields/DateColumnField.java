@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
@@ -30,6 +31,11 @@ public class DateColumnField extends AbstractDateField implements IColumnWrapper
     super.initConfig();
 
     m_propertyDelegator.init();
+  }
+
+  @Override
+  protected void execDisposeField() throws ProcessingException {
+    m_propertyDelegator.dispose();
   }
 
   @Override

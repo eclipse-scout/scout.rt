@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
 /**
@@ -32,6 +33,13 @@ public class StringColumnFieldPropertyDelegator extends ColumnFieldPropertyDeleg
     if (getSender().isTextWrap()) {
       //Text wrap typically only works if multiline is enabled
       getReceiver().setMultilineText(true);
+    }
+
+    if (getReceiver().isMultilineText()) {
+      //Make the field bigger in case of multiline text so the user can read / edit the data easier
+      GridData gd = getReceiver().getGridDataHints();
+      gd.h = 2;
+      getReceiver().setGridDataHints(gd);
     }
   }
 

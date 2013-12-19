@@ -45,6 +45,13 @@ public class TabBoxGroupBox extends AbstractGroupBox {
     getTableField().initField();
   }
 
+  @Override
+  protected void execDisposeField() throws ProcessingException {
+    super.execDisposeField();
+
+    m_propertyDelegator.dispose();
+  }
+
   public ITabBox getTabBox() {
     return m_propertyDelegator.getSender();
   }

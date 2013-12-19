@@ -80,6 +80,11 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   @Override
   protected void execDisposeForm() throws ProcessingException {
     getTable().removeTableListener(m_tableListener);
+    if (m_columnFields != null) {
+      for (IFormField formField : m_columnFields.values()) {
+        m_columnFieldBuilder.fieldDisposed(formField);
+      }
+    }
   }
 
   protected ColumnFieldBuilder createColumnFieldBuilder() {
