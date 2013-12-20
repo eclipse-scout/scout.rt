@@ -304,6 +304,11 @@ public class ColumnFilterForm extends AbstractForm {
           }
 
           @Override
+          protected boolean getConfiguredMultilineText() {
+            return true;
+          }
+
+          @Override
           protected boolean getConfiguredAutoResizeColumns() {
             return true;
           }
