@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.rap.action.MenuFactory;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
@@ -135,6 +136,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private ColorFactory m_colorFactory;
   private FontRegistry m_fontRegistry;
   private RwtIconLocator m_iconLocator;
+  private MenuFactory m_menuFactory;
 
   private List<IRwtKeyStroke> m_desktopKeyStrokes;
   private KeyStrokeManager m_keyStrokeManager;
@@ -380,6 +382,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       m_colorFactory = new ColorFactory(getDisplay());
       m_keyStrokeManager = new KeyStrokeManager(this);
       m_fontRegistry = new FontRegistry(getDisplay());
+      m_menuFactory = createMenuFactory();
       if (UiDecorationExtensionPoint.getLookAndFeel().isBrowserHistoryEnabled()) {
         m_historySupport = new RwtScoutNavigationSupport(this);
         m_historySupport.install();
@@ -633,16 +636,16 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   @Override
-  public void addKeyStroke(Control control, IRwtKeyStroke stoke, boolean exclusive) {
-    m_keyStrokeManager.addKeyStroke(control, stoke, exclusive);
+  public void addKeyStroke(Control control, IRwtKeyStroke stroke, boolean exclusive) {
+    m_keyStrokeManager.addKeyStroke(control, stroke, exclusive);
   }
 
   @Override
-  public boolean removeKeyStroke(Control control, IRwtKeyStroke stoke) {
+  public boolean removeKeyStroke(Control control, IRwtKeyStroke stroke) {
     if (m_keyStrokeManager == null) {
       return false;
     }
-    return m_keyStrokeManager.removeKeyStroke(control, stoke);
+    return m_keyStrokeManager.removeKeyStroke(control, stroke);
   }
 
   @Override
@@ -1263,6 +1266,15 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   @Override
   public LayoutValidateManager getLayoutValidateManager() {
     return m_layoutValidateManager;
+  }
+
+  @Override
+  public MenuFactory getMenuFactory() {
+    return m_menuFactory;
+  }
+
+  protected MenuFactory createMenuFactory() {
+    return new MenuFactory();
   }
 
   // GUI FACTORY

@@ -23,8 +23,12 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class RwtScoutMenuGroup extends AbstractRwtMenuAction {
 
+  public RwtScoutMenuGroup(Menu uiMenu, IAction scoutMenu, IRwtEnvironment uiEnvironment, boolean callInitializer) {
+    super(uiMenu, scoutMenu, uiEnvironment, callInitializer);
+  }
+
   public RwtScoutMenuGroup(Menu uiMenu, IAction scoutMenu, IRwtEnvironment uiEnvironment) {
-    super(uiMenu, scoutMenu, uiEnvironment, true);
+    this(uiMenu, scoutMenu, uiEnvironment, true);
   }
 
   @Override

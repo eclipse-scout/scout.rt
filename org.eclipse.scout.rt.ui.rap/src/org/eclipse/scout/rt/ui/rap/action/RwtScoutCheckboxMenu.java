@@ -18,8 +18,12 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class RwtScoutCheckboxMenu extends AbstractRwtMenuAction {
 
+  public RwtScoutCheckboxMenu(Menu uiMenu, ICheckBoxMenu scoutMenu, IRwtEnvironment uiEnvironment, boolean callInitializer) {
+    super(uiMenu, scoutMenu, uiEnvironment, callInitializer);
+  }
+
   public RwtScoutCheckboxMenu(Menu uiMenu, ICheckBoxMenu scoutMenu, IRwtEnvironment uiEnvironment) {
-    super(uiMenu, scoutMenu, uiEnvironment, true);
+    this(uiMenu, scoutMenu, uiEnvironment, true);
   }
 
   @Override
