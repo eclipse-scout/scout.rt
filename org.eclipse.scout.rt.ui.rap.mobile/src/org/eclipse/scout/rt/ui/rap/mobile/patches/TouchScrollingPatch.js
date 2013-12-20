@@ -8,6 +8,15 @@
       Style.setStyleProperty( target, property, value );
     };
 
+    // patch iframe
+    rwt.qx.Class.__initializeClass( rwt.widgets.base.Iframe);
+    var iframeProto = rwt.widgets.base.Iframe.prototype;
+    var originalIframeFunc = iframeProto._applyElement;
+    iframeProto._applyElement = function() {
+      originalIframeFunc.apply(this, arguments);
+        arguments[0].style.overflow="auto";
+    }
+
     // patch scrollable
     rwt.qx.Class.__initializeClass( rwt.widgets.base.Scrollable );
     var proto = rwt.widgets.base.Scrollable.prototype;
@@ -29,7 +38,7 @@
       mouseTimer.stop();
     } );
 
-    // fix render render gitches:
+    // fix render glitches:
     var style = document.createElement( "style");
     style.type = 'text/css';
     style.innerHTML = "*:not(html) { -webkit-transform: translate3d(0, 0, 0); }";
