@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,14 +20,13 @@ import org.eclipse.rap.rwt.client.service.UrlLauncher;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.rap.AbstractRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
 
 /**
  * @since 3.8.0
  */
 public class BrowserWindowHandler {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserWindowHandler.class);
 
   public void openLink(String link) {
     if (link == null) {
@@ -115,8 +114,10 @@ public class BrowserWindowHandler {
         //mac is not able to open files with a space, even when in quotes
         String ext = px.substring(px.lastIndexOf('.'));
         File f = new File(file.getParentFile(), "" + System.nanoTime() + ext);
-        file.renameTo(f);
         f.deleteOnExit();
+        if (file.renameTo(f)) {
+          file = f;
+        }
       }
     }
     return file;
