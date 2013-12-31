@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
  * This base implementation handles form attachment and listens for form removal on the desktop
  */
 public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutPart.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutPart.class);
 
   private IForm m_scoutForm;
   private IRwtEnvironment m_uiEnvironment;

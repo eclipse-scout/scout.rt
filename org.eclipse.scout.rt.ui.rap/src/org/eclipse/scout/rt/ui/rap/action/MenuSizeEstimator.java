@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 @SuppressWarnings("restriction")
 public class MenuSizeEstimator {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(MenuSizeEstimator.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MenuSizeEstimator.class);
 
   private Rectangle m_menuPadding;
   private Rectangle m_menuItemPadding;

@@ -32,7 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 public class ScoutApplicationStartup {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(ScoutApplicationStartup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutApplicationStartup.class);
 
   private final IRwtEnvironment m_uiEnvironment;
 

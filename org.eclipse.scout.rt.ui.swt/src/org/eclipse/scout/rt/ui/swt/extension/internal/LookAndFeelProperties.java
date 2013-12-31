@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.extension.ILookAndFeelProperties;
 
 public class LookAndFeelProperties implements ILookAndFeelProperties {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(LookAndFeelProperties.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LookAndFeelProperties.class);
 
   private String m_contributor;
   private int m_scope;

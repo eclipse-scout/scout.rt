@@ -52,7 +52,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  * @since 1.0.0 07.04.2008
  */
 public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements ISwtScoutButton {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutButton.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutButton.class);
 
   private ButtonListener m_scoutButtonListener;
   private OptimisticLock m_selectionLock;

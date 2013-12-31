@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class ColorFactory {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(ColorFactory.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColorFactory.class);
   private final Display m_display;
   private HashMap<String, Color> m_colorCache = new HashMap<String, Color>();
 

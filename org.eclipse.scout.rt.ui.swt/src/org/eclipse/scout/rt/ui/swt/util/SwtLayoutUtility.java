@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
 
 public final class SwtLayoutUtility {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
 
   private SwtLayoutUtility() {
   }

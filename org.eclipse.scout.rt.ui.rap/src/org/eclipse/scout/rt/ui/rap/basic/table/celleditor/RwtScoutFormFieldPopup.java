@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Event;
  * Wraps a {@link IFormField} to be displayed as popup cell editor
  */
 public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFormFieldPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFormFieldPopup.class);
 
   private P_RwtScoutDropDownPopup m_uiScoutPopup;
 

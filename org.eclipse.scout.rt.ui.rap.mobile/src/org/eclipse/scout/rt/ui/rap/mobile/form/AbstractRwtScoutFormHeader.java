@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
  * @since 3.9.0
  */
 public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm> implements IRwtScoutFormHeader {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutFormHeader.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutFormHeader.class);
   private static final String VARIANT_FORM_HEADER = "mobileFormHeader";
 
   @Override

@@ -28,7 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 public abstract class AbstractSwtStartup implements IStartup {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtStartup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtStartup.class);
 
   protected abstract ISwtEnvironment getSwtEnvironment();
 

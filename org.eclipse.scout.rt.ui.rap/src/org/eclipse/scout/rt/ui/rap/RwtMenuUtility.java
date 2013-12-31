@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.rap.action.MenuFactory;
 import org.eclipse.swt.widgets.Menu;
 
 public final class RwtMenuUtility {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtMenuUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtMenuUtility.class);
 
   private RwtMenuUtility() {
   }

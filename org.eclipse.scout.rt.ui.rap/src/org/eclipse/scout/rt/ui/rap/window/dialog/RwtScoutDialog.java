@@ -46,7 +46,7 @@ import org.eclipse.ui.forms.widgets.Form;
  * @since 3.8.0
  */
 public class RwtScoutDialog extends AbstractRwtScoutPart {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDialog.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDialog.class);
   private static String VARIANT_DIALOG_SHELL = "dialog";
 
   private DialogImpl m_uiDialog;

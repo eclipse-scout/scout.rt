@@ -54,7 +54,7 @@ import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
  * @since 1.0.3 06.02.2009
  */
 public abstract class AbstractChainableSecurityFilter implements Filter {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractChainableSecurityFilter.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractChainableSecurityFilter.class);
   public static final String PROP_SUBJECT = Subject.class.getName();
 
   public static final int STATUS_CONTINUE_CHAIN = 1;

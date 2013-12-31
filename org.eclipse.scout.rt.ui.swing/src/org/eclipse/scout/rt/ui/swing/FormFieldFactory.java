@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.osgi.framework.Bundle;
 
 public class FormFieldFactory implements IFormFieldFactory {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldFactory.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldFactory.class);
 
   private LinkedHashMap<Class<?>, IFormFieldFactory> m_fields;
 

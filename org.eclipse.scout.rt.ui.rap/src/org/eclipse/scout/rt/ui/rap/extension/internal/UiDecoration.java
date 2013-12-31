@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.swt.SWT;
 
 public class UiDecoration implements IUiDecoration {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(UiDecoration.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiDecoration.class);
 
   private String m_mandatoryFieldBackgroundColor;
   private int m_mandatoryStarMarkerPosition;

@@ -33,7 +33,7 @@ import org.eclipse.scout.http.servletfilter.ServletFilterDelegate;
  * filters a ranking is strong requirement to support chainable security filters.
  */
 public class DelegateFilter implements Filter {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(DelegateFilter.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DelegateFilter.class);
 
   private ServletContext m_servletContext;
 

@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
  * @since 1.0.0 02.05.2008
  */
 public class SwtScoutFileChooser {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutFileChooser.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutFileChooser.class);
   private final IFileChooser m_scoutFileChooser;
   private final ISwtEnvironment m_environment;
   private final Shell m_parentShell;

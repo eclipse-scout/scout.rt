@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.extension.internal.FormFieldExtension;
 
 public final class FormFieldsExtensionPoint {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
 
   private FormFieldsExtensionPoint() {
   }

@@ -37,7 +37,7 @@ import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
  * (focusComponent), or the component becomes invisible.
  */
 public class RwtScoutDropDownPopup extends RwtScoutPopup {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDropDownPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDropDownPopup.class);
 
   private Control m_focusComponent;
   private FocusListener m_focusComponentListener;

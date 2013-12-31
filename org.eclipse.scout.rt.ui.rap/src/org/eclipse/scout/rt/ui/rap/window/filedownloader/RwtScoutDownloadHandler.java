@@ -35,7 +35,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.widgets.Display;
 
 public class RwtScoutDownloadHandler implements ServiceHandler {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDownloadHandler.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDownloadHandler.class);
 
   private File m_file;
   private URI m_bundleURI;

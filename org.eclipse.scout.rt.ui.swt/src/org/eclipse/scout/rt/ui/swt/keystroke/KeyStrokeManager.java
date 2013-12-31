@@ -30,7 +30,7 @@ import org.eclipse.ui.PlatformUI;
  * @since 1.0.0 30.04.2008
  */
 public class KeyStrokeManager implements IKeyStrokeManager {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
 
   private Listener m_keyListener;
   private ArrayList<ISwtKeyStroke> m_globalKeyStrokes;

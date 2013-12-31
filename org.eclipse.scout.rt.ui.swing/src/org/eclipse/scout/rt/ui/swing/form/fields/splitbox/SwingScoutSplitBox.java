@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
  */
 public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> implements ISwingScoutSplitBox {
 
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutSplitBox.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutSplitBox.class);
   private OptimisticLock lockSplitter;
 
   public SwingScoutSplitBox() {

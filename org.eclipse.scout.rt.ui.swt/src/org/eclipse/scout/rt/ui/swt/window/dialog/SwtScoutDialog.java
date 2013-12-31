@@ -46,7 +46,7 @@ import org.eclipse.ui.forms.widgets.Form;
  * @since 1.0.9 18.07.2008
  */
 public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDialog.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDialog.class);
 
   private final ISwtEnvironment m_environment;
   private Composite m_contentPane;

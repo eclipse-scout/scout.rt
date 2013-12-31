@@ -27,7 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 public class RwtScoutComposerField extends RwtScoutFieldComposite<IComposerField> implements IRwtScoutComposerField {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutComposerField.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutComposerField.class);
 
   private IRwtScoutTree m_UiTreeComposite;
 

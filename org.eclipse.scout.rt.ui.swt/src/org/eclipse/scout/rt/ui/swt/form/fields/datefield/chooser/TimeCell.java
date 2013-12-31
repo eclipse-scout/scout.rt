@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Listener;
  * UiTimeChooserDialogContent.
  */
 public class TimeCell {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(TimeCell.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TimeCell.class);
   private Composite m_container = null;
 
   private Label m_timeLabel = null;

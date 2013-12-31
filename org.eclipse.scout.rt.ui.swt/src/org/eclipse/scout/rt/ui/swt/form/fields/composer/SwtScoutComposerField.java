@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.swt.widgets.Composite;
 
 public class SwtScoutComposerField extends SwtScoutFieldComposite<IComposerField> implements ISwtScoutComposerField {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutComposerField.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutComposerField.class);
 
   private ISwtScoutTree m_treeComposite;
 

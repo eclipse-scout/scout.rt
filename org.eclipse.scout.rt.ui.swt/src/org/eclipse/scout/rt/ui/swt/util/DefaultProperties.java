@@ -24,7 +24,7 @@ package org.eclipse.scout.rt.ui.swt.util;
 // * @since 1.0.0  10.04.2008
 // */
 //public class DefaultProperties {
-//  private static IScoutLogger LOG = ScoutLoggManager.getLogger(DefaultProperties.class);
+//  private static final IScoutLogger LOG = ScoutLoggManager.getLogger(DefaultProperties.class);
 //
 //  private static DefaultProperties instance = new DefaultProperties();
 //  private HashMap<String, Object> m_properties;

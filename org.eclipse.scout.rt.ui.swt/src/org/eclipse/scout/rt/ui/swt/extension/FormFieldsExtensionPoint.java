@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.swt.extension.internal.FormFieldExtension;
  * @since 1.0.8 17.04.2009
  */
 public final class FormFieldsExtensionPoint {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
 
   private FormFieldsExtensionPoint() {
   }

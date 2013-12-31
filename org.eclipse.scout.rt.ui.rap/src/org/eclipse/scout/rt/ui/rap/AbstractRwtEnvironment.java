@@ -120,7 +120,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
   private Subject m_subject;
 

@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  * (focusComponent), or the component becomes invisible.
  */
 public class SwtScoutDropDownPopup extends SwtScoutPopup {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDropDownPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDropDownPopup.class);
 
   private Composite m_focusComponent;
   private FocusListener m_focusComponentListener;

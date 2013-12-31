@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
  * @since 3.8.1
  */
 public class HtmlAdapter {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(HtmlAdapter.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlAdapter.class);
 
   private IRwtEnvironment m_uiEnvironment;
 

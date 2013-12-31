@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Event;
  */
 public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutFormFieldPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutFormFieldPopup.class);
 
   private SwtScoutDropDownPopup m_swtScoutPopup;
 

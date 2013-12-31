@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 public final class SwtMenuUtility {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtMenuUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtMenuUtility.class);
 
   private SwtMenuUtility() {
   }

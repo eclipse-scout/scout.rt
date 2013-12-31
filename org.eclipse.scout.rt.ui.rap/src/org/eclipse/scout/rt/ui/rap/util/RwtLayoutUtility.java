@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
 
 public final class RwtLayoutUtility {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtLayoutUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtLayoutUtility.class);
 
   private RwtLayoutUtility() {
   }

@@ -42,7 +42,7 @@ import org.eclipse.ui.forms.widgets.Form;
  * (focusComponent), or the component becomes invisible.
  */
 public class SwtScoutPopup implements ISwtScoutPart {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutPopup.class);
   public static final String PROP_POPUP_OWNER = "propPopupOwner";
 
   private ISwtEnvironment m_env;

@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.swt.SWT;
 
 public final class UiDecorationExtensionPoint {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(UiDecorationExtensionPoint.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiDecorationExtensionPoint.class);
   private static Map<IUiDeviceType, IUiDecoration> LOOK_AND_FEEL_MAP = new HashMap<IUiDeviceType, IUiDecoration>();
 
   public static final int SCOPE_DEFAULT = 1;

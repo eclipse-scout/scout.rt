@@ -133,7 +133,7 @@ import org.osgi.framework.Bundle;
  * @since 1.0.0 06.03.2008
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
 
   private final Bundle m_applicationBundle;
 

@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Widget;
  * @since 3.7.0 June 2011
  */
 public class KeyStrokeManager implements IKeyStrokeManager {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   private Listener m_keyListener;

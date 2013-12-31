@@ -44,7 +44,7 @@ import org.eclipse.ui.forms.widgets.Form;
  * (focusComponent), or the component becomes invisible.
  */
 public class RwtScoutPopup extends AbstractRwtScoutPart {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutPopup.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutPopup.class);
   public static final String PROP_POPUP_OWNER = "propPopupOwner";
 
   private static final String POPUP_CUSTOM_VARIANT = "popup";
