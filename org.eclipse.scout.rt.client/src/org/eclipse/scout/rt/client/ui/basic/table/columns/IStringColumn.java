@@ -27,6 +27,12 @@ public interface IStringColumn extends IColumn<String> {
 
   boolean isInputMasked();
 
+  /**
+   * Sets the display format of this column.
+   * 
+   * @param s
+   *          Either {@code null}, {@link #FORMAT_LOWER} or {@link #FORMAT_UPPER}.
+   */
   void setDisplayFormat(String s);
 
   String getDisplayFormat();

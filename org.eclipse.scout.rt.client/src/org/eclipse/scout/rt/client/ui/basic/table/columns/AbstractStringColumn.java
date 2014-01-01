@@ -71,7 +71,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
-   * @return Either {@code null}, {@link IStringColumn#FORMAT_LOWER} or {@link IStringColumn#FORMAT_LOWER}.
+   * @return Either {@code null}, {@link IStringColumn#FORMAT_LOWER} or {@link IStringColumn#FORMAT_UPPER}.
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(150)
