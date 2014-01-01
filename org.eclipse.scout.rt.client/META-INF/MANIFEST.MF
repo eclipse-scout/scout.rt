@@ -117,6 +117,7 @@ Export-Package: org.eclipse.scout.rt.client,
  org.eclipse.scout.rt.client.ui.form.useradmin,
  org.eclipse.scout.rt.client.ui.messagebox,
  org.eclipse.scout.rt.client.ui.profiler,
+ org.eclipse.scout.rt.client.ui.valuecontainer,
  org.eclipse.scout.rt.client.ui.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
