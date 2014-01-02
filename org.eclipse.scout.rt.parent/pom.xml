@@ -119,6 +119,7 @@
         <module>../org.eclipse.scout.rt.testing.core-feature</module>
         <module>../org.eclipse.scout.rt.testing.swing-feature</module>
         <module>../org.eclipse.scout.rt.testing.swt-feature</module>
+        <module>../org.eclipse.scout.rt.spec.client</module>
       </modules>
     </profile>
 

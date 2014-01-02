@@ -16,6 +16,7 @@
 
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.equinox.server.servletbridge.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
     </location>
 
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">

@@ -66,10 +66,10 @@ public class FormEvent extends EventObject {
   //next 6030
 
   private final int m_type;
-  private IFormField m_formField;
-  private PrintDevice m_printDevice;
-  private Map<String, Object> m_printParameters;
-  private File m_printedFile;
+  private final IFormField m_formField;
+  private final PrintDevice m_printDevice;
+  private final Map<String, Object> m_printParameters;
+  private final File m_printedFile;
 
   /**
    * A form event is sent whenever a form changes. You can register
@@ -79,27 +79,28 @@ public class FormEvent extends EventObject {
    * probably be interested in the <b>type</b> you get via <code>getType</code>.
    */
   public FormEvent(IForm form, int type) {
-    super(form);
-    m_type = type;
+    this(form, type, null, null, null);
   }
 
   public FormEvent(IForm form, int type, File printedFile) {
-    this(form, type);
-    m_printedFile = printedFile;
+    this(form, type, null, null, null, printedFile);
   }
 
   public FormEvent(IForm form, int type, IFormField causingField) {
-    super(form);
-    m_type = type;
-    m_formField = causingField;
+    this(form, type, causingField, null, null);
   }
 
   public FormEvent(IForm form, int type, IFormField printRoot, PrintDevice printDevice, Map<String, Object> printParameters) {
+    this(form, type, printRoot, printDevice, printParameters, null);
+  }
+
+  public FormEvent(IForm form, int type, IFormField printRoot, PrintDevice printDevice, Map<String, Object> printParameters, File printedFile) {
     super(form);
     m_type = type;
     m_formField = printRoot;
     m_printDevice = printDevice;
     m_printParameters = printParameters;
+    m_printedFile = printedFile;
   }
 
   public IForm getForm() {

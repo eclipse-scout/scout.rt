@@ -43,4 +43,11 @@
       <import plugin="org.junit" version="4.9.0" match="compatible"/>
    </requires>
 
+   <plugin
+         id="org.eclipse.scout.rt.spec.client"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

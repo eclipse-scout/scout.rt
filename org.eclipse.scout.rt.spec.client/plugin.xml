@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipse.scout.rt.spec.client.text.DocTextProviderTestService"
+            createImmediately="false"
+            ranking="10">
+      </service>
+   </extension>
+
+</plugin>

@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
@@ -155,24 +156,38 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement methodBlock(FrameworkMethod method) {
-    IClientSession clientSession = m_clientSession;
+    try {
+      // run each test method in a separate ClientSession
+      IClientSession clientSession = getClientSession(method);
+      return createWrappedStatement(super.methodBlock(method), clientSession);
+    }
+    catch (final ProcessingException e1) {
+      return new Statement() {
+        @Override
+        public void evaluate() throws Throwable {
+          throw e1;
+        }
+      };
+    }
+
+  }
+
+  protected IClientSession getClientSession(FrameworkMethod method) throws ProcessingException {
     ClientTest methodLevelClientTest = method.getAnnotation(ClientTest.class);
     if (methodLevelClientTest != null) {
       try {
         ClientTest classLevelClientTest = getTestClass().getJavaClass().getAnnotation(ClientTest.class);
-        clientSession = getOrCreateClientSession(classLevelClientTest, methodLevelClientTest);
+        return getOrCreateClientSession(classLevelClientTest, methodLevelClientTest);
       }
       catch (final Throwable e) {
-        return new Statement() {
-          @Override
-          public void evaluate() throws Throwable {
-            throw e;
-          }
-        };
+        throw new ProcessingException("Could not create ClientSession", e);
       }
     }
-    // run each test method in a separate ClientSession
-    return new ScoutClientJobWrapperStatement(clientSession, super.methodBlock(method));
+    return m_clientSession;
+  }
+
+  protected Statement createWrappedStatement(Statement statement, IClientSession session) {
+    return new ScoutClientJobWrapperStatement(session, statement);
   }
 
   @Override

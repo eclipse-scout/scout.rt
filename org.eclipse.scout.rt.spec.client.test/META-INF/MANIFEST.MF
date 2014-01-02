@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests for Specification
+Bundle-SymbolicName: org.eclipse.scout.rt.spec.client.test;singleton:=true
+Bundle-Version: 3.10.0.qualifier
+Fragment-Host: org.eclipse.scout.rt.spec.client
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project
+Import-Package: org.eclipse.scout.rt.client.ui.form.fields,
+ org.junit;version="[4.9.0,5.0.0)",
+ org.junit.runner;version="[4.9.0,5.0.0)",
+ org.junit.runners;version="[4.9.0,5.0.0)"
+Require-Bundle: org.mockito.mockito-all;bundle-version="1.9.5"

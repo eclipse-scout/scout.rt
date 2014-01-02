@@ -30,11 +30,6 @@ import org.eclipse.scout.commons.eventlistprofiler.IEventListenerSource;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-/**
- * Company: BSI AG
- * www.bsiag.com
- */
-
 public class BasicPropertySupport implements IEventListenerSource {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicPropertySupport.class);
 
@@ -45,10 +40,10 @@ public class BasicPropertySupport implements IEventListenerSource {
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
   public static final Long DEFAULT_LONG = Long.valueOf(DEFAULT_LONG_VALUE);
   private static final Boolean DEFAULT_BOOL = Boolean.FALSE;
-  private Map<String, Object> m_props = new HashMap<String, Object>();
+  private final Map<String, Object> m_props = new HashMap<String, Object>();
   private Object m_source;
   // observer
-  private Object m_listenerLock = new Object();
+  private final Object m_listenerLock = new Object();
   private List<Object> m_listeners;
   private Map<String, List<Object>> m_childListeners;
   private int m_propertiesChanging;

@@ -39,18 +39,29 @@ import org.eclipse.scout.testing.client.IGuiMock;
  */
 public class JUnitSwingJob extends Job {
   private final Class<? extends IClientSession> m_clientSessionClass;
+  private final long m_waitTimeout;
 
-  public JUnitSwingJob(Class<? extends IClientSession> clientSessionClass) {
+  /**
+   * @param clientSessionClass
+   * @param waitTimeout
+   *          timeout until the application is showing
+   */
+  public JUnitSwingJob(Class<? extends IClientSession> clientSessionClass, long waitTimeout) {
     super("JUnit Swing Job");
     setSystem(true);
     m_clientSessionClass = clientSessionClass;
+    m_waitTimeout = waitTimeout;
+  }
+
+  public JUnitSwingJob(Class<? extends IClientSession> clientSessionClass) {
+    this(clientSessionClass, IGuiMock.WAIT_TIMEOUT);
   }
 
   @Override
   protected IStatus run(IProgressMonitor monitor) {
     //wait until the application is showing
     try {
-      TestingUtility.waitUntil(IGuiMock.WAIT_TIMEOUT, new WaitCondition<Object>() {
+      TestingUtility.waitUntil(m_waitTimeout, new WaitCondition<Object>() {
         @Override
         public Object run() {
           try {

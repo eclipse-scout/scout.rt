@@ -62,11 +62,6 @@ public class ScoutInfoForm extends AbstractForm {
     return ScoutTexts.get("Info");
   }
 
-  @Override
-  protected String getConfiguredDoc() {
-    return "This is the InfoForm form";
-  }
-
   public MainBox getMainBox() {
     return (MainBox) getRootGroupBox();
   }
