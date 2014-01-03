@@ -64,7 +64,7 @@
       <unit id="org.eclipse.scout.sdk.testing.source.feature.group" version="0.0.0"/>
     </location>
 
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
             <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
     </location>
