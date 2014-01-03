@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-3.10I.target" sequenceNumber="9">
+<target name="scout-3.10I.target" sequenceNumber="10">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_luna_I" location="http://download.eclipse.org/eclipse/updates/4.4-I-builds/"/>
@@ -18,7 +18,12 @@
       <unit id="org.eclipse.emf.common.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
+
+    </location>
+
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
+            <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">

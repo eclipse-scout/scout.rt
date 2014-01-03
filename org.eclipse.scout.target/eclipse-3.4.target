@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-3.4.target" sequenceNumber="3">
+<target name="scout-3.4.target" sequenceNumber="4">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_ganymede" location="http://download.eclipse.org/releases/ganymede/"/>
@@ -59,5 +59,11 @@
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.sdk.testing.source.feature.group" version="0.0.0"/>
     </location>
+
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
+            <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
+    </location>
+
   </locations>
 </target>

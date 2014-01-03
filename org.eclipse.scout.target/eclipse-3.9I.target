@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-3.9I.target" sequenceNumber="9">
+<target name="scout-3.9I.target" sequenceNumber="10">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_kepler_I" location="http://download.eclipse.org/eclipse/updates/4.3-M-builds/"/>
@@ -18,8 +18,11 @@
       <unit id="org.eclipse.emf.common.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
+    </location>
 
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="eclipse_kepler" location="http://download.eclipse.org/releases/kepler"/>
+      <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
