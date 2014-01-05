@@ -8,25 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client.out.html;
+package org.eclipse.scout.rt.spec.client;
 
-import java.io.File;
-
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility;
-import org.eclipse.scout.rt.spec.client.internal.Activator;
+import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 
 /**
  *
  */
-public final class TemplateUtility {
-  private static final String DEFAULT_CSS = "resources/style/default.css";
+public abstract class AbstractSpecAssembly {
+  public final SpecFileConfig m_fileConfig;
 
-  private TemplateUtility() {
+  public AbstractSpecAssembly(String pluginName) {
+    m_fileConfig = new SpecFileConfig(pluginName);
   }
 
-  public static void copyDefaultCss(File destFile) throws ProcessingException {
-    SpecIOUtility.copyFile(Activator.getDefault().getBundle(), DEFAULT_CSS, destFile);
+  protected SpecFileConfig getFileConfig() {
+    return m_fileConfig;
   }
-
 }

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
@@ -51,8 +50,8 @@ public class DefaultColumnConfig extends AbstractEntitiesConfig<IColumn<?>> {
   }
 
   /**
-   * Default filters for {@link IColumn}: Ignores Types annotated with {@link Doc#ignore()}==false and columns that are
-   * not displayable
+   * Default filters for {@link IColumn}: Ignores Types annotated with {@link org.eclipse.scout.commons.annotations.Doc
+   * Doc#ignore()}==false and columns that are not displayable
    */
   @Override
   public List<IDocFilter<IColumn<?>>> getFilters() {

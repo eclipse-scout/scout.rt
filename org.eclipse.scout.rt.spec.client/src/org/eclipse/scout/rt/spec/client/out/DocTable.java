@@ -14,22 +14,22 @@ package org.eclipse.scout.rt.spec.client.out;
  * Simple data object for a documentation table.
  */
 public class DocTable implements IDocTable {
-  String[] m_headerTexts;
-  String[][] m_cellTexts;
+  private final String[] m_headerTexts;
+  private final String[][] m_cellTexts;
 
   public DocTable(String[] headerTexts, String[][] cellTexts) {
-    m_headerTexts = headerTexts;
-    m_cellTexts = cellTexts;
+    m_headerTexts = headerTexts.clone();
+    m_cellTexts = cellTexts.clone();
   }
 
   @Override
   public String[][] getCellTexts() {
-    return m_cellTexts;
+    return m_cellTexts.clone();
   }
 
   @Override
   public String[] getHeaderTexts() {
-    return m_headerTexts;
+    return m_headerTexts.clone();
   }
 
 }

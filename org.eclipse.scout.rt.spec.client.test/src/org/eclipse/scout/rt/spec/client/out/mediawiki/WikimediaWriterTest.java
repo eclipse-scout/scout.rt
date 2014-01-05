@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.spec.client.out.mediawiki;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.apache.derby.iapi.sql.dictionary.TableDescriptor;
 import org.eclipse.scout.rt.spec.client.out.DocTable;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.junit.Assert;
@@ -25,7 +24,7 @@ import org.junit.Test;
 public class WikimediaWriterTest {
 
   /**
-   * Test for {@link WikimediaTableWriter#appendTable(TableDescriptor)}
+   * Test for {@link WikimediaTableWriter#appendTable(IDocTable)}
    * 
    * @throws IOException
    */
@@ -37,10 +36,10 @@ public class WikimediaWriterTest {
   }
 
   /**
-   * Verifies that a test table is written as expected with {@link MediaWikiTableWriter#appendTable(TableDescriptor)}
+   * Verifies that a test table is written as expected with {@link MediaWikiTableWriter#appendTable(IDocTable)}
    * 
    * @param testTable
-   *          test {@link TableDescriptor}
+   *          test {@link IDocTable}
    * @param expectedTable
    *          Expected result in wikimedia format as {@link String}
    * @throws IOException
@@ -53,7 +52,7 @@ public class WikimediaWriterTest {
   }
 
   /**
-   * Test for {@link MediaWikiTableWriter#appendTableTransposed(TableDescriptor)}
+   * Test for {@link MediaWikiTableWriter#appendTableTransposed(IDocTable)}
    * 
    * @throws IOException
    */
@@ -65,24 +64,12 @@ public class WikimediaWriterTest {
     verifyAppendTableTransposed(testTable, expectedTable);
   }
 
-//  /**
-//   * Test for {@link WikimediaWriter#appendTableTransposed(TableDescriptor)} without headers
-//   *
-//   * @throws IOException
-//   */
-//  @Test
-//  public void appendTableTransposedTestNoHeaders() throws IOException {
-//    TableDescriptor testTable = getTestTableNoHeaders();
-//    String expectedTable = getTestTableWikiTransposed(false);
-//    verifyAppendTableTransposed(testTable, expectedTable);
-//  }
-
   /**
    * Verifies that a test table is written as expected with
-   * {@link MediaWikiTableWriter#appendTableTransposed(TableDescriptor)}
+   * {@link MediaWikiTableWriter#appendTableTransposed(IDocTable)}
    * 
    * @param testTable
-   *          test {@link TableDescriptor}
+   *          test {@link IDocTable}
    * @param expectedTable
    *          Expected result in wikimedia format as {@link String}
    * @throws IOException

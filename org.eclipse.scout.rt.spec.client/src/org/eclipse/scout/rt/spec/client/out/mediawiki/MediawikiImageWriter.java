@@ -18,7 +18,7 @@ import java.io.Writer;
  */
 public class MediawikiImageWriter {
   public static final String NEWLINE = System.getProperty("line.separator");
-  private final int imageScale = 500;
+  private static final int IMAGE_SCALE = 500;
 
   private final Writer m_writer;
 
@@ -42,7 +42,7 @@ public class MediawikiImageWriter {
 
   public void appendImages(String[] images) throws IOException {
     for (String image : images) {
-      appendImageLink(image, imageScale);
+      appendImageLink(image, IMAGE_SCALE);
     }
   }
 

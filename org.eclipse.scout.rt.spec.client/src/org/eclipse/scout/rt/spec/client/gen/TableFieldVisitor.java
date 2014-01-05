@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.spec.client.gen;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
@@ -23,7 +21,8 @@ import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
 
 /**
  * A visitor for {@link ITableField}s that collects information according to configurations for {@link ITableField},
- * {@link IColumn}, {@link IMenu}
+ * {@link org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn IColumn},
+ * {@link org.eclipse.scout.rt.client.ui.action.menu.IMenu IMenu}
  */
 public class TableFieldVisitor implements IDocFormFieldVisitor {
   private final IDocConfig m_config;

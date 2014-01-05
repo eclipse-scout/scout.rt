@@ -43,7 +43,7 @@ public class MediawikiWriter {
     m_indexFileWriter = indexFileWriter;
     m_wikiWriter = wikiWriter;
     m_section = section;
-    m_images = images;
+    m_images = images.clone();
     m_props = new Properties();
     m_lang = new MediaWikiLanguage();
   }

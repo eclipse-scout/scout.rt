@@ -17,7 +17,6 @@ import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
@@ -67,12 +66,12 @@ import org.eclipse.scout.testing.client.IGuiMock;
 import org.eclipse.scout.testing.client.robot.JavaRobot;
 
 /**
- * Uses {@link Robot}
+ * Uses {@link java.awt.Robot}
  */
 public class SwingMock implements IGuiMock {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingMock.class);
 
-  static interface MockRunnable<T> {
+  interface MockRunnable<T> {
     T run() throws Throwable;
   }
 

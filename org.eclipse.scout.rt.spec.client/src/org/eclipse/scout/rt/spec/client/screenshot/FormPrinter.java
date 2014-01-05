@@ -118,7 +118,7 @@ public class FormPrinter {
       ((ITabBox) parentTab).setSelectedTab(g);
     }
     getDestinationFolder().mkdirs();
-    HashMap<String, Object> parameters = createPrintParams(out);
+    Map<String, Object> parameters = createPrintParams(out);
     parentTab.printField(PrintDevice.File, parameters);
   }
 
@@ -126,7 +126,7 @@ public class FormPrinter {
     File out = getPrintFile(form);
     LOG.info("Printing: {}", out.getPath());
     getDestinationFolder().mkdirs();
-    HashMap<String, Object> parameters = createPrintParams(out);
+    Map<String, Object> parameters = createPrintParams(out);
     form.printForm(PrintDevice.File, parameters);
   }
 
@@ -142,7 +142,7 @@ public class FormPrinter {
     }
   }
 
-  private HashMap<String, Object> createPrintParams(File out) {
+  private Map<String, Object> createPrintParams(File out) {
     HashMap<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("file", out);
     parameters.put("contentType", getContentType());

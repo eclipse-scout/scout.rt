@@ -24,9 +24,12 @@ import java.io.Reader;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.DocBookDocumentBuilder;
 import org.eclipse.mylyn.wikitext.mediawiki.core.MediaWikiLanguage;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class DocBookConverter {
-  private final String ENCODING = "utf-8";
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocBookConverter.class);
+  private static final String ENCODING = "utf-8";
 
   public void convertWikiToDocBook(File in, File out) {
     BufferedWriter writer = null;
@@ -42,12 +45,10 @@ public class DocBookConverter {
       writer.close();
     }
     catch (FileNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOG.error("Error converting to docbook", e);
     }
     catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOG.error("Error converting to docbook", e);
     }
     finally {
       if (writer != null) {

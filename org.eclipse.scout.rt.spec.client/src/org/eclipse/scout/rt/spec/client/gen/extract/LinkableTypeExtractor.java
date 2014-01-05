@@ -36,7 +36,7 @@ public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> impl
   }
 
   public LinkableTypeExtractor(String typeName, Class<?>... ignoredClass) {
-    super(TEXTS.get("org.eclipse.scout.rt.spec.type"));
+    super(typeName);
     m_ignoredClasses = Arrays.asList(ignoredClass);
   }
 

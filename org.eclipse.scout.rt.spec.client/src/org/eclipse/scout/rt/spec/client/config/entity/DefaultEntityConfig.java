@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
@@ -25,10 +24,10 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IgnoreDocFilter;
 /**
  *
  */
-public abstract class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEntityConfig<T> {
+public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEntityConfig<T> {
 
   /**
-   * Default filters: Ignores Types annotated with {@link Doc#ignore()}==false
+   * Default filters: Ignores Types annotated with {@link org.eclipse.scout.commons.annotations.Doc Doc#ignore()}==false
    */
   @Override
   public List<IDocFilter<T>> getFilters() {

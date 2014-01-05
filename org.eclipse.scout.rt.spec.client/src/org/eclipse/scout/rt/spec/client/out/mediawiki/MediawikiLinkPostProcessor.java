@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.spec.client.link.DocLink;
  * Post processor to replace texts within {@value SpecReplaceUtility#REPLACE_TAG_NAME}
  */
 public class MediawikiLinkPostProcessor implements ITagProcessor {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiLinkPostProcessor.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiLinkPostProcessor.class);
   public static final String NEWLINE = System.getProperty("line.separator");
 
   private final Properties m_properties;

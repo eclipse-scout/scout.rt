@@ -42,7 +42,7 @@ public class SectionWithTable implements IDocSection {
 
   @Override
   public IDocSection[] getSubSections() {
-    return m_subSections;
+    return m_subSections.clone();
   }
 
   @Override

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
@@ -20,7 +19,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
  * A template for describing the configuration of the generated documentation for a specific type.
  * 
  * @param <T>
- *          the type of the configuration (e.g. {@link IFormField}
+ *          the type of the configuration (e.g. {@link org.eclipse.scout.rt.client.ui.form.fields.IFormField IFormField}
  */
 public interface IDocEntityConfig<T> {
 

@@ -23,14 +23,16 @@ public class MediawikiTableWriter {
   private final Writer m_writer;
 
   public static final String NEWLINE = System.getProperty("line.separator");
+
   private static final String TABLE_START = "{|";
   private static final String TABLE_END = "|}";
   private static final String TABLE_NEW_ROW = "|-" + NEWLINE;
   private static final String TABLE_COLUMN_SEPARATOR = "| ";
   private static final String EMPTY_CELL_TEXT = "&nbsp;";
-  private final char HEADING_CHAR = '=';
-  private final String m_table_options;
+  private static final char HEADING_CHAR = '=';
   private static final String DEFAULT_TABLE_BORDER = "border=\"1\" ";
+
+  private final String m_table_options;
 
   /**
    * @param {@link Writer}
@@ -117,8 +119,7 @@ public class MediawikiTableWriter {
 
   private String getEscapedText(String text) {
     String nonEmptyText = StringUtility.isNullOrEmpty(text) ? EMPTY_CELL_TEXT : text;
-    String noLinks = nonEmptyText.replace("[", "<nowiki>[</nowiki>").replace("]", "<nowiki>]</nowiki>");
-    return noLinks;
+    return nonEmptyText.replace("[", "<nowiki>[</nowiki>").replace("]", "<nowiki>]</nowiki>");
   }
 
   private void appendTableHeaders(String[] headerTexts) throws IOException {
@@ -130,7 +131,7 @@ public class MediawikiTableWriter {
   }
 
   public void appendHeading(String name, int level) throws IOException {
-    String prefix = multiply(level, HEADING_CHAR);
+    String prefix = repeat(HEADING_CHAR, level);
     m_writer.append(prefix);
     m_writer.append(" ");
     m_writer.append(name);
@@ -139,10 +140,10 @@ public class MediawikiTableWriter {
     m_writer.append(NEWLINE);
   }
 
-  private String multiply(int level, char c) {
+  private String repeat(char c, int n) {
     StringBuilder b = new StringBuilder();
-    for (int i = 0; i < level; i++) {
-      b.append(HEADING_CHAR);
+    for (int i = 0; i < n; i++) {
+      b.append(c);
     }
     return b.toString();
   }

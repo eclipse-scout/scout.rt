@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -30,7 +29,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 public class DefaultFormFieldConfig implements IDocEntityListConfig<IFormField> {
 
   /**
-   * Default properties for {@link IColumn} with
+   * Default properties for {@link org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn IColumn} with
    * <p>
    * Label,Type,Length,Mandatory,Enabled,Tooltip,Description
    * </p>

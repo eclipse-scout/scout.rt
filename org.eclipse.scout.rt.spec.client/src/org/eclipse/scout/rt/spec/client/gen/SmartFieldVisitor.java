@@ -13,19 +13,16 @@ package org.eclipse.scout.rt.spec.client.gen;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
 
 /**
- * A visitor for {@link ITableField}s that collects information according to configurations for {@link ITableField},
- * {@link IColumn}, {@link IMenu}
+ * A visitor for {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}s that collects
+ * information according to configuration.
  */
 public class SmartFieldVisitor implements IDocFormFieldVisitor {
 

@@ -26,16 +26,11 @@ import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder.Stylesheet;
 import org.eclipse.mylyn.wikitext.mediawiki.core.MediaWikiLanguage;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Converts a wikimedia file to html
- * 
- * @author jgu
+ * Converts a mediawiki file to html
  */
 public class HtmlConverter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlConverter.class);
 
   private static final String ENCODING = "utf-8";
   private final Stylesheet m_css;

@@ -12,6 +12,7 @@ package org.eclipse.scout.testing.client;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -39,7 +40,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class TestingClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
 
-  private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
+  private final Map<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
   private final Object m_cacheLock = new Object();
 
   private final IClientSessionRegistryService m_delegate;

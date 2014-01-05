@@ -15,7 +15,7 @@ import org.osgi.framework.BundleContext;
 
 public class Activator extends Plugin {
 
-  public static String PLUGIN_ID = "org.eclipse.scout.rt.spec.client";
+  public static final String PLUGIN_ID = "org.eclipse.scout.rt.spec.client";
 
   // The shared instance
   private static Activator plugin;
