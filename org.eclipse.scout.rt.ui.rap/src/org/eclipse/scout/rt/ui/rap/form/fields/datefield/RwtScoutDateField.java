@@ -107,10 +107,9 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     m_dateContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_dateContainer});
 
-    // key strokes on container
-    getUiEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke(), false);
-
-    // key strokes on field
+    // key strokes
+    getUiEnvironment().addKeyStroke(textField, new P_DateChooserOpenKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_DateChooserCloseKeyStroke(), true);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayUpKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayDownKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthUpKeyStroke(), false);
@@ -341,10 +340,8 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
   }
 
   protected void makeSureDateChooserIsClosed() {
-    if (m_dateChooserDialog != null
-        && m_dateChooserDialog.getShell() != null
-        && !m_dateChooserDialog.getShell().isDisposed()) {
-      m_dateChooserDialog.getShell().close();
+    if (m_dateChooserDialog != null) {
+      m_dateChooserDialog.close();
     }
 
     uninstallFocusListenerOnTextField();
@@ -513,6 +510,20 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     @Override
     public void handleUiAction(Event e) {
       handleUiDateChooserAction();
+    }
+  }
+
+  private class P_DateChooserCloseKeyStroke extends RwtKeyStroke {
+    public P_DateChooserCloseKeyStroke() {
+      super(SWT.ESC);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      if (m_dateChooserDialog != null) {
+        makeSureDateChooserIsClosed();
+        e.doit = false;
+      }
     }
   }
 }

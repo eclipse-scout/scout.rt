@@ -108,10 +108,9 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     m_timeContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_timeContainer});
 
-    // key strokes on container
-    getUiEnvironment().addKeyStroke(container, new P_TimeChooserOpenKeyStroke(), false);
-
-    // key strokes on field
+    // key strokes
+    getUiEnvironment().addKeyStroke(textField, new P_TimeChooserOpenKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_TimeChooserCloseKeyStroke(), true);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftNextQuarterHourKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousQuarterHourKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftNextHourKeyStroke(), false);
@@ -314,10 +313,8 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
   }
 
   protected void makeSureTimeChooserIsClosed() {
-    if (m_timeChooserDialog != null
-        && m_timeChooserDialog.getShell() != null
-        && !m_timeChooserDialog.getShell().isDisposed()) {
-      m_timeChooserDialog.getShell().close();
+    if (m_timeChooserDialog != null) {
+      m_timeChooserDialog.close();
     }
 
     uninstallFocusListenerOnTextField();
@@ -496,6 +493,20 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     @Override
     public void handleUiAction(Event e) {
       handleUiTimeChooserAction();
+    }
+  }
+
+  private class P_TimeChooserCloseKeyStroke extends RwtKeyStroke {
+    public P_TimeChooserCloseKeyStroke() {
+      super(SWT.ESC);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      if (m_timeChooserDialog != null) {
+        makeSureTimeChooserIsClosed();
+        e.doit = false;
+      }
     }
   }
 
