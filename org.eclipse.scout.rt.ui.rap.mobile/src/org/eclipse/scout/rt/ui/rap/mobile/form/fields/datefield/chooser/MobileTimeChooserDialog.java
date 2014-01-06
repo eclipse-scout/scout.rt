@@ -28,8 +28,8 @@ public class MobileTimeChooserDialog extends TimeChooserDialog {
 
   private static final long serialVersionUID = 1L;
 
-  public MobileTimeChooserDialog(Shell parentShell, Date date) {
-    super(parentShell, date);
+  public MobileTimeChooserDialog(Shell parentShell, Control field, Date date) {
+    super(parentShell, field, date);
   }
 
   @Override
@@ -41,12 +41,11 @@ public class MobileTimeChooserDialog extends TimeChooserDialog {
    * Position the popup in the center of the parent shell
    */
   @Override
-  protected Point getLocation(Control field) {
+  protected Point getInitialLocation(Point initialSize, Control field) {
     Rectangle parentShellBounds = getParentShell().getBounds();
-    Point dialogSize = getShell().getSize();
 
-    int x = parentShellBounds.x + (parentShellBounds.width - dialogSize.x) / 2;
-    int y = parentShellBounds.y + (parentShellBounds.height - dialogSize.y) / 2;
+    int x = parentShellBounds.x + (parentShellBounds.width - initialSize.x) / 2;
+    int y = parentShellBounds.y + (parentShellBounds.height - initialSize.y) / 2;
 
     return new Point(x, y);
   }

@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 
 public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutDateField, IPopupSupport {
 
@@ -364,18 +363,18 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
 
     makeSureDateChooserIsClosed();
-    m_dateChooserDialog = createDateChooserDialog(getUiField().getShell(), oldDate);
+    m_dateChooserDialog = createDateChooserDialog(oldDate);
     if (m_dateChooserDialog != null) {
 
       m_dateChooserDialog.getShell().addDisposeListener(new P_DateChooserDisposeListener());
 
-      m_dateChooserDialog.openDateChooser(getUiField());
+      m_dateChooserDialog.open();
       installFocusListenerOnTextField();
     }
   }
 
-  protected DateChooserDialog createDateChooserDialog(Shell parentShell, Date currentDate) {
-    return new DateChooserDialog(parentShell, currentDate);
+  protected DateChooserDialog createDateChooserDialog(Date currentDate) {
+    return new DateChooserDialog(getUiField().getShell(), getUiField(), currentDate);
   }
 
   private void getDateFromClosedDateChooserDialog() {

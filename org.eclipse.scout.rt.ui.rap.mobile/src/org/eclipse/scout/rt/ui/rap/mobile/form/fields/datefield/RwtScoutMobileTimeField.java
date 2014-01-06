@@ -34,7 +34,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -192,7 +191,7 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
     }
 
     makeSureTimeChooserIsClosed();
-    m_timeChooserDialog = createTimeChooserDialog(getUiField().getShell(), oldTime);
+    m_timeChooserDialog = createTimeChooserDialog(oldTime);
     if (m_timeChooserDialog != null) {
       m_timeChooserDialog.getShell().addDisposeListener(new DisposeListener() {
         private static final long serialVersionUID = 1L;
@@ -204,12 +203,12 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
         }
       });
 
-      m_timeChooserDialog.openTimeChooser(getUiField());
+      m_timeChooserDialog.open();
     }
   }
 
-  protected MobileTimeChooserDialog createTimeChooserDialog(Shell parentShell, Date currentTime) {
-    return new MobileTimeChooserDialog(parentShell, currentTime);
+  protected MobileTimeChooserDialog createTimeChooserDialog(Date currentTime) {
+    return new MobileTimeChooserDialog(getUiField().getShell(), getUiField(), currentTime);
   }
 
   private void getTimeFromClosedDateChooserDialog() {

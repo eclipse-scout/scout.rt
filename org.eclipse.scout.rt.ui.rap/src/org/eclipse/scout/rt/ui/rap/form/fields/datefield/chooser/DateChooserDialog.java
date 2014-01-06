@@ -63,18 +63,23 @@ public class DateChooserDialog extends Dialog {
   private Label m_monthLabel;
   private DatefieldTableModel m_model;
   private Date m_returnDate = null;
+  private Control m_field;
 
   @Override
   protected int getShellStyle() {
     return SWT.NONE;
   }
 
-  public DateChooserDialog(Shell parentShell, Date date) {
+  /**
+   * @param field
+   *          used to compute initial Location, see {@link #computeInitialLocation(Control)}. May be null.
+   */
+  public DateChooserDialog(Shell parentShell, Control field, Date date) {
     super(parentShell);
     m_model = new DatefieldTableModel(RwtUtility.getClientSessionLocale(parentShell.getDisplay()));
+    m_field = field;
     setDisplayDate(date);
     setBlockOnOpen(false);
-
     create();
   }
 
@@ -83,23 +88,12 @@ public class DateChooserDialog extends Dialog {
     m_model.setNavigationDate(date);
   }
 
-  public void openDateChooser(Control c) {
-    showDialogFor(c);
-  }
-
   public Date getReturnDate() {
     return m_returnDate;
   }
 
-  public int showDialogFor(Control field) {
-    Point location = getLocation(field);
-    if (location != null) {
-      getShell().setLocation(location);
-    }
-
-    m_viewer.refresh();
-
-    return this.open();
+  protected Control getField() {
+    return m_field;
   }
 
   /**
@@ -108,11 +102,11 @@ public class DateChooserDialog extends Dialog {
    * As default the popup is opened right under the field.
    * </p>
    */
-  protected Point getLocation(Control field) {
+  protected Point getInitialLocation(Point initialSize, Control field) {
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
     Point absPrefPos = field.toDisplay(0, field.getSize().y);
-    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, getShell().getSize().x, getShell().getSize().y);
+    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, initialSize.x, initialSize.y);
 
     // horizontal correction
     if (prefBounds.x + prefBounds.width > appBounds.width) {
@@ -124,6 +118,15 @@ public class DateChooserDialog extends Dialog {
     }
 
     return new Point(prefBounds.x, prefBounds.y);
+  }
+
+  @Override
+  protected Point getInitialLocation(Point initialSize) {
+    Point initialLocation = getInitialLocation(initialSize, getField());
+    if (initialLocation != null) {
+      return initialLocation;
+    }
+    return super.getInitialLocation(initialSize);
   }
 
   @Override

@@ -34,7 +34,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -191,7 +190,7 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
     }
 
     makeSureDateChooserIsClosed();
-    m_dateChooserDialog = createDateChooserDialog(getUiField().getShell(), oldDate);
+    m_dateChooserDialog = createDateChooserDialog(oldDate);
     if (m_dateChooserDialog != null) {
 
       m_dateChooserDialog.getShell().addDisposeListener(new DisposeListener() {
@@ -204,12 +203,12 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
         }
       });
 
-      m_dateChooserDialog.openDateChooser(getUiField());
+      m_dateChooserDialog.open();
     }
   }
 
-  protected MobileDateChooserDialog createDateChooserDialog(Shell parentShell, Date currentDate) {
-    return new MobileDateChooserDialog(parentShell, currentDate);
+  protected MobileDateChooserDialog createDateChooserDialog(Date currentDate) {
+    return new MobileDateChooserDialog(getUiField().getShell(), getUiField(), currentDate);
   }
 
   private void getDateFromClosedDateChooserDialog() {

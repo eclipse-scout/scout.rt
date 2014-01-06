@@ -40,21 +40,32 @@ public class TimeChooserDialog extends Dialog {
   private TimeChooser m_timeChooser;
   private Date m_returnTime = null;
   private Date m_displayDate;
+  private Control m_field;
 
   @Override
   protected int getShellStyle() {
     return SWT.NONE;
   }
 
-  public TimeChooserDialog(Shell parentShell, Date date) {
+  /**
+   * @param field
+   *          used to compute initial Location, see {@link #computeInitialLocation(Control)}. May be null.
+   */
+  public TimeChooserDialog(Shell parentShell, Control field, Date date) {
     super(parentShell);
+    m_field = field;
     setDisplayDate(date);
     setBlockOnOpen(false);
     create();
   }
 
-  public TimeChooserDialog(Shell parentShell, Number number) {
+  /**
+   * @param field
+   *          used to compute initial Location, see {@link #computeInitialLocation(Control)}. May be null.
+   */
+  public TimeChooserDialog(Shell parentShell, Control field, Number number) {
     super(parentShell);
+    m_field = field;
     setDisplayDate((Double) number);
     setBlockOnOpen(false);
     create();
@@ -79,10 +90,6 @@ public class TimeChooserDialog extends Dialog {
     m_displayDate = c.getTime();
   }
 
-  public void openTimeChooser(Control c) {
-    showDialogFor(c);
-  }
-
   /**
    * Returns the choosen time from the time table. The time value is represented in a Date object and
    * should be used.
@@ -94,13 +101,8 @@ public class TimeChooserDialog extends Dialog {
     return m_returnTime;
   }
 
-  public int showDialogFor(Control field) {
-    Point location = getLocation(field);
-    if (location != null) {
-      getShell().setLocation(location);
-    }
-
-    return this.open();
+  protected Control getField() {
+    return m_field;
   }
 
   /**
@@ -109,11 +111,11 @@ public class TimeChooserDialog extends Dialog {
    * As default the popup is opened right under the field.
    * </p>
    */
-  protected Point getLocation(Control field) {
+  protected Point getInitialLocation(Point initialSize, Control field) {
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
-    Point absPrefPos = field.toDisplay(field.getSize().x - getShell().getSize().x, field.getSize().y);
-    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, getShell().getSize().x, getShell().getSize().y);
+    Point absPrefPos = field.toDisplay(0, field.getSize().y);
+    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, initialSize.x, initialSize.y);
     // horizontal correction
     if (prefBounds.x + prefBounds.width > appBounds.width) {
       prefBounds.x = appBounds.width - prefBounds.width;
@@ -124,6 +126,15 @@ public class TimeChooserDialog extends Dialog {
     }
 
     return new Point(prefBounds.x, prefBounds.y);
+  }
+
+  @Override
+  protected Point getInitialLocation(Point initialSize) {
+    Point initialLocation = getInitialLocation(initialSize, getField());
+    if (initialLocation != null) {
+      return initialLocation;
+    }
+    return super.getInitialLocation(initialSize);
   }
 
   @Override

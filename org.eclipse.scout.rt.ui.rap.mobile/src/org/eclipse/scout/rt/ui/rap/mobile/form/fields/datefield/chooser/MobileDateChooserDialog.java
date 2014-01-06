@@ -30,8 +30,8 @@ public class MobileDateChooserDialog extends DateChooserDialog {
 
   private static final long serialVersionUID = 1L;
 
-  public MobileDateChooserDialog(Shell parentShell, Date date) {
-    super(parentShell, date);
+  public MobileDateChooserDialog(Shell parentShell, Control field, Date date) {
+    super(parentShell, field, date);
   }
 
   @Override
@@ -43,12 +43,11 @@ public class MobileDateChooserDialog extends DateChooserDialog {
    * Position the popup in the center of the parent shell
    */
   @Override
-  protected Point getLocation(Control field) {
+  protected Point getInitialLocation(Point initialSize, Control field) {
     Rectangle parentShellBounds = getParentShell().getBounds();
-    Point dialogSize = getShell().getSize();
 
-    int x = parentShellBounds.x + (parentShellBounds.width - dialogSize.x) / 2;
-    int y = parentShellBounds.y + (parentShellBounds.height - dialogSize.y) / 2;
+    int x = parentShellBounds.x + (parentShellBounds.width - initialSize.x) / 2;
+    int y = parentShellBounds.y + (parentShellBounds.height - initialSize.y) / 2;
 
     return new Point(x, y);
   }

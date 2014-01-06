@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 
 public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
 
@@ -336,17 +335,17 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
 
     makeSureTimeChooserIsClosed();
-    m_timeChooserDialog = createTimeChooserDialog(getUiField().getShell(), oldTime);
+    m_timeChooserDialog = createTimeChooserDialog(oldTime);
     if (m_timeChooserDialog != null) {
       m_timeChooserDialog.getShell().addDisposeListener(new P_TimeChooserDisposeListener());
 
-      m_timeChooserDialog.openTimeChooser(getUiField());
+      m_timeChooserDialog.open();
       installFocusListenerOnTextField();
     }
   }
 
-  protected TimeChooserDialog createTimeChooserDialog(Shell parentShell, Date currentTime) {
-    return new TimeChooserDialog(parentShell, currentTime);
+  protected TimeChooserDialog createTimeChooserDialog(Date currentTime) {
+    return new TimeChooserDialog(getUiField().getShell(), getUiField(), currentTime);
   }
 
   private void getTimeFromClosedDateChooserDialog() {
