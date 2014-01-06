@@ -28,6 +28,10 @@ import org.eclipse.swt.widgets.MenuItem;
 public class MenuFactory {
   private boolean m_addKeyStrokeTextEnabled;
 
+  public MenuFactory() {
+    m_addKeyStrokeTextEnabled = true;
+  }
+
   public void fillContextMenu(Menu menu, IMenu[] scoutMenus, IRwtEnvironment uiEnvironment) {
     if (scoutMenus == null || scoutMenus.length == 0) {
       menu.setVisible(false);
