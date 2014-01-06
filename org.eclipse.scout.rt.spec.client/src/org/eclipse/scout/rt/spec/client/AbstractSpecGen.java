@@ -40,20 +40,6 @@ public class AbstractSpecGen {
     return m_fileConfig;
   }
 
-  protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
-    File htmlDir = getFileConfig().getHtmlDir();
-    htmlDir.mkdirs();
-    File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
-
-    // copy css
-    File css = new File(htmlDir, "default.css");
-    TemplateUtility.copyDefaultCss(css);
-
-    HtmlConverter htmlConverter = new HtmlConverter(css);
-    htmlConverter.convertWikiToHtml(mediaWiki, htmlFile);
-    return htmlFile;
-  }
-
   protected File convertToDocBook(File out, String id, File mediaWiki) {
     File docBook = new File(out, id + ".xml");
     DocBookConverter c = new DocBookConverter();
@@ -90,6 +76,25 @@ public class AbstractSpecGen {
 
   public String getId(ITypeWithClassId o) {
     return o.classId();
+  }
+
+  protected File convertToHTML(File mediaWiki) throws ProcessingException {
+    String htmlName = mediaWiki.getName().replace(".mediawiki", "");
+    return convertToHTML(htmlName, mediaWiki);
+  }
+
+  protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
+    File htmlDir = getFileConfig().getHtmlDir();
+    htmlDir.mkdirs();
+    File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
+
+    // copy css
+    File css = new File(htmlDir, "default.css");
+    TemplateUtility.copyDefaultCss(css);
+
+    HtmlConverter htmlConverter = new HtmlConverter(css);
+    htmlConverter.convertWikiToHtml(mediaWiki, htmlFile);
+    return htmlFile;
   }
 
 }

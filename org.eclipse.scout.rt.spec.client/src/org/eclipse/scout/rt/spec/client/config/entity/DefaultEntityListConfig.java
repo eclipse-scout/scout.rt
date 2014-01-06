@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IgnoreDocFilter;
 /**
  *
  */
-public abstract class AbstractEntitiesConfig<T extends ITypeWithClassId> implements IDocEntityListConfig<T> {
+public abstract class DefaultEntityListConfig<T extends ITypeWithClassId> implements IDocEntityListConfig<T> {
 
   /**
    * Default filters for {@link org.eclipse.scout.rt.client.ui.form.fields.IFormField IFormField}: Ignores Types

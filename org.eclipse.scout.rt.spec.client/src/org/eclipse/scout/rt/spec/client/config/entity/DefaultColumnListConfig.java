@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilte
 /**
  * The default configuration for {@link IColumn}
  */
-public class DefaultColumnConfig extends AbstractEntitiesConfig<IColumn<?>> {
+public class DefaultColumnListConfig extends DefaultEntityListConfig<IColumn<?>> {
 
   /**
    * Default properties for {@link IColumn} with
@@ -40,12 +40,12 @@ public class DefaultColumnConfig extends AbstractEntitiesConfig<IColumn<?>> {
   @Override
   public List<IDocTextExtractor<IColumn<?>>> getTexts() {
     List<IDocTextExtractor<IColumn<?>>> propertyTemplate = new ArrayList<IDocTextExtractor<IColumn<?>>>();
-    propertyTemplate.add(new ColumnSortIndexExtractor());
     propertyTemplate.add(new ColumnHeaderTextExtractor());
-    propertyTemplate.add(new SimpleTypeTextExtractor<IColumn<?>>());
-    propertyTemplate.add(new ColumnWidthExtractor());
-    propertyTemplate.add(new ColumnHeaderTooltipExtractor());
     propertyTemplate.add(new DescriptionExtractor<IColumn<?>>());
+    propertyTemplate.add(new ColumnHeaderTooltipExtractor());
+    propertyTemplate.add(new ColumnSortIndexExtractor());
+    propertyTemplate.add(new ColumnWidthExtractor());
+    propertyTemplate.add(new SimpleTypeTextExtractor<IColumn<?>>());
     return propertyTemplate;
   }
 

@@ -18,10 +18,10 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
-import org.eclipse.scout.rt.spec.client.config.entity.DefaultColumnConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.DefaultColumnListConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultFormConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultFormFieldConfig;
-import org.eclipse.scout.rt.spec.client.config.entity.DefaultMenuConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.DefaultMenuListConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultSmartFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultTableFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultTablePageConfig;
@@ -45,12 +45,12 @@ public class DefaultDocConfig implements IDocConfig {
 
   @Override
   public IDocEntityListConfig<IColumn<?>> getColumnConfig() {
-    return new DefaultColumnConfig();
+    return new DefaultColumnListConfig();
   }
 
   @Override
   public IDocEntityListConfig<IMenu> getMenuConfig() {
-    return new DefaultMenuConfig();
+    return new DefaultMenuListConfig();
   }
 
   @Override

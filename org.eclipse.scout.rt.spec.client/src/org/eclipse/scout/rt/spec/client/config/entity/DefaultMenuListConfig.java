@@ -23,12 +23,11 @@ import org.eclipse.scout.rt.spec.client.gen.extract.action.ActionPropertyExtract
 import org.eclipse.scout.rt.spec.client.gen.extract.action.EmptySpaceSelectionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.action.MultiSelectionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.action.SingleSelectionExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  * The default configuration for {@link IMenu}
  */
-public class DefaultMenuConfig implements IDocEntityListConfig<IMenu> {
+public class DefaultMenuListConfig extends DefaultEntityListConfig<IMenu> {
 
   /**
    * Default properties for {@link IMenu} with
@@ -40,22 +39,17 @@ public class DefaultMenuConfig implements IDocEntityListConfig<IMenu> {
   public List<IDocTextExtractor<IMenu>> getTexts() {
     List<IDocTextExtractor<IMenu>> propertyTemplate = new ArrayList<IDocTextExtractor<IMenu>>();
     propertyTemplate.add(new ActionPropertyExtractor<IMenu>(IAction.PROP_TEXT, TEXTS.get("org.eclipse.scout.rt.spec.label")));
-    propertyTemplate.add(new SimpleTypeTextExtractor<IMenu>());
     propertyTemplate.add(new DescriptionExtractor<IMenu>());
     propertyTemplate.add(new EmptySpaceSelectionExtractor<IMenu>());
     propertyTemplate.add(new SingleSelectionExtractor<IMenu>());
     propertyTemplate.add(new MultiSelectionExtractor<IMenu>());
+    propertyTemplate.add(new SimpleTypeTextExtractor<IMenu>());
     return propertyTemplate;
   }
 
   @Override
   public String getTitle() {
     return TEXTS.get("org.eclipse.scout.rt.spec.menus");
-  }
-
-  @Override
-  public List<IDocFilter<IMenu>> getFilters() {
-    return null;
   }
 
 }
