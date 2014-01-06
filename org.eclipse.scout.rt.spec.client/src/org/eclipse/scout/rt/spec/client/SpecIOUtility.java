@@ -194,7 +194,7 @@ public final class SpecIOUtility {
     }
   }
 
-  private static void copy(File source, File dest) throws ProcessingException {
+  public static void copy(File source, File dest) throws ProcessingException {
     FileChannel sourceChannel = null;
     FileChannel destChannel = null;
     try {

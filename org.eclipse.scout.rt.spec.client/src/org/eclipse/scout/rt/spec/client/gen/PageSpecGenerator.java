@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
+import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
 
 /**
  * Creates Specification data for a page
@@ -25,13 +29,16 @@ public class PageSpecGenerator {
     m_config = config;
   }
 
-  public IDocSection getDocSection(IPageWithTable<ITable> page) {
-//    m_config.getPageConfig();
-//    IColumn<?>[] columns = page.getTable().getColumns();
-//    IMenu[] menus = page.getTable().getMenus();
-//    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig());
-//    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig());
-    //general form info
-    return null;
+  public IDocSection getDocSection(IPageWithTable<? extends ITable> page) {
+    IDocEntityConfig<IPageWithTable<? extends ITable>> tablePageConfig = m_config.getTablePageConfig();
+    String id = tablePageConfig.getId().getText(page);
+    String title = tablePageConfig.getTitle().getText(page);
+
+    IColumn<?>[] columns = page.getTable().getColumns();
+    IMenu[] menus = page.getTable().getMenus();
+
+    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig());
+    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig());
+    return new SectionWithTable(id, title, menuSection, columnSection);
   }
 }

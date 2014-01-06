@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.spec.client.config;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
@@ -61,5 +62,10 @@ public interface IDocConfig {
    * Configuration for documenting {@link Field}s.
    */
   IDocEntityListConfig<IFormField> getFieldListConfig();
+
+  /**
+   * Configuration for table page {@link IPageWithTable}.
+   */
+  IDocEntityConfig<IPageWithTable<? extends ITable>> getTablePageConfig();
 
 }

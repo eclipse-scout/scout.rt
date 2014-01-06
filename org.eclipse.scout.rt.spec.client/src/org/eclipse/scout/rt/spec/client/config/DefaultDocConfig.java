@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.spec.client.config;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.spec.client.config.entity.DefaultFormFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultMenuConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultSmartFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultTableFieldConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.DefaultTablePageConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 
@@ -59,6 +61,11 @@ public class DefaultDocConfig implements IDocConfig {
   @Override
   public IDocEntityConfig<ISmartField<?>> getSmartFieldConfig() {
     return new DefaultSmartFieldConfig();
+  }
+
+  @Override
+  public IDocEntityConfig<IPageWithTable<? extends ITable>> getTablePageConfig() {
+    return new DefaultTablePageConfig();
   }
 
 }
