@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -305,8 +306,11 @@ public class TableUtilityTest {
       }
 
       @Override
-      protected String getConfiguredFormat() {
-        return "#0.0000";
+      protected void initConfig() {
+        super.initConfig();
+        DecimalFormat df = getFormat();
+        df.applyPattern("#0.0000");
+        setFormat(df);
       }
     }
 
@@ -318,8 +322,11 @@ public class TableUtilityTest {
       }
 
       @Override
-      protected String getConfiguredFormat() {
-        return "#0.000";
+      protected void initConfig() {
+        super.initConfig();
+        DecimalFormat df = getFormat();
+        df.applyPattern("#0.000");
+        setFormat(df);
       }
     }
 
@@ -331,8 +338,11 @@ public class TableUtilityTest {
       }
 
       @Override
-      protected String getConfiguredFormat() {
-        return "#,##0.0";
+      protected void initConfig() {
+        super.initConfig();
+        DecimalFormat df = getFormat();
+        df.applyPattern("#,##0.0");
+        setFormat(df);
       }
     }
 
@@ -344,8 +354,11 @@ public class TableUtilityTest {
       }
 
       @Override
-      protected String getConfiguredFormat() {
-        return "#,##0";
+      protected void initConfig() {
+        super.initConfig();
+        DecimalFormat df = getFormat();
+        df.applyPattern("#,##0");
+        setFormat(df);
       }
     }
 
