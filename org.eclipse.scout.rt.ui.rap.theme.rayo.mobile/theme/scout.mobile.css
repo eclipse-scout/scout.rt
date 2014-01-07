@@ -437,6 +437,11 @@ MenuItem:hover {
   background-image:gradient(linear,left top,left bottom,from(#fe9915),to(#be7414));
 }
 
+MenuItem:hover:disabled {
+  background-color:transparent;
+  color:#33637f;
+}
+
 MenuItem-CheckIcon { background-image:url(theme/img/menu/checkbox-white.gif); }
 
 MenuItem-RadioIcon { background-image:url(theme/img/menu/radiobutton-white.gif); }

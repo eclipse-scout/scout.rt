@@ -464,6 +464,10 @@ MenuItem:hover {
   background-color: #e5f3fe;
   color: #000000;
 }
+MenuItem:hover:disabled {
+  background-color: transparent;
+  color: #cfcfcf;
+}
 MenuItem-CheckIcon {
   background-image: url(theme/img/menu/checkbox.gif);
 }
