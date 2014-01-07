@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.spec.client.screenshot.PrintFormListener;
 /**
  *
  */
-public abstract class AbstractFormSpecGen extends AbstractSpecGen {
+public abstract class AbstractFormSpecTest extends AbstractSpecGen {
 
-  public AbstractFormSpecGen(String pluginName) {
+  public AbstractFormSpecTest(String pluginName) {
     super(pluginName);
   }
 

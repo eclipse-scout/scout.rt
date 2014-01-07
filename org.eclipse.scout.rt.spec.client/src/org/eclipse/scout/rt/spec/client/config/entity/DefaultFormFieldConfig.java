@@ -21,12 +21,11 @@ import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldBooleanPropertyExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldPropertyExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  * The default configuration for {@link IFormField}
  */
-public class DefaultFormFieldConfig implements IDocEntityListConfig<IFormField> {
+public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField> {
 
   /**
    * Default properties for {@link org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn IColumn} with
@@ -45,11 +44,6 @@ public class DefaultFormFieldConfig implements IDocEntityListConfig<IFormField> 
     propertyTemplate.add(new FormFieldPropertyExtractor(IStringField.PROP_MAX_LENGTH, TEXTS.get("org.eclipse.scout.rt.spec.length")));
     propertyTemplate.add(new LinkableTypeExtractor<IFormField>());
     return propertyTemplate;
-  }
-
-  @Override
-  public List<IDocFilter<IFormField>> getFilters() {
-    return null;
   }
 
   @Override
