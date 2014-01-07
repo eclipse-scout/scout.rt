@@ -1506,6 +1506,14 @@ Table-RowOverlay {
   color: inherit;
   background-image: none;
 }
+Table-RowOverlay:hover {
+  background-color: #f1f8fe;
+}
+Table-RowOverlay:selected,
+Table-RowOverlay:selected:unfocused {
+  color: inherit;
+  background-color: #e5f3fe;
+}
 Composite.tableField {
   background-color: #ffffff;
   background-image: none;
@@ -1575,10 +1583,7 @@ TableItem {
 TableItem:hover {
   background-color: #f1f8fe;
 }
-TableItem:selected {
-  color: inherit;
-  background-color: #e5f3fe;
-}
+TableItem:selected,
 TableItem:selected:unfocused {
   color: inherit;
   background-color: #e5f3fe;
