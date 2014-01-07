@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  * Utilities for {@link IFormField}
  */
-final public class FormFieldUtility {
+public final class FormFieldUtility {
 
   private FormFieldUtility() {
   }

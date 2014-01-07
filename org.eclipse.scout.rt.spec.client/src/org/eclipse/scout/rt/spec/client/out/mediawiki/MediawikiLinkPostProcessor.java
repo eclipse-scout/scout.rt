@@ -75,17 +75,21 @@ public class MediawikiLinkPostProcessor implements ITagProcessor {
       throw new ProcessingException("Error replacing links", e);
     }
     finally {
-      try {
-        if (br != null) {
+      if (br != null) {
+        try {
           br.close();
         }
-        if (writer != null) {
-          writer.flush();
-          writer.close();
+        catch (IOException e) {
+          // nop
         }
       }
-      catch (IOException e) {
-        // NOP
+      if (writer != null) {
+        try {
+          writer.close();
+        }
+        catch (IOException e) {
+          // nop
+        }
       }
     }
   }

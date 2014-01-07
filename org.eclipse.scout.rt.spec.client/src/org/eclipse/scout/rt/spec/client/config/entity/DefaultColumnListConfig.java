@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilte
 /**
  * The default configuration for {@link IColumn}
  */
-public class DefaultColumnListConfig extends DefaultEntityListConfig<IColumn<?>> {
+public class DefaultColumnListConfig extends AbstractEntityListConfig<IColumn<?>> {
 
   /**
    * Default properties for {@link IColumn} with

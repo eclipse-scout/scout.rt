@@ -63,8 +63,7 @@ public abstract class AbstractFormSpecGen extends AbstractSpecGen {
   private String[] getImagePaths(IForm form) throws ProcessingException {
     FormPrinter printer = new FormPrinter(getFileConfig().getImageDir());
     File[] printFiles = printer.getPrintFiles(form);
-    String[] imagePaths = SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(printFiles, getFileConfig().getSpecDir()), "../");
-    return imagePaths;
+    return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(printFiles, getFileConfig().getSpecDir()), "../");
   }
 
 }

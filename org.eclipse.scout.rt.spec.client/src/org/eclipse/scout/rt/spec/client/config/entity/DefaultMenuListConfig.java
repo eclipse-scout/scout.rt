@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.action.SingleSelectionExtrac
 /**
  * The default configuration for {@link IMenu}
  */
-public class DefaultMenuListConfig extends DefaultEntityListConfig<IMenu> {
+public class DefaultMenuListConfig extends AbstractEntityListConfig<IMenu> {
 
   /**
    * Default properties for {@link IMenu} with
