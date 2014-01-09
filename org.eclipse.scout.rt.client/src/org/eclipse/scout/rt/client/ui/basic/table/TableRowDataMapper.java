@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  * 
  * @since 3.8.2
  */
-public class TableRowDataMapper {
+public class TableRowDataMapper implements ITableRowDataMapper {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowDataMapper.class);
 
   private final Map<IColumn, FastPropertyDescriptor> m_propertyDescriptorByColumn = new HashMap<IColumn, FastPropertyDescriptor>();
@@ -138,6 +138,7 @@ public class TableRowDataMapper {
    * @param row
    * @param rowData
    */
+  @Override
   @SuppressWarnings("unchecked")
   public void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
@@ -168,6 +169,7 @@ public class TableRowDataMapper {
    * @param row
    * @param rowData
    */
+  @Override
   public void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
       if (m_ignoredColumns.contains(column)) {
@@ -195,6 +197,7 @@ public class TableRowDataMapper {
    * <p>
    * As default every row is accepted.
    */
+  @Override
   public boolean acceptExport(ITableRow row) throws ProcessingException {
     return true;
   }
@@ -204,6 +207,7 @@ public class TableRowDataMapper {
    * <p>
    * As default every row is accepted.
    */
+  @Override
   public boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException {
     return true;
   }

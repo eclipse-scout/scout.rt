@@ -1453,6 +1453,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
+  public ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+    return execCreateTableRowDataMapper(rowType);
+  }
+
   /**
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
    * {@link AbstractTableRowData} type.
@@ -1464,13 +1469,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @ConfigOperation
   @Order(130)
-  protected TableRowDataMapper execCreateTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+  protected ITableRowDataMapper execCreateTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
     return new TableRowDataMapper(rowType, getColumnSet());
   }
 
   @Override
   public void exportToTableBeanData(AbstractTableFieldBeanData target) throws ProcessingException {
-    TableRowDataMapper rowMapper = execCreateTableRowDataMapper(target.getRowType());
+    ITableRowDataMapper rowMapper = createTableRowDataMapper(target.getRowType());
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
       if (rowMapper.acceptExport(row)) {
@@ -1496,7 +1501,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     clearAllRowsValidity();
     int deleteCount = 0;
     ArrayList<ITableRow> newRows = new ArrayList<ITableRow>();
-    TableRowDataMapper mapper = execCreateTableRowDataMapper(source.getRowType());
+    ITableRowDataMapper mapper = createTableRowDataMapper(source.getRowType());
     for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
       AbstractTableRowData rowData = source.rowAt(i);
       if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {

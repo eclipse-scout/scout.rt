@@ -870,4 +870,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException;
 
+  /**
+   * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
+   * {@link AbstractTableRowData} type.
+   * 
+   * @param rowType
+   * @return
+   * @throws ProcessingException
+   * @since 3.10.0-M5
+   */
+  ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException;
 }
