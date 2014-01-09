@@ -1634,16 +1634,16 @@ Table-RowOverlay {
   background-image:none;
 }
 
-Table-RowOverlay:hover { background-color:#f1f8fe; }
+Table-RowOverlay:hover { background-color:rgba(241,248,254,0.6); }
 
 Table-RowOverlay:selected {
   color:inherit;
-  background-color:#e5f3fe;
+  background-color:rgba(229,243,254,0.6);
 }
 
 Table-RowOverlay:selected:unfocused {
   color:inherit;
-  background-color:#e5f3fe;
+  background-color:rgba(229,243,254,0.6);
 }
 
 Composite.tableField {
