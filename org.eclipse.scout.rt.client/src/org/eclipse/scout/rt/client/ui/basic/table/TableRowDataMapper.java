@@ -11,10 +11,16 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.beans.IntrospectionException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.commons.annotations.ColumnData;
+import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -22,6 +28,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 /**
  * Maps table rows form an {@link ITable} to a {@link AbstractTableRowData} and vice versa. This implementation uses
@@ -37,6 +44,7 @@ public class TableRowDataMapper {
 
   private final Map<IColumn, FastPropertyDescriptor> m_propertyDescriptorByColumn = new HashMap<IColumn, FastPropertyDescriptor>();
   private final ColumnSet m_columnSet;
+  private final Set<IColumn<?>> m_ignoredColumns;
 
   public TableRowDataMapper(Class<? extends AbstractTableRowData> rowType, ColumnSet columnSet) throws ProcessingException {
     if (rowType == null) {
@@ -61,6 +69,22 @@ public class TableRowDataMapper {
     catch (IntrospectionException e) {
       throw new ProcessingException("Could not determine property descriptors", e);
     }
+    // compute ignored columns
+    Set<IColumn<?>> ignoredColumns = null;
+    for (IColumn<?> col : columnSet.getColumns()) {
+      if (isColumnIgnored(col)) {
+        if (ignoredColumns == null) {
+          ignoredColumns = new HashSet<IColumn<?>>();
+        }
+        ignoredColumns.add(col);
+      }
+    }
+    if (ignoredColumns != null) {
+      m_ignoredColumns = ignoredColumns;
+    }
+    else {
+      m_ignoredColumns = Collections.emptySet();
+    }
   }
 
   /**
@@ -79,6 +103,20 @@ public class TableRowDataMapper {
   protected IColumn findColumn(ColumnSet columnset, FastPropertyDescriptor rowDataPropertyDesc) {
     String columnId = capitalize(rowDataPropertyDesc.getName());
     return columnset.getColumnById(columnId);
+  }
+
+  /**
+   * @return Returns <code>true</code> if values of the given column are not imported from and exported to a
+   *         {@link AbstractTableFieldBeanData}.
+   * @since 3.10.0-M5
+   */
+  protected boolean isColumnIgnored(IColumn<?> column) {
+    Class<?> c = column.getClass();
+    ColumnData a = null;
+    while (((a = c.getAnnotation(ColumnData.class)) == null || a.value() == SdkColumnCommand.IGNORE) && c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    return a != null && a.value() == SdkColumnCommand.IGNORE;
   }
 
   /**
@@ -103,6 +141,9 @@ public class TableRowDataMapper {
   @SuppressWarnings("unchecked")
   public void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
+      if (m_ignoredColumns.contains(column)) {
+        continue;
+      }
       Object value = null;
       FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
       if (propertyDesc != null) {
@@ -129,6 +170,9 @@ public class TableRowDataMapper {
    */
   public void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
+      if (m_ignoredColumns.contains(column)) {
+        continue;
+      }
       Object value = column.getValue(row);
       FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
       if (propertyDesc != null) {
