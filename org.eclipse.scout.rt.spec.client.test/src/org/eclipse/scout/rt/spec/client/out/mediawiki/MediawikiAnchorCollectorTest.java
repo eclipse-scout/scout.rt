@@ -14,10 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -25,14 +29,16 @@ import org.junit.Test;
  */
 public class MediawikiAnchorCollectorTest {
   private static final String TEST_FILE = "CC_Einleitung.mediawiki";
+  private static final String TEST_INTRO = "CC.mediawiki";
+  private static final String TEST_LINKS_FILE = "links.properties";
+  private final SpecFileConfig m_config = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");
 
   @Test
   public void testCollectAnchors() throws ProcessingException {
-    SpecFileConfig config = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");
-    File inFile = new File(config.getMediawikiInDir(), TEST_FILE);
+    File testFile = new File(m_config.getMediawikiInDir(), TEST_FILE);
 
     MediawikiAnchorCollector ac = new MediawikiAnchorCollector();
-    List<String> anchors = ac.collectAnchors(inFile);
+    List<String> anchors = ac.collectAnchors(testFile);
     assertTrue("CC:New should be extracted", anchors.contains("CC:New"));
     assertTrue("CC:New should be extracted", anchors.contains("CC:Intro"));
     assertEquals("File should contain exactly 2 tags", 2, anchors.size());
@@ -48,5 +54,60 @@ public class MediawikiAnchorCollectorTest {
     String testTitle = "== Wizard {{CC:Wizard}} ==";
     String result = ac.readAnchorTag(testTitle);
     assertEquals(testTag, result);
+  }
+
+  @Test
+  public void testGetProperties() throws ProcessingException {
+    //TODO jgu
+    MediawikiAnchorCollector ac = new MediawikiAnchorCollector();
+//    ac.collectAnchors(TEST_FILE);
+    File linksFile = new File(m_config.getSpecDir(), TEST_LINKS_FILE);
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter(linksFile);
+      Properties p = new Properties();
+      p.setProperty("test", "bla");
+      p.store(writer, "");
+    }
+    catch (IOException e) {
+      try {
+        if (writer != null) {
+          writer.close();
+        }
+      }
+      catch (IOException e1) {
+        //nop
+      }
+    }
+  }
+
+  @Test
+  public void testReplaceAnchor() {
+    String testString = "==[[CC:Einleitung|Introduction]]==";
+    String expected = "==[[CC_Einleitung#CC:Einleitung|Introduction]]==";
+    MediawikiAnchorCollector m = new MediawikiAnchorCollector();
+    Properties p = new Properties();
+    p.setProperty("CC:Einleitung", "CC_Einleitung#CC:Einleitung");
+    String replacedLine = m.replaceText(testString, p);
+    Assert.assertEquals(expected, replacedLine);
+  }
+
+  @Test
+  public void testReplaceAnchorNegative() {
+    String testString = "[[CC:Einleitung|Introduction]]";
+    String expected = "[[CC:Einleitung|Introduction]]";
+    MediawikiAnchorCollector m = new MediawikiAnchorCollector();
+    Properties p = new Properties();
+    p.setProperty("CC", "xy");
+    String replacedLine = m.replaceText(testString, p);
+    Assert.assertEquals(expected, replacedLine);
+  }
+
+  @Test
+  public void testReplaceLinks() throws ProcessingException {
+    File linksFile = new File(m_config.getSpecInDir(), TEST_LINKS_FILE);
+    File introFile = new File(m_config.getMediawikiInDir(), TEST_INTRO);
+    MediawikiAnchorCollector m = new MediawikiAnchorCollector();
+    m.replaceLinks(introFile, linksFile);
   }
 }

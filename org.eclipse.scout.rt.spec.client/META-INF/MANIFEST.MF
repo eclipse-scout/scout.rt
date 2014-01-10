@@ -10,6 +10,7 @@ Export-Package: org.eclipse.scout.rt.spec.client,
  org.eclipse.scout.rt.spec.client.gen,
  org.eclipse.scout.rt.spec.client.out,
  org.eclipse.scout.rt.spec.client.out.html,
+ org.eclipse.scout.rt.spec.client.out.mediawiki,
  org.eclipse.scout.rt.spec.client.screenshot,
  org.eclipse.scout.rt.spec.client.text
 Require-Bundle: org.eclipse.core.runtime,

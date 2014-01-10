@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.docbook.DocBookConverter;
 import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
 import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
 
@@ -70,6 +71,7 @@ public class AbstractSpecGen {
     Properties prop = SpecIOUtility.loadProperties(properties);
     MediawikiLinkPostProcessor postproc = new MediawikiLinkPostProcessor(prop);
     postproc.replaceLinks(wiki, finalWiki);
+    new MediawikiAnchorCollector().storeAnchors(finalWiki, getFileConfig().getLinksFile());
 
     convertToHTML(id, finalWiki);
   }

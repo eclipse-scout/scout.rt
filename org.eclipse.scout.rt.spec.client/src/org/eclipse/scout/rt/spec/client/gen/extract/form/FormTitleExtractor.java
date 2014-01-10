@@ -29,7 +29,7 @@ public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
    */
   @Override
   public String getText(IForm form) {
-    return form.getTitle();
+    return form.getTitle() + "{{" + form.getClass().getSimpleName() + "}}";
   }
 
 }

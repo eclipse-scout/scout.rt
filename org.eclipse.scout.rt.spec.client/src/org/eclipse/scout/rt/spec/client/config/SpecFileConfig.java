@@ -29,6 +29,7 @@ public class SpecFileConfig {
   private static final String SPEC_IN_DIR_NAME = "resources" + File.separator + "spec";
 
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
+  private static final String LINKS_FILE_NAME = "links.properties";
 
   private final String m_pluginName;
 
@@ -115,6 +116,10 @@ public class SpecFileConfig {
    */
   public File getMediawikiInDir() throws ProcessingException {
     return new File(getSpecInDir(), MEDIAWIKI_DIR_NAME);
+  }
+
+  public File getLinksFile() throws ProcessingException {
+    return new File(getSpecInDir(), LINKS_FILE_NAME);
   }
 
 }

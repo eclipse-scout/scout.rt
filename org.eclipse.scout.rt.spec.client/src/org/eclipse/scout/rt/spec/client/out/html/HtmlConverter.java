@@ -16,16 +16,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder.Stylesheet;
 import org.eclipse.mylyn.wikitext.mediawiki.core.MediaWikiLanguage;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.spec.client.SpecIOUtility;
 
 /**
  * Converts a mediawiki file to html
@@ -63,6 +68,61 @@ public class HtmlConverter {
     catch (IOException e) {
       throw new ProcessingException("Could not convert document to html", e);
     }
+  }
+
+  public void replaceAll(File in, Map<String, String> m) throws ProcessingException {
+    FileReader reader = null;
+    FileWriter writer = null;
+    BufferedReader br = null;
+    File temp = new File(in.getParent(), in.getName() + "_temp");
+
+    try {
+      reader = new FileReader(in);
+      writer = new FileWriter(temp);
+      br = new BufferedReader(reader);
+
+      String line;
+      while ((line = br.readLine()) != null) {
+        String repl = replace(line, m);
+        writer.write(repl);
+        writer.write(System.getProperty("line.separator"));
+      }
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    finally {
+      try {
+        if (br != null) {
+          br.close();
+        }
+      }
+      catch (IOException e) {
+        // NOP
+      }
+
+      try {
+        if (writer != null) {
+          writer.close();
+        }
+      }
+      catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    SpecIOUtility.copy(temp, in);
+    temp.delete();
+  }
+
+  public String replace(String s, Map<String, String> m) {
+    for (Entry<String, String> e : m.entrySet()) {
+      s = s.replaceAll(e.getKey(), e.getValue());
+    }
+    return s;
   }
 
 }

@@ -33,4 +33,9 @@ public class DefaultFormConfig extends DefaultEntityConfig<IForm> {
     return propertyTemplate;
   }
 
+  @Override
+  public IDocTextExtractor<IForm> getTitle() {
+    return new FormTitleExtractor();
+  }
+
 }
