@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
+import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertComparableEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.shared.TestingUtility.NumberStringPercentSuffix;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,29 +77,41 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
   @Test
   public void testParseToBigDecimalInternal() throws ProcessingException {
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42), parseToBigDecimalInternal("42"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42), parseToBigDecimalInternal("-42"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0), parseToBigDecimalInternal("0"));
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+      setFormat(df);
+      assertComparableEquals(BigDecimal.valueOf(42), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "42")));
+      assertComparableEquals(BigDecimal.valueOf(-42), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, true, "42")));
+      assertComparableEquals(BigDecimal.valueOf(0), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "0")));
 
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42.8532), parseToBigDecimalInternal("42.8532"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42.77234), parseToBigDecimalInternal("-42.77234"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0), parseToBigDecimalInternal("0.00000"));
+      assertComparableEquals(BigDecimal.valueOf(42.8532), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "42", "8532")));
+      assertComparableEquals(BigDecimal.valueOf(-42.77234), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, true, "42", "77234")));
+      assertComparableEquals(BigDecimal.valueOf(0), parseToBigDecimalInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "0", "00000")));
+    }
   }
 
   @Test
   public void testParseValueInternalPercent() throws ProcessingException {
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88%");
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      setPercent(false);
+      setMultiplier(1);
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+      setFormat(df);
+      AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.",
+          this, TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL));
 
-    setPercent(true);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88%"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+      setPercent(true);
+      assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL)));
+      assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.NONE)));
 
-    setMultiplier(100);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88%"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal("59.88"));
-
+      setMultiplier(100);
+      assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL)));
+      assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.NONE)));
+    }
   }
 
   @Test
@@ -128,29 +142,29 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
 
     setPercent(true);
     assertTrue(isPercent());
     assertEquals(dfPercent.getPositiveSuffix(), getFormatInternal().getPositiveSuffix());
     assertEquals(dfPercent.getNegativeSuffix(), getFormatInternal().getNegativeSuffix());
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
 
     setPercent(false);
     assertFalse(isPercent());
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
 
     // manually setting suffixes
     getFormatInternal().setPositiveSuffix(dfPercent.getPositiveSuffix());
     assertFalse(isPercent());
     getFormatInternal().setNegativeSuffix(dfPercent.getNegativeSuffix());
     assertTrue(isPercent());
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
 
   }
 
@@ -278,8 +292,8 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
     setFractionDigits(6);
     assertTrue("expected tracker to be notified, when value changed", propertyTracker.m_notified);
-    ScoutAssert.assertComparableEquals("expected getter to return new setting", 6, getFractionDigits());
-    ScoutAssert.assertComparableEquals("expected new setting in property change notification", 6, (Integer) propertyTracker.m_cachedProperty);
+    assertComparableEquals("expected getter to return new setting", 6, getFractionDigits());
+    assertComparableEquals("expected new setting in property change notification", 6, (Integer) propertyTracker.m_cachedProperty);
   }
 
 }

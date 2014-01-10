@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
+import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertComparableEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -26,9 +27,7 @@ import java.util.Locale;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -75,47 +74,50 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @Test
   public void testParseValueSuffix() throws ProcessingException {
-    DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
-    df.applyPattern("#,##0.00 SUF");
-    setFormat(df);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999 SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999      SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999SUF"));
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+      df.applyPattern("#,##0.00 SUF");
+      setFormat(df);
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999 SUF"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999      SUF"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999SUF"));
 
-    df.applyPattern("#,##0.00");
-    setFormat(df);
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-    assertParseToBigDecimalInternalThrowsProcessingException("After setting a pattern without suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
+      df.applyPattern("#,##0.00");
+      setFormat(df);
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
+      assertParseToBigDecimalInternalThrowsProcessingException("After setting a pattern without suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
 
-    getFormatInternal().setPositiveSuffix(" SUF");
-    getFormatInternal().setNegativeSuffix(" SUF");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999 SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999      SUF"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999SUF"));
+      getFormatInternal().setPositiveSuffix(" SUF");
+      getFormatInternal().setNegativeSuffix(" SUF");
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999 SUF"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999      SUF"));
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999SUF"));
 
-    getFormatInternal().setPositiveSuffix("");
-    getFormatInternal().setNegativeSuffix("");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
-    assertParseToBigDecimalInternalThrowsProcessingException("After setting an empty suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
+      getFormatInternal().setPositiveSuffix("");
+      getFormatInternal().setNegativeSuffix("");
+      assertComparableEquals(BigDecimal.valueOf(9999), parseValueInternal("9999"));
+      assertParseToBigDecimalInternalThrowsProcessingException("After setting an empty suffix an excpetion is expected when parsing text with suffix.", this, "9999 SUF");
+    }
   }
 
   @Test
   public void testFormatValueInternal() {
     setRoundingMode(RoundingMode.HALF_EVEN);
-    Assert.assertEquals("12", formatValueInternal(BigDecimal.valueOf(12.5)));
+    assertEquals("12", formatValueInternal(BigDecimal.valueOf(12.5)));
     setRoundingMode(RoundingMode.HALF_UP);
-    Assert.assertEquals("13", formatValueInternal(BigDecimal.valueOf(12.5)));
+    assertEquals("13", formatValueInternal(BigDecimal.valueOf(12.5)));
 
     char groupingSeparator = new DecimalFormatSymbols(LocaleThreadLocal.get()).getGroupingSeparator();
-    Assert.assertEquals("123" + groupingSeparator + "456" + groupingSeparator + "789", formatValueInternal(BigDecimal.valueOf(123456789)));
+    assertEquals("123" + groupingSeparator + "456" + groupingSeparator + "789", formatValueInternal(BigDecimal.valueOf(123456789)));
 
     setGroupingUsed(false);
-    Assert.assertEquals("123456789", formatValueInternal(BigDecimal.valueOf(123456789)));
+    assertEquals("123456789", formatValueInternal(BigDecimal.valueOf(123456789)));
 
     setGroupingUsed(true);
-    Assert.assertEquals("123" + groupingSeparator + "456" + groupingSeparator + "789", formatValueInternal(BigDecimal.valueOf(123456789)));
+    assertEquals("123" + groupingSeparator + "456" + groupingSeparator + "789", formatValueInternal(BigDecimal.valueOf(123456789)));
   }
 
   @Test
@@ -178,8 +180,8 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
     setMinValue(BigDecimal.ONE);
     assertTrue("expected tracker to be notified, when value changed", propertyTracker.m_notified);
-    ScoutAssert.assertComparableEquals("expected getter to return new setting", BigDecimal.ONE, getMinValue());
-    ScoutAssert.assertComparableEquals("expected new setting in property change notification", BigDecimal.ONE, (BigDecimal) propertyTracker.m_cachedProperty);
+    assertComparableEquals("expected getter to return new setting", BigDecimal.ONE, getMinValue());
+    assertComparableEquals("expected new setting in property change notification", BigDecimal.ONE, (BigDecimal) propertyTracker.m_cachedProperty);
   }
 
   @Test
@@ -193,8 +195,8 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
     setMaxValue(BigDecimal.ONE);
     assertTrue("expected tracker to be notified, when value changed", propertyTracker.m_notified);
-    ScoutAssert.assertComparableEquals("expected getter to return new setting", BigDecimal.ONE, getMaxValue());
-    ScoutAssert.assertComparableEquals("expected new setting in property change notification", BigDecimal.ONE, (BigDecimal) propertyTracker.m_cachedProperty);
+    assertComparableEquals("expected getter to return new setting", BigDecimal.ONE, getMaxValue());
+    assertComparableEquals("expected new setting in property change notification", BigDecimal.ONE, (BigDecimal) propertyTracker.m_cachedProperty);
   }
 
   @Test
@@ -244,19 +246,19 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   @Test
   public void testSetMaxValueSmallerThanMin() {
     setMinValue(BigDecimal.valueOf(42));
-    ScoutAssert.assertComparableEquals("expected minValue to be as set before", BigDecimal.valueOf(42), getMinValue());
+    assertComparableEquals("expected minValue to be as set before", BigDecimal.valueOf(42), getMinValue());
 
     setMaxValue(BigDecimal.valueOf(9));
-    ScoutAssert.assertComparableEquals("expected minValue to be adapted when setting maxValue to a smaller value", BigDecimal.valueOf(9), getMinValue());
+    assertComparableEquals("expected minValue to be adapted when setting maxValue to a smaller value", BigDecimal.valueOf(9), getMinValue());
   }
 
   @Test
   public void testSetMinValueBiggerThanMax() {
     setMaxValue(BigDecimal.valueOf(7));
-    ScoutAssert.assertComparableEquals("expected maxValue to be as set before", BigDecimal.valueOf(7), getMaxValue());
+    assertComparableEquals("expected maxValue to be as set before", BigDecimal.valueOf(7), getMaxValue());
 
     setMinValue(BigDecimal.valueOf(9));
-    ScoutAssert.assertComparableEquals("expected maxValue to be adapted when setting minValue to a bigger value", BigDecimal.valueOf(9), getMinValue());
+    assertComparableEquals("expected maxValue to be adapted when setting minValue to a bigger value", BigDecimal.valueOf(9), getMinValue());
   }
 
   public static class P_PropertyTracker implements PropertyChangeListener {

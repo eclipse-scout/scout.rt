@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import static org.junit.Assert.assertEquals;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.easymock.EasyMock;
@@ -31,11 +30,14 @@ public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
     Integer testValue = Integer.valueOf(-123456789);
     cell.setValue(testValue);
 
-    DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.CANADA_FRENCH);
-    setFormat(df);
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+      setFormat(df);
 
-    decorateCellInternal(cell, row);
-    assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
+      decorateCellInternal(cell, row);
+      assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
+    }
   }
 
 }

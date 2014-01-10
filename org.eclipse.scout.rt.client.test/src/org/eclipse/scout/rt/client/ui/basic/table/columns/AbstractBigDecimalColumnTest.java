@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.easymock.EasyMock;
@@ -34,15 +33,20 @@ public class AbstractBigDecimalColumnTest extends AbstractBigDecimalColumn {
     BigDecimal testValue = new BigDecimal("-123456789.12345");
     cell.setValue(testValue);
 
-    DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.CANADA_FRENCH);
-    df.setMaximumFractionDigits(4);
-    df.setRoundingMode(RoundingMode.HALF_UP);
-    setFormat(df);
+    for (Locale locale : DecimalFormat.getAvailableLocales()) {
+      DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df.applyPattern(getFormat().toPattern());
+      df.setMaximumFractionDigits(4);
+      df.setRoundingMode(RoundingMode.HALF_UP);
+      setFormat(df);
 
-    char decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
-    decorateCellInternal(cell, row);
-    assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
-    assertTrue("cell text[" + cell.getText() + "] not rounded as expected", cell.getText().endsWith(decimalSeparator + "1235"));
+      char decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
+      decorateCellInternal(cell, row);
+      assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
+      DecimalFormat df1235 = (DecimalFormat) DecimalFormat.getInstance(locale);
+      df1235.applyPattern("#");
+      assertTrue("cell text[" + cell.getText() + "] not rounded as expected", cell.getText().endsWith(decimalSeparator + df1235.format(1235)));
+    }
   }
 
 }
