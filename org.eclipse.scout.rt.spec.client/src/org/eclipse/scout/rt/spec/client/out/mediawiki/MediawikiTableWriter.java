@@ -140,6 +140,7 @@ public class MediawikiTableWriter {
     m_writer.append(NEWLINE);
   }
 
+  // TODO ASA replace with StringUtility.repeat()
   private String repeat(char c, int n) {
     StringBuilder b = new StringBuilder();
     for (int i = 0; i < n; i++) {

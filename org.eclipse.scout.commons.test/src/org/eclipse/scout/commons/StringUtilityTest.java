@@ -367,4 +367,44 @@ public class StringUtilityTest {
     assertEquals(false, StringUtility.parseBoolean("false", true));
     assertEquals(true, StringUtility.parseBoolean("true", false));
   }
+
+  @Test
+  public void testRepeat() {
+    assertEquals("AAA", StringUtility.repeat("A", 3));
+    assertEquals("aBcDaBcDaBcDaBcDaBcD", StringUtility.repeat("aBcD", 5));
+
+    assertEquals("", StringUtility.repeat("aBcD", 0));
+    assertEquals("", StringUtility.repeat("aBcD", -42));
+
+    assertEquals("", StringUtility.repeat("", 399));
+  }
+
+  @Test
+  public void testNvl() {
+    assertEquals("value", StringUtility.nvl("value", "subsitute"));
+    assertEquals("subsitute", StringUtility.nvl(null, "subsitute"));
+    assertEquals("", StringUtility.nvl("", "subsitute"));
+    assertEquals("5", StringUtility.nvl(new Integer(5), "subsitute"));
+  }
+
+  @Test
+  public void testHasText() {
+    assertTrue(StringUtility.hasText("scout"));
+    assertTrue(StringUtility.hasText("                                      &"));
+    assertTrue(StringUtility.hasText("\t\nU\t\n"));
+    assertFalse(StringUtility.hasText(null));
+    assertFalse(StringUtility.hasText(""));
+    assertFalse(StringUtility.hasText("                                   "));
+    assertFalse(StringUtility.hasText("\t\n  \t\n"));
+  }
+
+  @Test
+  public void testSubstituteWhenEmpty() {
+    assertEquals("value", StringUtility.substituteWhenEmpty("value", "subsitute"));
+    assertEquals("subsitute", StringUtility.substituteWhenEmpty(null, "subsitute"));
+    assertEquals("subsitute", StringUtility.substituteWhenEmpty("", "subsitute"));
+    assertEquals("subsitute", StringUtility.substituteWhenEmpty("\t\n  \t\n", "subsitute"));
+    assertEquals("5", StringUtility.substituteWhenEmpty(new Integer(5), "subsitute"));
+  }
+
 }

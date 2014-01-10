@@ -11,9 +11,12 @@
 package org.eclipse.scout.rt.spec.client.gen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.Doc.Filtering;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -96,7 +99,7 @@ public final class DocGenUtility {
   /**
    * Creates a {@link IDocSection} for a number of scout entities, according to the configuration.
    * <p>
-   * E.g. to create a desciption for form fields with a table containing all form fields
+   * E.g. to create a description for form fields with a table containing all form fields
    * </p>
    * 
    * @param entities
@@ -105,7 +108,7 @@ public final class DocGenUtility {
    * @return {@link IDocTable}
    */
   public static <T> IDocSection createDocSection(T[] entities, IDocEntityListConfig<T> config) {
-    List<IDocTextExtractor<T>> textExtractors = config.getTexts();
+    List<IDocTextExtractor<T>> textExtractors = config.getTextExtractors();
     final List<String[]> rows = new ArrayList<String[]>();
     for (T e : entities) {
       if (isAccepted(e, config.getFilters())) {
@@ -130,15 +133,41 @@ public final class DocGenUtility {
    *          {@link IDocFilter}s (may be <code>null</code>)
    * @return <code>true</code>, if the scoutObject is accepted by all filters.
    */
+  @SuppressWarnings("unchecked")
   public static <T> boolean isAccepted(T scoutObject, List<IDocFilter<T>> filters) {
     if (filters == null) {
       return true;
     }
+    if (!isAccepted(scoutObject, filters, Filtering.REJECT, Filtering.TRANSPARENT)) {
+      return false;
+    }
+    // for fields consider hierarchy
+    if (scoutObject instanceof IFormField) {
+      IFormField superField = ((IFormField) scoutObject).getParentField();
+      while (superField != null) {
+        // TODO ASA howto generics: is there a better way?
+        ArrayList<IDocFilter<IFormField>> fieldFilters = new ArrayList<IDocFilter<IFormField>>();
+        for (IDocFilter<T> f : filters) {
+          fieldFilters.add((IDocFilter<IFormField>) f);
+        }
+        if (!isAccepted(superField, fieldFilters, Filtering.REJECT, Filtering.ACCEPT_REJECT_CHILDREN)) {
+          return false;
+        }
+        superField = superField.getParentField();
+      }
+
+    }
+    return true;
+  }
+
+  private static <T> boolean isAccepted(T scoutObject, List<IDocFilter<T>> filters, Filtering... notAccepted) {
     for (IDocFilter<T> filter : filters) {
-      if (!filter.accept(scoutObject)) {
+      Filtering filterResult = filter.accept(scoutObject);
+      if (Arrays.asList(notAccepted).contains(filterResult)) {
         return false;
       }
     }
     return true;
   }
+
 }

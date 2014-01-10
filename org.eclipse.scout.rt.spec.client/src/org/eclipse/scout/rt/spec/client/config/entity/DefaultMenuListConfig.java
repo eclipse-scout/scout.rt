@@ -36,7 +36,7 @@ public class DefaultMenuListConfig extends AbstractEntityListConfig<IMenu> {
    * </p>
    */
   @Override
-  public List<IDocTextExtractor<IMenu>> getTexts() {
+  public List<IDocTextExtractor<IMenu>> getTextExtractors() {
     List<IDocTextExtractor<IMenu>> propertyTemplate = new ArrayList<IDocTextExtractor<IMenu>>();
     propertyTemplate.add(new ActionPropertyExtractor<IMenu>(IAction.PROP_TEXT, TEXTS.get("org.eclipse.scout.rt.spec.label")));
     propertyTemplate.add(new DescriptionExtractor<IMenu>());

@@ -41,22 +41,26 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
   //deprecated will be replaced with doc service reading doc by classid
   private String tryReadingGetConfiguredDoc(ITypeWithClassId o) {
     Method configuredDocMethod;
-    try {
-      configuredDocMethod = o.getClass().getDeclaredMethod("getConfiguredDoc");
-      configuredDocMethod.setAccessible(true);
-      Object res = configuredDocMethod.invoke(o);
-      if (res instanceof String) {
-        return (String) res;
+    Class<?> clazz = o.getClass();
+    while (clazz != null) {
+      try {
+        configuredDocMethod = clazz.getDeclaredMethod("getConfiguredDoc");
+        configuredDocMethod.setAccessible(true);
+        Object res = configuredDocMethod.invoke(o);
+        if (res instanceof String) {
+          return (String) res;
+        }
       }
-    }
-    catch (NoSuchMethodException e) {
-      // ignore
-    }
-    catch (IllegalAccessException e) {
-      // ignore
-    }
-    catch (InvocationTargetException e) {
-      // ignore
+      catch (NoSuchMethodException e) {
+        // ignore
+      }
+      catch (IllegalAccessException e) {
+        // ignore
+      }
+      catch (InvocationTargetException e) {
+        // ignore
+      }
+      clazz = clazz.getSuperclass();
     }
     return "";
   }

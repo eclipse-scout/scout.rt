@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnHeaderTooltipEx
 import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnSortIndexExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnWidthExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
-import org.eclipse.scout.rt.spec.client.gen.filter.IgnoreDocFilter;
+import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilter;
 
 /**
@@ -38,7 +38,7 @@ public class DefaultColumnListConfig extends AbstractEntityListConfig<IColumn<?>
    * </p>
    */
   @Override
-  public List<IDocTextExtractor<IColumn<?>>> getTexts() {
+  public List<IDocTextExtractor<IColumn<?>>> getTextExtractors() {
     List<IDocTextExtractor<IColumn<?>>> propertyTemplate = new ArrayList<IDocTextExtractor<IColumn<?>>>();
     propertyTemplate.add(new ColumnHeaderTextExtractor());
     propertyTemplate.add(new DescriptionExtractor<IColumn<?>>());
@@ -56,7 +56,7 @@ public class DefaultColumnListConfig extends AbstractEntityListConfig<IColumn<?>
   @Override
   public List<IDocFilter<IColumn<?>>> getFilters() {
     List<IDocFilter<IColumn<?>>> columnFilters = new ArrayList<IDocFilter<IColumn<?>>>();
-    columnFilters.add(new IgnoreDocFilter<IColumn<?>>());
+    columnFilters.add(new DefaultDocFilter<IColumn<?>>());
     columnFilters.add(new DisplayableColumnFilter());
     return columnFilters;
   }

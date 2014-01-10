@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
-import org.eclipse.scout.rt.spec.client.gen.filter.IgnoreDocFilter;
+import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
 
 /**
  *
@@ -31,13 +31,13 @@ public abstract class AbstractEntityListConfig<T extends ITypeWithClassId> imple
    */
   @Override
   public List<IDocFilter<T>> getFilters() {
-    List<IDocFilter<T>> columnFilters = new ArrayList<IDocFilter<T>>();
-    columnFilters.add(new IgnoreDocFilter<T>());
-    return columnFilters;
+    List<IDocFilter<T>> filters = new ArrayList<IDocFilter<T>>();
+    filters.add(new DefaultDocFilter<T>());
+    return filters;
   }
 
   @Override
-  public List<IDocTextExtractor<T>> getTexts() {
+  public List<IDocTextExtractor<T>> getTextExtractors() {
     ArrayList<IDocTextExtractor<T>> p = new ArrayList<IDocTextExtractor<T>>();
     p.add(new TypeExtractor<T>());
     p.add(new DescriptionExtractor<T>());

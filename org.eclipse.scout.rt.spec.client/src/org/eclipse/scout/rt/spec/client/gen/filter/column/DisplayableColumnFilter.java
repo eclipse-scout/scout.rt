@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.filter.column;
 
+import org.eclipse.scout.commons.annotations.Doc.Filtering;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
@@ -24,8 +25,12 @@ public class DisplayableColumnFilter implements IDocFilter<IColumn<?>> {
    * @return true for displayable column
    */
   @Override
-  public boolean accept(IColumn<?> c) {
-    return c.isDisplayable();
+  public Filtering accept(IColumn<?> c) {
+    if (c.isDisplayable()) {
+      return Filtering.ACCEPT;
+    }
+    else {
+      return Filtering.REJECT;
+    }
   }
-
 }

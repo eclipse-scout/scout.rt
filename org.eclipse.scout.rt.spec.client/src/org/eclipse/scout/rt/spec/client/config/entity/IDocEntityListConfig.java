@@ -29,7 +29,7 @@ public interface IDocEntityListConfig<T> {
    * 
    * @return a list of properties that should be generated.
    */
-  List<IDocTextExtractor<T>> getTexts();
+  List<IDocTextExtractor<T>> getTextExtractors();
 
   /**
    * Configuration for filtering <code>T</code>. Only the objects accepted by all filters are generated.

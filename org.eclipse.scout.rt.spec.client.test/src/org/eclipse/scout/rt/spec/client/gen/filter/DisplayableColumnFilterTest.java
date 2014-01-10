@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.filter;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilter;
@@ -33,8 +34,7 @@ public class DisplayableColumnFilterTest {
     when(mockColumn.isDisplayable()).thenReturn(true);
 
     DisplayableColumnFilter filter = new DisplayableColumnFilter();
-    boolean actualAccepted = filter.accept(mockColumn);
-    assertTrue(actualAccepted);
+    assertEquals(Doc.Filtering.ACCEPT, filter.accept(mockColumn));
   }
 
 }

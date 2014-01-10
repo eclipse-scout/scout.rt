@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldBooleanPropertyExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldLabelExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldPropertyExtractor;
 
 /**
@@ -27,16 +28,26 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldProperty
  */
 public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField> {
 
+  private boolean m_hierarchicLabels;
+
+  public DefaultFormFieldConfig() {
+    this(true);
+  }
+
+  public DefaultFormFieldConfig(boolean hierarchicLabels) {
+    m_hierarchicLabels = hierarchicLabels;
+  }
+
   /**
-   * Default properties for {@link org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn IColumn} with
+   * Default properties for {@link IFormField} with
    * <p>
-   * Label,Type,Length,Mandatory,Enabled,Tooltip,Description
+   * Label,Description,Tooltip,Mandatory,Enabled,Length,Type
    * </p>
    */
   @Override
-  public List<IDocTextExtractor<IFormField>> getTexts() {
+  public List<IDocTextExtractor<IFormField>> getTextExtractors() {
     List<IDocTextExtractor<IFormField>> propertyTemplate = new ArrayList<IDocTextExtractor<IFormField>>();
-    propertyTemplate.add(new FormFieldPropertyExtractor(IFormField.PROP_LABEL, TEXTS.get("org.eclipse.scout.rt.spec.label")));
+    propertyTemplate.add(new FormFieldLabelExtractor(m_hierarchicLabels, getFilters()));
     propertyTemplate.add(new DescriptionExtractor<IFormField>());
     propertyTemplate.add(new FormFieldPropertyExtractor(IFormField.PROP_TOOLTIP_TEXT, TEXTS.get("org.eclipse.scout.rt.spec.tooltip")));
     propertyTemplate.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_MANDATORY, TEXTS.get("org.eclipse.scout.rt.spec.mandatory")));

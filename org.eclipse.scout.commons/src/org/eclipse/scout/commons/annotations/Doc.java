@@ -11,13 +11,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Doc {
+
+  enum Filtering {
+    ACCEPT, REJECT, TRANSPARENT, ACCEPT_REJECT_CHILDREN
+  }
+
+  // TODO ASA javadoc
+  Filtering filter() default Filtering.ACCEPT;
+
   /**
-   * @return If <code>true</code> the type is ignored for documentation.
-   *         <p>
-   *         If a type is ignored and contains other types that are documented, these are ignored as well. E.g. If a
-   *         <code>IGroupBox</code> is annotated with <code>@Doc(ignre=true)</code>, all fields within the group box are
-   *         ignored as well.
-   *         </p>
+   * @deprecated Will be removed with scout 3.11. Uses {@link #filter()} instead. (Is already with scout 3.10 not
+   *             evaluated anymore!)
    */
+  @Deprecated
   boolean ignore() default false;
 }

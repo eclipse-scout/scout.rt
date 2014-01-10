@@ -40,19 +40,17 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
    */
   @Override
   public boolean visitField(IFormField field, int level, int fieldIndex) {
-    boolean accepted = DocGenUtility.isAccepted(field, m_config.getFieldListConfig().getFilters());
-    if (accepted) {
-      String[] row = DocGenUtility.getTexts(field, m_config.getFieldListConfig().getTexts());
+    if (DocGenUtility.isAccepted(field, m_config.getFieldListConfig().getFilters())) {
+      String[] row = DocGenUtility.getTexts(field, m_config.getFieldListConfig().getTextExtractors());
       m_rows.add(row);
-      return true;
     }
-    return false;
+    return true;
   }
 
   @Override
   public List<IDocSection> getDocSections() {
     String[][] rowArray = CollectionUtility.toArray(m_rows, String[].class);
-    String[] headers = DocGenUtility.getHeaders(m_config.getFieldListConfig().getTexts());
+    String[] headers = DocGenUtility.getHeaders(m_config.getFieldListConfig().getTextExtractors());
     IDocTable table = new DocTable(headers, rowArray);
     String title = TEXTS.get("org.eclipse.scout.rt.spec.fields");
     ArrayList<IDocSection> sections = new ArrayList<IDocSection>();

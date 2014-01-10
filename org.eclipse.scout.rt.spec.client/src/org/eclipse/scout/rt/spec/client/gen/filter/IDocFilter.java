@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.filter;
 
+import org.eclipse.scout.commons.annotations.Doc.Filtering;
+
 /**
  * Interface for documentation filters. Accept or reject Items.
  * 
@@ -22,6 +24,6 @@ public interface IDocFilter<T> {
    * @param object
    * @return true, if accepted, false otherwise
    */
-  boolean accept(T object);
+  Filtering accept(T object);
 
 }

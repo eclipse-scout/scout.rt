@@ -48,6 +48,11 @@ public final class StringUtility {
     return s == null || s.length() == 0;
   }
 
+  /**
+   * @param s
+   * @return <code>true</code> if the provided string is not null or empty otherwise <code>false</code> (If the
+   *         string contains only whitespaces it is regarded as empty.)
+   */
   public static boolean hasText(String s) {
     return s != null && !"".equals(s.trim());
   }
@@ -1222,6 +1227,13 @@ public final class StringUtility {
     return ((st > 0) || (len < s.length())) ? s.substring(st, len) : s;
   }
 
+  /**
+   * Returns the string-representation of <code>value</code>, or <code>valueWhenNull</code> if value is null.
+   * 
+   * @param value
+   * @param valueWhenNull
+   * @see #substituteWhenEmpty(Object, String)
+   */
   public static String nvl(Object value, String valueWhenNull) {
     if (value != null) {
       return value.toString();
@@ -1652,5 +1664,33 @@ public final class StringUtility {
     catch (Throwable t) {
       return false;
     }
+  }
+
+  /**
+   * Creates a new string repeating the <code>token</code> <code>repetitions</code> times. If <code>repetitions</code>
+   * <= 0 an empty string is returned.
+   * 
+   * @param token
+   * @param repetitions
+   */
+  public static String repeat(CharSequence token, int repetitions) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < repetitions; ++i) {
+      sb.append(token);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Similar to {@link #nvl(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but as
+   * well when the String representation of <code>value</code> is empty or contains only whitespaces.
+   * 
+   * @param property
+   * @param string
+   * @return
+   */
+  public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
+    String stringValue = nvl(value, null);
+    return hasText(stringValue) ? stringValue : valueWhenEmpty;
   }
 }

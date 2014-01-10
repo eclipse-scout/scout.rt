@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.spec.client.fixture.SimplePersonForm.MainBox.TableFi
 import org.eclipse.scout.rt.spec.client.fixture.SimplePersonForm.MainBox.TableField.Table;
 
 /**
- * A simple form with @Doc(ignore = true) for testing
+ * A simple form with @Doc(filter = Doc.FilterResult.REJECTED) for testing
  */
 public class SimplePersonForm extends AbstractForm {
 
@@ -47,7 +47,7 @@ public class SimplePersonForm extends AbstractForm {
   public class MainBox extends AbstractGroupBox {
 
     @Order(20.0)
-    @Doc(ignore = true)
+    @Doc(filter = Doc.Filtering.REJECT)
     public class GroupBox extends AbstractGroupBox {
 
       @Order(10.0)
