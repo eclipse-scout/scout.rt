@@ -35,6 +35,7 @@ public class MultilineCheckbox extends MultilineButton {
     @Override
     public void mouseUp(MouseEvent e) {
       if (leftMouseButtonClicked(e)) {
+        m_btn.setFocus();
         m_btn.setSelection(!m_btn.getSelection());
       }
     }
