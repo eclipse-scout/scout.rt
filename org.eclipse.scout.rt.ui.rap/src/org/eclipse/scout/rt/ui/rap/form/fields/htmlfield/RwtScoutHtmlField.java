@@ -172,6 +172,10 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     else {
       try {
         String indexFile = m_browserExtension.addResource("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")));
+        // force the iframe to reload its content by making the file url unique
+        if (indexFile != null) {
+          indexFile += "?nocache=" + System.currentTimeMillis();
+        }
         getUiField().setUrl(indexFile);
       }
       catch (UnsupportedEncodingException e) {
