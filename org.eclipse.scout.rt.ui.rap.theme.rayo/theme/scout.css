@@ -1355,10 +1355,6 @@ Button.smartfield_browse {
   border-radius: 5px;
   cursor: pointer;
 }
-Button.smartfield_browse:disabled {
-  background-image: url(theme/img/button/smartfield_browse_disabled.png);
-  cursor: default;
-}
 Button.smartfield_browse:hover {
   background-image: url(theme/img/button/smartfield_browse_mouse_over.png);
 }
@@ -1366,18 +1362,36 @@ Button-FocusIndicator.smartfield_browse {
   background-color: transparent;
   border: none;
 }
+Button.smartfield_browse_disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+  cursor: default;
+}
+Button.smartfield_browse_disabled:hover {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+}
+Button-FocusIndicator.smartfield_browse_disabled {
+  background-color: transparent;
+  border: none;
+}
 Button.smartfield_browse_menu {
   background-image: url(theme/img/button/smartfield_browse_menu.png);
   cursor: pointer;
-}
-Button.smartfield_browse_menu:disabled {
-  background-image: url(theme/img/button/smartfield_browse_menu_disabled.png);
-  cursor: default;
 }
 Button.smartfield_browse_menu:hover {
   background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png);
 }
 Button-FocusIndicator.smartfield_browse_menu {
+  background-color: transparent;
+  border: none;
+}
+Button.smartfield_browse_disabled_menu {
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu.png);
+  cursor: default;
+}
+Button.smartfield_browse_disabled_menu:hover {
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu_mouse_over.png);
+}
+Button-FocusIndicator.smartfield_browse_disabled_menu {
   background-color: transparent;
   border: none;
 }

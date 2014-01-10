@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -37,13 +38,29 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   private Point m_mouseDownPosition;
   private boolean m_dropdownEnabled = true;
   private boolean m_buttonEnabled = true;
+  private MouseListener m_mouseListener;
 
   private String m_originalVariant = "";
 
   public DropDownButton(Composite parent, int style) {
     super(parent, style | SWT.DOUBLE_BUFFERED);
+    addOrRemoveMouseListener();
+  }
 
-    addMouseListener(new MouseAdapter() {
+  protected void addOrRemoveMouseListener() {
+    if (isButtonEnabled() || isDropdownEnabled()) {
+      addMouseListener();
+    }
+    else {
+      removeMouseListener();
+    }
+  }
+
+  protected void addMouseListener() {
+    if (m_mouseListener != null) {
+      return;
+    }
+    m_mouseListener = new MouseAdapter() {
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -52,7 +69,16 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
           handleSelectionInternal(event);
         }
       }
-    });
+    };
+    addMouseListener(m_mouseListener);
+  }
+
+  protected void removeMouseListener() {
+    if (m_mouseListener == null) {
+      return;
+    }
+    removeMouseListener(m_mouseListener);
+    m_mouseListener = null;
   }
 
   /**
@@ -70,7 +96,7 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
 
   protected void handleSelectionInternal(MouseEvent event) {
     Point pt = new Point(event.x, event.y);
-    if (m_buttonArea.contains(pt)) {
+    if (m_buttonArea.contains(pt) && isButtonEnabled()) {
       Event e = new Event();
       e.button = event.button;
       e.count = 1;
@@ -139,12 +165,8 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
-    if (!StringUtility.hasText(m_originalVariant)) {
-      m_originalVariant = (String) getData(RWT.CUSTOM_VARIANT);
-    }
-    String customVariant = m_dropdownEnabled ? m_originalVariant + "_menu" : m_originalVariant;
-    setData(RWT.CUSTOM_VARIANT, customVariant);
-    super.setEnabled(isButtonEnabled());
+    setCustomVariant();
+    addOrRemoveMouseListener();
   }
 
   @Override
@@ -155,7 +177,8 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   @Override
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
-    super.setEnabled(isButtonEnabled());
+    setCustomVariant();
+    addOrRemoveMouseListener();
   }
 
   @Override
@@ -168,6 +191,24 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     super.setEnabled(enabled);
     m_buttonEnabled = enabled;
     m_dropdownEnabled = enabled;
+  }
+
+  private void setCustomVariant() {
+    if (!StringUtility.hasText(m_originalVariant)) {
+      m_originalVariant = (String) getData(RWT.CUSTOM_VARIANT);
+    }
+    // valid combinations: smartfield_browse, smartfield_browse_disabled, smartfield_browse_menu, smartfield_browse_disabled_menu
+    // impossible combinations: smartfield_browse_menu_disabled, smartfield_browse_disabled_menu_disabled
+    if (m_originalVariant != null) {
+      String customVariant = m_originalVariant;
+      if (!m_buttonEnabled) {
+        customVariant += "_disabled";
+      }
+      if (m_dropdownEnabled) {
+        customVariant += "_menu";
+      }
+      setData(RWT.CUSTOM_VARIANT, customVariant);
+    }
   }
 
   @Override
