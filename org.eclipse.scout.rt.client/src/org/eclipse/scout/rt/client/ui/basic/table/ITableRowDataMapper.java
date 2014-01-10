@@ -14,14 +14,14 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 /**
- * Maps table rows form an {@link ITable} to an {@link AbstractTableRowData} and vice versa.
+ * Maps table rows from an {@link ITable} to an {@link AbstractTableRowData} and vice versa.
  * 
  * @since 3.10.0-M5
  */
 public interface ITableRowDataMapper {
 
   /**
-   * Writes the data form the given {@link AbstractTableRowData} to the given {@link ITableRow}.
+   * Writes the data from the given {@link AbstractTableRowData} to the given {@link ITableRow}.
    * 
    * @param row
    * @param rowData

@@ -31,11 +31,7 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 /**
- * Maps table rows form an {@link ITable} to a {@link AbstractTableRowData} and vice versa. This implementation uses
- * reflection for getting all properties of an {@link AbstractTableRowData} and maps them by name to
- * {@link IColumn#getColumnId()}. If there is no property for a particular {@link IColumn}, its value is stored to and
- * read from the custom column value map (i.e. {@link AbstractTableRowData#setCustomColumnValue(String, Object)} and
- * {@link AbstractTableRowData#getCustomColumnValue(String)}, respectively).
+ * Default implementation of {@link ITableRowDataMapper}.
  * 
  * @since 3.8.2
  */
@@ -132,12 +128,6 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     return s.substring(0, 1).toUpperCase() + s.substring(1);
   }
 
-  /**
-   * Writes the data form the given {@link AbstractTableRowData} to the given {@link ITableRow}.
-   * 
-   * @param row
-   * @param rowData
-   */
   @Override
   @SuppressWarnings("unchecked")
   public void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
@@ -163,12 +153,6 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     row.setStatus(rowData.getRowState());
   }
 
-  /**
-   * Writes the data from the given {@link ITableRow} to the given {@link AbstractTableRowData}.
-   * 
-   * @param row
-   * @param rowData
-   */
   @Override
   public void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
@@ -192,21 +176,11 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     rowData.setRowState(row.getStatus());
   }
 
-  /**
-   * Override to exclude certain rows from being exported.
-   * <p>
-   * As default every row is accepted.
-   */
   @Override
   public boolean acceptExport(ITableRow row) throws ProcessingException {
     return true;
   }
 
-  /**
-   * Override to exclude certain rows from being imported.
-   * <p>
-   * As default every row is accepted.
-   */
   @Override
   public boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException {
     return true;
