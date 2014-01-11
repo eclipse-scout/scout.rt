@@ -41,7 +41,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Order(300)
   @ValidationRule(ValidationRule.MIN_VALUE)
   protected BigDecimal getConfiguredMinValue() {
-    return DEFAULT_MIN_VALUE;
+    return AbstractBigDecimalField.DEFAULT_MIN_VALUE;
   }
 
   @Override
@@ -49,7 +49,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Order(310)
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigDecimal getConfiguredMaxValue() {
-    return DEFAULT_MAX_VALUE;
+    return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
   }
 
   /**

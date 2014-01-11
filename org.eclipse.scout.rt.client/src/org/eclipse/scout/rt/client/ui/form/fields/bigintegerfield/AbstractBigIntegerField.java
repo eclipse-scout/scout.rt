@@ -42,7 +42,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @ValidationRule(ValidationRule.MIN_VALUE)
   @Override
   protected BigInteger getConfiguredMinValue() {
-    return DEFAULT_MIN_VALUE;
+    return AbstractBigIntegerField.DEFAULT_MIN_VALUE;
   }
 
   @Override
@@ -50,7 +50,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @Order(260)
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected BigInteger getConfiguredMaxValue() {
-    return DEFAULT_MAX_VALUE;
+    return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
   }
 
   /**
