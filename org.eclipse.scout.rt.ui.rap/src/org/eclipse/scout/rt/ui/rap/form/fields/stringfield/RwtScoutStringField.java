@@ -204,11 +204,9 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   }
 
   protected void setDoInsertFromScout(String s) {
-    //XXX rap
-    /*
     if (s != null && s.length() > 0) {
       StyledText field = getUiField();
-      int offset = field.getCaretOffset();
+      int offset = field.getCaretPosition();
       int a = field.getSelection().x;
       int b = field.getSelection().y;
       String uiText = field.getText();
@@ -225,8 +223,11 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
       if (builder != null) {
         field.setText(builder.toString());
       }
+
+      // reset the cursor after the inserted text
+      field.setSelection(a + s.length());
     }
-    */
+
   }
 
   protected void setSelectionFromScout(int startIndex, int endIndex) {
