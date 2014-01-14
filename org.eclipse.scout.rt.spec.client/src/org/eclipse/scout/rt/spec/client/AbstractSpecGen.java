@@ -71,7 +71,7 @@ public class AbstractSpecGen {
     Properties prop = SpecIOUtility.loadProperties(properties);
     MediawikiLinkPostProcessor postproc = new MediawikiLinkPostProcessor(prop);
     postproc.replaceLinks(wiki, finalWiki);
-    new MediawikiAnchorCollector().storeAnchors(finalWiki, getFileConfig().getLinksFile());
+    new MediawikiAnchorCollector(finalWiki).storeAnchors(getFileConfig().getLinksFile());
 
     convertToHTML(id, finalWiki);
   }

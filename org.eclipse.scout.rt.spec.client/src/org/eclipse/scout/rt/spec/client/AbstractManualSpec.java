@@ -33,7 +33,7 @@ public abstract class AbstractManualSpec extends AbstractSpecGen {
       File destFile = new File(dest, file.getName());
       SpecIOUtility.copy(file, destFile);
       convertToHTML(destFile);
-      new MediawikiAnchorCollector().storeAnchors(destFile, getFileConfig().getLinksFile());
+      new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
     }
   }
 

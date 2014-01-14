@@ -24,11 +24,21 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.link.DocLink;
 
 /**
  *
  */
 public class MediawikiAnchorCollector {
+  private final File m_input;
+
+  private static final String LINK_START = "[[";
+  private static final String LINK_TARGET_END = "|";
+  private static final String LINK_END = "]]";
+
+  public MediawikiAnchorCollector(File input) {
+    m_input = input;
+  }
 
   /**
    * @param in
@@ -37,8 +47,8 @@ public class MediawikiAnchorCollector {
    *          the links Property file
    * @throws ProcessingException
    */
-  public void storeAnchors(File in, File out) throws ProcessingException {
-    Properties props = getAnchorProperties(in);
+  public void storeAnchors(File out) throws ProcessingException {
+    Properties props = getAnchorProperties();
     FileWriter writer = null;
     try {
       writer = new FileWriter(out, true);
@@ -60,12 +70,11 @@ public class MediawikiAnchorCollector {
    * Read all anchors {{XY}} in a file and creates properties of the form
    * XY=fileName#XY for them.
    **/
-  public Properties getAnchorProperties(File in) throws ProcessingException {
-    List<String> anchors = collectAnchors(in);
-    String name = in.getName();
+  public Properties getAnchorProperties() throws ProcessingException {
+    List<String> anchors = collectAnchors(m_input);
     Properties props = new Properties();
     for (String a : anchors) {
-      props.setProperty(a, name + "#" + a);
+      props.setProperty(a, m_input.getName() + "#" + a);
     }
     return props;
   }
@@ -120,20 +129,24 @@ public class MediawikiAnchorCollector {
   }
 
   public String replaceText(String s, Properties p) {
-    String start = "[[";
-    String end = "|";
 
     int startPos = 0;
     boolean finished = false;
 
     while (!finished) {
-      int firstPos = s.indexOf(start, startPos);
-      int lastPos = s.indexOf(end, firstPos);
-      if (firstPos > 0 && lastPos > 0 && firstPos > startPos) {
-        String tag = s.substring(firstPos + start.length(), lastPos);
-        String replacedTag = replace(tag, p);
-        s = s.substring(0, firstPos + start.length()) + replacedTag + s.substring(lastPos);
-        startPos = firstPos + start.length() + replacedTag.length();
+      int targetStartPos = s.indexOf(LINK_START, startPos);
+      int targetEndPos = s.indexOf(LINK_TARGET_END, targetStartPos);
+      int linkNameStartPos = targetEndPos + 1;
+      int linkNameEndPos = s.indexOf(LINK_END, targetEndPos);
+      if (isLinkFound(startPos, targetStartPos, targetEndPos, linkNameEndPos)) {
+        String targetId = s.substring(targetStartPos + LINK_START.length(), targetEndPos);
+        String displayName = s.substring(linkNameStartPos, linkNameEndPos);
+        DocLink link = new DocLink(targetId, displayName);
+        String textBeforeLink = s.substring(0, targetStartPos);
+        String textAfterLink = s.substring(linkNameEndPos + LINK_END.length());
+        String newLink = replace(link, p);
+        s = textBeforeLink + newLink + textAfterLink;
+        startPos = targetStartPos + LINK_START.length() + newLink.length();
       }
       else {
         finished = true;
@@ -142,14 +155,25 @@ public class MediawikiAnchorCollector {
     return s;
   }
 
-  private String replace(String tag, Properties p) {
+  private boolean isLinkFound(int startPos, int targetStartPos, int targetEndPos, int linkNameEndPos) {
+    return targetStartPos > 0 && targetEndPos > 0 && linkNameEndPos > 0 && targetStartPos > startPos;
+  }
+
+  private String replace(DocLink link, Properties p) {
+    String tag = link.getTargetId();
     if (p.containsKey(tag)) {
-      return (String) p.getProperty(tag);
+      DocLink newLink = new DocLink((String) p.getProperty(tag), link.getDisplayName());
+      return toWikiString(newLink);
     }
     if (!tag.startsWith("#") && !tag.startsWith("Image")) {
-      System.out.println("not found " + tag);
+      System.out.println(tag + " not found in file " + m_input.getName() + ", replacing with plain text: " + link.getDisplayName());
+      return link.getDisplayName();
     }
-    return tag;
+    return toWikiString(link);
+  }
+
+  private String toWikiString(DocLink link) {
+    return LINK_START + link.getTargetId() + LINK_TARGET_END + link.getDisplayName() + LINK_END;
   }
 
   /**

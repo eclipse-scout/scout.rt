@@ -16,11 +16,14 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Test for {@link IDocTextExtractor} for {@link org.eclipse.scout.rt.client.ui.form.IForm IForm}
  */
+//TODO jgu
+@Ignore
 public class FormExtractorTest {
 
   /**
