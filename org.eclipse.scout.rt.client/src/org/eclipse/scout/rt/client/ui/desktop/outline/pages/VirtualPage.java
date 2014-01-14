@@ -112,4 +112,9 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   public String classId() {
     return null;
   }
+
+  @Override
+  public <T> T getAdapter(Class<T> clazz) {
+    return null;
+  }
 }

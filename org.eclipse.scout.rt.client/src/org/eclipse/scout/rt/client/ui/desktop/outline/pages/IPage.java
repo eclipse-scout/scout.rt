@@ -127,4 +127,14 @@ public abstract interface IPage extends ITreeNode, ITypeWithClassId {
   void pageActivatedNotify();
 
   void pageDeactivatedNotify();
+
+  /**
+   * Adapter pattern. A page may contribute adapters when asked for a given adapter class. This way, functionality can
+   * be added to {@link IPage} without changing its lean interface
+   * 
+   * @param clazz
+   *          the adapter interface class, usually something like IXxxAdapter
+   * @return the contributed adapter instance or <code>null</code>
+   */
+  <T> T getAdapter(Class<T> clazz);
 }

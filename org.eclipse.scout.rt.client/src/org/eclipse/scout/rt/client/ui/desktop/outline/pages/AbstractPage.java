@@ -568,4 +568,9 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
   }
 
+  @Override
+  public <T> T getAdapter(Class<T> clazz) {
+    return null;
+  }
+
 }
