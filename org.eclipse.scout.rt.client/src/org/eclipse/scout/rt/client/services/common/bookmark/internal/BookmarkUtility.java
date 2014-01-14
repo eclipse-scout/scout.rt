@@ -31,6 +31,8 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.bookmark.DefaultBookmarkAdapter;
+import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkAdapter;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -113,7 +115,7 @@ public final class BookmarkUtility {
     return null;
   }
 
-  public static IPage resolvePage(IPage[] pages, String className, String userPreferenceContext) {
+  public static IPage resolvePage(IPage[] pages, String className, String bookmarkIdentifier) {
     if (className == null) {
       return null;
     }
@@ -129,7 +131,8 @@ public final class BookmarkUtility {
       else if (p.getClass().getSimpleName().equalsIgnoreCase(simpleClassName)) {
         classNameScore = -1;
       }
-      if (userPreferenceContext == null || userPreferenceContext.equalsIgnoreCase(p.getUserPreferenceContext())) {
+      IBookmarkAdapter bookmarkAdapter = getBookmarkAdapter(p);
+      if (bookmarkIdentifier == null || bookmarkIdentifier.equalsIgnoreCase(bookmarkAdapter.getIdentifier())) {
         userPreferenceContextScore = -1;
       }
       if (classNameScore != 0 && userPreferenceContextScore != 0) {
@@ -146,7 +149,7 @@ public final class BookmarkUtility {
       // check ambiguity
       CompositeObject nextKey = sortMap.firstKey();
       if (CompareUtility.equals(bestMatchingKey.getComponent(0), nextKey.getComponent(0)) && CompareUtility.equals(bestMatchingKey.getComponent(1), nextKey.getComponent(1))) {
-        LOG.warn("More than one pages found for page class [" + className + "] and user preference context [" + userPreferenceContext + "]");
+        LOG.warn("More than one pages found for page class [" + className + "] and bookmark Identifier [" + bookmarkIdentifier + "]");
       }
     }
     return bestMatchingPage;
@@ -455,6 +458,14 @@ public final class BookmarkUtility {
     }
   }
 
+  public static IBookmarkAdapter getBookmarkAdapter(IPage page) {
+    IBookmarkAdapter bookmarkAdapter = page.getAdapter(IBookmarkAdapter.class);
+    if (bookmarkAdapter != null) {
+      return bookmarkAdapter;
+    }
+    return new DefaultBookmarkAdapter(page);
+  }
+
   public static Bookmark createBookmark(IDesktop desktop) throws ProcessingException {
     IOutline outline = desktop.getOutline();
     if (outline == null) {
@@ -469,25 +480,27 @@ public final class BookmarkUtility {
     if (page == null || page.getOutline() == null) {
       return null;
     }
+    IBookmarkAdapter bookmarkAdapter = getBookmarkAdapter(page);
 
     IOutline outline = page.getOutline();
     Bookmark b = new Bookmark();
-    b.setIconId(page.getCell().getIconId());
+    b.setIconId(bookmarkAdapter.getIconId());
     // outline
-    b.setOutlineClassName(outline.getClass().getName());
+    b.setOutlineClassName(bookmarkAdapter.getOutlineClassName());
     ArrayList<IPage> path = new ArrayList<IPage>();
     ArrayList<String> titleSegments = new ArrayList<String>();
     while (page != null) {
+      IBookmarkAdapter currentBookmarkAdapter = getBookmarkAdapter(page);
       path.add(0, page);
-      String s = page.getCell().getText();
+      String s = currentBookmarkAdapter.getTitle();
       if (s != null) {
         titleSegments.add(0, s);
       }
       // next
       page = (IPage) page.getParentNode();
     }
-    if (outline.getTitle() != null) {
-      titleSegments.add(0, outline.getTitle());
+    if (bookmarkAdapter.getOutlineTitle() != null) {
+      titleSegments.add(0, bookmarkAdapter.getOutlineTitle());
     }
     // title
     int len = 0;
@@ -523,8 +536,9 @@ public final class BookmarkUtility {
     String prefix = "";
     for (int i = 0; i < path.size(); i++) {
       page = path.get(i);
+      IBookmarkAdapter currentBookmarkAdapter = getBookmarkAdapter(page);
       if (i > 0 || outline.isRootNodeVisible()) {
-        text.append(prefix + page.getCell().getText());
+        text.append(prefix + currentBookmarkAdapter.getText());
         text.append("\n");
         if (page instanceof IPageWithTable) {
           IPageWithTable tablePage = (IPageWithTable) page;
@@ -736,8 +750,9 @@ public final class BookmarkUtility {
     ITable table = page.getTable();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());
-    state.setBookmarkIdentifier(page.getUserPreferenceContext());
-    state.setLabel(page.getCell().getText());
+    IBookmarkAdapter bookmarkAdapter = getBookmarkAdapter(page);
+    state.setBookmarkIdentifier(bookmarkAdapter.getIdentifier());
+    state.setLabel(bookmarkAdapter.getText());
     state.setExpanded(page.isExpanded());
     IForm searchForm = page.getSearchFormInternal();
     if (searchForm != null) {
@@ -771,8 +786,9 @@ public final class BookmarkUtility {
   private static NodePageState bmStoreNodePage(IPageWithNodes page) throws ProcessingException {
     NodePageState state = new NodePageState();
     state.setPageClassName(page.getClass().getName());
-    state.setBookmarkIdentifier(page.getUserPreferenceContext());
-    state.setLabel(page.getCell().getText());
+    IBookmarkAdapter bookmarkAdapter = getBookmarkAdapter(page);
+    state.setBookmarkIdentifier(bookmarkAdapter.getIdentifier());
+    state.setLabel(bookmarkAdapter.getText());
     state.setExpanded(page.isExpanded());
     return state;
   }
