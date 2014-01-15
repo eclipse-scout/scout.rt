@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.wikitext.core,
  org.eclipse.mylyn.wikitext.mediawiki.core,
  org.eclipse.scout.rt.extension.client,
- org.eclipse.scout.commons
+ org.eclipse.scout.commons,
+ org.eclipse.scout.rt.testing.shared
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

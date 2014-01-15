@@ -53,6 +53,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGen {
 
     IDocSection doc = generate(form);
     write(doc, getId(form), getImagePaths(form));
+    form.doClose();
   }
 
   /**

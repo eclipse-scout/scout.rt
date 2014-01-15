@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +28,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -226,6 +231,60 @@ public final class SpecIOUtility {
         }
       }
     }
+  }
+
+  public static void replaceAll(File in, Map<String, String> m) throws ProcessingException {
+    FileReader reader = null;
+    FileWriter writer = null;
+    BufferedReader br = null;
+    File temp = new File(in.getParent(), in.getName() + "_temp");
+
+    try {
+      reader = new FileReader(in);
+      writer = new FileWriter(temp);
+      br = new BufferedReader(reader);
+
+      String line;
+      while ((line = br.readLine()) != null) {
+        String repl = replaceAll(line, m);
+        writer.write(repl);
+        writer.write(System.getProperty("line.separator"));
+      }
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    finally {
+      try {
+        if (br != null) {
+          br.close();
+        }
+      }
+      catch (IOException e) {
+        // NOP
+      }
+
+      try {
+        if (writer != null) {
+          writer.close();
+        }
+      }
+      catch (IOException e) {
+        // NOP
+      }
+    }
+    SpecIOUtility.copy(temp, in);
+    temp.delete();
+  }
+
+  private static String replaceAll(String s, Map<String, String> m) {
+    for (Entry<String, String> e : m.entrySet()) {
+      s = s.replaceAll(e.getKey(), e.getValue());
+    }
+    return s;
   }
 
 }
