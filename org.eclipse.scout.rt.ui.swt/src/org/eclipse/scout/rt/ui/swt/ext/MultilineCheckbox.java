@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * A CheckBox whose label supports multiline. See {@link MultilineButton} for more information
@@ -35,8 +37,15 @@ public class MultilineCheckbox extends MultilineButton {
     @Override
     public void mouseUp(MouseEvent e) {
       if (leftMouseButtonClicked(e)) {
-        m_btn.setFocus();
         m_btn.setSelection(!m_btn.getSelection());
+        m_btn.setFocus();
+        Event event = new Event();
+        event.widget = m_btn;
+        event.type = SWT.Selection;
+
+        for (Listener l : getListeners(SWT.Selection)) {
+          l.handleEvent(event);
+        }
       }
     }
 
