@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.spec.client.config.entity.DefaultMenuListConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultSmartFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultTableFieldConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultTablePageConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.DefaultTypesConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 
@@ -66,6 +67,11 @@ public class DefaultDocConfig implements IDocConfig {
   @Override
   public IDocEntityConfig<IPageWithTable<? extends ITable>> getTablePageConfig() {
     return new DefaultTablePageConfig();
+  }
+
+  @Override
+  public IDocEntityListConfig<Class> getTypesConfig() {
+    return new DefaultTypesConfig();
   }
 
 }

@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  *
@@ -31,6 +31,7 @@ public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEnti
    */
   @Override
   public List<IDocFilter<T>> getFilters() {
+    // TODO ASA rename
     List<IDocFilter<T>> columnFilters = new ArrayList<IDocFilter<T>>();
     columnFilters.add(new DefaultDocFilter<T>());
     return columnFilters;

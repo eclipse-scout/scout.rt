@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -78,6 +79,7 @@ import org.eclipse.scout.service.SERVICES;
  * 
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
+@ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
 public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 

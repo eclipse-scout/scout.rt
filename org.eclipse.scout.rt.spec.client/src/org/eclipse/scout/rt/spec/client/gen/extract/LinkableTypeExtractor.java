@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -59,12 +60,26 @@ public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> impl
     List<String> clazzes = new ArrayList<String>();
     while (c != null) {
       if (!ignoreList.contains(c)) {
-        DocLink link = new DocLink(c.getName(), c.getSimpleName());
+        DocLink link = new DocLink(c.getName(), getDisplayName(c));
         clazzes.add(link.toXML());
       }
       c = c.getSuperclass();
     }
     return clazzes;
+  }
+
+  private String getDisplayName(Class<?> c) {
+    StringBuilder specType = new StringBuilder(c.getSimpleName());
+    while (c != null) {
+      String name = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(c) + "_name");
+      // TODO ASA fix this hack: name.contains("{undefined text")
+      if (!name.contains("{undefined text")) {
+        specType.append(" (").append(name).append(")");
+        break;
+      }
+      c = c.getSuperclass();
+    }
+    return specType.toString();
   }
 
 }

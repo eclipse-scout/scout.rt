@@ -14,6 +14,7 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
+@ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
 public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
