@@ -77,6 +77,12 @@ public class OrganizeColumnsForm extends AbstractForm {
   }
 
   @Override
+  protected void initConfig() throws ProcessingException {
+    super.initConfig();
+    getRootGroupBox().setScrollable(true);
+  }
+
+  @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("OrganizeTableColumnsTitle");
   }
