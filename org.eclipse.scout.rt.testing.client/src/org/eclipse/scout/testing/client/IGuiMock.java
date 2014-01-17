@@ -39,6 +39,7 @@ public interface IGuiMock {
     Alt,
     Delete,
     Backspace,
+    Space,
     Enter,
     Esc,
     Tab,
@@ -228,10 +229,22 @@ public interface IGuiMock {
 
   void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX);
 
+  /**
+   * Press the key specified by the parameter <code>key</code>. Note, the key will not be released until
+   * {@link IGuiMock#releaseKey(Key)} is called.
+   * <p>
+   * The method {@link IGuiMock#typeKey(Key)} is a convenience method that presses and releases the specified key.
+   */
   void pressKey(Key key);
 
+  /**
+   * Releases the specified key
+   */
   void releaseKey(Key key);
 
+  /**
+   * Convenience method that presses and releases the specified key.
+   */
   void typeKey(Key key);
 
   void typeText(final String text);

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.radiobuttongroup.layout.RadioButtonGroupLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -38,19 +38,19 @@ import org.eclipse.swt.widgets.Listener;
 public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadioButtonGroup<?>> implements ISwtScoutRadioButtonGroup {
 
   private P_SwtButtonListener m_swtButtonListener = new P_SwtButtonListener();
-  private ArrayList<Button> m_swtRadioButtons = new ArrayList<Button>();
+  private ArrayList<MultilineRadioButton> m_swtRadioButtons = new ArrayList<MultilineRadioButton>();
 
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    Composite buttonArea = new P_RadioButtonComposite(container);// getEnvironment().getFormToolkit().createComposite(container);
+    Composite buttonArea = new P_RadioButtonComposite(container);
     getEnvironment().getFormToolkit().adapt(buttonArea);
     for (IFormField scoutField : getScoutObject().getFields()) {
       ISwtScoutFormField swtField = getEnvironment().createFormField(buttonArea, scoutField);
-      if (swtField.getSwtField() instanceof Button) {
-        Button swtButton = (Button) swtField.getSwtField();
+      if (swtField.getSwtField() instanceof MultilineRadioButton) {
+        MultilineRadioButton swtButton = (MultilineRadioButton) swtField.getSwtField();
         swtButton.addListener(SWT.Selection, m_swtButtonListener);
         swtButton.addListener(SWT.KeyDown, m_swtButtonListener);
         m_swtRadioButtons.add(swtButton);
@@ -96,7 +96,7 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
         c = initCol;
       }
       fld.setBackground(c);
-      for (Button b : m_swtRadioButtons) {
+      for (MultilineRadioButton b : m_swtRadioButtons) {
         b.setBackground(c);
       }
     }
@@ -107,8 +107,10 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Selection:
-          Button button = (Button) event.widget;
-          handleSelectionChanged(button);
+          if (event.widget instanceof MultilineRadioButton) {
+            MultilineRadioButton button = (MultilineRadioButton) event.widget;
+            handleSelectionChanged(button);
+          }
           break;
         case SWT.KeyDown:
           handleKeyDown(event);
@@ -116,32 +118,90 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
       }
     }
 
-    private void handleSelectionChanged(Button selectedButton) {
+    private void handleSelectionChanged(MultilineRadioButton selectedButton) {
       getSwtField().setTabList(new Control[]{selectedButton.getParent()});
     }
 
     private void handleKeyDown(Event event) {
       int index = m_swtRadioButtons.indexOf(event.widget);
+      if (index < 0) {
+        return;
+      }
       switch (event.keyCode) {
         case SWT.ARROW_DOWN:
         case SWT.ARROW_RIGHT:
-          index++;
+          selectNextPossibleRadioButton(index);
           break;
         case SWT.ARROW_UP:
         case SWT.ARROW_LEFT:
-          // ensure not -1
-          index = index + m_swtRadioButtons.size() - 1;
+          selectPreviousPossibleRadioButton(index);
           break;
         case SWT.HOME:
-          index = 0;
+          selectFirstPossibleRadioButton();
           break;
         case SWT.END:
-          index = m_swtRadioButtons.size() - 1;
+          selectLastPossibleRadioButton();
           break;
       }
-      index = index % m_swtRadioButtons.size();
-      m_swtRadioButtons.get(index).setFocus();
     }
+
+    /**
+     * Selects the next possible RadioButton based on the current index.
+     * 
+     * @since 3.10.0-M5
+     */
+    protected void selectNextPossibleRadioButton(int currentIndex) {
+      for (int i = 1; i < m_swtRadioButtons.size(); i++) {
+        int nextIndex = (currentIndex + i) % m_swtRadioButtons.size();
+        if (m_swtRadioButtons.get(nextIndex).setFocus()) {
+          return; //success
+        }
+      }
+    }
+
+    /**
+     * Selects the previous possible RadioButton based on the current index.
+     * 
+     * @since 3.10.0-M5
+     */
+    protected void selectPreviousPossibleRadioButton(int currentIndex) {
+      for (int i = 1; i < m_swtRadioButtons.size(); i++) {
+        int nextIndex = (currentIndex - i) % m_swtRadioButtons.size();
+        if (nextIndex < 0) {
+          nextIndex += m_swtRadioButtons.size();
+        }
+        if (m_swtRadioButtons.get(nextIndex).setFocus()) {
+          return; //success
+        }
+      }
+    }
+
+    /**
+     * Selects the first possible RadioButton
+     * 
+     * @since 3.10.0-M5
+     */
+    protected void selectLastPossibleRadioButton() {
+      for (int i = m_swtRadioButtons.size() - 1; i >= 0; i--) {
+        if (m_swtRadioButtons.get(i).setFocus()) {
+          return; //success
+        }
+      }
+    }
+
+    /**
+     * Selects the last possible RadioButton
+     * 
+     * @since 3.10.0-M5
+     */
+    protected void selectFirstPossibleRadioButton() {
+      for (MultilineRadioButton radioButton : m_swtRadioButtons) {
+        if (radioButton.setFocus()) {
+          return; //success
+        }
+      }
+    }
+
   } // end class P_SwtButtonKeyListener
 
   private class P_RadioButtonComposite extends Composite {
@@ -156,7 +216,7 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
 
     @Override
     public boolean setFocus() {
-      for (Button b : m_swtRadioButtons) {
+      for (MultilineRadioButton b : m_swtRadioButtons) {
         if (b.getSelection()) {
           return b.getParent().setFocus();
         }

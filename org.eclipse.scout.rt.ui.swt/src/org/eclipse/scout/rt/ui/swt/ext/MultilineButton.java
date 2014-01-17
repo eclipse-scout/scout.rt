@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -92,8 +93,8 @@ public abstract class MultilineButton extends Composite {
   @Override
   public void addListener(int eventType, Listener listener) {
     super.addListener(eventType, listener);
-    m_btn.addListener(eventType, listener);
-    m_label.addListener(eventType, listener);
+    m_btn.addListener(eventType, new P_ProxyListener(listener));
+    m_label.addListener(eventType, new P_ProxyListener(listener));
   }
 
   @Override
@@ -112,5 +113,45 @@ public abstract class MultilineButton extends Composite {
 
   public void setImage(Image icon) {
     m_btn.setImage(icon);
+  }
+
+  public Label getLabel() {
+    return m_label;
+  }
+
+  public ButtonEx getButton() {
+    return m_btn;
+  }
+
+  @Override
+  public boolean setFocus() {
+    return m_btn.setFocus();
+  }
+
+  @Override
+  public boolean isFocusControl() {
+    return m_btn.isFocusControl();
+  }
+
+  /**
+   * The purpose of this class is to change the event's widget to {@link MultilineButton}.
+   * If someone adds a listener to the MultilineButton, the listener is also attached
+   * to the Button and Label. If then an event is triggered by the Button for example (SWT.Selection),
+   * e.widget would be of type Button. For classes using the MultilineButton however, it should look like
+   * the event's widget is the MultilineButton itself, and not one of its inner elements.
+   */
+  class P_ProxyListener implements Listener {
+
+    private Listener m_originalListener;
+
+    public P_ProxyListener(Listener listener) {
+      this.m_originalListener = listener;
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+      event.widget = MultilineButton.this;
+      m_originalListener.handleEvent(event);
+    }
   }
 }

@@ -127,7 +127,7 @@ Button-FocusIndicator[CHECK] {
 
   background-color: transparent;
   border: 1px dotted #b0cce3;
-  margin: 3px;
+  margin: 1px 0px 1px 0px;
   padding: 0px;
   opacity: 1;
 }
@@ -141,7 +141,7 @@ Button-FocusIndicator[RADIO] {
 
   background-color: transparent;
   border: 1px dotted #b0cce3;
-  margin: 3px;
+  margin: 1px 0px 1px 0px;
   padding: 0px;
   opacity: 1;
 }

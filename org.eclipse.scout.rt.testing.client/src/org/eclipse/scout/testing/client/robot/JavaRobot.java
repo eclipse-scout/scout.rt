@@ -172,6 +172,8 @@ public class JavaRobot {
         return KeyEvent.VK_DELETE;
       case Backspace:
         return KeyEvent.VK_BACK_SPACE;
+      case Space:
+        return KeyEvent.VK_SPACE;
       case Enter:
         return KeyEvent.VK_ENTER;
       case Esc:
