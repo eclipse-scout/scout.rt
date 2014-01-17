@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.TrayItem;
 public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtScoutTray {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTray.class);
 
-  private TrayItem m_trayIcon;
+  private TrayItem m_trayItem;
   private Menu m_popupMenu;
 
   public SwtScoutTray() {
@@ -43,11 +43,9 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
   @Override
   protected void initializeSwt(Composite parent) {
     super.initializeSwt(parent);
-    Tray tray = getEnvironment().getDisplay().getSystemTray();
-    if (tray != null) {
-      m_trayIcon = new TrayItem(tray, SWT.NONE);
-      m_trayIcon.setImage(Activator.getIcon(SwtIcons.Window));
-      m_trayIcon.addMenuDetectListener(new MenuDetectListener() {
+    m_trayItem = createTrayItem();
+    if (m_trayItem != null) {
+      m_trayItem.addMenuDetectListener(new MenuDetectListener() {
         @Override
         public void menuDetected(MenuDetectEvent e) {
           if (m_popupMenu != null) {
@@ -56,10 +54,29 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
         }
       });
       //
-      Shell shell = new Shell(getEnvironment().getDisplay());
-      m_popupMenu = new Menu(shell, SWT.POP_UP);
+      m_popupMenu = createPopupMenu();
       updatePopupMenus();
     }
+  }
+
+  protected TrayItem createTrayItem() {
+    Tray tray = getEnvironment().getDisplay().getSystemTray();
+    if (tray != null) {
+      TrayItem trayItem = new TrayItem(tray, SWT.NONE);
+      trayItem.setImage(Activator.getIcon(SwtIcons.Window));
+      return trayItem;
+    }
+    return null;
+  }
+
+  protected Menu createPopupMenu() {
+    Shell shell = new Shell(getEnvironment().getDisplay());
+    return new Menu(shell, SWT.POP_UP);
+  }
+
+  @Override
+  public boolean isDisposed() {
+    return m_trayItem == null || m_trayItem.isDisposed();
   }
 
   protected void updatePopupMenus() {
@@ -97,7 +114,33 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
 
   @Override
   public TrayItem getSwtTrayItem() {
-    return m_trayIcon;
+    return m_trayItem;
   }
 
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    IDesktop desktop = getScoutObject();
+    setTooltipFromScout(desktop.getTitle());
+  }
+
+  /*
+   * properties
+   */
+  protected void setTooltipFromScout(String tooltip) {
+    if (m_trayItem != null) {
+      m_trayItem.setToolTipText(tooltip);
+    }
+  }
+
+  /*
+   * extended property observer
+   */
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (IDesktop.PROP_TITLE.equals(name)) {
+      setTooltipFromScout((String) newValue);
+    }
+  }
 }
