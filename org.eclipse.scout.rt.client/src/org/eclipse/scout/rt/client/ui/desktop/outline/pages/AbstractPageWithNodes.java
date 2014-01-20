@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
-import org.eclipse.scout.rt.shared.ContextMap;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -57,7 +56,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     this(callInitializer, null, null);
   }
 
-  public AbstractPageWithNodes(ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPageWithNodes()} in combination with getter and setter on the page
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPageWithNodes(org.eclipse.scout.rt.shared.ContextMap contextMap) {
     this(true, contextMap, null);
   }
 
@@ -69,7 +75,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     this(callInitializer, null, userPreferenceContext);
   }
 
-  public AbstractPageWithNodes(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPageWithNodes(boolean, String)} in combination with getter and setter on the page
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPageWithNodes(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(callInitializer, contextMap, userPreferenceContext);
   }
 

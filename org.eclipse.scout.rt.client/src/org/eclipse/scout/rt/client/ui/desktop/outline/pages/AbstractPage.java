@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.ContextMap;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -42,7 +41,8 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPage.class);
 
   private IForm m_detailForm;
-  private final ContextMap m_contextMap;
+  @SuppressWarnings("deprecation")
+  private final org.eclipse.scout.rt.shared.ContextMap m_contextMap;
   private boolean m_tableVisible;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
@@ -84,7 +84,13 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     this(callInitializer, null, null);
   }
 
-  public AbstractPage(ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPage()} in combination with getter and setter (page variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPage(org.eclipse.scout.rt.shared.ContextMap contextMap) {
     this(true, contextMap, null);
   }
 
@@ -92,11 +98,24 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     this(callInitializer, null, userPreferenceContext);
   }
 
-  public AbstractPage(boolean callInitializer, ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPage(boolean)} in combination with getter and setter (page variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
     this(callInitializer, contextMap, null);
   }
 
-  public AbstractPage(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPage(boolean, String)} in combination with getter and setter (page variable)
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(false);
     m_contextMap = contextMap;
     m_userPreferenceContext = userPreferenceContext;
@@ -297,7 +316,13 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   protected void execPageDeactivated() throws ProcessingException {
   }
 
-  protected ContextMap getContextMap() {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             getter and setter (page variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  protected org.eclipse.scout.rt.shared.ContextMap getContextMap() {
     return m_contextMap;
   }
 

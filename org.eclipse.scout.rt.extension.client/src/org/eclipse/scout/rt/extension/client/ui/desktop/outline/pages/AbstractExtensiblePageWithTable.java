@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
-import org.eclipse.scout.rt.shared.ContextMap;
 
 /**
  * Page with table implementation supporting the following Scout extension features:
@@ -36,7 +35,14 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
     super(callInitializer);
   }
 
-  public AbstractExtensiblePageWithTable(ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractExtensiblePageWithTable()} in combination with getter and setter (page variable)
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractExtensiblePageWithTable(org.eclipse.scout.rt.shared.ContextMap contextMap) {
     super(contextMap);
   }
 
@@ -44,7 +50,14 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
     super(userPreferenceContext);
   }
 
-  public AbstractExtensiblePageWithTable(boolean callInitializer, ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractExtensiblePageWithTable(boolean)} in combination with getter and setter (page
+   *             variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractExtensiblePageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
     super(callInitializer, contextMap);
   }
 
@@ -52,7 +65,15 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
     super(callInitializer, userPreferenceContext);
   }
 
-  public AbstractExtensiblePageWithTable(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractExtensiblePageWithTable(boolean, String)} in combination with getter and setter
+   *             (page
+   *             variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractExtensiblePageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(callInitializer, contextMap, userPreferenceContext);
   }
 

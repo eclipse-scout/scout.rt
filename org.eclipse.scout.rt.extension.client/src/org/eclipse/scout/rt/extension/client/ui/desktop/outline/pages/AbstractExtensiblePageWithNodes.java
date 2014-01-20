@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNode
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility;
-import org.eclipse.scout.rt.shared.ContextMap;
 
 /**
  * Page with nodes supporting the following Scout extension features:
@@ -40,7 +39,14 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
     super(callInitializer);
   }
 
-  public AbstractExtensiblePageWithNodes(ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractExtensiblePageWithNodes()} in combination with getter and setter (page variable)
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractExtensiblePageWithNodes(org.eclipse.scout.rt.shared.ContextMap contextMap) {
     super(contextMap);
   }
 
@@ -52,7 +58,15 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
     super(callInitializer, userPreferenceContext);
   }
 
-  public AbstractExtensiblePageWithNodes(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractExtensiblePageWithNodes(boolean, String)} in combination with getter and setter
+   *             (page
+   *             variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractExtensiblePageWithNodes(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(callInitializer, contextMap, userPreferenceContext);
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,12 @@ import org.eclipse.scout.commons.StringUtility;
 
 /**
  * @since 11.06.2008
+ * @deprecated Will be removed with Bug 426088.
+ *             This untyped Map should not be used.
+ *             If used in a Page, consider using getter and setter directly instead.
+ *             If used somewhere else, you should use your own {@link java.util.Map<K, V>}
  */
+@Deprecated
 public class ContextMap extends TreeMap<String, Object> {
   private static final long serialVersionUID = 1L;
 

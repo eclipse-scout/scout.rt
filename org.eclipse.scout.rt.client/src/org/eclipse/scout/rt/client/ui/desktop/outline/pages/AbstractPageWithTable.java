@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.ContextMap;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
@@ -88,7 +87,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     this(callInitializer, null, null);
   }
 
-  public AbstractPageWithTable(ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPageWithTable()} in combination with getter and setter (page variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPageWithTable(org.eclipse.scout.rt.shared.ContextMap contextMap) {
     this(true, contextMap, null);
   }
 
@@ -96,7 +101,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     this(true, null, userPreferenceContext);
   }
 
-  public AbstractPageWithTable(boolean callInitializer, ContextMap contextMap) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPageWithTable(boolean)} in combination with getter and setter (page variable)
+   *             instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
     this(callInitializer, contextMap, null);
   }
 
@@ -104,7 +116,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     this(callInitializer, null, userPreferenceContext);
   }
 
-  public AbstractPageWithTable(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+  /**
+   * @deprecated Will be removed with Bug 426088.
+   *             Use {@link #AbstractPageWithTable(boolean, String)} in combination with getter and setter (page
+   *             variable) instead.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public AbstractPageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(callInitializer, contextMap, userPreferenceContext);
     if (!callInitializer) {
       callMinimalInitializer();
