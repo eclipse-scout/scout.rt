@@ -88,11 +88,6 @@ public class MediawikiAnchorCollectorTest {
     }
   }
 
-//  @Test
-//  public void testFindNextLink(){
-//    String
-//  }
-
   @Test
   public void testReplaceAnchor() {
     String testString = "==[[CC:Einleitung|Introduction]]==";

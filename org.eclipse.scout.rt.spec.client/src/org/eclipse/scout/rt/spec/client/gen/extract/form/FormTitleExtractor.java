@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts the title texts for a {@link IForm}
@@ -29,7 +30,7 @@ public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
    */
   @Override
   public String getText(IForm form) {
-    return form.getTitle() + "{{" + form.getClass().getSimpleName() + "}}";
+    return MediawikiUtility.transformToWiki(form.getTitle()) + "{{" + form.getClass().getSimpleName() + "}}";
   }
 
 }

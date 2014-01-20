@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.form.page;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  *
@@ -27,6 +27,6 @@ public class TablePageExtractor<T extends IPageWithTable<? extends ITable>> exte
 
   @Override
   public String getText(T field) {
-    return StringUtility.nvl(field.getCell().getText(), "");
+    return MediawikiUtility.transformToWiki(field.getCell().getText());
   }
 }

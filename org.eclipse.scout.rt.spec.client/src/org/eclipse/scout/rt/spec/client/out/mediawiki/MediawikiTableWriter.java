@@ -118,8 +118,7 @@ public class MediawikiTableWriter {
   }
 
   private String getEscapedText(String text) {
-    String nonEmptyText = StringUtility.isNullOrEmpty(text) ? EMPTY_CELL_TEXT : text;
-    return nonEmptyText.replace("[", "<nowiki>[</nowiki>").replace("]", "<nowiki>]</nowiki>");
+    return StringUtility.isNullOrEmpty(text) ? EMPTY_CELL_TEXT : text;
   }
 
   private void appendTableHeaders(String[] headerTexts) throws IOException {

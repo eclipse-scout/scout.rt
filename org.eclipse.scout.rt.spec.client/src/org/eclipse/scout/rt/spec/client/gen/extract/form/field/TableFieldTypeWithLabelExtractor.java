@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.field;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts a text containing the simple class name and label. E.g. "MyCompanyTableField (Companies)"
@@ -25,7 +26,7 @@ public class TableFieldTypeWithLabelExtractor<T extends IFormField> extends Abst
 
   @Override
   public String getText(T field) {
-    String label = field.getLabel() == null ? "" : " (" + field.getLabel() + ")";
+    String label = field.getLabel() == null ? "" : " (" + MediawikiUtility.transformToWiki(field.getLabel()) + ")";
     return field.getClass().getSimpleName() + label;
   }
 }

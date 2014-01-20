@@ -28,6 +28,7 @@ public class SpecFileConfig {
   private static final String SPEC_OUT_DIR_NAME = "target" + File.separator + "spec";
   private static final String SPEC_IN_DIR_NAME = "resources" + File.separator + "spec";
 
+  private static final String IMAGES_DIR_NAME = "images";
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
   private static final String LINKS_FILE_NAME = "links.properties";
 
@@ -75,7 +76,17 @@ public class SpecFileConfig {
    * @throws ProcessingException
    */
   public File getImageDir() throws ProcessingException {
-    return new File(getSpecDir(), "images");
+    return new File(getSpecDir(), IMAGES_DIR_NAME);
+  }
+
+  /**
+   * Location of referenced images
+   * 
+   * @return image directory
+   * @throws ProcessingException
+   */
+  public File getImageInDir() throws ProcessingException {
+    return new File(getSpecInDir(), IMAGES_DIR_NAME);
   }
 
   /**

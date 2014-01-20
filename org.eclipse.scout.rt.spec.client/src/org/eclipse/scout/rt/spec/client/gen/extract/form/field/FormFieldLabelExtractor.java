@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts the label of a field
@@ -47,7 +48,8 @@ public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormFie
         sb.append(" ");
       }
     }
-    sb.append(StringUtility.substituteWhenEmpty(field.getProperty(IFormField.PROP_LABEL), "''" + TEXTS.get("org.eclipse.scout.rt.spec.action.withoutLabel") + "''"));
+    Object labelProperty = MediawikiUtility.transformToWiki((String) field.getProperty(IFormField.PROP_LABEL));
+    sb.append(StringUtility.substituteWhenEmpty(labelProperty, "''" + TEXTS.get("org.eclipse.scout.rt.spec.action.withoutLabel") + "''"));
     return sb.toString();
   }
 

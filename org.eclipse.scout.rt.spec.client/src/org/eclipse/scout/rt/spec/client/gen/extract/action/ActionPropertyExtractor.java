@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts the value of a property
@@ -37,7 +37,7 @@ public class ActionPropertyExtractor<T extends IAction> extends AbstractNamedTex
    */
   @Override
   public String getText(T object) {
-    return StringUtility.nvl(object.getProperty(m_propertyName), "");
+    return MediawikiUtility.transformToWiki(object.getProperty(m_propertyName));
   }
 
 }

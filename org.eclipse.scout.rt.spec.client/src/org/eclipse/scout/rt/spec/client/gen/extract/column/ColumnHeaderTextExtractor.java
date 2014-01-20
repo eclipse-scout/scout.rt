@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts the text of the {@link IHeaderCell} of the {@link IColumn}.
@@ -34,7 +35,7 @@ public class ColumnHeaderTextExtractor extends AbstractNamedTextExtractor<IColum
   public String getText(IColumn<?> column) {
     IHeaderCell headerCell = column.getHeaderCell();
     if (headerCell != null) {
-      return headerCell.getText();
+      return MediawikiUtility.transformToWiki(headerCell.getText());
     }
     return "";
   }

@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  * Extracts the value of a property
@@ -37,7 +38,7 @@ public class FormFieldPropertyExtractor extends AbstractNamedTextExtractor<IForm
    */
   @Override
   public String getText(IFormField field) {
-    return StringUtility.nvl(field.getProperty(m_propertyName), "");
+    return StringUtility.nvl(MediawikiUtility.transformToWiki(field.getProperty(m_propertyName)), "");
   }
 
 }

@@ -25,6 +25,12 @@ public abstract class AbstractManualSpec extends AbstractSpecGen {
     super(pluginName);
   }
 
+  protected void copyImages() throws ProcessingException {
+    File source = getFileConfig().getImageInDir();
+    File dest = getFileConfig().getImageDir();
+    SpecIOUtility.copyAll(source, dest, getFilter());
+  }
+
   protected void copyMediawikiFiles() throws ProcessingException {
     File source = getFileConfig().getMediawikiInDir();
     File dest = getFileConfig().getMediawikiDir();
