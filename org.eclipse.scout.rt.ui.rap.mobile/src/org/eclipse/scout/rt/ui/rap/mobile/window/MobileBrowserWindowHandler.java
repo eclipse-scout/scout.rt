@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.mobile.window;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.UrlTarget;
 import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 
 /**
@@ -19,18 +21,17 @@ import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 public class MobileBrowserWindowHandler extends BrowserWindowHandler {
 
   @Override
-  public void openLink(String link) {
+  protected IUrlTarget computeTargetAuto(String link) {
     if (link == null) {
-      return;
+      return super.computeTargetAuto(link);
     }
 
     if (isMapsLink(link)) {
       //Open the link in the same browser window to open the maps app. Otherwise the popup gets blocked without notice.
-      openLinkInSameBrowserWindow(link);
+      return UrlTarget.SELF;
     }
-    else {
-      super.openLink(link);
-    }
+
+    return super.computeTargetAuto(link);
   }
 
   public boolean isMapsLink(String link) {

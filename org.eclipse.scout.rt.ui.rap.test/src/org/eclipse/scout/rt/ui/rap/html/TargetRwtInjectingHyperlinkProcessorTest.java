@@ -17,15 +17,16 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class HtmlAdapterTest {
+public class TargetRwtInjectingHyperlinkProcessorTest {
 
   private void runConvert(String origString, String expected) {
     runConvert(origString, expected, null);
   }
 
   private void runConvert(String origString, String expected, Map<String, String> params) {
-    HtmlAdapter adapter = new HtmlAdapter(null);
-    String result = adapter.convertLinksWithLocalUrlsInHtmlCell(null, origString, params);
+    HyperlinkParser parser = new HyperlinkParser();
+    TargetRwtInjectingHyperlinkProcessor processor = new TargetRwtInjectingHyperlinkProcessor(params);
+    String result = parser.parse(origString, processor);
     assertEquals(expected, result);
   }
 
@@ -41,6 +42,22 @@ public class HtmlAdapterTest {
   public void testConvertLinksWithLocalUrlsInHtmlCellWhitespaces() {
     String origString = "<html><a   href=\"http://local/xy\">link</a></html>";
     String expectedString = "<html><a   href=\"http://local/xy\" target=\"_rwt\">link</a></html>";
+
+    runConvert(origString, expectedString);
+  }
+
+  @Test
+  public void testConvertLinksWithLocalUrlsBold() {
+    String origString = "<html><a   href=\"http://local/xy\"><b>link</b></a></html>";
+    String expectedString = "<html><a   href=\"http://local/xy\" target=\"_rwt\"><b>link</b></a></html>";
+
+    runConvert(origString, expectedString);
+  }
+
+  @Test
+  public void testConvertLinksWithLocalUrlsExistingTarget() {
+    String origString = "<html><a   href=\"http://local/xy\" target=\"_blank\"><b>link</b></a></html>";
+    String expectedString = "<html><a   href=\"http://local/xy\" target=\"_rwt\"><b>link</b></a></html>";
 
     runConvert(origString, expectedString);
   }
@@ -118,14 +135,14 @@ public class HtmlAdapterTest {
         "    <td align=\"center\"></td>" +
         "    <td style=\"text-overflow:ellipsis;overflow:hidden;white-space:nowrap;\">Ferienadresse<br/></td>" +
         "    <td><a" +
-        "  href=\"http://local/scout?action=drill_down&amp;1row1Num1=0\" target=\"_rwt\"" +
+        "  href=\"http://local/scout?action=drill_down&amp;1row1Num1=0\"" +
         "  style=\"" +
         "    display:block;" +
         "    background-image:url('rwt-resources/generated/17391170.png');" +
         "    background-repeat:no-repeat;" +
         "    background-position:center;" +
         "    width:100%;height:50px;\"" +
-        "  onclick=\"currentElement=event.target || event.srcElement;currentElement.style.backgroundImage='url(rwt-resources/generated/4c07c313.png)';return false;\">" +
+        "  onclick=\"currentElement=event.target || event.srcElement;currentElement.style.backgroundImage='url(rwt-resources/generated/4c07c313.png)';return false;\" target=\"_rwt\">" +
         "</a>" +
         "</td>" +
         "  </tr>" +

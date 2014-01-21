@@ -20,6 +20,8 @@ import org.eclipse.rap.rwt.client.service.UrlLauncher;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.UrlTarget;
 import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
 
 /**
@@ -28,23 +30,34 @@ import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler
 public class BrowserWindowHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserWindowHandler.class);
 
-  public void openLink(String link) {
+  public void openLink(String link, IUrlTarget urlTarget) {
     if (link == null) {
       return;
     }
 
-    if (isEmailLink(link)) {
+    if (UrlTarget.AUTO.equals(urlTarget)) {
+      urlTarget = computeTargetAuto(link);
+    }
+
+    if (UrlTarget.SELF.equals(urlTarget)) {
       openLinkInSameBrowserWindow(link);
     }
-    else if (isTelLink(link)) {
-      openLinkInSameBrowserWindow(link);
-    }
-    else if (isHttpLink(link)) {
+    else if (UrlTarget.BLANK.equals(urlTarget)) {
       openLinkInNewBrowserWindow(link);
     }
     else {
       downloadFile(link);
     }
+  }
+
+  protected IUrlTarget computeTargetAuto(String link) {
+    if (isEmailLink(link) || (isTelLink(link))) {
+      return UrlTarget.SELF;
+    }
+    else if (isHttpLink(link)) {
+      return UrlTarget.BLANK;
+    }
+    return UrlTarget.AUTO;
   }
 
   public boolean isEmailLink(String link) {
@@ -72,10 +85,9 @@ public class BrowserWindowHandler {
   }
 
   public void openLinkInNewBrowserWindow(String link) {
-    if (!isHttpLink(link)) {
+    if (link == null) {
       return;
     }
-
     UrlLauncher launcher = RWT.getClient().getService(UrlLauncher.class);
     if (launcher != null) {
       launcher.openURL(link);

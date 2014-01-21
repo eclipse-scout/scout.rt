@@ -74,6 +74,8 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -1213,8 +1215,27 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void openUrlInBrowser(String path, IUrlTarget target) {
+    if (!UserAgentUtility.isWebClient()) {
+      try {
+        SERVICES.getService(IShellService.class).shellOpen(path);
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+    else {
+      if (target == null) {
+        target = UrlTarget.AUTO;
+      }
+      fireOpenUrlInBrowser(path, target);
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void openBrowserWindow(String path) {
-    fireOpenBrowserWindow(path);
+    openUrlInBrowser(path, UrlTarget.AUTO);
   }
 
   @Override
@@ -1413,8 +1434,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireOpenBrowserWindow(String path) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_BROWSER_WINDOW, path);
+  private void fireOpenUrlInBrowser(String path, IUrlTarget target) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URL_IN_BROWSER, path, target);
     fireDesktopEvent(e);
   }
 

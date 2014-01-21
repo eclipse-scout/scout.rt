@@ -177,7 +177,7 @@ public class RwtScoutListModel implements IRwtScoutListModel {
       Map<String, String> params = new HashMap<String, String>();
       ITableRow tableRow = (ITableRow) element;
       params.put(HYPERLINK_ROW_PARAM, tableRow.getRowIndex() + "");
-      text = htmlAdapter.convertLinksWithLocalUrlsInHtmlCell(m_uiList, text, params);
+      text = htmlAdapter.convertLinksInHtmlCell(m_uiList, text, params);
     }
     else {
       boolean multiline = false;

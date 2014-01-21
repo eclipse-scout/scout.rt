@@ -68,23 +68,8 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(browserContainer, SWT.NONE);
     setUiField(browser);
 
-    m_browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
+    attachBrowserExtension(browser);
 
-      @Override
-      public void execute(String url) {
-        getUiField().setUrl(url);
-      }
-
-    });
-    m_browserExtension.attach();
-    browser.addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        m_browserExtension.detach();
-      }
-    });
     browser.addLocationListener(new LocationAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -116,6 +101,39 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
 
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  protected void attachBrowserExtension(Browser browser) {
+    detachBrowserExtension();
+    final BrowserExtension browserExtension = new BrowserExtension(browser, getUiEnvironment(), new IHyperlinkCallback() {
+
+      @Override
+      public void execute(String url) {
+        getUiField().setUrl(url);
+      }
+    });
+    browserExtension.attach();
+    browser.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        detachBrowserExtension();
+      }
+    });
+    adaptBrowserExtension(browserExtension);
+    m_browserExtension = browserExtension;
+  }
+
+  protected void adaptBrowserExtension(BrowserExtension browserExtension) {
+    browserExtension.setDefaultHyperlinkTarget("_top");
+  }
+
+  protected void detachBrowserExtension() {
+    if (m_browserExtension != null) {
+      m_browserExtension.detach();
+      m_browserExtension = null;
+    }
   }
 
   @Override
@@ -164,7 +182,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
       }
     }
     String cleanHtml = getUiEnvironment().styleHtmlText(this, rawHtml);
-    cleanHtml = m_browserExtension.adaptLocalHyperlinks(cleanHtml);
+    cleanHtml = m_browserExtension.adaptHyperlinks(cleanHtml);
     //fast create of browser content if there are no attachments
     if (a == null || a.length == 0) {
       getUiField().setText(cleanHtml);

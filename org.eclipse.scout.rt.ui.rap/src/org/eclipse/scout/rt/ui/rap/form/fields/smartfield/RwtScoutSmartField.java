@@ -136,9 +136,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_browseButton.addMenuDetectListener(new P_RwtMenuDetectListener());
     m_browseButton.addMenuListener(new P_ContextMenuListener((Control) getUiBrowseButton(), getUiField()));
 
-    // F2 key stroke
-    getUiEnvironment().addKeyStroke(getUiContainer(), new P_F2KeyStroke(), false);
-
     // listeners
     getUiField().addModifyListener(new P_ModifyListener());
     if (!getScoutObject().isAllowCustomText()) {
@@ -148,6 +145,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     else {
       attachFocusListener(getUiField(), true);
     }
+    getUiEnvironment().addKeyStroke(getUiField(), new P_F2KeyStroke(), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN), false);

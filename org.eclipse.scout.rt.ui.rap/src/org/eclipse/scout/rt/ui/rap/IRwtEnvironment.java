@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -183,7 +184,7 @@ public interface IRwtEnvironment {
    * <p>
    * If the address is a file path, this will trigger a file download from the browser.
    */
-  void openBrowserWindowFromScout(String path);
+  void openBrowserWindowFromScout(String path, IUrlTarget target);
 
   void showMessageBoxFromScout(IMessageBox messageBox);
 
@@ -207,9 +208,9 @@ public interface IRwtEnvironment {
   String adaptHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
 
   /**
-   * Convenience for {@link HtmlAdapter#convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite, String)}
+   * Convenience for {@link HtmlAdapter#convertLinksInHtmlCell(IRwtScoutComposite, String)}
    */
-  String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
+  String convertLinksInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
 
   /**
    * Convenience for {@link HtmlAdapter#styleHtmlText(IRwtScoutFormField, String)}.

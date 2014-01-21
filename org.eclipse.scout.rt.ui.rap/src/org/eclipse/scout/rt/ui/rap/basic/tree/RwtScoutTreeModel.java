@@ -138,7 +138,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
 
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
         text = getUiTree().getUiEnvironment().adaptHtmlCell(getUiTree(), text);
-        text = getUiTree().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTree(), text);
+        text = getUiTree().getUiEnvironment().convertLinksInHtmlCell(getUiTree(), text);
           }
       else {
         if (text.indexOf("\n") >= 0) {

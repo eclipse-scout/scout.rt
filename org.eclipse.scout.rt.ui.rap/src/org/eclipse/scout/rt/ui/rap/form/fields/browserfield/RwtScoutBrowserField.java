@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -73,17 +74,15 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
       @Override
       public void changing(LocationEvent event) {
         boolean changeAccepted = fireBeforeLocationChangedFromUi(event.location);
-        if (changeAccepted) {
-          // check: from local to external location?
-          if (m_browserExtension != null && isExternalUrl(event.location)) {
-            detachBrowserExtension();
-          }
-        }
         event.doit = changeAccepted;
       }
 
       @Override
       public void changed(LocationEvent event) {
+        // check: from local to external location?
+        if (m_browserExtension != null && (isExternalUrl(event.location))) {
+          detachBrowserExtension();
+        }
         fireAfterLocationChangedFromUi(event.location);
       }
     });
@@ -109,7 +108,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
 
   protected void attachBrowserExtension(Browser browser) {
     detachBrowserExtension();
-    final BrowserExtension browserExtension = new BrowserExtension(browser, new IHyperlinkCallback() {
+    final BrowserExtension browserExtension = new BrowserExtension(browser, getUiEnvironment(), new IHyperlinkCallback() {
 
       @Override
       public void execute(String url) {
@@ -122,10 +121,15 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
 
       @Override
       public void widgetDisposed(DisposeEvent e) {
-        browserExtension.detach();
+        detachBrowserExtension();
       }
     });
+    adaptBrowserExtension(browserExtension);
     m_browserExtension = browserExtension;
+  }
+
+  protected void adaptBrowserExtension(BrowserExtension browserExtension) {
+    // nop
   }
 
   protected void detachBrowserExtension() {
@@ -171,7 +175,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
         }
         else {
           String content = IOUtility.getContent(remoteFile.getDecompressedReader());
-          content = m_browserExtension.adaptLocalHyperlinks(content);
+          content = m_browserExtension.adaptHyperlinks(content);
           location = m_browserExtension.addResource(remoteFile.getName(), new ByteArrayInputStream(content.getBytes("UTF-8")));
         }
         //Prevent caching by making the request unique
@@ -199,7 +203,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
           String path = f.getAbsolutePath().substring(prefixLen);
           if (path.toLowerCase().matches(".*\\.(htm|html)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-            content = browserExtension.adaptLocalHyperlinks(content);
+            content = browserExtension.adaptHyperlinks(content);
             if (location == null && path.startsWith(simpleName)) {
               //this is the index.html
               location = browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
@@ -210,7 +214,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
           }
           else if (path.toLowerCase().matches(".*\\.(svg)")) {
             String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
-            content = browserExtension.adaptLocalHyperlinks(content);
+            content = browserExtension.adaptHyperlinks(content);
             browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
           }
           else {
@@ -243,26 +247,19 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
 
   protected boolean fireBeforeLocationChangedFromUi(final String location) {
     final AtomicReference<Boolean> accept = new AtomicReference<Boolean>();
-    synchronized (accept) {
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          synchronized (accept) {
-            accept.set(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
-            accept.notifyAll();
-          }
-        }
-      };
-      getUiEnvironment().invokeScoutLater(t, 0);
-      // end notify
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        accept.set(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
+      }
+    };
+    JobEx job = getUiEnvironment().invokeScoutLater(t, 0);
+    try {
       //wait at most 10 seconds
-      try {
-        accept.wait(10000L);
-      }
-      catch (InterruptedException e) {
-        //nop
-      }
+      job.join(10000L);
+    }
+    catch (InterruptedException e) {
+      //nop
     }
     return accept.get() != null ? accept.get().booleanValue() : false;
   }

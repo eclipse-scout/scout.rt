@@ -395,8 +395,14 @@ public interface IDesktop extends IPropertyObserver {
   void addFileChooser(IFileChooser fc);
 
   /**
-   * Creates and opens a browser window to download a file or open an url via user interface (only in web ui)
+   * Opens the link in the browser.
    */
+  void openUrlInBrowser(String url, IUrlTarget target);
+
+  /**
+   * @deprecated use {@link #openUrlInBrowser(String)}
+   */
+  @Deprecated
   void openBrowserWindow(String path);
 
   /**

@@ -84,7 +84,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     }
     else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
       text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-      text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
+      text = getUiTable().getUiEnvironment().convertLinksInHtmlCell(getUiTable(), text);
     }
     else {
       boolean multiline = isMultiline(text);

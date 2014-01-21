@@ -15,43 +15,50 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.service.ResourceManager;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
+import org.eclipse.scout.rt.ui.rap.html.IHyperlinkProcessor;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.browser.LocationListener;
 
 /**
- * <h3>BrowserSupport</h3> adding hyperlink callback support as in normal swt to the rwt browser
- * <p>
- * Adding support for registering/unregistering (publishing) local resources.
+ * Adds hyperlink callback support as in normal swt to the rwt browser<br/>
+ * Adds support for registering/unregistering (publishing) local resources.
  * 
  * @since 3.8.0
  */
 public class BrowserExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserExtension.class);
-  private static final Pattern LOCAL_URL_PATTERN = Pattern.compile("(['\"])(http://local[?/][^'\"]*)(['\"])", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-  private static final String HYPERLINK_FUNCTION_NAME = "scoutActivateLocalUrl";
-  private static final String HYPERLINK_FUNCTION_RETURN_TYPE = "void";
+  public static final String HYPERLINK_FUNCTION_NAME = "scoutActivateUrl";
+  public static final String HYPERLINK_FUNCTION_RETURN_TYPE = "void";
 
   private final Browser m_browser;
   private final HashMap<String, String> m_hyperlinkMap;
   private BrowserFunction m_hyperlinkBrowserFunction;
   private IHyperlinkCallback m_hyperlinkCallback;
   private String m_resourceFolderId;
-  //
-  private HashSet<String> m_tempFileNames = new HashSet<String>();
+  private IRwtEnvironment m_uiEnvironment;
+  private HyperlinkProcessor m_hyperlinkProcessor;
+  private HashSet<String> m_tempFileNames;
 
-  public BrowserExtension(Browser b, IHyperlinkCallback hyperlinkCallback) {
+  public BrowserExtension(Browser b, IRwtEnvironment uiEnvironment, IHyperlinkCallback hyperlinkCallback) {
     m_browser = b;
     m_hyperlinkCallback = hyperlinkCallback;
     m_hyperlinkMap = new HashMap<String, String>();
     m_resourceFolderId = UUID.randomUUID().toString();
+    m_uiEnvironment = uiEnvironment;
+    m_tempFileNames = new HashSet<String>();
+    m_hyperlinkProcessor = createHyperlinkProcessor();
+    m_hyperlinkProcessor.setGeneratedMappings(m_hyperlinkMap);
+    m_hyperlinkProcessor.setHyperlinkFunctionName(getHyperlinkFunctionName());
+    m_hyperlinkProcessor.setHyperlinkFunctionReturnType(getHyperlinkFunctionReturnType());
   }
 
   public void attach() {
@@ -61,7 +68,7 @@ public class BrowserExtension {
   }
 
   private BrowserFunction createLocalHyperlinkFunction() {
-    return new BrowserFunction(m_browser, getLocalHyperlinkFunctionName()) {
+    return new BrowserFunction(m_browser, getHyperlinkFunctionName()) {
       @Override
       public Object function(Object[] arguments) {
         String localUrl = m_hyperlinkMap.get(arguments[0]);
@@ -125,63 +132,132 @@ public class BrowserExtension {
   }
 
   /**
-   * Replaces all http://local/... urls with a call to a javascript callback function named
-   * {@link #getLocalHyperlinkFunctionName()}.
+   * Replaces the links in the given html with calls to a javascript callback function.
    * 
-   * @see {@link BrowserFunction}
+   * @see {@link HyperlinkProcessor}
    */
-  public String adaptLocalHyperlinks(String html) {
-    return rewriteLocalHyperlinks(html, m_hyperlinkMap, getLocalHyperlinkFunctionName(), getLocalHyperlinkFunctionReturnType());
+  public String adaptHyperlinks(String html) {
+    HtmlAdapter htmlAdapter = getUiEnvironment().getHtmlAdapter();
+    if (htmlAdapter == null) {
+      return html;
+    }
+    return htmlAdapter.processHyperlinks(html, m_hyperlinkProcessor);
+  }
+
+  protected HyperlinkProcessor createHyperlinkProcessor() {
+    return new HyperlinkProcessor();
   }
 
   public void clearLocalHyperlinkCache() {
     m_hyperlinkMap.clear();
   }
 
-  protected String getLocalHyperlinkFunctionName() {
+  protected String getHyperlinkFunctionName() {
     return HYPERLINK_FUNCTION_NAME;
   }
 
-  protected String getLocalHyperlinkFunctionReturnType() {
+  protected String getHyperlinkFunctionReturnType() {
     return HYPERLINK_FUNCTION_RETURN_TYPE;
   }
 
-  /**
-   * Replaces all href="http://local/... references in the html file with a javascript callback function
-   * 
-   * @param html
-   * @param generatedMappings
-   *          is being filled up with the generated mappings
-   * @return the rewritten html
-   */
-  private static String rewriteLocalHyperlinks(String html, Map<String /*externalKey*/, String /*url*/> generatedMappings, String callbackFuncName, String callbackFuncReturnType) {
-    if (html == null) {
-      return html;
-    }
-    StringBuilder buf = new StringBuilder();
-    Matcher m = LOCAL_URL_PATTERN.matcher(html);
-    int nextFind = 0;
-    while (m.find(nextFind)) {
-      String localUrl = m.group(2);
-      String externalKey = "" + generatedMappings.size();
-      String callableURL = "javascript:" + (StringUtility.hasText(callbackFuncReturnType) ? callbackFuncReturnType + " " : "") + callbackFuncName + "('" + externalKey + "');";
-
-      buf.append(html.substring(nextFind, m.start()));
-      buf.append(m.group(1));
-      buf.append(callableURL);
-      buf.append(m.group(3));
-      //register
-      generatedMappings.put(externalKey, localUrl);
-      //next
-      nextFind = m.end();
-    }
-    if (nextFind == 0) {
-      return html;
-    }
-    if (nextFind < html.length()) {
-      buf.append(html.substring(nextFind));
-    }
-    return buf.toString();
+  public IRwtEnvironment getUiEnvironment() {
+    return m_uiEnvironment;
   }
 
+  public String getDefaultHyperlinkTarget() {
+    return m_hyperlinkProcessor.getDefaultTarget();
+  }
+
+  public void setDefaultHyperlinkTarget(String defaultTarget) {
+    m_hyperlinkProcessor.setDefaultTarget(defaultTarget);
+  }
+
+  public boolean isConvertExternalUrlsEnabled() {
+    return m_hyperlinkProcessor.isConvertExternalUrlsEnabled();
+  }
+
+  public void setConvertExternalUrlsEnabled(boolean convertExternalUrls) {
+    m_hyperlinkProcessor.setConvertExternalUrlsEnabled(convertExternalUrls);
+  }
+
+  /**
+   * Replaces the links in the given html with calls to a javascript callback function. Considers &lt;a&gt; and
+   * &lt;area&gt; tags.
+   * <p>
+   * This is necessary because the RAP Browser widget does NOT send
+   * {@link LocationListener#changed(org.eclipse.swt.browser.LocationEvent)} and
+   * {@link LocationListener#changing(org.eclipse.swt.browser.LocationEvent)} if a link gets clicked.
+   */
+  public static class HyperlinkProcessor implements IHyperlinkProcessor {
+    private Map<String /*externalKey*/, String /*url*/> m_generatedMappings;
+    private String m_hyperlinkFunctionName;
+    private String m_hyperlinkFunctionReturnType;
+    private String m_defaultTarget;
+    private boolean m_convertExternalUrlsEnabled;
+
+    public Map<String, String> getGeneratedMappings() {
+      return m_generatedMappings;
+    }
+
+    public void setGeneratedMappings(Map<String, String> generatedMappings) {
+      m_generatedMappings = generatedMappings;
+    }
+
+    public String getHyperlinkFunctionName() {
+      return m_hyperlinkFunctionName;
+    }
+
+    public void setHyperlinkFunctionName(String hyperlinkFunctionName) {
+      m_hyperlinkFunctionName = hyperlinkFunctionName;
+    }
+
+    public String getHyperlinkFunctionReturnType() {
+      return m_hyperlinkFunctionReturnType;
+    }
+
+    public void setHyperlinkFunctionReturnType(String hyperlinkFunctionReturnType) {
+      m_hyperlinkFunctionReturnType = hyperlinkFunctionReturnType;
+    }
+
+    public String getDefaultTarget() {
+      return m_defaultTarget;
+    }
+
+    public void setDefaultTarget(String defaultTarget) {
+      m_defaultTarget = defaultTarget;
+    }
+
+    public boolean isConvertExternalUrlsEnabled() {
+      return m_convertExternalUrlsEnabled;
+    }
+
+    public void setConvertExternalUrlsEnabled(boolean convertExternalUrls) {
+      m_convertExternalUrlsEnabled = convertExternalUrls;
+    }
+
+    @Override
+    public String processUrl(String url, boolean local) {
+      if (url == null) {
+        return null;
+      }
+      if (!local && !isConvertExternalUrlsEnabled()) {
+        return url;
+      }
+
+      String externalKey = "" + m_generatedMappings.size();
+      String callableURL = "javascript:" + (StringUtility.hasText(m_hyperlinkFunctionReturnType) ? m_hyperlinkFunctionReturnType + " " : "") + m_hyperlinkFunctionName + "('" + externalKey + "');";
+
+      m_generatedMappings.put(externalKey, url);
+      return callableURL;
+    }
+
+    @Override
+    public String processTarget(String target, boolean local) {
+      if (local || !StringUtility.isNullOrEmpty(target)) {
+        return target;
+      }
+
+      return getDefaultTarget();
+    }
+  }
 }

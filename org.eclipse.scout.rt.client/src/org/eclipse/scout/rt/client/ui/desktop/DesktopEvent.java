@@ -50,15 +50,15 @@ public class DesktopEvent extends EventObject {
    */
   public static final int TYPE_PRINT = 900;
   /**
-	 *
-	 */
+   *
+   */
   public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   /**
    * Creates and opens a browser window to download a file or open an url via user interface (only supported in web ui),
-   * see {@link IDesktop#openBrowserWindow(String)}
+   * see {@link IDesktop#openUrlInBrowser(String)}
    */
-  public static final int TYPE_OPEN_BROWSER_WINDOW = 920;
+  public static final int TYPE_OPEN_URL_IN_BROWSER = 920;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
    * The listener can store the result using {@link #setFocusedField()} The event waits some time to give asynchronous
@@ -82,6 +82,7 @@ public class DesktopEvent extends EventObject {
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
+  private IUrlTarget m_urlTarget;
 
   public DesktopEvent(IDesktop source, int type) {
     super(source);
@@ -113,9 +114,10 @@ public class DesktopEvent extends EventObject {
     m_fileChooser = fc;
   }
 
-  public DesktopEvent(IDesktop source, int type, String path) {
+  public DesktopEvent(IDesktop source, int type, String path, IUrlTarget urlTarget) {
     this(source, type);
     m_path = path;
+    m_urlTarget = urlTarget;
   }
 
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
@@ -151,6 +153,10 @@ public class DesktopEvent extends EventObject {
 
   public String getPath() {
     return m_path;
+  }
+
+  public IUrlTarget getUrlTarget() {
+    return m_urlTarget;
   }
 
   public IMessageBox getMessageBox() {

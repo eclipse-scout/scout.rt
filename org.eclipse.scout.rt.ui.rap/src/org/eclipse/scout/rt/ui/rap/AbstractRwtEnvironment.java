@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -570,8 +571,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   @Override
-  public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
-    return getHtmlAdapter().convertLinksWithLocalUrlsInHtmlCell(uiComposite, rawHtml);
+  public String convertLinksInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
+    return getHtmlAdapter().convertLinksInHtmlCell(uiComposite, rawHtml);
   }
 
   @Override
@@ -794,13 +795,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   @Override
-  public void openBrowserWindowFromScout(String path) {
+  public void openBrowserWindowFromScout(String path, IUrlTarget urlTarget) {
     BrowserWindowHandler browserWindowHandler = createBrowserWindowHandler();
     if (browserWindowHandler == null) {
       return;
     }
 
-    browserWindowHandler.openLink(path);
+    browserWindowHandler.openLink(path, urlTarget);
   }
 
   protected BrowserWindowHandler createBrowserWindowHandler() {
@@ -1147,11 +1148,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           invokeUiLater(t);
           break;
         }
-        case DesktopEvent.TYPE_OPEN_BROWSER_WINDOW: {
+        case DesktopEvent.TYPE_OPEN_URL_IN_BROWSER: {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              openBrowserWindowFromScout(e.getPath());
+              openBrowserWindowFromScout(e.getPath(), e.getUrlTarget());
             }
           };
           invokeUiLater(t);

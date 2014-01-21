@@ -92,18 +92,44 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
         updateSvgDocument();
       }
     });
-    setBrowserExtension(new BrowserExtension(browser, new IHyperlinkCallback() {
+    attachBrowserExtension(browser);
+
+    // layout
+    getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  protected void attachBrowserExtension(Browser browser) {
+    detachBrowserExtension();
+    BrowserExtension browserExtension = new BrowserExtension(browser, getUiEnvironment(), new IHyperlinkCallback() {
 
       @Override
       public void execute(String url) {
         hyperlinkActivatedFromUi(url);
       }
 
-    }));
-    getBrowserExtension().attach();
+    });
+    browser.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
 
-    // layout
-    getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        detachBrowserExtension();
+      }
+    });
+    adaptBrowserExtension(browserExtension);
+    browserExtension.attach();
+    setBrowserExtension(browserExtension);
+  }
+
+  protected void adaptBrowserExtension(BrowserExtension browserExtension) {
+    browserExtension.setDefaultHyperlinkTarget("_top");
+  }
+
+  protected void detachBrowserExtension() {
+    if (m_browserExtension != null) {
+      m_browserExtension.detach();
+      m_browserExtension = null;
+    }
   }
 
   protected static String getSvgContentFromDocument(SVGDocument doc) throws ProcessingException {
@@ -138,8 +164,8 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
       doc.getRootElement().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, browserBounds.height + "px");
       doc.getRootElement().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, browserBounds.width + "px");
 
-      // get the svg code as string and rewrite the local links
-      String svgText = getBrowserExtension().adaptLocalHyperlinks(getSvgContentFromDocument(doc));
+      // get the svg code as string and rewrite the links
+      String svgText = getBrowserExtension().adaptHyperlinks(getSvgContentFromDocument(doc));
 
       // bugfix for SVG fields to ensure all context menus are closed when the user clicks into the svg field
       String contextMenuHideScript = "parent.parent.rwt.widgets.util.MenuManager.getInstance().update(null, 'mousedown');";
