@@ -137,8 +137,10 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   public void setStartBookmark() throws ProcessingException {
     ServiceState state = getServiceState();
     Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
-    b.setKind(Bookmark.USER_BOOKMARK);
-    state.m_model.getUserBookmarks().setStartupBookmark(b);
+    if (b != null) {
+      b.setKind(Bookmark.USER_BOOKMARK);
+      state.m_model.getUserBookmarks().setStartupBookmark(b);
+    }
   }
 
   @Override
