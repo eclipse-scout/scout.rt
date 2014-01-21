@@ -63,6 +63,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return false;
   }
 
+  /**
+   * @return true if all characters should be transformed to lower case when typing text into the string field. default
+   *         is false.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
   protected boolean getConfiguredFormatLower() {
@@ -82,6 +86,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return false;
   }
 
+  /**
+   * @return true if all characters should be transformed to upper case when typing text into the string field. default
+   *         is false.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
   protected boolean getConfiguredFormatUpper() {
