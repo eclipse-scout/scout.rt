@@ -57,6 +57,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return null;
   }
 
+  /**
+   * @return true if all characters should be masked (e.g. for a password field). default
+   *         is false.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
   protected boolean getConfiguredInputMasked() {
