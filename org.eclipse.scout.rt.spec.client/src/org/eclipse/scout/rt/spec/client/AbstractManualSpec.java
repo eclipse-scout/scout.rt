@@ -13,16 +13,18 @@ package org.eclipse.scout.rt.spec.client;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
+import org.osgi.framework.Bundle;
 
 /**
  *
  */
 public abstract class AbstractManualSpec extends AbstractSpecGen {
 
-  public AbstractManualSpec(String pluginName) {
-    super(pluginName);
+  public AbstractManualSpec() {
+    super(Platform.getProduct().getDefiningBundle().getSymbolicName());
   }
 
   protected void copyImages() throws ProcessingException {
@@ -32,14 +34,16 @@ public abstract class AbstractManualSpec extends AbstractSpecGen {
   }
 
   protected void copyMediawikiFiles() throws ProcessingException {
-    File source = getFileConfig().getMediawikiInDir();
     File dest = getFileConfig().getMediawikiDir();
     dest.mkdirs();
-    for (File file : source.listFiles(getFilter())) {
-      File destFile = new File(dest, file.getName());
-      SpecIOUtility.copy(file, destFile);
-      convertToHTML(destFile);
-      new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
+    for (Bundle bundle : getFileConfig().getSourceBundles()) {
+      File source = getFileConfig().getMediawikiInDir(bundle);
+      for (File file : source.listFiles(getFilter())) {
+        File destFile = new File(dest, file.getName());
+        SpecIOUtility.copy(file, destFile);
+        convertToHTML(destFile);
+        new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
+      }
     }
   }
 

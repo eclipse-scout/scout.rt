@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -21,8 +22,8 @@ import org.eclipse.scout.rt.spec.client.out.IDocSection;
  */
 public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
 
-  public AbstractTablePageSpecGen(String pluginName) {
-    super(pluginName);
+  public AbstractTablePageSpecGen() {
+    super(Platform.getProduct().getDefiningBundle().getSymbolicName());
   }
 
   public void printAllFields() throws ProcessingException {

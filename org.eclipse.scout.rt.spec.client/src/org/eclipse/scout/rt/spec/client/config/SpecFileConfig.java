@@ -15,10 +15,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 /**
@@ -33,6 +37,7 @@ public class SpecFileConfig {
   private static final String LINKS_FILE_NAME = "links.properties";
 
   private final String m_pluginName;
+  private String[] m_additionalSourcePlugins;
 
   public SpecFileConfig(String pluginName) {
     m_pluginName = pluginName;
@@ -42,10 +47,20 @@ public class SpecFileConfig {
    * @return root of the bundle output
    * @throws ProcessingException
    */
+  // TODO ASA check if getBundleRoot() (and calling hierachy) is needed anymore after refactoring
   private File getBundleRoot() throws ProcessingException {
+    return getBundleRoot(getBundle());
+  }
+
+  /**
+   * @param bundle
+   * @return
+   * @throws ProcessingException
+   */
+  private File getBundleRoot(Bundle bundle) throws ProcessingException {
     URI uri;
     try {
-      URL bundleRoot = getBundle().getEntry("/");
+      URL bundleRoot = bundle.getEntry("/");
       uri = FileLocator.resolve(bundleRoot).toURI();
       return new File(uri);
     }
@@ -59,6 +74,23 @@ public class SpecFileConfig {
 
   public Bundle getBundle() {
     return Platform.getBundle(m_pluginName);
+  }
+
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(SpecFileConfig.class);
+
+  public List<Bundle> getSourceBundles() {
+    ArrayList<Bundle> arrayList = new ArrayList<Bundle>();
+    arrayList.add(getBundle());
+    for (String bundleName : m_additionalSourcePlugins) {
+      Bundle bundle = Platform.getBundle(bundleName);
+      if (bundle != null) {
+        arrayList.add(bundle);
+      }
+      else {
+        LOG.warn("no bundle available with symbolic name: " + bundleName);
+      }
+    }
+    return arrayList;
   }
 
   /**
@@ -118,7 +150,16 @@ public class SpecFileConfig {
    * @throws ProcessingException
    */
   public File getSpecInDir() throws ProcessingException {
-    return new File(getBundleRoot(), SPEC_IN_DIR_NAME);
+    return getSpecInDir(getBundle());
+  }
+
+  /**
+   * @param bundle
+   * @return
+   * @throws ProcessingException
+   */
+  private File getSpecInDir(Bundle bundle) throws ProcessingException {
+    return new File(getBundleRoot(bundle), SPEC_IN_DIR_NAME);
   }
 
   /**
@@ -126,11 +167,24 @@ public class SpecFileConfig {
    * @throws ProcessingException
    */
   public File getMediawikiInDir() throws ProcessingException {
-    return new File(getSpecInDir(), MEDIAWIKI_DIR_NAME);
+    return getMediawikiInDir(getBundle());
+  }
+
+  /**
+   * @param bundle
+   * @return
+   * @throws ProcessingException
+   */
+  public File getMediawikiInDir(Bundle bundle) throws ProcessingException {
+    return new File(getSpecInDir(bundle), MEDIAWIKI_DIR_NAME);
   }
 
   public File getLinksFile() throws ProcessingException {
     return new File(getSpecInDir(), LINKS_FILE_NAME);
+  }
+
+  public void setAdditionalSourcePlugins(String... additionalSourcePlugins) {
+    m_additionalSourcePlugins = additionalSourcePlugins;
   }
 
 }

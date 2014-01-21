@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.spec.client.gen.FormSpecGenerator;
@@ -24,8 +25,8 @@ import org.eclipse.scout.rt.spec.client.screenshot.PrintFormListener;
  */
 public abstract class AbstractFormSpecTest extends AbstractSpecGen {
 
-  public AbstractFormSpecTest(String pluginName) {
-    super(pluginName);
+  public AbstractFormSpecTest() {
+    super(Platform.getProduct().getDefiningBundle().getSymbolicName());
   }
 
   public void printForm() throws ProcessingException {
