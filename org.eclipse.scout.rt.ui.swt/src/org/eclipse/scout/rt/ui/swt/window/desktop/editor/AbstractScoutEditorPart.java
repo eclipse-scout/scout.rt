@@ -163,18 +163,26 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   protected void setImageFromScout(String iconId) {
+    Form swtForm = getSwtForm();
+    if (swtForm.isDisposed()) {
+      return;
+    }
     Image img = getSwtEnvironment().getIcon(iconId);
     setTitleImage(img);
     String sub = getForm().getSubTitle();
     if (sub != null) {
-      getSwtForm().setImage(img);
+      swtForm.setImage(img);
     }
     else {
-      getSwtForm().setImage(null);
+      swtForm.setImage(null);
     }
   }
 
   protected void setTitleFromScout(String title) {
+    Form swtForm = getSwtForm();
+    if (swtForm.isDisposed()) {
+      return;
+    }
     IForm f = getForm();
     //
     String s = f.getBasicTitle();
@@ -182,10 +190,10 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     //
     s = f.getSubTitle();
     if (s != null) {
-      getSwtForm().setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
+      swtForm.setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
     }
     else {
-      getSwtForm().setText(null);
+      swtForm.setText(null);
     }
   }
 
