@@ -21,7 +21,7 @@
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_M" location="http://download.eclipse.org/tools/orbit/downloads/drops/M20131015031433/repository"/>
+      <repository id="orbit_M" location="http://download.eclipse.org/tools/orbit/downloads/drops/M20140114142710/repository"/>
 
       <unit id="javax.servlet" version="3.0.0.v201112011016"/>
       <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
@@ -84,7 +84,7 @@
       <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="rap_2.1" location="http://download.eclipse.org/rt/rap/2.1/SR1-RC3-20130902-1345/"/>
+      <repository id="rap_2.1" location="http://download.eclipse.org/rt/rap/2.1/SR2-RC1-20140121-1149/"/>
 
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
     </location>
