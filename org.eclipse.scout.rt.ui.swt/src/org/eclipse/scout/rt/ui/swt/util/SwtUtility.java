@@ -40,6 +40,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtScoutKeyStroke;
 import org.eclipse.swt.SWT;
@@ -163,49 +165,6 @@ public final class SwtUtility {
         }
       }
     }
-
-    // DataFlavor[] flavors=swtT.getTransferDataFlavors();
-    // if(swtT.type == FileTransfer)
-    // for(int i=0;i<flavors.length;i++){
-    // if(flavors[i].isFlavorJavaFileListType()){
-    // try{
-    // ArrayList<File> fileList=new ArrayList<File>();
-    // fileList.addAll((List)swtT.getTransferData(flavors[i]));
-    // return new FileListTransferObject(fileList);
-    // }
-    // catch(Exception e){
-    // if(ex==null) ex=e;
-    // }
-    // }
-    // else if(flavors[i].isFlavorTextType()){
-    // try{
-    // return new TextTransferObject((String)swtT.getTransferData(flavors[i]));
-    // }
-    // catch(Exception e){
-    // if(ex==null) ex=e;
-    // }
-    // }
-    // else if(flavors[i].isMimeTypeEqual(DataFlavor.imageFlavor)){
-    // try{
-    // return new TextTransferObject((String)swtT.getTransferData(flavors[i]));
-    // }
-    // catch(Exception e){
-    // if(ex==null) ex=e;
-    // }
-    // }
-    // else
-    // if(flavors[i].isMimeTypeEqual(DataFlavor.javaJVMLocalObjectMimeType)){
-    // try{
-    // return new JavaTransferObject(swtT.getTransferData(flavors[i]));
-    // }
-    // catch(Exception e){
-    // if(ex==null) ex=e;
-    // }
-    // }
-    // }
-    // if(ex!=null){
-    // LOG.warn("swt transferable="+swtT,ex);
-    // }
     return null;
   }
 
@@ -1122,5 +1081,31 @@ public final class SwtUtility {
     int stateMask = getSwtStateMask(ks);
     int keyCode = getSwtKeyCode(ks);
     return LegacyActionTools.convertAccelerator(stateMask | keyCode);
+  }
+
+  /**
+   * Run the inputVerifier on the currently focused control. See {@link #runSwtInputVerifier(Control)} for more details.
+   * 
+   * @since 3.10.0-M5
+   */
+  public static boolean runSwtInputVerifier() {
+    return runSwtInputVerifier(Display.getDefault().getFocusControl());
+  }
+
+  /**
+   * Force the control's inputVerifier to run
+   * 
+   * @since 3.10.0-M5
+   */
+  public static boolean runSwtInputVerifier(Control control) {
+    if (control == null || control.isDisposed()) {
+      return false;
+    }
+
+    ISwtScoutComposite compositeOnWidget = SwtScoutComposite.getCompositeOnWidget(control);
+    if (compositeOnWidget instanceof SwtScoutComposite) {
+      return ((SwtScoutComposite) compositeOnWidget).runSwtInputVerifier();
+    }
+    return true; //continue always
   }
 }

@@ -64,20 +64,22 @@ public class SwtScoutAction extends AbstractSwtScoutAction {
   }
 
   protected void handleSwtAction() {
-    if (!m_handleActionPending) {
-      m_handleActionPending = true;
-      Runnable job = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            getScoutAction().getUIFacade().fireActionFromUI();
+    if (SwtUtility.runSwtInputVerifier()) {
+      if (!m_handleActionPending) {
+        m_handleActionPending = true;
+        Runnable job = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              getScoutAction().getUIFacade().fireActionFromUI();
+            }
+            finally {
+              m_handleActionPending = false;
+            }
           }
-          finally {
-            m_handleActionPending = false;
-          }
-        }
-      };
-      getEnvironment().invokeScoutLater(job, 0);
+        };
+        getEnvironment().invokeScoutLater(job, 0);
+      }
     }
   }
 

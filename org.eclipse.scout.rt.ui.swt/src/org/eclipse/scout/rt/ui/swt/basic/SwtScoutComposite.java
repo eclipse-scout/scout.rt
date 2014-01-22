@@ -227,6 +227,15 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
     disconnectFromScout();
   }
 
+  /**
+   * Runs the SwtInputVerifier.
+   * 
+   * @since 3.10.0-M5
+   */
+  public boolean runSwtInputVerifier() {
+    return handleSwtInputVerifier();
+  }
+
   private class P_SwtFieldListener implements Listener {
     private long m_timestamp;
 
@@ -237,7 +246,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
       }
       switch (event.type) {
         case SWT.Verify:
-          if (event.text.equals("\t")) {
+          if ("\t".equals(event.text)) {
             event.doit = false;
           }
           break;

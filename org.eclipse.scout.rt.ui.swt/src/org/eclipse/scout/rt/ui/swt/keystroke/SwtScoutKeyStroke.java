@@ -4,15 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.keystroke;
 
-
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.widgets.Event;
 
 /**
@@ -36,22 +36,24 @@ public class SwtScoutKeyStroke extends SwtKeyStroke {
   @Override
   public void handleSwtAction(Event e) {
     if (getScoutKeyStroke().isEnabled() && getScoutKeyStroke().isVisible()) {
-      if (!m_handleActionPending) {
-        m_handleActionPending = true;
-        Runnable job = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getScoutKeyStroke().getUIFacade().fireActionFromUI();
+      if (SwtUtility.runSwtInputVerifier()) {
+        if (!m_handleActionPending) {
+          m_handleActionPending = true;
+          Runnable job = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                getScoutKeyStroke().getUIFacade().fireActionFromUI();
+              }
+              finally {
+                m_handleActionPending = false;
+              }
             }
-            finally {
-              m_handleActionPending = false;
-            }
-          }
-        };
-        getEnvironment().invokeScoutLater(job, 0);
-      }
-      e.doit = false;
+          };
+          getEnvironment().invokeScoutLater(job, 0);
+        }
+        e.doit = false;
+      } //
     }
   }
 

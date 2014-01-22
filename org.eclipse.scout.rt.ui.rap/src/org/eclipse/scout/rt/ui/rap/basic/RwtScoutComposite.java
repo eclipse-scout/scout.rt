@@ -366,6 +366,13 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     //do nothing
   }
 
+  /**
+   * Forces UI Input to be verified.
+   */
+  public void runUiInputVerifier() {
+    handleUiInputVerifier(true);
+  }
+
   protected void handleUiDispose() {
     if (!m_created) {
       return;

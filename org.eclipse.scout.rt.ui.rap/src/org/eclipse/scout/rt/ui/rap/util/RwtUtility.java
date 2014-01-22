@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtScoutKeyStroke;
 import org.eclipse.swt.SWT;
@@ -1500,14 +1499,35 @@ public final class RwtUtility {
     return MNEMONIC_PATTERN.matcher(text).replaceAll("\\&$1");
   }
 
+  /**
+   * @deprecated Use {@link #runUiInputVerifier(Control)} instead. Will be removed in the M-Release.
+   */
+  @Deprecated
   public static void verifyUiInput(Control control) {
+    runUiInputVerifier(control);
+  }
+
+  /**
+   * Run the inputVerifier on the currently focused control. See {@link #runUiInputVerifier(Control)} for more details.
+   * 
+   * @since 3.10.0-M5
+   */
+  public static void runUiInputVerifier() {
+    Control focusControl = Display.getDefault().getFocusControl();
+    runUiInputVerifier(focusControl);
+  }
+
+  /**
+   * Force the control's inputVerifier to run
+   */
+  public static void runUiInputVerifier(Control control) {
     if (control == null || control.isDisposed()) {
       return;
     }
 
     IRwtScoutComposite compositeOnWidget = RwtScoutComposite.getCompositeOnWidget(control);
-    if (compositeOnWidget != null && compositeOnWidget instanceof RwtScoutValueFieldComposite) {
-      ((RwtScoutValueFieldComposite) compositeOnWidget).verifyUiInput();
+    if (compositeOnWidget instanceof RwtScoutComposite) {
+      ((RwtScoutComposite) compositeOnWidget).runUiInputVerifier();
     }
   }
 

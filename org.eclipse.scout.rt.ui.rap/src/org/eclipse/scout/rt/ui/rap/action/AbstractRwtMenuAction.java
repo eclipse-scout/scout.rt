@@ -195,6 +195,7 @@ public class AbstractRwtMenuAction {
   }
 
   private void handleUiAction() {
+    RwtUtility.runUiInputVerifier();
     Runnable t = new Runnable() {
       @Override
       public void run() {

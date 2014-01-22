@@ -153,13 +153,15 @@ public class AbstractSwtMenuAction extends AbstractSwtScoutAction {
   }
 
   private void handleSwtAction() {
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        getScoutAction().getUIFacade().fireActionFromUI();
-      }
-    };
-    getEnvironment().invokeScoutLater(t, 0);
+    if (SwtUtility.runSwtInputVerifier()) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutAction().getUIFacade().fireActionFromUI();
+        }
+      };
+      getEnvironment().invokeScoutLater(t, 0);
+    }
   }
 
   @Override

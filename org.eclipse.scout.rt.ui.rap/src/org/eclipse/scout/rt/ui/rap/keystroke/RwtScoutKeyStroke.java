@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.keystroke;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.widgets.Event;
 
 /**
@@ -36,6 +37,7 @@ public class RwtScoutKeyStroke extends RwtKeyStroke {
   @Override
   public void handleUiAction(Event e) {
     if (getScoutKeyStroke().isEnabled() && getScoutKeyStroke().isVisible()) {
+      RwtUtility.runUiInputVerifier();
       if (!m_handleActionPending) {
         m_handleActionPending = true;
         Runnable job = new Runnable() {

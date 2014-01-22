@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 
 /**
  * @since 3.8.0
@@ -33,18 +34,21 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(IValueField.PROP_DISPLAY_TEXT)) {
+    if (IValueField.PROP_DISPLAY_TEXT.equals(name)) {
       String displayText = (String) newValue;
       setDisplayTextFromScout(displayText);
     }
-    else if (name.equals(IValueField.PROP_VALUE)) {
+    else if (IValueField.PROP_VALUE.equals(name)) {
       setValueFromScout();
     }
   }
 
   /**
    * Forces UI Input to be verified.
+   * 
+   * @deprecated Use {@link RwtScoutComposite#runUiInputVerifier()} instead. Will be removed in the M-Release.
    */
+  @Deprecated
   public void verifyUiInput() {
     handleUiInputVerifier(true);
   }

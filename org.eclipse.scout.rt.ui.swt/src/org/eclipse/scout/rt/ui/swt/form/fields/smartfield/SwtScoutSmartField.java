@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -66,7 +67,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutSmartField</h3> ...
- *
+ * 
  * @since 1.0.0 10.04.2008
  */
 public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<?>> implements ISwtScoutSmartField, IPopupSupport {
@@ -419,6 +420,10 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       }
     }
     final String text = getSwtField().getText();
+    // only handle if text has changed
+    if (!StringUtility.isNullOrEmpty(text) && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+      return true;
+    }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
     // notify Scout
     Runnable t = new Runnable() {

@@ -400,7 +400,7 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     public boolean close() {
       // force UI input to be verified on the last focused field, so that changes will be written to the model.
       Control focusControl = m_uiDialog.getShell().getDisplay().getFocusControl();
-      RwtUtility.verifyUiInput(focusControl);
+      RwtUtility.runUiInputVerifier(focusControl);
 
       //override and delegate to scout model
       Runnable job = new Runnable() {

@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -258,22 +259,24 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
   }
 
   protected void handleSwtAction() {
-    if (!m_handleActionPending) {
-      m_handleActionPending = true;
-      //notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            getScoutObject().getUIFacade().fireButtonClickedFromUI();
+    if (SwtUtility.runSwtInputVerifier()) {
+      if (!m_handleActionPending) {
+        m_handleActionPending = true;
+        //notify Scout
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              getScoutObject().getUIFacade().fireButtonClickedFromUI();
+            }
+            finally {
+              m_handleActionPending = false;
+            }
           }
-          finally {
-            m_handleActionPending = false;
-          }
-        }
-      };
-      getEnvironment().invokeScoutLater(t, 0);
-      //end notify
+        };
+        getEnvironment().invokeScoutLater(t, 0);
+        //end notify
+      }
     }
   }
 
