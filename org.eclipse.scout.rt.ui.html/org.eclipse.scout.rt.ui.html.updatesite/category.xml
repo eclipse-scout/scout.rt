@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="HTML UI for Eclipse Scout">
+      HTML UI for Eclipse Scout
+   </description>
+   <feature url="features/org.eclipse.scout.rt.ui.html.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.ui.html.source" version="0.0.0">
+      <category name="HTML UI for Eclipse Scout"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.ui.html_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.ui.html" version="0.0.0"/>
+   <category-def name="HTLM UI for Eclipse Scout" label="HTML UI for Eclipse Scout">
+      <description>
+         HTML UI for Eclipse Scout
+      </description>
+   </category-def>
+</site>
