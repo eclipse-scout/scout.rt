@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.action;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,14 +27,13 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class AbstractSwtMenuAction {
+/**
+ * Common code for the SWT widgets (sub classes of {@link MenuItem}) rendering {@link IAction}.
+ */
+public class AbstractSwtMenuAction extends AbstractSwtScoutAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtMenuAction.class);
 
-  private final ISwtEnvironment m_environment;
-  private final IAction m_scoutAction;
   private boolean m_initialized;
-  private boolean m_connectedToScout;
-  private P_ScoutPropertyChangeListener m_scoutPropertyListener;
   private MenuItem m_swtMenuItem;
   private final Menu m_swtMenu;
   // cache
@@ -46,9 +42,8 @@ public class AbstractSwtMenuAction {
   private SelectionListener m_menuSelectionListener;
 
   public AbstractSwtMenuAction(Menu swtMenu, IAction action, boolean createInitial, ISwtEnvironment environment) {
+    super(action, environment);
     m_swtMenu = swtMenu;
-    m_scoutAction = action;
-    m_environment = environment;
     if (createInitial) {
       callInitializers(m_swtMenu);
     }
@@ -75,73 +70,49 @@ public class AbstractSwtMenuAction {
     }
   }
 
-  protected final void connectToScout() {
-    if (!m_connectedToScout) {
-      attachScoutListeners();
-      applyScoutProperties();
-      m_connectedToScout = true;
-    }
-  }
-
-  protected final void disconnectFromScout() {
-    if (m_connectedToScout) {
-      detachScoutListeners();
-      m_connectedToScout = false;
-    }
-  }
-
-  protected void attachScoutListeners() {
-    if (m_scoutPropertyListener == null) {
-      m_scoutPropertyListener = new P_ScoutPropertyChangeListener();
-      m_scoutAction.addPropertyChangeListener(m_scoutPropertyListener);
-    }
-  }
-
-  protected void detachScoutListeners() {
-    if (m_scoutPropertyListener != null) {
-      m_scoutAction.removePropertyChangeListener(m_scoutPropertyListener);
-      m_scoutPropertyListener = null;
-    }
-  }
-
-  protected void applyScoutProperties() {
-    IAction scoutAction = getScoutAction();
-    setEnabledFromScout(scoutAction.isEnabled());
-    setTextFromScout(scoutAction.getTextWithMnemonic());
-    setTooltipTextFromScout(scoutAction.getTooltipText());
-    setIconFromScout(scoutAction.getIconId());
-    updateKeyStrokeFromScout();
-  }
-
+  @Override
   protected void setIconFromScout(String iconId) {
     if (!getSwtMenuItem().isDisposed()) {
       getSwtMenuItem().setImage(getEnvironment().getIcon(iconId));
     }
   }
 
+  @Override
   protected void setTooltipTextFromScout(String tooltipText) {
     if (!StringUtility.isNullOrEmpty(tooltipText)) {
       LOG.warn("unsuported method on swt");
     }
   }
 
+  /**
+   * @deprecated Use {@link #setTextWithMnemonicFromScout(String)} instead.
+   *             Will be removed with the M-Release.
+   */
+  @Deprecated
   protected void setTextFromScout(String text) {
+    setTextWithMnemonicFromScout(text);
+  }
+
+  @Override
+  protected void setTextWithMnemonicFromScout(String textWithMnemonic) {
     if (!getSwtMenuItem().isDisposed()) {
       IAction action = getScoutAction();
       if (action != null && StringUtility.hasText(action.getKeyStroke())) {
-        text += "\t" + SwtUtility.getKeyStrokePrettyPrinted(action);
+        textWithMnemonic += "\t" + SwtUtility.getKeyStrokePrettyPrinted(action);
       }
-      getSwtMenuItem().setText(text);
+      getSwtMenuItem().setText(textWithMnemonic);
     }
   }
 
+  @Override
   protected void setEnabledFromScout(boolean enabled) {
     if (!getSwtMenuItem().isDisposed()) {
       getSwtMenuItem().setEnabled(enabled);
     }
   }
 
-  protected void updateKeyStrokeFromScout() {
+  @Override
+  protected void setKeyStrokeFromScout(String keyStroke) {
     // remove old
     if (m_swtKeyStrokes != null) {
       for (ISwtKeyStroke swtStroke : m_swtKeyStrokes) {
@@ -149,7 +120,7 @@ public class AbstractSwtMenuAction {
       }
     }
     m_swtKeyStrokes = null;
-    if (getScoutAction().getKeyStroke() != null) {
+    if (keyStroke != null) {
       IKeyStroke scoutKeyStroke = new KeyStroke(getScoutAction().getKeyStroke());
       m_swtKeyStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, getEnvironment());
       for (ISwtKeyStroke swtStroke : m_swtKeyStrokes) {
@@ -159,14 +130,6 @@ public class AbstractSwtMenuAction {
   }
 
   protected void initializeSwt(Menu swtMenu) {
-  }
-
-  public ISwtEnvironment getEnvironment() {
-    return m_environment;
-  }
-
-  public IAction getScoutAction() {
-    return m_scoutAction;
   }
 
   public MenuItem getSwtMenuItem() {
@@ -199,47 +162,10 @@ public class AbstractSwtMenuAction {
     getEnvironment().invokeScoutLater(t, 0);
   }
 
-  private boolean isHandleScoutPropertyChange(String propertyName, Object newValue) {
-    return true;
+  @Override
+  protected boolean isHandleScoutPropertyChangeSwtThread() {
+    return !getSwtMenu().isDisposed();
   }
-
-  /**
-   * in swt thread
-   */
-  protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (name.equals(IAction.PROP_ENABLED)) {
-      setEnabledFromScout(((Boolean) newValue).booleanValue());
-    }
-    else if (name.equals(IAction.PROP_TEXT)) {
-      setTextFromScout((String) newValue);
-    }
-    else if (name.equals(IAction.PROP_TOOLTIP_TEXT)) {
-      setTooltipTextFromScout((String) newValue);
-    }
-    else if (name.equals(IAction.PROP_ICON_ID)) {
-      setIconFromScout((String) newValue);
-    }
-    else if (name.equals(IAction.PROP_KEYSTROKE)) {
-      updateKeyStrokeFromScout();
-    }
-  }
-
-  private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(final PropertyChangeEvent e) {
-      if (isHandleScoutPropertyChange(e.getPropertyName(), e.getNewValue())) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            handleScoutPropertyChange(e.getPropertyName(), e.getNewValue());
-          }
-
-        };
-        getEnvironment().invokeSwtLater(t);
-      }
-    }
-
-  }// end private class
 
   private class P_MenuItemSelectionListener extends SelectionAdapter {
     @Override

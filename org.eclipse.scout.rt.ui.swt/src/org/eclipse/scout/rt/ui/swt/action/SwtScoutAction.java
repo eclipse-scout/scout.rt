@@ -24,12 +24,11 @@ import org.eclipse.swt.SWT;
  * 
  * @since 1.0.0 28.03.2008
  */
-public class SwtScoutAction {
+public class SwtScoutAction extends AbstractSwtScoutAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutAction.class);
 
-  private final IAction m_scoutAction;
+  private boolean m_initialized;
   private final Action m_swtAction;
-  private final ISwtEnvironment m_environment;
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
@@ -38,17 +37,30 @@ public class SwtScoutAction {
   }
 
   public SwtScoutAction(IAction scoutAction, ISwtEnvironment environment, int style) {
-    m_scoutAction = scoutAction;
-    m_environment = environment;
+    super(scoutAction, environment);
     m_swtAction = new P_SwtAction(style);
-    // init
-    String keyStroke = m_scoutAction.getKeyStroke();
-    m_swtAction.setText(m_scoutAction.getTextWithMnemonic());
-    m_swtAction.setToolTipText(m_scoutAction.getTooltipText());
-    m_swtAction.setImageDescriptor(m_environment.getImageDescriptor(m_scoutAction.getIconId()));
-    m_swtAction.setEnabled(m_scoutAction.isEnabled());
+    callInitializers(m_swtAction);
+  }
 
-    setKeyStrokeFromScout(keyStroke);
+  /**
+   * @param swtAction
+   */
+  private void callInitializers(Action swtAction) {
+    if (m_initialized) {
+      return;
+    }
+    else {
+      m_initialized = true;
+      //
+      initializeSwt(swtAction);
+      connectToScout();
+    }
+  }
+
+  /**
+   * @param swtAction
+   */
+  protected void initializeSwt(Action swtAction) {
   }
 
   protected void handleSwtAction() {
@@ -69,16 +81,8 @@ public class SwtScoutAction {
     }
   }
 
-  public IAction getScoutAction() {
-    return m_scoutAction;
-  }
-
   public Action getSwtAction() {
     return m_swtAction;
-  }
-
-  public ISwtEnvironment getEnvironment() {
-    return m_environment;
   }
 
   private class P_SwtAction extends Action {
@@ -92,7 +96,28 @@ public class SwtScoutAction {
     }
   } // end P_SwtAction
 
-  private void setKeyStrokeFromScout(String keyStroke) {
+  @Override
+  protected void setEnabledFromScout(boolean enabled) {
+    m_swtAction.setEnabled(enabled);
+  }
+
+  @Override
+  protected void setTextWithMnemonicFromScout(String textWithMnemonic) {
+    m_swtAction.setText(textWithMnemonic);
+  }
+
+  @Override
+  protected void setTooltipTextFromScout(String tooltipText) {
+    m_swtAction.setToolTipText(tooltipText);
+  }
+
+  @Override
+  protected void setIconFromScout(String iconId) {
+    m_swtAction.setImageDescriptor(getEnvironment().getImageDescriptor(iconId));
+  }
+
+  @Override
+  protected void setKeyStrokeFromScout(String keyStroke) {
     if (keyStroke != null) {
       int keyCode = SwtUtility.getSwtKeyCode(new KeyStroke(keyStroke));
       int stateMask = SwtUtility.getSwtStateMask(new KeyStroke(keyStroke));
@@ -102,5 +127,4 @@ public class SwtScoutAction {
       getSwtAction().setAccelerator(SWT.NONE);
     }
   }
-
 }

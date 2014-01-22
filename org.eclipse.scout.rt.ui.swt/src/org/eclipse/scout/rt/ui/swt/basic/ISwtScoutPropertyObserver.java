@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,28 +12,16 @@ package org.eclipse.scout.rt.ui.swt.basic;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>ISwtScoutComposite</h3> ...
+ * Root interface for classes rendering elements from the Scout model.
  * 
- * @author Andreas Hoegger
+ * @since 3.10.0-M5
  */
-public interface ISwtScoutComposite<T extends IPropertyObserver> extends ISwtScoutPropertyObserver<T> {
-  String PROP_SWT_SCOUT_COMPOSITE = "ISwtScoutComposite";
+public interface ISwtScoutPropertyObserver<T extends IPropertyObserver> {
 
-  void createField(Composite parent, T model, ISwtEnvironment environment);
+  T getScoutObject();
 
-  Control getSwtField();
-
-  Composite getSwtContainer();
-
-  boolean isDisposed();
-
-  /**
-   * is not thought to override. This method is to call to dispose a composite.
-   */
-  void dispose();
+  ISwtEnvironment getEnvironment();
 
 }
