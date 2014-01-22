@@ -10,10 +10,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -844,7 +844,7 @@ public abstract class AbstractCalendarDocumentBuilder {
         for (Date d : c.getCoveredDays()) {
           Set<CalendarComponent> l = map.get(d);
           if (l == null) {
-            l = new HashSet<CalendarComponent>();
+            l = new TreeSet<CalendarComponent>();
             map.put(d, l);
           }
           l.add(c);

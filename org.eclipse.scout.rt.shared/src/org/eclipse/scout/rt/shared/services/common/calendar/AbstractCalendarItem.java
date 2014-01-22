@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Serializable {
+public abstract class AbstractCalendarItem implements ICalendarItem, Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final DateFormat getDumpDateFormat() {
@@ -175,4 +176,43 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
     return b.toString();
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_itemId == null) ? 0 : m_itemId.hashCode());
+    result = prime * result + ((m_subject == null) ? 0 : m_subject.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AbstractCalendarItem other = (AbstractCalendarItem) obj;
+    if (m_itemId == null) {
+      if (other.m_itemId != null) {
+        return false;
+      }
+    }
+    else if (!m_itemId.equals(other.m_itemId)) {
+      return false;
+    }
+    if (m_subject == null) {
+      if (other.m_subject != null) {
+        return false;
+      }
+    }
+    else if (!m_subject.equals(other.m_subject)) {
+      return false;
+    }
+    return true;
+  }
 }

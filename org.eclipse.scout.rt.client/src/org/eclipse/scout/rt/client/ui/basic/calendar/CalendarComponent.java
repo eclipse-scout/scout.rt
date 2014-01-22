@@ -16,13 +16,14 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarTask;
 
-public class CalendarComponent {
+public class CalendarComponent implements Comparable<CalendarComponent> {
   private ICalendar m_calendar;
   private ICalendarItemProvider m_producer;
   private ICalendarItem m_item;
@@ -220,4 +221,56 @@ public class CalendarComponent {
   public boolean isDraggable() {
     return m_producer.isMoveItemEnabled();
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public int compareTo(CalendarComponent o) {
+    if (m_item instanceof Comparable) {
+      return ((Comparable) m_item).compareTo(o.getItem());
+    }
+    else {
+      int i = this.getFromDate().compareTo(o.getFromDate());
+      if (i == 0) {
+        String label1 = m_item.getSubject();
+        String label2 = o.getItem().getSubject();
+        i = StringUtility.compareIgnoreCase(label1, label2);
+        if (i == 0) {
+          i = Integer.valueOf(this.hashCode()).compareTo(o.hashCode());
+        }
+      }
+      return i;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_item == null) ? 0 : m_item.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    CalendarComponent other = (CalendarComponent) obj;
+    if (m_item == null) {
+      if (other.m_item != null) {
+        return false;
+      }
+    }
+    else if (!m_item.equals(other.m_item)) {
+      return false;
+    }
+    return true;
+  }
+
 }
