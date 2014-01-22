@@ -35,6 +35,10 @@ public class RwtScoutPartEvent extends EventObject {
    * the part is closed
    */
   public static final int TYPE_CLOSED = 50;
+  /**
+   * the part is canceled
+   */
+  public static final int TYPE_CANCELED = 60;
 
   private int m_type;
   public boolean doit = true;

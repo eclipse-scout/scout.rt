@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.datefield;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
@@ -32,13 +29,8 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
   private IRwtScoutDateField m_dateField;
   private IRwtScoutTimeField m_timeField;
 
-  private Set<IPopupSupportListener> m_popupEventListeners;
-  private Object m_popupEventListenerLock;
-
   @Override
   protected void initializeUi(Composite parent) {
-    m_popupEventListeners = new HashSet<IPopupSupportListener>();
-    m_popupEventListenerLock = new Object();
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
@@ -115,18 +107,20 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
   @Override
   public void addPopupEventListener(IPopupSupportListener listener) {
     if (m_dateField instanceof IPopupSupport) {
-      IPopupSupport popupSupport = (IPopupSupport) m_dateField;
-      popupSupport.addPopupEventListener(listener);
-      popupSupport.addPopupEventListener(listener);
+      ((IPopupSupport) m_dateField).addPopupEventListener(listener);
+    }
+    if (m_timeField instanceof IPopupSupport) {
+      ((IPopupSupport) m_timeField).addPopupEventListener(listener);
     }
   }
 
   @Override
   public void removePopupEventListener(IPopupSupportListener listener) {
     if (m_dateField instanceof IPopupSupport) {
-      IPopupSupport popupSupport = (IPopupSupport) m_dateField;
-      popupSupport.removePopupEventListener(listener);
-      popupSupport.removePopupEventListener(listener);
+      ((IPopupSupport) m_dateField).removePopupEventListener(listener);
+    }
+    if (m_timeField instanceof IPopupSupport) {
+      ((IPopupSupport) m_timeField).removePopupEventListener(listener);
     }
   }
 }

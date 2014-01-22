@@ -27,12 +27,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
 import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -57,6 +60,8 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
   private int m_prefHeight;
   private int m_style;
   private RwtScoutPartListener m_popupEventListener;
+  private P_TraverseTabKeyListener m_traverseTabKeyListener;
+  private P_FocusLostListener m_focusLostListener;
 
   private List<IFormFieldPopupEventListener> m_eventListeners = new ArrayList<IFormFieldPopupEventListener>();
   private Object m_eventListenerLock = new Object();
@@ -65,6 +70,8 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
     m_owner = owner;
     m_style = SWT.NO_TRIM;
     m_popupEventListener = new P_PopupEventListener();
+    m_traverseTabKeyListener = new P_TraverseTabKeyListener();
+    m_focusLostListener = new P_FocusLostListener();
   }
 
   @Override
@@ -122,6 +129,8 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
       m_uiScoutPopup.showPart();
       // install traversal keystrokes on inner form
       installTraverseKeyStrokes(m_uiScoutPopup.getUiContentPane());
+      // install focus out listeners on inner form
+      installFocusOutListeners(m_uiScoutPopup.getUiContentPane());
     }
     catch (Throwable t) {
       LOG.error("failed to show popup form", t);
@@ -230,26 +239,6 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
           return "ctrl-enter";
         }
       }
-
-      @Order(20.0)
-      public class EscapeKeyStroke extends AbstractKeyStroke {
-
-        @Override
-        public void execAction() throws ProcessingException {
-          getUiContainer().getDisplay().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-              closePopup(FormFieldPopupEvent.TYPE_CANCEL);
-            }
-          });
-        }
-
-        @Override
-        public String getConfiguredKeyStroke() {
-          return "escape";
-        }
-      }
     }
 
     private class FormHandler extends AbstractFormHandler {
@@ -265,13 +254,20 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
     }
   }
 
+  /**
+   * Touch the field to write its UI value back to the model as long as the popup window was not canceled.
+   */
+  private void touch(int type) {
+    if ((type & FormFieldPopupEvent.TYPE_CANCEL) == 0) {
+      touch();
+    }
+  }
+
   private void touch(Control control) {
     if (control == null || control.isDisposed()) {
       return;
     }
-    Event event = new Event();
-    event.widget = control;
-    control.notifyListeners(SWT.Traverse, event);
+    fireFocusLostEvent(control);
 
     if (control instanceof Composite) {
       Composite composite = (Composite) control;
@@ -281,31 +277,55 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
     }
   }
 
-  private void installTraverseKeyStrokes(Control control) {
-    control.addTraverseListener(new TraverseListener() {
-      private static final long serialVersionUID = 1L;
+  private void fireFocusLostEvent(Control control) {
+    Event focusEvent = new Event();
+    focusEvent.widget = control;
+    control.notifyListeners(SWT.FocusOut, focusEvent);
+  }
 
-      @Override
-      public void keyTraversed(TraverseEvent e) {
-        switch (e.detail) {
-          case SWT.TRAVERSE_TAB_NEXT: {
-            e.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
-            break;
-          }
-          case SWT.TRAVERSE_TAB_PREVIOUS: {
-            e.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
-            break;
-          }
-        }
-      }
-    });
+  private void installTraverseKeyStrokes(Control control) {
+    control.addTraverseListener(m_traverseTabKeyListener);
+
     if (control instanceof Composite) {
       Composite composite = (Composite) control;
       for (Control child : composite.getChildren()) {
         installTraverseKeyStrokes(child);
       }
+    }
+  }
+
+  private void uninstallTraverseKeyStrokes(Control control) {
+    control.removeTraverseListener(m_traverseTabKeyListener);
+
+    if (control instanceof Composite) {
+      Composite composite = (Composite) control;
+      for (Control child : composite.getChildren()) {
+        uninstallTraverseKeyStrokes(child);
+      }
+    }
+  }
+
+  private void installFocusOutListeners(Control control) {
+    if (control instanceof Composite) {
+      Composite composite = (Composite) control;
+      for (Control child : composite.getChildren()) {
+        installFocusOutListeners(child);
+      }
+    }
+    else {
+      control.addFocusListener(m_focusLostListener);
+    }
+  }
+
+  private void uninstallFocusOutListeners(Control control) {
+    if (control instanceof Composite) {
+      Composite composite = (Composite) control;
+      for (Control child : composite.getChildren()) {
+        uninstallFocusOutListeners(child);
+      }
+    }
+    else {
+      control.removeFocusListener(m_focusLostListener);
     }
   }
 
@@ -332,7 +352,7 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
   }
 
   public void closePopup(int type) {
-    touch();
+    touch(type);
     m_uiScoutPopup.removeRwtScoutPartListener(m_popupEventListener);
     m_uiScoutPopup.closePart();
     m_uiScoutPopup = null;
@@ -400,6 +420,9 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
       if (e.getType() == RwtScoutPartEvent.TYPE_CLOSED) {
         closePopup(FormFieldPopupEvent.TYPE_OK);
       }
+      else if (e.getType() == RwtScoutPartEvent.TYPE_CANCELED) {
+        closePopup(FormFieldPopupEvent.TYPE_CANCEL); // close the pop without saving the value back to the model
+      }
     }
   }
 
@@ -409,6 +432,13 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
 
     public void createPart(IForm scoutForm, Composite ownerComponent, int style, IRwtEnvironment uiEnvironment) {
       super.createPart(scoutForm, ownerComponent, (Control) null, style, uiEnvironment);
+    }
+
+    @Override
+    protected void handleUiWindowClosed() {
+      super.handleUiWindowClosed();
+      uninstallFocusOutListeners(getUiContentPane());
+      uninstallTraverseKeyStrokes(getUiContentPane());
     }
 
     @Override
@@ -422,6 +452,16 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
             closePart();
             fireRwtScoutPartEvent(new RwtScoutPartEvent(P_RwtScoutDropDownPopup.this, RwtScoutPartEvent.TYPE_CLOSED));
           }
+
+          /*
+           * Shell closed event is fired when keystroke ESC gets pressed.
+           */
+          @Override
+          public void shellClosed(ShellEvent e) {
+            // focus listeners must be installed here to prevent writing the value back the to model.
+            uninstallFocusOutListeners(m_uiScoutPopup.getUiContentPane());
+            fireRwtScoutPartEvent(new RwtScoutPartEvent(P_RwtScoutDropDownPopup.this, RwtScoutPartEvent.TYPE_CANCELED));
+          }
         };
         getShell().addShellListener(m_shellListener);
       }
@@ -431,8 +471,40 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
     protected void uninstallFocusLostListener() {
       if (m_shellListener != null) {
         getShell().removeShellListener(m_shellListener);
+        m_shellListener = null;
       }
-      m_shellListener = null;
+    }
+  }
+
+  private class P_TraverseTabKeyListener implements TraverseListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void keyTraversed(TraverseEvent e) {
+      switch (e.detail) {
+        case SWT.TRAVERSE_TAB_NEXT: {
+          e.doit = false;
+          closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
+          break;
+        }
+        case SWT.TRAVERSE_TAB_PREVIOUS: {
+          e.doit = false;
+          closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
+          break;
+        }
+      }
+    }
+  }
+
+  private class P_FocusLostListener extends FocusAdapter {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void focusLost(FocusEvent event) {
+      if (event.widget instanceof Control) {
+        Control focusLostControl = (Control) event.widget;
+        RwtUtility.runUiInputVerifier(focusLostControl);
+      }
     }
   }
 }
