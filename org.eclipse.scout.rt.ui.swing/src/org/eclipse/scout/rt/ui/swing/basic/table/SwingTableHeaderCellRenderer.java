@@ -78,6 +78,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
       if (colIndex == 0 && !StringUtility.isNullOrEmpty(cell.getIconId())) {
         align = -1;
       }
+      label.setVerticalAlignment(SwingConstants.CENTER);
       if (align > 0) {
         label.setHorizontalAlignment(JLabel.RIGHT);
       }
