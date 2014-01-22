@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayoutData;
-import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -32,7 +31,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
@@ -258,35 +256,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     if (defaultButton != null) {
       defaultButton.setFocus();
       getShell().setDefaultButton(defaultButton);
-      final Button fDefaultButton = defaultButton;
-      // Press the default button with the ENTER key (workaround)
-      m_uiEnvironment.addKeyStroke(getShell(), new RwtKeyStroke(SWT.CR) {
-
-        @Override
-        public void handleUiAction(Event e) {
-          fDefaultButton.notifyListeners(SWT.Selection, null);
-        }
-      }, false);
     }
-
-    // Cancel the dialog with the ESCAPE key (workaround)
-    m_uiEnvironment.addKeyStroke(getShell(), new RwtKeyStroke(SWT.ESC) {
-
-      @Override
-      public void handleUiAction(Event e) {
-        cancelPressed();
-      }
-    }, false);
-
-    // remove key strokes when shell is disposed
-    getShell().addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent event) {
-        m_uiEnvironment.removeKeyStrokes(getShell());
-      }
-    });
 
     // layout
     GridData gridData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
