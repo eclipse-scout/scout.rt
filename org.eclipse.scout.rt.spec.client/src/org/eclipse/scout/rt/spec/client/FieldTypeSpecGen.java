@@ -23,10 +23,6 @@ import org.eclipse.scout.rt.spec.client.out.IDocSection;
  */
 public abstract class FieldTypeSpecGen extends AbstractSpecGen {
 
-  public FieldTypeSpecGen(String pluginName) {
-    super(pluginName);
-  }
-
   public void printAllFields() throws ProcessingException {
 
     Class[] fieldTypes = new Class[]{AbstractStringField.class, AbstractDateField.class};

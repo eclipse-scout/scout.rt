@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -31,12 +35,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.spec.client.internal.Activator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -129,21 +134,6 @@ public final class SpecIOUtility {
   }
 
   /**
-   * Copy all files in sourcefolder to destination
-   * 
-   * @param filter
-   * @param sourceDir
-   * @param destDir
-   * @throws ProcessingException
-   */
-  public static void copyAll(File sourceDir, File destDir, FilenameFilter filter) throws ProcessingException {
-    for (File file : sourceDir.listFiles(filter)) {
-      File destFile = new File(destDir, file.getName());
-      copy(file, destFile);
-    }
-  }
-
-  /**
    * Copies a file from a bundle with a given path inside this bundle (jar or source) to a destination directory
    * 
    * @param bundle
@@ -160,7 +150,7 @@ public final class SpecIOUtility {
     try {
       InputStream stream;
       try {
-        stream = FileLocator.openStream(Activator.getDefault().getBundle(), new Path(path), true);
+        stream = FileLocator.openStream(bundle, new Path(path), true);
         sourceChannel = Channels.newChannel(stream);
         out = new FileOutputStream(destFile);
         destChannel = out.getChannel();
@@ -287,4 +277,102 @@ public final class SpecIOUtility {
     return s;
   }
 
+  /**
+   * List all files in a directory inside a bundle. Source and binary bundles are supported.
+   * 
+   * @param bundle
+   * @param path
+   *          Relative path inside bundle. Expects {@link File#separator} as path-separator.
+   * @param filter
+   *          When implementing {@link FilenameFilter#accept(File dir, String name)}, make sure not to depend on the
+   *          <code>dir</code> parameter as this will be null in case of binary bundles.
+   * @return
+   * @throws ProcessingException
+   */
+  public static List<String> listFiles(Bundle bundle, String path, FilenameFilter filter) throws ProcessingException {
+    if (!path.endsWith(File.separator)) {
+      path = path + File.separator;
+    }
+
+    URL bundleRoot = bundle.getEntry("/");
+    URI resolvedBundleUri = null;
+    URL resolvedBundleUrl = null;
+    try {
+      resolvedBundleUrl = FileLocator.resolve(bundleRoot);
+      resolvedBundleUri = resolvedBundleUrl.toURI();
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException("Error reading directory", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error reading directory", e);
+    }
+
+    if ("jar".equals(resolvedBundleUri.getScheme())) {
+      return listFilesBinary(path, resolvedBundleUrl, filter);
+    }
+    else if ("file".equals(resolvedBundleUri.getScheme())) {
+      return listFilesSource(path, resolvedBundleUri, filter);
+    }
+    throw new ProcessingException("Error reading directory");
+  }
+
+  /**
+   * @param relativePath
+   * @param resolvedFileBundleUri
+   * @param filter
+   * @return
+   */
+  private static List<String> listFilesSource(String relativePath, URI resolvedFileBundleUri, FilenameFilter filter) {
+    ArrayList<String> fileNames = new ArrayList<String>();
+    File bundleRoot = new File(resolvedFileBundleUri);
+    File dir = new File(bundleRoot, relativePath);
+    File[] files = dir.listFiles(filter);
+    for (File file : files) {
+      if (file.isFile()) {
+        fileNames.add(file.getName());
+      }
+    }
+    return fileNames;
+  }
+
+  private static List<String> listFilesBinary(String relativePath, URL resolvedBinaryBundleUrl, FilenameFilter filter) throws ProcessingException {
+    ArrayList<String> list = new ArrayList<String>();
+    JarInputStream jis = null;
+    try {
+      JarURLConnection connection = (JarURLConnection) resolvedBinaryBundleUrl.openConnection();
+      File jarFile = new File(connection.getJarFileURL().toURI());
+      jis = new JarInputStream(new FileInputStream(jarFile));
+      ZipEntry entry;
+      while ((entry = jis.getNextEntry()) != null) {
+        String name = entry.getName().replace("/", File.separator);
+        if (name.startsWith(relativePath)
+            && name.substring(relativePath.length()).length() > 0
+            && !name.substring(relativePath.length()).contains(File.separator)
+            && filter.accept(null, name.substring(relativePath.length()))) {
+          list.add(name.substring(relativePath.length()));
+        }
+      }
+    }
+    catch (FileNotFoundException e) {
+      throw new ProcessingException("Error reading directory", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error reading directory", e);
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException("Error reading directory", e);
+    }
+    finally {
+      if (jis != null) {
+        try {
+          jis.close();
+        }
+        catch (IOException e) {
+          // ignore
+        }
+      }
+    }
+    return list;
+  }
 }

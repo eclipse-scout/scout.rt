@@ -40,7 +40,7 @@ public class SpecJob extends Job {
   private final SpecPostProcessor m_postProcessor;
 
   public SpecJob(Class<? extends IClientSession> clientSessionClass, String pluginName) {
-    this(clientSessionClass, STARTUP_TIMEOUT_IN_MS, new SpecPostProcessor(pluginName));
+    this(clientSessionClass, STARTUP_TIMEOUT_IN_MS, new SpecPostProcessor());
   }
 
   public SpecJob(Class<? extends IClientSession> clientSessionClass, long startupTimeout, SpecPostProcessor postProcessor) {

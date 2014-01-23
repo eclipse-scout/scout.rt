@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
 public class AbstractSpecGen {
   private final SpecFileConfig m_fileConfig;
 
-  public AbstractSpecGen(String pluginName) {
-    m_fileConfig = new SpecFileConfig(pluginName);
+  public AbstractSpecGen() {
+    m_fileConfig = new SpecFileConfig();
   }
 
   protected SpecFileConfig getFileConfig() {

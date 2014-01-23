@@ -37,12 +37,11 @@ public class MediawikiAnchorCollectorTest {
 
   @Before
   public void setUp() throws ProcessingException {
-    m_testFile = new File(m_config.getMediawikiInDir(), TEST_FILE);
+    m_testFile = new File(m_config.getBundleRoot(), m_config.getRelativeMediawikiSourceDirPath() + File.separator + TEST_FILE);
   }
 
   @Test
   public void testCollectAnchors() throws ProcessingException {
-    m_testFile = new File(m_config.getMediawikiInDir(), TEST_FILE);
 
     MediawikiAnchorCollector ac = new MediawikiAnchorCollector(m_testFile);
     List<String> anchors = ac.collectAnchors(m_testFile);
@@ -113,7 +112,7 @@ public class MediawikiAnchorCollectorTest {
   @Test
   public void testReplaceLinks() throws ProcessingException {
     File linksFile = new File(m_config.getSpecInDir(), TEST_LINKS_FILE);
-    File introFile = new File(m_config.getMediawikiInDir(), TEST_INTRO);
+    File introFile = new File(m_config.getBundleRoot(), m_config.getRelativeMediawikiSourceDirPath() + File.separator + TEST_INTRO);
     MediawikiAnchorCollector m = new MediawikiAnchorCollector(m_testFile);
     m.replaceLinks(introFile, linksFile);
   }

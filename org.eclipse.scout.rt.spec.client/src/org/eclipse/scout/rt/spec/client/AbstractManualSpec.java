@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.spec.client;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 import org.osgi.framework.Bundle;
@@ -23,30 +22,34 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractManualSpec extends AbstractSpecGen {
 
-  public AbstractManualSpec() {
-    super(Platform.getProduct().getDefiningBundle().getSymbolicName());
-  }
-
   protected void copyImages() throws ProcessingException {
-    File source = getFileConfig().getImageInDir();
     File dest = getFileConfig().getImageDir();
-    SpecIOUtility.copyAll(source, dest, getFilter());
+    dest.mkdirs();
+    for (Bundle bundle : getFileConfig().getSourceBundles()) {
+      for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeImagesSourceDirPath(), getFilter())) {
+        File destFile = new File(dest, file);
+        SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeImagesSourceDirPath() + File.separator + file, destFile);
+      }
+    }
   }
 
   protected void copyMediawikiFiles() throws ProcessingException {
     File dest = getFileConfig().getMediawikiDir();
     dest.mkdirs();
     for (Bundle bundle : getFileConfig().getSourceBundles()) {
-      File source = getFileConfig().getMediawikiInDir(bundle);
-      for (File file : source.listFiles(getFilter())) {
-        File destFile = new File(dest, file.getName());
-        SpecIOUtility.copy(file, destFile);
+      for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeMediawikiSourceDirPath(), getFilter())) {
+        File destFile = new File(dest, file);
+        SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeMediawikiSourceDirPath() + File.separator + file, destFile);
         convertToHTML(destFile);
         new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
       }
     }
   }
 
+  /**
+   * When overriding, make sure the returned {@link FilenameFilter} does not depend on the <code>dir</code> parameter in
+   * {@link FilenameFilter#accept(File dir, String name)} as this will be null in case of binary bundles.
+   */
   protected FilenameFilter getFilter() {
     return new FilenameFilter() {
 

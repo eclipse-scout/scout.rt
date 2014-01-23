@@ -21,10 +21,6 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
  */
 public class SpecPostProcessor extends AbstractSpecGen implements ISpecProcessor {
 
-  public SpecPostProcessor(String pluginName) {
-    super(pluginName);
-  }
-
   @Override
   public void process() throws ProcessingException {
     for (File wiki : getFileConfig().getMediawikiDir().listFiles()) {

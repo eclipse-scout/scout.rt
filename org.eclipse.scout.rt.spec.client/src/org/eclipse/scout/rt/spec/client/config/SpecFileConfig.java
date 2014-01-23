@@ -36,31 +36,33 @@ public class SpecFileConfig {
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
   private static final String LINKS_FILE_NAME = "links.properties";
 
-  private final String m_pluginName;
   private String[] m_additionalSourcePlugins;
-
-  public SpecFileConfig(String pluginName) {
-    m_pluginName = pluginName;
-  }
+  private Bundle m_bundle;
 
   /**
-   * @return root of the bundle output
-   * @throws ProcessingException
+   * The bundle property ({@link #getBundle()}) will be set to the defining bundle of the product which was selected
+   * when running this Eclipse instance.
    */
-  // TODO ASA check if getBundleRoot() (and calling hierachy) is needed anymore after refactoring
-  private File getBundleRoot() throws ProcessingException {
-    return getBundleRoot(getBundle());
+  public SpecFileConfig() {
+    m_bundle = Platform.getProduct().getDefiningBundle();
   }
 
   /**
-   * @param bundle
+   * The bundle property ({@link #getBundle()}) will be set to provided plugin.
+   */
+  public SpecFileConfig(String pluginName) {
+    m_bundle = Platform.getBundle(pluginName);
+  }
+
+  /**
+   * @return root of the plugin returned by {@link #getBundle()}
    * @return
    * @throws ProcessingException
    */
-  private File getBundleRoot(Bundle bundle) throws ProcessingException {
+  public File getBundleRoot() throws ProcessingException {
     URI uri;
     try {
-      URL bundleRoot = bundle.getEntry("/");
+      URL bundleRoot = getBundle().getEntry("/");
       uri = FileLocator.resolve(bundleRoot).toURI();
       return new File(uri);
     }
@@ -73,14 +75,13 @@ public class SpecFileConfig {
   }
 
   public Bundle getBundle() {
-    return Platform.getBundle(m_pluginName);
+    return m_bundle;
   }
 
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SpecFileConfig.class);
 
   public List<Bundle> getSourceBundles() {
     ArrayList<Bundle> arrayList = new ArrayList<Bundle>();
-    arrayList.add(getBundle());
     for (String bundleName : m_additionalSourcePlugins) {
       Bundle bundle = Platform.getBundle(bundleName);
       if (bundle != null) {
@@ -90,6 +91,7 @@ public class SpecFileConfig {
         LOG.warn("no bundle available with symbolic name: " + bundleName);
       }
     }
+    arrayList.add(getBundle());
     return arrayList;
   }
 
@@ -112,16 +114,6 @@ public class SpecFileConfig {
   }
 
   /**
-   * Location of referenced images
-   * 
-   * @return image directory
-   * @throws ProcessingException
-   */
-  public File getImageInDir() throws ProcessingException {
-    return new File(getSpecInDir(), IMAGES_DIR_NAME);
-  }
-
-  /**
    * @return Html output
    * @throws ProcessingException
    */
@@ -137,6 +129,14 @@ public class SpecFileConfig {
     return new File(getSpecDir(), MEDIAWIKI_DIR_NAME);
   }
 
+  public String getRelativeMediawikiSourceDirPath() {
+    return SPEC_IN_DIR_NAME + File.separator + MEDIAWIKI_DIR_NAME;
+  }
+
+  public String getRelativeImagesSourceDirPath() {
+    return SPEC_IN_DIR_NAME + File.separator + IMAGES_DIR_NAME;
+  }
+
   /**
    * @return mediawiki raw output (without postprocessing)
    * @throws ProcessingException
@@ -146,43 +146,32 @@ public class SpecFileConfig {
   }
 
   /**
-   * @return location of manually written input files, root directory
+   * @param bundle
+   * @return
    * @throws ProcessingException
    */
+  // TODO ASA remove when links.properties are not written anymore to input dir
   public File getSpecInDir() throws ProcessingException {
-    return getSpecInDir(getBundle());
-  }
-
-  /**
-   * @param bundle
-   * @return
-   * @throws ProcessingException
-   */
-  private File getSpecInDir(Bundle bundle) throws ProcessingException {
-    return new File(getBundleRoot(bundle), SPEC_IN_DIR_NAME);
-  }
-
-  /**
-   * @return mediawiki output
-   * @throws ProcessingException
-   */
-  public File getMediawikiInDir() throws ProcessingException {
-    return getMediawikiInDir(getBundle());
-  }
-
-  /**
-   * @param bundle
-   * @return
-   * @throws ProcessingException
-   */
-  public File getMediawikiInDir(Bundle bundle) throws ProcessingException {
-    return new File(getSpecInDir(bundle), MEDIAWIKI_DIR_NAME);
+    return new File(getBundleRoot(), SPEC_IN_DIR_NAME);
   }
 
   public File getLinksFile() throws ProcessingException {
     return new File(getSpecInDir(), LINKS_FILE_NAME);
   }
 
+  /**
+   * Define additional source plugins for copying mediawiki and image files. Source and binary plugins are supported.
+   * <p>
+   * Attention order matters for copying files: <br>
+   * First files from the additional plugins are copied in the same order as the plugins are provided here. Then files
+   * from the plugin returned by {@link #getBundle()} are copied. If different plugins contain files with the same name
+   * they are overwritten.
+   * <p>
+   * 
+   * @param additionalSourcePlugins
+   *          one or more bundle-symbolic-names
+   */
+  // TODO ASA So far, there is no support for subdirectories. Would we need it?
   public void setAdditionalSourcePlugins(String... additionalSourcePlugins) {
     m_additionalSourcePlugins = additionalSourcePlugins;
   }

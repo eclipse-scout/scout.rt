@@ -10,43 +10,123 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.runtime.FileLocator;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.List;
+
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 
 /**
  * Tests for {@link SpecIOUtility}
  */
 public class SpecIOUtilityTest {
-  private static final String TEST_DIR = "resources/spec/mediawiki";
-  private static final String TEST_FILE_PATH = TEST_DIR + "/CC.mediawiki";
+  private static final String TEST_DIR = "resources" + File.separator + "spec" + File.separator + "mediawiki";
+  private SpecFileConfig m_config;
 
-  /**
-   * Test for {@link SpecIOUtility#copyFile(org.osgi.framework.Bundle, String, java.io.File)}
-   * 
-   * @throws ProcessingException
-   */
-  @Test
-  public void testCopyFile() throws ProcessingException {
-    SpecFileConfig config = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");
-    File specDir = config.getSpecDir();
-    specDir.mkdirs();
-    SpecIOUtility.copyFile(config.getBundle(), TEST_FILE_PATH, new File(specDir, "out.mediawiki"));
+  @Before
+  public void setup() {
+    m_config = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");
+  }
+
+  @After
+  public void tearDown() throws ProcessingException {
+    FileUtility.deleteDirectoryRecursive(m_config.getSpecDir());
   }
 
   /**
-   * Copy all files
+   * Test for {@link SpecIOUtility#copyFile(org.osgi.framework.Bundle, String, java.io.File)}
    */
   @Test
-  public void testCopyAll2() throws ProcessingException, URISyntaxException, IOException {
-    SpecFileConfig config = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");
-    File f = new File(FileLocator.toFileURL(config.getBundle().getEntry("/resources/spec/mediawiki")).toURI());
-    SpecIOUtility.copyAll(f, config.getSpecDir().getParentFile(), null);
+  public void testCopyFileSource() throws ProcessingException, IOException {
+    testCopyFile(m_config.getBundle(), TEST_DIR + File.separator + "LoremIpsum1.mediawiki", "Lorem ipsum");
+  }
+
+  /**
+   * Test for {@link SpecIOUtility#copyFile(org.osgi.framework.Bundle, String, java.io.File)}
+   */
+  @Test
+  public void testCopyFileBinary() throws ProcessingException, IOException {
+    Bundle bundle = Platform.getBundle("org.eclipse.core.runtime");
+    String path = "org" + File.separator + "eclipse" + File.separator + "core" + File.separator + "runtime" + File.separator + "Platform.class";
+    String expectedContentPart = "Platform";
+    testCopyFile(bundle, path, expectedContentPart);
+  }
+
+  private void testCopyFile(Bundle bundle, String path, String expectedContentPart) throws ProcessingException, FileNotFoundException, IOException {
+    File specDir = m_config.getSpecDir();
+    specDir.mkdirs();
+    File destFile = new File(specDir, new File(path).getName());
+    SpecIOUtility.copyFile(bundle, path, destFile);
+    assertTrue("File was not copied as expected", destFile.exists());
+    BufferedReader reader = null;
+    boolean contentFound = false;
+    String line;
+    try {
+      reader = new BufferedReader(new FileReader(destFile));
+      do {
+        line = reader.readLine();
+        if (line.contains(expectedContentPart)) {
+          contentFound = true;
+          break;
+        }
+      }
+      while (line != null);
+    }
+    finally {
+      if (reader != null) {
+        reader.close();
+      }
+    }
+    assertTrue("Content of copied file not as expected.", contentFound);
+  }
+
+  /**
+   * Test for {@link SpecIOUtility#listFiles(org.osgi.framework.Bundle, String, FilenameFilter)}
+   */
+  @Test
+  public void testListFilesBinary() throws ProcessingException {
+    List<String> fileList = SpecIOUtility.listFiles(Platform.getBundle("org.eclipse.core.runtime"), "org" + File.separator + "eclipse" + File.separator + "core" + File.separator + "runtime", new AnyFileFilter());
+    assertTrue("Expected 'Platform.class' in fileList", fileList.contains("Platform.class"));
+  }
+
+  /**
+   * Test for {@link SpecIOUtility#listFiles(org.osgi.framework.Bundle, String, FilenameFilter)}
+   */
+  @Test
+  public void testListFilesSource() throws ProcessingException {
+    List<String> fileList = SpecIOUtility.listFiles(m_config.getBundle(), TEST_DIR, new LoremIpsum12Filter());
+    assertTrue("Expected 2 files in list. But fileList.size() returned [" + fileList.size() + "]", fileList.size() == 2);
+    assertTrue("Expected 'LoremIpsum1.mediawiki' in fileList.", fileList.contains("LoremIpsum1.mediawiki"));
+    assertTrue("Expected 'LoremIpsum2.mediawiki' in fileList.", fileList.contains("LoremIpsum2.mediawiki"));
+  }
+
+  private class AnyFileFilter implements FilenameFilter {
+    @Override
+    public boolean accept(File dir, String name) {
+      return true;
+    }
+  }
+
+  private class LoremIpsum12Filter implements FilenameFilter {
+
+    @Override
+    public boolean accept(File dir, String name) {
+      return name.contains("LoremIpsum") && !name.contains("LoremIpsum3");
+    }
+
   }
 
 }

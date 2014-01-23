@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.junit.Test;
@@ -40,5 +41,23 @@ public class FileUtilityTest {
       TestUtility.deleteTempFile(zipFile);
       TestUtility.deleteTempFile(noZipFile);
     }
+  }
+
+  @Test
+  public void testDeleteDirectoryRecursiv() throws IOException {
+    File tempFile = File.createTempFile("tempFile", "tmp");
+    File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");
+    File tempDirWithSubs = new File(tempDir, "sub" + File.separator + "sub" + File.separator + "sub");
+    tempFile.delete();
+    if (!tempDir.exists()) {
+      tempDirWithSubs.mkdirs();
+    }
+    tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
+    tempFile.createNewFile();
+    assertTrue("Temp dir was not successfully created.", tempDir.exists());
+    assertTrue("Temp file was not successfully created.", tempFile.exists());
+    FileUtility.deleteDirectoryRecursive(tempDir);
+    assertFalse("Temp dir was not deleted.", tempDir.exists());
+    assertFalse("Temp file was not deleted.", tempFile.exists());
   }
 }
