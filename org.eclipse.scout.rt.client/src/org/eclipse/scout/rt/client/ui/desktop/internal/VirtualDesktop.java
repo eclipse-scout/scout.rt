@@ -226,7 +226,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void openUrlInBrowser(String path, IUrlTarget target) {
+  public void openUrlInBrowser(String url) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void openUrlInBrowser(String url, IUrlTarget target) {
     throw createUnsupportedOperationException();
   }
 

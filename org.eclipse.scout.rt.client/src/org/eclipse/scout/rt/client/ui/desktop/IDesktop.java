@@ -397,6 +397,14 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * Opens the link in the browser.
    */
+  void openUrlInBrowser(String url);
+
+  /**
+   * Opens the link in the browser.
+   * 
+   * @param target
+   *          used to specify where the url should be opened. Only considered by the web ui.
+   */
   void openUrlInBrowser(String url, IUrlTarget target);
 
   /**

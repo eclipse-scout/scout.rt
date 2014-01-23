@@ -168,6 +168,9 @@ public class BrowserExtension {
     return m_hyperlinkProcessor.getDefaultTarget();
   }
 
+  /**
+   * Delegates to {@link HyperlinkProcessor#setDefaultTarget(String)}
+   */
   public void setDefaultHyperlinkTarget(String defaultTarget) {
     m_hyperlinkProcessor.setDefaultTarget(defaultTarget);
   }
@@ -176,6 +179,9 @@ public class BrowserExtension {
     return m_hyperlinkProcessor.isConvertExternalUrlsEnabled();
   }
 
+  /**
+   * Delegates to {@link HyperlinkProcessor#setConvertExternalUrlsEnabled(boolean)}
+   */
   public void setConvertExternalUrlsEnabled(boolean convertExternalUrls) {
     m_hyperlinkProcessor.setConvertExternalUrlsEnabled(convertExternalUrls);
   }
@@ -223,6 +229,11 @@ public class BrowserExtension {
       return m_defaultTarget;
     }
 
+    /**
+     * When set, target="defaultTarget" is added to external links if the link has not yet a target set.
+     * <p>
+     * Local links are not modified.
+     */
     public void setDefaultTarget(String defaultTarget) {
       m_defaultTarget = defaultTarget;
     }
@@ -231,6 +242,11 @@ public class BrowserExtension {
       return m_convertExternalUrlsEnabled;
     }
 
+    /**
+     * Set to true to also replace external urls with javascript callbacks, not only the local ones.
+     * <p>
+     * See <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=426326">bug 426326</a> for implications.
+     */
     public void setConvertExternalUrlsEnabled(boolean convertExternalUrls) {
       m_convertExternalUrlsEnabled = convertExternalUrls;
     }

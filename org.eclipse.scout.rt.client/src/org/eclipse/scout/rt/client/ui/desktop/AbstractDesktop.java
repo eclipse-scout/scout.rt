@@ -1215,10 +1215,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void openUrlInBrowser(String path, IUrlTarget target) {
+  public void openUrlInBrowser(String url) {
+    openUrlInBrowser(url, null);
+  }
+
+  @Override
+  public void openUrlInBrowser(String url, IUrlTarget target) {
     if (!UserAgentUtility.isWebClient()) {
       try {
-        SERVICES.getService(IShellService.class).shellOpen(path);
+        SERVICES.getService(IShellService.class).shellOpen(url);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1228,7 +1233,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (target == null) {
         target = UrlTarget.AUTO;
       }
-      fireOpenUrlInBrowser(path, target);
+      fireOpenUrlInBrowser(url, target);
     }
   }
 
