@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.RwtScoutGroupBox;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -43,7 +44,9 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
   private final String m_variantActiveMarked;
 
   private Composite m_tabItem;
-  private boolean m_uiFocus;
+  private boolean m_selected;
+  private boolean m_groupBoxBuilt;
+  private boolean m_lazyBuildEnabled;
   private Button m_tabButton;
 
   private RwtScoutTabItem m_nextTabItem = null;
@@ -57,10 +60,16 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     m_variantActive = variantActive;
     m_variantInActiveMarked = variantInActiveMarked;
     m_variantActiveMarked = variantActiveMarked;
+    setLazyBuildEnabled(true);
   }
 
   @Override
   protected void initializeUi(Composite parent) {
+    createTabButton();
+    createTabItem();
+  }
+
+  protected void createTabButton() {
     m_tabButton = getUiEnvironment().getFormToolkit().createButton(m_tabboxButtonbar, "", SWT.NONE);
 
     m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
@@ -70,7 +79,7 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
       @Override
       public void widgetSelected(SelectionEvent e) {
         handleUiSelection();
-        setActiveButton(m_tabButton);
+        select();
       }
     });
     registerCompositeOnWidget(m_tabButton, this);
@@ -80,21 +89,68 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
 
     RowData rowData = new RowData();
     m_tabButton.setLayoutData(rowData);
+  }
 
+  protected void createTabItem() {
     m_tabItem = getUiEnvironment().getFormToolkit().createComposite(m_tabboxContainer, SWT.NONE);
     m_tabItem.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     m_tabItem.setLayout(new FillLayout());
+    if (!isLazyBuildEnabled() || isSelected()) {
+      buildGroupbox();
+    }
+    else {
+      //A container is necessary otherwise isUiDisposed will return true
+      setUiContainer(m_tabItem);
+    }
+  }
+
+  public void recreateTabButton() {
+    disposeTabButton();
+    createTabButton();
+
+    //Reinit properties
+    attachScout();
+    if (isSelected()) {
+      select();
+    }
+    else {
+      unselect();
+    }
+  }
+
+  protected void buildGroupbox() {
+    if (isGroupBoxBuilt()) {
+      return;
+    }
 
     super.initializeUi(m_tabItem);
+    m_groupBoxBuilt = true;
+    if (isCreated()) {
+      // m_tabItem.layout(true, true) is not sufficient since the groupbox may be bigger than the previous one, thus the dialog may have to adjust its size
+      RwtLayoutUtility.invalidateLayout(getUiEnvironment(), m_tabItem);
+    }
+  }
+
+  public boolean isGroupBoxBuilt() {
+    return m_groupBoxBuilt;
   }
 
   @Override
   protected void disposeImpl() {
     super.disposeImpl();
+    disposeTabButton();
+    disposeTabItem();
+  }
+
+  protected void disposeTabButton() {
     if (m_tabButton != null && !m_tabButton.isDisposed()) {
+      getUiEnvironment().removeKeyStrokes(m_tabButton);
       m_tabButton.dispose();
       m_tabButton = null;
     }
+  }
+
+  protected void disposeTabItem() {
     if (m_tabItem != null && !m_tabItem.isDisposed()) {
       m_tabItem.dispose();
       m_tabItem = null;
@@ -129,42 +185,32 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     return true;
   }
 
-  private boolean setActiveButton(Button tabButton) {
-    if (!isValidWidget(tabButton)) {
-      return false;
-    }
-    Control[] children = tabButton.getParent().getChildren();
-    for (Control child : children) {
-      makeButtonInActive(child);
-    }
-    makeButtonActive(tabButton);
-    return true;
-  }
-
-  private void makeButtonInActive(Control tabButton) {
-    if (!isValidWidget(tabButton)) {
+  private void setButtonInactive() {
+    m_selected = false;
+    if (!isValidWidget(m_tabButton)) {
       return;
     }
-    Object oldVariant = tabButton.getData(RWT.CUSTOM_VARIANT);
+    Object oldVariant = m_tabButton.getData(RWT.CUSTOM_VARIANT);
     if (oldVariant == m_variantActiveMarked || oldVariant == m_variantInActiveMarked) {
-      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActiveMarked);
+      m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActiveMarked);
     }
     else {
-      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
+      m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     }
   }
 
-  private void makeButtonActive(Control tabButton) {
-    if (!isValidWidget(tabButton)) {
+  private void setButtonActive() {
+    if (!isValidWidget(m_tabButton)) {
       return;
     }
-    Object oldVariant = tabButton.getData(RWT.CUSTOM_VARIANT);
+    Object oldVariant = m_tabButton.getData(RWT.CUSTOM_VARIANT);
     if (oldVariant == m_variantActiveMarked || oldVariant == m_variantInActiveMarked) {
-      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActiveMarked);
+      m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActiveMarked);
     }
     else {
-      tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActive);
+      m_tabButton.setData(RWT.CUSTOM_VARIANT, m_variantActive);
     }
+    m_selected = true;
   }
 
   private void setButtonMarker(Button tabButton, boolean marked) {
@@ -198,7 +244,7 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
 
   protected void handleUiSelectionChanged() {
     handleUiSelection();
-    setActiveButton(m_tabButton);
+    select();
   }
 
   protected void handleUiSelection() {
@@ -266,8 +312,29 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     m_tabItem.setFont(getUiEnvironment().getFont(scoutFont, m_tabItem.getFont()));
   }
 
-  public boolean setUiFocus() {
-    return setActiveButton(m_tabButton);
+  public void unselect() {
+    setButtonInactive();
+  }
+
+  public void select() {
+    setButtonActive();
+    buildGroupbox();
+  }
+
+  protected boolean isSelected() {
+    return m_selected;
+  }
+
+  protected boolean isLazyBuildEnabled() {
+    return m_lazyBuildEnabled;
+  }
+
+  /**
+   * @param lazyBuildEnabled
+   *          true to lazily build the content of a tab item, false if not. Default is true.
+   */
+  public void setLazyBuildEnabled(boolean lazyBuildEnabled) {
+    m_lazyBuildEnabled = lazyBuildEnabled;
   }
 
   protected RwtScoutTabItem getNextTabItem() {

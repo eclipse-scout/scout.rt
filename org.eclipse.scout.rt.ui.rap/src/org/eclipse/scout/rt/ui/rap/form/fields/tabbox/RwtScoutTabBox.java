@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
@@ -30,14 +31,12 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements IRwtScoutTabBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTabBox.class);
 
   private HashMap<Composite, RwtScoutTabItem> m_tabs;
-  private Listener m_uiTabFocusListener;
+  private LinkedList<RwtScoutTabItem> m_tabList;
   private P_TabListener m_tabListener = new P_TabListener();
   private OptimisticLock m_selectedTabLock;
   private OptimisticLock m_rebuildItemsLock = new OptimisticLock();
@@ -46,7 +45,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
   private StackLayout m_stackLayout;
   private Composite m_tabboxContainer;
 
-  private RwtScoutTabItem m_focusedItem;
+  private RwtScoutTabItem m_selectedItem;
 
   public RwtScoutTabBox() {
     m_selectedTabLock = new OptimisticLock();
@@ -78,11 +77,6 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
       box.addPropertyChangeListener(m_tabListener);
     }
     rebuildItems();
-    if (m_uiTabFocusListener == null) {
-      m_uiTabFocusListener = new P_RwtFocusListener();
-    }
-    m_tabboxContainer.addListener(SWT.FocusIn, m_uiTabFocusListener);
-    m_tabboxContainer.addListener(SWT.FocusOut, m_uiTabFocusListener);
   }
 
   protected Composite createTabboxButtonBar(Composite parent) {
@@ -118,36 +112,16 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
         }
       }
       m_tabs = new HashMap<Composite, RwtScoutTabItem>();
-      LinkedList<RwtScoutTabItem> tabList = new LinkedList<RwtScoutTabItem>();
+      m_tabList = new LinkedList<RwtScoutTabItem>();
       for (IGroupBox box : getScoutObject().getGroupBoxes()) {
         if (box.isVisible()) {
-          RwtScoutTabItem item = new RwtScoutTabItem(getScoutObject(), m_tabboxButtonbar, m_tabboxContainer, VARIANT_TABBOX_BUTTON, VARIANT_TABBOX_BUTTON_ACTIVE, VARIANT_TABBOX_BUTTON_MARKED, VARIANT_TABBOX_BUTTON_ACTIVE_MARKED);
-          item.createUiField(getUiField(), box, getUiEnvironment());
+          RwtScoutTabItem item = createUiTabItem(box);
           m_tabs.put(item.getTabItem(), item);
-          tabList.add(item);
+          m_tabList.addLast(item);
         }
       }
 
-      // link the tab items together.
-      if (tabList.size() > 0) {
-        RwtScoutTabItem previousItem = null;
-        for (RwtScoutTabItem curItem : tabList) {
-          if (previousItem != null) {
-            curItem.setPreviousTabItem(previousItem);
-            previousItem.setNextTabItem(curItem);
-          }
-          previousItem = curItem;
-        }
-
-        /* the previous item of the first one is linked to the last one
-         * the next item of the last one is linked to the first one.
-         */
-        RwtScoutTabItem firstItem = tabList.getFirst();
-        RwtScoutTabItem lastItem = tabList.getLast();
-        firstItem.setPreviousTabItem(lastItem);
-        lastItem.setNextTabItem(firstItem);
-      }
-
+      linkTabItems();
       setSelectedTabFromScout();
     }
     finally {
@@ -156,9 +130,50 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     }
   }
 
+  protected RwtScoutTabItem createUiTabItem(IGroupBox groupBox) {
+    RwtScoutTabItem item = createUiTabItem();
+    item.createUiField(getUiField(), groupBox, getUiEnvironment());
+    return item;
+  }
+
+  private void linkTabItems() {
+    if (m_tabList == null || m_tabList.size() == 0) {
+      return;
+    }
+
+    RwtScoutTabItem previousItem = null;
+    for (RwtScoutTabItem curItem : m_tabList) {
+      if (previousItem != null) {
+        curItem.setPreviousTabItem(previousItem);
+        previousItem.setNextTabItem(curItem);
+      }
+      previousItem = curItem;
+    }
+
+    /* the previous item of the first one is linked to the last one
+     * the next item of the last one is linked to the first one.
+     */
+    RwtScoutTabItem firstItem = m_tabList.getFirst();
+    RwtScoutTabItem lastItem = m_tabList.getLast();
+    firstItem.setPreviousTabItem(lastItem);
+    lastItem.setNextTabItem(firstItem);
+  }
+
+  protected RwtScoutTabItem createUiTabItem() {
+    return new RwtScoutTabItem(getScoutObject(), getTabboxButtonbar(), getTabboxContainer(), VARIANT_TABBOX_BUTTON, VARIANT_TABBOX_BUTTON_ACTIVE, VARIANT_TABBOX_BUTTON_MARKED, VARIANT_TABBOX_BUTTON_ACTIVE_MARKED);
+  }
+
   @Override
   public Composite getUiField() {
     return (Composite) super.getUiField();
+  }
+
+  public Composite getTabboxButtonbar() {
+    return m_tabboxButtonbar;
+  }
+
+  public Composite getTabboxContainer() {
+    return m_tabboxContainer;
   }
 
   @Override
@@ -188,20 +203,18 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
       m_selectedTabLock.acquire();
       //
       IGroupBox selectedTab = getScoutObject().getSelectedTab();
-      Composite foundItem = null;
-      for (Map.Entry<Composite, RwtScoutTabItem> e : m_tabs.entrySet()) {
-        IGroupBox test = e.getValue().getScoutObject();
-        if (test == selectedTab) {
-          foundItem = e.getKey();
-          break;
-        }
-      }
-      if (foundItem != null) {
-        m_stackLayout.topControl = foundItem;
+      RwtScoutTabItem foundItem = getTabItem(selectedTab);
+      if (foundItem != null && foundItem.getTabItem() != null) {
+        m_stackLayout.topControl = foundItem.getTabItem();
         m_tabboxContainer.layout();
 
-        m_focusedItem = m_tabs.get(foundItem);
-        m_focusedItem.setUiFocus();
+        m_selectedItem = foundItem;
+        for (RwtScoutTabItem item : m_tabList) {
+          if (item != m_selectedItem) {
+            item.unselect();
+          }
+        }
+        m_selectedItem.select();
         m_tabboxButtonbar.layout();
       }
     }
@@ -210,9 +223,104 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     }
   }
 
+  protected void setGroupBoxVisibleFromScout(final IGroupBox groupBox) {
+    try {
+      if (m_rebuildItemsLock.acquire()) {
+        RunnableWithData t = new RunnableWithData() {
+          @Override
+          public void run() {
+            if (groupBox.isVisible()) {
+              showGroupBox(groupBox);
+            }
+            else {
+              hideGroupBox(groupBox);
+            }
+          }
+        };
+        getUiEnvironment().invokeUiLater(t);
+      }
+    }
+    finally {
+      m_rebuildItemsLock.release();
+    }
+  }
+
+  protected void showGroupBox(IGroupBox groupBox) {
+    getUiContainer().setRedraw(false);
+    try {
+      RwtScoutTabItem item = getTabItem(groupBox);
+      if (item == null) {
+        item = createUiTabItem(groupBox);
+        m_tabs.put(item.getTabItem(), item);
+        int index = getVisibleIndex(groupBox);
+        m_tabList.add(index, item);
+        linkTabItems();
+
+        //recreate buttons to order them correctly (necessary for the row layout)
+        for (int i = index + 1; i < m_tabList.size(); i++) {
+          m_tabList.get(i).recreateTabButton();
+        }
+
+        m_tabboxButtonbar.layout();
+      }
+    }
+    finally {
+      getUiContainer().setRedraw(true);
+    }
+  }
+
+  protected void hideGroupBox(IGroupBox groupBox) {
+    getUiContainer().setRedraw(false);
+    try {
+      RwtScoutTabItem item = getTabItem(groupBox);
+      if (item != null) {
+        m_tabs.remove(item.getTabItem());
+        m_tabList.remove(item);
+        linkTabItems();
+        item.dispose();
+
+        //recreate buttons otherwise active state is not properly visible
+        for (int i = 0; i < m_tabList.size(); i++) {
+          m_tabList.get(i).recreateTabButton();
+        }
+
+        m_tabboxButtonbar.layout();
+      }
+    }
+    finally {
+      getUiContainer().setRedraw(true);
+    }
+  }
+
+  protected RwtScoutTabItem getTabItem(IGroupBox groupBox) {
+    for (Map.Entry<Composite, RwtScoutTabItem> e : m_tabs.entrySet()) {
+      IGroupBox test = e.getValue().getScoutObject();
+      if (test == groupBox) {
+        return e.getValue();
+      }
+    }
+    return null;
+  }
+
   @Override
   protected void updateKeyStrokesFromScout() {
     // nop because the child fields also register the keystrokes of theirs parents
+  }
+
+  private int getVisibleIndex(IGroupBox groupBox) {
+    int result = -1;
+    if (groupBox == null || groupBox.getParentField() == null) {
+      return result;
+    }
+    for (IFormField box : groupBox.getParentField().getFields()) {
+      if (box.isVisible()) {
+        result++;
+        if (box == groupBox) {
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -226,47 +334,12 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     }
   }
 
-  private class P_RwtFocusListener implements Listener {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void handleEvent(Event event) {
-      RwtScoutTabItem item = m_tabs.get(m_stackLayout.topControl);
-      switch (event.type) {
-        case SWT.FocusOut:
-          if (m_focusedItem != null) {
-            m_focusedItem = null;
-          }
-          break;
-        case SWT.FocusIn:
-          if (item.setUiFocus()) {
-            m_focusedItem = item;
-          }
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
   private class P_TabListener implements PropertyChangeListener {
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(final PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals(IGroupBox.PROP_VISIBLE)) {
-        try {
-          if (m_rebuildItemsLock.acquire()) {
-            RunnableWithData t = new RunnableWithData() {
-              @Override
-              public void run() {
-                rebuildItems();
-              }
-            };
-            getUiEnvironment().invokeUiLater(t);
-          }
-        }
-        finally {
-          m_rebuildItemsLock.release();
-        }
+        IGroupBox groupBox = (IGroupBox) evt.getSource();
+        setGroupBoxVisibleFromScout(groupBox);
       }
     }
   }
