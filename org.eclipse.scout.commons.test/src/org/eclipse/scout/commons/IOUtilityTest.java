@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -114,5 +115,23 @@ public class IOUtilityTest {
     assertEquals("", IOUtility.getFileExtension("."));
     assertNull(IOUtility.getFileExtension(""));
     assertNull(IOUtility.getFileExtension(null));
+  }
+
+  @Test
+  public void testDeleteDirectory() throws IOException {
+    File tempFile = File.createTempFile("tempFile", "tmp");
+    File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");
+    File tempDirWithSubs = new File(tempDir, "sub" + File.separator + "sub" + File.separator + "sub");
+    tempFile.delete();
+    if (!tempDir.exists()) {
+      tempDirWithSubs.mkdirs();
+    }
+    tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
+    tempFile.createNewFile();
+    assertTrue("Temp dir was not successfully created.", tempDir.exists());
+    assertTrue("Temp file was not successfully created.", tempFile.exists());
+    IOUtility.deleteDirectory(tempDir);
+    assertFalse("Temp dir was not deleted.", tempDir.exists());
+    assertFalse("Temp file was not deleted.", tempFile.exists());
   }
 }

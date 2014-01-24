@@ -557,26 +557,4 @@ public final class FileUtility {
     }
   }
 
-  /**
-   * Delete a directory and all containing files and directories
-   * 
-   * @param directory
-   * @return true if and only if the directory is successfully deleted; false otherwise
-   * @throws SecurityException
-   *           - If a security manager exists and its check methods deny read or delete access
-   */
-  public static boolean deleteDirectoryRecursive(File directory) {
-    if (!directory.exists() || !directory.isDirectory()) {
-      return false;
-    }
-    for (File file : directory.listFiles()) {
-      if (file.isDirectory()) {
-        deleteDirectoryRecursive(file);
-      }
-      else {
-        file.delete();
-      }
-    }
-    return directory.delete();
-  }
 }

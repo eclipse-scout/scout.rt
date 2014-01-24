@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.junit.After;
@@ -33,6 +33,7 @@ import org.osgi.framework.Bundle;
  * Tests for {@link SpecIOUtility}
  */
 public class SpecIOUtilityTest {
+
   private static final String TEST_DIR = "resources" + File.separator + "spec" + File.separator + "mediawiki";
   private SpecFileConfig m_config;
 
@@ -43,7 +44,7 @@ public class SpecIOUtilityTest {
 
   @After
   public void tearDown() throws ProcessingException {
-    FileUtility.deleteDirectoryRecursive(m_config.getSpecDir());
+    IOUtility.deleteDirectory(m_config.getSpecDir());
   }
 
   /**

@@ -346,6 +346,14 @@ public final class IOUtility {
     }
   }
 
+  /**
+   * Delete a directory and all containing files and directories
+   * 
+   * @param directory
+   * @return true if the directory is successfully deleted or does not exists; false otherwise
+   * @throws SecurityException
+   *           - If a security manager exists and its check methods deny read or delete access
+   */
   public static boolean deleteDirectory(File dir) {
     if (dir != null && dir.exists()) {
       File[] a = dir.listFiles();
