@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.spec.client.gen.extract;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * A {@link IDocTextExtractor} for the documentation text defined by getConfiguredDoc (to be replaced by classid).
  */
+// TODO ASA unitTest
 public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
 
   public DescriptionExtractor() {
@@ -30,7 +33,10 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
    */
   @Override
   public String getText(T o) {
-    String doc = tryReadingGetConfiguredDoc(o);
+    String doc = getDocAssociatedWithClassId(o);
+    if (StringUtility.isNullOrEmpty(doc)) {
+      doc = tryReadingGetConfiguredDoc(o);
+    }
     if (doc != null) {
       doc = doc.replaceAll("</html>", "");
       doc = doc.replaceAll("<html>", "");
@@ -38,7 +44,25 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
     return doc;
   }
 
-  //deprecated will be replaced with doc service reading doc by classid
+  /**
+   * @param o
+   * @return
+   */
+  private String getDocAssociatedWithClassId(T o) {
+    String doc = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(o.getClass()));
+    // TODO ASA fix this hack: name.contains("{undefined text")
+    if (!doc.startsWith("{undefined text")) {
+      return doc;
+    }
+    return "";
+  }
+
+  /**
+   * @param o
+   * @return
+   * @deprecated only docs associated with the classId will be supported
+   */
+  @Deprecated
   private String tryReadingGetConfiguredDoc(ITypeWithClassId o) {
     Method configuredDocMethod;
     Class<?> clazz = o.getClass();
