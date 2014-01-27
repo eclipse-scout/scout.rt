@@ -459,9 +459,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     else if (name.equals(IFormField.PROP_LABEL_VISIBLE)) {
       setLabelVisibleFromScout();
     }
-    else if (name.equals(IFormField.PROP_LABEL_VISIBLE)) {
-      setLabelVisibleFromScout();
-    }
     else if (name.equals(IFormField.PROP_TOOLTIP_TEXT)) {
       setTooltipTextFromScout((String) newValue);
     }

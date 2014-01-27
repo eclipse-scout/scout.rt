@@ -85,6 +85,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.FileListTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.JVMLocalObjectTransferable;
@@ -339,17 +340,12 @@ public final class SwingUtility {
     }
   }
 
+  /**
+   * @deprecated Use {@link ColorUtility#createColor(String)} instead. Will be removed in the M-Release
+   */
+  @Deprecated
   public static Color createColor(String c) {
-    if (c == null) {
-      return null;
-    }
-    try {
-      return new Color(Integer.parseInt(c, 16));
-    }
-    catch (NumberFormatException nfe) {
-      LOG.warn("invalid color code: " + c, nfe);
-      return null;
-    }
+    return ColorUtility.createColor(c);
   }
 
   public static Font createFont(FontSpec scoutFont) {

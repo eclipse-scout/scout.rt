@@ -12,6 +12,7 @@ package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -273,6 +274,11 @@ public class StringUtilityTest {
   public void testGetTag() throws Exception {
     String input;
 
+    input = null;
+    assertNull(StringUtility.getTag(null, null));
+    assertNull(StringUtility.getTag("text", null));
+    assertNull(StringUtility.getTag(null, "a"));
+
     //simple case:
     input = "Lorem ipsum dolor sit amet, <strong>consetetur sadipscing elitr</strong>, sed diam voluptua.";
     assertEquals("consetetur sadipscing elitr", StringUtility.getTag(input, "strong"));
@@ -287,6 +293,28 @@ public class StringUtilityTest {
     assertEquals("Claritas: *", StringUtility.getTag(input, "strong"));
     assertEquals("Lorem <strong>Claritas: *</strong> ipsum", StringUtility.getTag(input, "td"));
     assertEquals("<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>", StringUtility.getTag(input, "tr"));
+
+    input = "<html>some <b>bold</b>text</html>";
+    assertEquals("some <b>bold</b>text", StringUtility.getTag(input, "html"));
+    input = "<html><body>some <b>bold</b>text</body></html>";
+    assertEquals("some <b>bold</b>text", StringUtility.getTag(input, "body"));
+    input = "<html><body font-size: \"12px;\" style=\"background-color: red;\">some <b>bold</b>text</body></html>";
+    assertEquals("some <b>bold</b>text", StringUtility.getTag(input, "body"));
+    assertEquals(null, StringUtility.getTag(input, "invalidTag"));
+  }
+
+  /**
+   * Tests for {@link StringUtility#removeTag(String, String)}
+   */
+  @Test
+  public void testRemoveTag() {
+    String input = "<html><body>some<b> bold </b> text</body></html>";
+    assertEquals(null, StringUtility.removeTag(null, null));
+    assertEquals(null, StringUtility.removeTag(null, "tag"));
+    assertEquals(input, StringUtility.removeTag(input, null));
+    assertEquals(input, StringUtility.removeTag(input, "nonExistingTag"));
+    assertEquals("<html></html>", StringUtility.removeTag(input, "body"));
+    assertEquals("<html><body>some text</body></html>", StringUtility.removeTag(input, "b"));
   }
 
   /**
@@ -317,7 +345,6 @@ public class StringUtilityTest {
     input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n" +
         "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
-
   }
 
   /**

@@ -402,7 +402,8 @@ public final class StringUtility {
   }
 
   /**
-   * @return the contents between a start and a end tag, resp "" when there is a single tag
+   * @return the contents between a start and a end tag, resp "" when there is a single tag. Returns <code>null</code>
+   *         when the tag is not found in the text.
    */
   public static String getTag(String text, String tagName) {
     if (text == null) {
@@ -454,9 +455,21 @@ public final class StringUtility {
     return text;
   }
 
+  /**
+   * Removes the tags from the given text. If the tag is not found, the original text is returned.
+   * <p>
+   * Example:
+   * <p>
+   * <code>String text = "&lt;html>some &lt;b&gt;bold&lt;/b> text&lt;/html&gt;";</code>
+   * <p>
+   * <code>removeTag(text, "b")</code> will return '&lt;html>some text&lt;/html&gt;'</code>
+   */
   public static String removeTag(String text, String tagName) {
     if (text == null) {
       return null;
+    }
+    else if (tagName == null) {
+      return text;
     }
     TagBounds a;
     TagBounds b;
@@ -469,6 +482,9 @@ public final class StringUtility {
     return text;
   }
 
+  /**
+   * Remove the given tags from the text. See {@link #removeTag(String, String)} for more details.
+   */
   public static String removeTags(String text, String[] tagNames) {
     if (text == null) {
       return null;

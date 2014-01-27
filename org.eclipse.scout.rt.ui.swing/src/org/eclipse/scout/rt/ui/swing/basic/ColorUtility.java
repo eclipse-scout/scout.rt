@@ -12,7 +12,12 @@ package org.eclipse.scout.rt.ui.swing.basic;
 
 import java.awt.Color;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 public final class ColorUtility {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColorUtility.class);
 
   private ColorUtility() {
   }
@@ -88,6 +93,40 @@ public final class ColorUtility {
         Math.round(((float) redHigh / 255f) * (float) redLow),
         Math.round(((float) greenHigh / 255f) * (float) greenLow),
         Math.round(((float) blueHigh / 255f) * (float) blueLow));
+  }
+
+  /**
+   * Create the color from the given string
+   */
+  public static Color createColor(String c) {
+    if (c == null) {
+      return null;
+    }
+    try {
+      return new Color(Integer.parseInt(c, 16));
+    }
+    catch (NumberFormatException nfe) {
+      LOG.warn("invalid color code: " + c, nfe);
+      return null;
+    }
+  }
+
+  /**
+   * Converts a {@link Color} to a hexadecimal representation.
+   * <p>
+   * Example: Color.RED --> "#ff0000"
+   * <p>
+   * Note: the hexadecimal representation is lowercase
+   * 
+   * @return hexadecimal representation of {@link Color} in lowercase. Returns <code>null</code> if parameter is
+   *         <code>null</code>
+   * @since 3.10.0-M5
+   */
+  public static String createStringFromColor(Color c) {
+    if (c == null) {
+      return null;
+    }
+    return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
   }
 
 }
