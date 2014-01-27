@@ -24,12 +24,12 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.field.TableFieldTypeWit
 public class DefaultTableFieldConfig extends DefaultEntityConfig<ITableField<? extends ITable>> {
 
   @Override
-  public List<IDocTextExtractor<ITableField<? extends ITable>>> getTexts() {
+  public List<IDocTextExtractor<ITableField<? extends ITable>>> getPropertyTextExtractors() {
     return new ArrayList<IDocTextExtractor<ITableField<? extends ITable>>>();
   }
 
   @Override
-  public IDocTextExtractor<ITableField<? extends ITable>> getTitle() {
+  public IDocTextExtractor<ITableField<? extends ITable>> getTitleExtractor() {
     return new TableFieldTypeWithLabelExtractor<ITableField<? extends ITable>>();
   }
 

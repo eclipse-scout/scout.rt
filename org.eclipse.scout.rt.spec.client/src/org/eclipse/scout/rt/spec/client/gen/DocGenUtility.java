@@ -84,7 +84,7 @@ public final class DocGenUtility {
    * @return {@link IDocTable}
    */
   public static <T> IDocTable createDocTable(T entity, IDocEntityConfig<T> config) {
-    List<IDocTextExtractor<T>> textExtractors = config.getTexts();
+    List<IDocTextExtractor<T>> textExtractors = config.getPropertyTextExtractors();
     List<String[]> rows = new ArrayList<String[]>();
     String[] texts = DocGenUtility.getTexts(entity, textExtractors);
     if (texts != null && texts.length > 0) {

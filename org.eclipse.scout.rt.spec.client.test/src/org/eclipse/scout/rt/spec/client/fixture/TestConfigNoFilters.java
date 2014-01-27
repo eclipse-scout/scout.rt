@@ -29,7 +29,7 @@ public class TestConfigNoFilters extends DefaultEntityConfig<IFormField> {
   }
 
   @Override
-  public List<IDocTextExtractor<IFormField>> getTexts() {
+  public List<IDocTextExtractor<IFormField>> getPropertyTextExtractors() {
     ArrayList<IDocTextExtractor<IFormField>> p = new ArrayList<IDocTextExtractor<IFormField>>();
     p.add(new TypeExtractor<IFormField>());
     return p;

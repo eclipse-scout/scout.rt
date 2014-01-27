@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.page.TablePageExtractor
 public class DefaultTablePageConfig extends DefaultEntityConfig<IPageWithTable<? extends ITable>> {
 
   @Override
-  public IDocTextExtractor<IPageWithTable<? extends ITable>> getTitle() {
+  public IDocTextExtractor<IPageWithTable<? extends ITable>> getTitleExtractor() {
     return new TablePageExtractor<IPageWithTable<? extends ITable>>();
   }
 

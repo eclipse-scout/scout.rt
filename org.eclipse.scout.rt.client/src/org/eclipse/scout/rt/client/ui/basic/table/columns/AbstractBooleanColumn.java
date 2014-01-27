@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 /**
  * Column holding Boolean values
  */
+@ClassId("62fcae6b-6b75-4e8c-bb3f-ea3b400e7e30")
 public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanColumn.class);
 

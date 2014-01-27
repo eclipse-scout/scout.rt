@@ -12,11 +12,22 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Doc {
 
+  /**
+   * {@link #ACCEPT} type appears in generated doc<br>
+   * {@link #REJECT} type does not appear in generated doc<br>
+   * {@link #TRANSPARENT} type does not appear in generated doc, but it's children do<br>
+   * {@link #ACCEPT_REJECT_CHILDREN} type appears in generated doc, but it's children do not
+   */
   enum Filtering {
-    ACCEPT, REJECT, TRANSPARENT, ACCEPT_REJECT_CHILDREN
+    ACCEPT,
+    REJECT,
+    TRANSPARENT,
+    ACCEPT_REJECT_CHILDREN
   }
 
-  // TODO ASA javadoc
+  /**
+   * Definition for the default filtering behavior
+   */
   Filtering filter() default Filtering.ACCEPT;
 
   /**

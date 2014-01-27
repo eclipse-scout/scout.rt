@@ -14,15 +14,22 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 
 /**
  * A post processor for replacing link tags to point to the generated files.
  */
 public class SpecPostProcessor extends AbstractSpecGen implements ISpecProcessor {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(SpecPostProcessor.class);
 
   @Override
   public void process() throws ProcessingException {
+    if (!getFileConfig().getMediawikiDir().exists()) {
+      LOG.warn("MediawikiDir does not exists! (" + getFileConfig().getMediawikiDir().getPath() + ")");
+      return;
+    }
     for (File wiki : getFileConfig().getMediawikiDir().listFiles()) {
       replaceLinks(wiki);
       File html = convertToHTML(wiki);

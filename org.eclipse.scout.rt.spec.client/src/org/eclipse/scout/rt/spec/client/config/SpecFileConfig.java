@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -36,7 +37,7 @@ public class SpecFileConfig {
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
   private static final String LINKS_FILE_NAME = "links.properties";
 
-  private String[] m_additionalSourcePlugins;
+  private String[] m_additionalSourcePlugins = new String[0];
   private Bundle m_bundle;
 
   /**
@@ -44,7 +45,11 @@ public class SpecFileConfig {
    * when running this Eclipse instance.
    */
   public SpecFileConfig() {
-    m_bundle = Platform.getProduct().getDefiningBundle();
+    IProduct product = Platform.getProduct();
+    // TODO ASA Nullcheck is only needed for tests. --> Create a product for tests and remove nullcheck.
+    if (product != null) {
+      m_bundle = product.getDefiningBundle();
+    }
   }
 
   /**

@@ -23,12 +23,12 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.field.TableFieldTypeWit
 public class DefaultSmartFieldConfig extends DefaultEntityConfig<ISmartField<?>> {
 
   @Override
-  public List<IDocTextExtractor<ISmartField<?>>> getTexts() {
+  public List<IDocTextExtractor<ISmartField<?>>> getPropertyTextExtractors() {
     return new ArrayList<IDocTextExtractor<ISmartField<?>>>();
   }
 
   @Override
-  public IDocTextExtractor<ISmartField<?>> getTitle() {
+  public IDocTextExtractor<ISmartField<?>> getTitleExtractor() {
     return new TableFieldTypeWithLabelExtractor<ISmartField<?>>();
   }
 }

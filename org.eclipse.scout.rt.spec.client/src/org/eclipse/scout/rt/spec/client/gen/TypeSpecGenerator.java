@@ -10,24 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen;
 
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
-/**
- * Creates Specification data for a page
- */
 public class TypeSpecGenerator {
   private final IDocConfig m_config;
+  private String m_id;
+  private String m_title;
 
-  public TypeSpecGenerator(IDocConfig config) {
+  public TypeSpecGenerator(IDocConfig config, String id, String title) {
     m_config = config;
+    m_id = id;
+    m_title = title;
   }
 
-  public IDocSection getDocSection(Class[] fieldTypes) {
-
-    IDocSection typeSection = DocGenUtility.createDocSection(fieldTypes, m_config.getTypesConfig());
-    return new SectionWithTable("org.eclipse.scout.rt.spec.types", TEXTS.get("org.eclipse.scout.rt.spec.types"), typeSection);
+  public IDocSection getDocSection(Class[] types) {
+    String titleWithAnchor = MediawikiUtility.transformToWiki(m_title + "{{" + m_id + "}}");
+    IDocSection typeSection = DocGenUtility.createDocSection(types, m_config.getTypesConfig());
+    return new SectionWithTable(m_id, titleWithAnchor, typeSection);
   }
 }

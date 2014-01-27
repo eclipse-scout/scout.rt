@@ -31,14 +31,13 @@ public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEnti
    */
   @Override
   public List<IDocFilter<T>> getFilters() {
-    // TODO ASA rename
-    List<IDocFilter<T>> columnFilters = new ArrayList<IDocFilter<T>>();
-    columnFilters.add(new DefaultDocFilter<T>());
-    return columnFilters;
+    List<IDocFilter<T>> filters = new ArrayList<IDocFilter<T>>();
+    filters.add(new DefaultDocFilter<T>());
+    return filters;
   }
 
   @Override
-  public List<IDocTextExtractor<T>> getTexts() {
+  public List<IDocTextExtractor<T>> getPropertyTextExtractors() {
     ArrayList<IDocTextExtractor<T>> p = new ArrayList<IDocTextExtractor<T>>();
     p.add(new TypeExtractor<T>());
     p.add(new DescriptionExtractor<T>());
@@ -46,12 +45,12 @@ public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEnti
   }
 
   @Override
-  public IDocTextExtractor<T> getId() {
+  public IDocTextExtractor<T> getIdExtractor() {
     return new TypeExtractor<T>();
   }
 
   @Override
-  public IDocTextExtractor<T> getTitle() {
+  public IDocTextExtractor<T> getTitleExtractor() {
     return new SimpleTypeTextExtractor<T>();
   }
 

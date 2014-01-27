@@ -44,8 +44,8 @@ public class FormSpecGenerator {
     IDocSection[] subSections = getSubSections(form, visitors);
 
     IDocTable formSpec = DocGenUtility.createDocTable(form, formConfig);
-    String id = formConfig.getId().getText(form);
-    String title = formConfig.getTitle().getText(form);
+    String id = formConfig.getIdExtractor().getText(form);
+    String title = formConfig.getTitleExtractor().getText(form);
 
     return new SectionWithTable(id, title, formSpec, subSections);
   }

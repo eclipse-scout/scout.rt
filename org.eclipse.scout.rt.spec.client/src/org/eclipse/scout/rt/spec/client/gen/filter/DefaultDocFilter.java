@@ -17,9 +17,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 
 /**
- * A default doc filter that implements the following rules which can optionally be overridden with the annotation
- * {@link Doc#filter()}:<br>
- * TODO ASA docu: default filtering rules
+ * A default doc filter that implements the following rules:
+ * <p>
+ * <li>If a filter annotation ({@link Doc#filter()}) is present for the element filtering is applied according the
+ * annotation.
+ * <li>For GroupBoxes with no filter annotation and neither label nor description defined: {@link Filtering#TRANSPARENT}
+ * is applied.
+ * <li>For all other elements: {@link Filtering#ACCEPT} is applied.
  */
 public class DefaultDocFilter<T> implements IDocFilter<T> {
 

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.FormTitleExtractor;
 public class DefaultFormConfig extends DefaultEntityConfig<IForm> {
 
   @Override
-  public List<IDocTextExtractor<IForm>> getTexts() {
+  public List<IDocTextExtractor<IForm>> getPropertyTextExtractors() {
     List<IDocTextExtractor<IForm>> propertyTemplate = new ArrayList<IDocTextExtractor<IForm>>();
     propertyTemplate.add(new FormTitleExtractor());
     propertyTemplate.add(new DescriptionExtractor<IForm>());
@@ -34,7 +34,7 @@ public class DefaultFormConfig extends DefaultEntityConfig<IForm> {
   }
 
   @Override
-  public IDocTextExtractor<IForm> getTitle() {
+  public IDocTextExtractor<IForm> getTitleExtractor() {
     return new FormTitleExtractor();
   }
 

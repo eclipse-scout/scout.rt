@@ -28,7 +28,7 @@ public interface IDocEntityConfig<T> {
    * 
    * @return a list of properties that should be generated.
    */
-  List<IDocTextExtractor<T>> getTexts();
+  List<IDocTextExtractor<T>> getPropertyTextExtractors();
 
   /**
    * Configuration for filtering <code>T</code>. Only the objects accepted by all filters are generated.
@@ -42,13 +42,13 @@ public interface IDocEntityConfig<T> {
    * 
    * @return {@link IDocTextExtractor}
    */
-  IDocTextExtractor<T> getId();
+  IDocTextExtractor<T> getIdExtractor();
 
   /**
    * Configuration describing an extractor for the title of the entity
    * 
    * @return {@link IDocTextExtractor}
    */
-  IDocTextExtractor<T> getTitle();
+  IDocTextExtractor<T> getTitleExtractor();
 
 }

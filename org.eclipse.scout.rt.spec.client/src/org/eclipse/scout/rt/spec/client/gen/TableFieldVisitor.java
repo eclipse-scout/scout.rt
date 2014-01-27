@@ -42,8 +42,8 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
   }
 
   private IDocSection createDocSection(ITableField<?> field) {
-    String id = m_config.getTableFieldConfig().getId().getText(field);
-    String title = m_config.getTableFieldConfig().getTitle().getText(field);
+    String id = m_config.getTableFieldConfig().getIdExtractor().getText(field);
+    String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
     IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuConfig());
     IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnConfig());
     return new SectionWithTable(id, title, menuSection, columnsSection);

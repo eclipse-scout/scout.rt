@@ -31,8 +31,8 @@ public class PageSpecGenerator {
 
   public IDocSection getDocSection(IPageWithTable<? extends ITable> page) {
     IDocEntityConfig<IPageWithTable<? extends ITable>> tablePageConfig = m_config.getTablePageConfig();
-    String id = tablePageConfig.getId().getText(page);
-    String title = tablePageConfig.getTitle().getText(page);
+    String id = tablePageConfig.getIdExtractor().getText(page);
+    String title = tablePageConfig.getTitleExtractor().getText(page);
 
     IColumn<?>[] columns = page.getTable().getColumns();
     IMenu[] menus = page.getTable().getMenus();

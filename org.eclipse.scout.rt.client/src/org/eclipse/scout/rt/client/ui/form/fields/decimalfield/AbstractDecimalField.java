@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -23,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
+@ClassId("f4ec575e-f572-418d-a49c-3d0811ea7540")
 public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalField.class);
 

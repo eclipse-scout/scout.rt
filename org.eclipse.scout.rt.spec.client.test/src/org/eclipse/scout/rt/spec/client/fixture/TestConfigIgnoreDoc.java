@@ -32,14 +32,14 @@ public class TestConfigIgnoreDoc extends DefaultEntityConfig<IFormField> {
   }
 
   @Override
-  public List<IDocTextExtractor<IFormField>> getTexts() {
+  public List<IDocTextExtractor<IFormField>> getPropertyTextExtractors() {
     ArrayList<IDocTextExtractor<IFormField>> p = new ArrayList<IDocTextExtractor<IFormField>>();
     p.add(new TypeExtractor<IFormField>());
     return p;
   }
 
   @Override
-  public IDocTextExtractor<IFormField> getId() {
+  public IDocTextExtractor<IFormField> getIdExtractor() {
     return null;
   }
 
