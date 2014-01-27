@@ -131,10 +131,8 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void setEnabledFromScout(boolean b) {
-    boolean updateLayout = false;
     Control field = getUiField();
     if (field != null) {
-      updateLayout = true;
       setFieldEnabled(field, b);
       if (b) {
         setForegroundFromScout(getScoutObject().getForegroundColor());
@@ -145,12 +143,8 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     }
     if (getUiLabel() != null) {
       if (getUiLabel().getEnabled() != b) {
-        updateLayout = true;
         getUiLabel().setEnabled(b);
       }
-    }
-    if (updateLayout && isCreated()) {
-      RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
     }
   }
 
