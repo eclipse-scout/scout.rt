@@ -175,44 +175,4 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
     b.append("]");
     return b.toString();
   }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m_itemId == null) ? 0 : m_itemId.hashCode());
-    result = prime * result + ((m_subject == null) ? 0 : m_subject.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    AbstractCalendarItem other = (AbstractCalendarItem) obj;
-    if (m_itemId == null) {
-      if (other.m_itemId != null) {
-        return false;
-      }
-    }
-    else if (!m_itemId.equals(other.m_itemId)) {
-      return false;
-    }
-    if (m_subject == null) {
-      if (other.m_subject != null) {
-        return false;
-      }
-    }
-    else if (!m_subject.equals(other.m_subject)) {
-      return false;
-    }
-    return true;
-  }
 }
