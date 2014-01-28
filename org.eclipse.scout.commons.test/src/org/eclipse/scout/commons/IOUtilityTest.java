@@ -134,4 +134,28 @@ public class IOUtilityTest {
     assertFalse("Temp dir was not deleted.", tempDir.exists());
     assertFalse("Temp file was not deleted.", tempFile.exists());
   }
+
+  @Test
+  public void testUrlEncode() throws Exception {
+    assertEquals("www.google.com", IOUtility.urlEncode("www.google.com"));
+    assertNull(IOUtility.urlEncode(null));
+    assertEquals("", IOUtility.urlEncode(""));
+    assertEquals("", IOUtility.urlEncode(" "));
+    assertEquals("", IOUtility.urlEncode(" \n\t"));
+    assertEquals("http%3A%2F%2Fwww.google.org", IOUtility.urlEncode("         http://www.google.org       "));
+    assertEquals("a%20test%20%20with%20%20%20multiple%20%20%20%20spaces", IOUtility.urlEncode(" a test  with   multiple    spaces"));
+    assertEquals("Expected UTF-8 charset", "%C3%B6%C3%A4%C3%BC%C3%A9%C3%A0%C3%A8", IOUtility.urlEncode("öäüéàè"));
+  }
+
+  @Test
+  public void testUrlDecode() throws Exception {
+    assertEquals("www.google.com", IOUtility.urlDecode("www.google.com"));
+    assertNull(IOUtility.urlDecode(null));
+    assertEquals("", IOUtility.urlDecode(""));
+    assertEquals("", IOUtility.urlDecode(" "));
+    assertEquals("", IOUtility.urlDecode(" \n\t"));
+    assertEquals("http://www.google.org", IOUtility.urlDecode("         http%3A%2F%2Fwww.google.org       "));
+    assertEquals("a test  with   multiple    spaces", IOUtility.urlDecode("a%20test%20%20with%20%20%20multiple%20%20%20%20spaces"));
+    assertEquals("Expected UTF-8 charset", "öäüéàè", IOUtility.urlDecode("%C3%B6%C3%A4%C3%BC%C3%A9%C3%A0%C3%A8"));
+  }
 }

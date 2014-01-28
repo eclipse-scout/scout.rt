@@ -535,38 +535,58 @@ public final class IOUtility {
     }
   }
 
-  public static String urlEncode(String o) throws ProcessingException {
-    String s;
-    if (o == null) {
-      s = "";
+  /**
+   * A null-safe variant for calling {@link URLEncoder#encode(String, String)}. This method returns null if the given
+   * <code>url</code> is null or an empty string respectively. Any leading / trailing whitespaces are omitted.
+   * Furthermore, "%20" is used to represent spaces instead of "+".
+   * 
+   * @param url
+   *          the URL string which shall be encoded
+   * @return the encoded URL string
+   */
+  public static String urlEncode(String url) {
+    if (url == null) {
+      return null;
     }
-    else {
-      s = o.toString().trim();
-    }
+
+    String s = url.toString().trim();
     if (s.length() == 0) {
-      s = " ";
+      return "";
     }
+
     try {
-      s = URLEncoder.encode(s, "UTF-8");// Build 158 needed an encoding
+      s = URLEncoder.encode(s, "UTF-8");
       s = StringUtility.replace(s, "+", "%20");
     }
     catch (UnsupportedEncodingException e) {
+      LOG.error("Unsupported encoding", e);
     }
     return s;
   }
 
-  public static String urlDecode(String o) throws ProcessingException {
-    String s;
-    if (o == null) {
-      s = "";
+  /**
+   * a null-safe variant for calling {@link URLDecoder#decode(String, String)}. This method returns null if the given
+   * <code>url</code> is null or an empty string respectively. Any leading / trailing whitespaces are omitted.
+   * 
+   * @param encodedUrl
+   *          the encoded URL string which shall be decoded
+   * @return the decoded URL string
+   */
+  public static String urlDecode(String encodedUrl) {
+    if (encodedUrl == null) {
+      return null;
     }
-    else {
-      s = o.toString().trim();
+
+    String s = encodedUrl.toString().trim();
+    if (s.length() == 0) {
+      return "";
     }
+
     try {
-      s = URLDecoder.decode(s, "UTF-8");// Build 158 needed an encoding
+      s = URLDecoder.decode(s, "UTF-8");
     }
     catch (UnsupportedEncodingException e) {
+      LOG.error("Unsupported encoding", e);
     }
     return s;
   }
