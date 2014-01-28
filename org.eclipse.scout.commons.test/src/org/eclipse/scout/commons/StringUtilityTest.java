@@ -24,6 +24,31 @@ import org.junit.Test;
  */
 public class StringUtilityTest {
 
+  /**
+   * Test for {@link StringUtility#concatenateTokens(String...)}
+   */
+  @Test
+  public void testConcatenateTokens() {
+    assertEquals("", StringUtility.concatenateTokens(""));
+    assertEquals("", StringUtility.concatenateTokens((String[]) null));
+    assertEquals("", StringUtility.concatenateTokens());
+    assertEquals("", StringUtility.concatenateTokens("", ""));
+    assertEquals("s0s1", StringUtility.concatenateTokens("s0", "", "s1"));
+    assertEquals("s0", StringUtility.concatenateTokens("s0", "-", ""));
+    assertEquals("s0", StringUtility.concatenateTokens("s0", "-", null));
+    assertEquals("s0-s1", StringUtility.concatenateTokens("s0", "-", "s1"));
+    assertEquals("s0-s1-", StringUtility.concatenateTokens("s0", "-", "s1", "-"));
+    assertEquals("s0-s1-s2", StringUtility.concatenateTokens("s0", "-", "s1", "-", "s2"));
+    assertEquals("s0-s1-s2-", StringUtility.concatenateTokens("s0", "-", "s1", "-", "s2", "-"));
+    assertEquals("s0-s1-s2-s3", StringUtility.concatenateTokens("s0", "-", "s1", "-", "s2", "-", "s3"));
+    assertEquals("s1-s2", StringUtility.concatenateTokens(null, "-", "s1", "-", "s2"));
+    assertEquals("s1-s2", StringUtility.concatenateTokens("", "-", "s1", "-", "s2"));
+    assertEquals("s2", StringUtility.concatenateTokens("", "-", null, "-", "s2"));
+    assertEquals("s2s3", StringUtility.concatenateTokens("", "-", null, "-", "s2", "", "s3"));
+    assertEquals("-", StringUtility.concatenateTokens("-", ""));
+    assertEquals("ab", StringUtility.concatenateTokens("a", "-", null, "-", null, "b"));
+  }
+
   @Test
   public void testImplodeDelimiters() {
     String a = "a";

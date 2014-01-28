@@ -1555,15 +1555,19 @@ public final class StringUtility {
   }
 
   /**
-   * The String s0 will only be added, if it is not empty. String s1, s3, ...
-   * are treated as delimeters and are only inserted, if the corresponding
-   * String s2, s4, ... is not empty. <br>
-   * If there is an even number of Strings, the
-   * last one will only be appended, if the concatenated String so far is not <code>null</code>
-   * 
-   * @param s
-   *          list of strings to append, s0 will be appended first, s1 only if
-   *          s2 is not empty, dito for s3 and s4 ..
+   * Concatenates a set of strings with delimiters.
+   * <p>
+   * The parameters s0, s2, s4, ... are treated as normal Strings, whereas the parameters s1, s3, s5, ... are treated as
+   * delimiters. The delimiters are only inserted, if the corresponding element before or after the delimiter is not
+   * empty. <br>
+   * If there is an even number of Strings, the last one will only be appended, if the concatenated String so far is not
+   * <code>null</code>
+   * <p>
+   * <b>Example:</b>
+   * <ul>
+   * <li><code>concatenateTokens('2014','-','01','-','31')</code> --> <code>'2014-01-31'</code>
+   * <li><code>concatenateTokens(null,'-','01','-','31')</code> --> <code>'01-31'</code>
+   * </ul>
    */
   public static String concatenateTokens(String... s) {
     String retVal = "";
