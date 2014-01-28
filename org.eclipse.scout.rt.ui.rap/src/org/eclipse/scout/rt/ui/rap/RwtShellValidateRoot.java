@@ -30,7 +30,7 @@ public class RwtShellValidateRoot extends DefaultValidateRoot {
     m_env = env;
   }
 
-  private Shell getShell() {
+  protected Shell getShell() {
     return (Shell) getUiComposite();
   }
 
@@ -50,11 +50,15 @@ public class RwtShellValidateRoot extends DefaultValidateRoot {
     super.validate();
     Rectangle curShellBounds = getShell().getBounds();
     Point prefSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+    setBoundsIfResizeIsNeeded(curShellBounds, prefSize);
+  }
 
+  protected void setBoundsIfResizeIsNeeded(Rectangle curShellBounds, Point prefSize) {
     int dhPref = 0;
     if (curShellBounds != null && prefSize != null) {
       dhPref = prefSize.y - curShellBounds.height;
-      if (dhPref > 0) {
+
+      if (dhPref != 0) {
         getShell().setBounds(new Rectangle(curShellBounds.x, curShellBounds.y, curShellBounds.width, prefSize.y));
       }
     }
