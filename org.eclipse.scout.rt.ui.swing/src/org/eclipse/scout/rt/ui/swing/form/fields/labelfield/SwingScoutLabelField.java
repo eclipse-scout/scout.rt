@@ -14,17 +14,18 @@ import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextPaneEx;
@@ -39,9 +40,13 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   private JPanelEx m_fieldPanel;
   private int m_horizontalAlignment;
   private int m_verticalAlignment;
-  private String m_cachedOriginalText;
+  private String m_unformattedText;
   private boolean m_textWrap;
   private IStyledTextCreator m_styledTextCreator;
+
+  private Color m_foregroundColor;
+
+  private Color m_backgroundColor;
 
   @Override
   protected void initializeSwing() {
@@ -87,6 +92,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     getSwingLabelField().setEditable(false); //JTextPane is never editable!
+    updateTextInGUI();
   }
 
   /**
@@ -128,38 +134,29 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
   protected void setTextWrapFromScout(boolean b) {
     m_textWrap = b;
-    updateText();
+    updateTextInGUI();
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    m_cachedOriginalText = s;
-    s = createStyledText(s);
+    m_unformattedText = s;
+    updateTextInGUI();
+  }
 
-    JTextPane swingField = getSwingLabelField();
-    String oldText = swingField.getText();
-    if (s == null) {
-      s = "";
-    }
-    if (oldText == null) {
-      oldText = "";
-    }
-    if (oldText.equals(s)) {
-      return;
-    }
-    swingField.setText(s);
+  public String getUnformattedText() {
+    return m_unformattedText;
   }
 
   @Override
   protected void setHorizontalAlignmentFromScout(int scoutAlign) {
     this.m_horizontalAlignment = SwingUtility.createHorizontalAlignment(scoutAlign);
-    updateText();
+    updateTextInGUI();
   }
 
   @Override
   protected void setVerticalAlignmentFromScout(int scoutAlign) {
     this.m_verticalAlignment = SwingUtility.createVerticalAlignment(scoutAlign);
-    updateText();
+    updateTextInGUI();
   }
 
   /**
@@ -176,10 +173,11 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   /**
    * This method creates an aligned text for the JTextPane.
    */
-  protected String createStyledText(String text) {
-    m_styledTextCreator.setText(text);
+  protected String createStyledText() {
+    m_styledTextCreator.setText(getUnformattedText());
     m_styledTextCreator.setTextWrap(m_textWrap);
-    Color bgColor = (Color) ((getSwingLabelField().getBackground() != null) ? getSwingLabelField().getBackground() : UIManager.getLookAndFeelDefaults().get("TextPane.background"));
+    Color bgColor = (Color) ((m_backgroundColor != null) ? m_backgroundColor : UIManager.getLookAndFeelDefaults().get("TextPane.background"));
+    m_styledTextCreator.setForegroundColor(getScoutObject().isEnabled() ? m_foregroundColor : getSwingLabelField().getDisabledTextColor());
     m_styledTextCreator.setBackgroundColor(bgColor);
     m_styledTextCreator.setHorizontalAlignment(m_horizontalAlignment);
     m_styledTextCreator.setVerticalAlignment(m_verticalAlignment);
@@ -190,7 +188,15 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   @Override
   protected void setBackgroundFromScout(String scoutColor) {
     super.setBackgroundFromScout(scoutColor);
-    updateText();
+    m_backgroundColor = ColorUtility.createColor(scoutColor);
+    updateTextInGUI();
+  }
+
+  @Override
+  protected void setForegroundFromScout(String scoutColor) {
+    super.setForegroundFromScout(scoutColor);
+    m_foregroundColor = ColorUtility.createColor(scoutColor);
+    updateTextInGUI();
   }
 
   /**
@@ -198,8 +204,16 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
    * 
    * @since 3.10.0-M5
    */
-  protected void updateText() {
-    setDisplayTextFromScout(m_cachedOriginalText);
+  protected void updateTextInGUI() {
+    String styledText = createStyledText();
+    if (hasTextChanged(styledText)) {
+      getSwingLabelField().setText(styledText);
+    }
+  }
+
+  private boolean hasTextChanged(String newText) {
+    String oldText = getSwingLabelField().getText();
+    return !StringUtility.nvl(oldText, "").equals(StringUtility.nvl(newText, ""));
   }
 
   /**
@@ -241,7 +255,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
         return;
       }
       oldHeight = e.getComponent().getHeight();
-      updateText();
+      updateTextInGUI();
     }
   }
 }

@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
  * <li>horizontal alignment: a <code>div</code> is used
  * <li>vertical alignment: a <code>table</code> is used
  * <li>background color: the color is assigned to the <code>body</code> tag
+ * <li>foreground color: the color is assigned to the <code>body</code> tag
  * <li>text wrapping: the <code>td</code> tag's 'white-space' attribute is used
  * </ul>
  * 
@@ -35,6 +36,7 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   private static final Pattern BODY_PATTERN = Pattern.compile("<body[^>]*>(.*)</body>");
 
   private Color m_backgroundColor;
+  private Color m_foregroundColor;
   private int m_horizontalAlignment = Integer.MIN_VALUE;
   private int m_verticalAlignment = Integer.MIN_VALUE;
   private int m_height;
@@ -57,6 +59,15 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
 
   public Color getBackgroundColor() {
     return this.m_backgroundColor;
+  }
+
+  @Override
+  public void setForegroundColor(Color color) {
+    this.m_foregroundColor = color;
+  }
+
+  public Color getForegroundColor() {
+    return this.m_foregroundColor;
   }
 
   @Override
@@ -142,7 +153,11 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
 
     String bodyStyle = "";
     if (StringUtility.hasText(ColorUtility.createStringFromColor(getBackgroundColor()))) {
-      bodyStyle = "background-color: " + ColorUtility.createStringFromColor(getBackgroundColor()) + ";";
+      bodyStyle += "background-color: " + ColorUtility.createStringFromColor(getBackgroundColor()) + ";";
+    }
+
+    if (StringUtility.hasText(ColorUtility.createStringFromColor(getForegroundColor()))) {
+      bodyStyle += "color: " + ColorUtility.createStringFromColor(getForegroundColor()) + ";";
     }
 
     styledText = "<html><body style=\"" + bodyStyle + "\"><div align=\"" + align + "\"><table cellpadding=\"0\" cellspacing=\"0\"><tr><td valign=\"" + valign + "\" height=\"" + getHeight() + "px\" style=\"white-space:" + wrapText + ";\">" + styledText + "</td></tr></table></div></body></html>";

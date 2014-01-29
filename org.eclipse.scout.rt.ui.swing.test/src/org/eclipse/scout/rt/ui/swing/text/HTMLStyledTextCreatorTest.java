@@ -46,6 +46,7 @@ public class HTMLStyledTextCreatorTest {
     Assert.assertEquals("left", getHorizontalAlignment(styledText));
     Assert.assertEquals("top", getVerticalAlignment(styledText));
     Assert.assertEquals("", getBackgroundColor(styledText));
+    Assert.assertEquals("", getForegroundColor(styledText));
     Assert.assertEquals(0, getHeight(styledText));
     Assert.assertFalse(isTextWrap(styledText));
   }
@@ -113,6 +114,17 @@ public class HTMLStyledTextCreatorTest {
   }
 
   @Test
+  public void testForegroundColor() {
+    creator.setText("some text");
+
+    creator.setForegroundColor(null);
+    Assert.assertEquals("", getForegroundColor(creator.createStyledText()));
+
+    creator.setForegroundColor(Color.red);
+    Assert.assertEquals("#ff0000", getForegroundColor(creator.createStyledText()));
+  }
+
+  @Test
   public void testWrapText() {
     creator.setText("some text");
 
@@ -172,6 +184,15 @@ public class HTMLStyledTextCreatorTest {
 
   private String getBackgroundColor(String styledText) {
     Pattern p = Pattern.compile(".*background-color:\\s*(#[0-f0-F]*);.*");
+    Matcher m = p.matcher(styledText);
+    if (m.matches()) {
+      return m.group(1);
+    }
+    return "";
+  }
+
+  private String getForegroundColor(String styledText) {
+    Pattern p = Pattern.compile(".*[^-]color:\\s*(#[0-f0-F]*);.*");
     Matcher m = p.matcher(styledText);
     if (m.matches()) {
       return m.group(1);

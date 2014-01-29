@@ -5,6 +5,9 @@ import static org.junit.Assert.assertTrue;
 import javax.swing.JComponent;
 import javax.swing.JTextPane;
 
+import org.easymock.EasyMock;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.swing.ext.JTextPaneEx;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +82,14 @@ public class SwingScoutLabelFieldTest {
     @Override
     protected void setTextWrapFromScout(boolean b) {
       super.setTextWrapFromScout(b);
+    }
+
+    @Override
+    public ILabelField getScoutObject() {
+      ILabelField scoutObject = EasyMock.createNiceMock(ILabelField.class);
+      EasyMock.expect(scoutObject.getGridData()).andReturn(new GridData(0, 0, 0, 0, 0, 0));
+      EasyMock.replay(scoutObject);
+      return scoutObject;
     }
   }
 

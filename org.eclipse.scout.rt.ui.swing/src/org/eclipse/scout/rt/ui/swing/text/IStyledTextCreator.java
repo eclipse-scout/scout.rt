@@ -29,6 +29,11 @@ public interface IStyledTextCreator {
   public void setBackgroundColor(Color color);
 
   /**
+   * The foregroundColor to be used. If empty no foregroundColor will be specified
+   */
+  public void setForegroundColor(Color color);
+
+  /**
    * The horizontal alignment of the text
    */
   public void setHorizontalAlignment(int scoutAlign);
