@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -522,10 +521,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       }
     }
     final String text = getUiField().getText();
-    // only handle if text has changed
-    if (!StringUtility.isNullOrEmpty(text) && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
-      return;
-    }
     // notify Scout
     Runnable t = new Runnable() {
       @Override
