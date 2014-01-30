@@ -19,11 +19,13 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +34,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -621,4 +624,76 @@ public final class IOUtility {
     }
     return url;
   }
+
+  /**
+   * Append a file to another. The provided {@link PrintWriter} will neither be flushed nor closed.
+   * <p>
+   * ATTENTION: Appending a file to itself using an autoflushing PrintWriter, will lead to an endless loop. (Appending a
+   * file to itself using a Printwriter without autoflushing is safe.)
+   * 
+   * @param writer
+   *          a PrintWriter for the destination file
+   * @param file
+   *          source file
+   * @throws ProcessingException
+   *           if an {@link IOException} occurs (e.g. if file does not exists)
+   */
+  public static void appendFile(PrintWriter writer, File file) throws ProcessingException {
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        writer.println(line);
+      }
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error appending file: " + file.getName(), e);
+    }
+    finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        }
+        catch (IOException e) {
+          // ignore
+        }
+      }
+    }
+
+  }
+
+  /**
+   * @param file
+   * @return List containing all lines of the file as Strings
+   * @throws ProcessingException
+   *           if an {@link IOException} occurs (e.g. if file does not exists)
+   */
+  public static List<String> readLines(File file) throws ProcessingException {
+    ArrayList<String> sourceFiles;
+    sourceFiles = new ArrayList<String>();
+    BufferedReader bufferedReader = null;
+    try {
+      bufferedReader = new BufferedReader(new FileReader(file));
+      String line;
+      while ((line = bufferedReader.readLine()) != null) {
+        sourceFiles.add(line);
+      }
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error reading config file.", e);
+    }
+    finally {
+      if (bufferedReader != null) {
+        try {
+          bufferedReader.close();
+        }
+        catch (IOException e) {
+          // ignore
+        }
+      }
+    }
+    return sourceFiles;
+  }
+
 }

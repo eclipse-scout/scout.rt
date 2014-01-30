@@ -37,18 +37,25 @@ public class SpecJob extends Job {
   private static final long STARTUP_TIMEOUT_IN_MS = 60 * 1000L;
   private final long m_startupTimeout;
   protected final Class<? extends IClientSession> m_clientSessionClass;
-  private final SpecPostProcessor m_postProcessor;
+  private final ISpecProcessor[] m_postProcessors;
 
-  public SpecJob(Class<? extends IClientSession> clientSessionClass, String pluginName) {
-    this(clientSessionClass, STARTUP_TIMEOUT_IN_MS, new SpecPostProcessor());
+  public SpecJob(Class<? extends IClientSession> clientSessionClass, String pluginName) throws ProcessingException {
+    this(clientSessionClass, STARTUP_TIMEOUT_IN_MS, new LinearOutputPostProcessor("SpecComplete.config"), new MediawikiPostProcessor());
   }
 
-  public SpecJob(Class<? extends IClientSession> clientSessionClass, long startupTimeout, SpecPostProcessor postProcessor) {
+  /**
+   * Creates a SpecJob. The postProcessors will be executed in the order they are provided here.
+   * 
+   * @param clientSessionClass
+   * @param startupTimeout
+   * @param postProcessors
+   */
+  public SpecJob(Class<? extends IClientSession> clientSessionClass, long startupTimeout, ISpecProcessor... postProcessors) {
     super("Specification");
     setSystem(true);
     m_clientSessionClass = clientSessionClass;
     m_startupTimeout = startupTimeout;
-    m_postProcessor = postProcessor;
+    m_postProcessors = postProcessors;
   }
 
   @Override
@@ -117,16 +124,18 @@ public class SpecJob extends Job {
   }
 
   private void postProcess() {
-    try {
-      getPostProcessor().process();
-    }
-    catch (ProcessingException e) {
-      LOG.error("Error during post Processing ", e);
+    for (ISpecProcessor processor : getPostProcessor()) {
+      try {
+        processor.process();
+      }
+      catch (ProcessingException e) {
+        LOG.error("Error during post Processing ", e);
+      }
     }
   }
 
-  public SpecPostProcessor getPostProcessor() {
-    return m_postProcessor;
+  public ISpecProcessor[] getPostProcessor() {
+    return m_postProcessors;
   }
 
 }

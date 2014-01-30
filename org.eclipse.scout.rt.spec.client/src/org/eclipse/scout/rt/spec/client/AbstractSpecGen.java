@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.Writer;
 import java.util.List;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
@@ -66,10 +65,6 @@ public class AbstractSpecGen {
     links.add(new LinkTarget(simpleId, simpleId, wiki.getName()));
     MediawikiLinkTargetManager w = new MediawikiLinkTargetManager(getFileConfig().getLinksFile());
     w.writeLinks(links);
-  }
-
-  public String getId(ITypeWithClassId o) {
-    return o.classId();
   }
 
 }

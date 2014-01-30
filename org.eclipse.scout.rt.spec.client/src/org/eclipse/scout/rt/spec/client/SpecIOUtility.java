@@ -42,12 +42,15 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 /**
  * Some utilities for files
  */
 public final class SpecIOUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecIOUtility.class);
   public static final String ENCODING = "utf-8";
 
   private SpecIOUtility() {
@@ -328,10 +331,15 @@ public final class SpecIOUtility {
     File bundleRoot = new File(resolvedFileBundleUri);
     File dir = new File(bundleRoot, relativePath);
     File[] files = dir.listFiles(filter);
-    for (File file : files) {
-      if (file.isFile()) {
-        fileNames.add(file.getName());
+    if (files != null) {
+      for (File file : files) {
+        if (file.isFile()) {
+          fileNames.add(file.getName());
+        }
       }
+    }
+    else {
+      LOG.warn("Could not read directory: " + dir.getPath());
     }
     return fileNames;
   }

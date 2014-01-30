@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,6 +31,21 @@ import org.osgi.framework.Bundle;
  * Configuration of input and output files
  */
 public class SpecFileConfig {
+  /**
+   * Commandline parameter or SystemProperty (comma separated) for defining additional source plugins for copying
+   * mediawiki, image and config files. Source and binary plugins are supported.
+   * <p>
+   * Attention order matters for copying files: <br>
+   * First files from the additional plugins are copied in the same order as the plugins are provided here. Then files
+   * from the plugin returned by {@link #getBundle()} are copied. If different plugins contain files with the same name
+   * they are overwritten.
+   * <p>
+   * 
+   * @param additionalSourcePlugins
+   *          one or more bundle-symbolic-names
+   */
+  // TODO ASA So far, there is no support for subdirectories. Would we need it?
+  private static final String ADDITIONAL_SOURCE_PLUGINS = "additionalSourcePlugins";
   private static final String SPEC_OUT_DIR_NAME = "target" + File.separator + "spec";
   private static final String SPEC_IN_DIR_NAME = "resources" + File.separator + "spec";
 
@@ -37,6 +53,7 @@ public class SpecFileConfig {
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
   private static final String LINKS_FILE_NAME = "links.properties";
 
+  // TODO ASA configure output dir, remove m_bundle, change m_additionalSourcePlugins to m_sourcePlugin and explicitly configure all
   private String[] m_additionalSourcePlugins = new String[0];
   private Bundle m_bundle;
 
@@ -50,11 +67,36 @@ public class SpecFileConfig {
     if (product != null) {
       m_bundle = product.getDefiningBundle();
     }
+    readAdditionalSourcePluginsFromConfig();
+  }
+
+  private void readAdditionalSourcePluginsFromConfig() {
+    String parameter = getConfigParameter(ADDITIONAL_SOURCE_PLUGINS);
+    m_additionalSourcePlugins = StringUtility.split(parameter, ",");
+  }
+
+  /**
+   * Returns the configuration value for the given parameter that is either configured as
+   * command line argument or as system property.
+   * 
+   * @param parameterName
+   * @return
+   */
+  // TODO ASA copied form ScoutJUnitPluginTestExecutor --> move to Utility
+  private static String getConfigParameter(String parameterName) {
+    String commandLineArgumentName = "-" + parameterName + "=";
+    for (String arg : Platform.getCommandLineArgs()) {
+      if (arg != null && arg.startsWith(commandLineArgumentName)) {
+        return arg.substring(commandLineArgumentName.length());
+      }
+    }
+    return System.getProperty(parameterName);
   }
 
   /**
    * The bundle property ({@link #getBundle()}) will be set to provided plugin.
    */
+  // TODO ASA only used in tests; refactor: configure output dir instead of bundle
   public SpecFileConfig(String pluginName) {
     m_bundle = Platform.getBundle(pluginName);
   }
@@ -85,6 +127,9 @@ public class SpecFileConfig {
 
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SpecFileConfig.class);
 
+  /**
+   * @return all source bundles, ordered by priority: lowest priority first, highest last
+   */
   public List<Bundle> getSourceBundles() {
     ArrayList<Bundle> arrayList = new ArrayList<Bundle>();
     for (String bundleName : m_additionalSourcePlugins) {
@@ -138,6 +183,10 @@ public class SpecFileConfig {
     return SPEC_IN_DIR_NAME + File.separator + MEDIAWIKI_DIR_NAME;
   }
 
+  public String getRelativeSourceDirPath() {
+    return SPEC_IN_DIR_NAME;
+  }
+
   public String getRelativeImagesSourceDirPath() {
     return SPEC_IN_DIR_NAME + File.separator + IMAGES_DIR_NAME;
   }
@@ -162,23 +211,6 @@ public class SpecFileConfig {
 
   public File getLinksFile() throws ProcessingException {
     return new File(getSpecDir(), LINKS_FILE_NAME);
-  }
-
-  /**
-   * Define additional source plugins for copying mediawiki and image files. Source and binary plugins are supported.
-   * <p>
-   * Attention order matters for copying files: <br>
-   * First files from the additional plugins are copied in the same order as the plugins are provided here. Then files
-   * from the plugin returned by {@link #getBundle()} are copied. If different plugins contain files with the same name
-   * they are overwritten.
-   * <p>
-   * 
-   * @param additionalSourcePlugins
-   *          one or more bundle-symbolic-names
-   */
-  // TODO ASA So far, there is no support for subdirectories. Would we need it?
-  public void setAdditionalSourcePlugins(String... additionalSourcePlugins) {
-    m_additionalSourcePlugins = additionalSourcePlugins;
   }
 
 }

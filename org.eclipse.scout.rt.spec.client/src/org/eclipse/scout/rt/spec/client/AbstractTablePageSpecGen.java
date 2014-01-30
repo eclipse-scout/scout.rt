@@ -24,7 +24,7 @@ public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
   public void printAllFields() throws ProcessingException {
     IPageWithTable<? extends ITable> page = createAndStartTablePage();
     IDocSection doc = generate(page);
-    write(doc, getId(page), new String[]{}, page.getClass().getSimpleName());
+    write(doc, page.classId(), new String[]{}, page.getClass().getSimpleName());
   }
 
   protected IDocSection generate(IPageWithTable<? extends ITable> page) {

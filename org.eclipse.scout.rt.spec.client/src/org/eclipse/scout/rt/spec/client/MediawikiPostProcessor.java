@@ -23,10 +23,13 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor;
 
 /**
- * A post processor for replacing link tags to point to the generated files.
+ * A post processor for mediawiki files which performs the following tasks:
+ * <p>
+ * <li>Replace link tags to point to the generated files.
+ * <li>Convert all mediawiki files to html files
  */
-public class SpecPostProcessor extends AbstractSpecGen implements ISpecProcessor {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(SpecPostProcessor.class);
+public class MediawikiPostProcessor extends AbstractSpecGen implements ISpecProcessor {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiPostProcessor.class);
 
   @Override
   public void process() throws ProcessingException {
