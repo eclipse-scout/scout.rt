@@ -60,6 +60,9 @@ public final class MailUtility {
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
   public static final String CONTENT_TYPE_MULTIPART = "alternative";
 
+  public static final Pattern wordPatternItem = Pattern.compile("item\\d{3,4}\\.xml");
+  public static final Pattern wordPatternProps = Pattern.compile("props\\d{3,4}\\.xml");
+
   private static MailUtility instance = new MailUtility();
 
   private MailUtility() {
@@ -576,8 +579,8 @@ public final class MailUtility {
         filename.equalsIgnoreCase("themedata.thmx") ||
         filename.equalsIgnoreCase("header.html") ||
         filename.equalsIgnoreCase("editdata.mso") ||
-        filename.matches("item\\d{4}\\.xml") ||
-        filename.matches("props\\d{4}\\.xml");
+        wordPatternItem.matcher(filename).matches() ||
+        wordPatternProps.matcher(filename).matches();
   }
 
   private static void writeHtmlBody(MimePart htmlBodyPart, String htmlMessage, List<DataSource> htmlDataSourceList) throws MessagingException {

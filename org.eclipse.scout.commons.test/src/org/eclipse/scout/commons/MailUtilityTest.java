@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -37,4 +39,29 @@ public class MailUtilityTest {
     message = MailUtility.createMimeMessage(null, null, "Subject", "Body", null);
     assertNotNull(message);
   }
+
+  @Test
+  public void testWordSpecificPattern() throws Exception {
+    assertFalse(isMatching("foobar.xml"));
+    assertFalse(isMatching("item.xml"));
+    assertFalse(isMatching("item0.xml"));
+    assertFalse(isMatching("item00.xml"));
+    assertTrue(isMatching("item000.xml"));
+    assertTrue(isMatching("item001.xml"));
+    assertTrue(isMatching("item0000.xml"));
+    assertFalse(isMatching("item00000.xml"));
+
+    assertFalse(isMatching("props.xml"));
+    assertFalse(isMatching("props0.xml"));
+    assertFalse(isMatching("props01.xml"));
+    assertTrue(isMatching("props002.xml"));
+    assertTrue(isMatching("props012.xml"));
+    assertTrue(isMatching("props0123.xml"));
+    assertFalse(isMatching("props01234.xml"));
+  }
+
+  private boolean isMatching(String fileName) {
+    return MailUtility.wordPatternItem.matcher(fileName).matches() || MailUtility.wordPatternProps.matcher(fileName).matches();
+  }
+
 }
