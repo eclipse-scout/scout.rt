@@ -19,9 +19,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
- * A {@link IDocTextExtractor} for the documentation text defined by getConfiguredDoc (to be replaced by classid).
+ * A {@link IDocTextExtractor} for the documentation text defined by classid
  */
-// TODO ASA unitTest
 public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
 
   public DescriptionExtractor() {
@@ -60,7 +59,7 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
   /**
    * @param o
    * @return
-   * @deprecated only docs associated with the classId will be supported
+   * @deprecated in scout 3.11 only docs associated with the classId will be supported
    */
   @Deprecated
   private String tryReadingGetConfiguredDoc(ITypeWithClassId o) {
