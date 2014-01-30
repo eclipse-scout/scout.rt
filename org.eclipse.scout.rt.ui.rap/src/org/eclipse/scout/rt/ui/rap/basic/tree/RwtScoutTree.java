@@ -367,7 +367,22 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           scrollToSelection();
           break;
         }
+        case TreeEvent.TYPE_NODE_CHANGED: {
+          updateTreeNode(e.getNode());
+          break;
+        }
       }
+    }
+  }
+
+  /**
+   * Update the given node.
+   * 
+   * @since 3.10.0-M5
+   */
+  protected void updateTreeNode(ITreeNode node) {
+    if (getUiTreeViewer() != null) {
+      getUiTreeViewer().update(node, null);
     }
   }
 
@@ -465,6 +480,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         case TreeEvent.TYPE_NODE_COLLAPSED:
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODE_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         case TreeEvent.TYPE_NODES_SELECTED:
@@ -487,6 +503,10 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED: {
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
         setExpansionFromScout(e.getCommonParentNode());
+        break;
+      }
+      case TreeEvent.TYPE_NODE_CHANGED: {
+        updateTreeNode(e.getNode());
         break;
       }
       case TreeEvent.TYPE_NODES_UPDATED: {

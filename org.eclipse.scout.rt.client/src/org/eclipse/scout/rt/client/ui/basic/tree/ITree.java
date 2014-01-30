@@ -488,4 +488,13 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    *          scrollbars.
    */
   void setSaveAndRestoreScrollbars(boolean b);
+
+  /**
+   * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
+   * color...) but no structural changes occurred
+   * 
+   * @param abstractTreeNode
+   * @since 3.10.0-M5
+   */
+  void fireNodeChanged(ITreeNode abstractTreeNode);
 }

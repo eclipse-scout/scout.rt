@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -122,6 +123,29 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
     catch (Exception e) {
       LOG.warn(null, e);
+    }
+  }
+
+  @Override
+  public void cellChanged(ICell cell, int changedBit) {
+    super.cellChanged(cell, changedBit);
+    updateParentTableRow(cell);
+  }
+
+  /**
+   * If the cell has changed (e.g. the text) we inform our parent as well.
+   * If the parent page is a {@link IPageWithNodes}, update its table accordingly.
+   * Since the table {@link P_Table} has only one column, we update the first column.
+   * 
+   * @since 3.10.0-M5
+   */
+  protected void updateParentTableRow(ICell cell) {
+    IPage parent = getParentPage();
+    if (parent != null && parent instanceof IPageWithNodes) {
+      ITableRow row = ((IPageWithNodes) parent).getTableRowFor(this);
+      if (row != null) {
+        row.getCellForUpdate(0).setText(cell.getText());
+      }
     }
   }
 
@@ -344,7 +368,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
 
       @Override
       protected void decorateCellInternal(Cell cell, ITableRow row) {
-        // Cells were already decorated by the tree, where they are taken from.
+        //if we encounter a cell change, update the tree as well
+        IPage page = m_tableRowToPageMap.get(row);
+        if (page != null) {
+          page.getCellForUpdate().setText(cell.getText());
+        }
       }
 
       @Override
@@ -393,6 +421,5 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
 
     }
-
   }
 }

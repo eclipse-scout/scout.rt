@@ -99,7 +99,16 @@ public class TreeEvent extends EventObject {
    * Advise to scroll to selection
    */
   public static final int TYPE_SCROLL_TO_SELECTION = 830;
-  // next 840
+
+  /**
+   * Node has changed in a way that may affect its presentation (e.g. text, font, color...) but no structural changes
+   * occurred
+   * 
+   * @since 3.10.0-M5
+   */
+  public static final int TYPE_NODE_CHANGED = 850;
+
+  // next 860
 
   private final int m_type;
   private ITreeNode m_commonParentNode;

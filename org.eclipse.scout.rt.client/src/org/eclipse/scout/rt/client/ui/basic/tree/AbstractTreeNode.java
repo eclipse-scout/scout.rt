@@ -951,6 +951,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
    */
   @Override
   public void cellChanged(ICell cell, int changedBit) {
+    if (getTree() != null) {
+      getTree().fireNodeChanged(this);
+    }
   }
 
   @Override

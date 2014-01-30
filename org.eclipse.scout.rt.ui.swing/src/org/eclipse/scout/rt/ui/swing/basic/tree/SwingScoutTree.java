@@ -585,6 +585,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         case TreeEvent.TYPE_NODE_COLLAPSED:
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODE_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         case TreeEvent.TYPE_NODES_SELECTED:
@@ -607,6 +608,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       case TreeEvent.TYPE_NODES_UPDATED: {
         updateTreeStructureAndKeepSelectionFromScout(e.getCommonParentNode());
         setExpansionFromScout(e.getCommonParentNode());
+        break;
+      }
+      case TreeEvent.TYPE_NODE_CHANGED: {
+        updateTreeNode(e.getNode());
         break;
       }
       case TreeEvent.TYPE_NODES_DELETED: {
@@ -693,7 +698,23 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           scrollToSelection();
           break;
         }
+        case TreeEvent.TYPE_NODE_CHANGED: {
+          updateTreeNode(e.getNode());
+          break;
+        }
       }
+    }
+  }
+
+  /**
+   * update the given node
+   *
+   * @since 3.10.0-M5
+   */
+  protected void updateTreeNode(ITreeNode node) {
+    if (getScoutObject() != null) {
+      SwingTreeModel swingTreeModel = (SwingTreeModel) getSwingTree().getModel();
+      swingTreeModel.updateNode(node);
     }
   }
 
@@ -851,7 +872,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   * 
+   *
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -1030,7 +1051,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {

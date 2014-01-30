@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -177,6 +177,26 @@ public class SwingTreeModel implements TreeModel {
     }
     Arrays.sort(a);
     return a;
+  }
+
+  /**
+   * Updates the given node.
+   * 
+   * @since 3.10.0-M5
+   */
+  public void updateNode(ITreeNode node) {
+    if (node != null) {
+      /**
+       * To indicate the root has changed, childIndices and children will be null
+       * http://docs.oracle.com/javase/7/docs/api/javax/swing/event/TreeModelListener.html
+       */
+      if (node.getParentNode() == null) {
+        fireTreeNodesChanged(node, null);
+      }
+      else {
+        fireTreeNodesChanged(node.getParentNode(), new ITreeNode[]{node});
+      }
+    }
   }
 
 }

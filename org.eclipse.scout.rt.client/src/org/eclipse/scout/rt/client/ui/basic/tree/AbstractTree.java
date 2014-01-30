@@ -1943,6 +1943,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
+  public void fireNodeChanged(ITreeNode node) {
+    fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_CHANGED, node));
+  }
+
   private void fireNodeFilterChanged() {
     fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_FILTER_CHANGED, getRootNode()));
   }

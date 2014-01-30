@@ -392,6 +392,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         case TreeEvent.TYPE_NODE_COLLAPSED:
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODE_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         case TreeEvent.TYPE_NODES_SELECTED:
@@ -422,6 +423,10 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       case TreeEvent.TYPE_NODES_INSERTED: {
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
         setExpansionFromScout(e.getCommonParentNode());
+        break;
+      }
+      case TreeEvent.TYPE_NODE_CHANGED: {
+        updateTreeNode(e.getNode());
         break;
       }
       case TreeEvent.TYPE_NODES_UPDATED: {
@@ -463,6 +468,10 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         break;
       }
     }
+  }
+
+  protected void updateTreeNode(ITreeNode node) {
+    getSwtTreeViewer().update(node, null);
   }
 
   protected void handleSwtNodeClick(final ITreeNode node) {
