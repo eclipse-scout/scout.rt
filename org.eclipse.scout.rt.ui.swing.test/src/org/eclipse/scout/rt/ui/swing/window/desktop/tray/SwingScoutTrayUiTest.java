@@ -14,10 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
+import java.awt.Image;
 import java.awt.PopupMenu;
 import java.awt.TrayIcon;
-
-import javax.swing.ImageIcon;
+import java.awt.image.BufferedImage;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.junit.Before;
@@ -70,8 +70,8 @@ public class SwingScoutTrayUiTest {
 
     @Override
     protected TrayIcon createTrayIcon() {
-      ImageIcon icon = new ImageIcon("");
-      return new TrayIcon(icon.getImage());
+      Image i = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+      return new TrayIcon(i);
     }
   }
 }
