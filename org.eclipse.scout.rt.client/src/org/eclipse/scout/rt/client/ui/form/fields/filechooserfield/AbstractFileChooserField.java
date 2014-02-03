@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
+@ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
 public abstract class AbstractFileChooserField extends AbstractValueField<String> implements IFileChooserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFileChooserField.class);
 

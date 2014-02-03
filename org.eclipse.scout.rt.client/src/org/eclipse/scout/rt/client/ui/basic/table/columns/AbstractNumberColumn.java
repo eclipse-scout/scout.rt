@@ -17,6 +17,7 @@ import java.text.NumberFormat;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 /**
  * Column holding Number
  */
+@ClassId("6b77a24f-8685-4023-b353-cbbe7d4bf22a")
 public abstract class AbstractNumberColumn<T extends Number> extends AbstractColumn<T> implements INumberColumn<T> {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
@@ -61,6 +62,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
+@ClassId("8e7f7eb8-be18-48e5-9efe-8a5b3459e247")
 @SuppressWarnings("deprecation")
 @FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractComposerField extends AbstractFormField implements IComposerField {

@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.WeakEventListener;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 
+@ClassId("6936b8b8-6612-4efa-bf29-80a26f80b9da")
 public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWizardStatusField.class);
   private IWizard m_wizard;

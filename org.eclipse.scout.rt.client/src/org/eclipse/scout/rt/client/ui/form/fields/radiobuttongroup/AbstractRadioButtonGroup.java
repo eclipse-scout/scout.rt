@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -57,6 +58,7 @@ import org.eclipse.scout.service.SERVICES;
  * inactive keys that are not reflected in the listbox<br>
  * Therefore an empty listbox table is not the same as a listbox with an empty value (null)
  */
+@ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
 public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRadioButtonGroup.class);
 

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.longfield;
 
 import java.math.BigDecimal;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +21,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
+@ClassId("cfc961a1-195f-491d-94c5-762f9d86efee")
 public abstract class AbstractLongField extends AbstractNumberField<Long> implements ILongField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLongField.class);
 

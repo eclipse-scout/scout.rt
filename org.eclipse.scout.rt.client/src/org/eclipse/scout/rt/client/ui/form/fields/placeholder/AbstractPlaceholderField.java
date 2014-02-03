@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.placeholder;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
+@ClassId("1c651d5d-f327-4c60-8bf4-4a4714bc22cc")
 public abstract class AbstractPlaceholderField extends AbstractFormField implements IPlaceholderField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlaceholderField.class);
 

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 /**
  * Column holding Double
  */
+@ClassId("fc6f348b-e7dc-4654-8b7c-f4c9f2f5cd08")
 public abstract class AbstractDoubleColumn extends AbstractDecimalColumn<Double> implements IDoubleColumn {
 
   public AbstractDoubleColumn() {

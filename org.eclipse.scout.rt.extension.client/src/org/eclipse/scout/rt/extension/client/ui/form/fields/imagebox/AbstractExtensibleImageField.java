@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.extension.client.ui.form.fields.imagebox;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
+@ClassId("784c57b0-3206-4530-b149-cf3e0426737c")
 public abstract class AbstractExtensibleImageField extends AbstractImageField implements IExtensibleScoutObject {
 
   public AbstractExtensibleImageField() {

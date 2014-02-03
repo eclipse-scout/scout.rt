@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * o show checked o show all
  * o show active o show inactive o show all
  */
+@ClassId("ebca1411-044f-425f-b63c-4920cde6bb1b")
 public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   private final OptimisticLock m_listBoxSyncLock;
   private PropertyChangeListener m_listBoxPropertyListener;

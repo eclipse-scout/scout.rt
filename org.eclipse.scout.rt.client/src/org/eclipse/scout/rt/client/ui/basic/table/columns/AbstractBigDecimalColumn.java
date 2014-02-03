@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
  */
 import java.math.BigDecimal;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
 
+@ClassId("cf4984e1-7ec9-4442-a9d8-23145b0e1614")
 public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal> implements IBigDecimalColumn {
 
   public AbstractBigDecimalColumn() {

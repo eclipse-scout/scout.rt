@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.textfield;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 /**
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
  * the word "textField" instead of "stringField"<br>
  * do not add further code or methods to this class
  */
+@ClassId("53abcbfa-f3d8-48f8-8467-ba61c10b2abb")
 public abstract class AbstractTextField extends AbstractStringField implements ITextField {
 
   public AbstractTextField() {

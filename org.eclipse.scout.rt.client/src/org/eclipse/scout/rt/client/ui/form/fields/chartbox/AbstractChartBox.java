@@ -13,10 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.chartbox;
 import java.util.EventListener;
 
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
+@ClassId("4b06de6a-09c5-4500-ba64-8d886467ffd8")
 public abstract class AbstractChartBox extends AbstractFormField implements IChartBox {
   private IChartBoxUIFacade m_uiFacade;
   private EventListenerList m_listenerList = new EventListenerList();

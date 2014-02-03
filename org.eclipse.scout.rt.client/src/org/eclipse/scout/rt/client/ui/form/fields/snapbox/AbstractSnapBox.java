@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.snapbox;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.snapbox.internal.SnapBoxGrid;
 
+@ClassId("57ba326b-0e46-40bd-aa06-031f6f908b0e")
 public abstract class AbstractSnapBox extends AbstractCompositeField implements ISnapBox {
 
   private SnapBoxGrid m_grid;

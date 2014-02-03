@@ -15,6 +15,7 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -37,6 +38,7 @@ import org.eclipse.scout.service.SERVICES;
  * See also {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html editing (requires a
  * fragment such as microsoft word editor)
  */
+@ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 

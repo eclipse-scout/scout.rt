@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 /**
  * Column holding Date
  */
+@ClassId("9185f9ed-3dc2-459b-b06b-f39c6c6fed2e")
 public abstract class AbstractDateColumn extends AbstractColumn<Date> implements IDateColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

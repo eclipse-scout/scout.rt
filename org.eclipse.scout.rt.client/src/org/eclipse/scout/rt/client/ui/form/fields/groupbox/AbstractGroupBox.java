@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 
+@ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
 
   private IGroupBoxUIFacade m_uiFacade;

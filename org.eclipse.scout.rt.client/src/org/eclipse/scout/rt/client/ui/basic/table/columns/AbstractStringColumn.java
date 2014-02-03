@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 /**
  * Column holding Strings
  */
+@ClassId("e564abbc-5f57-4ccc-a50c-003c408df519")
 public abstract class AbstractStringColumn extends AbstractColumn<String> implements IStringColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -51,6 +52,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("5648579d-1968-47be-a0c9-a8c846d2caf4")
 public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> implements ITreeBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeBox.class);
 

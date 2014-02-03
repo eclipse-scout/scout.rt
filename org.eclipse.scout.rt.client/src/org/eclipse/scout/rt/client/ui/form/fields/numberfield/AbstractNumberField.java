@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -32,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalFi
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
 public abstract class AbstractNumberField<T extends Number> extends AbstractBasicField<T> implements INumberField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractNumberField.class);
 

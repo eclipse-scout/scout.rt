@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -21,6 +22,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
+@ClassId("4c09f9f0-84fe-4c6c-95dd-1f51e92058d8")
 public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger> implements IBigIntegerField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigIntegerField.class);
   private static final BigInteger DEFAULT_MIN_VALUE = new BigInteger("-999999999999999999999999999999999999999999999999999999999999");

@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.EventListener;
 
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -27,6 +28,7 @@ import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
+@ClassId("20ed1036-9314-4bd8-bad6-c66e778f281f")
 public abstract class AbstractSvgField extends AbstractFormField implements ISvgField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSvgField.class);
 

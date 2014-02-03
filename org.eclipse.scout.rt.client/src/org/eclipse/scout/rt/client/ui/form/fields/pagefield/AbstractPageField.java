@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.pagefield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
  * Representation of a page as a composite of detailForm, table, searchForm for
  * usage inside a {@link IForm}
  */
+@ClassId("e2f4e714-637f-4a9b-b3be-d672900e1374")
 public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBox implements IPageField<T> {
   private T m_page;
   private SimpleOutline m_outline;

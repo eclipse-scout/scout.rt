@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
 public abstract class AbstractValueField<T> extends AbstractFormField implements IValueField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractValueField.class);

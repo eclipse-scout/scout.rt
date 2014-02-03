@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 import java.util.Date;
 
 import org.eclipse.scout.commons.UTCDate;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 /**
  * Date field with override on {@link #getHolderType()} to {@link UTCDate}
  */
+@ClassId("97712b93-4633-4a47-ae4f-ad891d30183a")
 @FormData(value = AbstractUTCFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractUTCDateField extends AbstractDateField implements IUTCDateField {
 

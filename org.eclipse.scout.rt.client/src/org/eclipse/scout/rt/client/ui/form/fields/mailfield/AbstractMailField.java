@@ -15,6 +15,7 @@ import java.net.URL;
 
 import javax.mail.internet.MimeMessage;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -27,6 +28,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * @version 3.x
  */
+@ClassId("35e1fd57-3c86-4c99-92ca-188c3c2dedde")
 @SuppressWarnings("restriction")
 public abstract class AbstractMailField extends AbstractValueField<MimeMessage> implements IMailField {
   private IMailFieldUIFacade m_uiFacade;

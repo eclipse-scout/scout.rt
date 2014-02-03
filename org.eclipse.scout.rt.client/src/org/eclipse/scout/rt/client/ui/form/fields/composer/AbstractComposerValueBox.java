@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
@@ -51,6 +52,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  * Template box containing all composer values.
  * <p>
  */
+@ClassId("2d8065cf-eeb3-4d64-8753-adb36cf852b8")
 public abstract class AbstractComposerValueBox extends AbstractGroupBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerValueBox.class);
 

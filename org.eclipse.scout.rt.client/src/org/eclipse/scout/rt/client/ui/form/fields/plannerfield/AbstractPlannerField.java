@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("8fbfbf19-ff9d-4e89-8a78-8e6a4a8dc36c")
 public abstract class AbstractPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<T, P, RI, AI> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerField.class);
 

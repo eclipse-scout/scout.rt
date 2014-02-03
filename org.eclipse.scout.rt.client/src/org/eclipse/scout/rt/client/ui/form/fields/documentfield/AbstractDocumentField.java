@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -19,6 +20,7 @@ import org.eclipse.scout.service.SERVICES;
  * Current known implementations inlcude the Microsoft office word document editor in swing. This will be released soon
  * as a scout swing fragment under epl.
  */
+@ClassId("4c022ea1-a522-43a5-b603-954d9cb8705c")
 public abstract class AbstractDocumentField extends AbstractValueField<RemoteFile> implements IDocumentField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDocumentField.class);
 

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("c333e52d-4678-41b3-8307-01d473864d2e")
 public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implements ISmartColumn<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSmartColumn.class);
 

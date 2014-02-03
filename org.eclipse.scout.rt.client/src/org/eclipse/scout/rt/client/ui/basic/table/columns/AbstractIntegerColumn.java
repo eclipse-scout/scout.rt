@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 /**
  * Column holding Integer
  */
+@ClassId("5ac66db0-da85-454a-bec5-8cffa2d2abef")
 public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer> implements IIntegerColumn {
 
   public AbstractIntegerColumn() {

@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("d5b9a643-bdf2-483c-8adf-e8728021611e")
 public abstract class AbstractCancelButton extends AbstractButton implements IButton {
 
   public AbstractCancelButton() {

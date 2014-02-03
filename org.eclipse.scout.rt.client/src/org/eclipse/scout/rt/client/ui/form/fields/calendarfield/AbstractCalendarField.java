@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
+@ClassId("0b1ac83b-6fa4-4e12-88d0-680ed168e914")
 public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date> implements ICalendarField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarField.class);
 

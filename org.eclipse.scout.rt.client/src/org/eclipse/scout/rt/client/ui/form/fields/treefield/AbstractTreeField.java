@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("bfbf00d0-b70a-48d4-8481-4faff294f37f")
 public abstract class AbstractTreeField extends AbstractFormField implements ITreeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeField.class);
 

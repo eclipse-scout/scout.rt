@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -62,6 +63,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("8129f1a3-5f00-4973-b089-c3dbd91d1c9d")
 public abstract class AbstractSmartField<T> extends AbstractValueField<T> implements ISmartField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSmartField.class);
 

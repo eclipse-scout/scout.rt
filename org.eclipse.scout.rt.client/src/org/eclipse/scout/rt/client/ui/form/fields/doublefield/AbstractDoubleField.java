@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.doublefield;
 
 import java.math.BigDecimal;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +21,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
+@ClassId("65251930-63db-4da4-ae28-9a25d75dcafb")
 public abstract class AbstractDoubleField extends AbstractDecimalField<Double> implements IDoubleField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDoubleField.class);
 

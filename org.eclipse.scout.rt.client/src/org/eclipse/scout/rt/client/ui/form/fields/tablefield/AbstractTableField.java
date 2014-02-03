@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.NumberUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -51,6 +52,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
+@ClassId("76887bde-6815-4f7d-9cbd-60409b49488d")
 @FormData(value = AbstractTableFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTableField<T extends ITable> extends AbstractFormField implements ITableField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTableField.class);

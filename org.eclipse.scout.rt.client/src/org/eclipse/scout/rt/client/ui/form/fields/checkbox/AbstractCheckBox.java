@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.checkbox;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 
 /**
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
  * the word "checkBox" instead of "booleanField"<br>
  * do not add further code or methods to this class
  */
+@ClassId("cb8efb7d-752a-4e95-955e-b4cb7436e05a")
 public abstract class AbstractCheckBox extends AbstractBooleanField implements ICheckBox {
 
   public AbstractCheckBox() {

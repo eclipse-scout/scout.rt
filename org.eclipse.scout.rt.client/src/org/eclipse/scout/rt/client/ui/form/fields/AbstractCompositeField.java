@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
 
   private IFormField[] m_fields;

@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Activator;
 import org.eclipse.scout.rt.client.mobile.Icons;
@@ -37,6 +38,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * @since 3.9.0
  */
+@ClassId("349c912d-0e60-42a0-bd8d-b4c6c08ec62a")
 public class AbstractRowSummaryColumn extends AbstractStringColumn implements IRowSummaryColumn {
   private boolean m_initialized;
 

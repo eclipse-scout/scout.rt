@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.customfield;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
 /**
  * default Convenience implementation base for a custom field
  */
+@ClassId("fa42ce51-a1c7-4d90-a680-6709f97da0f7")
 public abstract class AbstractCustomField extends AbstractFormField implements ICustomField {
 
   public AbstractCustomField() {

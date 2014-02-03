@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.util.HashSet;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * <p>
  * Expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
+@ClassId("678308dc-6f45-4284-9295-617b28b03cea")
 public abstract class AbstractDataModelAggregationField extends AbstractSmartField<Integer> {
 
   public AbstractDataModelAggregationField() {

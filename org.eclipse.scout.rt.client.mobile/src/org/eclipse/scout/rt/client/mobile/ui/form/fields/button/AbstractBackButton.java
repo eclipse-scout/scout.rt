@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 /**
  * @since 3.9.0
  */
+@ClassId("c4faa795-efda-47d3-9a89-dc249edd002a")
 public class AbstractBackButton extends AbstractButton implements IMobileButton {
 
   @Override

@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * convenience subclass of {@link AbstractDateField} with hasDate=false and hasTime=true
  */
+@ClassId("c9f9056a-02ab-4d8e-b80e-16fa81010617")
 public abstract class AbstractTimeField extends AbstractDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTimeField.class);
 

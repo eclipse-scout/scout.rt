@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -59,6 +60,7 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
 public abstract class AbstractColumn<T> extends AbstractPropertyObserver implements IColumn<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractColumn.class);
 

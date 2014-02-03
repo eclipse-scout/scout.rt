@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("14555c41-2d65-414a-94b1-d4328cbd818c")
 public abstract class AbstractTabBox extends AbstractCompositeField implements ITabBox {
 
   private ITabBoxUIFacade m_uiFacade;

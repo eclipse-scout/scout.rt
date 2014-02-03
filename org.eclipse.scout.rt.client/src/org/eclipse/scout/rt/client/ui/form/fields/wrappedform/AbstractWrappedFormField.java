@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
+@ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
 public abstract class AbstractWrappedFormField<T extends IForm> extends AbstractFormField implements IWrappedFormField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWrappedFormField.class);
 

@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -59,6 +60,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("3dc8747d-19eb-4c0a-b5fc-c3dc2ad0783d")
 public abstract class AbstractListBox<T> extends AbstractValueField<T[]> implements IListBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 

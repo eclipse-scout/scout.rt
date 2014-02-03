@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid
  * 
  * @since 3.1.12 16.07.2008
  */
+@ClassId("2b156923-e659-4993-8d5d-559f140ec59d")
 public abstract class AbstractSplitBox extends AbstractCompositeField implements ISplitBox {
 
   private SplitBoxGrid m_grid;

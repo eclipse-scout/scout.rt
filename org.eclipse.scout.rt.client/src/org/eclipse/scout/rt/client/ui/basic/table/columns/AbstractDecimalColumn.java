@@ -14,6 +14,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 /**
  * Column holding Decimal number
  */
+@ClassId("961989bf-d585-40a2-ab9f-b7e545baaac9")
 public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNumberColumn<T> implements IDecimalColumn<T> {
 
   public AbstractDecimalColumn() {

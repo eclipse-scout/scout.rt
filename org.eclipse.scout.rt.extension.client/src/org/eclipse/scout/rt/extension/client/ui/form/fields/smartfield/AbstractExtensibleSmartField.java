@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
+@ClassId("b26fb732-b858-4103-9280-b516ccc757f9")
 public abstract class AbstractExtensibleSmartField<T> extends AbstractSmartField<T> implements IExtensibleScoutObject {
 
   public AbstractExtensibleSmartField() {

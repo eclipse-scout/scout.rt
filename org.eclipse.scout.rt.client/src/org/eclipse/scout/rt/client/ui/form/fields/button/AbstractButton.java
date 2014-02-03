@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -32,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
+@ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractButton.class);
 

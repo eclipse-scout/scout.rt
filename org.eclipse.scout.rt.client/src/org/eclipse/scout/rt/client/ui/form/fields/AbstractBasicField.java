@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 
@@ -18,6 +19,7 @@ import org.eclipse.scout.commons.annotations.Order;
  * 
  * @since 3.10.0-M3
  */
+@ClassId("d5a72dd8-cb1c-4dea-a568-90d77e65854e")
 public abstract class AbstractBasicField<T> extends AbstractValueField<T> implements IBasicField<T> {
 
   private boolean m_whileTyping;

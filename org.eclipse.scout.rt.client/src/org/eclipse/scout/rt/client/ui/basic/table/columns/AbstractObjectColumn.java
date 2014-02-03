@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 
 /**
  * Column holding Objects
  */
+@ClassId("c6a6ffc3-d042-427b-abe5-8e4f288c358d")
 public abstract class AbstractObjectColumn extends AbstractColumn<Object> implements IObjectColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

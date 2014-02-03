@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
+@ClassId("480ea07e-9cec-4591-ba73-4bb9aa45a60d")
 public abstract class AbstractImageField extends AbstractFormField implements IImageField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractImageField.class);
 

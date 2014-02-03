@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
 /**
  * Column holding Long
  */
+@ClassId("97d8375f-84fa-4673-876f-9b274f218cce")
 public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> implements ILongColumn {
 
   public AbstractLongColumn() {
