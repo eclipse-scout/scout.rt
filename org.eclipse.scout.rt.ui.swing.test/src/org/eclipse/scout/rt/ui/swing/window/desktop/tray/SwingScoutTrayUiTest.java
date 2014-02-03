@@ -21,11 +21,13 @@ import java.awt.image.BufferedImage;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Tests for {@link SwingScoutTray}
  */
+@Ignore
 public class SwingScoutTrayUiTest {
   private static final String TEST_TITLE = "New Application Title";
 
