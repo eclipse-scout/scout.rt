@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.spec.client.out.mediawiki;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.eclipse.scout.rt.spec.client.out.DocTable;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
+import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
 
 /**
  * Creates Specification data for a page

@@ -11,30 +11,14 @@
 package org.eclipse.scout.rt.spec.client.out;
 
 /**
- *
+ * Representation of a link
  */
-public interface IDocSection {
+public interface IDocLink {
 
-  /**
-   * @return a unique id
-   */
-  String getId();
+  /** Id of the target or anchor id */
+  String getTargetId();
 
-  /**
-   * @return a title or heading of the section
-   */
-  String getTitle();
-
-  IDocSectionHeading getHeading();
-
-  IDocTable getTable();
-
-  IDocSection[] getSubSections();
-
-  boolean hasSubSections();
-
-  boolean hasTableCellTexts();
-
-  boolean isDisplayed();
+  /** Display name of the link */
+  String getDisplayName();
 
 }

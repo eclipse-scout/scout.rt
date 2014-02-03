@@ -50,10 +50,9 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
 
   @Test
   public void generateFieldTypeSpec() throws ProcessingException {
-
     Class[] fieldTypes = getAllClasses();
     IDocSection doc = generate(fieldTypes);
-    write(doc, m_id, new String[]{});
+    write(doc, m_id, new String[]{}, m_id);
   }
 
   protected Class[] getAllClasses() throws ProcessingException {

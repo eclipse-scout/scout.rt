@@ -41,8 +41,7 @@ public class HtmlConverter {
 
   public void convertWikiToHtml(File in, File out) throws ProcessingException {
     try {
-
-      BufferedWriter htmlWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out.getPath()), "UTF-8"));
+      BufferedWriter htmlWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out.getPath()), ENCODING));
 
       HtmlDocumentBuilder builder = new HtmlDocumentBuilder(htmlWriter);
       builder.addCssStylesheet(m_css);

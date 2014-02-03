@@ -12,9 +12,7 @@ package org.eclipse.scout.rt.spec.client.out.mediawiki;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Properties;
 
-import org.eclipse.mylyn.wikitext.mediawiki.core.MediaWikiLanguage;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -29,23 +27,17 @@ public class MediawikiWriter {
   private final MediawikiTableWriter m_tableWriter;
   private final MediawikiImageWriter m_imageWriter;
 
-  private final MediaWikiLanguage m_lang;
-  private final Properties m_props;
   private final String[] m_images;
   private final IDocSection m_section;
 
-  private final Writer m_indexFileWriter;
   private final Writer m_wikiWriter;
 
-  public MediawikiWriter(Writer indexFileWriter, Writer wikiWriter, IDocSection section, String[] images) {
+  public MediawikiWriter(Writer wikiWriter, IDocSection section, String[] images) {
     m_tableWriter = new MediawikiTableWriter(wikiWriter);
     m_imageWriter = new MediawikiImageWriter(wikiWriter);
-    m_indexFileWriter = indexFileWriter;
     m_wikiWriter = wikiWriter;
     m_section = section;
     m_images = images.clone();
-    m_props = new Properties();
-    m_lang = new MediaWikiLanguage();
   }
 
   /**
@@ -57,8 +49,6 @@ public class MediawikiWriter {
     try {
       LOG.info("writing section " + m_section.getId());
       appendSection(m_section, 2, true);
-      LOG.info("writing link properties for " + m_section.getId());
-      m_props.store(m_indexFileWriter, "link IDs");
       m_wikiWriter.flush();
     }
     catch (IOException e) {
@@ -71,13 +61,13 @@ public class MediawikiWriter {
         m_wikiWriter.close();
       }
       catch (IOException e) {
-        //
+        //nop
       }
     }
   }
 
-  public void appendSection(IDocSection section, int headingLevel, boolean appendImages) throws IOException {
-    if (section != null && (hasSubsections(section) || hasTableCellTexts(section))) {
+  private void appendSection(IDocSection section, int headingLevel, boolean appendImages) throws IOException {
+    if (section.isDisplayed()) {
       LOG.info("writing section " + section.getId());
       appendHeading(section, headingLevel);
       appendTable(section);
@@ -92,57 +82,28 @@ public class MediawikiWriter {
     }
   }
 
-  /**
-   * @param fieldWriter
-   * @param section
-   * @throws IOException
-   */
   private void appendSection(IDocSection section, int headingLevel) throws IOException {
     appendSection(section, headingLevel, false);
   }
 
-  /**
-   * @throws IOException
-   */
   private void appendImages() throws IOException {
     m_imageWriter.appendImages(m_images);
   }
 
-  /**
-   * @param section
-   * @param headingLevel
-   * @throws IOException
-   */
   private void appendHeading(IDocSection section, int headingLevel) throws IOException {
     if (section.getTitle() != null) {
-      writeHeading(section.getTitle(), section.getId(), headingLevel);
+      m_tableWriter.appendHeading(section.getTitle(), headingLevel);
     }
   }
 
   private void appendTable(IDocSection section) throws IOException {
-    if (hasTableCellTexts(section)) {
-      if (hasSubsections(section)) {
+    if (section.hasTableCellTexts()) {
+      if (section.hasSubSections()) {
         m_tableWriter.appendTableTransposed(section.getTable());
       }
       else {
         m_tableWriter.appendTable(section.getTable());
       }
-    }
-  }
-
-  private boolean hasSubsections(IDocSection section) {
-    return section.getSubSections() != null && section.getSubSections().length > 0;
-  }
-
-  private boolean hasTableCellTexts(IDocSection section) {
-    return section.getTable() != null && section.getTable().getCellTexts() != null && section.getTable().getCellTexts().length > 0;
-  }
-
-  private void writeHeading(String heading, String headingId, int level) throws IOException {
-    m_tableWriter.appendHeading(heading, level);
-    if (headingId != null) {
-      String link = m_lang.getIdGenerationStrategy().generateId(heading);
-      m_props.put(headingId, link);
     }
   }
 

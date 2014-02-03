@@ -22,13 +22,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.out.IDocLink;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class DocLink {
+public class DocLink implements IDocLink {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocLink.class);
 
   public static final String REPLACE_TAG_NAME = "replace";
@@ -46,10 +47,12 @@ public class DocLink {
     m_displayName = displayName;
   }
 
+  @Override
   public String getTargetId() {
     return m_targetId;
   }
 
+  @Override
   public String getDisplayName() {
     return m_displayName;
   }

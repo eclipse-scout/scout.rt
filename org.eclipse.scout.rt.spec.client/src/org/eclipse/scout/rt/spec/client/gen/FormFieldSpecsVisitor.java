@@ -17,10 +17,10 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
-import org.eclipse.scout.rt.spec.client.out.DocTable;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
-import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
+import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
 
 /**
  * Extracts information from {@link IFormField}s by visiting all fields.

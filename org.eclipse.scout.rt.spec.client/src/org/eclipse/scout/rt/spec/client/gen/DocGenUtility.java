@@ -21,10 +21,10 @@ import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
-import org.eclipse.scout.rt.spec.client.out.DocTable;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
-import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
+import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
 
 /**
  * Some utility methods for {@link IDocTextExtractor}.

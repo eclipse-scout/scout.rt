@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.spec.client.gen;
 
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 public class TypeSpecGenerator {

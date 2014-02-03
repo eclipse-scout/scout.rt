@@ -12,11 +12,15 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
+import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor;
 
 /**
  * A post processor for replacing link tags to point to the generated files.
@@ -40,6 +44,9 @@ public class SpecPostProcessor extends AbstractSpecGen implements ISpecProcessor
   private void replaceLinks(File f) throws ProcessingException {
     MediawikiAnchorCollector c = new MediawikiAnchorCollector(f);
     c.replaceLinks(f, getFileConfig().getLinksFile());
+    Properties prop = SpecIOUtility.loadProperties(getFileConfig().getLinksFile());
+    MediawikiLinkPostProcessor postproc = new MediawikiLinkPostProcessor(prop);
+    postproc.replaceLinks(f);
   }
 
   private void replaceWikiFileLinks(File htmlFile) throws ProcessingException {
@@ -47,6 +54,25 @@ public class SpecPostProcessor extends AbstractSpecGen implements ISpecProcessor
     map.put("/wiki/", "");
     map.put(".mediawiki", ".html");
     SpecIOUtility.replaceAll(htmlFile, map);
+  }
+
+  protected File convertToHTML(File mediaWiki) throws ProcessingException {
+    String htmlName = mediaWiki.getName().replace(".mediawiki", "");
+    return convertToHTML(htmlName, mediaWiki);
+  }
+
+  protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
+    File htmlDir = getFileConfig().getHtmlDir();
+    htmlDir.mkdirs();
+    File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
+
+    // copy css
+    File css = new File(htmlDir, "default.css");
+    TemplateUtility.copyDefaultCss(css);
+
+    HtmlConverter htmlConverter = new HtmlConverter(css);
+    htmlConverter.convertWikiToHtml(mediaWiki, htmlFile);
+    return htmlFile;
   }
 
 }

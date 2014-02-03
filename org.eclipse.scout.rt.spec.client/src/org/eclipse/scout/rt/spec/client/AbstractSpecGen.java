@@ -12,19 +12,18 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.Properties;
+import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.eclipse.scout.rt.spec.client.link.LinkTarget;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.docbook.DocBookConverter;
-import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
-import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor;
+import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkGen;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkTargetManager;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
 
 /**
@@ -41,62 +40,36 @@ public class AbstractSpecGen {
     return m_fileConfig;
   }
 
-  protected File convertToDocBook(File out, String id, File mediaWiki) {
-    File docBook = new File(out, id + ".xml");
-    DocBookConverter c = new DocBookConverter();
-    c.convertWikiToDocBook(mediaWiki, docBook);
-    return docBook;
-  }
-
   protected IDocConfig getConfiguration() {
     return new DefaultDocConfig();
   }
 
-  protected void write(IDocSection section, String id, String[] imagePaths) throws ProcessingException {
+  protected void write(IDocSection section, String id, String[] imagePaths, String simpleId) throws ProcessingException {
     File out = getFileConfig().getSpecDir();
     out.mkdirs();
 
-    File preprocessed = getFileConfig().getMediawikiRawDir();
-    File wiki = SpecIOUtility.createNewFile(preprocessed, id, "_raw.mediawiki");
-    Writer mediaWikiWriter = SpecIOUtility.createWriter(wiki);
-    File properties = SpecIOUtility.createNewFile(preprocessed, id, ".properties");
-    Writer linkIdWriter = SpecIOUtility.createWriter(properties);
+    File wiki = SpecIOUtility.createNewFile(getFileConfig().getMediawikiDir(), id, ".mediawiki");
+    Writer fileWriter = SpecIOUtility.createWriter(wiki);
+    MediawikiWriter w = new MediawikiWriter(fileWriter, section, imagePaths);
+    w.write();
 
-    //
-    MediawikiWriter wikimediaFormWriter = new MediawikiWriter(linkIdWriter, mediaWikiWriter, section, imagePaths);
-    wikimediaFormWriter.write();
+    storeLinkTargets(section, wiki, simpleId);
+  }
 
-    File mediawiki = getFileConfig().getMediawikiDir();
-    File finalWiki = SpecIOUtility.createNewFile(mediawiki, id, ".mediawiki");
-    Properties prop = SpecIOUtility.loadProperties(properties);
-    MediawikiLinkPostProcessor postproc = new MediawikiLinkPostProcessor(prop);
-    postproc.replaceLinks(wiki, finalWiki);
-    new MediawikiAnchorCollector(finalWiki).storeAnchors(getFileConfig().getLinksFile());
-
-    convertToHTML(id, finalWiki);
+  /**
+   * store link targets in property file
+   */
+  protected void storeLinkTargets(IDocSection section, File wiki, String simpleId) throws ProcessingException {
+    List<ILinkTarget> links = new MediawikiLinkGen().getLinkAnchors(section, wiki.getName());
+    //add simple name to allow manual links to simple name
+    //TODO move to preprocessor
+    links.add(new LinkTarget(simpleId, simpleId, wiki.getName()));
+    MediawikiLinkTargetManager w = new MediawikiLinkTargetManager(getFileConfig().getLinksFile());
+    w.writeLinks(links);
   }
 
   public String getId(ITypeWithClassId o) {
     return o.classId();
-  }
-
-  protected File convertToHTML(File mediaWiki) throws ProcessingException {
-    String htmlName = mediaWiki.getName().replace(".mediawiki", "");
-    return convertToHTML(htmlName, mediaWiki);
-  }
-
-  protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
-    File htmlDir = getFileConfig().getHtmlDir();
-    htmlDir.mkdirs();
-    File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
-
-    // copy css
-    File css = new File(htmlDir, "default.css");
-    TemplateUtility.copyDefaultCss(css);
-
-    HtmlConverter htmlConverter = new HtmlConverter(css);
-    htmlConverter.convertWikiToHtml(mediaWiki, htmlFile);
-    return htmlFile;
   }
 
 }

@@ -40,7 +40,6 @@ public abstract class AbstractManualSpec extends AbstractSpecGen {
       for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeMediawikiSourceDirPath(), getFilter())) {
         File destFile = new File(dest, file);
         SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeMediawikiSourceDirPath() + File.separator + file, destFile);
-        convertToHTML(destFile);
         new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
       }
     }

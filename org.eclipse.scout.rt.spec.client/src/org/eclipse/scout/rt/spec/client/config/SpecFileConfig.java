@@ -161,7 +161,7 @@ public class SpecFileConfig {
   }
 
   public File getLinksFile() throws ProcessingException {
-    return new File(getSpecInDir(), LINKS_FILE_NAME);
+    return new File(getSpecDir(), LINKS_FILE_NAME);
   }
 
   /**

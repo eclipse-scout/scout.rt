@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.SpecIOUtility;
 import org.eclipse.scout.rt.spec.client.link.DocLink;
 
 /**
@@ -52,15 +53,16 @@ public class MediawikiLinkPostProcessor implements ITagProcessor {
    *          output file
    * @throws ProcessingException
    */
-  public void replaceLinks(File in, File out) throws ProcessingException {
+  public void replaceLinks(File in) throws ProcessingException {
     FileReader reader = null;
     BufferedReader br = null;
     FileWriter writer = null;
+    File temp = new File(in.getParent(), in.getName() + "_temp");
     try {
       reader = new FileReader(in);
       br = new BufferedReader(reader);
 
-      writer = new FileWriter(out);
+      writer = new FileWriter(temp);
       String line;
       while ((line = br.readLine()) != null) {
         String replacedLine = replaceLinkText(line);
@@ -92,6 +94,9 @@ public class MediawikiLinkPostProcessor implements ITagProcessor {
         }
       }
     }
+
+    SpecIOUtility.copy(temp, in);
+    temp.delete();
   }
 
   /**
@@ -141,6 +146,6 @@ public class MediawikiLinkPostProcessor implements ITagProcessor {
   }
 
   private String createRelativeWikiLink(String target, String name) {
-    return "[[#" + target + "|" + name + "]]";
+    return "[[" + target + "|" + name + "]]";
   }
 }

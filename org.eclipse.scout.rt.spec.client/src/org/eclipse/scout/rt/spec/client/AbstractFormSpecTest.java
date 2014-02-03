@@ -46,9 +46,8 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGen {
 
   public void printAllFields() throws ProcessingException {
     IForm form = createAndStartForm();
-
     IDocSection doc = generate(form);
-    write(doc, getId(form), getImagePaths(form));
+    write(doc, getId(form), getImagePaths(form), form.getClass().getSimpleName());
     form.doClose();
   }
 

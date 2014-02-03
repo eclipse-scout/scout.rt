@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.spec.client.out.mediawiki;
 
 /**
- * Utilitis for mediawiki
+ * Utilities for mediawiki
  */
 public final class MediawikiUtility {
   private static final String[] ESCAPE_LIST = new String[]{"[", "]"};

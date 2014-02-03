@@ -11,25 +11,23 @@
 package org.eclipse.scout.rt.spec.client.out;
 
 /**
- * Simple data object for a documentation table.
+ * A section heading containing an id that can be referenced and a title to be displayed.
  */
-public class DocTable implements IDocTable {
-  private final String[] m_headerTexts;
-  private final String[][] m_cellTexts;
+public interface IDocSectionHeading {
 
-  public DocTable(String[] headerTexts, String[][] cellTexts) {
-    m_headerTexts = headerTexts.clone();
-    m_cellTexts = cellTexts.clone();
-  }
+  /**
+   * @return a unique id
+   */
+  String getId();
 
-  @Override
-  public String[][] getCellTexts() {
-    return m_cellTexts.clone();
-  }
+  /**
+   * @return a name of the heading
+   */
+  String getName();
 
-  @Override
-  public String[] getHeaderTexts() {
-    return m_headerTexts.clone();
-  }
+  /**
+   * @return <code>true</code>, if heading contains a valid id and name
+   */
+  boolean isValid();
 
 }

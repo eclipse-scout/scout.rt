@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
 
 /**
  * A visitor for {@link ITableField}s that collects information according to configurations for {@link ITableField},
@@ -46,7 +46,15 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
     String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
     IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuConfig());
     IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnConfig());
-    return new SectionWithTable(id, title, menuSection, columnsSection);
+    if (menuSection != null) {
+      if (columnsSection != null) {
+        return new SectionWithTable(id, title, menuSection, columnsSection);
+      }
+      else {
+        return new SectionWithTable(id, title, columnsSection);
+      }
+    }
+    return new SectionWithTable(id, title);
   }
 
   @Override
