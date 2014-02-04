@@ -1465,9 +1465,11 @@ Button.tabboxButton:hover {
   background-image:none;
   border:none;
   text-shadow:none;
-  color:#295973;
+  color:#000000;
   padding:6px 8px 7px 8px;
   font:14px Arial,Helvetica,sans-serif;
+  background-color:#ebf4f8;
+  border-radius:5px 5px 0px 0px;
 }
 
 Button.tabboxButton-marked {
@@ -1507,12 +1509,13 @@ Button.tabboxButton-marked:pressed {
 }
 
 Button.tabboxButton-marked:hover {
-  background-image:url(theme/img/button/icon_changed.png);
+  background-image:url(theme/img/button/icon_changed-marked.png);
   border:none;
   text-shadow:none;
-  color:#295973;
+  color:#000000;
   padding:6px 6px 7px 10px;
   font:14px Arial,Helvetica,sans-serif;
+  border-radius:5px 5px 0px 0px;
 }
 
 Button.tabboxButton-active {
