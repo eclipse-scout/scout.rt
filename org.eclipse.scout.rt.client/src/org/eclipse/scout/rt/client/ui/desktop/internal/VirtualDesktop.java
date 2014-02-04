@@ -530,4 +530,9 @@ public class VirtualDesktop implements IDesktop {
     return;
   }
 
+  @Override
+  public boolean doBeforeClosing() {
+    throw createUnsupportedOperationException();
+  }
+
 }

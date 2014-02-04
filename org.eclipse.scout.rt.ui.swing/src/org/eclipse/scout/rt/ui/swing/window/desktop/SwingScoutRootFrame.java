@@ -365,6 +365,19 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   protected void handleSwingWindowClosing(WindowEvent e) {
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().fireDesktopClosingFromUI(false);
+      }
+    };
+
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    // end notify
+  }
+
+  protected void handleScoutDesktopClosedInSwing(DesktopEvent e) {
     Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
       boolean ok = ((JComponent) focusOwner).getInputVerifier().verify((JComponent) focusOwner);
@@ -392,19 +405,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     }
     // </bsh>
     ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setApplicationWindowPreferences(r != null ? new BoundsSpec(r.x, r.y, r.width, r.height) : null, maximized);
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        getScoutObject().getUIFacade().fireDesktopClosingFromUI();
-      }
-    };
 
-    getSwingEnvironment().invokeScoutLater(t, 0);
-    // end notify
-  }
-
-  protected void handleScoutDesktopClosedInSwing(DesktopEvent e) {
     // desktop detach
     disconnectFromScout();
     m_swingFrame.dispose();
@@ -462,24 +463,24 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     @Override
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
-        case DesktopEvent.TYPE_PRINT:
+        case DesktopEvent.TYPE_PRINT: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleScoutPrintInSwing(e);
+            }
+          };
+          getSwingEnvironment().invokeSwingLater(t);
+          break;
+        }
         case DesktopEvent.TYPE_DESKTOP_CLOSED: {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              switch (e.getType()) {
-                case DesktopEvent.TYPE_PRINT: {
-                  handleScoutPrintInSwing(e);
-                  break;
-                }
-                case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-                  handleScoutDesktopClosedInSwing(e);
-                  break;
-                }
-              }
+              handleScoutDesktopClosedInSwing(e);
             }
           };
-          getSwingEnvironment().invokeSwingLater(t);
+          getSwingEnvironment().invokeSwingAndWait(t, 60000);
           break;
         }
       }

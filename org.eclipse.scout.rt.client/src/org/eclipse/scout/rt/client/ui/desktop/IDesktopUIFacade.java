@@ -38,8 +38,15 @@ public interface IDesktopUIFacade {
   /**
    * GUI fires this event when it is in the process of closing the workbench /
    * application
+   * <p>
+   * The default case is to pass <code>false</code> as parameter.
+   * 
+   * @param forcedClosing
+   *          If set to <code>true</code> all vetos to stop the closing process (see
+   *          {@link AbstractDesktop#doBeforeClosing()} will be ignored. Otherwise if set to <code>false</code> vetos
+   *          are accepted.
    */
-  void fireDesktopClosingFromUI();
+  void fireDesktopClosingFromUI(boolean forcedClosing);
 
   /**
    * GUI fires this event as soon as a gui is available

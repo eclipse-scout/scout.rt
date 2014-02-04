@@ -63,7 +63,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private Bundle m_bundle;
   // state
   private final Object m_stateLock;
-  private boolean m_active;
+  private volatile boolean m_active;
   private Throwable m_loadError;
   private int m_exitCode = IApplication.EXIT_OK;
   // model
@@ -346,6 +346,9 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public void stopSession(int exitCode) {
+    if (!m_desktop.doBeforeClosing()) {
+      return;
+    }
     m_exitCode = exitCode;
     try {
       execStoreSession();

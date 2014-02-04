@@ -436,4 +436,16 @@ public interface IDesktop extends IPropertyObserver {
   boolean isGuiAvailable();
 
   void changeVisibilityAfterOfflineSwitch();
+
+  /**
+   * Called before the desktop gets into its closing state, i.e. the desktop just received a request to close itself.
+   * This pre-hook of the closing process adds the possibility to execute some custom code and to abort the closing
+   * process.
+   * <p>
+   * Subclasses can override this method.
+   * 
+   * @return <code>true</code> to allow the desktop to proceed with closing. Otherwise <code>false</code> to veto the
+   *         closing process.
+   */
+  boolean doBeforeClosing();
 }

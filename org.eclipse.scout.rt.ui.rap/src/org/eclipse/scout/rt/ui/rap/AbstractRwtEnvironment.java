@@ -218,7 +218,16 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  protected void dispose() {
+  /**
+   * This method is synchronized because it may be called by different UI threads in case of an environment switch done
+   * in {@link #initClientSession(UserAgent)}:
+   * UI thread from the old environment and the UI thread from the new environment to be initialized. See
+   * {@link P_HttpSessionInvalidationListener}).
+   */
+  protected synchronized void dispose() {
+    if (m_status == RwtEnvironmentEvent.STOPPED) {
+      return;
+    }
     try {
       closeFormParts();
       if (m_historySupport != null) {
@@ -450,7 +459,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
 
       httpSession.setAttribute(IClientSession.class.getName(), clientSession);
-      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession));
+      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession, this));
     }
 
     return clientSession;
@@ -1413,9 +1422,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener {
     private IClientSession m_clientSession;
+    private AbstractRwtEnvironment m_environment;
 
-    public P_HttpSessionInvalidationListener(IClientSession clientSession) {
+    public P_HttpSessionInvalidationListener(IClientSession clientSession, AbstractRwtEnvironment environment) {
       m_clientSession = clientSession;
+      m_environment = environment;
     }
 
     @Override
@@ -1436,10 +1447,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         return;
       }
 
+      // ensure that the environment is disposed so that no events are handled anymore.
+      m_environment.dispose();
       new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          desktop.getUIFacade().fireDesktopClosingFromUI();
+          desktop.getUIFacade().fireDesktopClosingFromUI(true);
         }
       }.runNow(new NullProgressMonitor());
     }
