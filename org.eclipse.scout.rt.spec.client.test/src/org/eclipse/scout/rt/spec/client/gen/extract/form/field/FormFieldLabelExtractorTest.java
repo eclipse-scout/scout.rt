@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.spec.client.gen.extract.form.field;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,15 +37,16 @@ public class FormFieldLabelExtractorTest {
     String testLabel = "testLabel";
     when(testFormField.getProperty(IFormField.PROP_LABEL)).thenReturn(testLabel);
 
-    FormFieldLabelExtractor ex = createExtractor();
+    FormFieldLabelExtractor ex = createExtractor(true);
     String text = ex.getText(testFormField);
-    assertEquals("Doc Text Invalid", testLabel, text);
+    assertFalse("Doc Text Invalid", text.startsWith(FormFieldLabelExtractor.INDENT));
+    assertTrue("Doc Text Invalid", text.contains(testLabel));
   }
 
-  private static FormFieldLabelExtractor createExtractor() {
+  private static FormFieldLabelExtractor createExtractor(boolean hierarchic) {
     List<IDocFilter<IFormField>> filters = new ArrayList<IDocFilter<IFormField>>();
     filters.add(new DefaultDocFilter<IFormField>());
-    FormFieldLabelExtractor ex = new FormFieldLabelExtractor(true, filters);
+    FormFieldLabelExtractor ex = new FormFieldLabelExtractor(hierarchic, filters);
     return ex;
   }
 
@@ -68,39 +71,77 @@ public class FormFieldLabelExtractorTest {
     when(testFormField.getProperty(IFormField.PROP_LABEL)).thenReturn(testLabel);
     when(testFormField.getParentField()).thenReturn(superField);
 
-    FormFieldLabelExtractor ex = createExtractor();
+    FormFieldLabelExtractor ex = createExtractor(true);
     String text = ex.getText(testFormField);
-    assertEquals("Doc Text Invalid", FormFieldLabelExtractor.INDENT + FormFieldLabelExtractor.INDENT + " " + testLabel, text);
+    assertTrue("Doc Text Invalid", text.startsWith(FormFieldLabelExtractor.INDENT + FormFieldLabelExtractor.INDENT));
+    assertTrue("Doc Text Invalid", text.contains(testLabel));
   }
 
   @Test
   public void testGetLevel() {
-    AbstractGroupBox mainBox = mock(AbstractGroupBox.class);
-    when(mainBox.isMainBox()).thenReturn(true);
-
-    AbstractGroupBox superSuperField = mock(AbstractGroupBox.class);
-    when(superSuperField.getLabel()).thenReturn("If label is present group box is not transparent.");
-    when(superSuperField.getParentField()).thenReturn(mainBox);
-
-    AbstractGroupBox superField = mock(AbstractGroupBox.class);
-    when(superField.isVisible()).thenReturn(true);
-    when(superField.getLabel()).thenReturn("If label is present group box is not transparent.");
-    when(superField.getParentField()).thenReturn(superSuperField);
+    List<AbstractGroupBox> groupBoxTree = createGroupBoxTree();
+    AbstractGroupBox superSuperBox = groupBoxTree.get(1);
+    AbstractGroupBox superBox = groupBoxTree.get(2);
 
     AbstractFormField testFormField = mock(AbstractFormField.class);
 
-    FormFieldLabelExtractor ex = createExtractor();
+    FormFieldLabelExtractor ex = createExtractor(true);
     assertEquals(0, ex.getLevel(testFormField));
 
-    when(testFormField.getParentField()).thenReturn(superField);
+    when(testFormField.getParentField()).thenReturn(superBox);
     assertEquals(2, ex.getLevel(testFormField));
 
-    when(superField.getLabel()).thenReturn(null);
+    when(superBox.getLabel()).thenReturn(null);
     assertEquals(1, ex.getLevel(testFormField));
 
-    when(superSuperField.getLabel()).thenReturn(null);
+    when(superSuperBox.getLabel()).thenReturn(null);
     assertEquals(0, ex.getLevel(testFormField));
+  }
 
+  @Test
+  public void testGetIndentation() {
+    List<AbstractGroupBox> groupBoxTree = createGroupBoxTree();
+    AbstractGroupBox superSuperBox = groupBoxTree.get(1);
+    AbstractGroupBox superBox = groupBoxTree.get(2);
+    AbstractFormField testFormField = mock(AbstractFormField.class);
+    when(testFormField.getParentField()).thenReturn(superBox);
+
+    // hierarchic
+    FormFieldLabelExtractor exHierarchic = createExtractor(true);
+    assertEquals("Expected 0 indent levels", "", exHierarchic.getIndentation(superSuperBox));
+    assertEquals("Expected 1 indent levels", FormFieldLabelExtractor.INDENT, exHierarchic.getIndentation(superBox));
+    assertEquals("Expected 2 indent levels", FormFieldLabelExtractor.INDENT + FormFieldLabelExtractor.INDENT, exHierarchic.getIndentation(testFormField));
+
+    //flat
+    FormFieldLabelExtractor exFlat = createExtractor(false);
+    assertEquals("Expected no indentation", "", exFlat.getIndentation(superSuperBox));
+    assertEquals("Expected no indentation", "", exFlat.getIndentation(superBox));
+    assertEquals("Expected no indentation", "", exFlat.getIndentation(testFormField));
+  }
+
+  /**
+   * Creates a MainBox (GroupBox) containing a GroupBox which contains a third GroupBox
+   * 
+   * @return the created tree as a flat list
+   */
+  private List<AbstractGroupBox> createGroupBoxTree() {
+    AbstractGroupBox mainBox = mock(AbstractGroupBox.class);
+    when(mainBox.isMainBox()).thenReturn(true);
+
+    AbstractGroupBox innerBox = mock(AbstractGroupBox.class);
+    when(innerBox.getLabel()).thenReturn("If label is present group box is not transparent.");
+    when(innerBox.getParentField()).thenReturn(mainBox);
+
+    AbstractGroupBox innerInnerBox = mock(AbstractGroupBox.class);
+    when(innerInnerBox.isVisible()).thenReturn(true);
+    when(innerInnerBox.getLabel()).thenReturn("If label is present group box is not transparent.");
+    when(innerInnerBox.getParentField()).thenReturn(innerBox);
+
+    ArrayList<AbstractGroupBox> list = new ArrayList<AbstractGroupBox>();
+    list.add(mainBox);
+    list.add(innerBox);
+    list.add(innerInnerBox);
+    return list;
   }
 
 }

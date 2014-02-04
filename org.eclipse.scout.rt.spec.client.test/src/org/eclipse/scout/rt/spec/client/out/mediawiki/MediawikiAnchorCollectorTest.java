@@ -109,11 +109,4 @@ public class MediawikiAnchorCollectorTest {
     Assert.assertEquals(expected, replacedLine);
   }
 
-  @Test
-  public void testReplaceLinks() throws ProcessingException {
-    File linksFile = new File(m_config.getSpecInDir(), TEST_LINKS_FILE);
-    File introFile = new File(m_config.getBundleRoot(), m_config.getRelativeMediawikiSourceDirPath() + File.separator + TEST_INTRO);
-    MediawikiAnchorCollector m = new MediawikiAnchorCollector(m_testFile);
-    m.replaceLinks(introFile, linksFile);
-  }
 }

@@ -10,10 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
+import org.eclipse.scout.rt.shared.TEXTS;
+
 /**
  * An {@link IDocTextExtractor} with the simple class name as text.
  */
 public class SimpleTypeTextExtractor<T> extends TypeExtractor<T> {
+
+  public SimpleTypeTextExtractor() {
+    this(TEXTS.get("org.eclipse.scout.rt.spec.type"));
+  }
+
+  public SimpleTypeTextExtractor(String name) {
+    super(name);
+  }
 
   /**
    * @param object

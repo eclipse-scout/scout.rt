@@ -20,7 +20,6 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest.P_PropertyTracker;
@@ -32,9 +31,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
+ * Test for {@link AbstractDecimalField}
  */
-@ClassId("e72f6fdb-498d-4316-babc-bac9e452f579")
 public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
   private static Locale ORIGINAL_LOCALE;

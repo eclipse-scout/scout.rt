@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * Test for {@link AbstractTypeSpecTest}, {@link FieldTypesSpecTest}, {@link ColumnTypesSpecTest}
  */
-public class TypeSpceTest {
+public class TypeSpecTest {
 
   private FieldTypesSpecTest m_fieldTypesSpecTest;
   private ColumnTypesSpecTest m_columnTypesSpecTest;

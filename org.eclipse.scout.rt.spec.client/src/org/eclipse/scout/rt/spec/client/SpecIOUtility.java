@@ -137,16 +137,21 @@ public final class SpecIOUtility {
   }
 
   /**
-   * Copies a file from a bundle with a given path inside this bundle (jar or source) to a destination directory
+   * Copies a file from a bundle with a given path inside this bundle (jar or source) to a destination file.
+   * <p>
+   * If destFile has a parent (directory) which does not exist, this directory will be created.
    * 
    * @param bundle
    * @param path
    *          path within the bundle
-   * @param destDir
-   *          destination directory
+   * @param destFile
+   *          destination file
    * @throws ProcessingException
    */
   public static void copyFile(Bundle bundle, String path, File destFile) throws ProcessingException {
+    if (destFile.getParentFile() != null && !destFile.getParentFile().exists()) {
+      destFile.getParentFile().mkdirs();
+    }
     ReadableByteChannel sourceChannel = null;
     FileChannel destChannel = null;
     FileOutputStream out = null;

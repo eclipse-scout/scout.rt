@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * another place in the inner class hierarchy.
  * <p>
  * 
- * @see org.eclipse.scout.commons.ITypeWithClassId IObjectWithClassId
+ * @see org.eclipse.scout.commons.ITypeWithClassId
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

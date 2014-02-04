@@ -199,16 +199,6 @@ public class SpecFileConfig {
     return new File(getSpecDir(), "mediawiki_raw");
   }
 
-  /**
-   * @param bundle
-   * @return
-   * @throws ProcessingException
-   */
-  // TODO ASA remove when links.properties are not written anymore to input dir
-  public File getSpecInDir() throws ProcessingException {
-    return new File(getBundleRoot(), SPEC_IN_DIR_NAME);
-  }
-
   public File getLinksFile() throws ProcessingException {
     return new File(getSpecDir(), LINKS_FILE_NAME);
   }

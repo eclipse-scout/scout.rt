@@ -20,10 +20,15 @@ import org.junit.Test;
 public class MediawikiUtilityTest {
 
   @Test
-  public void excapeWikiCharsTest() {
+  public void escapeWikiCharsTest() {
     String testLabel = "Unit [kg]";
     String escapedLabel = "Unit <nowiki>[</nowiki>kg<nowiki>]</nowiki>";
     String newLabel = MediawikiUtility.transformToWiki(testLabel);
     assertEquals(escapedLabel, newLabel);
+  }
+
+  @Test
+  public void createLinkTest() {
+    assertEquals("[[ID0815|display name]]", MediawikiUtility.createLink("ID0815", "display name"));
   }
 }

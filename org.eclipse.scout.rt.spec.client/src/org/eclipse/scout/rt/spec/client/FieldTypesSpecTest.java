@@ -17,7 +17,12 @@ import org.eclipse.scout.rt.shared.TEXTS;
  */
 public class FieldTypesSpecTest extends AbstractTypeSpecTest {
 
+  /**
+   * ID used for linking and as text-key for title
+   */
+  public static final String ID = "org.eclipse.scout.rt.spec.fieldtypes";
+
   public FieldTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.fieldtypes", TEXTS.get("org.eclipse.scout.rt.spec.fieldtypes"), IFormField.class);
+    super(ID, TEXTS.get(ID), IFormField.class);
   }
 }

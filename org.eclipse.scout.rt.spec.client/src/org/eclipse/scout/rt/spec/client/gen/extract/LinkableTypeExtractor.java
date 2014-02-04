@@ -10,76 +10,49 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.ListUtility;
-import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.link.DocLink;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
- * An XML text with link templates that can later be converted to links, once the generated resources are known.
+ * Extractor for the entity's documented type (name with link to the doc section where the type is explained).
  * <p>
- * Example:
- * </p>
+ * The entity's class hierarchy will be searched bottom up for the first documented type. A documented type is a a class
+ * with a {@link ClassId} annotation for which a doc-text with key <code>[classid]_name</code> is available.
+ * 
+ * @param <T>
  */
 public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
   public static final String LINKS_TAG_NAME = "links";
 
-  private final List<Class<?>> m_ignoredClasses;
+  private String m_typeDocSectionId;
 
-  public LinkableTypeExtractor() {
-    this(TEXTS.get("org.eclipse.scout.rt.spec.type"), Object.class, AbstractPropertyObserver.class, AbstractFormField.class);
-  }
-
-  public LinkableTypeExtractor(String typeName, Class<?>... ignoredClass) {
-    super(typeName);
-    m_ignoredClasses = Arrays.asList(ignoredClass);
+  /**
+   * @param typeDocSectionId
+   *          Id of the doc section where the type is explained.
+   */
+  public LinkableTypeExtractor(String typeDocSectionId) {
+    super(TEXTS.get("org.eclipse.scout.rt.spec.type"));
+    m_typeDocSectionId = typeDocSectionId;
   }
 
   @Override
   public String getText(T o) {
-    Class<?> c = o.getClass();
-    List<String> clazzNames = getTypesAsLinks(c, m_ignoredClasses);
-    String formattedClasses = ListUtility.format(clazzNames, "");
-    String links = DocLink.encloseInTags(formattedClasses, LINKS_TAG_NAME);
-    return DocLink.encloseInTags(links, DocLink.REPLACE_TAG_NAME);
-  }
-
-  /**
-   * The type hierarchy of a class ignoring the once in the ignore list
-   * 
-   * @param c
-   * @param ignoreList
-   */
-  private List<String> getTypesAsLinks(Class<?> c, List<Class<?>> ignoreList) {
-    List<String> clazzes = new ArrayList<String>();
-    while (c != null) {
-      if (!ignoreList.contains(c)) {
-        DocLink link = new DocLink(c.getName(), getDisplayName(c));
-        clazzes.add(link.toXML());
-      }
-      c = c.getSuperclass();
-    }
-    return clazzes;
-  }
-
-  private String getDisplayName(Class<?> c) {
-    StringBuilder specType = new StringBuilder(c.getSimpleName());
-    while (c != null) {
-      String name = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(c) + "_name");
+    Class type = o.getClass();
+    StringBuilder specType = new StringBuilder();
+    while (type != null) {
+      String name = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name");
       // TODO ASA fix this hack: name.contains("{undefined text")
       if (!name.contains("{undefined text")) {
-        specType.append(" (").append(name).append(")");
+        specType.append(MediawikiUtility.createLink(m_typeDocSectionId, name));
         break;
       }
-      c = c.getSuperclass();
+      type = type.getSuperclass();
+    }
+    if (specType.length() == 0) {
+      specType.append(o.getClass().getSimpleName());
     }
     return specType.toString();
   }
-
 }

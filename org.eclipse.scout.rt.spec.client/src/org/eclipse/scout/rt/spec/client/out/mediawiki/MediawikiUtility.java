@@ -39,4 +39,17 @@ public final class MediawikiUtility {
     }
     return res;
   }
+
+  /**
+   * Create a mediawiki link
+   * 
+   * @param id
+   * @param name
+   * @return
+   */
+  public static String createLink(String id, String name) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("[[").append(id).append("|").append(name).append("]]");
+    return sb.toString();
+  }
 }

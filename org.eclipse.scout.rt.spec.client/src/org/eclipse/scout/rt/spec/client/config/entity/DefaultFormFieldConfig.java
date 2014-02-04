@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.FieldTypesSpecTest;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldBooleanPropertyExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldLabelExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldPropertyExtractor;
@@ -46,15 +49,18 @@ public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField>
    */
   @Override
   public List<IDocTextExtractor<IFormField>> getTextExtractors() {
-    List<IDocTextExtractor<IFormField>> propertyTemplate = new ArrayList<IDocTextExtractor<IFormField>>();
-    propertyTemplate.add(new FormFieldLabelExtractor(m_hierarchicLabels, getFilters()));
-    propertyTemplate.add(new DescriptionExtractor<IFormField>());
-    propertyTemplate.add(new FormFieldPropertyExtractor(IFormField.PROP_TOOLTIP_TEXT, TEXTS.get("org.eclipse.scout.rt.spec.tooltip")));
-    propertyTemplate.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_MANDATORY, TEXTS.get("org.eclipse.scout.rt.spec.mandatory")));
-    propertyTemplate.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_ENABLED, TEXTS.get("org.eclipse.scout.rt.spec.enabled")));
-    propertyTemplate.add(new FormFieldPropertyExtractor(IStringField.PROP_MAX_LENGTH, TEXTS.get("org.eclipse.scout.rt.spec.length")));
-    propertyTemplate.add(new LinkableTypeExtractor<IFormField>());
-    return propertyTemplate;
+    List<IDocTextExtractor<IFormField>> extractors = new ArrayList<IDocTextExtractor<IFormField>>();
+    extractors.add(new FormFieldLabelExtractor(m_hierarchicLabels, getFilters()));
+    extractors.add(new DescriptionExtractor<IFormField>());
+    extractors.add(new FormFieldPropertyExtractor(IFormField.PROP_TOOLTIP_TEXT, TEXTS.get("org.eclipse.scout.rt.spec.tooltip")));
+    extractors.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_MANDATORY, TEXTS.get("org.eclipse.scout.rt.spec.mandatory")));
+    extractors.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_ENABLED, TEXTS.get("org.eclipse.scout.rt.spec.enabled")));
+    extractors.add(new FormFieldPropertyExtractor(IStringField.PROP_MAX_LENGTH, TEXTS.get("org.eclipse.scout.rt.spec.length")));
+    if (Platform.inDevelopmentMode()) {
+      extractors.add(new SimpleTypeTextExtractor<IFormField>("[DEV] Classname"));
+    }
+    extractors.add(new LinkableTypeExtractor<IFormField>(FieldTypesSpecTest.ID));
+    return extractors;
   }
 
   @Override

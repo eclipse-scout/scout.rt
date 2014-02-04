@@ -52,7 +52,15 @@ public class SpecIOUtilityTest {
    */
   @Test
   public void testCopyFileSource() throws ProcessingException, IOException {
-    testCopyFile(m_config.getBundle(), TEST_DIR + File.separator + "LoremIpsum1.mediawiki", "Lorem ipsum");
+    testCopyFile(m_config.getBundle(), TEST_DIR + File.separator + "LoremIpsum1.mediawiki", "Lorem ipsum", true);
+  }
+
+  /**
+   * Test for {@link SpecIOUtility#copyFile(org.osgi.framework.Bundle, String, java.io.File)}
+   */
+  @Test
+  public void testCopyFileSourcePathDoesNotExist() throws ProcessingException, IOException {
+    testCopyFile(m_config.getBundle(), TEST_DIR + File.separator + "LoremIpsum1.mediawiki", "Lorem ipsum", false);
   }
 
   /**
@@ -63,12 +71,14 @@ public class SpecIOUtilityTest {
     Bundle bundle = Platform.getBundle("org.eclipse.core.runtime");
     String path = "org" + File.separator + "eclipse" + File.separator + "core" + File.separator + "runtime" + File.separator + "Platform.class";
     String expectedContentPart = "Platform";
-    testCopyFile(bundle, path, expectedContentPart);
+    testCopyFile(bundle, path, expectedContentPart, true);
   }
 
-  private void testCopyFile(Bundle bundle, String path, String expectedContentPart) throws ProcessingException, FileNotFoundException, IOException {
+  private void testCopyFile(Bundle bundle, String path, String expectedContentPart, boolean createDirs) throws ProcessingException, FileNotFoundException, IOException {
     File specDir = m_config.getSpecDir();
-    specDir.mkdirs();
+    if (createDirs) {
+      specDir.mkdirs();
+    }
     File destFile = new File(specDir, new File(path).getName());
     SpecIOUtility.copyFile(bundle, path, destFile);
     assertTrue("File was not copied as expected", destFile.exists());

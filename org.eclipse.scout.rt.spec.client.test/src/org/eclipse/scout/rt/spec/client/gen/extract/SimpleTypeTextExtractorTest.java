@@ -11,35 +11,21 @@
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.spec.client.gen.extract.action.SingleSelectionExtractor;
 import org.junit.Test;
 
 /**
- *
+ * Test form {@link SimpleTypeTextExtractor}
  */
-public class GeneralExtractorTest {
+public class SimpleTypeTextExtractorTest {
 
-  /**
-   * Tests that {@link SingleSelectionExtractor#getText(AbstractAction)} return the true text
-   * {@link AbstractBooleanTextExtractor.DOC_ID_TRUE}, if single selection is enabled.
-   */
   @Test
-  public void testSimpleTypeExtractor() {
+  public void testGetText() {
     SimpleTypeTextExtractor<AbstractAction> ex = new SimpleTypeTextExtractor<AbstractAction>();
     AbstractAction testAction = mock(AbstractAction.class);
     String text = ex.getText(testAction);
     assertEquals(testAction.getClass().getSimpleName(), text);
-  }
-
-  @Test
-  public void testLinkTypeExtractor() {
-    AbstractAction testAction = mock(AbstractAction.class);
-    LinkableTypeExtractor<AbstractAction> ex = new LinkableTypeExtractor<AbstractAction>();
-    String text = ex.getText(testAction);
-    assertTrue(text.contains(testAction.getClass().getName()));
   }
 }
