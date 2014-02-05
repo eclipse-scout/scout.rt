@@ -1952,7 +1952,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * In this case the closing process will always be executed.
    */
   @Override
-  public boolean doBeforeClosing() {
+  public boolean doBeforeClosingInternal() {
     IDesktopExtension[] extensions = getDesktopExtensions();
     boolean continueClosing = true;
     if (extensions != null) {

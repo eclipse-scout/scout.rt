@@ -438,6 +438,8 @@ public interface IDesktop extends IPropertyObserver {
   void changeVisibilityAfterOfflineSwitch();
 
   /**
+   * This method is used internally within the framework.
+   * <p>
    * Called before the desktop gets into its closing state, i.e. the desktop just received a request to close itself.
    * This pre-hook of the closing process adds the possibility to execute some custom code and to abort the closing
    * process.
@@ -447,5 +449,5 @@ public interface IDesktop extends IPropertyObserver {
    * @return <code>true</code> to allow the desktop to proceed with closing. Otherwise <code>false</code> to veto the
    *         closing process.
    */
-  boolean doBeforeClosing();
+  boolean doBeforeClosingInternal();
 }

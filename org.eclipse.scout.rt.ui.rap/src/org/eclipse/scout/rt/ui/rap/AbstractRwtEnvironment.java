@@ -219,10 +219,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   /**
-   * This method is synchronized because it may be called by different UI threads in case of an environment switch done
-   * in {@link #initClientSession(UserAgent)}:
-   * UI thread from the old environment and the UI thread from the new environment to be initialized. See
-   * {@link P_HttpSessionInvalidationListener}).
+   * This method is synchronized because the UI thread disposing the old environment has to run first before the
+   * {@link P_HttpSessionInvalidationListener}) continues to close the desktop. Synchronization is done on the
+   * environment instance.
    */
   protected synchronized void dispose() {
     if (m_status == RwtEnvironmentEvent.STOPPED) {
@@ -275,6 +274,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_status = RwtEnvironmentEvent.STARTED;
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
       }
+      notifyAll();
     }
   }
 
@@ -322,6 +322,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         LOG.error("could not initialize Environment", e);
       }
     }
+  }
+
+  protected boolean isStopped() {
+    return m_status == RwtEnvironmentEvent.STOPPED;
   }
 
   /**
@@ -1421,8 +1425,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener {
-    private IClientSession m_clientSession;
-    private AbstractRwtEnvironment m_environment;
+    private final IClientSession m_clientSession;
+    private final AbstractRwtEnvironment m_environment;
 
     public P_HttpSessionInvalidationListener(IClientSession clientSession, AbstractRwtEnvironment environment) {
       m_clientSession = clientSession;
@@ -1447,8 +1451,18 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         return;
       }
 
-      // ensure that the environment is disposed so that no events are handled anymore.
-      m_environment.dispose();
+      // wait until the environment has been stopped or a maximum of 5s before continuing to close the desktop.
+      synchronized (m_environment) {
+        if (!m_environment.isStopped()) {
+          try {
+            m_environment.wait(5000);
+          }
+          catch (InterruptedException e) {
+            LOG.warn("Interrupted while waiting for environment to stop.");
+          }
+        }
+      }
+
       new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {

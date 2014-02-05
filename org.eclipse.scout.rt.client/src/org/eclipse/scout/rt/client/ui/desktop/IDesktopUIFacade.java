@@ -43,7 +43,7 @@ public interface IDesktopUIFacade {
    * 
    * @param forcedClosing
    *          If set to <code>true</code> all vetos to stop the closing process (see
-   *          {@link AbstractDesktop#doBeforeClosing()} will be ignored. Otherwise if set to <code>false</code> vetos
+   *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code> vetos
    *          are accepted.
    */
   void fireDesktopClosingFromUI(boolean forcedClosing);

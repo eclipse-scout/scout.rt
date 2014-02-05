@@ -346,7 +346,7 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public void stopSession(int exitCode) {
-    if (!m_desktop.doBeforeClosing()) {
+    if (!m_desktop.doBeforeClosingInternal()) {
       return;
     }
     m_exitCode = exitCode;

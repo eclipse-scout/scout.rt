@@ -531,7 +531,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public boolean doBeforeClosing() {
+  public boolean doBeforeClosingInternal() {
     throw createUnsupportedOperationException();
   }
 
