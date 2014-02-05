@@ -224,7 +224,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  protected void dispose() {
+  /**
+   * This method is synchronized because the UI thread disposing the old environment has to run first before the
+   * {@link P_HttpSessionInvalidationListener}) continues to close the desktop. Synchronization is done on the
+   * environment instance.
+   */
+  protected synchronized void dispose() {
     try {
       closeFormParts();
       if (m_historySupport != null) {
@@ -272,6 +277,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_status = RwtEnvironmentEvent.STARTED;
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
       }
+      notifyAll();
     }
   }
 
@@ -317,6 +323,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         LOG.error("could not initialize Environment", e);
       }
     }
+  }
+
+  protected boolean isStopped() {
+    return m_status == RwtEnvironmentEvent.STOPPED;
   }
 
   /**
@@ -457,7 +467,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
 
       httpSession.setAttribute(IClientSession.class.getName(), clientSession);
-      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession));
+      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession, this));
     }
 
     return clientSession;
@@ -1436,10 +1446,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener {
-    private IClientSession m_clientSession;
+    private final IClientSession m_clientSession;
+    private final AbstractRwtEnvironment m_environment;
 
-    public P_HttpSessionInvalidationListener(IClientSession clientSession) {
+    public P_HttpSessionInvalidationListener(IClientSession clientSession, AbstractRwtEnvironment environment) {
       m_clientSession = clientSession;
+      m_environment = environment;
     }
 
     @Override
@@ -1460,13 +1472,24 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         return;
       }
 
+      // wait until the environment has been stopped or a maximum of 5s before continuing to close the desktop.
+      synchronized (m_environment) {
+        if (!m_environment.isStopped()) {
+          try {
+            m_environment.wait(5000);
+          }
+          catch (InterruptedException e) {
+            LOG.warn("Interrupted while waiting for environment to stop.");
+          }
+        }
+      }
+
       new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          desktop.getUIFacade().fireDesktopClosingFromUI();
+          desktop.getUIFacade().fireDesktopClosingFromUI(true);
         }
       }.runNow(new NullProgressMonitor());
     }
   }
-
 }

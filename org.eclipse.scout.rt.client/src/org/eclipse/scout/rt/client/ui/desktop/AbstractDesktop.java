@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -125,6 +126,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private boolean m_autoPrefixWildcardForTextSearch;
   private boolean m_desktopInited;
   private boolean m_trayVisible;
+  private boolean m_isForcedClosing = false;
 
   /**
    * do not instantiate a new desktop<br>
@@ -223,6 +225,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @ConfigOperation
   @Order(12)
   protected void execOpened() throws ProcessingException {
+  }
+
+  /**
+   * Called just after the core desktop receives the request to close the desktop.
+   * <p>
+   * Subclasses can override this method to execute some custom code before the desktop gets into its closing state. The
+   * default behavior is to do nothing. By throwing an explicit {@link VetoException} the closing process will be
+   * stopped.
+   * 
+   * @throws ProcessingException
+   */
+  @ConfigOperation
+  @Order(14)
+  protected void execBeforeClosing() throws ProcessingException {
   }
 
   /**
@@ -1549,6 +1565,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void closeInternal() throws ProcessingException {
+    setOpenedInternal(false);
     detachGui();
 
     List<IForm> openForms = new ArrayList<IForm>();
@@ -1697,6 +1714,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_uiFacade;
   }
 
+  private boolean isForcedClosing() {
+    return m_isForcedClosing;
+  }
+
+  private void setForcedClosing(boolean forcedClosing) {
+    m_isForcedClosing = forcedClosing;
+  }
+
   /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
@@ -1750,6 +1775,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
       execOpened();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
+      execBeforeClosing();
       return ContributionCommand.Continue;
     }
 
@@ -1849,8 +1880,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void fireDesktopClosingFromUI() {
-      setOpenedInternal(false);
+    public void fireDesktopClosingFromUI(boolean forcedClosing) {
+      setForcedClosing(forcedClosing);
+      // necessary so that no forms can be opened anymore.
+      if (forcedClosing) {
+        setOpenedInternal(false);
+      }
       ClientSyncJob.getCurrentSession().stopSession();
     }
 
@@ -1929,5 +1964,38 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void changeVisibilityAfterOfflineSwitch() {
     return;
+  }
+
+  /**
+   * Default behavior of the pre-hook is to delegate the before closing call to the each desktop extension.
+   * The method {@link IDesktopExtension#desktopBeforeClosingDelegate()} of each desktop extension will be called.
+   * If at least one of the desktop extension's delegate throws a {@link VetoException}, the closing process will be
+   * stopped unless the flag {@link AbstractDesktop#m_isForcedClosing} is not set to <code>true</code>.
+   * In this case the closing process will always be executed.
+   */
+  @Override
+  public boolean doBeforeClosingInternal() {
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    boolean continueClosing = true;
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.desktopBeforeClosingDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (VetoException e) {
+          continueClosing = false;
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Desktop before closing error", t));
+        }
+      }
+    }
+    return isForcedClosing() || continueClosing;
   }
 }

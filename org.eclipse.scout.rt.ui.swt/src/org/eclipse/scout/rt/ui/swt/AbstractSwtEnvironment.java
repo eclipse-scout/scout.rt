@@ -177,6 +177,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   private P_ScoutDesktopPropertyListener m_desktopPropertyListener;
 
   private P_PerspectiveListener m_perspectiveListener;
+  private P_WorkbenchListener m_workbenchListener;
 
   public AbstractSwtEnvironment(Bundle applicationBundle, String perspectiveId, Class<? extends IClientSession> clientSessionClass) {
     m_applicationBundle = applicationBundle;
@@ -197,6 +198,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   private void stopScout() throws CoreException {
+    final IClientSession localSession = m_clientSession;
     try {
       if (m_desktopKeyStrokes != null) {
         for (ISwtKeyStroke swtKeyStroke : m_desktopKeyStrokes) {
@@ -229,14 +231,42 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_clientSession = null;
 
       m_status = SwtEnvironmentEvent.STOPPED;
-      fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STOPPED));
+      // remove workbench listener to avoid recursive calls
+      PlatformUI.getWorkbench().removeWorkbenchListener(m_workbenchListener);
       setStartDesktopCalled(false);
     }
     finally {
-      if (m_status != SwtEnvironmentEvent.STOPPED) {
-        m_status = SwtEnvironmentEvent.STARTED;
-        fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STARTED));
+      if (m_status == SwtEnvironmentEvent.STOPPED) {
+        JobEx sendShutdownEventJob = new JobEx("wait for shutdown state lock job.") {
+          @Override
+          protected IStatus run(IProgressMonitor monitor) {
+            // we are stopping. wait until the session has released the state lock
+            Object stateLock = localSession.getStateLock();
+            while (localSession.isActive()) {
+              synchronized (stateLock) {
+                try {
+                  stateLock.wait();
+                }
+                catch (InterruptedException e) {
+                  LOG.warn("Interrupted while waiting for model thread.");
+                }
+              }
+            }
+            getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STOPPED));
+              }
+            });
+            return Status.OK_STATUS;
+          }
+        };
+        sendShutdownEventJob.schedule();
       }
+      else {
+        m_status = SwtEnvironmentEvent.STARTED;
+      }
+      fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STARTED));
     }
   }
 
@@ -429,31 +459,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         }
       }
       // environment shutdownhook
-      PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
-        @Override
-        public boolean preShutdown(IWorkbench workbench, boolean forced) {
-          return true;
-        }
+      m_workbenchListener = new P_WorkbenchListener();
+      PlatformUI.getWorkbench().addWorkbenchListener(m_workbenchListener);
 
-        @Override
-        public void postShutdown(IWorkbench workbench) {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
-            }
-          };
-          JobEx job = invokeScoutLater(t, 0);
-          if (job != null) {
-            try {
-              job.join(600000);
-            }
-            catch (InterruptedException e) {
-              //nop
-            }
-          }
-        }
-      });
       // notify ui available
       Runnable job = new Runnable() {
         @Override
@@ -1645,5 +1653,31 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   @Override
   public String getPerspectiveId() {
     return m_perspectiveId;
+  }
+
+  /**
+   * Delegate the shutdown process to the Scout model. The preShutdown process will always
+   * return @code{false}, meaning that there is a veto so that the UI is not allowed to close
+   * the workbench.
+   * If the desktop gets closed in the Scout model (@link{AbstractSwtEnvironment#stopScout()}, this listener
+   * should be removed to avoid recursive calls.
+   */
+  private class P_WorkbenchListener implements IWorkbenchListener {
+    @Override
+    public boolean preShutdown(IWorkbench workbench, boolean forced) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutDesktop().getUIFacade().fireDesktopClosingFromUI(false);
+        }
+      };
+      invokeScoutLater(t, 0);
+      return false;
+    }
+
+    @Override
+    public void postShutdown(IWorkbench workbench) {
+      // nop
+    }
   }
 }

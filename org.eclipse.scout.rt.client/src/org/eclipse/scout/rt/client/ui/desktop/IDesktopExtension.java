@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -68,6 +69,17 @@ public interface IDesktopExtension {
    * @throws ProcessingException
    */
   ContributionCommand desktopOpenedDelegate() throws ProcessingException;
+
+  /**
+   * Called just after the core desktop receives the request to close the desktop, i.e. before the desktop
+   * gets into its closing state.
+   * The desktop extension is allowed to veto the closing process by throwing a {@link VetoException}.
+   * 
+   * @return {@code ContributionCommand.Continue} if further extensions should be processed,
+   *         {@code ContributionCommand.Stop} otherwise
+   * @throws ProcessingException
+   */
+  ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException;
 
   /**
    * Called before the core desktop is being closed.

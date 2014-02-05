@@ -517,6 +517,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     m_synchronizer.invokeSwingLater(j);
   }
 
+  @Override
+  public void invokeSwingAndWait(Runnable r, long timeout) {
+    m_synchronizer.invokeSwingAndWait(r, timeout);
+  }
+
   /*
    * Factory
    */

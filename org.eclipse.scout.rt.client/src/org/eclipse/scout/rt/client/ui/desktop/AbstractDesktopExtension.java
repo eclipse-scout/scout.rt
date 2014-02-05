@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -47,6 +48,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @Override
   public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
     return execOpened();
+  }
+
+  @Override
+  public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
+    return execBeforeClosing();
   }
 
   @Override
@@ -174,6 +180,21 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @ConfigOperation
   @Order(12)
   protected ContributionCommand execOpened() throws ProcessingException {
+    return ContributionCommand.Continue;
+  }
+
+  /**
+   * Called just after the core desktop receives the request to close the desktop.
+   * This allows the desktop extension to execute custom code before the desktop gets into its closing state.
+   * By throwing an explicit {@link VetoException} the closing process will be stopped.
+   * 
+   * @return {@code ContributionCommand.Continue} if further extensions should be processed,
+   *         {@code ContributionCommand.Stop} otherwise
+   * @throws ProcessingException
+   */
+  @ConfigOperation
+  @Order(14)
+  protected ContributionCommand execBeforeClosing() throws ProcessingException {
     return ContributionCommand.Continue;
   }
 

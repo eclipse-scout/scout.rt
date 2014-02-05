@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.concurrency;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.SwingUtilities;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SwingScoutSynchronizer {
@@ -87,4 +92,42 @@ public class SwingScoutSynchronizer {
     SwingUtilities.invokeLater(j);
   }
 
+  /**
+   * Executes the given {@link Runnable} and waits until it has finished.<br>
+   * If the waiting thread is interrupted, this method returns before the {@link Runnable} has finished!
+   * 
+   * @param r
+   *          The {@link Runnable} to execute.
+   * @param timeout
+   *          The timeout in milliseconds. See {@link JobEx#join(long)}.
+   */
+  public void invokeSwingAndWait(final Runnable r, long timeout) {
+    JobEx runInSwing = new JobEx("execute runnable in swing sync") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          SwingUtilities.invokeAndWait(r);
+          return Status.OK_STATUS;
+        }
+        catch (InterruptedException e) {
+          String msg = "Interrupted while waiting for swing runnable.";
+          LOG.error(msg, e);
+          return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, msg, e);
+        }
+        catch (InvocationTargetException e) {
+          String msg = "Error executing swing runnable.";
+          LOG.error(msg, e);
+          return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, msg, e);
+        }
+      }
+    };
+
+    runInSwing.schedule();
+    try {
+      runInSwing.join(timeout);
+    }
+    catch (InterruptedException e) {
+      LOG.error("Interrupted while waiting for swing runnable timeout.", e);
+    }
+  }
 }

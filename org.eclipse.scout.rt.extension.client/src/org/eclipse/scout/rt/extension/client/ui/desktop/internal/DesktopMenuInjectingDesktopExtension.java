@@ -73,6 +73,11 @@ public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
   }
 
   @Override
+  public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   public ContributionCommand desktopClosingDelegate() throws ProcessingException {
     return ContributionCommand.Continue;
   }
@@ -125,4 +130,5 @@ public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
   @Override
   public void contributeOutlines(Collection<IOutline> outlines) {
   }
+
 }

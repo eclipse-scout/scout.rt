@@ -313,6 +313,19 @@ public interface ISwingEnvironment {
    */
   void invokeSwingLater(Runnable j);
 
+  /**
+   * calling from scout thread
+   * <p>
+   * Executes the given {@link Runnable} and waits until it has finished.<br>
+   * If the waiting thread is interrupted, this method returns before the {@link Runnable} has finished!
+   * 
+   * @param r
+   *          The {@link Runnable} to execute.
+   * @param timeout
+   *          The timeout in milliseconds. See {@link JobEx#join(long)}.
+   */
+  void invokeSwingAndWait(final Runnable r, long timeout);
+
   JStatusLabelEx createStatusLabel(IFormField formField);
 
   OnFieldLabelDecorator createOnFieldLabelDecorator(JComponent c, boolean mandatory);
