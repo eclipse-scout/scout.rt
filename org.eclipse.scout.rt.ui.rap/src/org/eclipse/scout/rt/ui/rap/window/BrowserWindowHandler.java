@@ -17,11 +17,12 @@ import java.util.UUID;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import org.eclipse.rap.rwt.client.service.UrlLauncher;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
 import org.eclipse.scout.rt.client.ui.desktop.UrlTarget;
+import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
 
 /**
@@ -51,10 +52,15 @@ public class BrowserWindowHandler {
   }
 
   protected IUrlTarget computeTargetAuto(String link) {
-    if (isEmailLink(link) || (isTelLink(link))) {
+    if (isEmailLink(link) || (isTelLink(link)) || isSmsLink(link)) {
       return UrlTarget.SELF;
     }
-    else if (isHttpLink(link)) {
+    BrowserInfo browserInfo = RwtUtility.getBrowserInfo();
+    if (BrowserInfo.System.OSX.equals(browserInfo.getSystem()) && isAppleMapsLink(link)) {
+      //Open the link in the same browser window to open the maps app without using a popup.
+      return UrlTarget.SELF;
+    }
+    if (isHttpLink(link)) {
       return UrlTarget.BLANK;
     }
     return UrlTarget.AUTO;
@@ -76,8 +82,16 @@ public class BrowserWindowHandler {
     return false;
   }
 
+  public boolean isSmsLink(String link) {
+    if (link != null && link.startsWith("sms:")) {
+      return true;
+    }
+
+    return false;
+  }
+
   public boolean isHttpLink(String link) {
-    if ((StringUtility.find(link, "http://") >= 0) || (StringUtility.find(link, "https://") >= 0)) {
+    if (stringContains(link, new String[]{"http://", "https://"})) {
       return true;
     }
 
@@ -114,6 +128,31 @@ public class BrowserWindowHandler {
     catch (IOException e) {
       LOG.error("Unexpected: " + link, e);
     }
+  }
+
+  public boolean isMapsLink(String link) {
+    return isGoogleMapsLink(link) || isAppleMapsLink(link);
+  }
+
+  public boolean isAppleMapsLink(String link) {
+    return stringContains(link, new String[]{"http://maps.apple.com", "https://maps.apple.com"});
+  }
+
+  public boolean isGoogleMapsLink(String link) {
+    return stringContains(link, new String[]{"http://maps.google.com", "https://maps.google.com"});
+  }
+
+  protected boolean stringContains(String baseStr, String[] stringsToFind) {
+    if (baseStr == null || stringsToFind == null) {
+      return false;
+    }
+
+    for (int i = 0; i < stringsToFind.length; i++) {
+      if (baseStr.contains(stringsToFind[i])) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected File validateLink(String link) throws IOException {

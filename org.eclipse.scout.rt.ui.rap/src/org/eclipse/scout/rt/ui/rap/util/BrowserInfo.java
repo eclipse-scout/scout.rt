@@ -41,6 +41,7 @@ public class BrowserInfo {
 
   private boolean m_isMobile = false;
   private boolean m_isTablet = false;
+  private boolean m_isStandalone = false;
 
   private System m_system;
   private Locale m_locale = null;
@@ -109,6 +110,17 @@ public class BrowserInfo {
 
   public void setTablet(boolean isTablet) {
     m_isTablet = isTablet;
+  }
+
+  /**
+   * True when running in home screen mode on ios
+   */
+  public boolean isStandalone() {
+    return m_isStandalone;
+  }
+
+  public void setStandalone(boolean isStandalone) {
+    m_isStandalone = isStandalone;
   }
 
   public Type getType() {
@@ -180,47 +192,89 @@ public class BrowserInfo {
     result = prime * result + (m_isMobile ? 1231 : 1237);
     result = prime * result + (m_isMshtml ? 1231 : 1237);
     result = prime * result + (m_isOpera ? 1231 : 1237);
+    result = prime * result + (m_isStandalone ? 1231 : 1237);
     result = prime * result + (m_isTablet ? 1231 : 1237);
     result = prime * result + (m_isWebkit ? 1231 : 1237);
     result = prime * result + ((m_locale == null) ? 0 : m_locale.hashCode());
     result = prime * result + ((m_system == null) ? 0 : m_system.hashCode());
+    result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
     result = prime * result + ((m_type == null) ? 0 : m_type.hashCode());
     result = prime * result + ((m_userAgent == null) ? 0 : m_userAgent.hashCode());
     result = prime * result + ((m_version == null) ? 0 : m_version.hashCode());
-    result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
     BrowserInfo other = (BrowserInfo) obj;
-    if (m_isGecko != other.m_isGecko) return false;
-    if (m_isMobile != other.m_isMobile) return false;
-    if (m_isMshtml != other.m_isMshtml) return false;
-    if (m_isOpera != other.m_isOpera) return false;
-    if (m_isTablet != other.m_isTablet) return false;
-    if (m_isWebkit != other.m_isWebkit) return false;
+    if (m_isGecko != other.m_isGecko) {
+      return false;
+    }
+    if (m_isMobile != other.m_isMobile) {
+      return false;
+    }
+    if (m_isMshtml != other.m_isMshtml) {
+      return false;
+    }
+    if (m_isOpera != other.m_isOpera) {
+      return false;
+    }
+    if (m_isStandalone != other.m_isStandalone) {
+      return false;
+    }
+    if (m_isTablet != other.m_isTablet) {
+      return false;
+    }
+    if (m_isWebkit != other.m_isWebkit) {
+      return false;
+    }
     if (m_locale == null) {
-      if (other.m_locale != null) return false;
+      if (other.m_locale != null) {
+        return false;
+      }
     }
-    else if (!m_locale.equals(other.m_locale)) return false;
-    if (m_system != other.m_system) return false;
-    if (m_type != other.m_type) return false;
-    if (m_userAgent == null) {
-      if (other.m_userAgent != null) return false;
+    else if (!m_locale.equals(other.m_locale)) {
+      return false;
     }
-    else if (!m_userAgent.equals(other.m_userAgent)) return false;
-    if (m_version == null) {
-      if (other.m_version != null) return false;
+    if (m_system != other.m_system) {
+      return false;
     }
-    else if (!m_version.equals(other.m_version)) return false;
     if (m_systemVersion == null) {
-      if (other.m_systemVersion != null) return false;
+      if (other.m_systemVersion != null) {
+        return false;
+      }
     }
-    else if (!m_systemVersion.equals(other.m_systemVersion)) return false;
+    else if (!m_systemVersion.equals(other.m_systemVersion)) {
+      return false;
+    }
+    if (m_type != other.m_type) {
+      return false;
+    }
+    if (m_userAgent == null) {
+      if (other.m_userAgent != null) {
+        return false;
+      }
+    }
+    else if (!m_userAgent.equals(other.m_userAgent)) {
+      return false;
+    }
+    if (m_version == null) {
+      if (other.m_version != null) {
+        return false;
+      }
+    }
+    else if (!m_version.equals(other.m_version)) {
+      return false;
+    }
     return true;
   }
 
