@@ -1102,7 +1102,7 @@ public final class SwtUtility {
    */
   public static boolean runSwtInputVerifier(Control control) {
     if (control == null || control.isDisposed()) {
-      return false;
+      return true; //continue, a tray menu can be selected for example
     }
 
     ISwtScoutComposite compositeOnWidget = SwtScoutComposite.getCompositeOnWidget(control);
