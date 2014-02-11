@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.swing"
       label="%featureName"
-      version="3.10.0.qualifier"
+      version="4.0.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://www.eclipse.org/scout/">
@@ -23,7 +23,7 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.client" version="3.10.0" match="compatible"/>
+      <import feature="org.eclipse.scout.rt.client" version="4.0.0" match="compatible"/>
    </requires>
 
    <plugin
