@@ -46,7 +46,7 @@ import org.osgi.framework.Bundle;
 
 public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
   //TODO CGU move to look and feel decoration
-  public static final int FORM_HEADER_HEIGHT = 43;
+  private static final int FORM_HEADER_HEIGHT = 43;
 
   public AbstractMobileStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     super(applicationBundle, clientSessionClazz);
