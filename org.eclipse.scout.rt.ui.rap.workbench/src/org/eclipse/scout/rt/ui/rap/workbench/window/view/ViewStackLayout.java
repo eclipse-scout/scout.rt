@@ -18,6 +18,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.forms.widgets.ILayoutExtension;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
 public class ViewStackLayout extends Layout implements ILayoutExtension {
   private static final long serialVersionUID = 1L;
 

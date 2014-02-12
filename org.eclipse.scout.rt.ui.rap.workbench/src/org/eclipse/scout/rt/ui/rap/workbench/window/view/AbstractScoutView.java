@@ -39,7 +39,10 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * @since 3.8.0
+ * @deprecated will be removed with the M-release.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutView.class);
   // public static enum ViewState{OPEN, CLOSING_UI, CLOSING_MODEL, CLOSED}

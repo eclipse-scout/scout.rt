@@ -15,7 +15,10 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
+ * @deprecated will be removed with the M-release.
  */
+@Deprecated
 public class Activator extends AbstractUIPlugin {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.rap.workbench"; //$NON-NLS-1$

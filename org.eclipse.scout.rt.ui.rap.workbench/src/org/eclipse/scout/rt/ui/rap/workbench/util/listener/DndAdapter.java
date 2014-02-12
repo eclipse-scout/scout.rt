@@ -19,7 +19,9 @@ import org.eclipse.swt.dnd.DropTargetListener;
  * <h3>DndAdapter</h3>
  * 
  * @since 1.0.9 15.07.2008
+ * @deprecated will be removed with the M-release.
  */
+@Deprecated
 public abstract class DndAdapter implements DragSourceListener, DropTargetListener {
   private static final long serialVersionUID = 1L;
 

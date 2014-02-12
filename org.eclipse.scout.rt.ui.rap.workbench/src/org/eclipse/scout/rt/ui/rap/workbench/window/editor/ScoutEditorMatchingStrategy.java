@@ -15,7 +15,12 @@ import org.eclipse.ui.IEditorMatchingStrategy;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
 public class ScoutEditorMatchingStrategy implements IEditorMatchingStrategy {
+  @SuppressWarnings("deprecation")
   @Override
   public boolean matches(IEditorReference editorRef, IEditorInput input) {
     if (!(editorRef.getEditor(false) instanceof AbstractScoutEditorPart)) {

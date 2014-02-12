@@ -17,7 +17,9 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 01.04.2011
+ * @deprecated will be removed with the M-release.
  */
+@Deprecated
 public interface IRwtWorkbenchEnvironment extends IRwtEnvironment {
 
   boolean acquireActivateViewLock();

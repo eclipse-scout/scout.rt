@@ -48,6 +48,11 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.presentations.IPresentablePart;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractScoutEditorPart extends EditorPart implements IRwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutEditorPart.class);
   public static final String EDITOR_ID = AbstractScoutEditorPart.class.getName();

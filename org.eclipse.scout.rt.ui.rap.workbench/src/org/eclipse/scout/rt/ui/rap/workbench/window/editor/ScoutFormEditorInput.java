@@ -19,6 +19,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
 public class ScoutFormEditorInput implements IEditorInput {
 
   private final IRwtEnvironment m_uiEnvironment;

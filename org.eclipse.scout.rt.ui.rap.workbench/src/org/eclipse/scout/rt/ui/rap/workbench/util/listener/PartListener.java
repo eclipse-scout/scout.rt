@@ -15,6 +15,10 @@ import java.util.EventListener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
 public abstract class PartListener implements IPartListener2, EventListener {
 
   @Override

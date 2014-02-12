@@ -20,7 +20,9 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.03.2011
+ * @deprecated will be removed with the M-release.
  */
+@Deprecated
 public abstract class AbstractWorkbenchEntryPoint implements EntryPoint {
 
   @Override

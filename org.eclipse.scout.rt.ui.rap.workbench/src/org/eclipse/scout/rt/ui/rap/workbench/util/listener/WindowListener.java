@@ -15,6 +15,10 @@ import java.util.EventListener;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
 
+/**
+ * @deprecated will be removed with the M-release.
+ */
+@Deprecated
 public class WindowListener implements IWindowListener, EventListener {
 
   @Override
