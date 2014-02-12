@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.swt.form.fields.checkbox.ISwtScoutCheckbox;
-import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -184,16 +183,11 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
 
   @Override
   protected void setEnabledFromScout(boolean b) {
-    boolean updateLayout = false;
     // only label
     if (getSwtLabel() != null) {
       if (getSwtLabel().getEnabled() != b) {
-        updateLayout = true;
         getSwtLabel().setEnabled(b);
       }
-    }
-    if (updateLayout && isConnectedToScout()) {
-      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 
