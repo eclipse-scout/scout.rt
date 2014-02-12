@@ -138,10 +138,8 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
   }
 
   protected void setEnabledFromScout(boolean b) {
-    boolean updateLayout = false;
     Control swtField = getSwtField();
     if (swtField != null) {
-      updateLayout = true;
       setFieldEnabled(swtField, b);
       if (b) {
         setForegroundFromScout(getScoutObject().getForegroundColor());
@@ -154,12 +152,8 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     }
     if (getSwtLabel() != null) {
       if (getSwtLabel().getEnabled() != b) {
-        updateLayout = true;
         getSwtLabel().setEnabled(b);
       }
-    }
-    if (updateLayout && isConnectedToScout()) {
-      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 
