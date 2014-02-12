@@ -45,6 +45,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -773,6 +774,25 @@ public class SwtMock implements IGuiMock {
       public String run() throws Throwable {
         Clipboard b = new Clipboard(getDisplay());
         return (String) b.getContents(TextTransfer.getInstance());
+      }
+    });
+  }
+
+  @Override
+  public void setClipboardText(final String value) {
+    waitForIdle();
+    syncExec(new MockRunnable<Object>() {
+
+      @Override
+      public Object run() throws Throwable {
+        Clipboard b = new Clipboard(getDisplay());
+        if (StringUtility.isNullOrEmpty(value)) {
+          b.clearContents();
+        }
+        else {
+          b.setContents(new Object[]{value}, new Transfer[]{TextTransfer.getInstance()});
+        }
+        return null;
       }
     });
   }

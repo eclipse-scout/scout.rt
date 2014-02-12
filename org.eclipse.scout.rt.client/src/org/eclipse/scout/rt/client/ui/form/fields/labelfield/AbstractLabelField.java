@@ -38,11 +38,23 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return false;
   }
 
+  /**
+   * Defines if the label should be selectable or not. Default is <code>true</code>
+   * 
+   * @since 3.10.0-M6
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(260)
+  protected boolean getConfiguredSelectable() {
+    return true;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
     setWrapText(getConfiguredWrapText());
+    setSelectable(getConfiguredSelectable());
   }
 
   @Override
@@ -64,6 +76,16 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   @Override
   public boolean isWrapText() {
     return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
+  }
+
+  @Override
+  public void setSelectable(boolean b) {
+    propertySupport.setPropertyBool(PROP_SELECTABLE, b);
+  }
+
+  @Override
+  public boolean isSelectable() {
+    return propertySupport.getPropertyBool(PROP_SELECTABLE);
   }
 
   @Override

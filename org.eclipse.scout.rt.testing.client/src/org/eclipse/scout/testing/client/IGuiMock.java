@@ -357,6 +357,8 @@ public interface IGuiMock {
 
   String getClipboardText();
 
+  void setClipboardText(String val);
+
   Object internal0(Object o);
 
   /**

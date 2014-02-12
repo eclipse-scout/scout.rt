@@ -9,6 +9,8 @@ import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.swing.ext.JTextPaneEx;
+import org.eclipse.scout.rt.ui.swing.text.HTMLStyledTextCreator;
+import org.eclipse.scout.rt.ui.swing.text.IStyledTextCreator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,6 +71,9 @@ public class SwingScoutLabelFieldTest {
   }
 
   private static class TestSwingScoutLabelField extends SwingScoutLabelField {
+
+    private IStyledTextCreator m_styledTextCreator = new HTMLStyledTextCreator();
+
     @Override
     public void setSwingField(JComponent swingField) {
       super.setSwingField(swingField);
@@ -90,6 +95,11 @@ public class SwingScoutLabelFieldTest {
       EasyMock.expect(scoutObject.getGridData()).andReturn(new GridData(0, 0, 0, 0, 0, 0));
       EasyMock.replay(scoutObject);
       return scoutObject;
+    }
+
+    @Override
+    public IStyledTextCreator getStyledTextCreator() {
+      return m_styledTextCreator;
     }
   }
 

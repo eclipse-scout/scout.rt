@@ -21,40 +21,40 @@ public interface IStyledTextCreator {
   /**
    * The text to be styled
    */
-  public void setText(String text);
+  IStyledTextCreator setText(String text);
 
   /**
    * The backgroundColor to be used. If empty no backgroundColor will be specified
    */
-  public void setBackgroundColor(Color color);
+  IStyledTextCreator setBackgroundColor(Color color);
 
   /**
    * The foregroundColor to be used. If empty no foregroundColor will be specified
    */
-  public void setForegroundColor(Color color);
+  IStyledTextCreator setForegroundColor(Color color);
 
   /**
    * The horizontal alignment of the text
    */
-  public void setHorizontalAlignment(int scoutAlign);
+  IStyledTextCreator setHorizontalAlignment(int scoutAlign);
 
   /**
    * The vertical alignment of the text
    */
-  public void setVerticalAlignment(int scoutAlign);
+  IStyledTextCreator setVerticalAlignment(int scoutAlign);
 
   /**
    * The height of the container. This may be needed for vertical alignment
    */
-  public void setHeight(int height);
+  IStyledTextCreator setHeight(int height);
 
   /**
    * Specifies whether text should be wrapped or not
    */
-  public void setTextWrap(boolean wrap);
+  IStyledTextCreator setTextWrap(boolean wrap);
 
   /**
    * Returns the styled text using the specified attributes
    */
-  public String createStyledText();
+  String createStyledText();
 }

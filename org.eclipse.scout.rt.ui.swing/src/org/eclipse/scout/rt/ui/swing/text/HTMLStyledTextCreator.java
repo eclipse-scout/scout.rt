@@ -32,8 +32,8 @@ import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
  */
 public class HTMLStyledTextCreator implements IStyledTextCreator {
 
-  private static final Pattern HTML_PATTERN = Pattern.compile("<html>(.*)</html>");
-  private static final Pattern BODY_PATTERN = Pattern.compile("<body[^>]*>(.*)</body>");
+  private static final Pattern HTML_PATTERN = Pattern.compile("<html>(.*)</html>", Pattern.DOTALL);
+  private static final Pattern BODY_PATTERN = Pattern.compile("<body[^>]*>(.*)</body>", Pattern.DOTALL);
 
   private Color m_backgroundColor;
   private Color m_foregroundColor;
@@ -44,8 +44,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   private boolean m_textWrap;
 
   @Override
-  public void setText(String text) {
+  public IStyledTextCreator setText(String text) {
     this.m_text = text;
+    return this;
   }
 
   public String getText() {
@@ -53,8 +54,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setBackgroundColor(Color color) {
+  public IStyledTextCreator setBackgroundColor(Color color) {
     this.m_backgroundColor = color;
+    return this;
   }
 
   public Color getBackgroundColor() {
@@ -62,8 +64,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setForegroundColor(Color color) {
+  public IStyledTextCreator setForegroundColor(Color color) {
     this.m_foregroundColor = color;
+    return this;
   }
 
   public Color getForegroundColor() {
@@ -71,8 +74,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setHorizontalAlignment(int scoutAlign) {
+  public IStyledTextCreator setHorizontalAlignment(int scoutAlign) {
     this.m_horizontalAlignment = scoutAlign;
+    return this;
   }
 
   public int getHorizontalAlignment() {
@@ -80,8 +84,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setVerticalAlignment(int scoutAlign) {
+  public IStyledTextCreator setVerticalAlignment(int scoutAlign) {
     this.m_verticalAlignment = scoutAlign;
+    return this;
   }
 
   public int getVerticalAlignment() {
@@ -89,8 +94,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setHeight(int height) {
+  public IStyledTextCreator setHeight(int height) {
     this.m_height = height;
+    return this;
   }
 
   public int getHeight() {
@@ -98,8 +104,9 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
   }
 
   @Override
-  public void setTextWrap(boolean wrap) {
+  public IStyledTextCreator setTextWrap(boolean wrap) {
     this.m_textWrap = wrap;
+    return this;
   }
 
   public boolean isTextWrap() {
@@ -112,45 +119,55 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
       setText("<!-- -->"); //This is necessary, otherwise the HTMLEditorKit will remove our tags if String is empty
     }
 
-    String styledText = getText();
+    String styledText = getText().trim();
 
     //remove html and body tags since we will add our owns
+    boolean originalTextIsHTML = false;
     if (HTML_PATTERN.matcher(styledText).matches()) {
       styledText = StringUtility.getTag(styledText, "html");
+      originalTextIsHTML = true;
     }
 
     if (BODY_PATTERN.matcher(styledText).matches()) {
       styledText = StringUtility.getTag(styledText, "body");
     }
 
-    String align = "left";
-    String valign = "top";
-
-    if (getHorizontalAlignment() == SwingConstants.HORIZONTAL) {
-      align = "center";
-    }
-    else if (getHorizontalAlignment() == SwingConstants.RIGHT) {
-      align = "right";
-    }
-    else {
-      align = "left";
+    if (!originalTextIsHTML) {
+      styledText = StringUtility.replaceNewLines(styledText, "<br>");
     }
 
+    styledText = "<html><body style=\"" + getBodyStyle() + "\"><div align=\"" + getAlign() + "\"><table cellpadding=\"0\" cellspacing=\"0\"><tr><td valign=\"" + getValign() + "\" height=\"" + getHeight() + "px\" style=\"white-space:" + getWrapText() + ";\">" + styledText + "</td></tr></table></div></body></html>";
+    return styledText;
+  }
+
+  protected String getValign() {
     if (getVerticalAlignment() == SwingConstants.CENTER) {
-      valign = "middle";
+      return "middle";
     }
     else if (getVerticalAlignment() == SwingConstants.BOTTOM) {
-      valign = "bottom";
+      return "bottom";
     }
-    else {
-      valign = "top";
-    }
+    return "top";
+  }
 
-    String wrapText = "normal";
+  protected String getAlign() {
+    if (getHorizontalAlignment() == SwingConstants.HORIZONTAL) {
+      return "center";
+    }
+    else if (getHorizontalAlignment() == SwingConstants.RIGHT) {
+      return "right";
+    }
+    return "left";
+  }
+
+  protected String getWrapText() {
     if (!isTextWrap()) {
-      wrapText = "nowrap";
+      return "nowrap";
     }
+    return "normal";
+  }
 
+  protected String getBodyStyle() {
     String bodyStyle = "";
     if (StringUtility.hasText(ColorUtility.createStringFromColor(getBackgroundColor()))) {
       bodyStyle += "background-color: " + ColorUtility.createStringFromColor(getBackgroundColor()) + ";";
@@ -159,9 +176,6 @@ public class HTMLStyledTextCreator implements IStyledTextCreator {
     if (StringUtility.hasText(ColorUtility.createStringFromColor(getForegroundColor()))) {
       bodyStyle += "color: " + ColorUtility.createStringFromColor(getForegroundColor()) + ";";
     }
-
-    styledText = "<html><body style=\"" + bodyStyle + "\"><div align=\"" + align + "\"><table cellpadding=\"0\" cellspacing=\"0\"><tr><td valign=\"" + valign + "\" height=\"" + getHeight() + "px\" style=\"white-space:" + wrapText + ";\">" + styledText + "</td></tr></table></div></body></html>";
-    return styledText;
+    return bodyStyle;
   }
-
 }

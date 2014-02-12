@@ -861,6 +861,18 @@ public class RapMock implements IGuiMock {
   }
 
   @Override
+  public void setClipboardText(String value) {
+    waitForIdle();
+    syncExec(new MockRunnable<Object>() {
+      @Override
+      public String run() throws Throwable {
+        //XXX RAP
+        return null;
+      }
+    });
+  }
+
+  @Override
   public Object internal0(final Object o) {
     return syncExec(new MockRunnable<String>() {
       @Override
