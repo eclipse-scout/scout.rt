@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
-import org.eclipse.scout.rt.ui.rap.mobile.RwtMobileShellValidateRoot;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.swt.SWT;
@@ -91,7 +90,8 @@ public class RwtScoutMobileDialog extends RwtScoutDialog {
 
   @Override
   protected DefaultValidateRoot createShellValidateRoot(Shell shell, IRwtEnvironment env) {
-    return new RwtMobileShellValidateRoot(shell, env);
+    // no resizing of dialogs supported for Tablet/Mobile see org.eclipse.scout.rt.ui.rap.mobile.FixedSizeDialogBoundsProvider.java
+    return null;
   }
 
 }
