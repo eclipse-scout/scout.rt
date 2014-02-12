@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,10 +14,23 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface ILabelField extends IValueField<String> {
   String PROP_WRAP_TEXT = "wrapText";
+  String PROP_SELECTABLE = "selectable";
 
   void setWrapText(boolean b);
 
   boolean isWrapText();
+
+  /**
+   * Specifies whether the label should be selectable or not
+   * 
+   * @since 3.10.0-M6
+   */
+  void setSelectable(boolean b);
+
+  /**
+   * returns <code>true</code> if the label is selectable, <code>false</code> otherwise
+   */
+  boolean isSelectable();
 
   ILabelFieldUIFacade getUIFacade();
 }

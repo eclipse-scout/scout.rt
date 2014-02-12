@@ -30,7 +30,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Looks for icons in the resources/icons folder of bundles
@@ -74,6 +73,7 @@ public class SwtIconLocator implements ISwtIconLocator {
     return desc;
 
   }
+
   /**
    * Find icon in plugin dependency path starting with root bundle {@link Platform#getProduct#getDefiningBundle}
    */
@@ -211,7 +211,7 @@ public class SwtIconLocator implements ISwtIconLocator {
   }
 
   private Image getFalse() {
-    Display display = PlatformUI.getWorkbench().getDisplay();
+    Display display = Display.getCurrent();
     Image img = new Image(display, 16, 16);
     GC gc = null;
     try {

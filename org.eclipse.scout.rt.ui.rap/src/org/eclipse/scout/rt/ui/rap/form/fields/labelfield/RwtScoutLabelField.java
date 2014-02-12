@@ -69,6 +69,21 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
   }
 
   @Override
+  protected void attachScout() {
+    super.attachScout();
+    setSelectableFromScout(getScoutObject().isSelectable());
+  }
+
+  /**
+   * Defines if the label should be selectable or not
+   * 
+   * @since 3.10.0-M6
+   */
+  protected void setSelectableFromScout(boolean booleanValue) {
+    //mnc: not possible yet
+  }
+
+  @Override
   protected void setDisplayTextFromScout(String s) {
     String oldText = getUiField().getText();
     if (s == null) {
@@ -84,4 +99,14 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
     getUiContainer().layout(true, true);
   }
 
+  /**
+   * scout property handler override
+   */
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (ILabelField.PROP_SELECTABLE.equals(name)) {
+      setSelectableFromScout(getScoutObject().isSelectable());
+    }
+  }
 }

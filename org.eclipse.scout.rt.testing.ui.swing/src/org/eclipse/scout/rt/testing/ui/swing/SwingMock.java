@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.dnd.TextTransferable;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.testing.client.IGuiMock;
 import org.eclipse.scout.testing.client.robot.JavaRobot;
@@ -719,6 +720,13 @@ public class SwingMock implements IGuiMock {
       return ((TextTransferObject) o).getPlainText();
     }
     return null;
+  }
+
+  @Override
+  public void setClipboardText(String value) {
+    waitForIdle();
+    TextTransferable text = new TextTransferable(value, value);
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(text, null);
   }
 
   @Override

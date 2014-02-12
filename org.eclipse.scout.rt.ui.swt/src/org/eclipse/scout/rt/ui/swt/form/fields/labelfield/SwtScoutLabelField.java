@@ -94,6 +94,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   protected void attachScout() {
     super.attachScout();
     setTextWrapFromScout(getScoutObject().isWrapText());
+    setSelectableFromScout(getScoutObject().isSelectable());
   }
 
   @Override
@@ -117,6 +118,15 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     // getSwtField().setWordWrap(booleanValue);
   }
 
+  /**
+   * Defines if the label should be selectable or not
+   * 
+   * @since 3.10.0-M6
+   */
+  protected void setSelectableFromScout(boolean booleanValue) {
+    getSwtField().setEnabled(booleanValue);
+  }
+
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
     // void here
@@ -129,8 +139,11 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   protected void handleScoutPropertyChange(String name, Object newValue) {
 
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ILabelField.PROP_WRAP_TEXT)) {
-      setTextWrapFromScout(((Boolean) newValue).booleanValue());
+    if (ILabelField.PROP_WRAP_TEXT.equals(name)) {
+      setTextWrapFromScout(getScoutObject().isWrapText());
+    }
+    else if (ILabelField.PROP_SELECTABLE.equals(name)) {
+      setSelectableFromScout(getScoutObject().isSelectable());
     }
   }
 

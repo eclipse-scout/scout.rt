@@ -14,8 +14,10 @@ import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.Highlighter;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -43,10 +45,10 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   private String m_unformattedText;
   private boolean m_textWrap;
   private IStyledTextCreator m_styledTextCreator;
-
   private Color m_foregroundColor;
-
   private Color m_backgroundColor;
+  private TransferHandler m_transferHandler;
+  private Highlighter m_highlighter;
 
   @Override
   protected void initializeSwing() {
@@ -61,9 +63,13 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     m_fieldPanel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, fieldData);
 
     JTextPaneEx labelField = createLabelField();
+    m_transferHandler = labelField.getTransferHandler();
+    m_highlighter = labelField.getHighlighter();
+
     labelField.addComponentListener(new P_ResizeListener());
     m_fieldPanel.add(labelField);
     setTopMarginForField();
+    m_styledTextCreator = createStyledTextCreator();
 
     container.add(m_fieldPanel);
     //
@@ -84,7 +90,6 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     HTMLEditorKit editorKit = createEditorKit();
     labelField.setEditorKit(editorKit);
     labelField.setBorder(null);
-    m_styledTextCreator = new HTMLStyledTextCreator();
     return labelField;
   }
 
@@ -102,6 +107,17 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
    */
   protected HTMLEditorKit createEditorKit() {
     return new HTMLEditorKit();
+  }
+
+  /**
+   * Create and return the {@link IStyledTextCreator}.
+   */
+  protected IStyledTextCreator createStyledTextCreator() {
+    return new HTMLStyledTextCreator();
+  }
+
+  public IStyledTextCreator getStyledTextCreator() {
+    return m_styledTextCreator;
   }
 
   /**
@@ -130,11 +146,28 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     super.attachScout();
     ILabelField f = getScoutObject();
     setTextWrapFromScout(f.isWrapText());
+    setSelectableFromScout(f.isSelectable());
   }
 
   protected void setTextWrapFromScout(boolean b) {
     m_textWrap = b;
     updateTextInGUI();
+  }
+
+  /**
+   * Defines if the label should be selectable or not
+   * 
+   * @since 3.10.0-M6
+   */
+  protected void setSelectableFromScout(boolean b) {
+    if (b) {
+      getSwingLabelField().setHighlighter(m_highlighter);
+      getSwingLabelField().setTransferHandler(m_transferHandler);
+    }
+    else {
+      getSwingLabelField().setHighlighter(null);
+      getSwingLabelField().setTransferHandler(null);
+    }
   }
 
   @Override
@@ -168,21 +201,27 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     if (ILabelField.PROP_WRAP_TEXT.equals(name)) {
       setTextWrapFromScout(getScoutObject().isWrapText());
     }
+    else if (ILabelField.PROP_SELECTABLE.equals(name)) {
+      setSelectableFromScout(getScoutObject().isSelectable());
+    }
   }
 
   /**
    * This method creates an aligned text for the JTextPane.
    */
   protected String createStyledText() {
-    m_styledTextCreator.setText(getUnformattedText());
-    m_styledTextCreator.setTextWrap(m_textWrap);
     Color bgColor = (Color) ((m_backgroundColor != null) ? m_backgroundColor : UIManager.getLookAndFeelDefaults().get("TextPane.background"));
-    m_styledTextCreator.setForegroundColor(getScoutObject().isEnabled() ? m_foregroundColor : getSwingLabelField().getDisabledTextColor());
-    m_styledTextCreator.setBackgroundColor(bgColor);
-    m_styledTextCreator.setHorizontalAlignment(m_horizontalAlignment);
-    m_styledTextCreator.setVerticalAlignment(m_verticalAlignment);
-    m_styledTextCreator.setHeight(adjustHeight(getSwingLabelField().getHeight()));
-    return m_styledTextCreator.createStyledText();
+    Color fgColor = getScoutObject().isEnabled() ? m_foregroundColor : getSwingLabelField().getDisabledTextColor();
+
+    getStyledTextCreator().setText(getUnformattedText())
+        .setTextWrap(m_textWrap)
+        .setForegroundColor(fgColor)
+        .setBackgroundColor(bgColor)
+        .setHorizontalAlignment(m_horizontalAlignment)
+        .setVerticalAlignment(m_verticalAlignment)
+        .setHeight(adjustHeight(getSwingLabelField().getHeight()));
+
+    return getStyledTextCreator().createStyledText();
   }
 
   @Override
