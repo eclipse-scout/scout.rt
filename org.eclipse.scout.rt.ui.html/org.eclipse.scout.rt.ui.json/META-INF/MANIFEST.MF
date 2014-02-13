@@ -1,8 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout JSON UI
-Bundle-SymbolicName: org.eclipse.scout.rt.ui.json
+Bundle-Name: Scout Json UI
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.json;singleton:=true
 Bundle-Version: 4.0.0.qualifier
 Bundle-Vendor: BSI Business Systems Integration AG
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Import-Package: javax.servlet;version="2.5.0",
+ javax.servlet.http;version="2.5.0",
+ org.json
+Require-Bundle: org.eclipse.scout.rt.client;bundle-version="4.0.0",
+ org.eclipse.scout.http.servletfilter;bundle-version="4.0.0",
+ org.eclipse.equinox.http.registry
+Export-Package: org.eclipse.scout.rt.ui.json
