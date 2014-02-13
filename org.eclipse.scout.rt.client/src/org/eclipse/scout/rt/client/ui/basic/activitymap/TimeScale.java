@@ -166,11 +166,11 @@ public class TimeScale {
     if (endTime.before(getBeginTime())) {
       return null;
     }
-    MinorTimeColumn[] minCols = getMinorTimeColumns();
     if (endTime.after(getEndTime())) {
       return getMinorTimeColumns().length - 1;
     }
     //approach in ascending order
+    MinorTimeColumn[] minCols = getMinorTimeColumns();
     for (int i = 0; i < minCols.length; i++) {
       if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
         // special handling: the minCols might contain a gap, i.e. the range is not contiguous.
@@ -191,23 +191,25 @@ public class TimeScale {
    * Normalized range [begin,end] of the column The normalized space starts at
    * 0.0 and ends at 1.0
    * 
-   * @return float[begin,end]
+   * @return double[begin,end] or null
    */
   public double[] getRangeOf(MajorTimeColumn column) {
     MinorTimeColumn[] minorCols = column.getMinorTimeColumns();
     if (minorCols.length > 0) {
-      return new double[]{getRangeOf(minorCols[0])[0], getRangeOf(minorCols[minorCols.length - 1])[1]};
+      double[] r1 = getRangeOf(minorCols[0]);
+      double[] r2 = getRangeOf(minorCols[minorCols.length - 1]);
+      if (r1 != null && r1.length > 0 && r2 != null && r2.length > 1) {
+        return new double[]{r1[0], r2[1]};
+      }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
    * Normalized location [begin,end] of the column The normalized space starts
    * at 0.0 and ends at 1.0
    * 
-   * @return float[begin,end]
+   * @return double[begin,end] or null
    */
   public double[] getRangeOf(MinorTimeColumn column) {
     MinorTimeColumn[] minCols = getMinorTimeColumns();

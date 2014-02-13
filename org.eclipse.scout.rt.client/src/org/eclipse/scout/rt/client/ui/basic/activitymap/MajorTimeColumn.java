@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,7 +22,7 @@ public class MajorTimeColumn {
   private String m_mediumText = "";
   private String m_largeText = "";
   private String m_tooltipText;
-  private TreeMap<Date, MinorTimeColumn> m_children = new TreeMap<Date, MinorTimeColumn>();
+  private final TreeMap<Date, MinorTimeColumn> m_children = new TreeMap<Date, MinorTimeColumn>();
 
   public MajorTimeColumn(TimeScale scale) {
     m_scale = scale;
