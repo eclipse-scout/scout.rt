@@ -1,0 +1,11 @@
+events:
+{
+  {type:"create", widgetType="desktop",
+    {id:"foo"}
+  },
+  {type:"update", id:"bar", selected:true },
+  {type:"create"  },
+  {type:"update",  },
+  {type:"update",  },
+  {type:"destroy", id:"xyz"},
+}

@@ -18,7 +18,17 @@ public interface IJsonEnvironment {
 
   void init() throws ProcessingException;
 
+  void registerJsonRenderer(String id, IJsonRenderer renderer);
+
+  void unregisterJsonRenderer(String id);
+
   JSONObject processRequest(JSONObject json) throws ProcessingException;
 
   IClientSession getClientSession();
+
+  void addCreateEvent(IJsonRenderer jsonRenderer);
+
+  void addUpdateEvent(String widgetId, String name, Object newValue);
+
+  String createUniqueIdFor(IJsonRenderer renderer);
 }

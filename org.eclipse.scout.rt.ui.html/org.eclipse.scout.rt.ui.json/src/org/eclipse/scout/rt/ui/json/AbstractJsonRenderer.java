@@ -16,17 +16,19 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
-public class JsonRenderer<T extends IPropertyObserver> {
+public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implements IJsonRenderer {
   private IJsonEnvironment m_jsonEnvironment;
   private T m_scoutObject;
   private P_PropertyChangeListener m_propertyChangeListener;
+  private String m_id;
 
-  public JsonRenderer(T scoutObject, IJsonEnvironment jsonEnvironment) {
+  public AbstractJsonRenderer(T scoutObject, IJsonEnvironment jsonEnvironment) {
     if (scoutObject == null) {
       throw new IllegalArgumentException("scoutObject must not be null");
     }
     m_scoutObject = scoutObject;
     m_jsonEnvironment = jsonEnvironment;
+    m_id = jsonEnvironment.createUniqueIdFor(this);
   }
 
   public IJsonEnvironment getJsonEnvironment() {
@@ -35,6 +37,11 @@ public class JsonRenderer<T extends IPropertyObserver> {
 
   public T getScoutObject() {
     return m_scoutObject;
+  }
+
+  @Override
+  public String getId() {
+    return m_id;
   }
 
   protected void attachScout() throws ProcessingException {
@@ -51,12 +58,16 @@ public class JsonRenderer<T extends IPropertyObserver> {
     }
   }
 
+  @Override
   public void init() throws ProcessingException {
+    getJsonEnvironment().registerJsonRenderer(getId(), this);
     attachScout();
   }
 
+  @Override
   public void dispose() throws ProcessingException {
     detachScout();
+    getJsonEnvironment().unregisterJsonRenderer(getId());
   }
 
   protected void handleScoutPropertyChange(String name, Object newValue) {

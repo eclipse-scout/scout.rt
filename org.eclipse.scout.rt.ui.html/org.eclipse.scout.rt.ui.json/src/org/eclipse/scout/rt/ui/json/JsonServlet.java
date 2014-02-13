@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +37,7 @@ public class JsonServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    System.out.println("doPost");
+    LOG.info("POST request started.");
     try {
       HttpSession session = req.getSession();
       IJsonEnvironment env = (IJsonEnvironment) session.getAttribute(SESSION_ATTR);
@@ -47,18 +48,27 @@ public class JsonServlet extends HttpServlet {
       JSONObject jsonReq = toJSON(req);
       JSONObject jsonResp = env.processRequest(jsonReq);
       String data = jsonResp.toString();
+
       resp.setContentLength(data.length());
       resp.setContentType("application/json");
       resp.getOutputStream().print(data);
+
+      LOG.debug("Returning: " + data);
     }
     catch (ProcessingException e) {
+      LOG.error("Exception while processing post request", e);
       resp.getWriter().print("ERROR: " + e.getMessage());
+    }
+    finally {
+      LOG.info("POST request finished.");
     }
   }
 
   private JSONObject toJSON(HttpServletRequest req) throws ProcessingException {
     try {
       String jsonData = IOUtility.getContent(req.getReader());
+      LOG.debug("Received: " + jsonData);
+
       if (StringUtility.isNullOrEmpty(jsonData)) {
         jsonData = "{}"; // TODO
       }
@@ -83,8 +93,20 @@ public class JsonServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    System.out.println("doGet");
-    doPost(req, resp);
+    LOG.info("GET request started.");
+    try {
+      InputStream is = JsonServlet.class.getResourceAsStream("index.html");
+      String html = new String(IOUtility.getContent(is));
+      resp.setContentType("text/html");
+      resp.getOutputStream().print(html);
+    }
+    catch (ProcessingException e) {
+      LOG.error("Exception while processing post request", e);
+      resp.getWriter().print("ERROR: " + e.getMessage());
+    }
+    finally {
+      LOG.info("GET request finished.");
+    }
   }
 
   public static void setEnvironmentClass(Class<? extends IJsonEnvironment> environmentClass) {
