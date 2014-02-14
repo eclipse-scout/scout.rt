@@ -39,6 +39,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
 		</link>
 		<link>
+			<name>.settings/org.eclipse.core.resources.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.core.resources.prefs</locationURI>
+		</link>
+		<link>
 			<name>.settings/org.eclipse.core.runtime.prefs</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.core.runtime.prefs</locationURI>

@@ -94,6 +94,10 @@ public abstract class AbstractJsonEnvironment implements IJsonEnvironment {
 
       JSONObject response = new JSONObject();
       response.put("events", m_events);
+
+      //Clear event map when sent to client
+      m_events = new JSONArray();
+
       return response;
     }
     catch (JSONException e) {
@@ -122,13 +126,12 @@ public abstract class AbstractJsonEnvironment implements IJsonEnvironment {
 
   @Override
   public String createUniqueIdFor(IJsonRenderer renderer) {
-    //TODO create id based on scout object for automatic gui testing, see CustomWidgetIdGenerator from scout.ui.rwt bundle
+    //TODO create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
     return ++lastId + "";
   }
 
   @Override
   public void addCreateEvent(IJsonRenderer jsonRenderer) {
-    m_events = new JSONArray(); //TODO
     try {
       JSONObject pc = new JSONObject();
       pc.put("type", "create");

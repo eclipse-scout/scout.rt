@@ -61,6 +61,17 @@ var log = console.log.bind(console);
     return this;
   };
 
+  $.fn.select = function (selected) {
+    if(selected) {
+      this.addClass('selected');
+    }
+    else {
+      this.removeClass('selected');
+    }
+
+    return this;
+  };
+
   // most used animate
   $.fn.animateAVCSD = function (attr, value, complete, step, duration) {
     var properties = {},
@@ -85,15 +96,29 @@ var log = console.log.bind(console);
 //
 
 Scout = function ($entryPoint) {
-  // initiate scout
+  this.widgetMap = {};
 
-  // create all widgets for entry point
-  var response = $.syncAjax('startup', {id : $entryPoint.attr('id')});
-
-  for (var i = 0; i < response.events.length; i++) {
-    if(response.events[i].type == "create") {
-      createWidget($entryPoint, response.events[i].object);
+  this.processEvents = function processEvents(events) {
+    for (var i = 0; i < events.length; i++) {
+      var event = events[i];
+      if(event.type == "create") {
+        var widget = createWidget($entryPoint, event.object);
+        this.widgetMap[widget.id] = widget;
+      }
+      else if(event.type == "update") {
+        var widget = this.widgetMap[event.id];
+        if(!widget) {
+          throw "No widget found for id " + event.id;
+        }
+        updateWidget(widget, event);
+      }
     }
+  }
+
+  this.init = function init() {
+    // create all widgets for entry point
+    var response = $.syncAjax('startup', {id : $entryPoint.attr('id')});
+    this.processEvents(response.events);
   }
 
   // create single widget based on a model object
@@ -103,10 +128,13 @@ Scout = function ($entryPoint) {
     }
   }
 
+  function updateWidget(widget, event) {
+    widget.handleUpdate(event);
+  }
 };
 
 //
-// desktop: contains views, main_tree, (empty) bench, tools
+// desktop: contains viewButtons, main_tree, (empty) bench, tools
 //
 
 Scout.Desktop = function ($parent, widget) {
@@ -127,13 +155,13 @@ Scout.Desktop = function ($parent, widget) {
 // view namespace and container
 //
 
-Scout.Desktop.ViewButtonBar = function ($desktop, views) {
+Scout.Desktop.ViewButtonBar = function ($desktop, viewButtons) {
   //  create container
   var $desktopView = $desktop.appendDiv('DesktopViews');
 
   //  add view-item, all before #viewAdd
-  for (var i = 0; i < views.length; i++) {
-    new Scout.Desktop.ViewButton($desktopView, views[i]);
+  for (var i = 0; i < viewButtons.length; i++) {
+    new Scout.Desktop.ViewButton($desktopView, viewButtons[i]);
   }
 
   //  create logo and plus sign
@@ -170,17 +198,25 @@ Scout.Desktop.ViewButtonBar = function ($desktop, views) {
   }
 };
 
-Scout.Desktop.ViewButton = function ($viewButtonBar, view) {
-    var selected = view.selected;
+Scout.Desktop.ViewButton = function ($viewButtonBar, viewButton) {
+    this.handleUpdate = function handleUpdate(event) {
+      if(event.selected !== undefined) {
+        $viewButton.select(event.selected);
+      }
+    };
+    scout.widgetMap[viewButton.id] = this;
+
+    var selected = viewButton.selected;
     var state = '';
-    if(view.selected) {
+    if(viewButton.selected) {
       state='selected';
     }
-    var $view = $viewButtonBar.appendDiv(view.id, 'view-item ' + state, view.text)
+    var $viewButton = $viewButtonBar.appendDiv(viewButton.id, 'view-item ' + state, viewButton.text)
     .on('click', '', onClick);
 
     function onClick (event) {
-      $.syncAjax('click', {id : $(this).attr('id')});
+      var response = $.syncAjax('click', {id : $(this).attr('id')});
+      scout.processEvents(response.events);
     }
 };
 
@@ -591,8 +627,12 @@ Scout.Scrollbar = function ($container, axis, trackResize) {
 // start all scouts after loading
 //
 
+var scout;
 $(document).ready(function () {
-  $('.scout').each(function () {new Scout($(this));});
+  //TODO separate instance for each scout div? if yes, how to access correct one?
+  $('.scout').each(function () {
+    scout = new Scout($(this));
+    scout.init();
+  });
 });
-
 // old
