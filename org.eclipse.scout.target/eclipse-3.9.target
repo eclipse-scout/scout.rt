@@ -94,7 +94,7 @@
       <unit id="org.eclipse.rap.fileupload.feature.feature.group" version="0.0.0"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+      <repository id="scout_nightly_3.10" location="http://download.eclipse.org/scout/nightly/3.10"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
