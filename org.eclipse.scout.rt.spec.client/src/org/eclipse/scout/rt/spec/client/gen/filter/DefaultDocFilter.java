@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.spec.client.gen.filter;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 
 /**
@@ -33,9 +33,9 @@ public class DefaultDocFilter<T> implements IDocFilter<T> {
     if (docAnnotation != null) {
       return docAnnotation.filter();
     }
-    if (o instanceof AbstractGroupBox) {
-      AbstractGroupBox groupBox = (AbstractGroupBox) o;
-      DescriptionExtractor<AbstractGroupBox> descExtractor = new DescriptionExtractor<AbstractGroupBox>();
+    if (o instanceof IGroupBox) {
+      IGroupBox groupBox = (IGroupBox) o;
+      DescriptionExtractor<IGroupBox> descExtractor = new DescriptionExtractor<IGroupBox>();
       if (groupBox.isMainBox() || !(StringUtility.hasText(groupBox.getLabel()) || StringUtility.hasText(descExtractor.getText(groupBox)))) {
         return Filtering.TRANSPARENT;
       }
