@@ -340,7 +340,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       s = "";
     }
     if (m_section != null) {
-      if (getScoutObject().isLabelVisible()) {
+      if (!getScoutObject().isLabelVisible()) {
         s = "";
       }
       m_section.setText(s);
