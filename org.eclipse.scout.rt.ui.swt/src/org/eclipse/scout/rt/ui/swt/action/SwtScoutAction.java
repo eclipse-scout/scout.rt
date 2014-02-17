@@ -96,6 +96,11 @@ public class SwtScoutAction extends AbstractSwtScoutAction {
     public void run() {
       handleSwtAction();
     }
+
+    @Override
+    public boolean isChecked() {
+      return super.isChecked();
+    }
   } // end P_SwtAction
 
   @Override

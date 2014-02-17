@@ -34,7 +34,11 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutCheckboxMenu;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuAction;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuContributionItem;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuGroup;
+import org.eclipse.scout.rt.ui.swt.menu.AbstractSwtScoutMenu;
+import org.eclipse.scout.rt.ui.swt.menu.SwtScoutCheckboxMenuItem;
+import org.eclipse.scout.rt.ui.swt.menu.SwtScoutMenuItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -45,6 +49,83 @@ public final class SwtMenuUtility {
   private SwtMenuUtility() {
   }
 
+  public static AbstractSwtScoutMenu createMenuItem(IMenu scoutMenu, Menu swtMenu, ISwtEnvironment environment) {
+    if (!isVisible(scoutMenu)) {
+      return null;
+    }
+    if (scoutMenu.hasChildActions()) {
+      return new org.eclipse.scout.rt.ui.swt.menu.SwtScoutMenuGroup(scoutMenu, swtMenu, environment);
+    }
+    if (scoutMenu instanceof ICheckBoxMenu) {
+      return new SwtScoutCheckboxMenuItem(scoutMenu, swtMenu, environment);
+    }
+    return new SwtScoutMenuItem(scoutMenu, swtMenu, environment);
+  }
+
+  public static boolean isVisible(IMenu menu) {
+    if (!menu.isVisible()) {
+      return false;
+    }
+    if (menu.hasChildActions()) {
+      boolean visible = false;
+      for (IMenu m : menu.getChildActions()) {
+
+        if (!m.isSeparator() && m.isVisible()) {
+          visible = true;
+          break;
+        }
+      }
+      return visible;
+    }
+    return true;
+  }
+
+  public static List<IMenu> consolidateMenus(List<IMenu> original) {
+    List<IMenu> consolidatedMenus = new ArrayList<IMenu>(original.size());
+    IMenu lastMenu = null;
+    for (IMenu m : original) {
+      if (isVisible(m)) {
+        if (m.isSeparator()) {
+          if (lastMenu != null && !lastMenu.isSeparator()) {
+            consolidatedMenus.add(m);
+          }
+        }
+        else {
+          consolidatedMenus.add(m);
+        }
+        lastMenu = m;
+      }
+    }
+    // remove tailing separators
+
+    for (int i = consolidatedMenus.size() - 1; i > -1; i--) {
+      if (consolidatedMenus.get(i).isSeparator()) {
+        consolidatedMenus.remove(i);
+      }
+      else {
+        break;
+      }
+    }
+    return consolidatedMenus;
+  }
+
+  /**
+   * @param scoutActionNodes
+   * @param environment
+   * @return
+   * @deprecated since 4.0.0 use {@link org.eclipse.scout.rt.ui.swt.menu.SwtScoutMenuContributionItem} instead
+   * 
+   *             <pre>
+   * IMenu[] menus = env.getClientSession().getDesktop().getMenus();
+   * List&lt;IMenu&gt; consolidatedMenus = SwtMenuUtility.consolidateMenus(Arrays.asList(menus));
+   * List&lt;IContributionItem&gt; swtContributionItems = new ArrayList&lt;IContributionItem&gt;();
+   * for (IMenu menu : consolidatedMenus) {
+   *   swtContributionItems.add(new SwtScoutMenuContributionItem(menu, env));
+   * }
+   * return swtContributionItems.toArray(new IContributionItem[swtContributionItems.size()]);
+   * </pre>
+   */
+  @Deprecated
   public static IContributionItem[] getMenuContribution(IActionNode<?>[] scoutActionNodes, ISwtEnvironment environment) {
     ArrayList<IContributionItem> contributionItems = new ArrayList<IContributionItem>();
     for (IActionNode<?> scoutAction : scoutActionNodes) {
@@ -77,11 +158,19 @@ public final class SwtMenuUtility {
     }
   }
 
+  /**
+   * @param scoutAction
+   * @param environment
+   * @return
+   * @deprecated since 4.0.0
+   */
+  @Deprecated
   public static IContributionItem getMenuContributionItem(IActionNode<?> scoutAction, ISwtEnvironment environment) {
     return getMenuContributionItem(scoutAction, environment, false);
   }
 
   public static IContributionItem getMenuContributionItem(IActionNode<?> scoutAction, ISwtEnvironment environment, boolean disableItem) {
+
     if (!scoutAction.isVisible()) {
       return null;
     }
@@ -98,19 +187,56 @@ public final class SwtMenuUtility {
       return manager;
     }
 
+    if (scoutAction instanceof IMenu) {
+      return new SwtScoutMenuContributionItem((IMenu) scoutAction, environment);
+    }
+
     if (scoutAction instanceof ICheckBoxMenu) {
       Action swtAction = new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction();
       if (disableItem) {
         swtAction.setEnabled(false);
       }
-      return new ActionContributionItem(swtAction);
+      return new ActionContributionItem(swtAction) {
+        @Override
+        public void fill(Menu parent, int index) {
+          super.fill(parent, index);
+        }
+
+        @Override
+        public boolean isDynamic() {
+          return true;
+        }
+
+        @Override
+        public boolean isDirty() {
+          System.out.println(getAction().getText());
+          return super.isDirty();
+        }
+
+        @Override
+        public void update(String propertyName) {
+          super.update(propertyName);
+        }
+      };
     }
 
     Action swtAction = new SwtScoutAction(scoutAction, environment).getSwtAction();
     if (disableItem) {
       swtAction.setEnabled(false);
     }
-    return new ActionContributionItem(swtAction);
+    return new ActionContributionItem(swtAction) {
+      @Override
+      public boolean isDynamic() {
+        return true;
+      }
+
+      @Override
+      public void update(String propertyName) {
+        MenuItem widget = (MenuItem) getWidget();
+        super.update(propertyName);
+        widget.setText(widget.getText() + "a");
+      }
+    };
   }
 
   public static void fillContextMenu(IMenu[] scoutMenus, Menu menu, ISwtEnvironment environment) {
