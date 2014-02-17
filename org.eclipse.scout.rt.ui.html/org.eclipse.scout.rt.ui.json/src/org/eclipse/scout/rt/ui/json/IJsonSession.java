@@ -10,25 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.json.JSONObject;
 
-public interface IJsonEnvironment {
+public interface IJsonSession {
 
-  void init() throws ProcessingException;
+  void init() throws JsonUIException;
+
+  IClientSession getClientSession();
+
+  String createUniqueIdFor(IJsonRenderer renderer);
 
   void registerJsonRenderer(String id, IJsonRenderer renderer);
 
   void unregisterJsonRenderer(String id);
 
-  JSONObject processRequest(JSONObject json) throws ProcessingException;
+  /**
+   * @return the current ui response that is collecting changes for the next {@link #processRequest(UIRequest)} cycle
+   */
+  UIResponse currentUIResponse();
 
-  IClientSession getClientSession();
+  UIResponse processRequest(UIRequest req) throws JsonUIException;
 
-  void addCreateEvent(IJsonRenderer jsonRenderer);
-
-  void addUpdateEvent(String widgetId, String name, Object newValue);
-
-  String createUniqueIdFor(IJsonRenderer renderer);
 }

@@ -14,29 +14,20 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implements IJsonRenderer {
-  private IJsonEnvironment m_jsonEnvironment;
-  private T m_scoutObject;
+  private final IJsonSession m_jsonSession;
+  private final T m_scoutObject;
+  private final String m_id;
   private P_PropertyChangeListener m_propertyChangeListener;
-  private String m_id;
 
-  public AbstractJsonRenderer(T scoutObject, IJsonEnvironment jsonEnvironment) {
+  public AbstractJsonRenderer(T scoutObject, IJsonSession jsonSession) {
     if (scoutObject == null) {
       throw new IllegalArgumentException("scoutObject must not be null");
     }
     m_scoutObject = scoutObject;
-    m_jsonEnvironment = jsonEnvironment;
-    m_id = jsonEnvironment.createUniqueIdFor(this);
-  }
-
-  public IJsonEnvironment getJsonEnvironment() {
-    return m_jsonEnvironment;
-  }
-
-  public T getScoutObject() {
-    return m_scoutObject;
+    m_jsonSession = jsonSession;
+    m_id = jsonSession.createUniqueIdFor(this);
   }
 
   @Override
@@ -44,30 +35,38 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
     return m_id;
   }
 
-  protected void attachScout() throws ProcessingException {
+  protected IJsonSession getJsonSession() {
+    return m_jsonSession;
+  }
+
+  protected T getScoutObject() {
+    return m_scoutObject;
+  }
+
+  @Override
+  public void init() throws JsonUIException {
+    getJsonSession().registerJsonRenderer(getId(), this);
+    attachModel();
+  }
+
+  protected void attachModel() throws JsonUIException {
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();
       m_scoutObject.addPropertyChangeListener(m_propertyChangeListener);
     }
   }
 
-  protected void detachScout() throws ProcessingException {
+  @Override
+  public void dispose() throws JsonUIException {
+    detachModel();
+    getJsonSession().unregisterJsonRenderer(getId());
+  }
+
+  protected void detachModel() throws JsonUIException {
     if (m_propertyChangeListener != null) {
       m_scoutObject.removePropertyChangeListener(m_propertyChangeListener);
       m_propertyChangeListener = null;
     }
-  }
-
-  @Override
-  public void init() throws ProcessingException {
-    getJsonEnvironment().registerJsonRenderer(getId(), this);
-    attachScout();
-  }
-
-  @Override
-  public void dispose() throws ProcessingException {
-    detachScout();
-    getJsonEnvironment().unregisterJsonRenderer(getId());
   }
 
   protected void handleScoutPropertyChange(String name, Object newValue) {

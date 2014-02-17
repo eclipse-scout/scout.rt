@@ -1,0 +1,53 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.json;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class UIRequest {
+  private final JSONObject m_event;
+
+  public UIRequest(JSONObject event) {
+    m_event = event;
+  }
+
+  public String getPortletPart() {
+    try {
+      return m_event.getString("pid_");
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  public String getEventType() {
+    try {
+      return m_event.getString("type_");
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  public String getEventId() {
+    try {
+      return m_event.getString("id");
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  public JSONObject getEventObject() {
+    return m_event;
+  }
+}

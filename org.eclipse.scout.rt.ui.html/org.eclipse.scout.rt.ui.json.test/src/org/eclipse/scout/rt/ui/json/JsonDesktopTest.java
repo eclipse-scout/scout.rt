@@ -15,13 +15,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JsonDesktopTest {
-  private JsonDesktop m_jsonDesktop;
+  private JsonDesktopRenderer m_jsonDesktop;
 
   @Before
   public void beforeTest() {
     IDesktop desktop = EasyMock.createMock(IDesktop.class);
-    IJsonEnvironment env = EasyMock.createMock(IJsonEnvironment.class);
-    m_jsonDesktop = new JsonDesktop(desktop, env);
+    IJsonSession env = EasyMock.createMock(IJsonSession.class);
+    m_jsonDesktop = new JsonDesktopRenderer(desktop, env);
   }
 
   @Test
@@ -32,7 +32,7 @@ public class JsonDesktopTest {
     EasyMock.expect(form.getIconId()).andReturn("JsonForm");
     EasyMock.replay(form);
 
-    JSONObject json = m_jsonDesktop.toJson(form);
+    JSONObject json = m_jsonDesktop.formToJson(form);
     assertEquals(
         "{\"title\":\"JsonForm\",\"formId\":\"JsonForm\",\"iconId\":\"JsonForm\"}",
         json.toString());

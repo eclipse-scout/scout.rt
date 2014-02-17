@@ -2,21 +2,20 @@ package org.eclipse.scout.rt.ui.json;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
+public class JsonViewButtonRenderer extends AbstractJsonRenderer<IViewButton> {
 
-  public JsonViewButton(IViewButton scoutObject,
-      IJsonEnvironment jsonEnvironment) {
-    super(scoutObject, jsonEnvironment);
+  public JsonViewButtonRenderer(IViewButton scoutObject,
+      IJsonSession jsonSession) {
+    super(scoutObject, jsonSession);
   }
 
   @Override
-  public JSONObject toJson() throws ProcessingException {
+  public JSONObject toJson() throws JsonUIException {
     try {
       JSONObject json = new JSONObject();
       json.put("id", getId());
@@ -25,12 +24,22 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
       return json;
     }
     catch (JSONException e) {
-      throw new ProcessingException(e.getMessage(), e);
+      throw new JsonUIException(e.getMessage(), e);
     }
   }
 
-  protected void handleUiClickEvent() {
-    ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonEnvironment().getClientSession()) {
+  @Override
+  public void handleUiEvent(UIRequest req, UIResponse res) throws JsonUIException {
+    if ("click".equals(req.getEventType())) {
+      handleUiClickEvent(req, res);
+    }
+    else {
+      throw new IllegalArgumentException("unsupported event type");
+    }
+  }
+
+  protected void handleUiClickEvent(UIRequest req, UIResponse res) {
+    ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         getScoutObject().getUIFacade().setSelectedFromUI(true);
@@ -41,19 +50,9 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
   }
 
   @Override
-  public void handleUiEvent(String type) {
-    if ("click".equals(type)) {
-      handleUiClickEvent();
-    }
-    else {
-      throw new IllegalArgumentException("unsupported event type");
-    }
-  }
-
-  @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     if (IViewButton.PROP_SELECTED.equals(name)) {
-      getJsonEnvironment().addUpdateEvent(getId(), name, newValue);
+      getJsonSession().currentUIResponse().addUpdateEvent(getId(), name, newValue);
     }
     else {
       super.handleScoutPropertyChange(name, newValue);

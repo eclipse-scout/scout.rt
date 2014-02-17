@@ -27,27 +27,25 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonServlet extends HttpServlet {
-
-  private static final String SESSION_ATTR = IJsonEnvironment.class.getName();
+public abstract class AbstractJsonServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonServlet.class);
-  private static Class<? extends IJsonEnvironment> s_environmentClass;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started.");
     try {
-      HttpSession session = req.getSession();
-      IJsonEnvironment env = (IJsonEnvironment) session.getAttribute(SESSION_ATTR);
-      if (env == null) {
-        env = createEnvironment();
-        session.setAttribute(SESSION_ATTR, env);
+      UIRequest uiReq = new UIRequest(toJSON(req));
+      String sessionAttributeName = "JsonUi#" + uiReq.getPortletPart();
+      HttpSession httpSession = req.getSession();
+      IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
+      if (jsonSession == null) {
+        jsonSession = createJsonSession();
+        httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
-      JSONObject jsonReq = toJSON(req);
-      JSONObject jsonResp = env.processRequest(jsonReq);
-      String data = jsonResp.toString();
+      UIResponse uiRes = jsonSession.processRequest(uiReq);
+      String data = uiRes.toJson().toString();
 
       resp.setContentLength(data.length());
       resp.setContentType("application/json");
@@ -55,7 +53,7 @@ public class JsonServlet extends HttpServlet {
 
       LOG.debug("Returning: " + data);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       LOG.error("Exception while processing post request", e);
       resp.getWriter().print("ERROR: " + e.getMessage());
     }
@@ -64,7 +62,7 @@ public class JsonServlet extends HttpServlet {
     }
   }
 
-  private JSONObject toJSON(HttpServletRequest req) throws ProcessingException {
+  protected JSONObject toJSON(HttpServletRequest req) throws JsonUIException {
     try {
       String jsonData = IOUtility.getContent(req.getReader());
       LOG.debug("Received: " + jsonData);
@@ -74,43 +72,29 @@ public class JsonServlet extends HttpServlet {
       }
       return new JSONObject(jsonData);
     }
-    catch (IOException | JSONException e) {
-      throw new ProcessingException(e.getMessage(), e);
+    catch (ProcessingException | IOException | JSONException e) {
+      throw new JsonUIException(e.getMessage(), e);
     }
   }
 
-  private IJsonEnvironment createEnvironment() throws ProcessingException {
-    IJsonEnvironment env = null;
-    try {
-      env = s_environmentClass.newInstance();
-      env.init();
-      return env;
-    }
-    catch (InstantiationException | IllegalAccessException e) {
-      throw new ProcessingException(e.getMessage(), e);
-    }
-  }
+  protected abstract IJsonSession createJsonSession() throws JsonUIException;
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("GET request started.");
     try {
-      InputStream is = JsonServlet.class.getResourceAsStream("index.html");
+      InputStream is = AbstractJsonServlet.class.getResourceAsStream("index.html");
       String html = new String(IOUtility.getContent(is));
       resp.setContentType("text/html");
       resp.getOutputStream().print(html);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       LOG.error("Exception while processing post request", e);
       resp.getWriter().print("ERROR: " + e.getMessage());
     }
     finally {
       LOG.info("GET request finished.");
     }
-  }
-
-  public static void setEnvironmentClass(Class<? extends IJsonEnvironment> environmentClass) {
-    s_environmentClass = environmentClass;
   }
 
 }

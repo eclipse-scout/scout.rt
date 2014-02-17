@@ -9,23 +9,6 @@ var log = console.log.bind(console);
 //
 
 (function ($) {
-  // server communication
-  $.syncAjax = function (type, data) {
-    var url = 'http://localhost:8082/json'; // TODO URL anpassen
-    data.type=type;
-    var ret;
-    $.ajax({
-      async : false,
-      type : "POST",
-      dataType : "json",
-      cache : false,
-      url : url,
-      data : JSON.stringify(data),
-      success : function (message) {ret = message; }
-    });
-    return ret;
-  };
-
   // scout uses only divs...
     $.makeDiv = function (i, c, h) {
     i = i ? ' id="' + i + '"' : '';
@@ -95,40 +78,62 @@ var log = console.log.bind(console);
 // scout
 //
 
-Scout = function ($entryPoint) {
+Scout = function ($entryPoint, pid) {
   this.widgetMap = {};
 
+  // server communication
+  this.syncAjax = function (type, data) {
+    var url = 'http://localhost:8082/json'; // TODO URL anpassen
+    data.pid_=pid;
+    data.type_=type;
+    var ret;
+    $.ajax({
+      async : false,
+      type : "POST",
+      dataType : "json",
+      cache : false,
+      url : url,
+      data : JSON.stringify(data),
+      success : function (message) {ret = message; }
+    });
+    return ret;
+  };
+
   this.processEvents = function processEvents(events) {
-    for (var i = 0; i < events.length; i++) {
-      var event = events[i];
-      if(event.type == "create") {
-        var widget = createWidget($entryPoint, event.object);
-        this.widgetMap[widget.id] = widget;
+    //BE CAREFUL when using "this" directly, may change scope inside '$.' functions!
+    var scout=this;
+    $.each(events, function (index, event) {
+      if(event.type_ == "create") {
+        var widget = createWidget(scout, $entryPoint, event);
+        scout.widgetMap[event.id] = widget;
       }
-      else if(event.type == "update") {
-        var widget = this.widgetMap[event.id];
+      else if(event.type_ == "update") {
+        var widget = scout.widgetMap[event.id];
         if(!widget) {
+          //TODO fail for all following events too ? or just this event...
           throw "No widget found for id " + event.id;
         }
-        updateWidget(widget, event);
+        updateWidget(scout, widget, event);
       }
-    }
+    });
   }
 
   this.init = function init() {
     // create all widgets for entry point
-    var response = $.syncAjax('startup', {id : $entryPoint.attr('id')});
+    var response = this.syncAjax('startup', {id : $entryPoint.attr('id')});
     this.processEvents(response.events);
   }
 
   // create single widget based on a model object
-  function createWidget ($parent, widget) {
-    if (widget.type == "desktop") {
-      return new Scout.Desktop($parent, widget);
+  function createWidget (scout, $parent, widget) {
+    //BE CAREFUL when using "this" directly, may change scope inside '$.' functions and anonymous functions!
+    if (widget.id == "Desktop") {
+      return new Scout.Desktop(scout, $parent, widget);
     }
   }
 
-  function updateWidget(widget, event) {
+  function updateWidget(scout, widget, event) {
+    //BE CAREFUL when using "this" directly, may change scope inside '$.' functions and anonymous functions!
     widget.handleUpdate(event);
   }
 };
@@ -137,17 +142,17 @@ Scout = function ($entryPoint) {
 // desktop: contains viewButtons, main_tree, (empty) bench, tools
 //
 
-Scout.Desktop = function ($parent, widget) {
+Scout.Desktop = function (scout, $parent, widget) {
   // create all 4 containers
   // TODO rename -> Outline
-  var viewButtonBar = new Scout.Desktop.ViewButtonBar($parent, widget.viewButtons);
-//  var tool = new Scout.Desktop.Tool($parent, widget.tools);
+  var viewButtonBar = new Scout.Desktop.ViewButtonBar(scout, $parent, widget.viewButtons);
+//  var tool = new Scout.Desktop.Tool(scout, $parent, widget.tools);
   // TODO step 2
-//  var tree = new Scout.Desktop.Tree($parent, widget.pages);
-//  var bench = new Scout.Desktop.Bench($parent);
+//  var tree = new Scout.Desktop.Tree(scout, $parent, widget.pages);
+//  var bench = new Scout.Desktop.Bench(scout, $parent);
 
   // show node
-//  var nodes = $.syncAjax('drilldown', {id : widget.start});
+//  var nodes = scout.syncAjax('drilldown', {id : widget.start});
 //  tree.addNodes(nodes);
 };
 
@@ -155,13 +160,13 @@ Scout.Desktop = function ($parent, widget) {
 // view namespace and container
 //
 
-Scout.Desktop.ViewButtonBar = function ($desktop, viewButtons) {
+Scout.Desktop.ViewButtonBar = function (scout, $desktop, viewButtons) {
   //  create container
   var $desktopView = $desktop.appendDiv('DesktopViews');
 
   //  add view-item, all before #viewAdd
   for (var i = 0; i < viewButtons.length; i++) {
-    new Scout.Desktop.ViewButton($desktopView, viewButtons[i]);
+    new Scout.Desktop.ViewButton(scout, $desktopView, viewButtons[i]);
   }
 
   //  create logo and plus sign
@@ -179,8 +184,9 @@ Scout.Desktop.ViewButtonBar = function ($desktop, viewButtons) {
     var state = 'view-own',
       label = name[0] + ' (' + c + ')';
 
+    //TODO method clickView is not defined yet
     var $view = $('#ViewAdd').beforeDiv('', 'view-item ' + state, label)
-            .on('click', '', clickView)
+            .on('click', '', function(){/*clickView*/})
             .selectOne();
 
     $view.appendDiv('', 'view-remove').on('click', '', removeOwnView);
@@ -198,7 +204,7 @@ Scout.Desktop.ViewButtonBar = function ($desktop, viewButtons) {
   }
 };
 
-Scout.Desktop.ViewButton = function ($viewButtonBar, viewButton) {
+Scout.Desktop.ViewButton = function (scout, $viewButtonBar, viewButton) {
     this.handleUpdate = function handleUpdate(event) {
       if(event.selected !== undefined) {
         $viewButton.select(event.selected);
@@ -215,7 +221,7 @@ Scout.Desktop.ViewButton = function ($viewButtonBar, viewButton) {
     .on('click', '', onClick);
 
     function onClick (event) {
-      var response = $.syncAjax('click', {id : $(this).attr('id')});
+      var response = scout.syncAjax('click', {id : $(this).attr('id')});
       scout.processEvents(response.events);
     }
 };
@@ -224,7 +230,7 @@ Scout.Desktop.ViewButton = function ($viewButtonBar, viewButton) {
 // tool namespace and container
 //
 
-Scout.Desktop.Tool = function ($desktop, tools) {
+Scout.Desktop.Tool = function (scout, $desktop, tools) {
   // create container
   var $desktopTools = $desktop.appendDiv('DesktopTools');
 
@@ -269,11 +275,11 @@ Scout.Desktop.Tool = function ($desktop, tools) {
 // tree
 //
 
-Scout.Desktop.Tree = function ($desktop) {
+Scout.Desktop.Tree = function (scout, $desktop) {
   // create container
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
-  var scrollbar = new Scout.Scrollbar($desktopTreeScroll, 'y', true);
+  var scrollbar = new Scout.Scrollbar(scout, $desktopTreeScroll, 'y', true);
   $desktopTree.appendDiv('DesktopTreeResize')
     .on('mousedown', '', resizeTree);
 
@@ -361,7 +367,7 @@ Scout.Desktop.Tree = function ($desktop) {
 
     // show bench
     if (bench.type == 'table') {
-      new Scout.Desktop.Table($('#DesktopBench'));
+      new Scout.Desktop.Table(scout, $('#DesktopBench'));
     } else{
       $('#DesktopBench').text(JSON.stringify(bench));
     }
@@ -369,7 +375,7 @@ Scout.Desktop.Tree = function ($desktop) {
     // open node
     if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
       // load model and draw nodes
-      var nodes = $.syncAjax('drilldown', {id : $clicked.attr('id')});
+      var nodes = scout.syncAjax('drilldown', {id : $clicked.attr('id')});
       var $newNodes = addNodes(nodes, $clicked);
 
       if ($newNodes.length) {
@@ -425,7 +431,7 @@ Scout.Desktop.Tree = function ($desktop) {
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.Menu(id, x, y);
+    new Scout.Menu(scout, id, x, y);
   }
 };
 
@@ -433,7 +439,7 @@ Scout.Desktop.Tree = function ($desktop) {
 // bench
 //
 
-Scout.Desktop.Bench = function ($desktop) {
+Scout.Desktop.Bench = function (scout, $desktop) {
   //create container
   var $desktopBench = $desktop.appendDiv('DesktopBench');
 
@@ -445,7 +451,7 @@ Scout.Desktop.Bench = function ($desktop) {
 // desktop table namespace and element
 //
 
-Scout.Desktop.Table = function ($bench) {
+Scout.Desktop.Table = function (scout, $bench) {
   //create container
   var $desktopTable = $bench.appendDiv('DesktopTable');
   $desktopTable.appendDiv('DesktopTableHeader');
@@ -475,12 +481,12 @@ Scout.Desktop.Table = function ($bench) {
 // menu namespace and element
 //
 
-Scout.Menu = function (id, x, y) {
+Scout.Menu = function (scout, id, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var menu = $.syncAjax('drilldown_menu', {id : id});
+  var menu = scout.syncAjax('drilldown_menu', {id : id});
 
   // withou model, nothing to do
   if (menu.length === 0) return;
@@ -534,7 +540,7 @@ Scout.Menu = function (id, x, y) {
 // scrollbar namespace and element
 //
 
-Scout.Scrollbar = function ($container, axis, trackResize) {
+Scout.Scrollbar = function (scout, $container, axis, trackResize) {
   var dir = (axis === "x" ? "left" : "top"),
     dim = (axis === "x" ? "Width" : "Height"),
     begin = 0, beginDefault = 0,
@@ -627,11 +633,14 @@ Scout.Scrollbar = function ($container, axis, trackResize) {
 // start all scouts after loading
 //
 
-var scout;
 $(document).ready(function () {
-  //TODO separate instance for each scout div? if yes, how to access correct one?
+  //every browser tab has its own tabId (random number)
+  var tabId = ''+new Date().getTime();
   $('.scout').each(function () {
-    scout = new Scout($(this));
+    //depending on the page concept, each div may have a different portlet part id.
+    var portletid = (typeof $(this).attr("data-partid") === "undefined") ? "0" : $(this).attr("data-partid");
+    var pid = tabId+'.'+portletid;
+    var scout = new Scout($(this), pid);
     scout.init();
   });
 });

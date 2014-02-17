@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -29,19 +28,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
+public class JsonDesktopRenderer extends AbstractJsonRenderer<IDesktop> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopRenderer.class);
+  private static final String WIDGET_ID = "Desktop";
 
   private JSONArray m_jsonFormsArray;
   private JSONArray m_jsonPagesArray;
   private DesktopListener m_desktopListener;
-  private List<JsonViewButton> m_jsonViewButtons;
+  private List<JsonViewButtonRenderer> m_jsonViewButtons;
 
-  public JsonDesktop(IDesktop desktop, IJsonEnvironment jsonEnvironment) {
-    super(desktop, jsonEnvironment);
+  public JsonDesktopRenderer(IDesktop desktop, IJsonSession jsonSession) {
+    super(desktop, jsonSession);
     m_jsonFormsArray = new JSONArray();
     m_jsonPagesArray = new JSONArray();
-    m_jsonViewButtons = new LinkedList<JsonViewButton>();
+    m_jsonViewButtons = new LinkedList<JsonViewButtonRenderer>();
   }
 
   public IDesktop getDesktop() {
@@ -50,19 +50,19 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
   @Override
   public String getId() {
-    return "Desktop";
+    return WIDGET_ID;
   }
 
   @Override
-  public void attachScout() throws ProcessingException {
-    super.attachScout();
+  protected void attachModel() throws JsonUIException {
+    super.attachModel();
 
     if (m_desktopListener == null) {
       m_desktopListener = new P_DesktopListener();
       getDesktop().addDesktopListener(m_desktopListener);
     }
 
-    new ClientSyncJob("Desktop opened", getJsonEnvironment().getClientSession()) {
+    new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         if (!getDesktop().isOpened()) {
@@ -76,25 +76,25 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
     IViewButton[] viewButtons = getDesktop().getViewButtons();
     for (IViewButton viewButton : viewButtons) {
-      JsonViewButton button = new JsonViewButton(viewButton, getJsonEnvironment());
+      JsonViewButtonRenderer button = new JsonViewButtonRenderer(viewButton, getJsonSession());
       button.init();
       m_jsonViewButtons.add(button);
     }
     if (getDesktop().getOutline().isRootNodeVisible()) {
       IPage rootPage = getDesktop().getOutline().getRootPage();
-      m_jsonPagesArray.put(toJson(rootPage));
+      m_jsonPagesArray.put(pageToJson(rootPage));
     }
     else {
       IPage[] childPages = getDesktop().getOutline().getRootPage().getChildPages();
       for (IPage childPage : childPages) {
-        m_jsonPagesArray.put(toJson(childPage));
+        m_jsonPagesArray.put(pageToJson(childPage));
       }
     }
   }
 
   @Override
-  protected void detachScout() throws ProcessingException {
-    super.detachScout();
+  protected void detachModel() throws JsonUIException {
+    super.detachModel();
 
     if (m_desktopListener != null) {
       getDesktop().removeDesktopListener(m_desktopListener);
@@ -103,14 +103,14 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   }
 
   @Override
-  public JSONObject toJson() throws ProcessingException {
+  public JSONObject toJson() throws JsonUIException {
     JSONObject jsonResponse = new JSONObject();
     try {
-      jsonResponse.put("type", "desktop");
+      jsonResponse.put("id", getId());
       jsonResponse.put("forms", m_jsonFormsArray);
       jsonResponse.put("pages", m_jsonPagesArray);
       JSONArray viewButtons = new JSONArray();
-      for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
+      for (JsonViewButtonRenderer jsonViewButton : m_jsonViewButtons) {
         viewButtons.put(jsonViewButton.toJson());
       }
       jsonResponse.put("viewButtons", viewButtons);
@@ -118,23 +118,23 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       return jsonResponse;
     }
     catch (JSONException e) {
-      throw new ProcessingException(e.getMessage(), e);
+      throw new JsonUIException(e.getMessage(), e);
     }
-  }
-
-  protected void handleUiStartupEvent() throws ProcessingException {
-    //Instruct gui to create desktop
-    getJsonEnvironment().addCreateEvent(this);
   }
 
   @Override
-  public void handleUiEvent(String type) throws ProcessingException {
-    if ("startup".equals(type)) {
-      handleUiStartupEvent();
+  public void handleUiEvent(UIRequest req, UIResponse res) throws JsonUIException {
+    if ("startup".equals(req.getEventType())) {
+      handleUiStartupEvent(req, res);
     }
   }
 
-  protected JSONObject toJson(IPage page) throws ProcessingException {
+  protected void handleUiStartupEvent(UIRequest req, UIResponse res) throws JsonUIException {
+    //Instruct gui to create desktop
+    res.addCreateEvent(this.toJson());
+  }
+
+  protected JSONObject pageToJson(IPage page) throws JsonUIException {
     try {
       JSONObject json = new JSONObject();
       json.put("text", page.getCell().getText());
@@ -143,7 +143,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       if (page.getChildNodeCount() > 0) {
         JSONArray jsonChildPages = new JSONArray();
         for (IPage childPage : page.getChildPages()) {
-          jsonChildPages.put(toJson(childPage));
+          jsonChildPages.put(pageToJson(childPage));
         }
         json.put("childPages", jsonChildPages);
       }
@@ -151,11 +151,11 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       return json;
     }
     catch (JSONException e) {
-      throw new ProcessingException(e.getMessage(), e);
+      throw new JsonUIException(e.getMessage(), e);
     }
   }
 
-  protected JSONObject toJson(IForm form) throws ProcessingException {
+  protected JSONObject formToJson(IForm form) throws JsonUIException {
     try {
       JSONObject jsonForm = new JSONObject();
       jsonForm.put("formId", form.getFormId());
@@ -164,7 +164,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       return jsonForm;
     }
     catch (JSONException e) {
-      throw new ProcessingException(e.getMessage(), e);
+      throw new JsonUIException(e.getMessage(), e);
     }
   }
 
@@ -195,10 +195,10 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
           IForm form = e.getForm();
           JSONObject jsonForm;
           try {
-            jsonForm = toJson(form);
+            jsonForm = formToJson(form);
             m_jsonFormsArray.put(jsonForm);
           }
-          catch (ProcessingException e1) {
+          catch (JsonUIException e1) {
             LOG.error("", e1);
           }
 

@@ -1,16 +1,17 @@
 package org.eclipse.scout.rt.ui.json;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.json.JSONObject;
 
 public interface IJsonRenderer {
+
   String getId();
 
-  JSONObject toJson() throws ProcessingException;
+  void init() throws JsonUIException;
 
-  void handleUiEvent(String type) throws ProcessingException;
+  void dispose() throws JsonUIException;
 
-  void init() throws ProcessingException;
+  JSONObject toJson() throws JsonUIException;
 
-  void dispose() throws ProcessingException;
+  void handleUiEvent(UIRequest req, UIResponse res) throws JsonUIException;
+
 }
