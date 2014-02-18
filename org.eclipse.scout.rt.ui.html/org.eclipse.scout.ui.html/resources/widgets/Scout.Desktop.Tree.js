@@ -4,7 +4,7 @@
 // tree
 //
 
-Scout.Desktop.Tree = function (scout, $desktop) {
+Scout.Desktop.Tree = function (scout, $desktop, modelTree) {
   // create container
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
@@ -13,8 +13,12 @@ Scout.Desktop.Tree = function (scout, $desktop) {
     .on('mousedown', '', resizeTree);
 
   // set this for later usage
-  this.$div = $desktopTree;
+  this.$div = $desktopTreeScroll;
   this.addNodes = addNodes;
+  this.clearNodes = clearNodes;
+  this.outlineId = modelTree.id;
+
+  this.addNodes(modelTree.pages);
 
   // named  funktions
   function resizeTree (event) {
@@ -37,18 +41,29 @@ Scout.Desktop.Tree = function (scout, $desktop) {
     return false;
   }
 
+  function clearNodes() {
+    this.$div.find("div").remove();
+  }
+
   function addNodes (nodes, $parent) {
     var $allNodes = $('');
 
     for (var i =  nodes.length - 1; i >= 0; i--) {
       // create node
-      var node = nodes[i],
-        state = node.state || '',
-        level = $parent ? $parent.data('level') + 1 : 0;
+      var node = nodes[i];
+      var state = '';
+      if(node.expanded) {
+        state='expanded ';
+      }
+      if(!node.leaf) {
+        state+='can-expand '; //TODO rename
+      }
+      level = $parent ? $parent.data('level') + 1 : 0;
 
-      var $node = $.makeDiv(node.id, 'tree-item ' + state, node.label)
+      var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
               .on('click', '', clickNode)
-              .data('bench', node.bench)
+              .data('node', node)
+              .data('outlineId', this.outlineId) //TODO if fired from clickNode this == window, how to handle?
               .attr('data-level', level)
               .css('margin-left', level * 20)
               .css('width', 'calc(100% - ' + (level * 20 + 30) + 'px)');
@@ -88,24 +103,25 @@ Scout.Desktop.Tree = function (scout, $desktop) {
   }
 
   function clickNode (event) {
-    var $clicked = $(this),
-      bench = $clicked.data('bench');
+    var $clicked = $(this);
+    var node = $clicked.data('node');
+    var outlineId = $clicked.data('outlineId');
 
     // selected the one
     $clicked.selectOne();
 
     // show bench
-    if (bench.type == 'table') {
+    if (node.bench.type == 'table') {
       new Scout.Desktop.Table(scout, $('#DesktopBench'));
     } else{
-      $('#DesktopBench').text(JSON.stringify(bench));
+      $('#DesktopBench').text(JSON.stringify(node.bench));
     }
 
     // open node
     if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
       // load model and draw nodes
-      var nodes = scout.syncAjax('drilldown', $clicked.attr('id'));
-      var $newNodes = addNodes(nodes, $clicked);
+      var response = scout.syncAjax('drilldown', outlineId, {"nodeId":$clicked.attr('id')});
+      var $newNodes = addNodes(response.events[0].data.nodesAdded, $clicked);
 
       if ($newNodes.length) {
         // animated opening ;)

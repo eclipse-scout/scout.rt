@@ -65,15 +65,15 @@ public class JsonResponse {
         throw new JSONException("id is null");
       }
       //coalesce
-      JSONObject e = m_idToEventMap.get(id);
-      if (e == null) {
-        e = new JSONObject();
-        m_eventList.add(e);
-        m_idToEventMap.put(id, e);
-        e.put("id", id);
-        e.put("type", "update");
-        e.put("data", new JSONObject());
-      }
+//      JSONObject e = m_idToEventMap.get(id); //TODO does not work when having update and create events for the same id
+//      if (e == null) {
+      JSONObject e = new JSONObject();
+      m_eventList.add(e);
+      m_idToEventMap.put(id, e);
+      e.put("id", id);
+      e.put("type", "update");
+      e.put("data", new JSONObject());
+//      }
       e.getJSONObject("data").put(name, newValue);
     }
     catch (JSONException ex) {

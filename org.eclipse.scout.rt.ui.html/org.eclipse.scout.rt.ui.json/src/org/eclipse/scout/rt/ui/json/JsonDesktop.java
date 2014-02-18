@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,14 +32,13 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   private static final String WIDGET_ID = "Desktop";
 
   private JSONArray m_jsonFormsArray;
-  private JSONArray m_jsonPagesArray;
   private DesktopListener m_desktopListener;
   private List<JsonViewButton> m_jsonViewButtons;
+  private JsonOutline m_jsonOutline;
 
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession) {
     super(desktop, jsonSession);
     m_jsonFormsArray = new JSONArray();
-    m_jsonPagesArray = new JSONArray();
     m_jsonViewButtons = new LinkedList<JsonViewButton>();
   }
 
@@ -55,13 +53,6 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
   @Override
   protected void attachModel() throws JsonUIException {
-    super.attachModel();
-
-    if (m_desktopListener == null) {
-      m_desktopListener = new P_DesktopListener();
-      getDesktop().addDesktopListener(m_desktopListener);
-    }
-
     new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -80,15 +71,15 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       button.init();
       m_jsonViewButtons.add(button);
     }
-    if (getDesktop().getOutline().isRootNodeVisible()) {
-      IPage rootPage = getDesktop().getOutline().getRootPage();
-      m_jsonPagesArray.put(pageToJson(rootPage));
-    }
-    else {
-      IPage[] childPages = getDesktop().getOutline().getRootPage().getChildPages();
-      for (IPage childPage : childPages) {
-        m_jsonPagesArray.put(pageToJson(childPage));
-      }
+    m_jsonOutline = new JsonOutline(this, getDesktop().getOutline(), getJsonSession());
+    m_jsonOutline.init();
+
+    //FIXME add listener afterwards -> don't handle events, refactor
+    super.attachModel();
+
+    if (m_desktopListener == null) {
+      m_desktopListener = new P_DesktopListener();
+      getDesktop().addDesktopListener(m_desktopListener);
     }
   }
 
@@ -108,12 +99,12 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
     try {
       jsonResponse.put("id", getId());
       jsonResponse.put("forms", m_jsonFormsArray);
-      jsonResponse.put("pages", m_jsonPagesArray);
       JSONArray viewButtons = new JSONArray();
       for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
         viewButtons.put(jsonViewButton.toJson());
       }
       jsonResponse.put("viewButtons", viewButtons);
+      jsonResponse.put("outline", m_jsonOutline.toJson());
 
       return jsonResponse;
     }
@@ -132,27 +123,6 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   protected void handleUiStartupEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     //Instruct gui to create desktop
     res.addCreateEvent(this.toJson());
-  }
-
-  protected JSONObject pageToJson(IPage page) throws JsonUIException {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("text", page.getCell().getText());
-      json.put("expanded", page.isExpanded());
-
-      if (page.getChildNodeCount() > 0) {
-        JSONArray jsonChildPages = new JSONArray();
-        for (IPage childPage : page.getChildPages()) {
-          jsonChildPages.put(pageToJson(childPage));
-        }
-        json.put("childPages", jsonChildPages);
-      }
-
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
   }
 
   protected JSONObject formToJson(IForm form) throws JsonUIException {
@@ -190,6 +160,12 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
     @Override
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
+        case DesktopEvent.TYPE_OUTLINE_CHANGED:
+          m_jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
+          m_jsonOutline.init();//TODO read outline from widget cache? map modelId jsonId? send create event?
+//          getJsonSession().currentUIResponse().addCreateEvent(m_jsonOutline.toJson());
+          getJsonSession().currentUIResponse().addUpdateEvent(getId(), "outline", m_jsonOutline.toJson());
+          break;
         case DesktopEvent.TYPE_FORM_ADDED: {
 
           IForm form = e.getForm();

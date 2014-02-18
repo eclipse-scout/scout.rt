@@ -4,13 +4,33 @@
 // desktop: contains viewButtons, main_tree, (empty) bench, tools
 //
 
-Scout.Desktop = function (scout, $parent, widget) {
+Scout.Desktop = function (scout, $parent, data) {
+  this.handleUpdate = function handleUpdate(event) {
+    if(event.outline !== undefined) {
+      this.tree.outlineId = event.outline.id;
+      this.tree.clearNodes();
+      this.tree.addNodes(event.outline.pages);
+    }
+    else if(event.nodesAdded !== undefined) {
+      var nodes = event.nodesAdded;
+     //TODO work with e.getCommonParentNode()
+      //TODO move to outline/tree.js?
+      for(var i in nodes) {
+        var $parentNode = this.tree.$div.find("#"+ nodes[i].parentNodeId);
+        var tmpNodes = new Array();
+        tmpNodes[0]=nodes[i];
+        this.tree.addNodes(tmpNodes,$parentNode);
+      }
+    }
+  };
+  scout.widgetMap[data.id] = this;
+
   // create all 4 containers
-  var viewButtonBar = new Scout.Desktop.ViewButtonBar(scout, $parent, widget.viewButtons);
-//  var tool = new Scout.Desktop.ToolButton(scout, $parent, widget.tools);
-  // TODO step 2
-//  var tree = new Scout.Desktop.Tree(scout, $parent, widget.pages);
-//  var bench = new Scout.Desktop.Bench(scout, $parent);
+  this.viewButtonBar = new Scout.Desktop.ViewButtonBar(scout, $parent, data.viewButtons);
+//  var tool = new Scout.Desktop.Tool(scout, $parent, data.tools);
+
+  this.tree = new Scout.Desktop.Tree(scout, $parent, data.outline);
+  this.bench = new Scout.Desktop.Bench(scout, $parent);
 
   // show node
 //  var nodes = scout.syncAjax('drilldown', widget.start);
