@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.equinox.http.registry.resources">
       <resource
-            alias="/static"
+            alias="/res"
             base-name="/resources">
       </resource>
    </extension>
