@@ -74,6 +74,7 @@
     </plugins>
   </build>
 
+<!--
   <dependencies>
   <dependency>
     <groupId>net.alchim31.maven</groupId>
@@ -82,5 +83,6 @@
     <type>maven-plugin</type>
   </dependency>
   </dependencies>
+-->
 
 </project>
