@@ -60,7 +60,11 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
     RwtScoutFormFieldGridData layoutData = new RwtScoutFormFieldGridData(getScoutObject().getRootGroupBox());
     getUiField().setLayoutData(layoutData);
     container.setLayout(new LogicalGridLayout(0, 0));
-    container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(parent));
+
+    //Add validate root for root form (not for inner forms)
+    if (getScoutObject().getOuterForm() == null) {
+      container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(parent));
+    }
   }
 
   @Override

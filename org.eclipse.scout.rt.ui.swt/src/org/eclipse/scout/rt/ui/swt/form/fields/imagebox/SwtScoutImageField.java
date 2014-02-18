@@ -82,7 +82,6 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     body.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(body) {
       @Override
       public void validate() {
-        super.validate();
         if (m_scrolledForm != null) {
           if (!m_scrolledForm.isDisposed()) {
             m_scrolledForm.reflow(true);

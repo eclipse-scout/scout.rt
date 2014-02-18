@@ -14,8 +14,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
-import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
-import org.eclipse.scout.rt.ui.rap.IValidateRoot;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -37,7 +35,6 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
   @Override
   protected void initializeUi(Composite parent) {
     SashForm container = getUiEnvironment().getFormToolkit().createSashForm(parent, getScoutObject().isSplitHorizontal() ? SWT.HORIZONTAL : SWT.VERTICAL);
-    container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(container));
     for (IFormField scoutField : getScoutObject().getFields()) {
       getUiEnvironment().createFormField(container, scoutField);
     }

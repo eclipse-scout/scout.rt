@@ -81,7 +81,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     m_swtBodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_swtBodyPart) {
       @Override
       public void validate() {
-        super.validate();
         if (m_scrolledForm != null) {
           if (!m_scrolledForm.isDisposed()) {
             m_scrolledForm.reflow(true);

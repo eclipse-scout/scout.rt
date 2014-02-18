@@ -48,10 +48,8 @@ public class RwtShellValidateRoot extends DefaultValidateRoot {
     if (getShell() == null || getShell().isDisposed() || !getShell().isVisible() || !isActive()) {
       return;
     }
-    super.validate();
     Rectangle curShellBounds = getShell().getBounds();
     Point prefSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-
     if (curShellBounds != null && prefSize != null) {
       // if perfSize is higher than the displays current height area reduce the height to the parent height to keep forms scrollable
       if (prefSize.y > Display.getCurrent().getBounds().height) {

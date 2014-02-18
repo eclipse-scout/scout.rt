@@ -116,8 +116,10 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
 
     if (getUiContainer() != null) {
       if (getUiContainer().getVisible() != b) {
-        updateLayout = true;
+        boolean wasVisible = getUiContainer().isVisible();
         getUiContainer().setVisible(b);
+        //Update only if really changed (visibility does not get changed if parent is invisible)
+        updateLayout = wasVisible != getUiContainer().isVisible();
       }
     }
     else if (getUiField() != null && getUiField().getVisible() != b) {

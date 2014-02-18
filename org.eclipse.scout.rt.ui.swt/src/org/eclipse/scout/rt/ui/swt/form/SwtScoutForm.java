@@ -53,7 +53,11 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     SwtScoutFormFieldGridData layoutData = new SwtScoutFormFieldGridData(getScoutObject().getRootGroupBox());
     getSwtField().setLayoutData(layoutData);
     container.setLayout(new LogicalGridLayout(0, 0));
-    container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(parent));
+
+    //Add validate root for root form (not for inner forms)
+    if (getScoutObject().getOuterForm() == null) {
+      container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(parent));
+    }
   }
 
   @Override

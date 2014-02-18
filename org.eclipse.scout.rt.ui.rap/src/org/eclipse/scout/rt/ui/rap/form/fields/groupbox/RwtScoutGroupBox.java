@@ -118,7 +118,6 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     m_bodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_bodyPart) {
       @Override
       public void validate() {
-        super.validate();
         if (m_scrolledComposite != null && !m_scrolledComposite.isDisposed()) {
           m_scrolledComposite.setMinSize(computeScrolledCompositeMinSize(true));
         }
