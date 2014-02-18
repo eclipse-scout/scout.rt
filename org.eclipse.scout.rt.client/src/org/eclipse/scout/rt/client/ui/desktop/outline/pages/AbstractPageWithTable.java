@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IStatus;
@@ -765,7 +767,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       if (tree != null) {
         oldSelectedNode = tree.getSelectedNode();
       }
-      Object[] oldSelectedRowKeys = null;
+      List<Object> oldSelectedRowKeys = null;
       if (oldSelectedNode != null) {
         ITreeNode t = oldSelectedNode;
         while (t != null && t.getParentNode() != null) {
@@ -854,7 +856,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public IPage[] getUpdatedChildPagesFor(ITableRow[] tableRows) {
+  public List<IPage> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows) {
     return getChildPagesFor(tableRows, true);
   }
 
@@ -862,40 +864,26 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Computes the list of linked child pages for the given table rows. Revalidates the the pages cell
    * if <code>updateChildPageCells</code> is true. Otherwise, the cells are not updated.
    */
-  private IPage[] getChildPagesFor(ITableRow[] tableRows, boolean updateChildPageCells) {
-    IPage[] pages = new IPage[tableRows.length];
-    int missingCount = 0;
+  private List<IPage> getChildPagesFor(List<? extends ITableRow> tableRows, boolean updateChildPageCells) {
+    List<IPage> result = new ArrayList<IPage>();
     try {
-      for (int i = 0; i < tableRows.length; i++) {
-        pages[i] = m_tableRowToPageMap.get(tableRows[i]);
-        if (pages[i] != null) {
+      for (ITableRow row : tableRows) {
+        IPage page = m_tableRowToPageMap.get(row);
+        if (page != null) {
+          result.add(page);
           if (updateChildPageCells) {
             // update tree nodes from table rows
-            ICell tableCell = getTable().getSummaryCell(tableRows[i]);
-            pages[i].setEnabledInternal(tableRows[i].isEnabled());
-            pages[i].getCellForUpdate().updateFrom(tableCell);
+            ICell tableCell = getTable().getSummaryCell(row);
+            page.setEnabledInternal(row.isEnabled());
+            page.getCellForUpdate().updateFrom(tableCell);
           }
-        }
-        else {
-          missingCount++;
         }
       }
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
-    if (missingCount > 0) {
-      IPage[] tmp = new IPage[pages.length - missingCount];
-      int index = 0;
-      for (IPage element : pages) {
-        if (element != null) {
-          tmp[index] = element;
-          index++;
-        }
-      }
-      pages = tmp;
-    }
-    return pages;
+    return result;
   }
 
   @Override
@@ -914,27 +902,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public ITableRow[] getTableRowsFor(ITreeNode[] childPageNodes) {
-    ITableRow[] rows = new ITableRow[childPageNodes.length];
-    int missingCount = 0;
-    for (int i = 0; i < childPageNodes.length; i++) {
-      rows[i] = m_pageToTableRowMap.get(childPageNodes[i]);
-      if (rows[i] == null) {
-        missingCount++;
+  public List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes) {
+    List<ITableRow> result = new ArrayList<ITableRow>();
+    for (ITreeNode node : childPageNodes) {
+      ITableRow row = m_pageToTableRowMap.get(node);
+      if (row != null) {
+        result.add(row);
       }
     }
-    if (missingCount > 0) {
-      ITableRow[] tmp = new ITableRow[rows.length - missingCount];
-      int index = 0;
-      for (ITableRow element : rows) {
-        if (element != null) {
-          tmp[index] = element;
-          index++;
-        }
-      }
-      rows = tmp;
-    }
-    return rows;
+    return result;
   }
 
   private OutlineMediator getOutlineMediator() {
@@ -965,10 +941,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case TableEvent.TYPE_ALL_ROWS_DELETED:
         case TableEvent.TYPE_ROWS_DELETED: {
           if (!isLeaf()) {
-            ITableRow[] tableRows = e.getRows();
-            IPage[] childNodes = getChildPagesFor(tableRows, false);
-            for (int i = 0; i < childNodes.length; i++) {
-              unlinkTableRowWithPage(tableRows[i]);
+            List<ITableRow> tableRows = e.getRows();
+            List<IPage> childNodes = getChildPagesFor(e.getRows(), false);
+            for (ITableRow row : tableRows) {
+              unlinkTableRowWithPage(row);
             }
 
             if (outlineMediator != null) {
@@ -980,7 +956,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
             ArrayList<IPage> childPageList = new ArrayList<IPage>();
-            ITableRow[] tableRows = e.getRows();
+            List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {
                 IPage childPage = execCreateVirtualChildPage(element);
@@ -1000,8 +976,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             }
 
             if (outlineMediator != null) {
-              IPage[] childPages = childPageList.toArray(new IPage[childPageList.size()]);
-              outlineMediator.mediateTableRowsInserted(tableRows, childPages, AbstractPageWithTable.this);
+              outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
             }
 
             // check if a page was revoked

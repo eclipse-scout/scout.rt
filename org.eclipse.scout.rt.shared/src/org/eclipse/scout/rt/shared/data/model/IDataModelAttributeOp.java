@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.util.List;
+
 public interface IDataModelAttributeOp {
 
-  String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts);
+  String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts);
 
   /**
    * example: "is bewteen {0} and {1}"

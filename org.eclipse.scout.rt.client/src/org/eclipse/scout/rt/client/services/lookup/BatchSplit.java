@@ -10,32 +10,38 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.lookup;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
  * Split a batch into local calls and remote calls
  */
 public class BatchSplit {
-  private LookupCall[] m_calls;
+  private List<ILookupCall<?>> m_calls;
   private boolean[] m_local;
   private int m_localCount;
   private int m_remoteCount;
   //
-  private LookupRow[][] m_results;
+  private Map<ILookupCall<?>, List<ILookupRow<?>>> m_results;
 
   public BatchSplit(BatchLookupCall batch) {
     this(batch.getCallBatch());
   }
 
-  public BatchSplit(LookupCall[] calls) {
+  public BatchSplit(List<ILookupCall<?>> calls) {
     m_calls = calls;
-    m_local = new boolean[m_calls.length];
-    for (int i = 0; i < m_calls.length; i++) {
-      if (m_calls[i] != null) {
-        if (m_calls[i] instanceof LocalLookupCall) {
+    m_local = new boolean[m_calls.size()];
+    for (int i = 0; i < m_calls.size(); i++) {
+      ILookupCall<?> call = m_calls.get(i);
+      if (call != null) {
+        if (call instanceof LocalLookupCall) {
           m_local[i] = true;
           m_localCount++;
         }
@@ -45,71 +51,75 @@ public class BatchSplit {
         }
       }
     }
-    m_results = new LookupRow[m_calls.length][];
+    m_results = new HashMap<ILookupCall<?>, List<ILookupRow<?>>>();
   }
 
   public int getLocalCallCount() {
     return m_localCount;
   }
 
-  public LookupCall[] getLocalCalls() {
-    LookupCall[] a = new LookupCall[m_localCount];
-    int k = 0;
-    for (int i = 0; i < m_calls.length; i++) {
-      if (m_calls[i] != null) {
+  public List<ILookupCall<?>> getLocalCalls() {
+    List<ILookupCall<?>> localResult = new ArrayList<ILookupCall<?>>();
+    for (int i = 0; i < m_calls.size(); i++) {
+      ILookupCall<?> call = m_calls.get(i);
+      if (call != null) {
         if (m_local[i]) {
-          a[k] = m_calls[i];
-          k++;
+          localResult.add(call);
         }
       }
     }
-    return a;
+    return localResult;
   }
 
   public int getRemoteCallCount() {
     return m_remoteCount;
   }
 
-  public LookupCall[] getRemoteCalls() {
-    LookupCall[] a = new LookupCall[m_remoteCount];
-    int k = 0;
-    for (int i = 0; i < m_calls.length; i++) {
-      if (m_calls[i] != null) {
+  public List<ILookupCall<?>> getRemoteCalls() {
+    List<ILookupCall<?>> remoteResult = new ArrayList<ILookupCall<?>>();
+    for (int i = 0; i < m_calls.size(); i++) {
+      ILookupCall<?> call = m_calls.get(i);
+      if (call != null) {
         if (!m_local[i]) {
-          a[k] = m_calls[i];
-          k++;
+          remoteResult.add(call);
         }
       }
     }
-    return a;
+    return remoteResult;
   }
 
-  public void setLocalResults(LookupRow[][] data) {
+  public void setLocalResults(List<List<ILookupRow<?>>> data) {
     int k = 0;
-    for (int i = 0; i < m_calls.length; i++) {
-      if (m_calls[i] != null) {
+    for (int i = 0; i < m_calls.size(); i++) {
+      ILookupCall<?> call = m_calls.get(i);
+      if (call != null) {
         if (m_local[i]) {
-          m_results[i] = data[k];
+          m_results.put(call, data.get(k));
           k++;
         }
       }
     }
   }
 
-  public void setRemoteResults(LookupRow[][] data) {
+  public void setRemoteResults(List<List<ILookupRow<?>>> data) {
     int k = 0;
-    for (int i = 0; i < m_calls.length; i++) {
-      if (m_calls[i] != null) {
+    for (int i = 0; i < m_calls.size(); i++) {
+      ILookupCall<?> call = m_calls.get(i);
+      if (call != null) {
         if (!m_local[i]) {
-          m_results[i] = data[k];
+          m_results.put(call, data.get(k));
           k++;
         }
       }
     }
   }
 
-  public LookupRow[][] getCombinedResults() {
-    return m_results;
+  public List<List<ILookupRow<?>>> getCombinedResults() {
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    for (ILookupCall<?> call : m_calls) {
+      result.add(m_results.get(call));
+    }
+    return result;
   }
 
 }

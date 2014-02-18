@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
-public interface ICodeLookupCallVisitor {
+public interface ICodeLookupCallVisitor<KEY_TYPE> {
 
   /**
    * @return true=continue visiting, false=end visiting
    */
-  boolean visit(CodeLookupCall call, ICode code, int treeLevel);
+  boolean visit(CodeLookupCall<KEY_TYPE> call, ICode<KEY_TYPE> code, int treeLevel);
 
 }

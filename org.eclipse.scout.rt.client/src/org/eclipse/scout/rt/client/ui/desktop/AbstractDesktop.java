@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -106,23 +106,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final EventListenerList m_listenerList;
   private final Map<Object, EventListenerList> m_dataChangeListenerList;
   private final IDesktopUIFacade m_uiFacade;
-  private IOutline[] m_availableOutlines;
+  private List<IOutline> m_availableOutlines;
   private IOutline m_outline;
   private boolean m_outlineChanging = false;
   private P_ActiveOutlineListener m_activeOutlineListener;
   private final P_ActivatedFormListener m_activatedFormListener;
-  private final LinkedList<WeakReference<IForm>> m_lastActiveFormList;
+  private final List<WeakReference<IForm>> m_lastActiveFormList;
   private ITable m_pageDetailTable;
   private IOutlineTableForm m_outlineTableForm;
   private boolean m_outlineTableFormVisible;
   private IForm m_pageDetailForm;
   private IForm m_pageSearchForm;
-  private final ArrayList<IForm> m_viewStack;
-  private final ArrayList<IForm> m_dialogStack;
-  private final ArrayList<IMessageBox> m_messageBoxStack;
-  private IMenu[] m_menus;
-  private IViewButton[] m_viewButtons;
-  private IToolButton[] m_toolButtons;
+  private final List<IForm> m_viewStack;
+  private final List<IForm> m_dialogStack;
+  private final List<IMessageBox> m_messageBoxStack;
+  private List<IMenu> m_menus;
+  private List<IViewButton> m_viewButtons;
+  private List<IToolButton> m_toolButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
   private boolean m_desktopInited;
   private boolean m_trayVisible;
@@ -143,6 +143,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_outlineTableFormVisible = true;
     m_activatedFormListener = new P_ActivatedFormListener();
     m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
+
     initConfig();
   }
 
@@ -197,9 +198,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
-  private Class<? extends IAction>[] getConfiguredActions() {
+  private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IAction>[] fca = ConfigurationUtility.filterClasses(dca, IAction.class);
+    List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
@@ -406,8 +407,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
   }
 
-  public IDesktopExtension[] getDesktopExtensions() {
-    return m_desktopExtensions.toArray(new IDesktopExtension[m_desktopExtensions.size()]);
+  public List<IDesktopExtension> getDesktopExtensions() {
+    return CollectionUtility.unmodifiableListCopy(m_desktopExtensions);
   }
 
   /**
@@ -421,31 +422,26 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
-    propertySupport.setProperty(PROP_KEY_STROKES, new IKeyStroke[0]);
-    IDesktopExtension[] extensions = getDesktopExtensions();
+    List<IDesktopExtension> extensions = getDesktopExtensions();
     //outlines
-    ArrayList<IOutline> outlineList = new ArrayList<IOutline>();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ext.contributeOutlines(outlineList);
-        }
-        catch (Throwable t) {
-          LOG.error("contrinuting outlines by " + ext, t);
-        }
+    List<IOutline> outlineList = new ArrayList<IOutline>();
+    for (IDesktopExtension ext : extensions) {
+      try {
+        ext.contributeOutlines(outlineList);
+      }
+      catch (Throwable t) {
+        LOG.error("contrinuting outlines by " + ext, t);
       }
     }
-    m_availableOutlines = ConfigurationUtility.sortByOrder(outlineList).toArray(new IOutline[outlineList.size()]);
+    m_availableOutlines = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(outlineList));
     //actions (keyStroke, menu, viewButton, toolButton)
-    ArrayList<IAction> actionList = new ArrayList<IAction>();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ext.contributeActions(actionList);
-        }
-        catch (Throwable t) {
-          LOG.error("contrinuting actions by " + ext, t);
-        }
+    List<IAction> actionList = new ArrayList<IAction>();
+    for (IDesktopExtension ext : extensions) {
+      try {
+        ext.contributeActions(actionList);
+      }
+      catch (Throwable t) {
+        LOG.error("contrinuting actions by " + ext, t);
       }
     }
     //extract keystroke hints from menus
@@ -462,11 +458,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     //build completed menu, viewButton, toolButton arrays
     List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false); // only top level menus
-    m_menus = ConfigurationUtility.sortByOrder(menuList).toArray(new IMenu[menuList.size()]);
+    m_menus = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(menuList));
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
-    m_viewButtons = ConfigurationUtility.sortByOrder(viewButtonList).toArray(new IViewButton[viewButtonList.size()]);
+    m_viewButtons = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(viewButtonList));
     List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class, false);
-    m_toolButtons = ConfigurationUtility.sortByOrder(toolButtonList).toArray(new IToolButton[toolButtonList.size()]);
+    m_toolButtons = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(toolButtonList).toArray(new IToolButton[toolButtonList.size()]));
     //add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
@@ -484,7 +480,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private void initDesktopExtensions() {
     m_desktopExtensions = new LinkedList<IDesktopExtension>();
     m_desktopExtensions.add(getLocalDesktopExtension());
-
     injectDesktopExtensions(m_desktopExtensions);
   }
 
@@ -497,6 +492,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
    * the extension. That way the extension can use and access this desktop's methods.
    * </p>
+   * 
+   * @param desktopExtensions
+   *          a live list can be modified.
    */
   protected void injectDesktopExtensions(List<IDesktopExtension> desktopExtensions) {
   }
@@ -508,18 +506,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       //local
       prepareAllMenus();
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.initDelegate();
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.initDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (Throwable t) {
-            LOG.error("extension " + ext);
-          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext);
         }
       }
     }
@@ -604,10 +599,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T extends IForm> T[] findForms(Class<T> formType) {
-    ArrayList<T> resultList = new ArrayList<T>();
+  public <T extends IForm> List<T> findForms(Class<T> formType) {
+    List<T> resultList = new ArrayList<T>();
     if (formType != null) {
-      ArrayList<IForm> list = new ArrayList<IForm>();
+      List<IForm> list = new ArrayList<IForm>();
       list.addAll(m_viewStack);
       list.addAll(m_dialogStack);
       for (IForm f : list) {
@@ -616,7 +611,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    return resultList.toArray((T[]) Array.newInstance(formType, resultList.size()));
+    return resultList;
   }
 
   @Override
@@ -639,13 +634,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IForm[] getViewStack() {
-    return m_viewStack.toArray(new IForm[m_viewStack.size()]);
+  public List<IForm> getViewStack() {
+    return CollectionUtility.unmodifiableList(CollectionUtility.arrayList(m_viewStack));
   }
 
   @Override
-  public IForm[] getDialogStack() {
-    return m_dialogStack.toArray(new IForm[m_dialogStack.size()]);
+  public List<IForm> getDialogStack() {
+    return CollectionUtility.unmodifiableList(CollectionUtility.arrayList(m_dialogStack));
   }
 
   /**
@@ -657,8 +652,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @return
    */
   @Override
-  public IForm[] getSimilarViewForms(IForm form) {
-    ArrayList<IForm> forms = new ArrayList<IForm>(3);
+  public List<IForm> getSimilarViewForms(IForm form) {
+    List<IForm> forms = new ArrayList<IForm>(3);
     try {
       if (form != null && form.computeExclusiveKey() != null) {
         Object originalKey = form.computeExclusiveKey();
@@ -685,13 +680,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
-    return forms.toArray(new IForm[forms.size()]);
+    return forms;
   }
 
   @Override
   public void ensureViewStackVisible() {
-    IForm[] viewStack = getViewStack();
-    for (IForm form : viewStack) {
+    if (CollectionUtility.isEmpty(m_viewStack)) {
+      return;
+    }
+    for (IForm form : m_viewStack) {
       ensureVisible(form);
     }
   }
@@ -708,27 +705,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void addForm(IForm form) {
     //Allow DesktopExtensions to do any modifications on forms before UI is informed
-    IDesktopExtension[] extensions = getDesktopExtensions();
-    if (extensions != null) {
-      final IHolder<IForm> formHolder = new Holder<IForm>(IForm.class, form);
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ContributionCommand cc = ext.customFormModificationDelegate(formHolder);
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
-        }
-        catch (ProcessingException e) {
-          formHolder.setValue(form);
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        }
-        catch (Throwable t) {
-          formHolder.setValue(form);
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Formmodification error: " + form, t));
+    final IHolder<IForm> formHolder = new Holder<IForm>(IForm.class, form);
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.customFormModificationDelegate(formHolder);
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
       }
-      form = formHolder.getValue();
+      catch (ProcessingException e) {
+        formHolder.setValue(form);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      catch (Throwable t) {
+        formHolder.setValue(form);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Formmodification error: " + form, t));
+      }
     }
+    form = formHolder.getValue();
     if (form != null) {
       switch (form.getDisplayHint()) {
         case IForm.DISPLAY_HINT_POPUP_WINDOW:
@@ -794,8 +788,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IMessageBox[] getMessageBoxStack() {
-    return m_messageBoxStack.toArray(new IMessageBox[0]);
+  public List<IMessageBox> getMessageBoxStack() {
+    return CollectionUtility.unmodifiableListCopy(m_messageBoxStack);
   }
 
   @Override
@@ -819,14 +813,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IOutline[] getAvailableOutlines() {
-    return m_availableOutlines;
+  public List<IOutline> getAvailableOutlines() {
+    return CollectionUtility.unmodifiableListCopy(m_availableOutlines);
   }
 
   @Override
-  public void setAvailableOutlines(IOutline[] availableOutlines) {
+  public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
     setOutline((IOutline) null);
-    m_availableOutlines = availableOutlines != null ? availableOutlines : new IOutline[0];
+    m_availableOutlines = CollectionUtility.arrayList(availableOutlines);
   }
 
   @Override
@@ -903,8 +897,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
               m_outline.selectNode(m_outline.getRootNode(), false);
             }
             else {
-              ITreeNode[] children = m_outline.getRootNode().getChildNodes();
-              if (children.length > 0) {
+              List<ITreeNode> children = m_outline.getRootNode().getChildNodes();
+              if (CollectionUtility.hasElements(children)) {
                 for (ITreeNode node : children) {
                   if (node.isVisible() && node.isEnabled()) {
                     m_outline.selectNode(node, false);
@@ -949,51 +943,46 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IKeyStroke[] getKeyStrokes() {
-    return (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
+  public Set<IKeyStroke> getKeyStrokes() {
+    return CollectionUtility.unmodifiableSetCopy(propertySupport.<IKeyStroke> getPropertySet(PROP_KEY_STROKES));
   }
 
   @Override
-  public void setKeyStrokes(IKeyStroke[] ks) {
-    if (ks == null) {
-      ks = new IKeyStroke[0];
-    }
-    propertySupport.setProperty(PROP_KEY_STROKES, ks);
+  public void setKeyStrokes(Collection<? extends IKeyStroke> ks) {
+    propertySupport.setPropertySet(PROP_KEY_STROKES, CollectionUtility.<IKeyStroke> hashSetWithoutNullElements(ks));
   }
 
   @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      HashMap<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
+      Map<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
       for (IKeyStroke ks : getKeyStrokes()) {
         map.put(ks.getKeyStroke(), ks);
       }
       for (IKeyStroke ks : keyStrokes) {
         map.put(ks.getKeyStroke(), ks);
       }
-      setKeyStrokes(map.values().toArray(new IKeyStroke[map.size()]));
+      setKeyStrokes(map.values());
     }
   }
 
   @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      HashMap<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
+      Map<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
       for (IKeyStroke ks : getKeyStrokes()) {
         map.put(ks.getKeyStroke(), ks);
       }
       for (IKeyStroke ks : keyStrokes) {
         map.remove(ks.getKeyStroke());
       }
-      setKeyStrokes(map.values().toArray(new IKeyStroke[map.size()]));
+      setKeyStrokes(map.values());
     }
   }
 
   @Override
-  public IMenu[] getMenus() {
-    IMenu[] a = new IMenu[m_menus.length];
-    System.arraycopy(m_menus, 0, a, 0, a.length);
-    return a;
+  public List<IMenu> getMenus() {
+    return CollectionUtility.unmodifiableListCopy(m_menus);
   }
 
   @Override
@@ -1011,47 +1000,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IAction[] getActions() {
-    IAction[] a = getKeyStrokes();
-    IAction[] b = getMenus();
-    IAction[] c = getViewButtons();
-    IAction[] d = getToolButtons();
-    if (a == null) {
-      a = new IAction[0];
-    }
-    if (b == null) {
-      b = new IAction[0];
-    }
-    if (c == null) {
-      c = new IAction[0];
-    }
-    if (d == null) {
-      d = new IAction[0];
-    }
-    IAction[] all = new IAction[a.length + b.length + c.length + d.length];
-    int offset = 0;
-    System.arraycopy(a, 0, all, offset, a.length);
-    offset += a.length;
-    System.arraycopy(b, 0, all, offset, b.length);
-    offset += b.length;
-    System.arraycopy(c, 0, all, offset, c.length);
-    offset += c.length;
-    System.arraycopy(d, 0, all, offset, d.length);
-    return all;
+  public List<IAction> getActions() {
+    List<IAction> result = new ArrayList<IAction>();
+    result.addAll(getKeyStrokes());
+    result.addAll(getMenus());
+    result.addAll(getViewButtons());
+    result.addAll(getToolButtons());
+    return result;
   }
 
   @Override
-  public IToolButton[] getToolButtons() {
-    IToolButton[] a = new IToolButton[m_toolButtons.length];
-    System.arraycopy(m_toolButtons, 0, a, 0, a.length);
-    return a;
+  public List<IToolButton> getToolButtons() {
+    return CollectionUtility.unmodifiableListCopy(m_toolButtons);
   }
 
   @Override
-  public IViewButton[] getViewButtons() {
-    IViewButton[] a = new IViewButton[m_viewButtons.length];
-    System.arraycopy(m_viewButtons, 0, a, 0, a.length);
-    return a;
+  public List<IViewButton> getViewButtons() {
+    return CollectionUtility.unmodifiableListCopy(m_viewButtons);
   }
 
   @Override
@@ -1065,18 +1030,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       IForm oldForm = m_pageDetailForm;
       m_pageDetailForm = f;
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.pageDetailFormChangedDelegate(oldForm, m_pageDetailForm);
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.pageDetailFormChangedDelegate(oldForm, m_pageDetailForm);
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (Throwable t) {
-            LOG.error("extension " + ext, t);
-          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext, t);
         }
       }
     }
@@ -1097,18 +1059,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       IForm oldForm = m_pageSearchForm;
       m_pageSearchForm = f;
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.pageSearchFormChangedDelegate(oldForm, m_pageSearchForm);
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.pageSearchFormChangedDelegate(oldForm, m_pageSearchForm);
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (Throwable t) {
-            LOG.error("extension " + ext, t);
-          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext, t);
         }
       }
     }
@@ -1167,18 +1126,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       ITable oldTable = m_pageDetailTable;
       m_pageDetailTable = t;
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.pageDetailTableChangedDelegate(oldTable, m_pageDetailTable);
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.pageDetailTableChangedDelegate(oldTable, m_pageDetailTable);
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (Throwable x) {
-            LOG.error("extension " + ext, x);
-          }
+        }
+        catch (Throwable x) {
+          LOG.error("extension " + ext, x);
         }
       }
     }
@@ -1388,7 +1344,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(new DesktopEvent(this, DesktopEvent.TYPE_PRINT, device, parameters));
   }
 
-  private IMenu[] fireTrayPopup() {
+  private List<IMenu> fireTrayPopup() {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_TRAY_POPUP);
     // single observer for exec callback
     addLocalPopupMenus(e);
@@ -1407,21 +1363,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private void fireOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     if (oldOutline != newOutline) {
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.outlineChangedDelegate(oldOutline, newOutline);
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.outlineChangedDelegate(oldOutline, newOutline);
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-          }
-          catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
-          }
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
         }
       }
     }
@@ -1483,20 +1436,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void addLocalPopupMenus(DesktopEvent event) {
     try {
-      ArrayList<IMenu> list = new ArrayList<IMenu>();
+      List<IMenu> list = new ArrayList<IMenu>();
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.addTrayMenusDelegate(list);
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.addTrayMenusDelegate(list);
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (Throwable t) {
-            LOG.error("extension " + ext, t);
-          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext, t);
         }
       }
       for (IMenu m : list) {
@@ -1531,9 +1481,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void refreshPages(Class... pageTypes) {
+  public void refreshPages(Class<? extends IPage>... pageTypes) {
+    refreshPages(CollectionUtility.arrayList(pageTypes));
+  }
+
+  @Override
+  public void refreshPages(List<Class<? extends IPage>> pages) {
     for (IOutline outline : getAvailableOutlines()) {
-      outline.refreshPages(pageTypes);
+      outline.refreshPages(pages);
     }
   }
 
@@ -1547,18 +1502,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void afterTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     //extensions
-    IDesktopExtension[] extensions = getDesktopExtensions();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ContributionCommand cc = ext.tablePageLoadedDelegate(tablePage);
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.tablePageLoadedDelegate(tablePage);
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
-        catch (Throwable t) {
-          LOG.error("extension " + ext, t);
-        }
+      }
+      catch (Throwable t) {
+        LOG.error("extension " + ext, t);
       }
     }
   }
@@ -1580,18 +1532,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       openForms.add(dialog);
     }
     //extensions
-    IDesktopExtension[] extensions = getDesktopExtensions();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ContributionCommand cc = ext.desktopClosingDelegate();
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.desktopClosingDelegate();
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
-        catch (Throwable t) {
-          LOG.error("extension " + ext, t);
-        }
+      }
+      catch (Throwable t) {
+        LOG.error("extension " + ext, t);
       }
     }
 
@@ -1635,21 +1584,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setGuiAvailableInternal(true);
 
     //extensions
-    IDesktopExtension[] extensions = getDesktopExtensions();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ContributionCommand cc = ext.guiAttachedDelegate();
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.guiAttachedDelegate();
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
-        catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        }
-        catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
-        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
       }
     }
   }
@@ -1661,21 +1607,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setGuiAvailableInternal(false);
 
     //extensions
-    IDesktopExtension[] extensions = getDesktopExtensions();
-    if (extensions != null) {
-      for (IDesktopExtension ext : extensions) {
-        try {
-          ContributionCommand cc = ext.guiDetachedDelegate();
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.guiDetachedDelegate();
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
-        catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        }
-        catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
-        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
       }
     }
   }
@@ -1754,14 +1697,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void contributeActions(Collection<IAction> actions) {
-      Class<? extends IAction>[] actionArray = getConfiguredActions();
-      for (Class<? extends IAction> element : actionArray) {
+      for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
         try {
-          IAction tool = ConfigurationUtility.newInnerInstance(AbstractDesktop.this, element);
-          actions.add(tool);
+          actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));
         }
         catch (Exception e) {
-          LOG.error("adding action " + element, e);
+          LOG.error("adding action " + actionClazz, e);
         }
       }
     }
@@ -1860,21 +1801,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     public void fireDesktopOpenedFromUI() {
       setOpenedInternal(true);
       //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.desktopOpenedDelegate();
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.desktopOpenedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
           }
-          catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-          }
-          catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
-          }
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
         }
       }
     }
@@ -1890,7 +1828,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public IMenu[] fireTrayPopupFromUI() {
+    public List<IMenu> fireTrayPopupFromUI() {
       return fireTrayPopup();
     }
 
@@ -1975,7 +1913,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @Override
   public boolean doBeforeClosingInternal() {
-    IDesktopExtension[] extensions = getDesktopExtensions();
+    List<IDesktopExtension> extensions = getDesktopExtensions();
     boolean continueClosing = true;
     if (extensions != null) {
       for (IDesktopExtension ext : extensions) {

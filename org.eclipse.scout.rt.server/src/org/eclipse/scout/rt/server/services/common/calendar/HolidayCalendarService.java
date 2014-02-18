@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.calendar;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TTLCache;
@@ -38,7 +40,7 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
   // minutes
 
   @Override
-  public ICalendarItem[] getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {
+  public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {
     // load new items
     HolidayCalendarItemParser p = null;
     String key = spec.getPath();
@@ -60,7 +62,14 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
         }
       }
     }
-    return p != null ? p.getItems(LocaleThreadLocal.get(), minDate, maxDate) : new ICalendarItem[0];
+    final Set<? extends ICalendarItem> result;
+    if (p != null) {
+      result = p.getItems(LocaleThreadLocal.get(), minDate, maxDate);
+    }
+    else {
+      result = Collections.emptySet();
+    }
+    return result;
   }
 
 }

@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -27,7 +28,7 @@ public class SequenceBoxGrid {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SequenceBoxGrid.class);
 
   private ISequenceBox m_rangeBox = null;
-  private IFormField[] m_fields;
+  private List<IFormField> m_fields;
   private int m_gridColumns;
   private int m_gridRows;
 
@@ -39,7 +40,7 @@ public class SequenceBoxGrid {
     // reset
     m_gridColumns = 0;
     m_gridRows = 0;
-    ArrayList<IFormField> list = new ArrayList<IFormField>();
+    List<IFormField> list = new ArrayList<IFormField>();
     // filter
     for (IFormField f : m_rangeBox.getFields()) {
       if (f.isVisible()) {
@@ -50,25 +51,24 @@ public class SequenceBoxGrid {
         f.setGridDataInternal(data);
       }
     }
-    m_fields = list.toArray(new IFormField[list.size()]);
-    layoutStatic();
+    layoutStatic(list);
   }
 
-  private void layoutStatic() {
+  private void layoutStatic(List<IFormField> fields) {
     int x = 0;
-    for (int i = 0; i < m_fields.length; i++) {
-      GridData data = GridDataBuilder.createFromHints(m_fields[i], 1);
+    for (IFormField field : fields) {
+      GridData data = GridDataBuilder.createFromHints(field, 1);
       data.x = x;
       data.y = 0;
       if (data.weightX < 0) {
-        if (m_fields[i] instanceof IButton) {
+        if (field instanceof IButton) {
           data.weightX = 0;
         }
         else {
           data.weightX = data.w;
         }
       }
-      m_fields[i].setGridDataInternal(data);
+      field.setGridDataInternal(data);
       x = x + data.w;
       m_gridRows = Math.max(m_gridRows, data.h);
     }

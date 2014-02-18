@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -619,9 +620,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return null;
   }
 
-  private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
+  private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IKeyStroke>[] fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
+    List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
@@ -1059,9 +1060,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     IForm form = getForm();
     String currentClassId = computeClassId();
     if (form != null) {
-      IFormField[] allFields = form.getAllFields();
-      ArrayList<String> classIds = new ArrayList<String>();
-      for (IFormField f : allFields) {
+      List<String> classIds = new ArrayList<String>();
+      for (IFormField f : form.getAllFields()) {
         if (f != this) {
           String fClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(f.getClass(), true);
           classIds.add(fClassId);
@@ -1721,9 +1721,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void updateKeyStrokes() {
-    HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
+    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
     //
-    IKeyStroke[] c = getLocalKeyStrokes();
+    List<IKeyStroke> c = getLocalKeyStrokes();
     if (c != null) {
       for (IKeyStroke ks : c) {
         if (ks != null) {
@@ -1740,39 +1740,35 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       }
     }
-    propertySupport.setProperty(PROP_KEY_STROKES, ksMap.values().toArray(new IKeyStroke[ksMap.size()]));
+    propertySupport.setPropertyList(PROP_KEY_STROKES, CollectionUtility.arrayListWithoutNullElements(ksMap.values()));
   }
 
   @Override
-  public IKeyStroke[] getContributedKeyStrokes() {
+  public List<IKeyStroke> getContributedKeyStrokes() {
     return null;
   }
 
   @Override
-  public IKeyStroke[] getLocalKeyStrokes() {
-    HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
-    Class<? extends IKeyStroke>[] shortcutArray = getConfiguredKeyStrokes();
-    for (int i = 0; i < shortcutArray.length; i++) {
+  public List<IKeyStroke> getLocalKeyStrokes() {
+    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
+
+    for (Class<? extends IKeyStroke> keystrokeClazz : getConfiguredKeyStrokes()) {
       IKeyStroke ks;
       try {
-        ks = ConfigurationUtility.newInnerInstance(this, shortcutArray[i]);
+        ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + shortcutArray[i].getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + keystrokeClazz.getName(), t));
       }
     }
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksMap.values());
-    return ksList.toArray(new IKeyStroke[ksList.size()]);
+    return Collections.unmodifiableList(ksList);
   }
 
   @Override
-  public IKeyStroke[] getKeyStrokes() {
-    IKeyStroke[] keyStrokes = (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
-    if (keyStrokes == null) {
-      keyStrokes = new IKeyStroke[0];
-    }
-    return keyStrokes;
+  public List<IKeyStroke> getKeyStrokes() {
+    return CollectionUtility.unmodifiableListCopy(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
   }
 
   private class P_MasterListener implements MasterListener {

@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swt.basic.tree;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -26,6 +28,8 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -230,30 +234,29 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   private void setExpansionFromScoutRec(ITreeNode scoutNode) {
-    boolean exp;
+    boolean expand;
     if (scoutNode.getParentNode() == null) {
-      exp = true;
+      expand = true;
     }
     else {
-      exp = scoutNode.isExpanded();
+      expand = scoutNode.isExpanded();
     }
-    ITreeNode[] filteredChildNodes = scoutNode.getFilteredChildNodes();
-    boolean hasChilds = filteredChildNodes.length > 0;
-    if (hasChilds && exp != getSwtTreeViewer().getExpandedState(scoutNode)) {
-      getSwtTreeViewer().setExpandedState(scoutNode, exp);
+    List<ITreeNode> filteredChildNodes = scoutNode.getFilteredChildNodes();
+    if (CollectionUtility.hasElements(filteredChildNodes) && expand != getSwtTreeViewer().getExpandedState(scoutNode)) {
+      getSwtTreeViewer().setExpandedState(scoutNode, expand);
     }
-    if (exp) {
+    if (expand) {
       for (ITreeNode childNode : filteredChildNodes) {
         setExpansionFromScoutRec(childNode);
       }
     }
   }
 
-  protected void setSelectionFromScout(ITreeNode[] scoutNodes) {
+  protected void setSelectionFromScout(Collection<ITreeNode> scoutNodes) {
     if (getSwtField().isDisposed()) {
       return;
     }
-    getSwtTreeViewer().setSelection(new StructuredSelection(scoutNodes));
+    getSwtTreeViewer().setSelection(new StructuredSelection(new ArrayList<ITreeNode>(scoutNodes)));
     getSwtField().showSelection();
   }
 
@@ -265,9 +268,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       }
     }
     // add new
-    ArrayList<ISwtKeyStroke> newSwtKeyStrokes = new ArrayList<ISwtKeyStroke>();
-    IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-    for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
+    List<ISwtKeyStroke> newSwtKeyStrokes = new ArrayList<ISwtKeyStroke>();
+    for (IKeyStroke scoutKeyStroke : getScoutObject().getKeyStrokes()) {
       ISwtKeyStroke[] swtStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, getEnvironment());
       for (ISwtKeyStroke swtStroke : swtStrokes) {
         getEnvironment().addKeyStroke(getSwtField(), swtStroke);
@@ -286,7 +288,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     }
   }
 
-  protected void setSelectionFromSwt(final ITreeNode[] nodes) {
+  protected void setSelectionFromSwt(final List<ITreeNode> nodes) {
     if (m_ignoreSelectionEventsFromSwtToScout) {
       return;
     }
@@ -384,8 +386,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   /**
    * model thread: scout table observer
    */
-  protected boolean isHandleScoutTreeEvent(TreeEvent[] a) {
-    for (TreeEvent element : a) {
+  protected boolean isHandleScoutTreeEvent(List<? extends TreeEvent> events) {
+    for (TreeEvent element : events) {
       switch (element.getType()) {
         case TreeEvent.TYPE_REQUEST_FOCUS:
         case TreeEvent.TYPE_NODE_EXPANDED:
@@ -432,7 +434,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       case TreeEvent.TYPE_NODES_UPDATED: {
         //in case a virtual node was resolved, check if selection still valid
         ISelection oldSelection = getSwtTreeViewer().getSelection();
-        ISelection newSelection = new StructuredSelection(getScoutObject().getSelectedNodes());
+        ISelection newSelection = new StructuredSelection(CollectionUtility.copyList(getScoutObject().getSelectedNodes()));
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
         if (!newSelection.equals(oldSelection)) {
           getSwtTreeViewer().setSelection(newSelection);
@@ -570,7 +572,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   private class P_ScoutTreeListener implements TreeListener {
     @Override
     public void treeChanged(final TreeEvent e) {
-      if (isHandleScoutTreeEvent(new TreeEvent[]{e})) {
+      if (isHandleScoutTreeEvent(CollectionUtility.arrayList(e))) {
         if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) {
           return;
         }
@@ -592,39 +594,38 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     }
 
     @Override
-    public void treeChangedBatch(final TreeEvent[] a) {
-      if (isHandleScoutTreeEvent(a)) {
-        final ArrayList<TreeEvent> filteredList = new ArrayList<TreeEvent>();
-        for (TreeEvent element : a) {
+    public void treeChangedBatch(final List<? extends TreeEvent> events) {
+      if (isHandleScoutTreeEvent(events)) {
+        final List<TreeEvent> filteredList = new ArrayList<TreeEvent>();
+        for (TreeEvent element : events) {
           if (!isIgnoredScoutEvent(TreeEvent.class, "" + element.getType())) {
             filteredList.add(element);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                getUpdateSwtFromScoutLock().acquire();
+                if (!getSwtField().isDisposed()) {
+                  getSwtField().setRedraw(false);
+                }
+                //
+                for (TreeEvent element : filteredList) {
+                  handleScoutTreeEventInSwt(element);
+                }
+              }
+              finally {
+                getUpdateSwtFromScoutLock().release();
+                if (!getSwtField().isDisposed()) {
+                  getSwtField().setRedraw(true);
+                }
+              }
+            }
+          };
+          getEnvironment().invokeSwtLater(t);
         }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getUpdateSwtFromScoutLock().acquire();
-              if (!getSwtField().isDisposed()) {
-                getSwtField().setRedraw(false);
-              }
-              //
-              for (TreeEvent element : filteredList) {
-                handleScoutTreeEventInSwt(element);
-              }
-            }
-            finally {
-              getUpdateSwtFromScoutLock().release();
-              if (!getSwtField().isDisposed()) {
-                getSwtField().setRedraw(true);
-              }
-            }
-          }
-        };
-        getEnvironment().invokeSwtLater(t);
       }
     }
   }// end private class
@@ -635,8 +636,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     public void selectionChanged(SelectionChangedEvent event) {
       if (isEnabledFromScout()) {
         StructuredSelection sel = (StructuredSelection) event.getSelection();
-        ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
-        setSelectionFromSwt(nodes);
+        setSelectionFromSwt((List<ITreeNode>) sel.toList());
       }
     }
   } // end class P_SwtSelectionListener
@@ -759,7 +759,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       }
 
       final boolean emptySpace = (getSwtField().getContextItem() == null);
-      IMenu[] menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getEnvironment());
+      List<IMenu> menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getEnvironment());
 
       SwtMenuUtility.fillContextMenu(menus, m_contextMenu, getEnvironment());
     }

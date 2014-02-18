@@ -10,32 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public interface ISmartFieldProposalForm extends IForm {
-  String PROP_SEARCH_TEXT = "searchText";
+public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
 
-  ISmartField<?> getSmartField();
+  String PROP_SEARCH_RESULT = "searchResult";
 
-  @FormData
-  String getSearchText();
-
-  @FormData
-  void setSearchText(String text);
+  IContentAssistField<?, KEY_TYPE> getContentAssistField();
 
   void startForm() throws ProcessingException;
-
-  /**
-   * @param selectCurrentValue
-   *          select the current smartfield value in the proposal table/tree/custom
-   *          If necessary in a tree, load the tree children until the key is found
-   * @param synchronous
-   *          true to execute the lookup call synchronous
-   */
-  void update(boolean selectCurrentValue, boolean synchronous) throws ProcessingException;
 
   /**
    * Force a proposal to be selected if possible, this means that for example if there is just one proposal, then select
@@ -45,11 +32,36 @@ public interface ISmartFieldProposalForm extends IForm {
   void forceProposalSelection() throws ProcessingException;
 
   /**
+   * @return the displayed result.
+   */
+  IContentAssistFieldDataFetchResult<KEY_TYPE> getSearchResult();
+
+  /**
    * This method may call {@link ISmartField#acceptProposal(LookupRow)}
    * 
    * @return true if a propsal was accepted (might be a single match or the
    *         selcted one that is enabled)
    */
-  LookupRow getAcceptedProposal() throws ProcessingException;
+  ILookupRow<KEY_TYPE> getAcceptedProposal() throws ProcessingException;
+
+  /**
+   * @param rows
+   * @param failed
+   * @param maxCount
+   * @param selectCurrentValue
+   */
+  void dataFetchedDelegate(IContentAssistFieldDataFetchResult<KEY_TYPE> result, int maxCount);
+
+  /**
+   * @param status
+   */
+  void setTablePopulateStatus(IProcessingStatus status);
+
+  /**
+   * delegate method to search result.
+   * 
+   * @return the search text of the last successful search.
+   */
+  String getSearchText();
 
 }

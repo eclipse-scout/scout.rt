@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
+
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -77,19 +79,19 @@ public interface IGroupBox extends ICompositeField {
   /**
    * fields excluding process buttons
    */
-  IFormField[] getControlFields();
+  List<IFormField> getControlFields();
 
-  IGroupBox[] getGroupBoxes();
+  List<IGroupBox> getGroupBoxes();
 
   /**
    * buttons with processButton=true and systemType=none
    */
-  IButton[] getCustomProcessButtons();
+  List<IButton> getCustomProcessButtons();
 
   /**
    * buttons with processButton=true and systemType<>none
    */
-  IButton[] getSystemProcessButtons();
+  List<IButton> getSystemProcessButtons();
 
   boolean isMainBox();
 

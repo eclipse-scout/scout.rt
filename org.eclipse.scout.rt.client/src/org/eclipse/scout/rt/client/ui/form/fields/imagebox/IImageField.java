@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -51,10 +53,10 @@ public interface IImageField extends IFormField, IDNDSupport {
 
   byte[] getByteArrayValue();
 
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   @Override
-  IKeyStroke[] getKeyStrokes();
+  List<IKeyStroke> getKeyStrokes();
 
   boolean isAutoFit();
 

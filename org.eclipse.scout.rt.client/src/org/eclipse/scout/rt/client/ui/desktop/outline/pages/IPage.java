@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -77,13 +79,13 @@ public abstract interface IPage extends ITreeNode, ITypeWithClassId {
 
   /**
    * @return all child pages
-   *         Note that this is <b>not</b> exactly the same as (IPage[])getChildNodes().
+   *         Note that this is <b>not</b> exactly the same as (IPage)getChildNodes().
    *         see {@link VirtualPage} for more details.
    *         <p>
    *         Note: Calling this method effectively creates all child page objects and may be expensive on pages with
    *         many child pages.
    */
-  IPage[] getChildPages();
+  List<IPage> getChildPages();
 
   /**
    * Convenience for (IPage)getParentNode()

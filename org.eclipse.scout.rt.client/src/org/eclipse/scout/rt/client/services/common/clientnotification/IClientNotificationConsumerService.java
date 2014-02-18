@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.clientnotification;
 
+import java.util.Collection;
+
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
@@ -28,7 +30,7 @@ public interface IClientNotificationConsumerService extends IService {
    * The {@link IServiceTunnel} calles this method whenever client notifications
    * have been received. This method is normally not called by clients
    */
-  void dispatchClientNotifications(IClientNotification[] notifications, IClientSession session);
+  void dispatchClientNotifications(Collection<? extends IClientNotification> notifications, IClientSession session);
 
   /**
    * A consumer of client notifications can add a listener on this service. The

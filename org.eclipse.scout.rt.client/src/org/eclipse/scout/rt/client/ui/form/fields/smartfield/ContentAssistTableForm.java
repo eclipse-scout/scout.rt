@@ -10,12 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
@@ -31,110 +35,75 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ActiveStateRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.NewButton;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ResultTableField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ResultTableField.Table;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ActiveStateRadioButtonGroup;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.NewButton;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ResultTableField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ResultTableField.Table;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public class SmartTableForm extends AbstractSmartFieldProposalForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SmartTableForm.class);
+public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistFieldProposalForm<KEY_TYPE> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ContentAssistTableForm.class);
 
   private JobEx m_dataLoadJob;
-  private Object m_lastSelectedKey;
+  private KEY_TYPE m_lastSelectedKey;
 
-  public SmartTableForm(ISmartField<?> smartField) throws ProcessingException {
-    super(smartField);
+  public ContentAssistTableForm(IContentAssistField<?, KEY_TYPE> contentAssistField, boolean allowCustomText) throws ProcessingException {
+    super(contentAssistField, allowCustomText);
   }
 
   @Override
   public void forceProposalSelection() throws ProcessingException {
-    ResultTableField.Table table = getResultTableField().getTable();
+    @SuppressWarnings("unchecked")
+    ContentAssistTableForm<KEY_TYPE>.MainBox.ResultTableField tableField = getResultTableField();
+    ContentAssistTableForm.MainBox.ResultTableField.Table table = tableField.getTable();
     table.selectNextRow();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void update(final boolean selectCurrentValue, boolean synchronous) throws ProcessingException {
-    String text = getSearchText();
-    if (text == null) {
-      text = "";
+  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<KEY_TYPE> result, int maxCount) {
+    List<? extends ILookupRow<KEY_TYPE>> rows = null;
+    boolean selectCurrentValue = false;
+    ProcessingException failed = null;
+    String searchText = null;
+    if (result != null) {
+      rows = result.getLookupRows();
+      selectCurrentValue = result.isSelectCurrentValue();
+      failed = result.getProcessingException();
+      searchText = result.getSearchText();
     }
-    final String textNonNull = text;
-    final int maxCount = getSmartField().getBrowseMaxRowCount();
-    getResultTableField().setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("searchingProposals"), ProcessingStatus.WARNING));
-    if (m_dataLoadJob != null) {
-      m_dataLoadJob.cancel();
+    if (rows == null) {
+      rows = new ArrayList<ILookupRow<KEY_TYPE>>();
     }
-    ILookupCallFetcher fetcher = new ILookupCallFetcher() {
-      @Override
-      public void dataFetched(LookupRow[] rows, ProcessingException failed) {
-        dataFetchedDelegate(rows, failed, maxCount, selectCurrentValue);
-      }
-    };
-    // go async/sync
-    if (synchronous) {
-      try {
-        LookupRow[] rows;
-        if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
-          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        else if (text.length() == 0) {
-          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        else {
-          rows = getSmartField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        fetcher.dataFetched(rows, null);
-      }
-      catch (ProcessingException e) {
-        fetcher.dataFetched(null, e);
-      }
-    }
-    else {
-      if (ISmartField.BROWSE_ALL_TEXT.equals(textNonNull)) {
-        m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
-      }
-      else if (textNonNull.length() == 0) {
-        m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
-      }
-      else {
-        m_dataLoadJob = getSmartField().callTextLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
-      }
-    }
-  }
-
-  private void dataFetchedDelegate(LookupRow[] rows, ProcessingException failed, int maxCount, boolean selectCurrentValue) {
     try {
       // populate table
-      ResultTableField.Table table = getResultTableField().getTable();
-      if (rows == null) {
-        rows = LookupRow.EMPTY_ARRAY;
-      }
-      int n = rows.length;
+      ResultTableField.Table table = (Table) getResultTableField().getTable();
+
+      int n = rows.size();
       if (maxCount > 0) {
         n = Math.min(n, maxCount);
       }
-      ITableRow[] tableRows = new ITableRow[n];
+      List<ITableRow> tableRows = new ArrayList<ITableRow>();
       for (int i = 0; i < n; i++) {
-        tableRows[i] = table.createRow(new Object[]{rows[i], null});
-        tableRows[i].setEnabled(rows[i].isEnabled());
+        ITableRow row = table.createRow(new Object[]{rows.get(i), null});
+        tableRows.add(row);
+        row.setEnabled(rows.get(i).isEnabled());
       }
       try {
         table.setTableChanging(true);
         table.discardAllRows();
         table.addRows(tableRows);
         //restore selection
-        Object keyToSelect = null;
+        KEY_TYPE keyToSelect = null;
         if (selectCurrentValue) {
-          m_lastSelectedKey = getSmartField().getValue();
+          m_lastSelectedKey = getContentAssistField().getValueAsLookupKey();
           keyToSelect = m_lastSelectedKey;
         }
-        else if (table.getRowCount() == 1 && !getSmartField().isAllowCustomText()) {
+        else if (table.getRowCount() == 1 && !isAllowCustomText()) {
           // select first
-          keyToSelect = table.getKeyColumn().getValue(0).getKey();
+          keyToSelect = (KEY_TYPE) table.getKeyColumn().getValue(0).getKey();
         }
         if (keyToSelect != null) {
           for (ITableRow row : table.getRows()) {
@@ -157,12 +126,12 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         statusText = failed.getStatus().getMessage();
         severity = ProcessingStatus.ERROR;
       }
-      else if (rows.length <= 0) {
-        statusText = ScoutTexts.get("SmartFieldCannotComplete", getSearchText());
+      else if (rows.size() <= 0) {
+        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
         severity = ProcessingStatus.WARNING;
       }
-      else if (rows.length > getSmartField().getBrowseMaxRowCount()) {
-        statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getSmartField().getBrowseMaxRowCount());
+      else if (rows.size() > getContentAssistField().getBrowseMaxRowCount()) {
+        statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getContentAssistField().getBrowseMaxRowCount());
         severity = ProcessingStatus.INFO;
       }
       if (statusText != null) {
@@ -175,24 +144,33 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         getNewButton().setVisible(table.getRowCount() <= 0);
       }
       structureChanged(getResultTableField());
+
     }
     catch (ProcessingException e) {
       LOG.warn("update proposal list", e);
     }
   }
 
+  @Override
+  public void setTablePopulateStatus(IProcessingStatus status) {
+    getResultTableField().setTablePopulateStatus(status);
+  }
+
   /**
-   * Override this method to change that behaviour of what is a single match.
+   * Override this method to change that behavior of what is a single match.
    * <p>
    * By default a single match is when there is only one enabled row in the drop down table
    * </p>
    */
   @ConfigOperation
   @Order(120)
-  protected LookupRow execGetSingleMatch() {
+  protected ILookupRow<KEY_TYPE> execGetSingleMatch() {
     int matchCount = 0;
-    LookupRow foundRow = null;
-    for (LookupRow row : getResultTableField().getTable().getKeyColumn().getValues()) {
+    ILookupRow<KEY_TYPE> foundRow = null;
+    Table table = (Table) getResultTableField().getTable();
+    @SuppressWarnings("unchecked")
+    List<ILookupRow<KEY_TYPE>> values = table.getKeyColumn().getValues();
+    for (ILookupRow<KEY_TYPE> row : values) {
       if (row.isEnabled()) {
         foundRow = row;
         matchCount++;
@@ -218,7 +196,8 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   @ConfigOperation
   @Order(130)
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
-    LookupRow lrow = getResultTableField().getTable().getKeyColumn().getSelectedValue();
+    @SuppressWarnings("unchecked")
+    ILookupRow<KEY_TYPE> lrow = (ILookupRow<KEY_TYPE>) ((Table) getResultTableField().getTable()).getKeyColumn().getSelectedValue();
     if (lrow != null && lrow.isEnabled()) {
       doOk();
     }
@@ -231,12 +210,12 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   }
 
   @Override
-  public LookupRow getAcceptedProposal() throws ProcessingException {
-    LookupRow row = getSelectedLookupRow();
+  public ILookupRow<KEY_TYPE> getAcceptedProposal() throws ProcessingException {
+    ILookupRow<KEY_TYPE> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;
     }
-    else if (getSmartField().isAllowCustomText()) {
+    else if (isAllowCustomText()) {
       return null;
     }
     else {
@@ -244,17 +223,18 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     }
   }
 
-  public LookupRow getSelectedLookupRow() {
-    Table table = getResultTableField().getTable();
-    LookupRow row = null;
+  @SuppressWarnings("unchecked")
+  public ILookupRow<KEY_TYPE> getSelectedLookupRow() {
+    Table table = (Table) getResultTableField().getTable();
+    ILookupRow<KEY_TYPE> row = null;
     if (table.isCheckable()) {
-      ITableRow[] checkedRows = table.getCheckedRows();
-      if (checkedRows != null && checkedRows.length > 0) {
-        row = table.getKeyColumn().getValue(checkedRows[0]);
+      Collection<ITableRow> checkedRows = table.getCheckedRows();
+      if (CollectionUtility.hasElements(checkedRows)) {
+        row = (ILookupRow<KEY_TYPE>) table.getKeyColumn().getValue(CollectionUtility.firstElement(checkedRows));
       }
     }
     else {
-      row = table.getKeyColumn().getSelectedValue();
+      row = (ILookupRow<KEY_TYPE>) table.getKeyColumn().getSelectedValue();
     }
 
     return row;
@@ -268,6 +248,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     startInternal(new FormHandler());
   }
 
+  @SuppressWarnings("unchecked")
   public MainBox getMainBox() {
     return (MainBox) getRootGroupBox();
   }
@@ -310,7 +291,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     }
 
     @Order(10)
-    public class ResultTableField extends AbstractTableField<ResultTableField.Table> {
+    public class ResultTableField extends AbstractTableField<ContentAssistTableForm.MainBox.ResultTableField.Table> {
 
       public ResultTableField() {
         super();
@@ -387,16 +368,18 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
           execResultTableRowClicked(row);
         }
 
+        @SuppressWarnings("unchecked")
         public KeyColumn getKeyColumn() {
           return getColumnSet().getColumnByClass(KeyColumn.class);
         }
 
+        @SuppressWarnings("unchecked")
         public TextColumn getTextColumn() {
           return getColumnSet().getColumnByClass(TextColumn.class);
         }
 
         @Order(1)
-        public class KeyColumn extends AbstractColumn<LookupRow> {
+        public class KeyColumn extends AbstractColumn<ILookupRow<KEY_TYPE>> {
           @Override
           protected boolean getConfiguredPrimaryKey() {
             return true;
@@ -412,7 +395,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         public class TextColumn extends AbstractStringColumn {
           @Override
           protected void execDecorateCell(Cell cell, ITableRow row) {
-            LookupRow lookupRow = getKeyColumn().getValue(row);
+            ILookupRow<KEY_TYPE> lookupRow = getKeyColumn().getValue(row);
             cell.setText(lookupRow.getText());
             cell.setTooltipText(lookupRow.getTooltipText());
             cell.setBackgroundColor(lookupRow.getBackgroundColor());
@@ -439,8 +422,8 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       @Override
       protected void execChangedValue() throws ProcessingException {
         if (isVisible() && !isFormLoading()) {
-          getSmartField().setActiveFilter(getValue());
-          update(false, false);
+          getContentAssistField().setActiveFilter(getValue());
+          getContentAssistField().doSearch(false, false);
         }
       }
 
@@ -536,7 +519,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
 
       @Override
       protected void execClickAction() throws ProcessingException {
-        getSmartField().doBrowseNew(getSearchText());
+        getContentAssistField().doBrowseNew(getSearchText());
       }
     }// end field
 
@@ -547,18 +530,19 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
    */
   private class FormHandler extends AbstractFormHandler {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void execLoad() throws ProcessingException {
-      getResultTableField().getTable().setDefaultIconId(getSmartField().getBrowseIconId());
-      getActiveStateRadioButtonGroup().setVisible(getSmartField().isActiveFilterEnabled());
-      getActiveStateRadioButtonGroup().setValue(getSmartField().getActiveFilter());
-      getNewButton().setEnabled(getSmartField().getBrowseNewText() != null);
-      getNewButton().setLabel(getSmartField().getBrowseNewText());
+      getResultTableField().getTable().setDefaultIconId(getContentAssistField().getBrowseIconId());
+      getActiveStateRadioButtonGroup().setVisible(getContentAssistField().isActiveFilterEnabled());
+      getActiveStateRadioButtonGroup().setValue((TriState) getContentAssistField().getActiveFilter());
+      getNewButton().setEnabled(getContentAssistField().getBrowseNewText() != null);
+      getNewButton().setLabel(getContentAssistField().getBrowseNewText());
     }
 
     @Override
     protected boolean execValidate() throws ProcessingException {
-      return getAcceptedProposal() != null || getSmartField().isAllowCustomText();
+      return getAcceptedProposal() != null || isAllowCustomText();
     }
 
     @Override

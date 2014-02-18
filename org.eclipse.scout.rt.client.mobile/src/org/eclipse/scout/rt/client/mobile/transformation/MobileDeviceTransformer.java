@@ -396,7 +396,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   public boolean acceptMobileTabBoxTransformation(ITabBox tabBox) {
     IGroupBox mainBox = tabBox.getForm().getRootGroupBox();
     if (tabBox.getParentField() == mainBox) {
-      return !(mainBox.getControlFields()[0] == tabBox);
+      return !(mainBox.getControlFields().get(0) == tabBox);
     }
 
     return false;

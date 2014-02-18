@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.basic.table;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -69,12 +70,12 @@ public class SortIconUtility {
    * @param ascending
    * @return
    */
-  public static Icon createSortIcon(IColumn column, IColumn[] sortColumns, boolean ascending) {
+  public static Icon createSortIcon(IColumn column, List<? extends IColumn<?>> sortColumns, boolean ascending) {
     if (column == null || sortColumns == null) {
       return null;
     }
 
-    float count = sortColumns.length;
+    float count = sortColumns.size();
     float factor = 1 + (column.getSortIndex() / count) * BRIGHTEN_FACTOR;
 
     Icon icon = m_sortDownIcon;

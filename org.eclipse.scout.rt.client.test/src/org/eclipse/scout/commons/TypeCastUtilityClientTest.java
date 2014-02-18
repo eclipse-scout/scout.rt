@@ -13,6 +13,7 @@ package org.eclipse.scout.commons;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -32,10 +33,10 @@ public class TypeCastUtilityClientTest {
     Class<?> T;
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IHolder.class, 0);
-    assertEquals(Long[].class, T);
+    assertEquals(Set.class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IValueField.class, 0);
-    assertEquals(Long[].class, T);
+    assertEquals(Set.class, T);
     //
     T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IListBox.class, 0);
     assertEquals(Long.class, T);

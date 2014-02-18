@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -61,9 +63,9 @@ public interface IHtmlField extends IValueField<String> {
   /**
    * local images and local resources bound to the html text
    */
-  RemoteFile[] getAttachments();
+  Set<RemoteFile> getAttachments();
 
-  void setAttachments(RemoteFile[] attachments);
+  void setAttachments(Collection<? extends RemoteFile> attachments);
 
   String getPlainText();
 

@@ -24,7 +24,7 @@ import java.util.List;
  * 
  * @since 3.8
  */
-public final class EntityPath {
+public final class EntityPath implements IDataModelPath {
   public static final EntityPath EMPTY = new EntityPath();
 
   private final List<IDataModelEntity> m_entityPath;

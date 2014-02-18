@@ -14,8 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();
@@ -78,15 +78,14 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     requiredMenus.addAll(resolveMenusOfPageWithTable(subTablePage, SubPageWithTableEmptySpaceMenu.class));
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    IMenu[] menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
-    List<IMenu> actualMenus = Arrays.asList(menus);
+    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
 
-    assertTrue(actualMenus.containsAll(requiredMenus));
+    assertTrue(menus.containsAll(requiredMenus));
 
-    assertTrue(actualMenus.size() == (requiredMenus.size() + 1)); // + 1 stands for menu separator
+    assertTrue(menus.size() == (requiredMenus.size() + 1)); // + 1 stands for menu separator
 
     boolean hasMenuSeparator = false;
-    for (IMenu menu : actualMenus) {
+    for (IMenu menu : menus) {
       if (menu instanceof MenuSeparator) {
         hasMenuSeparator = true;
       }

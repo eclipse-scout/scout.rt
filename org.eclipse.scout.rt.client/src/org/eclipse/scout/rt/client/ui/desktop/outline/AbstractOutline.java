@@ -14,7 +14,9 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -166,10 +168,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void refreshPages(final Class... pageTypes) {
-    final ArrayList<IPage> candidates = new ArrayList<IPage>();
+  public void refreshPages(Class<? extends IPage>... pageTypes) {
+    refreshPages(CollectionUtility.arrayList(pageTypes));
+  }
+
+  @Override
+  public void refreshPages(final List<Class<? extends IPage>> pageTypes) {
+    final List<IPage> candidates = new ArrayList<IPage>();
     ITreeVisitor v = new ITreeVisitor() {
-      @SuppressWarnings("unchecked")
       @Override
       public boolean visit(ITreeNode node) {
         IPage page = (IPage) node;
@@ -230,9 +236,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         if (selectedPage == null) {
           try {
             getRootNode().ensureChildrenLoaded();
-            ITreeNode[] children = getRootNode().getFilteredChildNodes();
-            if (children.length > 0) {
-              selectNode(children[0]);
+            List<ITreeNode> children = getRootNode().getFilteredChildNodes();
+            if (CollectionUtility.hasElements(children)) {
+              selectNode(CollectionUtility.firstElement(children));
             }
           }
           catch (ProcessingException e) {

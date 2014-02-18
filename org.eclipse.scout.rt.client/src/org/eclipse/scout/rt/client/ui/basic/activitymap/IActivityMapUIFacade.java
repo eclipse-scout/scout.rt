@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
@@ -20,7 +21,7 @@ public interface IActivityMapUIFacade<RI, AI> {
 
   void setSelectedActivityCellFromUI(ActivityCell<RI, AI> cell);
 
-  void setSelectionFromUI(RI[] resourceIds, double[] normalizedRange);
+  void setSelectionFromUI(List<? extends RI> resourceIds, double[] normalizedRange);
 
   /**
    * Action on a empty cell or activity cell
@@ -33,11 +34,11 @@ public interface IActivityMapUIFacade<RI, AI> {
   /**
    * Popup on activity
    */
-  IMenu[] fireEditActivityPopupFromUI();
+  List<IMenu> fireEditActivityPopupFromUI();
 
   /**
    * Popup on planned activity
    */
-  IMenu[] fireNewActivityPopupFromUI();
+  List<IMenu> fireNewActivityPopupFromUI();
 
 }

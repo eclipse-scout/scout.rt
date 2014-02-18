@@ -1599,7 +1599,7 @@ public final class StringUtility {
    * Delegate to {@link ListUtility.parse(String text)}
    */
   public static Collection<Object> stringToCollection(String text) {
-    return ListUtility.parse(text);
+    return CollectionUtility.parse(text);
   }
 
   /**
@@ -1613,7 +1613,7 @@ public final class StringUtility {
    * Delegate to {@link ListUtility.format(Collection c, boolean quoteStrings)}
    */
   public static String collectionToString(Collection<Object> c, boolean quoteStrings) {
-    return ListUtility.format(c, quoteStrings);
+    return CollectionUtility.format(c, quoteStrings);
   }
 
   /**

@@ -4,15 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EventObject;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
@@ -52,11 +53,11 @@ public class ButtonEvent extends EventObject {
     return m_type;
   }
 
-  public void addPopupMenus(IMenu[] menus) {
+  public void addPopupMenus(List<IMenu> menus) {
     if (m_popupMenuList == null) {
       m_popupMenuList = new ArrayList<IMenu>();
     }
-    m_popupMenuList.addAll(Arrays.asList(menus));
+    m_popupMenuList.addAll(menus);
   }
 
   public void addPopupMenu(IMenu menu) {
@@ -66,12 +67,12 @@ public class ButtonEvent extends EventObject {
     m_popupMenuList.add(menu);
   }
 
-  public IMenu[] getPopupMenus() {
+  public List<IMenu> getPopupMenus() {
     if (m_popupMenuList == null) {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
     else {
-      return m_popupMenuList.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(m_popupMenuList);
     }
   }
 }

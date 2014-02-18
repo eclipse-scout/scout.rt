@@ -10,21 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public interface ISmartFieldUIFacade {
 
-  IMenu[] firePopupFromUI();
+/**
+ *
+ */
+public class HierachycalContentAssistDataFetcher<LOOKUP_TYPE> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_TYPE> {
 
   /**
-   * This may result in a property change {@link ISmartField#PROP_PROPOSAL_FORM} see
-   * {@link ISmartField#getProposalForm()}
+   * @param contentAssistField
    */
-  void openProposalFromUI(String newText, boolean selectCurrentValue);
+  public HierachycalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_TYPE> contentAssistField) {
+    super(contentAssistField);
+  }
 
-  boolean acceptProposalFromUI();
+  @Override
+  public void update(String searchText, boolean selectCurrentValue, boolean synchronous) {
+    // in case of hierarchical simply delegate the searchText
+    setResult(new ContentAssistFieldDataFetchResult<LOOKUP_TYPE>(null, null, searchText, selectCurrentValue));
+  }
 
-  boolean setTextFromUI(String text);
-
-  void unregisterProposalFormFromUI(ISmartFieldProposalForm form);
 }

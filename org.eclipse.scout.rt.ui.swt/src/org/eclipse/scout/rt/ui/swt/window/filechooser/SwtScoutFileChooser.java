@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.ui.swt.window.filechooser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -41,7 +44,7 @@ public class SwtScoutFileChooser {
   }
 
   public void showFileChooser() {
-    File[] files = null;
+    List<File> files = null;
     try {
       if (getScoutFileChooser().isFolderMode()) {
         files = showDirecoryDialog();
@@ -51,7 +54,7 @@ public class SwtScoutFileChooser {
       }
     }
     finally {
-      final File[] finalFiles = files;
+      final List<File> finalFiles = files;
       Runnable job = new Runnable() {
         @Override
         public void run() {
@@ -62,7 +65,7 @@ public class SwtScoutFileChooser {
     }
   }
 
-  protected File[] showFileDialog() {
+  protected List<File> showFileDialog() {
 
     int style = SWT.NONE;
     if (getScoutFileChooser().isTypeLoad()) {
@@ -76,7 +79,7 @@ public class SwtScoutFileChooser {
     }
     String[] extensions = new String[]{"*.*"};
     if (getScoutFileChooser().getFileExtensions() != null) {
-      ArrayList<String> extensionList = new ArrayList<String>();
+      List<String> extensionList = new ArrayList<String>();
       for (String ext : getScoutFileChooser().getFileExtensions()) {
         extensionList.add("*." + ext);
       }
@@ -93,17 +96,14 @@ public class SwtScoutFileChooser {
     dialog.open();
     String filterPath = dialog.getFilterPath();
     String[] fileNames = dialog.getFileNames();
-    if (fileNames.length > 0) {
-      File[] files = new File[fileNames.length];
-      for (int i = 0; i < fileNames.length; i++) {
-        files[i] = new Path(filterPath).append(fileNames[i]).toFile();
-      }
-      return files;
+    List<File> result = new ArrayList<File>();
+    for (String fileName : fileNames) {
+      result.add(new Path(filterPath).append(fileName).toFile());
     }
-    return new File[0];
+    return result;
   }
 
-  protected File[] showDirecoryDialog() {
+  protected List<File> showDirecoryDialog() {
     if (getScoutFileChooser().isMultiSelect()) {
       LOG.warn("Swt file chooser is not allowed in folder mode with multi select!");
     }
@@ -112,11 +112,11 @@ public class SwtScoutFileChooser {
       dialog.setFilterPath(getScoutFileChooser().getDirectory().getAbsolutePath());
     }
     String selectedDirecotry = dialog.open();
-    if (selectedDirecotry != null && selectedDirecotry.length() > 0) {
-      return new File[]{new File(selectedDirecotry)};
+    if (StringUtility.hasText(selectedDirecotry)) {
+      return Collections.singletonList(new File(selectedDirecotry));
     }
     else {
-      return new File[0];
+      return Collections.emptyList();
     }
   }
 

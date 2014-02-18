@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -23,8 +26,8 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModel.class);
 
   private boolean m_calledInitializer;
-  private IDataModelAttribute[] m_attributes;
-  private IDataModelEntity[] m_entities;
+  private List<IDataModelAttribute> m_attributes;
+  private List<IDataModelEntity> m_entities;
 
   public AbstractDataModel() {
     this(true);
@@ -44,36 +47,34 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
     }
   }
 
-  protected IDataModelAttribute[] createAttributes() {
+  protected List<IDataModelAttribute> createAttributes() {
     ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
-    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
+    List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
+    for (Class<? extends IDataModelAttribute> attributeClazz : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
       try {
-        IDataModelAttribute a = ConfigurationUtility.newInnerInstance(this, c);
-        attributes.add(a);
+        attributes.add(ConfigurationUtility.newInnerInstance(this, attributeClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
       }
     }
-    return attributes.toArray(new IDataModelAttribute[attributes.size()]);
+    return Collections.unmodifiableList(attributes);
   }
 
-  protected IDataModelEntity[] createEntities() {
-    ArrayList<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
+  protected List<IDataModelEntity> createEntities() {
+    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
-    for (Class<? extends IDataModelEntity> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
+    List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
+    for (Class<? extends IDataModelEntity> dataModelEntityClazz : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
       try {
-        IDataModelEntity e = ConfigurationUtility.newInnerInstance(this, c);
-        entities.add(e);
+        entities.add(ConfigurationUtility.newInnerInstance(this, dataModelEntityClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
       }
     }
-    return entities.toArray(new IDataModelEntity[entities.size()]);
+    return Collections.unmodifiableList(entities);
   }
 
   @SuppressWarnings("deprecation")
@@ -117,13 +118,13 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
   }
 
   @Override
-  public IDataModelAttribute[] getAttributes() {
-    return m_attributes;
+  public List<IDataModelAttribute> getAttributes() {
+    return CollectionUtility.unmodifiableListCopy(m_attributes);
   }
 
   @Override
-  public IDataModelEntity[] getEntities() {
-    return m_entities;
+  public List<IDataModelEntity> getEntities() {
+    return CollectionUtility.unmodifiableListCopy(m_entities);
   }
 
   @Override

@@ -13,22 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
+ * Responsible for creating {@link IContentAssistFieldProposalForm}.
+ * 
  * @since 3.8.0
  */
-public class DefaultSmartFieldProposalFormProvider implements ISmartFieldProposalFormProvider {
-
-  @Override
-  public ISmartFieldProposalForm createProposalForm(ISmartField smartField) throws ProcessingException {
-    ISmartFieldProposalForm form;
-    if (smartField.isBrowseHierarchy()) {
-      form = new SmartTreeForm(smartField);
-    }
-    else {
-      form = new SmartTableForm(smartField);
-    }
-    form.setAutoAddRemoveOnDesktop(false);
-
-    return form;
-  }
-
+public interface IContentAssistFieldProposalFormProvider<KEY_TYPE> {
+  IContentAssistFieldProposalForm<KEY_TYPE> createProposalForm(IContentAssistField<?, KEY_TYPE> smartField, boolean allowCustomText) throws ProcessingException;
 }

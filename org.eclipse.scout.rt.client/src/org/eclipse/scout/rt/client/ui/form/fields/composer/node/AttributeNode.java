@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -27,8 +30,8 @@ public class AttributeNode extends AbstractComposerNode {
   private Integer m_aggregationType;
   private IDataModelAttributeOp m_op;
   private String m_verbose;
-  private Object[] m_values;
-  private String[] m_texts;
+  private List<Object> m_values;
+  private List<String> m_texts;
 
   public AttributeNode(IComposerField composerField, IDataModelAttribute attrbiute) {
     super(composerField, false);
@@ -71,23 +74,23 @@ public class AttributeNode extends AbstractComposerNode {
   /**
    * guaranteed to never return null
    */
-  public Object[] getValues() {
-    return m_values;
+  public List<Object> getValues() {
+    return CollectionUtility.unmodifiableListCopy(m_values);
   }
 
-  public void setValues(Object[] a) {
-    m_values = a;
+  public void setValues(List<? extends Object> values) {
+    m_values = CollectionUtility.unmodifiableListCopy(values);
   }
 
   /**
    * guaranteed to never return null
    */
-  public String[] getTexts() {
-    return m_texts;
+  public List<String> getTexts() {
+    return CollectionUtility.unmodifiableListCopy(m_texts);
   }
 
-  public void setTexts(String[] s) {
-    m_texts = s;
+  public void setTexts(List<String> s) {
+    m_texts = CollectionUtility.arrayListWithoutNullElements(s);
   }
 
   public IDataModelAttribute getAttribute() {

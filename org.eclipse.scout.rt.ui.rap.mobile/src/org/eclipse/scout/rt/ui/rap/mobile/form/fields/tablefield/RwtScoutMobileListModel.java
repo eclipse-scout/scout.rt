@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.IMobileTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 
@@ -51,8 +53,8 @@ public class RwtScoutMobileListModel extends RwtScoutListModel {
     }
 
     if (getScoutTable() != null) {
-      ITableRow[] filteredRows = getScoutTable().getFilteredRows();
-      return m_pagingSupport.getElementsOfCurrentPage(filteredRows);
+      List<ITableRow> filteredRows = getScoutTable().getFilteredRows();
+      return m_pagingSupport.getElementsOfCurrentPage(filteredRows).toArray();
     }
     else {
       return new Object[0];

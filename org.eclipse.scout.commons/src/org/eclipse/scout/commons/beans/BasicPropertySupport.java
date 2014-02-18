@@ -15,13 +15,16 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.eventlistprofiler.EventListenerProfiler;
@@ -187,6 +190,72 @@ public class BasicPropertySupport implements IEventListenerSource {
 
   public Object getProperty(String name) {
     return m_props.get(name);
+  }
+
+  public <T> boolean setPropertyList(String name, List<T> newValue) {
+    return setPropertyList(name, newValue, false);
+  }
+
+  public <T> boolean setPropertyListAlwaysFire(String name, List<T> newValue) {
+    return setPropertyList(name, newValue, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> boolean setPropertyList(String name, List<T> newValue, boolean alwaysFire) {
+    Object oldValue = m_props.get(name);
+    boolean propChanged = setPropertyNoFire(name, newValue);
+    if (propChanged || alwaysFire) {
+      Object eventOldValue = null;
+      if (oldValue instanceof List) {
+        eventOldValue = Collections.unmodifiableList(CollectionUtility.arrayList((List) oldValue));
+      }
+      // fire a copy
+      List<T> eventNewValue = null;
+      if (newValue != null) {
+        eventNewValue = Collections.unmodifiableList(CollectionUtility.arrayList(newValue));
+      }
+      firePropertyChangeImpl(name, eventOldValue, eventNewValue);
+      return propChanged;
+    }
+    return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> List<T> getPropertyList(String name) {
+    return (List<T>) m_props.get(name);
+  }
+
+  public <T> boolean setPropertySet(String name, Set<T> newValue) {
+    return setPropertySet(name, newValue, false);
+  }
+
+  public <T> boolean setPropertySetAlwaysFire(String name, Set<T> newValue) {
+    return setPropertySet(name, newValue, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> boolean setPropertySet(String name, Set<T> newValue, boolean alwaysFire) {
+    Object oldValue = m_props.get(name);
+    boolean propChanged = setPropertyNoFire(name, newValue);
+    if (propChanged || alwaysFire) {
+      Object eventOldValue = null;
+      if (oldValue instanceof Set) {
+        eventOldValue = Collections.unmodifiableSet(CollectionUtility.hashSet((Set) oldValue));
+      }
+      // fire a copy
+      Set<T> eventNewValue = null;
+      if (newValue != null) {
+        eventNewValue = Collections.unmodifiableSet(CollectionUtility.hashSet(newValue));
+      }
+      firePropertyChangeImpl(name, eventOldValue, eventNewValue);
+      return propChanged;
+    }
+    return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> Set<T> getPropertySet(String name) {
+    return (Set<T>) m_props.get(name);
   }
 
   public boolean setProperty(String name, Object newValue) {

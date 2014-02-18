@@ -17,8 +17,10 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -71,7 +73,7 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
   protected void updatePopupMenus(PopupMenu pm) {
     pm.removeAll();
     if (getScoutObject() != null) {
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       // notify Scout
       Runnable t = new Runnable() {
         @Override
@@ -86,7 +88,7 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
         //nop
       }
       // end notify
-      if (scoutMenusRef.get() != null && scoutMenusRef.get().length > 0) {
+      if (CollectionUtility.hasElements(scoutMenusRef.get())) {
         //create awt menu wrappers
         for (IAction a : scoutMenusRef.get()) {
           if (a.isSeparator()) {

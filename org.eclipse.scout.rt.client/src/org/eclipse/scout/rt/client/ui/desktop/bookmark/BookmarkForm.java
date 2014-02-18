@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   private BookmarkFolder m_bookmarkRootFolder;
@@ -143,7 +143,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
         }
 
         @Override
-        protected Class<? extends LookupCall> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<BookmarkFolder>> getConfiguredLookupCall() {
           return BookmarkFolderLookupCall.class;
         }
       }
@@ -156,12 +156,12 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
         }
 
         @Override
-        protected Class<? extends LookupCall> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
           return KeyStrokeLookupCall.class;
         }
 
         @Override
-        protected void execPrepareLookup(LookupCall call) {
+        protected void execPrepareLookup(ILookupCall<String> call) throws ProcessingException {
           ((KeyStrokeLookupCall) call).setCurrentKeyStroke(getValue());
         }
       }

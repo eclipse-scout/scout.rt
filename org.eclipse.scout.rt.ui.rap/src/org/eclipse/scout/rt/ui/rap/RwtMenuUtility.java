@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +32,7 @@ public final class RwtMenuUtility {
 
   private RwtMenuUtility() {
   }
+  
 
   public static void fillContextMenu(IMenu[] scoutMenus, IRwtEnvironment uiEnvironment, Menu menu) {
     MenuFactory menuFactory = uiEnvironment.getMenuFactory();
@@ -47,12 +48,12 @@ public final class RwtMenuUtility {
     }
   }
 
-  public static IMenu[] collectMenus(final IButton button, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final IButton button, IRwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        menuList.addAll(Arrays.asList(button.getUIFacade().fireButtonPopupFromUI()));
+        menuList.addAll(button.getUIFacade().fireButtonPopupFromUI());
       }
     };
 
@@ -64,19 +65,19 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(tree.getUIFacade().fireEmptySpacePopupFromUI()));
+          menuList.addAll(tree.getUIFacade().fireEmptySpacePopupFromUI());
         }
         if (nodeActions) {
-          menuList.addAll(Arrays.asList(tree.getUIFacade().fireNodePopupFromUI()));
+          menuList.addAll(tree.getUIFacade().fireNodePopupFromUI());
         }
       }
     };
@@ -89,19 +90,19 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(table.getUIFacade().fireEmptySpacePopupFromUI()));
+          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
         }
         if (rowActions) {
-          menuList.addAll(Arrays.asList(table.getUIFacade().fireRowPopupFromUI()));
+          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
         }
       }
     };
@@ -114,19 +115,19 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, IRwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireNewPopupFromUI()));
+          menuList.addAll(calendar.getUIFacade().fireNewPopupFromUI());
         }
         if (componentActions) {
-          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireComponentPopupFromUI()));
+          menuList.addAll(calendar.getUIFacade().fireComponentPopupFromUI());
         }
       }
     };
@@ -139,37 +140,37 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectRowMenus(final ITable table, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectRowMenus(final ITable table, IRwtEnvironment uiEnvironment) {
     return collectMenus(table, false, true, uiEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ITable table, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ITable table, IRwtEnvironment uiEnvironment) {
     return collectMenus(table, true, false, uiEnvironment);
   }
 
-  public static IMenu[] collectNodeMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectNodeMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
     return collectMenus(tree, false, true, uiEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
     return collectMenus(tree, true, false, uiEnvironment);
   }
 
-  public static IMenu[] collectComponentMenus(final ICalendar calendar, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectComponentMenus(final ICalendar calendar, IRwtEnvironment uiEnvironment) {
     return collectMenus(calendar, false, true, uiEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ICalendar calendar, IRwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ICalendar calendar, IRwtEnvironment uiEnvironment) {
     return collectMenus(calendar, true, false, uiEnvironment);
   }
 
   /**
    * Splits the menus in groups, separated by the {@link IActionNode#isSeparator()}
    */
-  public static List<List<IMenu>> split(IMenu[] unseparatedMenus) {
+  public static List<List<IMenu>> split(List<IMenu> unseparatedMenus) {
     List<List<IMenu>> separatedMenus = new LinkedList<List<IMenu>>();
 
     List<IMenu> menus = new LinkedList<IMenu>();

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
@@ -60,7 +60,7 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
-  private IMenu[] m_scoutActions;
+  private List<IMenu> m_scoutActions;
 
   public RwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -287,7 +287,7 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
     Menu menu = createMenu();
 
     m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
-    int menuHeight = new MenuSizeEstimator(menu).estimateMenuHeight(Arrays.asList(m_scoutActions));
+    int menuHeight = new MenuSizeEstimator(menu).estimateMenuHeight(m_scoutActions);
     Point menuPosition = null;
     if (shouldMenuOpenOnTop(menuHeight)) {
       menuPosition = computeMenuPositionForTop(menuHeight);

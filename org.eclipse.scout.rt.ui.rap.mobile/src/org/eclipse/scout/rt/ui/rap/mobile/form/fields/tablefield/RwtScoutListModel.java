@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -62,7 +63,7 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   @Override
   public Object[] getElements(Object inputElement) {
     if (m_scoutTable != null) {
-      return m_scoutTable.getFilteredRows();
+      return m_scoutTable.getFilteredRows().toArray();
     }
     else {
       return new Object[0];
@@ -134,7 +135,7 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   }
 
   protected ICell getCell(Object row) {
-    IColumn<?> column = m_scoutTable.getColumnSet().getVisibleColumns()[0];
+    IColumn<?> column = CollectionUtility.firstElement(m_scoutTable.getColumnSet().getVisibleColumns());
     if (column != null) {
       ITableRow tableRow = (ITableRow) row;
       return tableRow.getCell(column);

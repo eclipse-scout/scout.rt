@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.action;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -24,20 +23,12 @@ public class ActionFinder {
   public ActionFinder() {
   }
 
-  public <T extends IAction> T findAction(IAction[] actionTree, Class<T> searchType) {
-    return findAction(Arrays.asList(actionTree), searchType);
-  }
-
   public <T extends IAction> T findAction(List<? extends IAction> actionTree, Class<T> searchType) {
     List<T> filteredActions = findActions(actionTree, searchType, true, true);
     if (filteredActions.size() > 0) {
       return filteredActions.get(0);
     }
     return null;
-  }
-
-  public <T extends IAction> List<T> findActions(IAction[] actionTree, Class<T> searchType, boolean recursive) {
-    return findActions(Arrays.asList(actionTree), searchType, recursive);
   }
 
   public <T extends IAction> List<T> findActions(List<? extends IAction> actionTree, Class<T> searchType, boolean recursive) {

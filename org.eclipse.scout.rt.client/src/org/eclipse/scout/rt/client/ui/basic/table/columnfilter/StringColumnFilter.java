@@ -74,9 +74,9 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
   }
 
   @Override
-  public List<LookupRow> createHistogram() {
-    TreeMap<String, LookupRow> hist = new TreeMap<String, LookupRow>(Collator.getInstance(LocaleThreadLocal.get()));
-    HashMap<String, Integer> countMap = new HashMap<String, Integer>();
+  public List<LookupRow<String>> createHistogram() {
+    Map<String, LookupRow<String>> hist = new TreeMap<String, LookupRow<String>>(Collator.getInstance(LocaleThreadLocal.get()));
+    Map<String, Integer> countMap = new HashMap<String, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);
       if (!StringUtility.hasText(s)) {
@@ -84,23 +84,22 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
       }
       if (s != null && !hist.containsKey(s)) {
         FontSpec font = (row.isFilterAccepted() ? null : FontSpec.parse("italic"));
-        hist.put(s, new LookupRow(s, s, null, null, null, null, font));
+        hist.put(s, new LookupRow<String>(s, s, null, null, null, null, font));
       }
       Integer count = countMap.get(s);
       countMap.put(s, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<String, LookupRow> e : hist.entrySet()) {
+    for (Map.Entry<String, LookupRow<String>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        LookupRow row = e.getValue();
-        row.setText(row.getText() + " (" + count + ")");
+        e.getValue().setText(e.getValue().getText() + " (" + count + ")");
       }
     }
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    List<LookupRow<String>> list = new ArrayList<LookupRow<String>>();
     list.addAll(hist.values());
     //
     Integer nullCount = countMap.get(null);
-    list.add(new LookupRow(null, "(" + ScoutTexts.get("ColumnFilterNullText") + ")" + (nullCount != null && nullCount > 1 ? " (" + nullCount + ")" : "")));
+    list.add(new LookupRow<String>(null, "(" + ScoutTexts.get("ColumnFilterNullText") + ")" + (nullCount != null && nullCount > 1 ? " (" + nullCount + ")" : "")));
     return list;
   }
 

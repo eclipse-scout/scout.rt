@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.rap.util;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -462,14 +462,15 @@ public final class RwtUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T[] getItemsOfSelection(Class<T> t, StructuredSelection selection) {
-    T[] result = (T[]) Array.newInstance(t, selection.size());
-    int i = 0;
-    for (Object o : selection.toArray()) {
-      result[i++] = (T) o;
+  public static <T> List<T> getItemsOfSelection(Class<T> t, StructuredSelection selection) {
+    List<T> result = new ArrayList<T>();
+    if (selection != null) {
+      Iterator selectionIt = selection.iterator();
+      while (selectionIt.hasNext()) {
+        result.add((T) selectionIt.next());
+      }
     }
     return result;
-
   }
 
   /**

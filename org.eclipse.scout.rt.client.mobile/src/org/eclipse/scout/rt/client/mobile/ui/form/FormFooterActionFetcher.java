@@ -32,12 +32,10 @@ public class FormFooterActionFetcher extends AbstractFormActionFetcher {
     List<IMenu> formActions = new LinkedList<IMenu>();
     if (getForm().getRootGroupBox().getCustomProcessButtonCount() > 0) {
       List<IMobileAction> leftActions = createLeftFooterActions();
-      if (leftActions != null) {
-        for (IMobileAction action : leftActions) {
-          action.setHorizontalAlignment(IMobileAction.HORIZONTAL_ALIGNMENT_LEFT);
-        }
-        formActions.addAll(leftActions);
+      for (IMobileAction action : leftActions) {
+        action.setHorizontalAlignment(IMobileAction.HORIZONTAL_ALIGNMENT_LEFT);
       }
+      formActions.addAll(leftActions);
     }
     return formActions;
   }

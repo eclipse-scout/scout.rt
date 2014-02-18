@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.services.common.workflow;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -231,9 +232,9 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
    * Configuration
    */
 
-  private Class<? extends IWorkflowStep>[] getConfiguredSteps() {
+  private List<Class<? extends IWorkflowStep>> getConfiguredSteps() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IWorkflowStep.class);
+    List<Class<IWorkflowStep>> filtered = ConfigurationUtility.filterClasses(dca, IWorkflowStep.class);
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IWorkflowStep.class);
   }
 

@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -389,7 +391,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   @Override
-  public IPage[] getChildPages() {
+  public List<IPage> getChildPages() {
     if (ClientSyncJob.isSyncClientJob()) {
       try {
         getTree().resolveVirtualNodes(getChildNodes());
@@ -398,12 +400,11 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         LOG.error("failed to create the real page from the virtual page", e);
       }
     }
-    ITreeNode[] a = getChildNodes();
-    IPage[] b = new IPage[a.length];
-    for (int i = 0; i < b.length; i++) {
-      b[i] = (IPage) a[i];
+    List<IPage> childPages = new ArrayList<IPage>();
+    for (ITreeNode childNode : getChildNodes()) {
+      childPages.add((IPage) childNode);
     }
-    return b;
+    return childPages;
   }
 
   @Override

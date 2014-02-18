@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
@@ -24,7 +25,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
-public class DataModelOperatorLookupCall extends LocalLookupCall {
+public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttributeOp> {
   private static final long serialVersionUID = 1L;
 
   private IDataModelAttribute m_attribute;
@@ -38,9 +39,9 @@ public class DataModelOperatorLookupCall extends LocalLookupCall {
   }
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    List<LookupRow> result = new ArrayList<LookupRow>();
-    IDataModelAttributeOp[] ops = null;
+  protected List<ILookupRow<IDataModelAttributeOp>> execCreateLookupRows() throws ProcessingException {
+    List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>();
+    List<IDataModelAttributeOp> ops = null;
     if (m_attribute != null) {
       ops = m_attribute.getOperators();
     }
@@ -53,7 +54,7 @@ public class DataModelOperatorLookupCall extends LocalLookupCall {
         if (text != null && text.indexOf("{1}") >= 0) {
           text = text.replace("{1}", "m");
         }
-        result.add(new LookupRow(op, text));
+        result.add(new LookupRow<IDataModelAttributeOp>(op, text));
       }
     }
 

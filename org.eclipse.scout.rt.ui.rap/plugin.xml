@@ -85,8 +85,8 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
-            name="Smart field"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField"
+            name="Content Assist Field"
             scope="default">
             <uiClass
               class="org.eclipse.scout.rt.ui.rap.form.fields.smartfield.RwtScoutSmartField">

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.security;
 
 import java.security.Permission;
 import java.security.Permissions;
+import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
@@ -66,5 +67,5 @@ public interface IAccessControlService extends IService {
    * This method is lenient.
    */
   @RemoteServiceAccessDenied
-  void clearCacheOfUserIds(String... userIds);
+  void clearCacheOfUserIds(Collection<String> userIds);
 }

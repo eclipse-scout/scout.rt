@@ -95,8 +95,7 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     m_swtBodyPart.setLayout(bodyLayout);
     installSwtContainerBorder();
     // FIELDS:
-    IFormField[] scoutFields = getScoutObject().getControlFields();
-    for (IFormField field : scoutFields) {
+    for (IFormField field : getScoutObject().getControlFields()) {
       ISwtScoutFormField swtScoutComposite = getEnvironment().createFormField(m_swtBodyPart, field);
       SwtScoutFormFieldGridData layoutData = new SwtScoutFormFieldGridData(field);
       swtScoutComposite.getSwtContainer().setLayoutData(layoutData);

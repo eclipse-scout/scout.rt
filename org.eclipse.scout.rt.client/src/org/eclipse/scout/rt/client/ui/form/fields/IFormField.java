@@ -508,17 +508,17 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   /**
    * @return only contributed key strokes
    */
-  IKeyStroke[] getContributedKeyStrokes();
+  List<IKeyStroke> getContributedKeyStrokes();
 
   /**
    * @return only local key strokes
    */
-  IKeyStroke[] getLocalKeyStrokes();
+  List<IKeyStroke> getLocalKeyStrokes();
 
   /**
    * @return local and contributed key strokes
    */
-  IKeyStroke[] getKeyStrokes();
+  List<IKeyStroke> getKeyStrokes();
 
   String getForegroundColor();
 

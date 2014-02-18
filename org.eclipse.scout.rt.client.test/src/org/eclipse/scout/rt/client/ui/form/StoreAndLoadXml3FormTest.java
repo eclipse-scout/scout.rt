@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
@@ -87,8 +88,8 @@ public class StoreAndLoadXml3FormTest {
     f.getG2Box().getText1Field().setValue("g2t1");
     f.getG2Box().getText2Field().setValue("g2t2");
     f.getG3G4Text2Field().setValue("g3g2");
-    f.getG1Box().getTestListBox().setValue(new String[]{"g1L"});
-    f.getG2Box().getTestListBox().setValue(new String[]{"g2L"});
+    f.getG1Box().getTestListBox().setValue(CollectionUtility.hashSet("g1L"));
+    f.getG2Box().getTestListBox().setValue(CollectionUtility.hashSet("g2L"));
     String xml = f.getXML(null);
 
     f = new TestForm();
@@ -102,8 +103,8 @@ public class StoreAndLoadXml3FormTest {
     assertEquals("g1t2", f.getG1Box().getText2Field().getValue());
     assertEquals("g2t1", f.getG2Box().getText1Field().getValue());
     assertEquals("g3g2", f.getG3G4Text2Field().getValue());
-    assertEquals("g1L", f.getG1Box().getTestListBox().getValue()[0]);
-    assertEquals("g2L", f.getG2Box().getTestListBox().getValue()[0]);
+    assertEquals("g1L", CollectionUtility.firstElement(f.getG1Box().getTestListBox().getValue()));
+    assertEquals("g2L", CollectionUtility.firstElement(f.getG2Box().getTestListBox().getValue()));
   }
 
   @Test

@@ -15,6 +15,7 @@ import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -230,7 +231,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   }
 
   @Override
-  public void clearCacheOfUserIds(String... userIds) {
+  public void clearCacheOfUserIds(Collection<String> userIds) {
     m_accessControlStore.clearCacheOfUserIds(userIds);
   }
 }

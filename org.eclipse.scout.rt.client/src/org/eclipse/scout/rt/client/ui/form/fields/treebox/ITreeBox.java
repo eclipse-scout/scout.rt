@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -17,25 +20,25 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * A treebox represents an array of values which correspond to checked keys in
+ * A treebox represents a list of values which correspond to checked keys in
  * the tree. When setting loadIncremental=false just one LookupCall by
- * <b>all</b> is sent to load all tree nodes. It is expected that the returned {@link LookupRow}s containt their
- * corresponding parentKey or null for root
- * nodes When setting loadIncremental=true a LookupCall by <b>rec</b> is sent
+ * <b>all</b> is sent to load all tree nodes. It is expected that the returned {@link ILookupRow}s contains their
+ * corresponding parentKey or null for root nodes.
+ * When setting loadIncremental=true a {@link ILookupCall} by <b>rec</b> is sent
  * whenever a node's children are loaded and contains the parentKey.
  * <p>
- * The listbox value is a ObjectX[] where the ObjectX[] is the set of checked keys of the listbox<br>
- * the inner table shows those rows as checked which have the key value as a part of the listbox value (ObjectX[])
+ * The listbox value is a List<T> where the {@link List<T>} is the set of checked keys of the listbox<br>
+ * the inner table shows those rows as checked which have the key value as a part of the listbox value (List<T>)
  * <p>
  * Note, that the listbox might not necessarily show all checked rows since the value of the listbox might contain
  * inactive keys that are not reflected in the listbox<br>
  * Therefore an empty listbox table is not the same as a listbox with an empty value (null)
  */
-public interface ITreeBox<T> extends IValueField<T[]>, ICompositeField {
+public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   /**
    * {@link boolean}
@@ -98,17 +101,17 @@ public interface ITreeBox<T> extends IValueField<T[]>, ICompositeField {
 
   void loadChildNodes(ITreeNode parentNode) throws ProcessingException;
 
-  ITreeNode[] callChildLookup(ITreeNode parentNode) throws ProcessingException;
+  List<ITreeNode> callChildLookup(ITreeNode parentNode) throws ProcessingException;
 
-  ITreeNode[] callCompleteTreeLookup() throws ProcessingException;
+  List<ITreeNode> callCompleteTreeLookup() throws ProcessingException;
 
-  LookupCall getLookupCall();
+  ILookupCall<T> getLookupCall();
 
-  void setLookupCall(LookupCall call);
+  void setLookupCall(ILookupCall<T> call);
 
-  Class<? extends ICodeType> getCodeTypeClass();
+  Class<? extends ICodeType<?, T>> getCodeTypeClass();
 
-  void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass);
+  void setCodeTypeClass(Class<? extends ICodeType<?, T>> codeTypeClass);
 
   boolean isAutoExpandAll();
 
@@ -123,6 +126,12 @@ public interface ITreeBox<T> extends IValueField<T[]>, ICompositeField {
   void setLoadIncremental(boolean b);
 
   boolean isNodeActive(ITreeNode node);
+
+  @Override
+  Set<T> getValue();
+
+  @Override
+  Set<T> getInitValue();
 
   /**
    * @return the first selected/checked value if any
@@ -142,19 +151,29 @@ public interface ITreeBox<T> extends IValueField<T[]>, ICompositeField {
 
   T getCheckedKey();
 
-  T[] getCheckedKeys();
+  Set<T> getCheckedKeys();
 
-  LookupRow getCheckedLookupRow();
+  /**
+   * @return
+   * @deprecated will be removed with version 3.11. Use {@link #getCheckedKey()} instead
+   */
+  @Deprecated
+  ILookupRow getCheckedLookupRow();
 
-  LookupRow[] getCheckedLookupRows();
+  /**
+   * @return
+   * @deprecated will be removed with version 3.11. Use {@link #getCheckedKeys()} instead
+   */
+  @Deprecated
+  Set<ILookupRow> getCheckedLookupRows();
 
   void checkKey(T key);
 
-  void checkKeys(T[] keys);
+  void checkKeys(Set<T> keys);
 
   void uncheckAllKeys();
 
-  T[] getUncheckedKeys();
+  Set<T> getUncheckedKeys();
 
   void checkAllKeys();
 

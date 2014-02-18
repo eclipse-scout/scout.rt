@@ -1,9 +1,12 @@
 package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,11 +35,10 @@ public class ActivityMapTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testSetAndGetActivityCells() {
     ActivityCell<String, Double> cell = getTestCell();
 
-    activityMap.addActivityCells(new ActivityCell[]{cell});
+    activityMap.addActivityCells(CollectionUtility.arrayList(cell));
     activityMap.setSelectedActivityCell(cell);
 
     assertEquals(cell.getResourceId(), activityMap.getSelectedActivityCell().getResourceId());
@@ -55,7 +57,7 @@ public class ActivityMapTest {
   @Test
   public void testSetAndGetResourceIds() {
     activityMap.setResourceIds(null);
-    assertEquals(activityMap.getResourceIds().getClass(), String[].class);
+    assertTrue(activityMap.getResourceIds() instanceof List);
   }
 
   /**

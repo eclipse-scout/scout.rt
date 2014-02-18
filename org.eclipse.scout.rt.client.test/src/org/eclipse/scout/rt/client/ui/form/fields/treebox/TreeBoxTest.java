@@ -12,19 +12,20 @@ package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(Arrays.asList(treeBox.getValue()));
+    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
 
     // only one node selected
     assertEquals(1, valueSet.size());
@@ -76,7 +77,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(Arrays.asList(treeBox.getValue()));
+    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
 
     // parent node and 3 childs nodes selected
     assertEquals(4, valueSet.size());
@@ -104,7 +105,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(Arrays.asList(treeBox.getValue()));
+    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
 
     // parent node and 4 childs nodes selected
     assertEquals(5, valueSet.size());
@@ -121,7 +122,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, false);
 
-    valueSet = new HashSet<Long>(Arrays.asList(treeBox.getValue()));
+    valueSet = new HashSet<Long>(treeBox.getValue());
 
     // parent node and all minus one childs nodes selected
     assertEquals(4, valueSet.size());
@@ -138,14 +139,14 @@ public class TreeBoxTest {
     tree.setNodeChecked(node, false);
 
     // no nodes selected
-    Long[] values = treeBox.getValue();
-    assertNull(values);
+    Set<Long> values = treeBox.getValue();
+    assertTrue(CollectionUtility.isEmpty(values));
   }
 
   public class SimpleTreeBox extends AbstractTreeBox<Long> {
 
     @Override
-    protected Class<? extends LookupCall> getConfiguredLookupCall() {
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
       return TreeBoxLookupCall.class;
     }
 
@@ -159,32 +160,32 @@ public class TreeBoxTest {
     }
 
     @Override
-    protected Class<? extends LookupCall> getConfiguredLookupCall() {
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
       return TreeBoxLookupCall.class;
     }
   }
 
-  public static class TreeBoxLookupCall extends LocalLookupCall {
+  public static class TreeBoxLookupCall extends LocalLookupCall<Long> {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-      List<LookupRow> list = new ArrayList<LookupRow>();
-      list.add(new LookupRow(1L, "A", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow(2L, "B", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow(3L, "C", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow(4L, "D", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow(5L, "A-A", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow(6L, "A-B", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow(7L, "A-C", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow(8L, "C-A", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow(9L, "C-B", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow(10L, "C-C", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow(11L, "C-B-A", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow(12L, "C-B-B", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow(13L, "C-B-C", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow(14L, "C-B-D", null, null, null, null, null, true, /*parent*/9L, true));
+    protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+      List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
+      list.add(new LookupRow<Long>(1L, "A", null, null, null, null, null, true, /*parent*/null, true));
+      list.add(new LookupRow<Long>(2L, "B", null, null, null, null, null, true, /*parent*/null, true));
+      list.add(new LookupRow<Long>(3L, "C", null, null, null, null, null, true, /*parent*/null, true));
+      list.add(new LookupRow<Long>(4L, "D", null, null, null, null, null, true, /*parent*/null, true));
+      list.add(new LookupRow<Long>(5L, "A-A", null, null, null, null, null, true, /*parent*/1L, true));
+      list.add(new LookupRow<Long>(6L, "A-B", null, null, null, null, null, true, /*parent*/1L, true));
+      list.add(new LookupRow<Long>(7L, "A-C", null, null, null, null, null, true, /*parent*/1L, true));
+      list.add(new LookupRow<Long>(8L, "C-A", null, null, null, null, null, true, /*parent*/3L, true));
+      list.add(new LookupRow<Long>(9L, "C-B", null, null, null, null, null, true, /*parent*/3L, true));
+      list.add(new LookupRow<Long>(10L, "C-C", null, null, null, null, null, true, /*parent*/3L, true));
+      list.add(new LookupRow<Long>(11L, "C-B-A", null, null, null, null, null, true, /*parent*/9L, true));
+      list.add(new LookupRow<Long>(12L, "C-B-B", null, null, null, null, null, true, /*parent*/9L, true));
+      list.add(new LookupRow<Long>(13L, "C-B-C", null, null, null, null, null, true, /*parent*/9L, true));
+      list.add(new LookupRow<Long>(14L, "C-B-D", null, null, null, null, null, true, /*parent*/9L, true));
       return list;
     }
   }

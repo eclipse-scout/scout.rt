@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
@@ -24,7 +25,7 @@ public interface IComposerValueField {
 
   void removeValueChangeListenerFromTarget(PropertyChangeListener listener);
 
-  void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values);
+  void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List<?> values);
 
   void clearSelectionContext();
 
@@ -36,11 +37,11 @@ public interface IComposerValueField {
    *         <p>
    *         Note: "between a and b" field has <b>two</b> values so returning an array with two elements: [a, b ]
    */
-  Object[] getValues();
+  List<Object> getValues();
 
   /**
    * @return the texts of the values of the selected field
    */
-  String[] getTexts();
+  List<String> getTexts();
 
 }

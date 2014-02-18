@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.scout.commons.ListUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -54,7 +54,7 @@ public final class EntityContributionUtility {
     if (whereContribution.getWhereParts().isEmpty()) {
       return null;
     }
-    return ListUtility.format(whereContribution.getWhereParts(), " AND ");
+    return CollectionUtility.format(whereContribution.getWhereParts(), " AND ");
   }
 
   /**
@@ -84,18 +84,18 @@ public final class EntityContributionUtility {
     // create an EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...)
     StringBuilder sb = new StringBuilder();
     sb.append(" EXISTS (SELECT 1 FROM ");
-    sb.append(ListUtility.format(contrib.getFromParts(), ", "));
+    sb.append(CollectionUtility.format(contrib.getFromParts(), ", "));
     if (!contrib.getWhereParts().isEmpty()) {
       sb.append(" WHERE ");
-      sb.append(ListUtility.format(contrib.getWhereParts(), " AND "));
+      sb.append(CollectionUtility.format(contrib.getWhereParts(), " AND "));
     }
     if (!contrib.getGroupByParts().isEmpty()) {
       sb.append(" GROUP BY ");
-      sb.append(ListUtility.format(contrib.getGroupByParts(), ", "));
+      sb.append(CollectionUtility.format(contrib.getGroupByParts(), ", "));
     }
     if (!contrib.getHavingParts().isEmpty()) {
       sb.append(" HAVING ");
-      sb.append(ListUtility.format(contrib.getHavingParts(), " AND "));
+      sb.append(CollectionUtility.format(contrib.getHavingParts(), " AND "));
     }
     sb.append(")");
     return EntityContribution.create(sb.toString());
@@ -184,7 +184,7 @@ public final class EntityContributionUtility {
       entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
       // extend the where section
       if (childContributions.getWhereParts().size() > 0) {
-        final String s = ListUtility.format(childContributions.getWhereParts(), " AND ");
+        final String s = CollectionUtility.format(childContributions.getWhereParts(), " AND ");
         if (StringUtility.getTag(entityPart, "whereParts") != null) {
           entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
             @Override
@@ -208,7 +208,7 @@ public final class EntityContributionUtility {
             for (String s : childContributions.getGroupByParts()) {
               checkGroupByPart(s);
             }
-            final String s = ListUtility.format(childContributions.getGroupByParts(), ", ");
+            final String s = CollectionUtility.format(childContributions.getGroupByParts(), ", ");
             if (StringUtility.getTag(entityPart, "groupByParts") != null) {
               entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
                 @Override
@@ -239,7 +239,7 @@ public final class EntityContributionUtility {
           entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
           //
           if (childContributions.getHavingParts().size() > 0) {
-            final String s = ListUtility.format(childContributions.getHavingParts(), " AND ");
+            final String s = CollectionUtility.format(childContributions.getHavingParts(), " AND ");
             if (StringUtility.getTag(entityPart, "havingParts") != null) {
               entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
                 @Override

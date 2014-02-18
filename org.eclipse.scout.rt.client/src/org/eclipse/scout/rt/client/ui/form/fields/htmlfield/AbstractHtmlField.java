@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -45,7 +48,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   private IHtmlFieldUIFacade m_uiFacade;
   private boolean m_htmlEditor;
   private boolean m_scrollBarEnabled;
-  private RemoteFile[] m_attachments;
+  private Set<RemoteFile> m_attachments;
   private Boolean m_monitorSpelling = null; // If null the application-wide
 
   public AbstractHtmlField() {
@@ -95,7 +98,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
-    setAttachments(new RemoteFile[0]);
     super.initConfig();
     m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();
@@ -198,13 +200,13 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * local images and local resources bound to the html text
    */
   @Override
-  public RemoteFile[] getAttachments() {
-    return m_attachments;
+  public Set<RemoteFile> getAttachments() {
+    return CollectionUtility.unmodifiableSetCopy(m_attachments);
   }
 
   @Override
-  public void setAttachments(RemoteFile[] attachments) {
-    m_attachments = attachments;
+  public void setAttachments(Collection<? extends RemoteFile> attachments) {
+    m_attachments = CollectionUtility.<RemoteFile> hashSetWithoutNullElements(attachments);
   }
 
   @Override
@@ -227,7 +229,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
 
     @Override
-    public void setAttachmentsFromUI(RemoteFile[] attachments) {
+    public void setAttachmentsFromUI(Collection<? extends RemoteFile> attachments) {
       setAttachments(attachments);
     }
 

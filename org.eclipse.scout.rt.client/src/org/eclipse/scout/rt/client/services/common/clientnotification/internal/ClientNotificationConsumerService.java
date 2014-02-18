@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.clientnotification.internal;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -25,7 +29,6 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-3)
-@SuppressWarnings("deprecation")
 public class ClientNotificationConsumerService extends AbstractService implements IClientNotificationConsumerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationConsumerService.class);
   private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";
@@ -48,8 +51,9 @@ public class ClientNotificationConsumerService extends AbstractService implement
   }
 
   @Override
-  public void dispatchClientNotifications(final IClientNotification[] notifications, final IClientSession session) {
-    if (notifications == null || notifications.length == 0) {
+  public void dispatchClientNotifications(final Collection<? extends IClientNotification> notifications0, final IClientSession session) {
+    final Set<IClientNotification> notifications = CollectionUtility.hashSetWithoutNullElements(notifications0);
+    if (notifications.isEmpty()) {
       return;
     }
     if (ClientJob.getCurrentSession() == session) {

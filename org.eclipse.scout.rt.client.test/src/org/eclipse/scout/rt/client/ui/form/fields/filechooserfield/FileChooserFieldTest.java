@@ -1,8 +1,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -84,8 +84,8 @@ public class FileChooserFieldTest {
         }
 
         @Override
-        protected String[] getConfiguredFileExtensions() {
-          return new String[]{"png", "bmp", "jpg", "jpeg", "gif"};
+        protected List<String> getConfiguredFileExtensions() {
+          return CollectionUtility.arrayList("png", "bmp", "jpg", "jpeg", "gif");
         }
 
         @Override
@@ -116,7 +116,7 @@ public class FileChooserFieldTest {
 
   @Test
   public void testFileExtensions() {
-    List<String> extensions = Arrays.asList(m_form.getFileChooserField().getFileExtensions());
+    List<String> extensions = m_form.getFileChooserField().getFileExtensions();
     Assert.assertEquals("There should be 5 file extensions registered", 5, extensions.size());
     Assert.assertTrue(extensions.contains("png"));
     Assert.assertTrue(extensions.contains("bmp"));
@@ -127,20 +127,20 @@ public class FileChooserFieldTest {
 
   @Test
   public void testMenusAndKeyStrokes() {
-    IMenu[] fileChooserFieldMenus = m_form.getFileChooserField().getMenus();
-    Assert.assertEquals("fileChooserField should have 2 menus", 2, fileChooserFieldMenus.length);
+    List<IMenu> fileChooserFieldMenus = m_form.getFileChooserField().getMenus();
+    Assert.assertEquals("fileChooserField should have 2 menus", 2, fileChooserFieldMenus.size());
 
-    Assert.assertEquals("Menu1", fileChooserFieldMenus[0].getText());
-    Assert.assertEquals("&Menu1", fileChooserFieldMenus[0].getTextWithMnemonic());
-    Assert.assertEquals("alternate-1", fileChooserFieldMenus[0].getKeyStroke());
+    Assert.assertEquals("Menu1", fileChooserFieldMenus.get(0).getText());
+    Assert.assertEquals("&Menu1", fileChooserFieldMenus.get(0).getTextWithMnemonic());
+    Assert.assertEquals("alternate-1", fileChooserFieldMenus.get(0).getKeyStroke());
 
-    Assert.assertEquals("Menu2", fileChooserFieldMenus[1].getText());
-    Assert.assertEquals("Menu&2", fileChooserFieldMenus[1].getTextWithMnemonic());
-    Assert.assertEquals("alternate-2", fileChooserFieldMenus[1].getKeyStroke());
+    Assert.assertEquals("Menu2", fileChooserFieldMenus.get(1).getText());
+    Assert.assertEquals("Menu&2", fileChooserFieldMenus.get(1).getTextWithMnemonic());
+    Assert.assertEquals("alternate-2", fileChooserFieldMenus.get(1).getKeyStroke());
 
-    IKeyStroke[] fileChooserFieldKeyStrokes = m_form.getFileChooserField().getContributedKeyStrokes();
+    List<IKeyStroke> fileChooserFieldKeyStrokes = m_form.getFileChooserField().getContributedKeyStrokes();
     Assert.assertNotNull("KeyStrokes of fileChooserField should not be null", fileChooserFieldKeyStrokes);
-    Assert.assertEquals("fileChooserField should have 2 keyStrokes registered", 2, fileChooserFieldKeyStrokes.length);
+    Assert.assertEquals("fileChooserField should have 2 keyStrokes registered", 2, fileChooserFieldKeyStrokes.size());
   }
 
   @After

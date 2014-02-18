@@ -4,14 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import java.util.Date;
+import java.util.List;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public interface ICalendarUIFacade {
@@ -22,11 +24,16 @@ public interface ICalendarUIFacade {
 
   void fireComponentMovedFromUI(CalendarComponent comp, Date newDate);
 
-  IMenu[] fireComponentPopupFromUI();
+  List<IMenu> fireComponentPopupFromUI();
 
-  IMenu[] fireNewPopupFromUI();
+  List<IMenu> fireNewPopupFromUI();
 
   void fireReloadFromUI();
+
+  /**
+   * @param dateRange
+   */
+  void setVisibleRangeFromUI(Range<Date> dateRange);
 
   void setVisibleRangeFromUI(Date minDate, Date maxDate);
 

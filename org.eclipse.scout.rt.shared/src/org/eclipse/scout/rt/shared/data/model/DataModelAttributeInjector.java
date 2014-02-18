@@ -11,11 +11,12 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DataModelAttributeInjector implements DataModelConstants {
 
   public void injectOperators(IDataModelAttribute attribute) {
-    ArrayList<IDataModelAttributeOp> opList = new ArrayList<IDataModelAttributeOp>();
+    List<IDataModelAttributeOp> opList = new ArrayList<IDataModelAttributeOp>();
     switch (attribute.getType()) {
       case IDataModelAttribute.TYPE_SMART: {
         opList.add(DataModelAttributeOp.create(OPERATOR_EQ));
@@ -217,7 +218,7 @@ public class DataModelAttributeInjector implements DataModelConstants {
       }
     }
     //
-    attribute.setOperators(opList.toArray(new IDataModelAttributeOp[opList.size()]));
+    attribute.setOperators(opList);
   }
 
   public void injectAggregationTypes(IDataModelAttribute attribute) {

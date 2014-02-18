@@ -25,10 +25,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -51,13 +53,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendar.class);
 
   private boolean m_initialized;
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private ICalendarItemProvider[] m_providers;
   private final HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private ICalendarUIFacade m_uiFacade;
   private int m_calendarChanging;
   private final DateTimeFormatFactory m_dateTimeFormatFactory;
-  private ArrayList<CalendarEvent> m_calendarEventBuffer;
+  private List<CalendarEvent> m_calendarEventBuffer;
   private final EventListenerList m_listenerList;
 
   public AbstractCalendar() {
@@ -126,17 +128,17 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return true;
   }
 
-  private Class<? extends ICalendarItemProvider>[] getConfiguredProducers() {
+  private List<Class<? extends ICalendarItemProvider>> getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
-    Class<ICalendarItemProvider>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, ICalendarItemProvider.class);
+    List<Class<ICalendarItemProvider>> filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
+    List<Class<? extends ICalendarItemProvider>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, ICalendarItemProvider.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<Class<? extends IMenu>> getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
@@ -184,10 +186,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] ma = getConfiguredMenus();
-    for (int i = 0; i < ma.length; i++) {
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, ma[i]);
+        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
       }
       catch (Exception e) {
@@ -200,14 +201,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = Collections.unmodifiableList(menuList);
     // producers
     ArrayList<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>();
-    Class<? extends ICalendarItemProvider>[] pa = getConfiguredProducers();
-    for (int i = 0; i < pa.length; i++) {
+    for (Class<? extends ICalendarItemProvider> itemProviderClazz : getConfiguredProducers()) {
       try {
-        ICalendarItemProvider producer = ConfigurationUtility.newInnerInstance(this, pa[i]);
-        producerList.add(producer);
+        producerList.add(ConfigurationUtility.newInnerInstance(this, itemProviderClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
@@ -406,12 +405,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
      * fire events tree changes are finished now, fire all buffered events and
      * call lookups
      */
-    CalendarEvent[] a = m_calendarEventBuffer.toArray(new CalendarEvent[0]);
     m_calendarEventBuffer = new ArrayList<CalendarEvent>();
     // coalesce ITEMS_CHANGED,ITEM_SELECTED events
-    HashSet<Integer> types = new HashSet<Integer>();
-    LinkedList<CalendarEvent> coalescedEvents = new LinkedList<CalendarEvent>();
+    Set<Integer> types = new HashSet<Integer>();
+    List<CalendarEvent> coalescedEvents = new LinkedList<CalendarEvent>();
     // reverse traversal
+    CalendarEvent[] a = m_calendarEventBuffer.toArray(new CalendarEvent[0]);
     for (int i = a.length - 1; i >= 0; i--) {
       switch (a[i].getType()) {
         case CalendarEvent.TYPE_COMPONENT_ACTION: {
@@ -427,10 +426,10 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
     // fire the batch
-    fireCalendarEventBatchInternal(coalescedEvents.toArray(new CalendarEvent[0]));
+    fireCalendarEventBatchInternal(coalescedEvents);
   }
 
-  public IMenu[] getMenus() {
+  public List<IMenu> getMenus() {
     return m_menus;
   }
 
@@ -455,17 +454,25 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   @Override
-  public Date[] getViewRange() {
-    Date[] a = (Date[]) propertySupport.getProperty(PROP_VIEW_RANGE);
-    if (a == null) {
-      a = new Date[2];
-    }
-    return a;
+  public Range<Date> getViewRange() {
+    @SuppressWarnings("unchecked")
+    Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
+    // return a copy
+    return new Range<Date>(propValue);
   }
 
   @Override
   public void setViewRange(Date minDate, Date maxDate) {
-    propertySupport.setProperty(PROP_VIEW_RANGE, new Date[]{minDate, maxDate});
+    setViewRangeInternal(new Range<Date>(minDate, maxDate));
+  }
+
+  @Override
+  public void setViewRange(Range<Date> viewRange) {
+    setViewRangeInternal(new Range<Date>(viewRange));
+  }
+
+  private void setViewRangeInternal(Range<Date> viewRange) {
+    propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
   @Override
@@ -511,20 +518,16 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   @Override
-  public CalendarComponent[] getComponents() {
-    CalendarComponent[] a = (CalendarComponent[]) propertySupport.getProperty(PROP_COMPONENTS);
-    if (a == null) {
-      a = new CalendarComponent[0];
-    }
-    return a;
+  public Set<CalendarComponent> getComponents() {
+    return CollectionUtility.unmodifiableSetCopy(propertySupport.<CalendarComponent> getPropertySet(PROP_COMPONENTS));
   }
 
   private void updateComponentsInternal(ICalendarItemProvider[] changedProviders) {
-    Date[] d = getViewRange();
-    if (d[0] != null && d[1] != null) {
+    Range<Date> d = getViewRange();
+    if (d.getFrom() != null && d.getTo() != null) {
       for (ICalendarItemProvider p : changedProviders) {
         LinkedList<CalendarComponent> components = new LinkedList<CalendarComponent>();
-        for (ICalendarItem item : p.getItems(d[0], d[1])) {
+        for (ICalendarItem item : p.getItems(d.getFrom(), d.getTo())) {
           Cell cell = new Cell();
           p.decorateCell(cell, item);
           components.add(new CalendarComponent(this, p, item, cell));
@@ -545,7 +548,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
           sortMap.put(new CompositeObject(comp.getFromDate(), index++), comp);
         }
       }
-      propertySupport.setProperty(PROP_COMPONENTS, sortMap.values().toArray(new CalendarComponent[0]));
+      propertySupport.setPropertySet(PROP_COMPONENTS, CollectionUtility.hashSet(sortMap.values()));
       // validate selection
       setSelectedComponent(getSelectedComponent());
     }
@@ -661,7 +664,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
-  private IMenu[] fireComponentPopup(CalendarComponent comp) {
+  private List<IMenu> fireComponentPopup(CalendarComponent comp) {
     if (comp != null) {
       CalendarEvent e = new CalendarEvent(this, CalendarEvent.TYPE_COMPONENT_POPUP, comp);
       // single observer for calendar-defined menus
@@ -670,7 +673,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       return e.getPopupMenus();
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 
@@ -699,7 +702,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
-  private IMenu[] fireNewPopup() {
+  private List<IMenu> fireNewPopup() {
     CalendarEvent e = new CalendarEvent(this, CalendarEvent.TYPE_NEW_POPUP);
     // single observer for calendar-defined menus
     addNewPopupMenus(e);
@@ -800,7 +803,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   // batch handler
-  private void fireCalendarEventBatchInternal(CalendarEvent[] batch) {
+  private void fireCalendarEventBatchInternal(List<CalendarEvent> batch) {
     if (isCalendarChanging()) {
       LOG.error("Illegal State: firing a event batch while calendar is changing");
     }
@@ -852,6 +855,11 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
+    public void setVisibleRangeFromUI(Range<Date> dateRange) {
+      setVisibleRangeFromUI(dateRange.getFrom(), dateRange.getTo());
+    }
+
+    @Override
     public void setVisibleRangeFromUI(Date minDate, Date maxDate) {
       try {
         pushUIProcessor();
@@ -876,7 +884,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
-    public IMenu[] fireComponentPopupFromUI() {
+    public List<IMenu> fireComponentPopupFromUI() {
       try {
         pushUIProcessor();
         //
@@ -888,7 +896,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
-    public IMenu[] fireNewPopupFromUI() {
+    public List<IMenu> fireNewPopupFromUI() {
       try {
         pushUIProcessor();
         //

@@ -71,6 +71,6 @@ public interface IDocConfig {
   /**
    * Configuration for types (eg. field types, column types, ...)
    */
-  IDocEntityListConfig<Class> getTypesConfig();
+  IDocEntityListConfig<Class<?>> getTypesConfig();
 
 }

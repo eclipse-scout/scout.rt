@@ -2,6 +2,8 @@ package org.eclipse.scout.rt.client.ui.form.menu;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -19,10 +21,10 @@ public class AbstractMenuTest {
   @Test
   public void testAbstractMenuInImageField() {
     ImageField imageField = new ImageField();
-    IMenu[] menus = imageField.getMenus();
-    assertEquals(2, menus.length);
-    assertEquals(menus[0].getText(), "Menu1");
-    assertEquals(menus[1].getText(), "Menu2");
+    List<IMenu> menus = imageField.getMenus();
+    assertEquals(2, menus.size());
+    assertEquals(menus.get(0).getText(), "Menu1");
+    assertEquals(menus.get(1).getText(), "Menu2");
   }
 
   public class ImageField extends AbstractImageField {

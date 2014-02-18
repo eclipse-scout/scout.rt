@@ -15,9 +15,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.JSplitPane;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -46,11 +48,11 @@ public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> impl
     JSplitPane container = new JSplitPane(getScoutObject().isSplitHorizontal() ? JSplitPane.HORIZONTAL_SPLIT : JSplitPane.VERTICAL_SPLIT, true);
     container.setName(getScoutObject().getClass().getSimpleName() + ".container");
     container.setBorder(null);
-    IFormField[] scoutFields = getScoutObject().getFields();
-    if (scoutFields.length == 2) {
-      ISwingScoutFormField swingScoutComposite = getSwingEnvironment().createFormField(container, scoutFields[0]);
+    List<IFormField> scoutFields = getScoutObject().getFields();
+    if (scoutFields.size() == 2) {
+      ISwingScoutFormField swingScoutComposite = getSwingEnvironment().createFormField(container, CollectionUtility.firstElement(scoutFields));
       container.add(swingScoutComposite.getSwingContainer());
-      ISwingScoutFormField swingScoutComposite1 = getSwingEnvironment().createFormField(container, scoutFields[1]);
+      ISwingScoutFormField swingScoutComposite1 = getSwingEnvironment().createFormField(container, CollectionUtility.getElement(scoutFields, 1));
       container.add(swingScoutComposite1.getSwingContainer());
     }
     else {

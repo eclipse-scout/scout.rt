@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,11 +21,12 @@ import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-public class KeyStrokeLookupCall extends LocalLookupCall {
+public class KeyStrokeLookupCall extends LocalLookupCall<String> {
   private static final long serialVersionUID = 1L;
 
   private String m_currentKeyStroke;
@@ -39,7 +40,7 @@ public class KeyStrokeLookupCall extends LocalLookupCall {
   }
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<String>> execCreateLookupRows() throws ProcessingException {
     final HashMap<String, Integer> keyStrokesUpper = new HashMap<String, Integer>();
     //build possible keyStrokes
     for (int i = 1; i <= 12; i++) {
@@ -71,11 +72,11 @@ public class KeyStrokeLookupCall extends LocalLookupCall {
     service.getBookmarkData().getUserBookmarks().visit(v);
     //
     TreeSet<Integer> availableNumbers = new TreeSet<Integer>(keyStrokesUpper.values());
-    ArrayList<LookupRow> resultList = new ArrayList<LookupRow>();
+    ArrayList<ILookupRow<String>> resultList = new ArrayList<ILookupRow<String>>();
     for (Integer i : availableNumbers) {
       String key = "Shift-F" + i;
       String text = "Shift-F" + i;
-      LookupRow row = new LookupRow(key, text);
+      ILookupRow<String> row = new LookupRow<String>(key, text);
       resultList.add(row);
     }
     return resultList;

@@ -288,7 +288,7 @@ public interface IForm extends IPropertyObserver, ITypeWithClassId {
   /**
    * traverse all fields recursive and return them as a list
    */
-  IFormField[] getAllFields();
+  List<IFormField> getAllFields();
 
   List<? extends IFormField> getInvalidFields();
 

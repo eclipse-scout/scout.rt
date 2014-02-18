@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.validate.checks;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.validate.ValidationUtility;
 import org.eclipse.scout.rt.shared.validate.annotations.CodeValue;
@@ -20,9 +22,9 @@ import org.eclipse.scout.rt.shared.validate.annotations.CodeValue;
 public class CodeValueCheck implements IValidateCheck {
   public static final String ID = "codeValue";
 
-  private ICodeType<?> m_codeType;
+  private ICodeType<?, ?> m_codeType;
 
-  public CodeValueCheck(ICodeType<?> codeType) {
+  public CodeValueCheck(ICodeType<?, ?> codeType) {
     m_codeType = codeType;
   }
 
@@ -38,8 +40,8 @@ public class CodeValueCheck implements IValidateCheck {
 
   @Override
   public void check(Object obj) throws Exception {
-    if (obj.getClass().isArray()) {
-      ValidationUtility.checkCodeTypeArray(obj, m_codeType);
+    if (obj instanceof Set<?>) {
+      ValidationUtility.checkCodeTypeSet(obj, m_codeType);
     }
     else {
       ValidationUtility.checkCodeTypeValue(obj, m_codeType);

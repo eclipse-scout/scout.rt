@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.junit.Assert;
@@ -104,7 +105,7 @@ public class AbstractTreeTest {
     }
 
     @Override
-    public void treeChangedBatch(TreeEvent[] batch) {
+    public void treeChangedBatch(List<? extends TreeEvent> batch) {
       ++m_notificationCounter;
       for (TreeEvent e : batch) {
         handleTreeEvent(e);

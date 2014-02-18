@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 
@@ -37,7 +39,7 @@ public interface ITabBox extends ICompositeField {
   /*
    * Runtime
    */
-  IGroupBox[] getGroupBoxes();
+  List<IGroupBox> getGroupBoxes();
 
   IGroupBox getSelectedTab();
 

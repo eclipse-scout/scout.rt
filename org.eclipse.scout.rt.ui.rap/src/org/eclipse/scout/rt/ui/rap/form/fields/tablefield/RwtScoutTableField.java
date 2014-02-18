@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -127,7 +127,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       form = getScoutObject().getForm();
     }
 
-    if (form == null || form instanceof ISmartFieldProposalForm || form instanceof IOutlineTableForm) {
+    if (form == null || form instanceof IContentAssistFieldProposalForm || form instanceof IOutlineTableForm) {
       return true;
     }
 
@@ -138,7 +138,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
    * @since 3.8.0
    */
   protected IRwtScoutTable createRwtScoutTable() {
-    if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
+    if (getScoutObject().getForm() instanceof IContentAssistFieldProposalForm) {
       return SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_PROPOSAL_FORM);
     }
     else {

@@ -142,6 +142,7 @@ public final class ConfigIniUtility {
     }
   }
 
+  @SuppressWarnings("null")
   private static void parseExternalConfigIniFiles(List<ConfigIniProperty> parsingList, List<String> externalConfigPaths) {
     for (String path : externalConfigPaths) {
       BufferedReader in = null;
@@ -157,14 +158,15 @@ public final class ConfigIniUtility {
           if (resolvedPath == null) {
             resolvedPath = System.getenv(variable);
           }
+          if (resolvedPath == null) {
+            continue;
+          }
           resolvedPath += tail;
-        }
-        if (resolvedPath == null) {
-          continue;
         }
         resolvedPath = resolvedPath.replace("@user.home", System.getProperty("user.home"));
         resolvedPath = resolvedPath.replace("@user.dir", System.getProperty("user.dir"));
         File f1 = new File(resolvedPath);
+
         if (f1.exists()) {
           if (f1.isFile()) {
             url = f1.toURI().toURL();

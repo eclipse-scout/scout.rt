@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.swt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -126,8 +126,8 @@ public final class SwtMenuUtility {
    * </pre>
    */
   @Deprecated
-  public static IContributionItem[] getMenuContribution(IActionNode<?>[] scoutActionNodes, ISwtEnvironment environment) {
-    ArrayList<IContributionItem> contributionItems = new ArrayList<IContributionItem>();
+  public static IContributionItem[] getMenuContribution(List<? extends IActionNode<?>> scoutActionNodes, ISwtEnvironment environment) {
+    List<IContributionItem> contributionItems = new ArrayList<IContributionItem>();
     for (IActionNode<?> scoutAction : scoutActionNodes) {
       if (!scoutAction.isVisible()) {
         continue;
@@ -288,16 +288,16 @@ public final class SwtMenuUtility {
     }
   }
 
-  public static IMenu[] collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(tree.getUIFacade().fireEmptySpacePopupFromUI()));
+          menuList.addAll(tree.getUIFacade().fireEmptySpacePopupFromUI());
         }
         if (nodeActions) {
-          menuList.addAll(Arrays.asList(tree.getUIFacade().fireNodePopupFromUI()));
+          menuList.addAll(tree.getUIFacade().fireNodePopupFromUI());
         }
       }
     };
@@ -310,19 +310,19 @@ public final class SwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, ISwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(table.getUIFacade().fireEmptySpacePopupFromUI()));
+          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
         }
         if (rowActions) {
-          menuList.addAll(Arrays.asList(table.getUIFacade().fireRowPopupFromUI()));
+          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
         }
       }
     };
@@ -335,19 +335,19 @@ public final class SwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, ISwtEnvironment swtEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
+  public static List<IMenu> collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, ISwtEnvironment swtEnvironment) {
+    final List<IMenu> menuList = new ArrayList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
         if (emptySpaceActions) {
-          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireNewPopupFromUI()));
+          menuList.addAll(calendar.getUIFacade().fireNewPopupFromUI());
         }
         if (componentActions) {
-          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireComponentPopupFromUI()));
+          menuList.addAll(calendar.getUIFacade().fireComponentPopupFromUI());
         }
       }
     };
@@ -360,30 +360,30 @@ public final class SwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menuList.toArray(new IMenu[menuList.size()]);
+    return Collections.unmodifiableList(menuList);
   }
 
-  public static IMenu[] collectRowMenus(final ITable table, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectRowMenus(final ITable table, ISwtEnvironment uiEnvironment) {
     return collectMenus(table, false, true, uiEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ITable table, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ITable table, ISwtEnvironment uiEnvironment) {
     return collectMenus(table, true, false, uiEnvironment);
   }
 
-  public static IMenu[] collectNodeMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectNodeMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
     return collectMenus(tree, false, true, uiEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
     return collectMenus(tree, true, false, uiEnvironment);
   }
 
-  public static IMenu[] collectComponentMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
+  public static List<IMenu> collectComponentMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
     return collectMenus(calendar, false, true, swtEnvironment);
   }
 
-  public static IMenu[] collectEmptySpaceMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
+  public static List<IMenu> collectEmptySpaceMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
     return collectMenus(calendar, true, false, swtEnvironment);
   }
 

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.services.common.security;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -192,7 +193,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   @Override
-  public void clearCacheOfUserIds(String... userIds) {
+  public void clearCacheOfUserIds(Collection<String> userIds) {
     //nop
   }
 

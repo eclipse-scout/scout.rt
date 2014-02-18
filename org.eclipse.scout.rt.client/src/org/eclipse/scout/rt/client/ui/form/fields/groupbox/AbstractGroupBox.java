@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -34,10 +37,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   private boolean m_mainBoxFlag = false;
   private int m_gridColumnCountHint;
   private boolean m_scrollable;
-  private IFormField[] m_controlFields;
-  private IGroupBox[] m_groupBoxes;
-  private IButton[] m_customButtons;
-  private IButton[] m_systemButtons;
+  private List<IFormField> m_controlFields;
+  private List<IGroupBox> m_groupBoxes;
+  private List<IButton> m_customButtons;
+  private List<IButton> m_systemButtons;
   private GroupBoxBodyGrid m_bodyGrid;
   private GroupBoxProcessButtonGrid m_customProcessButtonGrid;
   private GroupBoxProcessButtonGrid m_systemProcessButtonGrid;
@@ -226,40 +229,38 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
     m_systemProcessButtonGrid = new GroupBoxProcessButtonGrid(this, false, true);
     super.initConfig();
-    IFormField[] a = getFields();
     // categorize items
-    ArrayList<IFormField> controlList = new ArrayList<IFormField>();
-    ArrayList<IGroupBox> groupList = new ArrayList<IGroupBox>();
-    ArrayList<IButton> customButtonList = new ArrayList<IButton>();
-    ArrayList<IButton> systemButtonList = new ArrayList<IButton>();
-    for (int i = 0; i < a.length; i++) {
-      IFormField f = a[i];
-      if (f instanceof IGroupBox) {
-        groupList.add((IGroupBox) f);
-        controlList.add(f);
+    List<IFormField> controlList = new ArrayList<IFormField>();
+    List<IGroupBox> groupList = new ArrayList<IGroupBox>();
+    List<IButton> customButtonList = new ArrayList<IButton>();
+    List<IButton> systemButtonList = new ArrayList<IButton>();
+    for (IFormField field : getFields()) {
+      if (field instanceof IGroupBox) {
+        groupList.add((IGroupBox) field);
+        controlList.add(field);
       }
-      else if (f instanceof IButton) {
-        IButton b = (IButton) f;
+      else if (field instanceof IButton) {
+        IButton b = (IButton) field;
         if (b.isProcessButton()) {
           if (b.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
-            systemButtonList.add((IButton) f);
+            systemButtonList.add((IButton) field);
           }
           else {
-            customButtonList.add((IButton) f);
+            customButtonList.add((IButton) field);
           }
         }
         else {
-          controlList.add(f);
+          controlList.add(field);
         }
       }
       else {
-        controlList.add(f);
+        controlList.add(field);
       }
     }
-    m_controlFields = controlList.toArray(new IFormField[controlList.size()]);
-    m_groupBoxes = groupList.toArray(new IGroupBox[groupList.size()]);
-    m_customButtons = customButtonList.toArray(new IButton[customButtonList.size()]);
-    m_systemButtons = systemButtonList.toArray(new IButton[systemButtonList.size()]);
+    m_controlFields = Collections.unmodifiableList(controlList);
+    m_groupBoxes = Collections.unmodifiableList(groupList);
+    m_customButtons = Collections.unmodifiableList(customButtonList);
+    m_systemButtons = Collections.unmodifiableList(systemButtonList);
     //
     setExpandable(getConfiguredExpandable());
     setExpanded(getConfiguredExpanded());
@@ -273,8 +274,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   @Override
-  public IKeyStroke[] getContributedKeyStrokes() {
-    ArrayList<IKeyStroke> list = new ArrayList<IKeyStroke>(2);
+  public List<IKeyStroke> getContributedKeyStrokes() {
+    List<IKeyStroke> list = new ArrayList<IKeyStroke>(2);
     if (isMainBox() && (getForm() != null && getForm().getOuterForm() == null)) {
       // add default escape and enter key stroke only if no similar key stroke
       // is defined on the mainbox
@@ -295,7 +296,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         list.add(new DefaultFormEscapeKeyStroke(getForm()));
       }
     }
-    return list.toArray(new IKeyStroke[list.size()]);
+    return Collections.unmodifiableList(list);
   }
 
   @Override
@@ -322,55 +323,42 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public int getGroupBoxIndex(IGroupBox groupBox) {
-    for (int i = 0; i < m_groupBoxes.length; i++) {
-      if (m_groupBoxes[i] == groupBox) {
-        return i;
-      }
-    }
-    return -1;
+    return m_groupBoxes.indexOf(groupBox);
   }
 
   @Override
   public int getCustomProcessButtonCount() {
-    return m_customButtons.length;
+    return m_customButtons.size();
   }
 
   @Override
   public int getGroupBoxCount() {
-    return m_groupBoxes.length;
+    return m_groupBoxes.size();
   }
 
   @Override
   public int getSystemProcessButtonCount() {
-    return m_systemButtons.length;
+    return m_systemButtons.size();
   }
 
   @Override
-  public IGroupBox[] getGroupBoxes() {
-    IGroupBox[] a = new IGroupBox[m_groupBoxes.length];
-    System.arraycopy(m_groupBoxes, 0, a, 0, a.length);
-    return a;
+  public List<IGroupBox> getGroupBoxes() {
+    return CollectionUtility.unmodifiableListCopy(m_groupBoxes);
   }
 
   @Override
-  public IFormField[] getControlFields() {
-    IFormField[] a = new IFormField[m_controlFields.length];
-    System.arraycopy(m_controlFields, 0, a, 0, a.length);
-    return a;
+  public List<IFormField> getControlFields() {
+    return CollectionUtility.unmodifiableListCopy(m_controlFields);
   }
 
   @Override
-  public IButton[] getCustomProcessButtons() {
-    IButton[] a = new IButton[m_customButtons.length];
-    System.arraycopy(m_customButtons, 0, a, 0, a.length);
-    return a;
+  public List<IButton> getCustomProcessButtons() {
+    return CollectionUtility.unmodifiableListCopy(m_customButtons);
   }
 
   @Override
-  public IButton[] getSystemProcessButtons() {
-    IButton[] a = new IButton[m_systemButtons.length];
-    System.arraycopy(m_systemButtons, 0, a, 0, a.length);
-    return a;
+  public List<IButton> getSystemProcessButtons() {
+    return CollectionUtility.unmodifiableListCopy(m_systemButtons);
   }
 
   @Override

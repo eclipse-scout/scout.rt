@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.spec.client;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -93,7 +95,8 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
 
   protected IDocSection generate(Class[] fieldTypes) {
     TypeSpecGenerator g = new TypeSpecGenerator(getConfiguration(), m_id, m_title);
-    return g.getDocSection(fieldTypes);
+    List<Class<?>> fieldTypeList = CollectionUtility.<Class<?>> arrayList(fieldTypes);
+    return g.getDocSection(fieldTypeList);
   }
 
 }

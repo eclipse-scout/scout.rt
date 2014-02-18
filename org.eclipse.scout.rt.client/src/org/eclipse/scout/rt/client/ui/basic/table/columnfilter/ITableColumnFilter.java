@@ -24,13 +24,13 @@ public interface ITableColumnFilter<T> extends ITableRowFilter {
 
   IColumn<T> getColumn();
 
-  void setColumn(IColumn column);
+  void setColumn(IColumn<T> column);
 
   Set<T> getSelectedValues();
 
   void setSelectedValues(Set<T> set);
 
-  List<LookupRow> createHistogram();
+  List<LookupRow<T>> createHistogram();
 
   boolean isEmpty();
 

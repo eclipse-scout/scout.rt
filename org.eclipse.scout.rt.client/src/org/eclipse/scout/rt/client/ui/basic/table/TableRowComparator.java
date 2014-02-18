@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -18,17 +19,17 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  * compares two TableRow objects based on 1 ore more columns
  */
 public class TableRowComparator implements Comparator<ITableRow> {
-  private final IColumn[] m_columns;
+  private final List<IColumn<?>> m_columns;
 
-  public TableRowComparator(IColumn[] columns) {
+  public TableRowComparator(List<IColumn<?>> columns) {
     m_columns = columns;
   }
 
   @Override
   public int compare(ITableRow row1, ITableRow row2) {
-    for (int i = 0; i < m_columns.length; i++) {
-      int c = m_columns[i].compareTableRows(row1, row2);
-      if (!m_columns[i].getHeaderCell().isSortAscending()) {
+    for (IColumn col : m_columns) {
+      int c = col.compareTableRows(row1, row2);
+      if (!col.getHeaderCell().isSortAscending()) {
         c = -c;
       }
       if (c != 0) {

@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.Activator;
@@ -21,6 +24,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -52,7 +56,7 @@ public class CodeLookupCallTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(new CodeLookupCallTestCodeType()));
+    s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(CollectionUtility.arrayList(new CodeLookupCallTestCodeType())));
   }
 
   @AfterClass
@@ -63,10 +67,10 @@ public class CodeLookupCallTest {
   @Test
   public void testGetDataByAll() throws Exception {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
-    LookupRow[] oldRows = oldLc.getDataByAll();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByAll();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
-    LookupRow[] newRows = newLc.getDataByAll();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByAll();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
@@ -74,10 +78,10 @@ public class CodeLookupCallTest {
   @Test
   public void testGetDataByText() throws Exception {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
-    LookupRow[] oldRows = oldLc.getDataByText();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByText();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
-    LookupRow[] newRows = newLc.getDataByText();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByText();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
@@ -98,11 +102,11 @@ public class CodeLookupCallTest {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setText(text);
-    LookupRow[] oldRows = oldLc.getDataByText();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByText();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
     newLc.setText(text);
-    LookupRow[] newRows = newLc.getDataByText();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByText();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
@@ -112,19 +116,18 @@ public class CodeLookupCallTest {
     runGetDataByKey(0, null);
     runGetDataByKey(1, ROW10_KEY);
     runGetDataByKey(1, ROW31_KEY);
-    runGetDataByKey(0, "x");
     runGetDataByKey(0, Integer.valueOf(0));
   }
 
-  private void runGetDataByKey(int expectedLength, Object key) throws ProcessingException {
+  private void runGetDataByKey(int expectedLength, Integer key) throws ProcessingException {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setKey(key);
-    LookupRow[] oldRows = oldLc.getDataByKey();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByKey();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
     newLc.setKey(key);
-    LookupRow[] newRows = newLc.getDataByKey();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByKey();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
@@ -136,18 +139,17 @@ public class CodeLookupCallTest {
     runGetDataByRec(0, ROW20_KEY);
     runGetDataByRec(1, ROW30_KEY);
     runGetDataByRec(0, ROW11_KEY);
-    runGetDataByRec(0, "x");
 
   }
 
-  private void runGetDataByRec(int expectedLength, Object parent) throws ProcessingException {
+  private void runGetDataByRec(int expectedLength, Integer parent) throws ProcessingException {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setRec(parent);
-    LookupRow[] oldRows = oldLc.getDataByRec();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByRec();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
     newLc.setRec(parent);
-    LookupRow[] newRows = newLc.getDataByRec();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByRec();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
@@ -156,50 +158,56 @@ public class CodeLookupCallTest {
   public void testGetFilteredData() throws Exception {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
-    oldLc.setFilter(new ILegacyCodeLookupCallVisitor() {
+    oldLc.setFilter(new ILegacyCodeLookupCallVisitor<Integer>() {
+
       @Override
       public boolean visit(LegacyCodeLookupCall call, ICode code, int treeLevel) {
         return true;
       }
     });
-    LookupRow[] oldRows = oldLc.getDataByAll();
+    List<ILookupRow<Integer>> oldRows = oldLc.getDataByAll();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
-    newLc.setFilter(new ICodeLookupCallVisitor() {
+    newLc.setFilter(new ICodeLookupCallVisitor<Integer>() {
 
       @Override
-      public boolean visit(CodeLookupCall call, ICode code, int treeLevel) {
+      public boolean visit(CodeLookupCall<Integer> call, ICode<Integer> code, int treeLevel) {
         return true;
       }
     });
-    LookupRow[] newRows = newLc.getDataByAll();
+    List<ILookupRow<Integer>> newRows = newLc.getDataByAll();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
   }
 
-  private static boolean equals(LookupRow[] rows1, LookupRow[] rows2) {
-    if ((rows1 == null && rows2 != null) || (rows1 != null && rows2 == null)) {
+  private static boolean equals(List<? extends ILookupRow<?>> rows1, List<? extends ILookupRow<?>> rows2) {
+    if (rows1 == null && rows2 == null) {
+      return true;
+    }
+    if (rows1 == null || rows2 == null) {
       return false;
     }
+    else {
 
-    if (rows1 != null) {
-      if (rows1.length != rows2.length) {
+    }
+    if (rows1.size() != rows2.size()) {
+      return false;
+    }
+    Iterator<? extends ILookupRow<?>> it1 = rows1.iterator();
+    Iterator<? extends ILookupRow<?>> it2 = rows2.iterator();
+    while (it1.hasNext() && it2.hasNext()) {
+      if (!equals(it1.next(), it2.next())) {
         return false;
       }
-      for (int i = 0; i < rows1.length; i++) {
-        if (!equals(rows1[i], rows2[i])) {
-          return false;
-        }
-      }
     }
-    return true;
+    return it1.hasNext() == it2.hasNext();
   }
 
-  private static boolean equals(LookupRow row1, LookupRow row2) {
+  private static boolean equals(ILookupRow<?> row1, ILookupRow<?> row2) {
     return CompareUtility.equals(row1.getBackgroundColor(), row2.getBackgroundColor()) && CompareUtility.equals(row1.getFont(), row2.getFont()) && CompareUtility.equals(row1.getForegroundColor(), row2.getForegroundColor()) && CompareUtility.equals(row1.getIconId(), row2.getIconId()) && CompareUtility.equals(row1.getKey(), row2.getKey()) && CompareUtility.equals(row1.getParentKey(), row2.getParentKey()) && CompareUtility.equals(row1.getText(), row2.getText()) && CompareUtility.equals(row1.getTooltipText(), row2.getTooltipText());
   }
 
-  private class P_NewCodeLookupCall extends CodeLookupCall {
+  private class P_NewCodeLookupCall extends CodeLookupCall<Integer> {
     public P_NewCodeLookupCall() {
       super(CodeLookupCallTestCodeType.class);
     }
@@ -207,7 +215,7 @@ public class CodeLookupCallTest {
     private static final long serialVersionUID = 1L;
   }
 
-  private class P_LegacyCodeLookupCall extends LegacyCodeLookupCall {
+  private class P_LegacyCodeLookupCall extends LegacyCodeLookupCall<Integer> {
     public P_LegacyCodeLookupCall() {
       super(CodeLookupCallTestCodeType.class);
     }
@@ -215,9 +223,9 @@ public class CodeLookupCallTest {
     private static final long serialVersionUID = 1L;
   }
 
-  private static class CodeLookupCallTestCodeType extends AbstractCodeType<String> {
+  private static class CodeLookupCallTestCodeType extends AbstractCodeType<Long, Integer> {
     private static final long serialVersionUID = 1L;
-    public static final String ID = "CodeLookupCallTestCodeId";
+    public static final Long ID = Long.valueOf(22);
 
     public static final String ICON = "configuredIcon";
     public static final String TOOLTIP = "configuredTooltip";
@@ -230,26 +238,25 @@ public class CodeLookupCallTest {
     public static final double VALUE = 42d;
 
     @Override
-    public String getId() {
+    public Long getId() {
       return ID;
     }
 
     @Override
-    protected CodeRow[] execLoadCodes() throws ProcessingException {
-      CodeRow[] result = new CodeRow[]{
-          createTestCodeRow(ROW10_KEY, null, ROW10_TEXT),
-          createTestCodeRow(ROW11_KEY, ROW10_KEY, ROW11_TEXT),
-          createTestCodeRow(ROW12_KEY, ROW10_KEY, ROW12_TEXT),
-          createTestCodeRow(ROW20_KEY, null, ROW20_TEXT),
-          createTestCodeRow(ROW30_KEY, null, ROW30_TEXT),
-          createTestCodeRow(ROW31_KEY, ROW30_KEY, ROW31_TEXT)
-      };
+    protected List<ICodeRow<Integer>> execLoadCodes(Class<? extends ICodeRow<Integer>> codeRowType) throws ProcessingException {
+      List<ICodeRow<Integer>> result = new ArrayList<ICodeRow<Integer>>();
+      result.add(createTestCodeRow(ROW10_KEY, null, ROW10_TEXT));
+      result.add(createTestCodeRow(ROW11_KEY, ROW10_KEY, ROW11_TEXT));
+      result.add(createTestCodeRow(ROW12_KEY, ROW10_KEY, ROW12_TEXT));
+      result.add(createTestCodeRow(ROW20_KEY, null, ROW20_TEXT));
+      result.add(createTestCodeRow(ROW30_KEY, null, ROW30_TEXT));
+      result.add(createTestCodeRow(ROW31_KEY, ROW30_KEY, ROW31_TEXT));
       return result;
     }
   }
 
-  private static CodeRow createTestCodeRow(Integer key, Integer parentKey, String text) {
-    return new CodeRow(key,
+  private static CodeRow<Integer> createTestCodeRow(Integer key, Integer parentKey, String text) {
+    return new CodeRow<Integer>(key,
         text,
         CodeLookupCallTestCodeType.ICON,
         CodeLookupCallTestCodeType.TOOLTIP,

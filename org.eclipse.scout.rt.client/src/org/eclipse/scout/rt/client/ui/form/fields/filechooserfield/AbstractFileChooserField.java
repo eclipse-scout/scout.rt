@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -37,13 +39,13 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFileChooserField.class);
 
   private File m_directory;
-  private String[] m_fileExtensions;
+  private List<String> m_fileExtensions;
   private boolean m_typeLoad;
   private boolean m_folderMode;
   private boolean m_showDirectory;
   private boolean m_showFileName;
   private boolean m_showFileExtension;
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private IFileChooserFieldUIFacade m_uiFacade;
 
   public AbstractFileChooserField() {
@@ -97,7 +99,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @ConfigProperty(ConfigProperty.FILE_EXTENSIONS)
   @Order(230)
-  protected String[] getConfiguredFileExtensions() {
+  protected List<String> getConfiguredFileExtensions() {
     return null;
   }
 
@@ -120,15 +122,15 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return 4000;
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<Class<? extends IMenu>> getConfiguredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @Override
-  public IKeyStroke[] getContributedKeyStrokes() {
+  public List<IKeyStroke> getContributedKeyStrokes() {
     return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
@@ -148,12 +150,10 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     setFileIconId(getConfiguredFileIconId());
     setMaxLength(getConfiguredMaxLength());
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] a = getConfiguredMenus();
-    for (int i = 0; i < a.length; i++) {
+    List<IMenu> menuList = new ArrayList<IMenu>();
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, a[i]);
-        menuList.add(menu);
+        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
@@ -165,7 +165,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = menuList;
   }
 
   /**
@@ -257,13 +257,13 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   @Override
-  public void setFileExtensions(String[] a) {
-    m_fileExtensions = a;
+  public void setFileExtensions(List<String> a) {
+    m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(a);
   }
 
   @Override
-  public String[] getFileExtensions() {
-    return m_fileExtensions;
+  public List<String> getFileExtensions() {
+    return CollectionUtility.unmodifiableListCopy(m_fileExtensions);
   }
 
   @Override
@@ -306,13 +306,13 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   @Override
-  public IMenu[] getMenus() {
-    return m_menus;
+  public List<IMenu> getMenus() {
+    return CollectionUtility.unmodifiableListCopy(m_menus);
   }
 
   @Override
   public boolean hasMenus() {
-    return m_menus.length > 0;
+    return CollectionUtility.hasElements(m_menus);
   }
 
   @Override
@@ -447,8 +447,8 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       if (p.length() == 0 && getDirectory() != null) {
         p = getDirectory().getAbsolutePath();
       }
-      if (e.length() == 0 && m_fileExtensions != null && m_fileExtensions.length > 0) {
-        e = "." + m_fileExtensions[0];
+      if (e.length() == 0 && CollectionUtility.hasElements(m_fileExtensions)) {
+        e = "." + CollectionUtility.firstElement(m_fileExtensions);
       }
       text = p;
       if (p.length() > 0) {
@@ -477,15 +477,15 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   private class P_UIFacade implements IFileChooserFieldUIFacade {
 
     @Override
-    public IMenu[] firePopupFromUI() {
-      ArrayList<IMenu> menus = new ArrayList<IMenu>();
+    public List<IMenu> firePopupFromUI() {
+      List<IMenu> menus = new ArrayList<IMenu>();
       for (IMenu menu : getMenus()) {
         menu.prepareAction();
         if (menu.isVisible()) {
           menus.add(menu);
         }
       }
-      return menus.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(menus);
     }
 
     @Override

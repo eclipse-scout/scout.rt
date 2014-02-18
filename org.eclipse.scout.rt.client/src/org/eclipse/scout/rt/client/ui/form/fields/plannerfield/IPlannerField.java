@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
@@ -57,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * 
  * 
  * 
+ * 
  * </pre>
  */
 
@@ -95,11 +98,11 @@ public interface IPlannerField<T extends ITable, P extends IActivityMap<RI, AI>,
 
   ITableRow activityCellToResourceRow(ActivityCell<RI, AI> activityCell);
 
-  ITableRow[] activityCellsToResourceRows(ActivityCell<RI, AI>[] activityCells);
+  List<ITableRow> activityCellsToResourceRows(List<? extends ActivityCell<RI, AI>> activityCells);
 
-  ActivityCell<RI, AI>[] resourceRowToActivityCells(ITableRow resourceRow);
+  List<ActivityCell<RI, AI>> resourceRowToActivityCells(ITableRow resourceRow);
 
-  ActivityCell<RI, AI>[] resourceRowsToActivityCells(ITableRow[] resourceRows);
+  List<ActivityCell<RI, AI>> resourceRowsToActivityCells(List<? extends ITableRow> resourceRows);
 
   IPlannerFieldUIFacade getUIFacade();
 

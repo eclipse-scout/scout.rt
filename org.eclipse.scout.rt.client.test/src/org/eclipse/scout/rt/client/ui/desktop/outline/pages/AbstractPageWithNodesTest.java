@@ -15,6 +15,7 @@ import static org.junit.Assert.assertSame;
 
 import java.util.Collection;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -37,7 +38,7 @@ public class AbstractPageWithNodesTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
+    desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -58,23 +58,22 @@ public abstract class AbstractWorkflowData implements Serializable {
     initConfig();
   }
 
-  private Class<? extends AbstractWorkflowStepData>[] getConfiguredStepDatas() {
+  private List<Class<AbstractWorkflowStepData>> getConfiguredStepDatas() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, AbstractWorkflowStepData.class);
   }
 
   protected void initConfig() {
-    Class<? extends AbstractWorkflowStepData>[] stepArray = getConfiguredStepDatas();
-    for (int i = 0; i < stepArray.length; i++) {
+    for (Class<AbstractWorkflowStepData> workflowStepDataClazz : getConfiguredStepDatas()) {
       AbstractWorkflowStepData f;
       try {
-        f = ConfigurationUtility.newInnerInstance(this, stepArray[i]);
+        f = ConfigurationUtility.newInnerInstance(this, workflowStepDataClazz);
         m_stepList.add(f);
       }// end try
       catch (Exception e) {
         LOG.warn(null, e);
       }
-    }// end for
+    }
   }
 
   /*

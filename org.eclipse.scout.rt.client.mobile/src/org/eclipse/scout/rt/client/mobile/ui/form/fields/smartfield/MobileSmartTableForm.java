@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -33,18 +33,20 @@ import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.9.0
  */
-public class MobileSmartTableForm extends SmartTableForm {
+public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LOOKUP_TYPE> {
 
   /**
    * Slow page size to speed up the list.
@@ -54,15 +56,15 @@ public class MobileSmartTableForm extends SmartTableForm {
   private P_SmartFieldListener m_smartFieldListener;
   private boolean m_acceptingProposal;
 
-  public MobileSmartTableForm(ISmartField<?> smartField) throws ProcessingException {
-    super(smartField);
+  public MobileSmartTableForm(IContentAssistField<?, LOOKUP_TYPE> smartField, boolean allowCustomText) throws ProcessingException {
+    super(smartField, allowCustomText);
   }
 
   @Override
   protected void initConfig() throws ProcessingException {
     super.initConfig();
 
-    String title = getSmartField().getLabel();
+    String title = getContentAssistField().getLabel();
     if (StringUtility.hasText(title)) {
       title = TEXTS.get("MobileSmartFormTitle", title);
     }
@@ -85,7 +87,7 @@ public class MobileSmartTableForm extends SmartTableForm {
     addFormListener(new P_FormListener());
     if (m_smartFieldListener == null) {
       m_smartFieldListener = new P_SmartFieldListener();
-      getSmartField().addPropertyChangeListener(m_smartFieldListener);
+      getContentAssistField().addPropertyChangeListener(m_smartFieldListener);
     }
   }
 
@@ -94,7 +96,7 @@ public class MobileSmartTableForm extends SmartTableForm {
     super.execDisposeForm();
 
     if (m_smartFieldListener != null) {
-      getSmartField().removePropertyChangeListener(m_smartFieldListener);
+      getContentAssistField().removePropertyChangeListener(m_smartFieldListener);
       m_smartFieldListener = null;
     }
   }
@@ -118,7 +120,7 @@ public class MobileSmartTableForm extends SmartTableForm {
   protected void injectResultTableMenus(List<IMenu> menuList) {
     super.injectResultTableMenus(menuList);
 
-    List<IMenu> smartFieldMenus = Arrays.asList(getSmartField().getMenus());
+    List<IMenu> smartFieldMenus = getContentAssistField().getMenus();
     menuList.addAll(smartFieldMenus);
   }
 
@@ -130,9 +132,9 @@ public class MobileSmartTableForm extends SmartTableForm {
   private void acceptProposal() throws ProcessingException {
     m_acceptingProposal = true;
     try {
-      LookupRow lookupRow = getAcceptedProposal();
+      ILookupRow<LOOKUP_TYPE> lookupRow = getAcceptedProposal();
       if (lookupRow != null) {
-        getSmartField().acceptProposal(lookupRow);
+        getContentAssistField().acceptProposal(lookupRow);
       }
     }
     finally {
@@ -140,19 +142,20 @@ public class MobileSmartTableForm extends SmartTableForm {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LookupRow getAcceptedProposal() throws ProcessingException {
-    LookupRow row = getSelectedLookupRow();
+  public ILookupRow<LOOKUP_TYPE> getAcceptedProposal() throws ProcessingException {
+    ILookupRow<LOOKUP_TYPE> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;
     }
-    else if (getSmartField().isAllowCustomText()) {
-      return new CustomTextLookupRow(getFilterField().getValue());
+    else if (isAllowCustomText()) {
+      return (ILookupRow<LOOKUP_TYPE>) new CustomTextLookupRow(getFilterField().getValue());
     }
     else {
       // With the mobile smartfield deleting a value is only possible by not selecting any value.
       // The deletion of the value is achieved by returning an empty lookup row.
-      return ISmartField.EMPTY_LOOKUP_ROW;
+      return new LookupRow<LOOKUP_TYPE>(null, "", null, null, null, null, null, true);
     }
   }
 
@@ -160,7 +163,7 @@ public class MobileSmartTableForm extends SmartTableForm {
     return getFieldByClass(FilterField.class);
   }
 
-  public class MainBox extends SmartTableForm.MainBox {
+  public class MainBox extends ContentAssistTableForm.MainBox {
 
     @Override
     protected void execInitField() throws ProcessingException {
@@ -201,8 +204,7 @@ public class MobileSmartTableForm extends SmartTableForm {
 
         @Override
         protected void execChangedValue() throws ProcessingException {
-          setSearchText(getValue());
-          update(false, false);
+          getContentAssistField().doSearch(getValue(), false, false);
         }
 
       }
@@ -215,8 +217,8 @@ public class MobileSmartTableForm extends SmartTableForm {
 
   }
 
-  private void handleTableRowsUpdated(ITableRow[] rows) {
-    if (rows != null && rows.length > 0) {
+  private void handleTableRowsUpdated(List<? extends ITableRow> rows) {
+    if (CollectionUtility.hasElements(rows)) {
       try {
         //Accept proposal if a row gets checked. This makes sure the smartfield menus work.
         acceptProposal();
@@ -251,7 +253,7 @@ public class MobileSmartTableForm extends SmartTableForm {
     public void propertyChange(PropertyChangeEvent evt) {
       if (ISmartField.PROP_VALUE.equals(evt.getPropertyName())) {
         if (!m_acceptingProposal) {
-          getFilterField().setValue(getSmartField().getDisplayText());
+          getFilterField().setValue(getContentAssistField().getDisplayText());
         }
       }
     }
@@ -270,12 +272,12 @@ public class MobileSmartTableForm extends SmartTableForm {
 
           removeFormListener(this);
           if (getCloseSystemType() == IButton.SYSTEM_TYPE_OK) {
-            LookupRow row = getAcceptedProposal();
+            ILookupRow<LOOKUP_TYPE> row = getAcceptedProposal();
             if (row instanceof CustomTextLookupRow) {
               // Setting the value is done by AbstractSmartField.P_ProposalFormListener
               // Unfortunately, if the value is not valid, the display text is not updated as well.
               // That's why it is set here
-              getSmartField().setDisplayText(row.getText());
+              getContentAssistField().setDisplayText(row.getText());
             }
           }
           break;

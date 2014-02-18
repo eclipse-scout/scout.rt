@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
 public class ServiceTunnelResponse implements java.io.Serializable {
@@ -20,9 +23,9 @@ public class ServiceTunnelResponse implements java.io.Serializable {
   private transient int m_httpCode;
   private transient String m_soapOperation;
   private Object m_data;
-  private Object[] m_outVars = new Object[0];
+  private Object[] m_outVars;
   private Throwable m_exception;
-  private IClientNotification[] m_clientNotifications;
+  private Set<IClientNotification> m_clientNotifications;
   private Object m_metaData;
   // added in 3.1.17
   private Long m_processingDuration;
@@ -71,12 +74,12 @@ public class ServiceTunnelResponse implements java.io.Serializable {
     return m_exception;
   }
 
-  public IClientNotification[] getClientNotifications() {
-    return m_clientNotifications;
+  public Set<IClientNotification> getClientNotifications() {
+    return CollectionUtility.unmodifiableSet(m_clientNotifications);
   }
 
-  public void setClientNotifications(IClientNotification[] a) {
-    m_clientNotifications = a;
+  public void setClientNotifications(Collection<? extends IClientNotification> clientNotifications) {
+    m_clientNotifications = CollectionUtility.hashSet(clientNotifications);
   }
 
   public Object getMetaData() {

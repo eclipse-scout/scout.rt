@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -45,5 +47,5 @@ public interface IRwtScoutTableForPatch extends IRwtScoutTable {
 
   ITableRow getUiSelectedRow();
 
-  ITableRow[] getUiSelectedRows();
+  List<ITableRow> getUiSelectedRows();
 }

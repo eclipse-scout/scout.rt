@@ -12,12 +12,16 @@ package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -53,26 +57,29 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 @ClassId("3dc8747d-19eb-4c0a-b5fc-c3dc2ad0783d")
-public abstract class AbstractListBox<T> extends AbstractValueField<T[]> implements IListBox<T> {
+public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> implements IListBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 
   private ITable m_table;
   private IListBoxUIFacade m_uiFacade;
-  private LookupCall m_lookupCall;
-  private Class<? extends ICodeType> m_codeTypeClass;
+  private ILookupCall<T> m_lookupCall;
+  private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private boolean m_valueTableSyncActive;
   private ITableRowFilter m_checkedRowsFilter;
   private ITableRowFilter m_activeRowsFilter;
   // children
-  private IFormField[] m_fields;
+  private List<IFormField> m_fields;
 
   public AbstractListBox() {
     this(true);
@@ -88,14 +95,14 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
   @ValidationRule(ValidationRule.LOOKUP_CALL)
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<T>> getConfiguredLookupCall() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
   @ValidationRule(ValidationRule.CODE_TYPE)
-  protected Class<? extends ICodeType> getConfiguredCodeType() {
+  protected Class<? extends ICodeType<?, T>> getConfiguredCodeType() {
     return null;
   }
 
@@ -140,9 +147,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return 1.0;
   }
 
-  private Class<? extends IFormField>[] getConfiguredFields() {
+  private List<Class<? extends IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IFormField.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(Arrays.asList(dca), IFormField.class);
   }
 
   /**
@@ -150,7 +157,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigOperation
   @Order(250)
-  protected void execPrepareLookup(LookupCall call) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<T> call) throws ProcessingException {
   }
 
   /**
@@ -162,41 +169,41 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    */
   @ConfigOperation
   @Order(260)
-  protected void execFilterLookupResult(LookupCall call, List<LookupRow> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
   }
 
   @ConfigOperation
   @Order(230)
-  protected LookupRow[] execLoadTableData() throws ProcessingException {
-    LookupRow[] data;
+  protected List<? extends ILookupRow<T>> execLoadTableData() throws ProcessingException {
+    List<? extends ILookupRow<T>> data;
     // (1) get data by service
     if (getLookupCall() != null) {
-      LookupCall call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractListBox.this));
+      ILookupCall<T> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractListBox.this));
       prepareLookupCall(call);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
     }
     // (b) get data direct
     else {
-      data = new LookupRow[0];
+      data = Collections.emptyList();
       data = filterLookupResult(null, data);
     }
     return data;
   }
 
   /**
-   * interceptor is called after data was fetched from LookupCall and is adding
+   * Intercepter is called after data was fetched from LookupCall and is adding
    * a table row for every LookupRow using IListBoxTable.createTableRow(row) and
    * ITable.addRows()
    * <p>
    * For most cases the override of just {@link #execLoadTableData()} is sufficient
    * 
    * <pre>
-   * LookupRow[] data=execLoadTableData();
-   * ITableRow[] rows=new ITableRow[data!=null? data.length : 0];
+   * List<ILookupRow<T>> data=execLoadTableData();
+   * List<ITableRow> rows=new ArrayList();
    * if(data!=null){
    *   for(int i=0; i{@code<}data.length; i++){
-   *     rows[i]=createTableRow(data[i]);
+   *     rows.add(createTableRow(data[i]));
    *   }
    * }
    * getTable().replaceRows(rows);
@@ -205,15 +212,15 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @ConfigOperation
   @Order(240)
   protected void execPopulateTable() throws ProcessingException {
-    LookupRow[] data = null;
+    List<? extends ILookupRow<T>> data = null;
     //sle Ticket 92'893: Listbox Master required. only run loadTable when master value is set
     if (!isMasterRequired() || getMasterValue() != null) {
       data = execLoadTableData();
     }
-    ITableRow[] rows = new ITableRow[data != null ? data.length : 0];
+    List<ITableRow> rows = new ArrayList<ITableRow>();
     if (data != null) {
-      for (int i = 0; i < data.length; i++) {
-        rows[i] = getTableRowBuilder().createTableRow(data[i]);
+      for (ILookupRow<T> lr : data) {
+        rows.add(getTableRowBuilder().createTableRow(lr));
       }
     }
     getTable().replaceRows(rows);
@@ -221,14 +228,14 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   private Class<? extends ITable> getConfiguredTable() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<? extends ITable>[] f = ConfigurationUtility.filterClasses(dca, ITable.class);
-    if (f.length == 1) {
-      return f[0];
+    List<Class<ITable>> tableClasses = ConfigurationUtility.filterClasses(dca, ITable.class);
+    if (tableClasses.size() == 1) {
+      return CollectionUtility.firstElement(tableClasses);
     }
     else {
-      for (Class<? extends ITable> c : f) {
-        if (c.getDeclaringClass() != AbstractListBox.class) {
-          return c;
+      for (Class<ITable> tableClazz : tableClasses) {
+        if (tableClazz.getDeclaringClass() != AbstractListBox.class) {
+          return tableClazz;
         }
       }
       return null;
@@ -244,7 +251,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @Override
   protected void initConfig() {
     m_uiFacade = createUIFacade();
-    m_fields = new IFormField[0];
+    m_fields = Collections.emptyList();
     super.initConfig();
     setFilterActiveRows(getConfiguredFilterActiveRows());
     setFilterActiveRowsValue(TriState.TRUE);
@@ -288,7 +295,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     // lookup call
     if (getConfiguredLookupCall() != null) {
       try {
-        LookupCall call = getConfiguredLookupCall().newInstance();
+        ILookupCall<T> call = getConfiguredLookupCall().newInstance();
         setLookupCall(call);
       }
       catch (Exception e) {
@@ -318,22 +325,22 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
       }
     });
     // add fields
-    ArrayList<IFormField> fieldList = new ArrayList<IFormField>();
-    Class<? extends IFormField>[] fieldArray = getConfiguredFields();
-    for (int i = 0; i < fieldArray.length; i++) {
+    List<Class<? extends IFormField>> fieldClasses = getConfiguredFields();
+    List<IFormField> fieldList = new ArrayList<IFormField>();
+    for (Class<? extends IFormField> fieldClazz : fieldClasses) {
       IFormField f;
       try {
-        f = ConfigurationUtility.newInnerInstance(this, fieldArray[i]);
+        f = ConfigurationUtility.newInnerInstance(this, fieldClazz);
         fieldList.add(f);
       }// end try
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldArray[i].getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldClazz.getName(), t));
       }
     }
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = fieldList.toArray(new IFormField[0]);
+    m_fields = Collections.unmodifiableList(fieldList);
   }
 
   @SuppressWarnings("unchecked")
@@ -363,7 +370,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     getTable().disposeTable();
   }
 
-  public AbstractTableRowBuilder getTableRowBuilder() {
+  public AbstractTableRowBuilder<T> getTableRowBuilder() {
     return new P_TableRowBuilder();
   }
 
@@ -479,41 +486,28 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    * do not use this internal method directly
    */
   @Override
-  public final void prepareLookupCall(LookupCall call) throws ProcessingException {
+  public final void prepareLookupCall(ILookupCall<T> call) throws ProcessingException {
     prepareLookupCallInternal(call);
     execPrepareLookup(call);
   }
 
-  private LookupRow[] filterLookupResult(LookupCall call, LookupRow[] data) throws ProcessingException {
-    ArrayList<LookupRow> result;
-    if (data != null) {
-      result = new ArrayList<LookupRow>(Arrays.asList(data));
-    }
-    else {
-      result = new ArrayList<LookupRow>();
-    }
+  private List<ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) throws ProcessingException {
+    // create a copy for the custom filter method
+    List<ILookupRow<T>> result = new ArrayList<ILookupRow<T>>(data);
     execFilterLookupResult(call, result);
-    int len = 0;
-    for (LookupRow r : result) {
-      if (r != null) {
-        len++;
+    Iterator<ILookupRow<T>> resultIt = result.iterator();
+    while (resultIt.hasNext()) {
+      if (resultIt.next() == null) {
+        resultIt.remove();
       }
     }
-    LookupRow[] a = new LookupRow[len];
-    int index = 0;
-    for (LookupRow r : result) {
-      if (r != null) {
-        a[index] = r;
-        index++;
-      }
-    }
-    return a;
+    return result;
   }
 
   /**
    * do not use this internal method directly
    */
-  private void prepareLookupCallInternal(LookupCall call) {
+  private void prepareLookupCallInternal(ILookupCall<T> call) {
     call.setActive(TriState.UNDEFINED);
     //when there is a master value defined in the original call, don't set it to null when no master value is available
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
@@ -522,22 +516,22 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   @Override
-  public final LookupCall getLookupCall() {
+  public final ILookupCall<T> getLookupCall() {
     return m_lookupCall;
   }
 
   @Override
-  public void setLookupCall(LookupCall call) {
+  public void setLookupCall(ILookupCall<T> call) {
     m_lookupCall = call;
   }
 
   @Override
-  public Class<? extends ICodeType> getCodeTypeClass() {
+  public Class<? extends ICodeType<?, T>> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
   @Override
-  public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
+  public void setCodeTypeClass(Class<? extends ICodeType<?, T>> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
     m_lookupCall = null;
@@ -553,73 +547,79 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   @Override
-  protected String formatValueInternal(T[] validValue) {
-    if (validValue == null || validValue.length == 0) {
+  protected String formatValueInternal(Set<T> validValue) {
+    if (!CollectionUtility.hasElements(validValue)) {
       return "";
     }
-    StringBuffer b = new StringBuffer();
-    ITableRow[] rows = getKeyColumnInternal().findRows(validValue);
-    for (int i = 0; i < rows.length; i++) {
-      if (i > 0) {
+    StringBuilder b = new StringBuilder();
+    List<ITableRow> rows = getKeyColumnInternal().findRows(validValue);
+    if (CollectionUtility.hasElements(rows)) {
+      Iterator<ITableRow> rowIt = rows.iterator();
+      b.append(getTextColumnInternal().getValue(rowIt.next()));
+      while (rowIt.hasNext()) {
         b.append(", ");
+        b.append(getTextColumnInternal().getValue(rowIt.next()));
       }
-      b.append(getTextColumnInternal().getValue(rows[i]));
     }
     return b.toString();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected T[] validateValueInternal(T[] rawValue) throws ProcessingException {
-    T[] validValue = rawValue;
-    //
-    if (validValue != null && validValue.length == 0) {
-      validValue = null;
+  protected final Set<T> validateValueInternal(Set<T> rawValue0) throws ProcessingException {
+    Set<T> rawValue = CollectionUtility.hashSetWithoutNullElements(rawValue0);
+    return doValidateValueInternal(rawValue);
+  }
+
+  /**
+   * override this method to perform detailed validation in subclasses
+   */
+  protected Set<T> doValidateValueInternal(Set<T> rawValue) throws ProcessingException {
+    if (CollectionUtility.isEmpty(rawValue)) {
+      // fast return empty set
+      return rawValue;
     }
     ITable table = getTable();
-    if (table != null && validValue != null) {
+    if (table != null) {
       if ((table.isCheckable() && !table.isMultiCheck()) || (!table.isCheckable() && !table.isMultiSelect())) {
         //only single value
-        if (validValue.length > 1) {
-          LOG.warn(getClass().getName() + " only accepts a single value. Got " + Arrays.toString(validValue) + ". Using only first value.");
-          T[] newArray = (T[]) Array.newInstance(validValue.getClass().getComponentType(), 1);
-          newArray[0] = validValue[0];
-          validValue = newArray;
+        if (rawValue.size() > 1) {
+          LOG.warn(getClass().getName() + " only accepts a single value. Got " + CollectionUtility.format(rawValue) + ". Using only first value.");
+          return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
         }
       }
     }
-    return validValue;
+    return rawValue;
+  }
+
+  @Override
+  public Set<T> getValue() {
+    return CollectionUtility.unmodifiableSetCopy(super.getValue());
+  }
+
+  @Override
+  public Set<T> getInitValue() {
+    return CollectionUtility.unmodifiableSetCopy(super.getInitValue());
   }
 
   @Override
   public T getSingleValue() {
-    T[] a = getValue();
-    if (a != null && a.length > 0) {
-      return a[0];
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(super.getValue());
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void setSingleValue(T value) {
-    if (value == null) {
-      setValue(null);
+    Set<T> valueSet = new HashSet<T>();
+    if (value != null) {
+      valueSet.add(value);
     }
-    else {
-      T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 1);
-      array[0] = value;
-      setValue(array);
-    }
+    setValue(valueSet);
   }
 
   @Override
   public int getCheckedKeyCount() {
-    T[] keys = getValue();
-    if (keys != null) {
-      return keys.length;
+    Set<T> value = super.getValue();
+    if (value != null) {
+      return value.size();
     }
     else {
       return 0;
@@ -628,61 +628,43 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @Override
   public T getCheckedKey() {
-    T[] a = getCheckedKeys();
-    if (a != null && a.length > 0) {
-      return a[0];
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(getCheckedKeys());
   }
 
   @Override
-  public T[] getCheckedKeys() {
+  public Set<T> getCheckedKeys() {
     return getValue();
   }
 
   @Override
-  public LookupRow getCheckedLookupRow() {
-    LookupRow[] a = getCheckedLookupRows();
-    if (a != null && a.length > 0) {
-      return a[0];
-    }
-    else {
-      return null;
-    }
+  public ILookupRow<T> getCheckedLookupRow() {
+    return CollectionUtility.firstElement(getCheckedLookupRows());
   }
 
-  @Override
-  public LookupRow[] getCheckedLookupRows() {
-    LookupRow[] lookupRows = null;
-    ITableRow[] tableRows = getTable().getCheckedRows();
-    if (tableRows != null) {
-      lookupRows = new LookupRow[tableRows.length];
-      for (int i = 0; i < tableRows.length; i++) {
-        ICell cell = tableRows[i].getCell(1);
-        lookupRows[i] = new LookupRow(tableRows[i].getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled());
-      }
-    }
-    return lookupRows;
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
+  @Override
+  public Set<ILookupRow<T>> getCheckedLookupRows() {
+    Set<ILookupRow<T>> result = new HashSet<ILookupRow<T>>();
+    for (ITableRow row : getTable().getCheckedRows()) {
+      ICell cell = row.getCell(1);
+      result.add(new LookupRow<T>((T) row.getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled()));
+    }
+    return Collections.unmodifiableSet(result);
+  }
+
+  @Override
   public void checkKey(T key) {
     if (key == null) {
       checkKeys(null);
     }
     else {
-      T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 1);
-      array[0] = key;
-      checkKeys(array);
+      checkKeys(CollectionUtility.hashSet(key));
     }
   }
 
   @Override
-  public void checkKeys(T[] keys) {
-    setValue(keys);
+  public void checkKeys(Collection<? extends T> keys) {
+    setValue(CollectionUtility.<T> hashSetWithoutNullElements(keys));
   }
 
   @Override
@@ -691,23 +673,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getUncheckedKeys() {
-    HashSet<T> set = new HashSet<T>();
-    T[] a = getInitValue();
-    if (a != null) {
-      set.addAll(Arrays.asList(a));
+  public Set<T> getUncheckedKeys() {
+    Set<T> result = new HashSet<T>();
+    Set<T> initValue = getInitValue();
+    if (initValue != null) {
+      result.addAll(initValue);
     }
-    a = getCheckedKeys();
-    if (a != null) {
-      set.removeAll(Arrays.asList(a));
+    Set<T> checkedKeys = getCheckedKeys();
+    if (checkedKeys != null) {
+      result.removeAll(checkedKeys);
     }
-    T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 0);
-    a = set.toArray(array);
-    if (a != null && a.length == 0) {
-      a = null;
-    }
-    return a;
+    return CollectionUtility.unmodifiableSet(result);
   }
 
   @Override
@@ -723,6 +699,19 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @Override
   public void uncheckAllInactiveKeys() {
     checkKeys(getKeyColumnInternal().getValues(getActiveColumnInternal().findRows(false)));
+  }
+
+  @Override
+  public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
+    @SuppressWarnings("unchecked")
+    AbstractValueFieldData<Set<T>> v = (AbstractValueFieldData<Set<T>>) target;
+    Set<T> value = getValue();
+    if (CollectionUtility.isEmpty(value)) {
+      v.setValue(null);
+    }
+    else {
+      v.setValue(CollectionUtility.hashSet(this.getValue()));
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -748,8 +737,8 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
       m_valueTableSyncActive = true;
       getTable().setTableChanging(true);
       //
-      T[] checkedKeys = getCheckedKeys();
-      ITableRow[] checkedRows = getKeyColumnInternal().findRows(checkedKeys);
+      Set<T> checkedKeys = getCheckedKeys();
+      List<ITableRow> checkedRows = getKeyColumnInternal().findRows(checkedKeys);
       for (ITableRow row : getTable().getRows()) {
         row.setChecked(false);
       }
@@ -774,7 +763,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
       m_valueTableSyncActive = true;
       m_table.setTableChanging(true);
       //
-      ITableRow[] checkedRows;
+      Collection<ITableRow> checkedRows;
       if (getTable().isCheckable()) {
         checkedRows = getTable().getCheckedRows();
       }
@@ -856,24 +845,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @Override
   public int getFieldCount() {
-    return m_fields.length;
+    return m_fields.size();
   }
 
   @Override
   public int getFieldIndex(IFormField f) {
-    for (int i = 0; i < m_fields.length; i++) {
-      if (m_fields[i] == f) {
-        return i;
-      }
-    }
-    return -1;
+    return m_fields.indexOf(f);
   }
 
   @Override
-  public IFormField[] getFields() {
-    IFormField[] a = new IFormField[m_fields.length];
-    System.arraycopy(m_fields, 0, a, 0, a.length);
-    return a;
+  public List<IFormField> getFields() {
+    return CollectionUtility.unmodifiableListCopy(m_fields);
   }
 
   @Override
@@ -884,15 +866,14 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
     // children
     int index = 0;
-    IFormField[] f = m_fields;
-    for (int i = 0; i < f.length; i++) {
-      if (f[i] instanceof ICompositeField) {
-        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) {
+    for (IFormField field : m_fields) {
+      if (field instanceof ICompositeField) {
+        if (!((ICompositeField) field).visitFields(visitor, startLevel + 1)) {
           return false;
         }
       }
       else {
-        if (!visitor.visitField(f[i], startLevel, index)) {
+        if (!visitor.visitField(field, startLevel, index)) {
           return false;
         }
       }
@@ -1002,19 +983,18 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   protected class P_ListBoxUIFacade implements IListBoxUIFacade {
   }
 
-  private class P_TableRowBuilder extends AbstractTableRowBuilder {
+  private class P_TableRowBuilder extends AbstractTableRowBuilder<T> {
 
     @Override
     protected ITableRow createEmptyTableRow() {
       return new TableRow(getTable().getColumnSet());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ITableRow createTableRow(LookupRow dataRow) throws ProcessingException {
+    public ITableRow createTableRow(ILookupRow<T> dataRow) throws ProcessingException {
       TableRow tableRow = (TableRow) super.createTableRow(dataRow);
       // fill values to tableRow
-      getKeyColumnInternal().setValue(tableRow, (T) dataRow.getKey());
+      getKeyColumnInternal().setValue(tableRow, dataRow.getKey());
       getTextColumnInternal().setValue(tableRow, dataRow.getText());
       getActiveColumnInternal().setValue(tableRow, dataRow.isActive());
 

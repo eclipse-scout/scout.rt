@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -51,7 +52,7 @@ import org.osgi.framework.Bundle;
 public class PrintFormsAction extends AbstractAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintFormsAction.class);
 
-  private Class<?>[] m_formTypes;
+  private List<Class<? extends IForm>> m_formTypes;
   private String m_contentType;
   private File m_destinationFolder;
   // output files
@@ -71,33 +72,34 @@ public class PrintFormsAction extends AbstractAction {
     m_printedFiles = new ArrayList<File>();
   }
 
-  public Class<?>[] getFormTypes() {
-    return m_formTypes;
+  public List<Class<? extends IForm>> getFormTypes() {
+    return CollectionUtility.unmodifiableList(m_formTypes);
   }
 
-  public void setFormTypes(Class<?>[] formTypes) {
-    m_formTypes = formTypes;
+  public void setFormTypes(List<Class<? extends IForm>> formTypes) {
+    m_formTypes = CollectionUtility.arrayListWithoutNullElements(formTypes);
   }
 
   /**
    * Convenience setter to choose all existing form types in a specific plugin
    */
+  @SuppressWarnings("unchecked")
   public void setFormTypesByBundle(Bundle bundle) {
     BundleBrowser b = new BundleBrowser(bundle.getSymbolicName(),
         bundle.getSymbolicName());
-    ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+    List<Class<? extends IForm>> list = new ArrayList<Class<? extends IForm>>();
     for (String name : b.getClasses(false, true)) {
       try {
         Class<?> c = bundle.loadClass(name);
         if (IForm.class.isAssignableFrom(c)) {
-          list.add(c);
+          list.add((Class<? extends IForm>) c);
         }
       }
       catch (ClassNotFoundException e) {
         // nop
       }
     }
-    m_formTypes = list.toArray(new Class[list.size()]);
+    m_formTypes = list;
   }
 
   public String getContentType() {
@@ -116,8 +118,8 @@ public class PrintFormsAction extends AbstractAction {
     m_destinationFolder = folder;
   }
 
-  public File[] getPrintedFiles() {
-    return m_printedFiles.toArray(new File[m_printedFiles.size()]);
+  public List<File> getPrintedFiles() {
+    return CollectionUtility.unmodifiableList(m_printedFiles);
   }
 
   @SuppressWarnings("unchecked")
@@ -151,7 +153,7 @@ public class PrintFormsAction extends AbstractAction {
   }
 
   protected List<IForm> createFormInstancesFor(Class<? extends IForm> formClass) throws Throwable {
-    ArrayList<IForm> list = new ArrayList<IForm>();
+    List<IForm> list = new ArrayList<IForm>();
     list.add(formClass.newInstance());
     return list;
   }

@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import java.io.Serializable;
-
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public class CodeRow implements Serializable {
+public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
 
-  private Object m_key;
+  private ID_TYPE m_key;
   private String m_text;
   private String m_iconId;
   private String m_tooltip;
@@ -27,7 +25,7 @@ public class CodeRow implements Serializable {
   private FontSpec m_font;
   private boolean m_active = true;
   private boolean m_enabled = true;
-  private transient Object m_parentKey;
+  private transient ID_TYPE m_parentKey;
   private String m_extKey;
   private Number m_value;
   private long m_partitionId;
@@ -53,13 +51,14 @@ public class CodeRow implements Serializable {
    * [11] Long enabled (0 or 1) <br>
    * [12] Long partitionId
    */
+  @SuppressWarnings("unchecked")
   public CodeRow(Object[] cells, int maxColumnIndex) {
     if (cells != null) {
       for (int index = 0; index < cells.length && index <= maxColumnIndex; index++) {
         if (cells[index] != null) {
           switch (index) {
             case 0: {
-              m_key = cells[index];
+              m_key = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
               break;
             }
             case 1: {
@@ -92,7 +91,7 @@ public class CodeRow implements Serializable {
               break;
             }
             case 8: {
-              Object o = cells[index];
+              ID_TYPE o = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
               if ((o instanceof Number) && ((Number) o).longValue() == 0) {
                 o = null;
               }
@@ -125,12 +124,12 @@ public class CodeRow implements Serializable {
     }
   }
 
-  public CodeRow(CodeRow t) {
+  public CodeRow(ICodeRow<ID_TYPE> t) {
     this(
         t.getKey(),
         t.getText(),
         t.getIconId(),
-        t.getTooltip(),
+        t.getTooltipText(),
         t.getBackgroundColor(),
         t.getForegroundColor(),
         t.getFont(),
@@ -142,12 +141,12 @@ public class CodeRow implements Serializable {
         t.getPartitionId());
   }
 
-  public CodeRow(Object key, String text) {
+  public CodeRow(ID_TYPE key, String text) {
     m_key = key;
     m_text = text;
   }
 
-  public CodeRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, Object parentKey, boolean active, String extKey, Number value, long partitionId) {
+  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId) {
     m_key = key;
     m_text = text;
     m_iconId = iconId;
@@ -166,30 +165,45 @@ public class CodeRow implements Serializable {
   /*
    * typed member access
    */
-  public Object getKey() {
+  @Override
+  public ID_TYPE getKey() {
     return m_key;
   }
 
-  public void setKey(Object key) {
+  public void setKey(ID_TYPE key) {
     m_key = key;
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
 
+  @Override
   public void setText(String text) {
     m_text = text;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void setIconId(String iconId) {
     m_iconId = iconId;
   }
 
+  @Override
+  public String getTooltipText() {
+    return getTooltip();
+  }
+
+  /**
+   * @return
+   * @deprecated use {@link #getTooltipText()}
+   */
+  @Deprecated
   public String getTooltip() {
     return m_tooltip;
   }
@@ -198,6 +212,7 @@ public class CodeRow implements Serializable {
     m_tooltip = tooltip;
   }
 
+  @Override
   public String getForegroundColor() {
     return m_foregroundColor;
   }
@@ -206,6 +221,7 @@ public class CodeRow implements Serializable {
     m_foregroundColor = foregroundColor;
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_backgroundColor;
   }
@@ -214,6 +230,7 @@ public class CodeRow implements Serializable {
     m_backgroundColor = backgroundColor;
   }
 
+  @Override
   public FontSpec getFont() {
     return m_font;
   }
@@ -222,46 +239,57 @@ public class CodeRow implements Serializable {
     m_font = font;
   }
 
+  @Override
   public boolean isActive() {
     return m_active;
   }
 
+  @Override
   public void setActive(boolean b) {
     m_active = b;
   }
 
+  @Override
   public boolean isEnabled() {
     return m_enabled;
   }
 
+  @Override
   public void setEnabled(boolean b) {
     m_enabled = b;
   }
 
-  public Object getParentKey() {
+  @Override
+  public ID_TYPE getParentKey() {
     return m_parentKey;
   }
 
-  public void setParentKey(Object parentKey) {
+  @Override
+  public void setParentKey(ID_TYPE parentKey) {
     m_parentKey = parentKey;
   }
 
+  @Override
   public String getExtKey() {
     return m_extKey;
   }
 
+  @Override
   public void setExtKey(String extKey) {
     m_extKey = extKey;
   }
 
+  @Override
   public Number getValue() {
     return m_value;
   }
 
+  @Override
   public void setValue(Number value) {
     m_value = value;
   }
 
+  @Override
   public long getPartitionId() {
     return m_partitionId;
   }

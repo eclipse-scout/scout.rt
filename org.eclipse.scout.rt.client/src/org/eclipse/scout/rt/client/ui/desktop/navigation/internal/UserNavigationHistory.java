@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -398,7 +399,7 @@ public class UserNavigationHistory {
     }
   }
 
-  public IMenu[] getMenus() {
+  public List<IMenu> getMenus() {
     List<Bookmark> bookmarks = getBookmarks();
     Bookmark current = getActiveBookmark();
     // children
@@ -411,7 +412,7 @@ public class UserNavigationHistory {
       }
       newList.add(m);
     }
-    return newList.toArray(new IMenu[newList.size()]);
+    return Collections.unmodifiableList(newList);
   }
 
   /**

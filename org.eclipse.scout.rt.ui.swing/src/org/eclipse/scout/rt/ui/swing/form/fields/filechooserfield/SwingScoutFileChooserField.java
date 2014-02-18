@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swing.form.fields.filechooserfield;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -24,6 +25,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -198,13 +200,13 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
         @Override
         public void run() {
           IFileChooser fc = getScoutObject().getFileChooser();
-          final File[] files = fc.startChooser();
+          final List<File> files = fc.startChooser();
 
           Runnable swingJob = new Runnable() {
             @Override
             public void run() {
-              if (files != null && files.length > 0) {
-                getSwingTextField().setText(files[0].getAbsolutePath());
+              if (CollectionUtility.hasElements(files)) {
+                getSwingTextField().setText(CollectionUtility.firstElement(files).getAbsolutePath());
                 handleSwingInputVerifier();
               }
             }
@@ -224,7 +226,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
           // <bsh 2010-10-08>
           // The default implemention positions the popup menu on the left side of the
           // "target" component. This is no longer correct in Rayo. So we use the target's

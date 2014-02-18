@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.services.lookup;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.AbstractService;
 
@@ -20,9 +21,13 @@ import org.eclipse.scout.service.AbstractService;
 @Priority(-1)
 public class DefaultLookupCallProvisioningService extends AbstractService implements ILookupCallProvisioningService {
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LookupCall newClonedInstance(LookupCall templateCall, IProvisioningContext context) {
-    return (LookupCall) templateCall.clone();
+  public <T> ILookupCall<T> newClonedInstance(ILookupCall<T> templateCall, IProvisioningContext context) {
+    if (templateCall instanceof LookupCall<?>) {
+      return (ILookupCall<T>) ((LookupCall<?>) templateCall).clone();
+    }
+    return null;
   }
 
 }

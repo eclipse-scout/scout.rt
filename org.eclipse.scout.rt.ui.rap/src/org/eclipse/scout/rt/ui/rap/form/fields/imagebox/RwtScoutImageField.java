@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.imagebox;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -169,11 +170,11 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
           scoutMenusRef.set(scoutMenus);
         }
       };

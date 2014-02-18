@@ -13,13 +13,15 @@ package org.eclipse.scout.rt.client.ui.basic.activitymap;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 @SuppressWarnings("serial")
-public class ActivityMapEvent<RI> extends java.util.EventObject {
+public class ActivityMapEvent extends java.util.EventObject {
   /**
    * Some activities have been added valid properties: activities,
    * firstActivity, lastActivity
@@ -57,9 +59,9 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
   public static final int TYPE_NEW_ACTIVITY_POPUP = 701;
 
   private int m_type;
-  private ActivityCell[] m_activities = new ActivityCell[0];
+  private List<? extends ActivityCell> m_activities = Collections.emptyList();
   private List<IMenu> m_popupMenus;
-  private RI m_resourceId;
+  private Object m_resourceId;
   private MinorTimeColumn m_column;
 
   public ActivityMapEvent(IActivityMap source, int type) {
@@ -71,23 +73,27 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
     super(source);
     m_type = type;
     if (activity != null) {
-      m_activities = new ActivityCell[]{activity};
+      ArrayList<ActivityCell> list = new ArrayList<ActivityCell>();
+      list.add(activity);
+      m_activities = list;
     }
   }
 
-  public ActivityMapEvent(IActivityMap source, int type, ActivityCell[] activities) {
+  public ActivityMapEvent(IActivityMap source, int type, List<? extends ActivityCell> activities) {
     super(source);
     m_type = type;
-    if (activities != null && activities.length > 0) {
+    if (CollectionUtility.hasElements(activities)) {
       m_activities = activities;
     }
   }
 
-  public ActivityMapEvent(IActivityMap source, int type, RI resourceId, MinorTimeColumn column, ActivityCell activity) {
+  public ActivityMapEvent(IActivityMap source, int type, Object resourceId, MinorTimeColumn column, ActivityCell activity) {
     super(source);
     m_type = type;
     if (activity != null) {
-      m_activities = new ActivityCell[]{activity};
+      ArrayList<ActivityCell> list = new ArrayList<ActivityCell>();
+      list.add(activity);
+      m_activities = list;
     }
     m_resourceId = resourceId;
     m_column = column;
@@ -101,7 +107,7 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
     return m_type;
   }
 
-  public RI getResourceId() {
+  public Object getResourceId() {
     return m_resourceId;
   }
 
@@ -109,24 +115,24 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
     return m_column;
   }
 
-  public ActivityCell[] getActivities() {
-    return m_activities;
+  public List<ActivityCell> getActivities() {
+    return Collections.unmodifiableList(m_activities);
   }
 
-  protected void setActivities(ActivityCell[] activities) {
+  protected void setActivities(List<? extends ActivityCell> activities) {
     m_activities = activities;
   }
 
   public int getActivityCount() {
-    return m_activities != null ? m_activities.length : 0;
+    return m_activities != null ? m_activities.size() : 0;
   }
 
   public ActivityCell getFirstActivity() {
-    return m_activities.length > 0 ? m_activities[0] : null;
+    return CollectionUtility.firstElement(m_activities);
   }
 
   public ActivityCell getLastActivity() {
-    return m_activities.length > 0 ? m_activities[m_activities.length - 1] : null;
+    return CollectionUtility.lastElement(m_activities);
   }
 
   /**
@@ -144,24 +150,24 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
   /**
    * used by TYPE_NEW_ACTIVITY_POPUP and TYPE_EDIT_ACTIVITY_POPUP to add actions
    */
-  public void addPopupMenus(IMenu[] menus) {
+  public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
         m_popupMenus = new ArrayList<IMenu>();
       }
-      m_popupMenus.addAll(Arrays.asList(menus));
+      m_popupMenus.addAll(menus);
     }
   }
 
   /**
    * used by TYPE_NEW_ACTIVITY_POPUP and TYPE_EDIT_ACTIVITY_POPUP to add actions
    */
-  public IMenu[] getPopupMenus() {
+  public List<IMenu> getPopupMenus() {
     if (m_popupMenus != null) {
-      return m_popupMenus.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(m_popupMenus);
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 
@@ -198,19 +204,16 @@ public class ActivityMapEvent<RI> extends java.util.EventObject {
     }
     buf.append(" ");
     // activities
-    if (m_activities != null && m_activities.length > 0 && getActivityMap() != null) {
-      if (m_activities.length == 1) {
-        buf.append("row " + m_activities[0]);
+    if (CollectionUtility.hasElements(m_activities) && getActivityMap() != null) {
+      if (m_activities.size() == 1) {
+        buf.append("row " + CollectionUtility.firstElement(m_activities));
       }
       else {
-        buf.append("activities {");
-        for (int i = 0; i < m_activities.length; i++) {
-          if (i >= 0) {
-            buf.append(",");
-          }
-          buf.append("" + m_activities[i]);
+        Iterator<? extends ActivityCell> actIt = m_activities.iterator();
+        buf.append("" + actIt.next());
+        while (actIt.hasNext()) {
+          buf.append(",").append("" + actIt.next());
         }
-        buf.append("}");
       }
     }
     else {

@@ -173,9 +173,9 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
 
     private final int m_tokenId;
     private final int m_op;
-    private final Object[] m_values;
+    private final List<? extends Object> m_values;
 
-    public AttributeNodeToken(int tokenId, int op, Object[] values) {
+    public AttributeNodeToken(int tokenId, int op, List<? extends Object> values) {
       m_tokenId = tokenId;
       m_op = op;
       m_values = values;
@@ -189,8 +189,8 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
       return m_op;
     }
 
-    public Object[] getValues() {
-      return m_values;
+    public List<Object> getValues() {
+      return Collections.unmodifiableList(m_values);
     }
   }
 

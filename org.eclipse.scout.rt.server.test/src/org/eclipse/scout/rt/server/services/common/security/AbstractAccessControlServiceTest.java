@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
@@ -40,7 +42,7 @@ public class AbstractAccessControlServiceTest {
     TestClientNotificationQueueListener listener = new TestClientNotificationQueueListener();
     SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(listener);
     final String testUser = "testuser";
-    accessControlService.clearCacheOfUserIds(testUser);
+    accessControlService.clearCacheOfUserIds(Collections.singleton(testUser));
 
     List<ClientNotificationQueueEvent> eventList = listener.getEventList();
     Assert.assertEquals("No client notification received.", eventList.size(), 1);
@@ -58,7 +60,7 @@ public class AbstractAccessControlServiceTest {
    */
   @Test
   public void testClientNotificationSentForClearCacheNullUsers() {
-    verifyNoNotificationSentForClearCache((String[]) null);
+    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
   }
 
   /**
@@ -67,7 +69,7 @@ public class AbstractAccessControlServiceTest {
    */
   @Test
   public void testClientNotificationSentForClearCacheNoUsers() {
-    verifyNoNotificationSentForClearCache();
+    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
   }
 
   /**
@@ -76,10 +78,10 @@ public class AbstractAccessControlServiceTest {
    */
   @Test
   public void testClientNotificationSentForClearCacheEmptyUsers() {
-    verifyNoNotificationSentForClearCache(new String[]{null});
+    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
   }
 
-  private void verifyNoNotificationSentForClearCache(String... userIds) {
+  private void verifyNoNotificationSentForClearCache(Collection<String> userIds) {
     AbstractAccessControlService accessControlService = new TestAccessControlService();
     accessControlService.initializeService(null);
 

@@ -97,7 +97,8 @@ public class RapMock implements IGuiMock {
 
   private static boolean useChrome = false;
   private static boolean useFirefox = !useChrome;
-  private static boolean useFirebug = false && useFirefox;
+
+  private static boolean useFirebug = false;// && useFirefox;
 
   public void setClientSession(IClientSession session) {
     m_session = session;

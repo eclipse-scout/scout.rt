@@ -116,9 +116,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     // 2. remove transitive replacements (i.e. compute replacing leaf classes)
     if (!m_replacingFields.isEmpty()) {
-      @SuppressWarnings("unchecked")
-      Class<? extends IFormField>[] classes = m_replacingFields.toArray(new Class[m_replacingFields.size()]);
-      m_replacingFields = ConfigurationUtility.getReplacingLeafClasses(classes);
+      m_replacingFields = ConfigurationUtility.getReplacingLeafClasses(new ArrayList<Class<? extends IFormField>>(m_replacingFields));
     }
 
     // 3. remove injected fields that are replaced and treat those replacing fields as injected fields

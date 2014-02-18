@@ -76,31 +76,30 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
   }
 
   @Override
-  public List<LookupRow> createHistogram() {
-    TreeMap<T, LookupRow> hist = new TreeMap<T, LookupRow>();
-    HashMap<T, Integer> countMap = new HashMap<T, Integer>();
+  public List<LookupRow<T>> createHistogram() {
+    Map<T, LookupRow<T>> hist = new TreeMap<T, LookupRow<T>>();
+    Map<T, Integer> countMap = new HashMap<T, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       T key = m_column.getValue(row);
       String text = m_column.getDisplayText(row);
       if (key != null && !hist.containsKey(key)) {
         FontSpec font = (row.isFilterAccepted() ? null : FontSpec.parse("italic"));
-        hist.put(key, new LookupRow(key, text, null, null, null, null, font));
+        hist.put(key, new LookupRow<T>(key, text, null, null, null, null, font));
       }
       Integer count = countMap.get(key);
       countMap.put(key, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<T, LookupRow> e : hist.entrySet()) {
+    for (Map.Entry<T, LookupRow<T>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        LookupRow row = e.getValue();
-        row.setText(row.getText() + " (" + count + ")");
+        e.getValue().setText(e.getValue().getText() + " (" + count + ")");
       }
     }
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    List<LookupRow<T>> list = new ArrayList<LookupRow<T>>();
     list.addAll(hist.values());
     //
     Integer nullCount = countMap.get(null);
-    list.add(new LookupRow(null, "(" + ScoutTexts.get("ColumnFilterNullText") + ")" + (nullCount != null && nullCount > 1 ? " (" + nullCount + ")" : "")));
+    list.add(new LookupRow<T>(null, "(" + ScoutTexts.get("ColumnFilterNullText") + ")" + (nullCount != null && nullCount > 1 ? " (" + nullCount + ")" : "")));
     return list;
   }
 

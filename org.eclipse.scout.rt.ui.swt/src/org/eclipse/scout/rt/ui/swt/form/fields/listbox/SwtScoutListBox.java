@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.listbox;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
@@ -41,10 +44,11 @@ public class SwtScoutListBox extends SwtScoutValueFieldComposite<IListBox<?>> im
     m_tableComposite.createField(container, getScoutObject().getTable(), getEnvironment());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
     // filter box
-    IFormField[] childFields = getScoutObject().getFields();
-    if (childFields.length > 0) {
-      ISwtScoutComposite filterComposite = getEnvironment().createFormField(container, childFields[0]);
-      LogicalGridData filterData = LogicalGridDataBuilder.createField(childFields[0].getGridData());
+    List<IFormField> childFields = getScoutObject().getFields();
+    if (CollectionUtility.hasElements(childFields)) {
+      IFormField firstField = CollectionUtility.firstElement(childFields);
+      ISwtScoutComposite filterComposite = getEnvironment().createFormField(container, firstField);
+      LogicalGridData filterData = LogicalGridDataBuilder.createField(firstField.getGridData());
       filterData.gridx = fieldData.gridx;
       filterData.gridy = fieldData.gridy + fieldData.gridh;
       filterData.gridw = fieldData.gridw;

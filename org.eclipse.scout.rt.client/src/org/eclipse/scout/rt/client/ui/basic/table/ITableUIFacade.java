@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -38,21 +40,21 @@ public interface ITableUIFacade {
   /**
    * Popup on selected row(s)
    */
-  IMenu[] fireRowPopupFromUI();
+  List<IMenu> fireRowPopupFromUI();
 
   /**
    * Popup on empty space
    */
-  IMenu[] fireEmptySpacePopupFromUI();
+  List<IMenu> fireEmptySpacePopupFromUI();
 
-  IMenu[] fireHeaderPopupFromUI();
+  List<IMenu> fireHeaderPopupFromUI();
 
   void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex);
 
   /**
    * @param visibleColumns
    */
-  void fireVisibleColumnsChangedFromUI(IColumn<?>[] visibleColumns);
+  void fireVisibleColumnsChangedFromUI(Collection<IColumn<?>> visibleColumns);
 
   void setColumnWidthFromUI(IColumn<?> c, int newWidth);
 
@@ -67,7 +69,7 @@ public interface ITableUIFacade {
    */
   void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort);
 
-  void setSelectedRowsFromUI(ITableRow[] rows);
+  void setSelectedRowsFromUI(List<? extends ITableRow> rows);
 
   /**
    * Drag selected rows

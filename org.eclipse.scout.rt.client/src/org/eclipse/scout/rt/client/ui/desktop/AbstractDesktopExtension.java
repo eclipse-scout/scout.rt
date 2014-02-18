@@ -124,14 +124,9 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
 
   @Override
   public void contributeActions(Collection<IAction> actions) {
-    Class<? extends IAction>[] array = getConfiguredActions();
-    if (array == null) {
-      return;
-    }
-    for (Class<? extends IAction> element : array) {
+    for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
       try {
-        IAction a = ConfigurationUtility.newInnerInstance(this, element);
-        actions.add(a);
+        actions.add(ConfigurationUtility.newInnerInstance(this, actionClazz));
       }
       catch (Exception e) {
         LOG.error(null, e);
@@ -390,9 +385,9 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
     return null;
   }
 
-  private Class<? extends IAction>[] getConfiguredActions() {
+  private List<Class<? extends IAction>> getConfiguredActions() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class<IAction>[] fca = ConfigurationUtility.filterClasses(dca, IAction.class);
+    List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 

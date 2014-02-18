@@ -14,18 +14,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public class SpellCheckerShortcutLookupCall extends LocalLookupCall {
+public class SpellCheckerShortcutLookupCall extends LocalLookupCall<String> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  protected List<ILookupRow<String>> execCreateLookupRows() throws ProcessingException {
+    ArrayList<ILookupRow<String>> list = new ArrayList<ILookupRow<String>>();
     for (int i = 1; i <= 12; i++) {
-      list.add(new LookupRow("f" + i, "F" + i));
+      list.add(new LookupRow<String>("f" + i, "F" + i));
     }
     return list;
   }

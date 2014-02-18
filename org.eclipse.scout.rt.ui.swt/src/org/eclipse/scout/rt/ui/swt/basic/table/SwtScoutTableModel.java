@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtIcons;
@@ -62,7 +62,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public Object[] getElements(Object inputElement) {
     if (m_table != null) {
-      return m_table.getFilteredRows();
+      return m_table.getFilteredRows().toArray();
     }
     else {
       return new Object[0];
@@ -118,7 +118,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
           iconId = SwtIcons.CheckboxNo;
         }
       }
-      else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
+      else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof IProposalColumn) || ((IProposalColumn) col).getLookupCall() == null)) {
         Boolean b = (Boolean) cell.getValue();
         if (b != null && b.booleanValue()) {
           iconId = SwtIcons.CheckboxYes;

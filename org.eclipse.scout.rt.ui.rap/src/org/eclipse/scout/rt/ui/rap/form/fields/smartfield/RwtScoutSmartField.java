@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,8 +28,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
@@ -138,7 +140,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     // listeners
     getUiField().addModifyListener(new P_ModifyListener());
-    if (!getScoutObject().isAllowCustomText()) {
+    if (!(getScoutObject() instanceof IProposalField)) {
       getUiField().addTraverseListener(new P_TraverseListener());
       attachFocusListener(getUiField(), false);
     }
@@ -260,7 +262,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
+  protected void setProposalFormFromScout(IContentAssistFieldProposalForm form) {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -275,12 +277,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void showProposalPopup(final ISmartFieldProposalForm form) {
+  protected void showProposalPopup(final IContentAssistFieldProposalForm form) {
     // close old
     hideProposalPopup();
 
     //Prevent showing if it should not be displayed
-    if (getScoutObject().isAllowCustomText() && !getUiField().isFocusControl()) {
+    if (getScoutObject() instanceof IProposalField && !getUiField().isFocusControl()) {
       //If the user writes fast and presses tab before the proposal popup shows up, the popup needs to stay closed
       getUiEnvironment().invokeScoutLater(new Runnable() {
         @Override
@@ -299,7 +301,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
 
     // make sure tab won't go to next field
-    if (!getScoutObject().isAllowCustomText()) {
+    if (!(getScoutObject() instanceof IProposalField)) {
       disableTabbing();
     }
 
@@ -552,7 +554,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       setIconIdFromScout((String) newValue);
     }
     else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
-      setProposalFormFromScout((ISmartFieldProposalForm) newValue);
+      setProposalFormFromScout((IContentAssistFieldProposalForm) newValue);
     }
   }
 
@@ -764,11 +766,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
           scoutMenusRef.set(scoutMenus);
         }
       };

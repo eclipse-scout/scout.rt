@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -116,19 +118,19 @@ public class ButtonTest {
 
   @Test
   public void testMenusAndKeyStrokes() {
-    IMenu[] pushButton1Menus = m_form.getPushButton1().getMenus();
-    Assert.assertEquals("PushButton1 should have 2 menus", 2, pushButton1Menus.length);
-    Assert.assertEquals("TestMenu1", pushButton1Menus[0].getText());
-    Assert.assertEquals("&TestMenu1", pushButton1Menus[0].getTextWithMnemonic());
-    Assert.assertEquals("alternate-2", pushButton1Menus[0].getKeyStroke());
+    List<IMenu> pushButton1Menus = m_form.getPushButton1().getMenus();
+    Assert.assertEquals("PushButton1 should have 2 menus", 2, pushButton1Menus.size());
+    Assert.assertEquals("TestMenu1", pushButton1Menus.get(0).getText());
+    Assert.assertEquals("&TestMenu1", pushButton1Menus.get(0).getTextWithMnemonic());
+    Assert.assertEquals("alternate-2", pushButton1Menus.get(0).getKeyStroke());
 
-    Assert.assertEquals("TestMenu2", pushButton1Menus[1].getText());
-    Assert.assertEquals("T&estMenu2", pushButton1Menus[1].getTextWithMnemonic());
-    Assert.assertEquals("control-alternate-f11", pushButton1Menus[1].getKeyStroke());
+    Assert.assertEquals("TestMenu2", pushButton1Menus.get(1).getText());
+    Assert.assertEquals("T&estMenu2", pushButton1Menus.get(1).getTextWithMnemonic());
+    Assert.assertEquals("control-alternate-f11", pushButton1Menus.get(1).getKeyStroke());
 
-    IKeyStroke[] pushButton1KeyStrokes = m_form.getPushButton1().getContributedKeyStrokes();
+    List<IKeyStroke> pushButton1KeyStrokes = m_form.getPushButton1().getContributedKeyStrokes();
     Assert.assertNotNull("KeyStrokes of PushButton1 should not be null", pushButton1KeyStrokes);
-    Assert.assertEquals("PushButton1 should have 2 keyStrokes registered", 2, pushButton1KeyStrokes.length);
+    Assert.assertEquals("PushButton1 should have 2 keyStrokes registered", 2, pushButton1KeyStrokes.size());
   }
 
   @After

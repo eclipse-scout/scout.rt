@@ -74,7 +74,7 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
       public void widgetDisposed(DisposeEvent e) {
         if (m_scoutTabMapping != null) {
           IGroupBox selectedGroupBox = getScoutObject().getSelectedTab();
-          IGroupBox[] groupBoxes = getScoutObject().getGroupBoxes();
+          IGroupBox[] groupBoxes = getScoutObject().getGroupBoxes().toArray(new IGroupBox[getScoutObject().getGroupBoxes().size()]);
           //reverse order to avoid flickering
           for (int i = groupBoxes.length - 1; i >= 0; i--) {
             IGroupBox groupBox = groupBoxes[i];

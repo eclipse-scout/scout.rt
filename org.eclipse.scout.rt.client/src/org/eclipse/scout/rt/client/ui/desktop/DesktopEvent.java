@@ -14,7 +14,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
@@ -198,24 +198,24 @@ public class DesktopEvent extends EventObject {
   /**
    * used by TYPE_TRAY_POPUP to add menus
    */
-  public void addPopupMenus(IMenu[] menus) {
+  public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
         m_popupMenus = new ArrayList<IMenu>();
       }
-      m_popupMenus.addAll(Arrays.asList(menus));
+      m_popupMenus.addAll(menus);
     }
   }
 
   /**
    * used by TYPE_TRAY_POPUP to add menus
    */
-  public IMenu[] getPopupMenus() {
+  public List<IMenu> getPopupMenus() {
     if (m_popupMenus != null) {
-      return m_popupMenus.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(m_popupMenus);
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 

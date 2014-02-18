@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.server.services.common.security.internal;
 
 import java.security.Permissions;
+import java.util.Collection;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -113,13 +116,9 @@ public class AccessControlStore {
    * clears the cache
    */
   public void clearCache() {
-    String[] userIds;
-    synchronized (m_storeLock) {
-      userIds = m_store.keySet().toArray(new String[m_store.size()]);
-    }
     // notify with a filter, that will be accepted nowhere
     SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
-    clearCacheOfUserIds(userIds);
+    clearCacheOfUserIds(CollectionUtility.unmodifiableSet(m_store.keySet()));
   }
 
   /**
@@ -128,8 +127,9 @@ public class AccessControlStore {
    * @param userIds
    *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
-  public void clearCacheOfUserIds(String... userIds) {
-    if (userIds == null || userIds.length == 0) {
+  public void clearCacheOfUserIds(Collection<String> userIds0) {
+    Set<String> userIds = CollectionUtility.hashSetWithoutNullElements(userIds0);
+    if (userIds.isEmpty()) {
       return;
     }
     synchronized (m_storeLock) {

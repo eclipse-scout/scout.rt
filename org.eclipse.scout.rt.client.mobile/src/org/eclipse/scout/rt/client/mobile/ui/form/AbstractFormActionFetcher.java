@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -32,12 +34,14 @@ public abstract class AbstractFormActionFetcher implements IActionFetcher {
   public abstract List<IMenu> fetch();
 
   protected List<IMobileAction> convertCustomProcessButtons() {
-    IButton[] customProcessButtons = getForm().getRootGroupBox().getCustomProcessButtons();
-    if (customProcessButtons == null || customProcessButtons.length == 0) {
-      return null;
+    List<IButton> customProcessButtons = getForm().getRootGroupBox().getCustomProcessButtons();
+    if (CollectionUtility.hasElements(customProcessButtons)) {
+      return ActionButtonBarUtility.convertButtonsToActions(getForm().getRootGroupBox().getCustomProcessButtons());
+    }
+    else {
+      return Collections.emptyList();
     }
 
-    return ActionButtonBarUtility.convertButtonsToActions(getForm().getRootGroupBox().getCustomProcessButtons());
   }
 
 }

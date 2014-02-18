@@ -41,7 +41,7 @@ public class UserNavigationHistoryTest {
     UserNavigationHistory history = new UserNavigationHistory();
     assertEquals("Inithial history size should be 0.", 0, history.getSize());
     assertNull("Inithially history should contains no active bookmark.", history.getActiveBookmark());
-    assertEquals("Initially there should be no menus.", 0, history.getMenus().length);
+    assertEquals("Initially there should be no menus.", 0, history.getMenus().size());
   }
 
   /**
@@ -57,7 +57,7 @@ public class UserNavigationHistoryTest {
     assertEquals(1, history.getSize());
     assertEquals(0, history.getIndex());
     assertEquals("Added bookmark should be active.", testBookmark, history.getActiveBookmark());
-    assertEquals("There should be one menu for the added bookmark", 1, history.getMenus().length);
+    assertEquals("There should be one menu for the added bookmark", 1, history.getMenus().size());
     assertEquals("There should be no backward bookmarks.", 0, history.getBackwardBookmarks().size());
     assertEquals("There should be no forward bookmarks.", 0, history.getForwardBookmarks().size());
   }
@@ -284,7 +284,7 @@ public class UserNavigationHistoryTest {
     assertEquals("Last added bookmark should be active.", testBookmark, history.getActiveBookmark());
     assertEquals("There should be backward bookmarks.", historySize - 1, history.getBackwardBookmarks().size());
     assertTrue(history.getForwardBookmarks().isEmpty());
-    assertEquals("There should be one menu.", historySize, history.getMenus().length);
+    assertEquals("There should be one menu.", historySize, history.getMenus().size());
   }
 
   /**
@@ -358,7 +358,7 @@ public class UserNavigationHistoryTest {
     assertFalse("There should be no backward bookmarks.", history.hasBackwardBookmarks());
     assertEquals("There should be no forward bookmarks.", 0, history.getForwardBookmarks().size());
     assertFalse("There should be no forward bookmarks.", history.hasForwardBookmarks());
-    assertEquals("There should be one menu.", 1, history.getMenus().length);
+    assertEquals("There should be one menu.", 1, history.getMenus().size());
   }
 
   /**

@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm;
 
 /**
  * <p>
@@ -111,10 +111,10 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
    * really necessary at that point in time.
    * <p>
    * The default checks if the job is in a smart tree operation and ignores busy, see
-   * {@link SmartTreeForm#JOB_PROPERTY_LOAD_TREE}.
+   * {@link ContentAssistTreeForm#JOB_PROPERTY_LOAD_TREE}.
    */
   protected boolean shouldRunBusy(Job job) {
-    Boolean b = (Boolean) job.getProperty(SmartTreeForm.JOB_PROPERTY_LOAD_TREE);
+    Boolean b = (Boolean) job.getProperty(ContentAssistTreeForm.JOB_PROPERTY_LOAD_TREE);
     if (b != null && b.booleanValue()) {
       return false;
     }

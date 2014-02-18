@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
@@ -44,8 +45,9 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -63,11 +65,11 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRadioButtonGroup.class);
 
   private boolean m_valueAndSelectionMediatorActive;
-  private LookupCall m_lookupCall;
-  private Class<? extends ICodeType> m_codeTypeClass;
+  private ILookupCall<T> m_lookupCall;
+  private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private RadioButtonGroupGrid m_grid;
-  private IFormField[] m_fields;
-  private IButton[] m_radioButtons;
+  private List<IFormField> m_fields;
+  private List<IButton> m_radioButtons;
 
   public AbstractRadioButtonGroup() {
     this(true);
@@ -87,7 +89,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
   @ValidationRule(ValidationRule.LOOKUP_CALL)
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<T>> getConfiguredLookupCall() {
     return null;
   }
 
@@ -100,7 +102,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
   @ValidationRule(ValidationRule.CODE_TYPE)
-  protected Class<? extends ICodeType> getConfiguredCodeType() {
+  protected Class<? extends ICodeType<?, T>> getConfiguredCodeType() {
     return null;
   }
 
@@ -109,7 +111,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigOperation
   @Order(260)
-  protected void execPrepareLookup(LookupCall call) {
+  protected void execPrepareLookup(ILookupCall<T> call) {
   }
 
   /**
@@ -121,12 +123,12 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ConfigOperation
   @Order(270)
-  protected void execFilterLookupResult(LookupCall call, List<LookupRow> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
   }
 
   @Override
   protected void initConfig() {
-    m_fields = new IFormField[0];
+    m_fields = Collections.emptyList();
     m_grid = new RadioButtonGroupGrid(this);
     super.initConfig();
     // Configured CodeType
@@ -134,10 +136,10 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       setCodeTypeClass(getConfiguredCodeType());
     }
     // Configured LookupCall
-    Class<? extends LookupCall> lookupCallClass = getConfiguredLookupCall();
+    Class<? extends ILookupCall<T>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
       try {
-        LookupCall call = lookupCallClass.newInstance();
+        ILookupCall<T> call = lookupCallClass.newInstance();
         setLookupCall(call);
       }
       catch (Exception e) {
@@ -145,23 +147,20 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       }
     }
     // add fields
-    ArrayList<IFormField> fieldList = new ArrayList<IFormField>();
-    Class<? extends IFormField>[] fieldArray = getConfiguredFields();
-    for (int i = 0; i < fieldArray.length; i++) {
-      IFormField f;
+    List<IFormField> fieldList = new ArrayList<IFormField>();
+    for (Class<? extends IFormField> fieldClazz : getConfiguredFields()) {
       try {
-        f = ConfigurationUtility.newInnerInstance(this, fieldArray[i]);
-        fieldList.add(f);
+        fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }// end try
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldArray[i].getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldClazz.getName(), t));
       }
     }
     injectFieldsInternal(fieldList);
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = fieldList.toArray(new IFormField[0]);
+    m_fields = fieldList;
     //attach a proxy controller to each child field in the group for: visible, saveNeeded
     for (IFormField f : m_fields) {
       f.addPropertyChangeListener(new P_FieldPropertyChangeListenerEx());
@@ -174,7 +173,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         buttonList.add(b);
       }
     }
-    m_radioButtons = buttonList.toArray(new IButton[buttonList.size()]);
+    m_radioButtons = buttonList;
     //decorate radiobuttons
     for (IButton b : m_radioButtons) {
       b.setDisplayStyleInternal(IButton.DISPLAY_STYLE_RADIO);
@@ -210,16 +209,16 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     if (getLookupCall() != null) {
       // Use the LookupCall
       try {
-        LookupRow[] lookupRows = getLookupRows();
-        for (int i = 0; i < lookupRows.length; i++) {
+        List<ILookupRow<T>> lookupRows = getLookupRows();
+        for (ILookupRow<T> row : lookupRows) {
           RadioButton radioButton = new RadioButton();
-          radioButton.setEnabled(lookupRows[i].isEnabled());
-          radioButton.setLabel(lookupRows[i].getText());
-          radioButton.setRadioValue(lookupRows[i].getKey());
-          radioButton.setTooltipText(lookupRows[i].getTooltipText());
-          radioButton.setBackgroundColor(lookupRows[i].getBackgroundColor());
-          radioButton.setForegroundColor(lookupRows[i].getForegroundColor());
-          radioButton.setFont(lookupRows[i].getFont());
+          radioButton.setEnabled(row.isEnabled());
+          radioButton.setLabel(row.getText());
+          radioButton.setRadioValue(row.getKey());
+          radioButton.setTooltipText(row.getTooltipText());
+          radioButton.setBackgroundColor(row.getBackgroundColor());
+          radioButton.setForegroundColor(row.getForegroundColor());
+          radioButton.setFont(row.getFont());
           fieldList.add(radioButton);
         }
       }
@@ -229,19 +228,19 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  public LookupCall getLookupCall() {
+  public ILookupCall<T> getLookupCall() {
     return m_lookupCall;
   }
 
-  public void setLookupCall(LookupCall call) {
+  public void setLookupCall(ILookupCall<T> call) {
     m_lookupCall = call;
   }
 
-  public Class<? extends ICodeType> getCodeTypeClass() {
+  public Class<? extends ICodeType<?, T>> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
-  public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
+  public void setCodeTypeClass(Class<? extends ICodeType<?, T>> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
     m_lookupCall = null;
@@ -255,9 +254,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  protected Class<? extends IFormField>[] getConfiguredFields() {
+  protected List<Class<? extends IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IFormField.class);
+    List<Class<IFormField>> filtered = ConfigurationUtility.filterClasses(dca, IFormField.class);
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IFormField.class);
   }
 
@@ -281,9 +280,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * @return
    * @throws ProcessingException
    */
-  private LookupRow[] getLookupRows() throws ProcessingException {
-    LookupRow[] data;
-    LookupCall call = null;
+  private List<ILookupRow<T>> getLookupRows() throws ProcessingException {
+    List<? extends ILookupRow<T>> data;
+    ILookupCall<T> call = null;
     // Get the data
     if (getLookupCall() != null) {
       call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
@@ -291,28 +290,28 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       data = call.getDataByAll();
     }
     else {
-      data = new LookupRow[0];
+      data = Collections.emptyList();
     }
 
     // Filter the result
-    ArrayList<LookupRow> result;
+    ArrayList<ILookupRow<T>> result;
     if (data != null) {
-      result = new ArrayList<LookupRow>(Arrays.asList(data));
+      result = new ArrayList<ILookupRow<T>>(data);
     }
     else {
-      result = new ArrayList<LookupRow>();
+      result = new ArrayList<ILookupRow<T>>();
     }
     filterLookup(call, result);
 
-    return result.toArray(new LookupRow[result.size()]);
+    return result;
   }
 
-  private void prepareLookupCall(LookupCall call) {
+  private void prepareLookupCall(ILookupCall<T> call) {
     prepareLookupCallInternal(call);
     execPrepareLookup(call);
   }
 
-  private void prepareLookupCallInternal(LookupCall call) {
+  private void prepareLookupCallInternal(ILookupCall<T> call) {
     call.setActive(TriState.UNDEFINED);
     //when there is a master value defined in the original call, don't set it to null when no master value is available
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
@@ -320,7 +319,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  private void filterLookup(LookupCall call, List<LookupRow> result) throws ProcessingException {
+  private void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
     execFilterLookupResult(call, result);
   }
 
@@ -511,29 +510,25 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   public int getFieldCount() {
-    return m_fields.length;
+    return m_fields.size();
   }
 
   @Override
   public int getFieldIndex(IFormField f) {
-    for (int i = 0; i < m_fields.length; i++) {
-      if (m_fields[i] == f) {
-        return i;
-      }
+    return m_fields.indexOf(f);
+  }
+
+  @Override
+  public List<IFormField> getFields() {
+    return CollectionUtility.unmodifiableListCopy(m_fields);
+  }
+
+  @Override
+  public List<IButton> getButtons() {
+    if (m_radioButtons == null) {
+      return Collections.emptyList();
     }
-    return -1;
-  }
-
-  @Override
-  public IFormField[] getFields() {
-    IFormField[] a = new IFormField[m_fields.length];
-    System.arraycopy(m_fields, 0, a, 0, a.length);
-    return a;
-  }
-
-  @Override
-  public IButton[] getButtons() {
-    return m_radioButtons;
+    return CollectionUtility.unmodifiableListCopy(m_radioButtons);
   }
 
   @Override
@@ -544,15 +539,14 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
     // children
     int index = 0;
-    IFormField[] f = m_fields;
-    for (int i = 0; i < f.length; i++) {
-      if (f[i] instanceof ICompositeField) {
-        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) {
+    for (IFormField field : m_fields) {
+      if (field instanceof ICompositeField) {
+        if (!((ICompositeField) field).visitFields(visitor, startLevel + 1)) {
           return false;
         }
       }
       else {
-        if (!visitor.visitField(f[i], startLevel, index)) {
+        if (!visitor.visitField(field, startLevel, index)) {
           return false;
         }
       }

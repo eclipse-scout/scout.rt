@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -53,15 +55,15 @@ public class TableTest {
     table.deleteAllRows();
     assertRowCount(0, 2, table);
 
-    ITableRow[] deletedRows = table.getDeletedRows();
-    assertEquals(2, deletedRows.length);
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[0]);
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[1]);
+    List<ITableRow> deletedRows = table.getDeletedRows();
+    assertEquals(2, deletedRows.size());
+    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
+    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
 
-    table.discardDeletedRow(deletedRows[0]);
+    table.discardDeletedRow(deletedRows.get(0));
     assertRowCount(0, 1, table);
-    asssertNoTable(deletedRows[0]);
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[1]);
+    asssertNoTable(deletedRows.get(0));
+    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
   }
 
   /**
@@ -102,15 +104,15 @@ public class TableTest {
     table.deleteAllRows();
     assertRowCount(0, 2, table);
 
-    ITableRow[] deletedRows = table.getDeletedRows();
-    assertEquals(2, deletedRows.length);
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[0]);
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows[1]);
+    List<ITableRow> deletedRows = table.getDeletedRows();
+    assertEquals(2, deletedRows.size());
+    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
+    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
 
     table.discardAllDeletedRows();
     assertRowCount(0, 0, table);
-    asssertNoTable(deletedRows[0]);
-    asssertNoTable(deletedRows[1]);
+    asssertNoTable(deletedRows.get(0));
+    asssertNoTable(deletedRows.get(1));
   }
 
   /**

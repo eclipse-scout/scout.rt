@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.MailUtility;
@@ -493,7 +495,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        IMenu[] scoutMenus = new IMenu[]{new P_AttachmentPopupMenu(target.getAttachment().getFile())};
+        List<IMenu> scoutMenus = CollectionUtility.arrayList((IMenu) new P_AttachmentPopupMenu(target.getAttachment().getFile()));
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), target, new Point(0, target.getHeight()), scoutMenus).enqueue();
       }
@@ -673,11 +675,11 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
 
     @Override
     public void doAction() throws ProcessingException {
-      String[] extensions = new String[0];
+      List<String> extensions = null;
       try {
         String fileName = m_file.getName();
         String fileExt = m_file.getName().substring(fileName.lastIndexOf(".") + 1, fileName.length());
-        extensions = new String[]{fileExt};
+        extensions = Collections.singletonList(fileExt);
       }
       catch (Exception e) {
         LOG.warn("could not find extension of '" + m_file.getName() + "'");
@@ -686,9 +688,9 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
       File dir = null;
       FileChooser fileChooser = new FileChooser(dir, extensions, false);
       fileChooser.setFileName(m_file.getName());
-      File[] a = fileChooser.startChooser();
-      if (a.length > 0) {
-        path = a[0];
+      List<File> a = fileChooser.startChooser();
+      if (!a.isEmpty()) {
+        path = a.get(0);
         try {
           IOUtility.writeContent(new FileOutputStream(path), IOUtility.getContent(new FileInputStream(m_file)));
         }

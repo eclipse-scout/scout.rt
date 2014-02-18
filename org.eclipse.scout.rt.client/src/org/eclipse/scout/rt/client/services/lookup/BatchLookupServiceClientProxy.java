@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.lookup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -18,8 +22,8 @@ import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-3)
@@ -29,93 +33,99 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   }
 
   @Override
-  public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
-    LookupCall[] allCalls = batch.getCallBatch();
+  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
+    List<ILookupCall<?>> allCalls = batch.getCallBatch();
+    List<ILookupCall<?>> cleanCalls = new ArrayList<ILookupCall<?>>(allCalls.size());
     //set calls with key==null to null
-    for (int i = 0; i < allCalls.length; i++) {
-      if (allCalls[i] != null && allCalls[i].getKey() == null) {
-        allCalls[i] = null;
+    for (ILookupCall<?> call : allCalls) {
+      if (call != null && call.getKey() == null) {
+        cleanCalls.add(null);
+      }
+      else {
+        cleanCalls.add(call);
       }
     }
-    BatchSplit split = new BatchSplit(allCalls);
+    BatchSplit split = new BatchSplit(cleanCalls);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
-      LookupCall[] calls = split.getLocalCalls();
-      LookupRow[][] resultArray = new LookupRow[calls.length][];
-      for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = cache.getDataByKey(calls[i]);
+      List<ILookupCall<?>> calls = split.getLocalCalls();
+      List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+      for (ILookupCall<?> call : calls) {
+        result.add(cache.getDataByKey(call));
       }
-      split.setLocalResults(resultArray);
+      split.setLocalResults(result);
     }
     if (split.getRemoteCallCount() > 0) {
       BatchLookupNormalizer normalizer = new BatchLookupNormalizer();
-      LookupCall[] normCallArray = normalizer.normalizeCalls(split.getRemoteCalls());
-      LookupRow[][] normResultArray = getTargetService().getBatchDataByKey(new BatchLookupCall(normCallArray));
-      LookupRow[][] resultArray = normalizer.denormalizeResults(normResultArray);
+      List<ILookupCall<?>> normCallArray = normalizer.normalizeCalls(split.getRemoteCalls());
+      List<List<ILookupRow<?>>> normResultArray = getTargetService().getBatchDataByKey(new BatchLookupCall(normCallArray));
+      List<List<ILookupRow<?>>> resultArray = normalizer.denormalizeResults(normResultArray);
       split.setRemoteResults(resultArray);
     }
-    LookupRow[][] results = split.getCombinedResults();
-    //set null results to LookupRow[0]
-    for (int i = 0; i < results.length; i++) {
-      if (results[i] == null) {
-        results[i] = LookupRow.EMPTY_ARRAY;
+    List<List<ILookupRow<?>>> results = split.getCombinedResults();
+
+    //set null results to empty list
+    List<ILookupRow<?>> emptyList = Collections.emptyList();
+    for (int i = 0; i < results.size(); i++) {
+      if (results.get(i) == null) {
+        results.set(i, emptyList);
       }
     }
     return results;
   }
 
   @Override
-  public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
-      LookupCall[] calls = split.getLocalCalls();
-      LookupRow[][] resultArray = new LookupRow[calls.length][];
-      for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = cache.getDataByText(calls[i]);
+      List<ILookupCall<?>> calls = split.getLocalCalls();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      for (ILookupCall<?> call : calls) {
+        resultArray.add(cache.getDataByText(call));
       }
       split.setLocalResults(resultArray);
     }
     if (split.getRemoteCallCount() > 0) {
-      LookupRow[][] resultArray = getTargetService().getBatchDataByText(new BatchLookupCall(split.getRemoteCalls()));
+      List<List<ILookupRow<?>>> resultArray = getTargetService().getBatchDataByText(new BatchLookupCall(split.getRemoteCalls()));
       split.setRemoteResults(resultArray);
     }
     return split.getCombinedResults();
   }
 
   @Override
-  public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
-      LookupCall[] calls = split.getLocalCalls();
-      LookupRow[][] resultArray = new LookupRow[calls.length][];
-      for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = cache.getDataByAll(calls[i]);
+      List<ILookupCall<?>> calls = split.getLocalCalls();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      for (ILookupCall<?> call : calls) {
+        resultArray.add(cache.getDataByAll(call));
       }
       split.setLocalResults(resultArray);
     }
     if (split.getRemoteCallCount() > 0) {
-      LookupRow[][] resultArray = getTargetService().getBatchDataByAll(new BatchLookupCall(split.getRemoteCalls()));
+      List<List<ILookupRow<?>>> resultArray = getTargetService().getBatchDataByAll(new BatchLookupCall(split.getRemoteCalls()));
       split.setRemoteResults(resultArray);
     }
     return split.getCombinedResults();
   }
 
   @Override
-  public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
+  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
-      LookupCall[] calls = split.getLocalCalls();
-      LookupRow[][] resultArray = new LookupRow[calls.length][];
-      for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = cache.getDataByRec(calls[i]);
+      List<ILookupCall<?>> calls = split.getLocalCalls();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      for (ILookupCall<?> call : calls) {
+        resultArray.add(cache.getDataByRec(call));
       }
       split.setLocalResults(resultArray);
     }
     if (split.getRemoteCallCount() > 0) {
-      LookupRow[][] resultArray = getTargetService().getBatchDataByRec(new BatchLookupCall(split.getRemoteCalls()));
+      List<List<ILookupRow<?>>> resultArray = getTargetService().getBatchDataByRec(new BatchLookupCall(split.getRemoteCalls()));
       split.setRemoteResults(resultArray);
     }
     return split.getCombinedResults();

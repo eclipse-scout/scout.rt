@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
+
+import java.util.List;
 
 /**
  * inside gui handling or in non-model threads don't use this adapter because it
@@ -17,9 +19,9 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 public class TreeAdapter implements TreeListener {
 
   @Override
-  public void treeChangedBatch(TreeEvent[] batch) {
-    for (int i = 0; i < batch.length; i++) {
-      treeChanged(batch[i]);
+  public void treeChangedBatch(List<? extends TreeEvent> events) {
+    for (TreeEvent event : events) {
+      treeChanged(event);
     }
   }
 

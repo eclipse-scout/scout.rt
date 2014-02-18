@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.OfficialVersion;
@@ -83,7 +83,7 @@ public class DiagnosticSession {
 
     IDiagnostic[] diagnosticServices = DiagnosticFactory.getDiagnosticProviders();
     for (IDiagnostic diagnosticService : diagnosticServices) {
-      if (ListUtility.length(diagnosticService.getPossibleActions()) > 0) {
+      if (CollectionUtility.hasElements(diagnosticService.getPossibleActions())) {
         diagnosticService.addSubmitButtonsHTML(result);
       }
     }

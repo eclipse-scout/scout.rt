@@ -14,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -53,13 +56,13 @@ public class ActionTest {
   @Test
   public void testActionClassIdsForTemplates() throws ProcessingException {
     TestFormWithTemplateSmartfield smartfield = new TestFormWithTemplateSmartfield();
-    IMenu[] menus1 = smartfield.getFieldByClass(SmartField1.class).getMenus();
-    IMenu[] menus2 = smartfield.getFieldByClass(SmartField2.class).getMenus();
-    if (menus1.length != 1 || menus2.length != 1) {
+    List<IMenu> menus1 = smartfield.getFieldByClass(SmartField1.class).getMenus();
+    List<IMenu> menus2 = smartfield.getFieldByClass(SmartField2.class).getMenus();
+    if (menus1.size() != 1 || menus2.size() != 1) {
       fail("Test smartfields should contain exactly one menu.");
     }
 
-    assertNotEquals(menus1[0].classId(), menus2[0].classId());
+    assertNotEquals(CollectionUtility.firstElement(menus1).classId(), CollectionUtility.firstElement(menus2).classId());
   }
 
   @ClassId(TEST_CLASS_ID)

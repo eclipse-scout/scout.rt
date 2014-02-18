@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -168,23 +169,20 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
       rawHtml = "";
     }
     // create attachments
-    RemoteFile[] a = getScoutObject().getAttachments();
-    if (a != null) {
-      for (RemoteFile f : a) {
-        if (f != null && f.exists()) {
-          try {
-            m_browserExtension.addResource(f.getPath(), f.getDecompressedInputStream());
-          }
-          catch (IOException e1) {
-            LOG.warn("could not read remote file '" + f.getName() + "'", e1);
-          }
+    for (RemoteFile f : getScoutObject().getAttachments()) {
+      if (f != null && f.exists()) {
+        try {
+          m_browserExtension.addResource(f.getPath(), f.getDecompressedInputStream());
+        }
+        catch (IOException e1) {
+          LOG.warn("could not read remote file '" + f.getName() + "'", e1);
         }
       }
     }
     String cleanHtml = getUiEnvironment().styleHtmlText(this, rawHtml);
     cleanHtml = m_browserExtension.adaptHyperlinks(cleanHtml);
     //fast create of browser content if there are no attachments
-    if (a == null || a.length == 0) {
+    if (CollectionUtility.isEmpty(getScoutObject().getAttachments())) {
       getUiField().setText(cleanHtml);
     }
     else {

@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 /**
  * Default configuration for {@link Class}
  */
-public class DefaultTypesConfig implements IDocEntityListConfig<Class> {
+public class DefaultTypesConfig implements IDocEntityListConfig<Class<?>> {
 
   @Override
-  public List<IDocTextExtractor<Class>> getTextExtractors() {
-    ArrayList<IDocTextExtractor<Class>> extractors = new ArrayList<IDocTextExtractor<Class>>();
+  public List<IDocTextExtractor<Class<?>>> getTextExtractors() {
+    List<IDocTextExtractor<Class<?>>> extractors = new ArrayList<IDocTextExtractor<Class<?>>>();
 
     extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name"));
     extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.doc"), "_description"));
@@ -34,13 +34,14 @@ public class DefaultTypesConfig implements IDocEntityListConfig<Class> {
   }
 
   @Override
-  public List<IDocFilter<Class>> getFilters() {
+  public List<IDocFilter<Class<?>>> getFilters() {
+    // TODO ASA filter for types?
     return Collections.emptyList();
   }
 
   @Override
   public String getTitle() {
-    return null;
+    return TEXTS.get("org.eclipse.scout.rt.spec.types");
   }
 
 }

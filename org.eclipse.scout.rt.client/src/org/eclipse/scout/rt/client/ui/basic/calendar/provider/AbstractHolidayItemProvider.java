@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.client.ui.basic.calendar.provider;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayItem;
@@ -41,11 +41,11 @@ public abstract class AbstractHolidayItemProvider extends AbstractCalendarItemPr
   }
 
   @Override
-  protected void execLoadItemsInBackground(IClientSession session, Date minDate, Date maxDate, Holder<ICalendarItem[]> resultHolder) throws ProcessingException {
+  protected void execLoadItemsInBackground(IClientSession session, Date minDate, Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
     IHolidayCalendarService service = SERVICES.getService(IHolidayCalendarService.class);
     if (service != null) {
       RemoteFile f = new RemoteFile(getConfiguredRemoteFile(), 0);
-      resultHolder.setValue(service.getItems(f, minDate, maxDate));
+      result.addAll(service.getItems(f, minDate, maxDate));
     }
   }
 

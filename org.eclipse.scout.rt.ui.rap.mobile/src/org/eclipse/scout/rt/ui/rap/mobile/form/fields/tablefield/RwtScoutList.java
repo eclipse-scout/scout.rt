@@ -13,8 +13,9 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,7 +25,8 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -201,23 +203,17 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   }
 
   public ITableRow getUiSelectedRow() {
-    ITableRow[] rows = getUiSelectedRows();
-    if (rows.length > 0) {
-      return rows[0];
-    }
-    return null;
+    return CollectionUtility.firstElement(getUiSelectedRows());
   }
 
-  public ITableRow[] getUiSelectedRows() {
-    StructuredSelection uiSelection = (StructuredSelection) getUiTableViewer().getSelection();
+  public List<ITableRow> getUiSelectedRows() {
     TreeSet<ITableRow> sortedRows = new TreeSet<ITableRow>(new RowIndexComparator());
-    if (uiSelection != null && !uiSelection.isEmpty()) {
-      for (Object o : uiSelection.toArray()) {
-        ITableRow row = (ITableRow) o;
-        sortedRows.add(row);
-      }
+    StructuredSelection uiSelection = (StructuredSelection) getUiTableViewer().getSelection();
+    Iterator uiSelectionIt = uiSelection.iterator();
+    while (uiSelectionIt.hasNext()) {
+      sortedRows.add((ITableRow) uiSelectionIt.next());
     }
-    return sortedRows.toArray(new ITableRow[sortedRows.size()]);
+    return Collections.unmodifiableList(new ArrayList<ITableRow>(sortedRows));
   }
 
   protected void setRowHeightFromScout() {
@@ -252,8 +248,8 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   /**
    * scout table observer
    */
-  protected boolean isHandleScoutTableEvent(TableEvent[] a) {
-    for (TableEvent element : a) {
+  protected boolean isHandleScoutTableEvent(List<? extends TableEvent> events) {
+    for (TableEvent element : events) {
       switch (element.getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
         case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
@@ -337,22 +333,22 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     getUiField().setEnabled(enabledFromScout);
   }
 
-  protected void setSelectionFromScout(ITableRow[] selectedRows) {
+  protected void setSelectionFromScout(List<? extends ITableRow> selectedRows) {
     setSelectionFromScout(selectedRows, true);
   }
 
-  protected void setSelectionFromScout(ITableRow[] selectedRows, boolean considerScrollToSelection) {
+  protected void setSelectionFromScout(List<? extends ITableRow> selectedRows, boolean considerScrollToSelection) {
     if (getUiField().isDisposed()) {
       return;
     }
-    ITableRow[] uiSelection = getUiSelectedRows();
-    if (CompareUtility.equals(uiSelection, selectedRows)) {
+    List<ITableRow> uiSelection = getUiSelectedRows();
+    if (CollectionUtility.equalsCollection(uiSelection, selectedRows)) {
       // no change
       return;
     }
     else {
       if (selectedRows == null) {
-        selectedRows = new ITableRow[0];
+        selectedRows = Collections.emptyList();
       }
       getUiTableViewer().setSelection(new StructuredSelection(selectedRows), considerScrollToSelection);
       if (considerScrollToSelection) {
@@ -431,9 +427,9 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       return;
     }
 
-    ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
-    final ITableRow[] selectedRowsFiltered = filterTableRows(selectedRows);
-    if (selectedRows.length > 0 && selectedRowsFiltered.length == 0) {
+    List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
+    final List<ITableRow> selectedRowsFiltered = filterTableRows(selectedRows);
+    if (selectedRows.size() > 0 && selectedRowsFiltered.size() == 0) {
       //Don't notify model if every row was removed due to the filter
       return;
     }
@@ -464,15 +460,15 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     m_tableRowSelectionFilters.remove(filter);
   }
 
-  private ITableRow[] filterTableRows(ITableRow... rows) {
+  private List<ITableRow> filterTableRows(List<? extends ITableRow> rows) {
     if (rows == null) {
-      return new ITableRow[0];
+      return Collections.emptyList();
     }
     if (m_tableRowSelectionFilters.size() == 0) {
-      return rows;
+      return Collections.unmodifiableList(rows);
     }
 
-    List<ITableRow> filteredRows = new LinkedList<ITableRow>();
+    List<ITableRow> filteredRows = new ArrayList<ITableRow>();
     for (ITableRow row : rows) {
       boolean accept = false;
       for (ITableRowFilter filter : m_tableRowSelectionFilters) {
@@ -488,15 +484,15 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
     }
 
-    return filteredRows.toArray(new ITableRow[filteredRows.size()]);
+    return Collections.unmodifiableList(filteredRows);
   }
 
   protected void handleUiRowClick(final ITableRow row) {
     if (getScoutObject() == null || row == null) {
       return;
     }
-    ITableRow[] filteredRows = filterTableRows(row);
-    if (filteredRows.length == 0) {
+    List<ITableRow> filteredRows = filterTableRows(CollectionUtility.arrayList(row));
+    if (filteredRows.size() == 0) {
       return;
     }
 
@@ -515,8 +511,8 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     if (getScoutObject() == null || row == null || getScoutObject().isCheckable()) {
       return;
     }
-    ITableRow[] filteredRows = filterTableRows(row);
-    if (filteredRows.length == 0) {
+    List<ITableRow> filteredRows = filterTableRows(CollectionUtility.arrayList(row));
+    if (filteredRows.size() == 0) {
       return;
     }
 
@@ -561,9 +557,9 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       if (e.stateMask == 0) {
         switch (e.keyCode) {
           case ' ':
-            ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
-            if (selectedRows != null && selectedRows.length > 0) {
-              handleUiRowClick(selectedRows[0]);
+            List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
+            if (CollectionUtility.hasElements(selectedRows)) {
+              handleUiRowClick(CollectionUtility.firstElement(selectedRows));
             }
             e.doit = false;
             break;
@@ -574,9 +570,9 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
   private class P_ScoutTableListener implements TableListener {
     @Override
-    public void tableChanged(final TableEvent e) {
-      if (isHandleScoutTableEvent(new TableEvent[]{e})) {
-        if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
+    public void tableChanged(final TableEvent event) {
+      if (isHandleScoutTableEvent(CollectionUtility.arrayList(event))) {
+        if (isIgnoredScoutEvent(TableEvent.class, "" + event.getType())) {
           return;
         }
         Runnable t = new Runnable() {
@@ -585,7 +581,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
             try {
               getUpdateUiFromScoutLock().acquire();
               //
-              handleScoutTableEventInUi(e);
+              handleScoutTableEventInUi(event);
             }
             finally {
               getUpdateUiFromScoutLock().release();
@@ -597,42 +593,41 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     }
 
     @Override
-    public void tableChangedBatch(final TableEvent[] a) {
-      if (isHandleScoutTableEvent(a)) {
-        final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TableEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+    public void tableChangedBatch(final List<? extends TableEvent> events) {
+      if (isHandleScoutTableEvent(events)) {
+        final List<TableEvent> filteredList = new ArrayList<TableEvent>();
+        for (TableEvent e : events) {
+          if (!isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
+            filteredList.add(e);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
-        }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (isUiDisposed()) {
-              return;
-            }
-            m_redrawHandler.pushControlChanging();
-            try {
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              if (isUiDisposed()) {
+                return;
+              }
+              m_redrawHandler.pushControlChanging();
               try {
-                getUpdateUiFromScoutLock().acquire();
-                //
-                for (TableEvent element : filteredList) {
-                  handleScoutTableEventInUi(element);
+                try {
+                  getUpdateUiFromScoutLock().acquire();
+                  //
+                  for (TableEvent element : filteredList) {
+                    handleScoutTableEventInUi(element);
+                  }
+                }
+                finally {
+                  getUpdateUiFromScoutLock().release();
                 }
               }
               finally {
-                getUpdateUiFromScoutLock().release();
+                m_redrawHandler.popControlChanging();
               }
             }
-            finally {
-              m_redrawHandler.popControlChanging();
-            }
-          }
-        };
-        getUiEnvironment().invokeUiLater(t);
+          };
+          getUiEnvironment().invokeUiLater(t);
+        }
       }
     }
   }

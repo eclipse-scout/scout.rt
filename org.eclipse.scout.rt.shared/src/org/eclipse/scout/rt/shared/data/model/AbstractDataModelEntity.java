@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -103,15 +104,15 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   protected void execInitEntity() throws ProcessingException {
   }
 
-  private Class<? extends IDataModelAttribute>[] getConfiguredAttributes() {
+  private List<Class<? extends IDataModelAttribute>> getConfiguredAttributes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
+    List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class);
   }
 
-  private Class<? extends IDataModelEntity>[] getConfiguredEntities() {
+  private List<Class<? extends IDataModelEntity>> getConfiguredEntities() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
+    List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class);
   }
 
@@ -124,8 +125,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> c : getConfiguredAttributes()) {
       try {
-        IDataModelAttribute a = ConfigurationUtility.newInnerInstance(this, c);
-        attributes.add(a);
+        attributes.add(ConfigurationUtility.newInnerInstance(this, c));
       }
       catch (Exception e) {
         LOG.warn(null, e);
@@ -272,13 +272,13 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   @Override
-  public IDataModelAttribute[] getAttributes() {
-    return m_attributes.toArray(new IDataModelAttribute[0]);
+  public List<IDataModelAttribute> getAttributes() {
+    return Collections.unmodifiableList(m_attributes);
   }
 
   @Override
-  public IDataModelEntity[] getEntities() {
-    return m_entities.toArray(new IDataModelEntity[0]);
+  public List<IDataModelEntity> getEntities() {
+    return Collections.unmodifiableList(m_entities);
   }
 
   @Override

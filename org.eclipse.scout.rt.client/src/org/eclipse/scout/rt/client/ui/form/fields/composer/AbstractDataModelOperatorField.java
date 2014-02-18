@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 /**
  * Convenience field template to present {@link IDataModelAttribute#getOperators()}
@@ -45,7 +46,7 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
   }
 
   @Override
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<IDataModelAttributeOp>> getConfiguredLookupCall() {
     return DataModelOperatorLookupCall.class;
   }
 
@@ -61,13 +62,13 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
     if (attribute != null) {
       setView(true, true, false);
       HashSet<IDataModelAttributeOp> tmp = new HashSet<IDataModelAttributeOp>();
-      IDataModelAttributeOp[] ops = attribute.getOperators();
-      tmp.addAll(Arrays.asList(ops));
+      List<IDataModelAttributeOp> ops = attribute.getOperators();
+      tmp.addAll(ops);
       if (tmp.contains(oldOp)) {
         newOp = oldOp;
       }
-      else if (ops.length > 0) {
-        newOp = ops[0];
+      else {
+        newOp = CollectionUtility.firstElement(ops);
       }
     }
     else {

@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
  * Convenience field template to present {@link IDataModelAttribute#getAggregationTypes()}
@@ -48,7 +48,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   }
 
   @Override
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<Integer>> getConfiguredLookupCall() {
     return DataModelAggregationLookupCall.class;
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     Integer newAg = null;
     if (attribute != null) {
       HashSet<Integer> agSet = new HashSet<Integer>();
-      for (LookupRow row : ((DataModelAggregationLookupCall) getLookupCall()).getLookupRows()) {
+      for (ILookupRow<Integer> row : ((DataModelAggregationLookupCall) getLookupCall()).getLookupRows()) {
         agSet.add((Integer) row.getKey());
       }
       if (agSet.contains(DataModelConstants.AGGREGATION_NONE)) {

@@ -11,16 +11,19 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
@@ -41,28 +44,29 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ActiveStateRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.NewButton;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ResultTreeField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ResultTreeField.Tree;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.StatusField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm.MainBox.ActiveStateRadioButtonGroup;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm.MainBox.NewButton;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm.MainBox.ResultTreeField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm.MainBox.ResultTreeField.Tree;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-public class SmartTreeForm extends AbstractSmartFieldProposalForm {
+public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFieldProposalForm<LOOKUP_TYPE> {
   /**
    * Boolean marker on {@link Job#getProperty(QualifiedName)} that can be used to detect that the tree is loading some
    * nodes.
    * <p>
    * This can be used for example to avoid busy handling when a tree smart popup is loading its incremental tree data
-   * (only relevant when {@link ISmartField#isBrowseLoadIncremental()}=true.
+   * (only relevant when {@link IContentAssistField#isBrowseLoadIncremental()}=true.
    */
-  public static final QualifiedName JOB_PROPERTY_LOAD_TREE = new QualifiedName(SmartTreeForm.class.getName(), "loadTree");
+  public static final QualifiedName JOB_PROPERTY_LOAD_TREE = new QualifiedName(ContentAssistTreeForm.class.getName(), "loadTree");
 
   private P_ActiveNodesFilter m_activeNodesFilter;
   private P_MatchingNodesFilter m_matchingNodesFilter;
@@ -70,8 +74,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   private boolean m_populateInitialTreeDone;
   private JobEx m_populateInitialTreeJob;
 
-  public SmartTreeForm(ISmartField<?> smartField) throws ProcessingException {
-    super(smartField);
+  public ContentAssistTreeForm(IContentAssistField<?, LOOKUP_TYPE> contentAssistField, boolean allowCustomText) throws ProcessingException {
+    super(contentAssistField, allowCustomText);
   }
 
   /*
@@ -88,7 +92,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    * @throws ProcessingException
    */
   private void startPopulateInitialTree() throws ProcessingException {
-    if (getSmartField().isBrowseLoadIncremental()) {
+    if (getContentAssistField().isBrowseLoadIncremental()) {
       //do sync
       getResultTreeField().loadRootNode();
       commitPopulateInitialTree(getResultTreeField().getTree());
@@ -99,19 +103,19 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       getStatusField().setValue(ScoutTexts.get("searchingProposals"));
       getStatusField().setVisible(true);
       //go async to fetch data
-      m_populateInitialTreeJob = getSmartField().callBrowseLookupInBackground(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher() {
+      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_TYPE>() {
         @Override
-        public void dataFetched(LookupRow[] rows, ProcessingException failed) {
+        public void dataFetched(List<? extends ILookupRow<LOOKUP_TYPE>> rows, ProcessingException failed) {
           if (failed == null) {
             try {
               getStatusField().setVisible(false);
-              ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
+              List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
               ITree tree = getResultTreeField().getTree();
               try {
                 tree.setTreeChanging(true);
                 //
                 updateSubTree(tree, tree.getRootNode(), subTree);
-                if (getSmartField().isBrowseAutoExpandAll()) {
+                if (getContentAssistField().isBrowseAutoExpandAll()) {
                   tree.expandAll(getResultTreeField().getTree().getRootNode());
                 }
                 commitPopulateInitialTree(tree);
@@ -149,7 +153,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       }
     }
     m_populateInitialTreeDone = true;
-    update(m_selectCurrentValueRequested, true);
+    getContentAssistField().doSearch(m_selectCurrentValueRequested, true);
   }
 
   @Override
@@ -162,18 +166,18 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   protected void execInitForm() throws ProcessingException {
     m_activeNodesFilter = new P_ActiveNodesFilter();
     m_matchingNodesFilter = new P_MatchingNodesFilter();
-    getResultTreeField().getTree().setIconId(getSmartField().getBrowseIconId());
+    getResultTreeField().getTree().setIconId(getContentAssistField().getBrowseIconId());
     getResultTreeField().getTree().addTreeListener(new TreeAdapter() {
       @Override
       public void treeChanged(TreeEvent e) {
         switch (e.getType()) {
           case TreeEvent.TYPE_NODE_EXPANDED:
-                  case TreeEvent.TYPE_NODE_COLLAPSED: {
-                  structureChanged(getResultTreeField());
-                  break;
-                }
-              }
-            }
+          case TreeEvent.TYPE_NODE_COLLAPSED: {
+            structureChanged(getResultTreeField());
+            break;
+          }
+        }
+      }
     });
   }
 
@@ -207,9 +211,9 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   @ConfigOperation
   @Order(110)
   protected boolean execAcceptNodeByTreeFilter(Pattern filterPattern, ITreeNode node, int level) {
+    IContentAssistField<?, LOOKUP_TYPE> sf = getContentAssistField();
     @SuppressWarnings("unchecked")
-    ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-    LookupRow row = (LookupRow) node.getCell().getValue();
+    ILookupRow<LOOKUP_TYPE> row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
     if (node.isChildrenLoaded()) {
       if (row != null) {
         String q1 = node.getTree().getPathText(node, "\n");
@@ -241,14 +245,14 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    */
   @ConfigOperation
   @Order(120)
-  protected LookupRow execGetSingleMatch() {
-    // when load incremental is set, dont visit the tree but use text-to-key
+  protected ILookupRow<LOOKUP_TYPE> execGetSingleMatch() {
+    // when load incremental is set, don't visit the tree but use text-to-key
     // lookup method on smartfield.
-    if (getSmartField().isBrowseLoadIncremental()) {
+    if (getContentAssistField().isBrowseLoadIncremental()) {
       try {
-        LookupRow[] rows = getSmartField().callTextLookup(getSearchText(), 2);
-        if (rows.length == 1) {
-          return rows[0];
+        List<? extends ILookupRow<LOOKUP_TYPE>> rows = getContentAssistField().callTextLookup(getSearchText(), 2);
+        if (rows != null && rows.size() == 1) {
+          return rows.get(0);
         }
         else {
           return null;
@@ -260,12 +264,13 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       }
     }
     else {
-      final ArrayList<LookupRow> foundLeafs = new ArrayList<LookupRow>();
+      final List<ILookupRow<LOOKUP_TYPE>> foundLeafs = new ArrayList<ILookupRow<LOOKUP_TYPE>>();
       ITreeVisitor v = new ITreeVisitor() {
         @Override
         public boolean visit(ITreeNode node) {
           if (node.isEnabled() && node.isLeaf()) {
-            LookupRow row = (LookupRow) node.getCell().getValue();
+            @SuppressWarnings("unchecked")
+            ILookupRow<LOOKUP_TYPE> row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
             if (row != null && row.isEnabled()) {
               foundLeafs.add(row);
             }
@@ -298,7 +303,18 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    */
 
   @Override
-  public void update(boolean selectCurrentValue, boolean synchonous) throws ProcessingException {
+  public void setTablePopulateStatus(IProcessingStatus status) {
+//    getStatusField().setErrorStatus(status);
+  }
+
+  @Override
+  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_TYPE> result, int maxCount) {
+    String searchText = null;
+    boolean selectCurrentValue = false;
+    if (result != null) {
+      selectCurrentValue = result.isSelectCurrentValue();
+      searchText = result.getSearchText();
+    }
     if (!m_populateInitialTreeDone) {
       m_selectCurrentValueRequested = selectCurrentValue;
       return;
@@ -307,7 +323,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     try {
       tree.setTreeChanging(true);
       //
-      m_matchingNodesFilter.update(getSearchText());
+      m_matchingNodesFilter.update(searchText);
       tree.addNodeFilter(m_matchingNodesFilter);
     }
     finally {
@@ -327,8 +343,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     try {
       tree.setTreeChanging(true);
       //
-      if (getSmartField().isActiveFilterEnabled()) {
-        m_activeNodesFilter.update(getSmartField().getActiveFilter());
+      if (getContentAssistField().isActiveFilterEnabled()) {
+        m_activeNodesFilter.update(getContentAssistField().getActiveFilter());
       }
       else {
         m_activeNodesFilter.update(TriState.TRUE);
@@ -341,7 +357,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     structureChanged(getResultTreeField());
   }
 
-  private void updateSubTree(ITree tree, final ITreeNode parentNode, ITreeNode[] subTree) throws ProcessingException {
+  private void updateSubTree(ITree tree, final ITreeNode parentNode, List<ITreeNode> subTree) throws ProcessingException {
     if (tree == null || parentNode == null || subTree == null) {
       return;
     }
@@ -350,12 +366,12 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   }
 
   @Override
-  public LookupRow getAcceptedProposal() throws ProcessingException {
-    LookupRow row = getSelectedLookupRow();
+  public ILookupRow<LOOKUP_TYPE> getAcceptedProposal() throws ProcessingException {
+    ILookupRow<LOOKUP_TYPE> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;
     }
-    else if (getSmartField().isAllowCustomText()) {
+    else if (isAllowCustomText()) {
       return null;
     }
     else {
@@ -363,21 +379,22 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
-  public LookupRow getSelectedLookupRow() {
-    LookupRow row = null;
+  @SuppressWarnings("unchecked")
+  public ILookupRow<LOOKUP_TYPE> getSelectedLookupRow() {
+    ILookupRow<LOOKUP_TYPE> row = null;
     ITree tree = getResultTreeField().getTree();
     ITreeNode node = null;
     if (tree.isCheckable()) {
-      ITreeNode[] checkedNodes = tree.getCheckedNodes();
-      if (checkedNodes != null && checkedNodes.length > 0) {
-        node = checkedNodes[0];
+      Collection<ITreeNode> checkedNodes = tree.getCheckedNodes();
+      if (CollectionUtility.hasElements(checkedNodes)) {
+        node = CollectionUtility.firstElement(checkedNodes);
       }
     }
     else {
       node = tree.getSelectedNode();
     }
     if (node != null && node.isFilterAccepted() && node.isEnabled()) {
-      row = (LookupRow) node.getCell().getValue();
+      row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
     }
 
     return row;
@@ -391,6 +408,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     startInternal(new FormHandler());
   }
 
+  @SuppressWarnings("unchecked")
   public MainBox getMainBox() {
     return (MainBox) getRootGroupBox();
   }
@@ -415,7 +433,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   }
 
   private boolean selectCurrentValueInternal() throws ProcessingException {
-    final Object selectedKey = getSmartField().getValue();
+    final LOOKUP_TYPE selectedKey = getContentAssistField().getValueAsLookupKey();
     if (selectedKey != null) {
       //check existing tree
       ITree tree = getResultTreeField().getTree();
@@ -424,7 +442,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         @Override
         public boolean visit(ITreeNode node) {
           Object val = node.getCell().getValue();
-          if (val instanceof LookupRow && CompareUtility.equals(selectedKey, ((LookupRow) val).getKey())) {
+          if (val instanceof ILookupRow && CompareUtility.equals(selectedKey, ((ILookupRow) val).getKey())) {
             matchingNodes.add(node);
           }
           return true;
@@ -465,11 +483,11 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
-  private ITreeNode loadNodeWithKey(Object key) throws ProcessingException {
-    ArrayList<LookupRow> path = new ArrayList<LookupRow>();
-    Object t = key;
+  private ITreeNode loadNodeWithKey(LOOKUP_TYPE key) throws ProcessingException {
+    ArrayList<ILookupRow<LOOKUP_TYPE>> path = new ArrayList<ILookupRow<LOOKUP_TYPE>>();
+    LOOKUP_TYPE t = key;
     while (t != null) {
-      LookupRow row = getLookupRowFor(t);
+      ILookupRow<LOOKUP_TYPE> row = getLookupRowFor(t);
       if (row != null) {
         path.add(0, row);
         t = row.getParentKey();
@@ -486,8 +504,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       Object childKey = path.get(i).getKey();
       ITreeNode nextNode = null;
       for (ITreeNode n : parentNode.getChildNodes()) {
-        if (n.getCell().getValue() instanceof LookupRow) {
-          if (CompareUtility.equals(((LookupRow) n.getCell().getValue()).getKey(), childKey)) {
+        if (n.getCell().getValue() instanceof ILookupRow) {
+          if (CompareUtility.equals(((ILookupRow) n.getCell().getValue()).getKey(), childKey)) {
             nextNode = n;
             break;
           }
@@ -500,13 +518,13 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   }
 
   @SuppressWarnings("unchecked")
-  private LookupRow getLookupRowFor(Object key) throws ProcessingException {
+  private ILookupRow<LOOKUP_TYPE> getLookupRowFor(LOOKUP_TYPE key) throws ProcessingException {
     if (key instanceof Number && ((Number) key).longValue() == 0) {
       key = null;
     }
     if (key != null) {
-      ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-      for (LookupRow row : sf.callKeyLookup(key)) {
+      ISmartField<LOOKUP_TYPE> sf = (ISmartField<LOOKUP_TYPE>) getContentAssistField();
+      for (ILookupRow<LOOKUP_TYPE> row : sf.callKeyLookup(key)) {
         return row;
       }
     }
@@ -565,8 +583,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       @SuppressWarnings("unchecked")
       @Override
       protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-        ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-        if (sf.isBrowseLoadIncremental()) {
+        IContentAssistField<?, LOOKUP_TYPE> contentAssistField = getContentAssistField();
+        if (contentAssistField.isBrowseLoadIncremental()) {
           Job currentJob = Job.getJobManager().currentJob();
           //show loading status
           boolean statusWasVisible = getStatusField().isVisible();
@@ -575,9 +593,9 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
           try {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
             //load node
-            LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-            LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
-            ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
+            ILookupRow<LOOKUP_TYPE> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
+            List<? extends ILookupRow<LOOKUP_TYPE>> data = contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
+            List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
             updateSubTree(getTree(), parentNode, subTree);
           }
           finally {
@@ -648,7 +666,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       @Override
       protected void execChangedValue() throws ProcessingException {
         if (isVisible() && !isFormLoading()) {
-          getSmartField().setActiveFilter(getValue());
+          getContentAssistField().setActiveFilter(getValue());
           updateActiveFilter();
         }
       }
@@ -746,7 +764,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
 
       @Override
       protected void execClickAction() throws ProcessingException {
-        getSmartField().doBrowseNew(getSearchText());
+        getContentAssistField().doBrowseNew(getSearchText());
       }
     }// end field
 
@@ -782,7 +800,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         return true;
       }
       else {
-        LookupRow row = (LookupRow) node.getCell().getValue();
+        ILookupRow row = (LookupRow) node.getCell().getValue();
         if (row != null) {
           return row.isActive() == m_ts.equals(TriState.TRUE);
         }
@@ -809,7 +827,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
-  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder {
+  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_TYPE> {
     @Override
     protected ITreeNode createEmptyTreeNode() throws ProcessingException {
       ITree tree = getResultTreeField().getTree();
@@ -827,12 +845,13 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    */
   private class FormHandler extends AbstractFormHandler {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void execLoad() throws ProcessingException {
-      getActiveStateRadioButtonGroup().setVisible(getSmartField().isActiveFilterEnabled());
-      getActiveStateRadioButtonGroup().setValue(getSmartField().getActiveFilter());
-      getNewButton().setEnabled(getSmartField().getBrowseNewText() != null);
-      getNewButton().setLabel(getSmartField().getBrowseNewText());
+      getActiveStateRadioButtonGroup().setVisible(getContentAssistField().isActiveFilterEnabled());
+      getActiveStateRadioButtonGroup().setValue(getContentAssistField().getActiveFilter());
+      getNewButton().setEnabled(getContentAssistField().getBrowseNewText() != null);
+      getNewButton().setLabel(getContentAssistField().getBrowseNewText());
       startPopulateInitialTree();
     }
 

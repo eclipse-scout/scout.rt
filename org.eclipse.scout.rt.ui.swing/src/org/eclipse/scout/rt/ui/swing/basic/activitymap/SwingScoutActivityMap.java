@@ -15,9 +15,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.swing.JScrollPane;
@@ -289,7 +289,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       @SuppressWarnings("unchecked")
       @Override
       public void run() {
-        Object resourceId = getScoutActivityMap().getResourceIds()[row];
+        Object resourceId = getScoutActivityMap().getResourceIds().get(row);
         getScoutActivityMap().getUIFacade().fireCellActionFromUI(resourceId, range, cell);
       }
     };
@@ -298,11 +298,11 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
   }
 
   private void setSelectionFromScout() {
-    HashSet<Object> selectedIds = new HashSet<Object>(Arrays.asList(getScoutActivityMap().getSelectedResourceIds()));
-    Object[] ids = getScoutActivityMap().getResourceIds();
+    HashSet<Object> selectedIds = new HashSet<Object>(getScoutActivityMap().getSelectedResourceIds());
+    List<?> ids = getScoutActivityMap().getResourceIds();
     TreeSet<Integer> indexes = new TreeSet<Integer>();
-    for (int i = 0; i < ids.length; i++) {
-      if (selectedIds.contains(ids[i])) {
+    for (int i = 0; i < ids.size(); i++) {
+      if (selectedIds.contains(ids.get(i))) {
         indexes.add(i);
       }
     }
@@ -321,17 +321,17 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     }
     //
     final double[] normalizedRange = range;
-    Object[] ids = getScoutActivityMap().getResourceIds();
-    final Set<Object> selectedIds = new HashSet<Object>();
+    List<?> ids = getScoutActivityMap().getResourceIds();
+    final List<Object> selectedIds = new ArrayList<Object>();
     for (int i : rows) {
-      selectedIds.add(ids[i]);
+      selectedIds.add(ids.get(i));
     }
     // notify Scout
     Runnable t = new Runnable() {
       @SuppressWarnings("unchecked")
       @Override
       public void run() {
-        getScoutActivityMap().getUIFacade().setSelectionFromUI(selectedIds.toArray(new Object[selectedIds.size()]), normalizedRange);
+        getScoutActivityMap().getUIFacade().setSelectionFromUI(selectedIds, normalizedRange);
       }
     };
 
@@ -409,7 +409,8 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireNewActivityPopupFromUI();
+        @SuppressWarnings("unchecked")
+        List<IMenu> scoutMenus = getScoutActivityMap().getUIFacade().fireNewActivityPopupFromUI();
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }
@@ -427,7 +428,8 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        IMenu[] scoutMenus = getScoutActivityMap().getUIFacade().fireEditActivityPopupFromUI();
+        @SuppressWarnings("unchecked")
+        List<IMenu> scoutMenus = getScoutActivityMap().getUIFacade().fireEditActivityPopupFromUI();
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
       }

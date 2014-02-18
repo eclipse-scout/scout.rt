@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -75,7 +78,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     getSwingEnvironment().invokeScoutLater(t, 0);
     // end notify
     setSetupFromScout(getScoutObject().getDisplayMode(), getScoutObject().isDisplayCondensed());
-    setCalendarComponentsFromScout(getScoutObject().getComponents());
+    updateCalendarComponentsFromScout();
     setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
     setWorkHours(getScoutObject().getStartHour(), getScoutObject().getEndHour(), getScoutObject().getUseOverflowCells());
     setShowDisplayModeSelectionPanel(getScoutObject().getShowDisplayModeSelection());
@@ -120,8 +123,8 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     }
   }
 
-  protected void setCalendarComponentsFromScout(CalendarComponent[] c) {
-    getDateChooser().setModel(new P_SwingCalendarModel(c));
+  protected void updateCalendarComponentsFromScout() {
+    getDateChooser().setModel(new P_SwingCalendarModel(getScoutObject().getComponents()));
   }
 
   @Override
@@ -131,7 +134,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
     }
     else if (name.equals(ICalendar.PROP_COMPONENTS)) {
-      setCalendarComponentsFromScout((CalendarComponent[]) newValue);
+      updateCalendarComponentsFromScout();
     }
     else if (name.equals(ICalendar.PROP_LOAD_IN_PROGRESS)) {
       setLoadInProgressFromScout((Boolean) newValue);
@@ -153,7 +156,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireComponentPopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireComponentPopupFromUI();
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
@@ -167,7 +170,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireNewPopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireNewPopupFromUI();
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
@@ -199,10 +202,10 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
    */
 
   private class P_SwingCalendarModel implements CalendarModel {
-    private CalendarComponent[] m_components;
-    private HashMap<Date, Collection<Object>> m_dayMap;
+    private Set<? extends CalendarComponent> m_components;
+    private Map<Date, Collection<Object>> m_dayMap;
 
-    public P_SwingCalendarModel(CalendarComponent[] components) {
+    public P_SwingCalendarModel(Set<? extends CalendarComponent> components) {
       m_components = components;
       // build map of all items per day
       m_dayMap = new HashMap<Date, Collection<Object>>();

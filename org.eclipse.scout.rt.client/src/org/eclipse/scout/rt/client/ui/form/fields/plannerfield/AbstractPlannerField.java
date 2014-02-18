@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -126,28 +128,27 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
    */
   @ConfigOperation
   @Order(10)
-  protected Object[][] execLoadActivityMapData(RI[] resourceIds, ITableRow[] resourceRows) throws ProcessingException {
+  protected Object[][] execLoadActivityMapData(List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
     return null;
   }
 
   /**
    * Load activity data<br>
-   * By default loads data using {@link #execLoadActivityMapData(ITableRow[], long[])}, transforms to
-   * {@link ActivityCell}, maps to resources using the resourceId, and sets the {@link ActivityCell}s on the
-   * coresponding activtyRow.
+   * By default loads data using {@link #execLoadActivityMapData(List, List)}, transforms to {@link ActivityCell}, maps
+   * to resources using the resourceId, and sets the {@link ActivityCell}s on the
+   * corresponding activtyRow.
    */
-  @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(10)
-  protected void execPopulateActivities(RI[] resourceIds, ITableRow[] resourceRows) throws ProcessingException {
+  protected void execPopulateActivities(List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
     Object[][] data = execLoadActivityMapData(resourceIds, resourceRows);
     ArrayList<ActivityCell<RI, AI>> list = new ArrayList<ActivityCell<RI, AI>>();
     for (Object[] row : data) {
       ActivityCell<RI, AI> cell = new ActivityCell<RI, AI>(row);
       list.add(cell);
     }
-    getActivityMap().removeActivityCells(resourceIds);
-    getActivityMap().addActivityCells(list.toArray(new ActivityCell[list.size()]));
+    getActivityMap().removeActivityCellsById(resourceIds);
+    getActivityMap().addActivityCells(list);
   }
 
   @Override
@@ -274,12 +275,12 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     loadActivityMapDataInternal(getResourceTable().getSelectedRows());
   }
 
-  private void loadActivityMapDataInternal(ITableRow[] resourceRows) throws ProcessingException {
-    RI[] resourceIds = getResourceIdColumnInternal().getValues(resourceRows);
+  private void loadActivityMapDataInternal(List<? extends ITableRow> resourceRows) throws ProcessingException {
+    List<RI> resourceIds = getResourceIdColumnInternal().getValues(resourceRows);
     try {
       getActivityMap().setActivityMapChanging(true);
       //
-      execPopulateActivities(resourceIds, resourceRows);
+      execPopulateActivities(Collections.unmodifiableList(resourceIds), Collections.unmodifiableList(resourceRows));
     }
     finally {
       getActivityMap().setActivityMapChanging(false);
@@ -297,25 +298,25 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   @Override
-  public ITableRow[] activityCellsToResourceRows(ActivityCell<RI, AI>[] activityCells) {
-    HashSet<ITableRow> resourceRowSet = new HashSet<ITableRow>();
+  public List<ITableRow> activityCellsToResourceRows(List<? extends ActivityCell<RI, AI>> activityCells) {
+    List<ITableRow> resourceRowSet = new ArrayList<ITableRow>();
     for (ActivityCell<RI, AI> cell : activityCells) {
       ITableRow resourceRow = getResourceIdColumnInternal().findRow(cell.getResourceId());
       if (resourceRow != null) {
         resourceRowSet.add(resourceRow);
       }
     }
-    return resourceRowSet.toArray(new ITableRow[resourceRowSet.size()]);
+    return Collections.unmodifiableList(resourceRowSet);
   }
 
   @Override
-  public ActivityCell<RI, AI>[] resourceRowToActivityCells(ITableRow resourceRow) {
-    return resourceRowsToActivityCells(new ITableRow[]{resourceRow});
+  public List<ActivityCell<RI, AI>> resourceRowToActivityCells(ITableRow resourceRow) {
+    return resourceRowsToActivityCells(CollectionUtility.arrayList(resourceRow));
   }
 
   @Override
-  public ActivityCell<RI, AI>[] resourceRowsToActivityCells(ITableRow[] resourceRows) {
-    return getActivityMap().getActivityCells((RI[]) getResourceIdColumnInternal().getValues(resourceRows));
+  public List<ActivityCell<RI, AI>> resourceRowsToActivityCells(List<? extends ITableRow> resourceRows) {
+    return getActivityMap().getActivityCells(getResourceIdColumnInternal().getValues(resourceRows));
   }
 
   private void syncSelectionFromResourceToActivity() {
@@ -325,7 +326,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     try {
       m_selectionMediatorRunning = true;
       //
-      getActivityMap().setSelectedResourceIds((RI[]) getResourceIdColumnInternal().getSelectedValues());
+      getActivityMap().setSelectedResourceIds(getResourceIdColumnInternal().getSelectedValues());
     }
     finally {
       m_selectionMediatorRunning = false;
@@ -339,7 +340,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     try {
       m_selectionMediatorRunning = true;
       //
-      ITableRow[] resourceRows = getResourceIdColumnInternal().findRows(getActivityMap().getSelectedResourceIds());
+      List<ITableRow> resourceRows = getResourceIdColumnInternal().findRows(getActivityMap().getSelectedResourceIds());
       getResourceTable().selectRows(resourceRows, false);
     }
     finally {

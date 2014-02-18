@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
+
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 
@@ -21,7 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * Once data is loaded, the callback method {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
  * called back with either failed==null which signals successful processing or failed!=null which signals a failure.
  */
-public interface ILookupCallFetcher {
+public interface ILookupCallFetcher<T> {
 
   /**
    * This method may be called in a background thread out of the scout session
@@ -32,6 +34,6 @@ public interface ILookupCallFetcher {
    * @param failed
    *          null if ok, not null if any error occured during fetch
    */
-  void dataFetched(LookupRow[] rows, ProcessingException failed);
+  void dataFetched(List<? extends ILookupRow<T>> rows, ProcessingException failed);
 
 }

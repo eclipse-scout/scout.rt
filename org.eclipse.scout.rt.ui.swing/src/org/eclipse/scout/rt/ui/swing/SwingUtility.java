@@ -451,7 +451,7 @@ public final class SwingUtility {
       return null;
     }
     if (scoutT instanceof FileListTransferObject) {
-      return new FileListTransferable(((FileListTransferObject) scoutT).getFileList());
+      return new FileListTransferable(((FileListTransferObject) scoutT).getFiles());
     }
     else if (scoutT instanceof TextTransferObject) {
       TextTransferObject textTransferObject = (TextTransferObject) scoutT;

@@ -17,6 +17,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -98,7 +100,7 @@ public class SwtScoutCalendar extends SwtCalendar {
   @Override
   public void showGeneralContextMenu(IMenuManager manager) {
     // pop up with a general menu
-    IMenu[] scoutMenus = SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment());
+    List<IMenu> scoutMenus = SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment());
     if (scoutMenus != null) {
       for (IMenu menuItem : scoutMenus) {
         if (menuItem instanceof IMenu) {
@@ -115,7 +117,7 @@ public class SwtScoutCalendar extends SwtCalendar {
 
   @Override
   public void showItemContextMenu(IMenuManager manager, Object item) {
-    IMenu[] scoutMenus = SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment());
+    List<IMenu> scoutMenus = SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment());
     if (scoutMenus != null) {
       for (IMenu menuItem : scoutMenus) {
         if (menuItem instanceof IMenu) {
@@ -229,6 +231,7 @@ public class SwtScoutCalendar extends SwtCalendar {
     }
   }
 
+  @SuppressWarnings("unchecked")
   protected void handleScoutPropertyChange(String name, final Object newValue) {
 
     try {
@@ -257,7 +260,7 @@ public class SwtScoutCalendar extends SwtCalendar {
           refreshLayout();
         }
         else if (name.equals(ICalendar.PROP_COMPONENTS)) {
-          setCalendarComponentsFromScout((CalendarComponent[]) newValue);
+          setCalendarComponentsFromScout((Set<? extends CalendarComponent>) newValue);
         }
         else if (name.equals(ICalendar.PROP_SELECTED_COMPONENT)) {
           // handled by calendarListener below
@@ -288,7 +291,7 @@ public class SwtScoutCalendar extends SwtCalendar {
     return this;
   }
 
-  public void setCalendarComponentsFromScout(CalendarComponent[] c) {
+  public void setCalendarComponentsFromScout(Set<? extends CalendarComponent> c) {
     getSwtCalendar().setModel(new P_SwtCalendarModel(c));
   }
 
@@ -313,10 +316,10 @@ public class SwtScoutCalendar extends SwtCalendar {
   }//end class
 
   private class P_SwtCalendarModel implements CalendarModel {
-    private CalendarComponent[] m_components;
+    private Set<? extends CalendarComponent> m_components;
     private HashMap<Date, Collection<CalendarComponent>> m_dayMap;
 
-    public P_SwtCalendarModel(CalendarComponent[] components) {
+    public P_SwtCalendarModel(Set<? extends CalendarComponent> components) {
       m_components = components;
       //build map of all items per day
       m_dayMap = new HashMap<Date, Collection<CalendarComponent>>();

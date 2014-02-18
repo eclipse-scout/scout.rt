@@ -86,7 +86,7 @@ public class NavigationHistoryService extends AbstractService implements INaviga
   }
 
   @Override
-  public IMenu[] getMenus() {
+  public List<IMenu> getMenus() {
     return getUserNavigationHistory().getMenus();
   }
 

@@ -22,7 +22,7 @@ import java.util.List;
  * 
  * @since 3.8
  */
-public final class AttributePath {
+public final class AttributePath implements IDataModelPath {
   private final EntityPath m_entityPath;
   private final IDataModelAttribute m_attribute;
 

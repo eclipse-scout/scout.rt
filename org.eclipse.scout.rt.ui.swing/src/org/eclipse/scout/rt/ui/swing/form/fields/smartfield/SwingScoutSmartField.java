@@ -17,6 +17,7 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -49,8 +50,8 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -71,7 +72,7 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
  * popup typing space just AFTER up/down key selects the currently selected row
  * in the proposal popup
  */
-public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartField<?>> implements ISwingScoutSmartField {
+public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwingScoutSmartField {
   private static final long serialVersionUID = 1L;
 
   // proposal support
@@ -169,7 +170,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected void attachScout() {
     super.attachScout();
-    ISmartField f = getScoutObject();
+    IContentAssistField f = getScoutObject();
     setIconIdFromScout(f.getIconId());
     setProposalFormFromScout(f.getProposalForm());
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
@@ -228,7 +229,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
   }
 
-  protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
+  protected void setProposalFormFromScout(IContentAssistFieldProposalForm form) {
     if (form != null) {
       showProposalPopup(form);
     }
@@ -276,7 +277,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       public void actionPerformed(ActionEvent e) {
         if (getSwingTextField().isVisible() && getSwingTextField().isEditable()) {
           if (m_proposalPopup == null) {
-            requestProposalSupportFromSwing(ISmartField.BROWSE_ALL_TEXT, true, 0);
+            requestProposalSupportFromSwing(IContentAssistField.BROWSE_ALL_TEXT, true, 0);
           }
           else {
             JComponent c = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTable.class);
@@ -327,7 +328,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     // end notify
   }
 
-  private void showProposalPopup(final ISmartFieldProposalForm form) {
+  private void showProposalPopup(final IContentAssistFieldProposalForm form) {
     setInputDirty(true);
 
     // check is needed, because for inline editing tables, the swing field might be already disposed
@@ -569,7 +570,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
 
   protected void handleSwingSmartChooserAction(long initialDelay) {
     if (isSmartChooserEnabled()) {
-      requestProposalSupportFromSwing(ISmartField.BROWSE_ALL_TEXT, true, initialDelay);
+      requestProposalSupportFromSwing(IContentAssistField.BROWSE_ALL_TEXT, true, initialDelay);
     }
   }
 
@@ -579,7 +580,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
           // <bsh 2010-10-08>
           // The default implemention positions the popup menu on the left side of the
           // "target" component. This is no longer correct in Rayo. So we use the target's
@@ -603,11 +604,11 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ISmartField.PROP_ICON_ID)) {
+    if (name.equals(IContentAssistField.PROP_ICON_ID)) {
       setIconIdFromScout((String) newValue);
     }
-    else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
-      setProposalFormFromScout((ISmartFieldProposalForm) newValue);
+    else if (name.equals(IContentAssistField.PROP_PROPOSAL_FORM)) {
+      setProposalFormFromScout((IContentAssistFieldProposalForm) newValue);
     }
   }
 

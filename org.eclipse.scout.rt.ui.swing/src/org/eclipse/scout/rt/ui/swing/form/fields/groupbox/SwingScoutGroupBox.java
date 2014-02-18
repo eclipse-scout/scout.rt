@@ -99,12 +99,11 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     LogicalGridLayout bodyLayout = new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap());
     m_swingBodyPart.setLayout(bodyLayout);
     // items without process buttons
-    IFormField[] scoutFields = getScoutObject().getControlFields();
-    for (int i = 0; i < scoutFields.length; i++) {
+    for (IFormField field : getScoutObject().getControlFields()) {
       // create item
-      ISwingScoutFormField swingScoutComposite = getSwingEnvironment().createFormField(m_swingBodyPart, scoutFields[i]);
+      ISwingScoutFormField swingScoutComposite = getSwingEnvironment().createFormField(m_swingBodyPart, field);
       // create layout constraints
-      SwingScoutFormFieldGridData cons = new SwingScoutFormFieldGridData(scoutFields[i]);
+      SwingScoutFormFieldGridData cons = new SwingScoutFormFieldGridData(field);
       swingScoutComposite.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, cons);
       m_swingBodyPart.add(swingScoutComposite.getSwingContainer());
     }

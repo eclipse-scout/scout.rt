@@ -140,13 +140,11 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   public List<IForm> getCurrentNavigationForms() {
     List<IForm> navigationForms = new LinkedList<IForm>();
 
-    IForm[] dialogStack = getDesktop().getDialogStack();
-    for (IForm form : dialogStack) {
+    for (IForm form : getDesktop().getDialogStack()) {
       navigationForms.add(form);
     }
 
-    IForm[] viewStack = getDesktop().getViewStack();
-    for (IForm form : viewStack) {
+    for (IForm form : getDesktop().getViewStack()) {
       if (m_navigationFormsDisplayViewIds != null && m_navigationFormsDisplayViewIds.contains(form.getDisplayViewId())) {
         navigationForms.add(form);
       }

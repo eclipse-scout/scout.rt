@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -55,7 +56,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   private HashSet<RI/* resourceId */> m_selectedResourceIds;
   private int m_tableChanging;
   private ArrayList<ActivityMapEvent> m_eventBuffer = new ArrayList<ActivityMapEvent>();
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private IActivityCellObserver<RI, AI> m_cellObserver;
   private boolean m_timeScaleValid;
 
@@ -149,10 +150,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     return true;
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<Class<? extends IMenu>> getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
@@ -238,24 +239,24 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     setLastHourOfDay(getConfiguredLastHourOfDay());
     setDrawSections(getConfiguredDrawSections());
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] ma = getConfiguredMenus();
-    for (int i = 0; i < ma.length; i++) {
+    List<IMenu> menuList = new ArrayList<IMenu>();
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, ma[i]);
+        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
       }
       catch (Exception e) {
         LOG.warn(null, e);
       }
     }
+
     try {
       injectMenusInternal(menuList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = Collections.unmodifiableList(menuList);
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -414,64 +415,48 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     return m_activities.get(new CompositeObject(cell.getResourceId(), cell.getActivityId()));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell<RI, AI>[] resolveActivityCells(ActivityCell<RI, AI>[] cells) {
+  public List<ActivityCell<RI, AI>> resolveActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
     if (cells == null) {
-      cells = new ActivityCell[0];
+      cells = Collections.emptyList();
     }
-    int mismatchCount = 0;
-    for (int i = 0; i < cells.length; i++) {
-      if (resolveActivityCell(cells[i]) != cells[i]) {
-        LOG.warn("could not resolve " + cells[i]);
-        mismatchCount++;
+    List<ActivityCell<RI, AI>> result = new ArrayList<ActivityCell<RI, AI>>();
+    for (ActivityCell<RI, AI> cell : cells) {
+      if (resolveActivityCell(cell) == cell) {
+        result.add(cell);
       }
     }
-    if (mismatchCount > 0) {
-      ActivityCell<RI, AI>[] resolvedCells = new ActivityCell[cells.length - mismatchCount];
-      int index = 0;
-      for (int i = 0; i < cells.length; i++) {
-        if (resolveActivityCell(cells[i]) == cells[i]) {
-          resolvedCells[index] = cells[i];
-          index++;
-        }
-      }
-      cells = resolvedCells;
-    }
-    return cells;
+    return result;
   }
 
   @Override
-  public ActivityCell<RI, AI>[] getActivityCells(RI resourceId) {
-    @SuppressWarnings("unchecked")
-    RI[] array = (RI[]) Array.newInstance(getResourceIdClass(), 1);
-    array[0] = resourceId;
-    return getActivityCells(array);
+  public List<ActivityCell<RI, AI>> getActivityCells(RI resourceId) {
+    ArrayList<RI> resourceList = new ArrayList<RI>();
+    resourceList.add(resourceId);
+    return getActivityCells(resourceList);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell<RI, AI>[] getActivityCells(RI[] resourceIds) {
-    ArrayList<ActivityCell<RI, AI>> all = new ArrayList<ActivityCell<RI, AI>>();
+  public List<ActivityCell<RI, AI>> getActivityCells(List<? extends RI> resourceIds) {
+    List<ActivityCell<RI, AI>> all = new ArrayList<ActivityCell<RI, AI>>();
     for (RI resourceId : resourceIds) {
       List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(resourceId);
       if (list != null) {
         all.addAll(list);
       }
     }
-    return all.toArray(new ActivityCell[all.size()]);
+    return Collections.unmodifiableList(all);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public ActivityCell<RI, AI>[] getAllActivityCells() {
-    return m_activities.values().toArray(new ActivityCell[m_activities.size()]);
+  public List<ActivityCell<RI, AI>> getAllActivityCells() {
+    return Collections.unmodifiableList(new ArrayList(m_activities.values()));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void addActivityCells(ActivityCell<RI, AI>[] cells) {
-    ArrayList<ActivityCell<RI, AI>> addedCells = new ArrayList<ActivityCell<RI, AI>>();
+  public void addActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
+    List<ActivityCell<RI, AI>> addedCells = new ArrayList<ActivityCell<RI, AI>>();
     for (ActivityCell<RI, AI> cell : cells) {
       CompositeObject key = new CompositeObject(cell.getResourceId(), cell.getActivityId());
       if (!m_activities.containsKey(key)) {
@@ -488,23 +473,23 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       }
     }
     if (addedCells.size() > 0) {
-      fireActivitiesInserted(addedCells.toArray(new ActivityCell[addedCells.size()]));
+      fireActivitiesInserted(addedCells);
     }
   }
 
   @Override
-  public void updateActivityCells(ActivityCell<RI, AI>[] cells) {
+  public void updateActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
     cells = resolveActivityCells(cells);
     updateActivityCellsInternal(cells);
   }
 
   @Override
-  public void updateActivityCells(RI[] resourceIds) {
+  public void updateActivityCellsById(List<? extends RI> resourceIds) {
     updateActivityCellsInternal(getActivityCells(resourceIds));
   }
 
   // resolved cells
-  private void updateActivityCellsInternal(ActivityCell<RI, AI>[] cells) {
+  private void updateActivityCellsInternal(List<? extends ActivityCell<RI, AI>> cells) {
     for (ActivityCell<RI, AI> cell : cells) {
       decorateActivityCell(cell);
     }
@@ -512,19 +497,19 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   @Override
-  public void removeActivityCells(ActivityCell<RI, AI>[] cells) {
+  public void removeActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
     cells = resolveActivityCells(cells);
     removeActivityCellsInternal(cells);
   }
 
   @Override
-  public void removeActivityCells(RI[] resourceIds) {
+  public void removeActivityCellsById(List<? extends RI> resourceIds) {
     removeActivityCellsInternal(getActivityCells(resourceIds));
   }
 
   // cells are resolved
-  private void removeActivityCellsInternal(ActivityCell<RI, AI>[] cells) {
-    if (cells.length > 0) {
+  private void removeActivityCellsInternal(List<? extends ActivityCell<RI, AI>> cells) {
+    if (CollectionUtility.hasElements(cells)) {
       for (ActivityCell<RI, AI> cell : cells) {
         cell.setObserver(null);
         m_activities.remove(new CompositeObject(cell.getResourceId(), cell.getActivityId()));
@@ -539,8 +524,8 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
   @Override
   public void removeAllActivityCells() {
-    ActivityCell<RI, AI>[] a = getAllActivityCells();
-    if (a.length > 0) {
+    List<ActivityCell<RI, AI>> a = getAllActivityCells();
+    if (CollectionUtility.hasElements(a)) {
       for (ActivityCell<RI, AI> cell : a) {
         cell.setObserver(null);
       }
@@ -569,57 +554,53 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
   @SuppressWarnings("unchecked")
   @Override
-  public RI[] getSelectedResourceIds() {
-    RI[] a = (RI[]) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
+  public List<RI> getSelectedResourceIds() {
+    List<RI> a = (List<RI>) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
     if (a == null) {
-      a = (RI[]) Array.newInstance(getResourceIdClass(), 0);
+      a = Collections.emptyList();
     }
     return a;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void setSelectedResourceIds(RI[] resourceIds) {
-    RI[] internalResourceIds;
+  public void setSelectedResourceIds(List<? extends RI> resourceIds) {
+    List<RI> internalResourceIds;
     if (resourceIds == null) {
-      internalResourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
+      internalResourceIds = Collections.emptyList();
     }
     else {
-      // Guarantee the type of the array. This is necessary for raw type clients which might still pass Object[]
-      internalResourceIds = (RI[]) Array.newInstance(getResourceIdClass(), resourceIds.length);
-      System.arraycopy(resourceIds, 0, internalResourceIds, 0, resourceIds.length);
+      internalResourceIds = new ArrayList<RI>(resourceIds);
     }
 
     m_selectedResourceIds.clear();
-    m_selectedResourceIds.addAll(Arrays.asList(internalResourceIds));
+    m_selectedResourceIds.addAll(internalResourceIds);
     propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, internalResourceIds);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public RI[] getResourceIds() {
-    RI[] resourceIds = (RI[]) propertySupport.getProperty(PROP_RESOURCE_IDS);
+  public List<RI> getResourceIds() {
+    List<RI> resourceIds = (List<RI>) propertySupport.getProperty(PROP_RESOURCE_IDS);
     if (resourceIds == null) {
-      resourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
+      return Collections.emptyList();
     }
-    return resourceIds;
+    return Collections.unmodifiableList(resourceIds);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void setResourceIds(RI[] resourceIds) {
+  public void setResourceIds(List<? extends RI> resourceIds) {
     if (resourceIds == null) {
-      resourceIds = (RI[]) Array.newInstance(getResourceIdClass(), 0);
+      resourceIds = Collections.emptyList();
     }
     // delete activities of resourceIds that no Objecter exist
     HashSet<RI> eliminatedResourceIdSet = new HashSet<RI>();
-    eliminatedResourceIdSet.addAll(Arrays.asList(getResourceIds()));
-    eliminatedResourceIdSet.removeAll(Arrays.asList(resourceIds));
+    eliminatedResourceIdSet.addAll(getResourceIds());
+    eliminatedResourceIdSet.removeAll(resourceIds);
     try {
       setActivityMapChanging(true);
       //
       propertySupport.setProperty(PROP_RESOURCE_IDS, resourceIds);
-      removeActivityCells(eliminatedResourceIdSet.toArray((RI[]) Array.newInstance(getResourceIdClass(), eliminatedResourceIdSet.size())));
+      removeActivityCellsById(new ArrayList<RI>(eliminatedResourceIdSet));
       updateActivityCellsInternal(getAllActivityCells());
     }
     finally {
@@ -643,11 +624,11 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   @Override
-  public IMenu[] getMenus() {
+  public List<IMenu> getMenus() {
     return m_menus;
   }
 
-  private IMenu[] fireEditActivityPopup(ActivityCell<RI, AI> cell) {
+  private List<IMenu> fireEditActivityPopup(ActivityCell<RI, AI> cell) {
     if (cell != null) {
       ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_EDIT_ACTIVITY_POPUP, cell);
       // single observer for declared menus
@@ -656,29 +637,23 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       return e.getPopupMenus();
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 
   private void addEditActivityPopupMenus(ActivityMapEvent e) {
-    IMenu[] a = getMenus();
-    for (int i = 0; i < a.length; i++) {
-      IMenu validMenu = null;
-      // pass 1
-      if (a[i].isSingleSelectionAction()) {
-        validMenu = a[i];
-      }
-      // pass 2
-      if (validMenu != null) {
-        validMenu.prepareAction();
-        if (validMenu.isVisible()) {
-          e.addPopupMenu(validMenu);
+    for (IMenu menu : getMenus()) {
+      if (menu.isSingleSelectionAction()) {
+        menu.prepareAction();
+        if (menu.isVisible()) {
+          e.addPopupMenu(menu);
         }
       }
     }
+
   }
 
-  private IMenu[] fireNewActivityPopup() {
+  private List<IMenu> fireNewActivityPopup() {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_NEW_ACTIVITY_POPUP);
     // single observer for declared menus
     addNewActivityPopupMenus(e);
@@ -687,24 +662,18 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   private void addNewActivityPopupMenus(ActivityMapEvent e) {
-    IMenu[] a = getMenus();
-    for (int i = 0; i < a.length; i++) {
-      IMenu validMenu = null;
+    for (IMenu menu : getMenus()) {
       // pass 1
-      if (a[i].isSingleSelectionAction()) {
+      if (menu.isSingleSelectionAction()) {
         // ignore
       }
-      else if (a[i].isMultiSelectionAction()) {
+      else if (menu.isMultiSelectionAction()) {
         // ignore
       }
       else {
-        validMenu = a[i];
-      }
-      // pass 2
-      if (validMenu != null) {
-        validMenu.prepareAction();
-        if (validMenu.isVisible()) {
-          e.addPopupMenu(validMenu);
+        menu.prepareAction();
+        if (menu.isVisible()) {
+          e.addPopupMenu(menu);
         }
       }
     }
@@ -721,26 +690,26 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     catch (Throwable t) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
-    ActivityMapEvent e = new ActivityMapEvent<RI>(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
+    ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesInserted(ActivityCell<RI, AI>[] a) {
+  private void fireActivitiesInserted(List<? extends ActivityCell<RI, AI>> a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_INSERTED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesUpdated(ActivityCell<RI, AI>[] a) {
+  private void fireActivitiesUpdated(List<? extends ActivityCell<RI, AI>> a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_UPDATED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireActivitiesDeleted(ActivityCell<RI, AI>[] a) {
+  private void fireActivitiesDeleted(List<? extends ActivityCell<RI, AI>> a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ACTIVITIES_DELETED, a);
     fireActivityMapEventInternal(e);
   }
 
-  private void fireAllActivitiesDeleted(ActivityCell<RI, AI>[] a) {
+  private void fireAllActivitiesDeleted(List<? extends ActivityCell<RI, AI>> a) {
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_ALL_ACTIVITIES_DELETED, a);
     fireActivityMapEventInternal(e);
   }
@@ -857,10 +826,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       HashSet<ActivityCell> coalesceList = new HashSet<ActivityCell>();
       for (ActivityMapEvent t : list) {
         if (t.getActivityCount() > 0) {
-          coalesceList.addAll(Arrays.asList(t.getActivities()));
+          coalesceList.addAll(t.getActivities());
         }
       }
-      ce.setActivities(coalesceList.toArray(new ActivityCell[coalesceList.size()]));
+      ce.setActivities(new ArrayList<ActivityCell>(coalesceList));
       //
       return ce;
     }
@@ -1310,10 +1279,11 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
    */
   private class P_ActivityCellObserver implements IActivityCellObserver<RI, AI> {
 
-    @SuppressWarnings("unchecked")
     @Override
     public void cellChanged(ActivityCell<RI, AI> cell, int bitPos) {
-      fireActivitiesUpdated(new ActivityCell[]{cell});
+      ArrayList<ActivityCell<RI, AI>> cellList = new ArrayList<ActivityCell<RI, AI>>(1);
+      cellList.add(cell);
+      fireActivitiesUpdated(cellList);
     }
   }
 
@@ -1327,7 +1297,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     }
 
     @Override
-    public void setSelectionFromUI(RI[] resourceIds, double[] normalizedRange) {
+    public void setSelectionFromUI(List<? extends RI> resourceIds, double[] normalizedRange) {
       try {
         setActivityMapChanging(true);
         //
@@ -1343,12 +1313,12 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     }
 
     @Override
-    public IMenu[] fireEditActivityPopupFromUI() {
+    public List<IMenu> fireEditActivityPopupFromUI() {
       return fireEditActivityPopup(getSelectedActivityCell());
     }
 
     @Override
-    public IMenu[] fireNewActivityPopupFromUI() {
+    public List<IMenu> fireNewActivityPopupFromUI() {
       return fireNewActivityPopup();
     }
 

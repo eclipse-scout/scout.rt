@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 /**
  * Checkboxes, Boolean values
  */
-public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITableColumnFilter<Boolean>, Serializable {
+public class BooleanColumnFilter implements ITableColumnFilter<Boolean>, Serializable {
   private static final long serialVersionUID = 1L;
   private IColumn<Boolean> m_column;
   private Set<Boolean> m_selectedValues;
@@ -58,24 +58,24 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
   }
 
   @Override
-  public List<LookupRow> createHistogram() {
-    TreeMap<Boolean, LookupRow> hist = new TreeMap<Boolean, LookupRow>();
+  public List<LookupRow<Boolean>> createHistogram() {
+    TreeMap<Boolean, LookupRow<Boolean>> hist = new TreeMap<Boolean, LookupRow<Boolean>>();
     HashMap<Boolean, Integer> countMap = new HashMap<Boolean, Integer>();
-    hist.put(true, new LookupRow(true, "(" + ScoutTexts.get("ColumnFilterCheckedText") + ")"));
-    hist.put(false, new LookupRow(false, "(" + ScoutTexts.get("ColumnFilterUncheckedText") + ")"));
+    hist.put(true, new LookupRow<Boolean>(true, "(" + ScoutTexts.get("ColumnFilterCheckedText") + ")"));
+    hist.put(false, new LookupRow<Boolean>(false, "(" + ScoutTexts.get("ColumnFilterUncheckedText") + ")"));
     for (ITableRow row : m_column.getTable().getRows()) {
       Boolean key = BooleanUtility.nvl(m_column.getValue(row), false);
       Integer count = countMap.get(key);
       countMap.put(key, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<Boolean, LookupRow> e : hist.entrySet()) {
+    for (Map.Entry<Boolean, LookupRow<Boolean>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        LookupRow row = e.getValue();
+        LookupRow<Boolean> row = e.getValue();
         row.setText(row.getText() + " (" + count + ")");
       }
     }
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    List<LookupRow<Boolean>> list = new ArrayList<LookupRow<Boolean>>();
     list.addAll(hist.values());
     return list;
   }

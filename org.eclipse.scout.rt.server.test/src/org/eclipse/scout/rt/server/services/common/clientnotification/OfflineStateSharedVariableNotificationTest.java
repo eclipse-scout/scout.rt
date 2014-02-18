@@ -14,9 +14,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
@@ -72,14 +74,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
     OfflineState.setOfflineInCurrentThread(null);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).length > 0);
+    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).size() > 0);
   }
 
   /**
@@ -95,14 +97,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
     OfflineState.setOfflineInCurrentThread(true);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).length > 0);
+    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).size() > 0);
   }
 
   /**
@@ -118,14 +120,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
     OfflineState.setOfflineInCurrentThread(false);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("No new client notification expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No new client notification expected.", svc.getNextNotifications(0).isEmpty());
   }
 
   /**
@@ -141,14 +143,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
     OfflineState.setOfflineInCurrentThread(null);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).length > 0);
+    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).size() > 0);
   }
 
   /**
@@ -164,14 +166,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
     OfflineState.setOfflineInCurrentThread(false);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).length > 0);
+    assertTrue("At least one client notification expected.", svc.getNextNotifications(0).size() > 0);
   }
 
   /**
@@ -187,14 +189,14 @@ public class OfflineStateSharedVariableNotificationTest {
     IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
-    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
     OfflineState.setOfflineInCurrentThread(true);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
-    assertTrue("No new client notification expected.", svc.getNextNotifications(0).length == 0);
+    assertTrue("No new client notification expected.", svc.getNextNotifications(0).isEmpty());
   }
 
   /**
@@ -221,15 +223,15 @@ public class OfflineStateSharedVariableNotificationTest {
    * A client notification service for testing purposes.
    */
   private static class MockClientNotificationService extends AbstractService implements IClientNotificationService {
-    private List<IClientNotification> m_notifications;
+    private Set<IClientNotification> m_notifications;
 
     public MockClientNotificationService() {
-      m_notifications = new LinkedList<IClientNotification>();
+      m_notifications = new HashSet<IClientNotification>();
     }
 
     @Override
-    public IClientNotification[] getNextNotifications(long blockingTimeout) {
-      IClientNotification[] result = m_notifications.toArray(new IClientNotification[m_notifications.size()]);
+    public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
+      Set<IClientNotification> result = CollectionUtility.hashSetWithoutNullElements(m_notifications);
       m_notifications.clear();
       return result;
     }

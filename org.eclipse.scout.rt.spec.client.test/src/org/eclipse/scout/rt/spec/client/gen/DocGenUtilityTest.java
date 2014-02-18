@@ -172,8 +172,8 @@ public class DocGenUtilityTest {
   @Test
   public void createDoc() {
     IFormField testField = new TestFormField();
-    IFormField[] fields = new IFormField[1];
-    fields[0] = testField;
+    List<IFormField> fields = new ArrayList<IFormField>();
+    fields.add(testField);
     @SuppressWarnings("unchecked")
     IDocEntityListConfig<IFormField> config = mock(IDocEntityListConfig.class);
     ArrayList<IDocTextExtractor<IFormField>> ex = new ArrayList<IDocTextExtractor<IFormField>>();

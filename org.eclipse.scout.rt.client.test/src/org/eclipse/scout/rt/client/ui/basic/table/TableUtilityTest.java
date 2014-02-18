@@ -305,6 +305,7 @@ public class TableUtilityTest {
         return "TestBigDecimalColumn";
       }
 
+      @SuppressWarnings("deprecation")
       @Override
       protected void initConfig() {
         super.initConfig();
@@ -321,6 +322,7 @@ public class TableUtilityTest {
         return "TestDoubleColumn";
       }
 
+      @SuppressWarnings("deprecation")
       @Override
       protected void initConfig() {
         super.initConfig();
@@ -337,6 +339,7 @@ public class TableUtilityTest {
         return "TestIntegerColumn";
       }
 
+      @SuppressWarnings("deprecation")
       @Override
       protected void initConfig() {
         super.initConfig();
@@ -353,6 +356,7 @@ public class TableUtilityTest {
         return "TestLongColumn";
       }
 
+      @SuppressWarnings("deprecation")
       @Override
       protected void initConfig() {
         super.initConfig();

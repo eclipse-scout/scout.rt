@@ -62,7 +62,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public Object[] getChildren(Object parentElement) {
     ITreeNode scoutNode = (ITreeNode) parentElement;
-    return scoutNode.getFilteredChildNodes();
+    return scoutNode.getFilteredChildNodes().toArray();
   }
 
   @Override
@@ -84,7 +84,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
         return new Object[]{getScoutTree().getRootNode()};
       }
       else {
-        return getScoutTree().getRootNode().getFilteredChildNodes();
+        return getScoutTree().getRootNode().getFilteredChildNodes().toArray();
       }
     }
     else {
@@ -139,7 +139,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
         text = getUiTree().getUiEnvironment().adaptHtmlCell(getUiTree(), text);
         text = getUiTree().getUiEnvironment().convertLinksInHtmlCell(getUiTree(), text);
-          }
+      }
       else {
         if (text.indexOf("\n") >= 0) {
           text = StringUtility.replaceNewLines(text, " ");

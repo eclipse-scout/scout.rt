@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -71,7 +72,7 @@ public class PageWithTableAndPageBeanTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline(invokeSuperExecLoadData)});
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline(invokeSuperExecLoadData)));
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();

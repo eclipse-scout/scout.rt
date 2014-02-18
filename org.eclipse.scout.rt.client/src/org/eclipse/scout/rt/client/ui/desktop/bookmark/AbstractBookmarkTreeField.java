@@ -12,13 +12,15 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -347,7 +349,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Override
-    protected TransferObject execDrag(ITreeNode[] nodes) {
+    protected TransferObject execDrag(Collection<ITreeNode> nodes) throws ProcessingException {
       if (ACCESS.check(getUpdatePermission())) {
         return new JavaTransferObject(nodes);
       }
@@ -355,16 +357,16 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Override
-    protected void execDrop(ITreeNode dropNode, TransferObject t) {
-      if (t instanceof JavaTransferObject) {
+    protected void execDrop(ITreeNode dropNode, TransferObject transfer) {
+      if (transfer instanceof JavaTransferObject) {
         try {
           getTree().setTreeChanging(true);
           //
-          if (((JavaTransferObject) t).getLocalObject() instanceof ITreeNode[]) {
+          List<ITreeNode> elements = ((JavaTransferObject) transfer).getLocalObjectAsList(ITreeNode.class);
+          if (CollectionUtility.hasElements(elements)) {
             boolean updateTree = false;
-            ITreeNode[] dragNodes = (ITreeNode[]) ((JavaTransferObject) t).getLocalObject();
             HashSet<ITreeNode> draggedFolders = new HashSet<ITreeNode>();
-            for (ITreeNode source : dragNodes) {
+            for (ITreeNode source : elements) {
               if (source != dropNode && source.getTree() == getTree()) {
                 ITreeNode target = dropNode;
                 if (isFolderNode(source)) {
@@ -408,7 +410,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
                         ITreeNode targetAncestor = target;
                         ITreeNode targetAncestorWalkThrough = target;
                         while (targetAncestorWalkThrough.getParentNode() != source) {
-                          if (!Arrays.asList(dragNodes).contains(targetAncestor.getParentNode())) {
+                          if (!elements.contains(targetAncestor.getParentNode())) {
                             targetAncestor = targetAncestorWalkThrough.getParentNode();
                           }
                           targetAncestorWalkThrough = targetAncestorWalkThrough.getParentNode();

@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.ClassIdentifier;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
@@ -796,13 +797,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
     ComposerAttributeNodeData attributeNode = (ComposerAttributeNodeData) node;
     Integer agg = attributeNode.getAggregationType();
     if (agg == null || agg == AGGREGATION_NONE) {
-      if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues())) {
+      if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues().toArray())) {
         return AttributeKind.NonAggregationNonZeroTraversing;
       }
       return AttributeKind.NonAggregation;
     }
     //
-    if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues())) {
+    if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues().toArray())) {
       return AttributeKind.AggregationNonZeroTraversing;
     }
     return AttributeKind.Aggregation;
@@ -887,7 +888,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         // remove possible outer join signs (+) in where / having constraint
         // this is necessary because outer joins are not allowed in OR clause
         // the removal of outer joins does not influence the result set
-        buf.append(ListUtility.format(ListUtility.combine(subContrib.getWhereParts(), subContrib.getHavingParts()), " AND ").replaceAll("\\(\\+\\)", ""));
+        buf.append(CollectionUtility.format(ListUtility.combine(subContrib.getWhereParts(), subContrib.getHavingParts()), " AND ").replaceAll("\\(\\+\\)", ""));
         buf.append(")");
         count++;
       }
@@ -1543,7 +1544,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (contrib.isEmpty()) {
       return null;
     }
-    return ListUtility.format(contrib.getWhereParts(), " AND ");
+    return CollectionUtility.format(contrib.getWhereParts(), " AND ");
   }
 
   /**

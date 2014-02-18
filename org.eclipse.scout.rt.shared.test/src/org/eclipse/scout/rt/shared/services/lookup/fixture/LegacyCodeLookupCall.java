@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup.fixture;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCallTest;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
@@ -30,13 +32,13 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * 
  * @see CodeLookupCallTest
  */
-public class LegacyCodeLookupCall extends LocalLookupCall implements Serializable {
+public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE> implements Serializable {
   private static final long serialVersionUID = 0L;
 
-  private Class<? extends ICodeType> m_codeTypeClass;
-  private ILegacyCodeLookupCallVisitor m_filter;
+  private Class<? extends ICodeType<?, CODE_ID_TYPE>> m_codeTypeClass;
+  private ILegacyCodeLookupCallVisitor<CODE_ID_TYPE> m_filter;
 
-  public LegacyCodeLookupCall(Class<? extends ICodeType> codeTypeClass) {
+  public LegacyCodeLookupCall(Class<? extends ICodeType<?, CODE_ID_TYPE>> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
   }
 
@@ -60,11 +62,11 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
     return true;
   }
 
-  public Class<? extends ICodeType> getCodeTypeClass() {
+  public Class<? extends ICodeType<?, CODE_ID_TYPE>> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
-  public void setFilter(ILegacyCodeLookupCallVisitor filter) {
+  public void setFilter(ILegacyCodeLookupCallVisitor<CODE_ID_TYPE> filter) {
     m_filter = filter;
   }
 
@@ -77,7 +79,7 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * <p>
    * By default calls {@link #createLookupRowArray(List)}
    */
-  protected LookupRow[] execCreateLookupRowsFromCodes(List<? extends ICode<?>> codes) {
+  protected List<ILookupRow<CODE_ID_TYPE>> execCreateLookupRowsFromCodes(List<? extends ICode<CODE_ID_TYPE>> codes) {
     return createLookupRowArray(codes);
   }
 
@@ -86,17 +88,16 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * <p>
    * Called by {@link #execCreateLookupRowsFromCodes(List)}.
    */
-  public static LookupRow[] createLookupRowArray(List<? extends ICode> codes) {
-    LookupRow[] a = new LookupRow[codes.size()];
-    for (int i = 0; i < a.length; i++) {
-      ICode c = codes.get(i);
-      Object parentId = null;
-      if (c.getParentCode() != null) {
-        parentId = c.getParentCode().getId();
+  protected List<ILookupRow<CODE_ID_TYPE>> createLookupRowArray(List<? extends ICode<CODE_ID_TYPE>> codes) {
+    List<ILookupRow<CODE_ID_TYPE>> rows = new ArrayList<ILookupRow<CODE_ID_TYPE>>();
+    for (ICode<CODE_ID_TYPE> code : codes) {
+      CODE_ID_TYPE parentId = null;
+      if (code.getParentCode() != null) {
+        parentId = code.getParentCode().getId();
       }
-      a[i] = new LookupRow(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
+      rows.add(new LookupRow<CODE_ID_TYPE>(code.getId(), code.getText(), code.getIconId(), code.getTooltipText(), code.getBackgroundColor(), code.getForegroundColor(), code.getFont(), code.isEnabled(), parentId, code.isActive()));
     }
-    return a;
+    return rows;
   }
 
   public static Pattern getSearchPattern(String s) {
@@ -114,12 +115,12 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * Complete override using code data
    */
   @Override
-  public LookupRow[] getDataByKey() throws ProcessingException {
-    Object key = getKey();
-    ArrayList<ICode<?>> list = new ArrayList<ICode<?>>(1);
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByKey() throws ProcessingException {
+    CODE_ID_TYPE key = getKey();
+    List<ICode<CODE_ID_TYPE>> list = new ArrayList<ICode<CODE_ID_TYPE>>(1);
+    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
     if (t != null) {
-      ICode c = t.getCode(key);
+      ICode<CODE_ID_TYPE> c = t.getCode(key);
       if (c != null) {
         list.add(c);
       }
@@ -131,11 +132,11 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * Complete override using code data
    */
   @Override
-  public LookupRow[] getDataByText() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByText() throws ProcessingException {
     final Pattern pat = getSearchPattern(getText());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
       @Override
-      public boolean visit(ICode code, int treeLevel) {
+      public boolean visit(ICode<CODE_ID_TYPE> code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(LegacyCodeLookupCall.this, code, treeLevel)) {
           return true;
         }
@@ -149,7 +150,7 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }
@@ -160,11 +161,11 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * Complete override using code data
    */
   @Override
-  public LookupRow[] getDataByAll() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByAll() throws ProcessingException {
     final Pattern pat = getSearchPattern(getAll());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
       @Override
-      public boolean visit(ICode code, int treeLevel) {
+      public boolean visit(ICode<CODE_ID_TYPE> code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(LegacyCodeLookupCall.this, code, treeLevel)) {
           return true;
         }
@@ -178,7 +179,7 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }
@@ -189,7 +190,7 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
    * Complete override using code data
    */
   @Override
-  public LookupRow[] getDataByRec() throws ProcessingException {
+  public List<ILookupRow<CODE_ID_TYPE>> getDataByRec() throws ProcessingException {
     Object recValue = getRec();
     if ((recValue instanceof Number) && ((Number) recValue).longValue() == 0) {
       recValue = null;
@@ -197,7 +198,7 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
     final Object key = recValue;
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
       @Override
-      public boolean visit(ICode code, int treeLevel) {
+      public boolean visit(ICode<CODE_ID_TYPE> code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(LegacyCodeLookupCall.this, code, treeLevel)) {
           return true;
         }
@@ -210,24 +211,24 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+    ICodeType<?, CODE_ID_TYPE> t = CODES.getCodeType(m_codeTypeClass);
     if (t != null) {
       t.visit(v, false);
     }
     return execCreateLookupRowsFromCodes(v.getCodes());
   }
 
-  private static abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor {
-    private ArrayList<ICode<?>> m_list = new ArrayList<ICode<?>>();
+  private abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor<ICode<CODE_ID_TYPE>> {
+    private ArrayList<ICode<CODE_ID_TYPE>> m_list = new ArrayList<ICode<CODE_ID_TYPE>>();
 
     public P_AbstractCollectingCodeVisitor() {
     }
 
-    public void add(ICode code) {
+    public void add(ICode<CODE_ID_TYPE> code) {
       m_list.add(code);
     }
 
-    public ICode getFirstCode() {
+    public ICode<CODE_ID_TYPE> getFirstCode() {
       if (m_list.size() > 0) {
         return m_list.get(0);
       }
@@ -236,8 +237,8 @@ public class LegacyCodeLookupCall extends LocalLookupCall implements Serializabl
       }
     }
 
-    public List<ICode<?>> getCodes() {
-      return m_list;
+    public List<ICode<CODE_ID_TYPE>> getCodes() {
+      return Collections.unmodifiableList(m_list);
     }
   }
 }

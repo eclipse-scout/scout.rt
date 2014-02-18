@@ -25,7 +25,7 @@ public class LookupRowTest {
 
   @Test
   public void testSerializeDeserialize() throws Exception {
-    LookupRow row = new LookupRow("key", "text");
+    ILookupRow<String> row = new LookupRow<String>("key", "text");
 
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     ObjectOutputStream oout = new ObjectOutputStream(bout);

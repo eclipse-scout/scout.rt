@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.button;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.OptimisticLock;
@@ -383,12 +384,11 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
       for (MenuItem item : m_contextMenu.getItems()) {
         disposeMenuItem(item);
       }
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireButtonPopupFromUI();
-          scoutMenusRef.set(scoutMenus);
+          scoutMenusRef.set(getScoutObject().getUIFacade().fireButtonPopupFromUI());
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);

@@ -4,48 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public interface ISmartColumn<T> extends IColumn<T> {
-
-  /**
-   * code value decorator
-   */
-  Class<? extends ICodeType> getCodeTypeClass();
-
-  void setCodeTypeClass(Class<? extends ICodeType> t);
-
-  /**
-   * custom value decorator
-   */
-  LookupCall getLookupCall();
-
-  void setLookupCall(LookupCall c);
-
-  LookupCall prepareLookupCall(ITableRow row);
-
-  /**
-   * see {@link #setSortCodesByDisplayText(boolean)}
-   * 
-   * @since 04.11.2009
-   */
-  boolean isSortCodesByDisplayText();
-
-  /**
-   * Sorting of columns with attached {@link ICodeType} can be based on the
-   * codes sort order or their display texts. Default is sort by codes sort
-   * order.
-   * 
-   * @since 04.11.2009 ticket 82478
-   */
-  void setSortCodesByDisplayText(boolean b);
+public interface ISmartColumn<T> extends IMixedSmartColumn<T, T> {
 
 }

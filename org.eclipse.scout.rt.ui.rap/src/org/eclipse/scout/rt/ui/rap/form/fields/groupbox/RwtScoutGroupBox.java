@@ -131,8 +131,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     m_bodyPart.setLayout(bodyLayout);
     installUiContainerBorder();
     // FIELDS:
-    IFormField[] scoutFields = getScoutObject().getControlFields();
-    for (IFormField field : scoutFields) {
+    for (IFormField field : getScoutObject().getControlFields()) {
       IRwtScoutFormField uiScoutComposite = getUiEnvironment().createFormField(m_bodyPart, field);
       RwtScoutFormFieldGridData layoutData = new RwtScoutFormFieldGridData(field);
       uiScoutComposite.getUiContainer().setLayoutData(layoutData);

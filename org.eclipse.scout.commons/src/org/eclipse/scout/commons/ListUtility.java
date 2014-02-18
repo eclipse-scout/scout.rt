@@ -13,7 +13,6 @@ package org.eclipse.scout.commons;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public final class ListUtility {
     return list;
   }
 
-  public static Object[] toArray(Object... array) {
+  public static <T> T[] toArray(T... array) {
     return array;
   }
 
@@ -71,11 +70,16 @@ public final class ListUtility {
     return false;
   }
 
+  /**
+   * @deprecated use {@link CollectionUtility#format(Collection, String)} instead
+   */
+  @Deprecated
   public static <T> String format(Collection<T> list, String delimiter) {
+
     if (list == null) {
       return "";
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     int index = 0;
     for (T o : list) {
       if (index > 0) {
@@ -87,10 +91,18 @@ public final class ListUtility {
     return buf.toString();
   }
 
+  /**
+   * @deprecated use {@link CollectionUtility#format(Collection)} instead
+   */
+  @Deprecated
   public static String format(Collection<?> list) {
-    return format(list, false);
+    return CollectionUtility.format(list);
   }
 
+  /**
+   * @deprecated use {@link CollectionUtility#format(Collection, boolean)} instead
+   */
+  @Deprecated
   public static <T> String format(Collection<T> c, boolean quoteStrings) {
     StringBuffer buf = new StringBuffer();
     if (c != null) {
@@ -118,6 +130,10 @@ public final class ListUtility {
     return buf.toString();
   }
 
+  /**
+   * @deprecated use {@link CollectionUtility#parse(String)} instead
+   */
+  @Deprecated
   public static List<Object> parse(String text) {
     List<Object> list = null;
     if (text != null && text.trim().length() > 0) {
@@ -158,7 +174,7 @@ public final class ListUtility {
         list = CollectionUtility.appendList(list, o);
       }
     }
-    return CollectionUtility.copyList(list);
+    return CollectionUtility.arrayList(list);
   }
 
   /**
@@ -174,59 +190,13 @@ public final class ListUtility {
         }
       }
     }
-    return CollectionUtility.copyList(list);
+    return CollectionUtility.arrayList(list);
   }
 
   /**
-   * @return true if the collection contains at least two equal values
+   * @deprecated use {@link CollectionUtility#hasElements(Object[])} instead
    */
-  public static <T> boolean isAmbiguous(Collection<T> c) {
-    return !isDistinct(c);
-  }
-
-  /**
-   * @return true if all values in the collection are distinct
-   */
-  public static <T> boolean isDistinct(Collection<T> c) {
-    HashSet<T> set = new HashSet<T>(c);
-    return (set.size() == c.size());
-  }
-
-  /**
-   * returns the (single) number, if all values are the same in the array,
-   * otherwise null
-   */
-  public static <T> T getUnique(T... n) {
-    if (n == null || n.length == 0) {
-      return null;
-    }
-    T retVal = null;
-    for (int i = 0; i < n.length; i++) {
-      if (n[i] != null) {
-        if (retVal == null) {
-          retVal = n[i];
-        }
-        else {
-          if (!retVal.equals(n[i])) {
-            return null;
-          }
-        }
-      }
-    }
-    return retVal;
-  }
-
-  /**
-   * @return the length of an array using {@link Array#getLength(Object)}.
-   *         <p>
-   *         Accepts arrays, {@link Collection}s, {@link Map}s, null
-   *         <p>
-   *         if the array has multiple dimensions, returns the first dimension
-   *         <p>
-   *         if the array is null, returns -1
-   *         <p>
-   * @throws {@link IllegalArgumentException} if the argument is neither an array nor null
-   */
+  @Deprecated
   public static int length(Object array) {
     if (array == null) {
       return -1;
@@ -241,5 +211,37 @@ public final class ListUtility {
       return ((Map<?, ?>) array).size();
     }
     throw new IllegalArgumentException("expected one of: null, array, collection, map");
+  }
+
+  /**
+   * @deprecated use {@link CollectionUtility#arrayList(Object...)} instead.
+   */
+  @Deprecated
+  public static <T> ArrayList<T> arrayList(T... values) {
+    return CollectionUtility.arrayList(values);
+  }
+
+  /**
+   * @deprecated use {@link CollectionUtility#arrayList(Object)} instead.
+   */
+  @Deprecated
+  public static <T> ArrayList<T> arrayList(T value) {
+    return CollectionUtility.arrayList(value);
+  }
+
+  /**
+   * @deprecated use {@link CollectionUtility#unmodifiableList(List)} instead.
+   */
+  @Deprecated
+  public static <T> List<T> unmodifiableList(List<? extends T> list) {
+    return CollectionUtility.unmodifiableList(list);
+  }
+
+  /**
+   * @deprecated use {@link CollectionUtility#getElement(List, int)} instead.
+   */
+  @Deprecated
+  public static <T> T getElement(List<? extends T> list, int index) {
+    return CollectionUtility.getElement(list, index);
   }
 }

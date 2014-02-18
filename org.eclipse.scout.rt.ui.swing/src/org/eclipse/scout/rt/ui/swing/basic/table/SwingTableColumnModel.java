@@ -16,6 +16,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableColumnModel;
@@ -89,11 +90,13 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
       if (m_swingScoutTable.getSwingTable().getTableHeader() != null) {
         m_swingScoutTable.getSwingTable().getTableHeader().addMouseListener(m_swingTableHeaderMouseListener);
       }
-      IColumn[] scoutCols = m_swingScoutTable.getScoutObject().getColumnSet().getVisibleColumns();
-      for (int i = 0; i < scoutCols.length; i++) {
-        SwingTableColumn swingColumn = m_env.createColumn(i, scoutCols[i]);
+      List<IColumn<?>> scoutCols = m_swingScoutTable.getScoutObject().getColumnSet().getVisibleColumns();
+      int i = 0;
+      for (IColumn<?> scoutColumn : scoutCols) {
+        SwingTableColumn swingColumn = m_env.createColumn(i, scoutColumn);
         // add column
         addColumn(swingColumn);
+        i++;
       }
     }
   }

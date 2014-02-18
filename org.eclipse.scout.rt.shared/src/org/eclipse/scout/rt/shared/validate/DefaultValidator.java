@@ -351,10 +351,10 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
     }
   }
 
-  protected ICodeType<?> createCodeTypeByValidationRules(FormDataCheckContext ctx) throws Exception {
+  protected ICodeType<?, ?> createCodeTypeByValidationRules(FormDataCheckContext ctx) throws Exception {
     @SuppressWarnings("unchecked")
-    Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) ctx.ruleValue;
-    ICodeType<?> codeType = CODES.getCodeType(cls);
+    Class<? extends ICodeType<?, ?>> cls = (Class<? extends ICodeType<?, ?>>) ctx.ruleValue;
+    ICodeType<?, ?> codeType = CODES.getCodeType(cls);
     if (codeType == null) {
       throw new ProcessingException(ctx.fieldName + " codeType " + cls.getSimpleName() + " does not exist");
     }

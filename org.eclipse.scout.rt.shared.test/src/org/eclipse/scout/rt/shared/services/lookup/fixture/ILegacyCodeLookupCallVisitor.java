@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.shared.services.lookup.fixture;
 
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
-public interface ILegacyCodeLookupCallVisitor {
+public interface ILegacyCodeLookupCallVisitor<CODE_ID_TYPE> {
 
   /**
    * @return true=continue visiting, false=end visiting
    */
-  boolean visit(LegacyCodeLookupCall call, ICode code, int treeLevel);
+  boolean visit(LegacyCodeLookupCall<CODE_ID_TYPE> call, ICode<CODE_ID_TYPE> code, int treeLevel);
 
 }

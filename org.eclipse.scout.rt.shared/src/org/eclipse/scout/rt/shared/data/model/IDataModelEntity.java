@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.security.Permission;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -44,11 +45,11 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   void setText(String s);
 
-  IDataModelAttribute[] getAttributes();
+  List<IDataModelAttribute> getAttributes();
 
   public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz);
 
-  IDataModelEntity[] getEntities();
+  List<IDataModelEntity> getEntities();
 
   IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz);
 

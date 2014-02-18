@@ -15,7 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.zip.CRC32;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -63,7 +64,7 @@ public final class BookmarkUtility {
   private BookmarkUtility() {
   }
 
-  public static IOutline resolveOutline(IOutline[] outlines, String className) {
+  public static IOutline resolveOutline(List<? extends IOutline> outlines, String className) {
     if (className == null) {
       return null;
     }
@@ -89,7 +90,7 @@ public final class BookmarkUtility {
    * @param className
    *          is the columnId, simple class name or class name of the columns to find
    */
-  public static IColumn resolveColumn(IColumn[] columns, String identifier) {
+  public static IColumn resolveColumn(List<? extends IColumn> columns, String identifier) {
     if (identifier == null) {
       return null;
     }
@@ -115,7 +116,7 @@ public final class BookmarkUtility {
     return null;
   }
 
-  public static IPage resolvePage(IPage[] pages, String className, String bookmarkIdentifier) {
+  public static IPage resolvePage(List<? extends IPage> pages, String className, String bookmarkIdentifier) {
     if (className == null) {
       return null;
     }
@@ -159,8 +160,9 @@ public final class BookmarkUtility {
    * intercept objects that are not remoting-capable or not serializable and
    * replace by strings
    */
-  public static Object[] makeSerializableKeys(Object[] a, boolean useLegacySupport) {
-    return (Object[]) makeSerializableKey(a, useLegacySupport);
+  @SuppressWarnings("unchecked")
+  public static List<Object> makeSerializableKeys(List<?> a, boolean useLegacySupport) {
+    return (List<Object>) makeSerializableKey(a, useLegacySupport);
   }
 
   public static Object makeSerializableKey(Object o, boolean useLegacySupport) {
@@ -178,6 +180,13 @@ public final class BookmarkUtility {
     }
     else if (o instanceof Date) {
       return o;
+    }
+    else if (o instanceof Collection) {
+      List<Object> result = new ArrayList<Object>();
+      for (Object oi : (Collection) o) {
+        result.add(makeSerializableKey(oi, useLegacySupport));
+      }
+      return result;
     }
     else if (o.getClass().isArray()) {
       ArrayList<Integer> dimList = new ArrayList<Integer>();
@@ -400,9 +409,9 @@ public final class BookmarkUtility {
           }
         }
       }
-      List<IColumn> existingVisibleCols = Arrays.asList(columnSet.getVisibleColumns());
+      List<IColumn<?>> existingVisibleCols = columnSet.getVisibleColumns();
       if (!existingVisibleCols.equals(visibleColumns)) {
-        columnSet.setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
+        columnSet.setVisibleColumns(visibleColumns);
       }
       // filters
       if (table.getColumnFilterManager() != null) {
@@ -662,9 +671,9 @@ public final class BookmarkUtility {
         }
       }
       else {
-        ITreeNode[] filteredChildNodes = tablePage.getFilteredChildNodes();
-        if (filteredChildNodes.length > 0) {
-          childPage = (IPage) filteredChildNodes[0];
+        List<ITreeNode> filteredChildNodes = tablePage.getFilteredChildNodes();
+        if (filteredChildNodes.size() > 0) {
+          childPage = (IPage) CollectionUtility.firstElement(filteredChildNodes);
         }
         else if (tablePage.getChildNodeCount() > 0) {
           childPage = tablePage.getChildPage(0);
@@ -688,7 +697,7 @@ public final class BookmarkUtility {
           }
         }
         if (rowList.size() > 0) {
-          table.selectRows(rowList.toArray(new ITableRow[0]));
+          table.selectRows(rowList);
         }
       }
 

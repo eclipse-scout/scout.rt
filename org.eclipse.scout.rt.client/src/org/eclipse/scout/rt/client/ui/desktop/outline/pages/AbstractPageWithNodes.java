@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -189,7 +190,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   public void loadChildren() throws ProcessingException {
     ArrayList<IPage> pageList = new ArrayList<IPage>();
     createChildPagesInternal(pageList);
-    IPage[] pages = pageList.toArray(new IPage[pageList.size()]);
     // load tree
     ITree tree = getTree();
     try {
@@ -221,7 +221,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       setChildrenLoaded(false);
       //
       getTree().removeAllChildNodes(this);
-      getTree().addChildNodes(this, pages);
+      getTree().addChildNodes(this, pageList);
       //
       setChildrenLoaded(true);
       setChildrenDirty(false);
@@ -264,17 +264,17 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
 
   @Override
   public void rebuildTableInternal() throws ProcessingException {
-    ITreeNode[] childNodes = getChildNodes();
+    List<ITreeNode> childNodes = getChildNodes();
     try {
       getInternalTable().setTableChanging(true);
       //
       unlinkAllTableRowWithPage();
       getInternalTable().discardAllRows();
-      for (int i = 0; i < childNodes.length; i++) {
+      for (ITreeNode childNode : childNodes) {
         ITableRow row = new TableRow(getInternalTable().getColumnSet());
-        row.setCell(0, childNodes[i].getCell());
+        row.setCell(0, childNode.getCell());
         ITableRow insertedRow = getInternalTable().addRow(row);
-        linkTableRowWithPage(insertedRow, (IPage) childNodes[i]);
+        linkTableRowWithPage(insertedRow, (IPage) childNode);
       }
     }
     finally {
@@ -310,29 +310,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   @Override
   public ITableRow getTableRowFor(ITreeNode childPageNode) {
     return m_pageToTableRowMap.get(childPageNode);
-  }
-
-  private ITreeNode[] getTreeNodesFor(ITableRow[] tableRows) {
-    ITreeNode[] nodes = new ITreeNode[tableRows.length];
-    int missingCount = 0;
-    for (int i = 0; i < tableRows.length; i++) {
-      nodes[i] = m_tableRowToPageMap.get(tableRows[i]);
-      if (nodes[i] == null) {
-        missingCount++;
-      }
-    }
-    if (missingCount > 0) {
-      ITreeNode[] tmp = new ITreeNode[nodes.length - missingCount];
-      int index = 0;
-      for (int i = 0; i < nodes.length; i++) {
-        if (nodes[i] != null) {
-          tmp[index] = nodes[i];
-          index++;
-        }
-      }
-      nodes = tmp;
-    }
-    return nodes;
   }
 
   /**

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -233,14 +234,14 @@ public interface ITreeNode {
 
   boolean isExpanded();
 
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   /**
    * Convenience to find a menu, uses {@link ActionFinder}
    */
   <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
 
-  void setMenus(IMenu[] a);
+  void setMenus(List<? extends IMenu> a);
 
   /**
    * get tree containing this node
@@ -296,12 +297,12 @@ public interface ITreeNode {
 
   ITreeNode getChildNode(int childIndex);
 
-  ITreeNode[] getChildNodes();
+  List<ITreeNode> getChildNodes();
 
   /**
    * @see ITree#getNodeFilters() This method is Thread-Safe
    */
-  ITreeNode[] getFilteredChildNodes();
+  List<ITreeNode> getFilteredChildNodes();
 
   /**
    * @return the level from top to bottom if root is invisible then it is not

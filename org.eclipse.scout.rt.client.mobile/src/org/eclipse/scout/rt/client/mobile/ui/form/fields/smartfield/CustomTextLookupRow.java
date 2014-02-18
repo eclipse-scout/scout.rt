@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield;
 
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public class CustomTextLookupRow extends LookupRow {
+public class CustomTextLookupRow<LOOKUP_TYPE> extends LookupRow<LOOKUP_TYPE> {
 
   private static final long serialVersionUID = 1L;
 

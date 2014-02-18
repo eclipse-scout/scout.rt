@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
+
+import java.util.List;
 
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -19,32 +21,32 @@ public interface ICode<T> {
    */
   T getId();
 
-  ICode getParentCode();
+  ICode<T> getParentCode();
 
   /**
    * do not use this internal method
    */
-  void setParentCodeInternal(ICode c);
+  void setParentCodeInternal(ICode<T> c);
 
-  ICode[] getChildCodes();
+  List<? extends ICode<T>> getChildCodes();
 
-  ICode[] getChildCodes(boolean activeOnly);
+  List<? extends ICode<T>> getChildCodes(boolean activeOnly);
 
-  ICode getChildCode(Object codeId);
+  ICode<T> getChildCode(T codeId);
 
-  ICode getChildCodeByExtKey(Object extKey);
-
-  /**
-   * do not use this internal method
-   */
-  void addChildCodeInternal(ICode code);
-
-  ICodeType getCodeType();
+  ICode<T> getChildCodeByExtKey(Object extKey);
 
   /**
    * do not use this internal method
    */
-  void setCodeTypeInternal(ICodeType type);
+  void addChildCodeInternal(ICode<T> code);
+
+  ICodeType<?, T> getCodeType();
+
+  /**
+   * do not use this internal method
+   */
+  void setCodeTypeInternal(ICodeType<?, T> type);
 
   String getText();
 
@@ -80,10 +82,10 @@ public interface ICode<T> {
   /**
    * Visit all codes in the subtree of this code <b>excluding</b> this code.
    */
-  boolean visit(ICodeVisitor visitor, int level, boolean activeOnly);
+  <CODE extends ICode<T>> boolean visit(ICodeVisitor<CODE> visitor, int level, boolean activeOnly);
 
   /**
    * @return a value copy of the code state in form a {@link CodeRow}
    */
-  CodeRow toCodeRow();
+  ICodeRow<T> toCodeRow();
 }

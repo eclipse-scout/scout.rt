@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -35,6 +36,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -383,9 +385,9 @@ public class ComponentSpyAction extends AbstractAction {
     private void loadChildren() {
       Vector<ScoutNode> newList = new Vector<ScoutNode>();
       Object o = getUserObject();
-      IFormField[] childFields = null;
+      List<IFormField> childFields = null;
       if (o instanceof IForm) {
-        childFields = new IFormField[]{((IForm) o).getRootGroupBox()};
+        childFields = CollectionUtility.arrayList((IFormField) ((IForm) o).getRootGroupBox());
       }
       else if (o instanceof ICompositeField) {
         childFields = ((ICompositeField) o).getFields();

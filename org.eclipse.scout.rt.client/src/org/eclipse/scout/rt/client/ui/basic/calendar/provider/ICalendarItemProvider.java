@@ -4,13 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar.provider;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -21,7 +23,7 @@ import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 public interface ICalendarItemProvider extends IPropertyObserver {
 
   /**
-   * type {@link ICalendarItem}[]
+   * type {@link Set<ICalendarItem>}
    */
   String PROP_ITEMS = "items";
   /**
@@ -60,11 +62,11 @@ public interface ICalendarItemProvider extends IPropertyObserver {
    *         {@link #execItemMovedAction(ICalendarItem, Date)} is launched and will result in a
    *         PropertyChangeEvent("items")
    */
-  ICalendarItem[] getItems(Date minDate, Date maxDate);
+  Set<ICalendarItem> getItems(Date minDate, Date maxDate);
 
   void reloadProvider();
 
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   void onItemAction(ICalendarItem item) throws ProcessingException;
 

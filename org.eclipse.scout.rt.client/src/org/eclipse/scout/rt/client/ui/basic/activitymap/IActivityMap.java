@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -255,23 +256,23 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
 
   ActivityCell<RI, AI> resolveActivityCell(ActivityCell<RI, AI> cell);
 
-  ActivityCell<RI, AI>[] resolveActivityCells(ActivityCell<RI, AI>[] cells);
+  List<ActivityCell<RI, AI>> resolveActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 
-  ActivityCell<RI, AI>[] getActivityCells(RI resourceId);
+  List<ActivityCell<RI, AI>> getActivityCells(RI resourceId);
 
-  ActivityCell<RI, AI>[] getActivityCells(RI[] resourceIds);
+  List<ActivityCell<RI, AI>> getActivityCells(List<? extends RI> resourceIds);
 
-  ActivityCell<RI, AI>[] getAllActivityCells();
+  List<ActivityCell<RI, AI>> getAllActivityCells();
 
-  void addActivityCells(ActivityCell<RI, AI>[] cells);
+  void addActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 
-  void updateActivityCells(ActivityCell<RI, AI>[] cells);
+  void updateActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 
-  void updateActivityCells(RI[] resourceIds);
+  void updateActivityCellsById(List<? extends RI> resourceIds);
 
-  void removeActivityCells(ActivityCell<RI, AI>[] cells);
+  void removeActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 
-  void removeActivityCells(RI[] resourceIds);
+  void removeActivityCellsById(List<? extends RI> resourceIds);
 
   void removeAllActivityCells();
 
@@ -284,16 +285,16 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
   /**
    * available resource ids in the same order as the resource table
    */
-  RI[] getResourceIds();
+  List<RI> getResourceIds();
 
-  void setResourceIds(RI[] resourceIds);
+  void setResourceIds(List<? extends RI> resourceIds);
 
   /**
    * selected resource ids in arbitrary order
    */
-  RI[] getSelectedResourceIds();
+  List<RI> getSelectedResourceIds();
 
-  void setSelectedResourceIds(RI[] resourceIds);
+  void setSelectedResourceIds(List<? extends RI> resourceIds);
 
   void isSelectedResourceId(RI resourceId);
 
@@ -329,7 +330,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    */
   Object getContainer();
 
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   IActivityMapUIFacade getUIFacade();
 

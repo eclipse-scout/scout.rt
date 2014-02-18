@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -39,29 +42,29 @@ public class PageWithTable3Test {
   public void testSorting() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     PageWithTableOutline outline = new PageWithTableOutline();
-    desktop.setAvailableOutlines(new IOutline[]{outline});
+    desktop.setAvailableOutlines(Collections.singletonList(outline));
     desktop.setOutline(outline);
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
     table.resetDisplayableColumns();
     //
     //load table with configured sort columns
-    assertArrayEquals(new Integer[]{7, 6, 5, 4, 3, 2, 1, 0}, table.getValueColumn().getValues());
+    assertTrue(CollectionUtility.equalsCollection(CollectionUtility.arrayList(7, 6, 5, 4, 3, 2, 1, 0), table.getValueColumn().getValues()));
     //user sorts value column asc (all other columns lost their sort index resp. their sort is now explicit=false)
     table.getUIFacade().fireHeaderSortFromUI(table.getValueColumn(), false);
-    assertSortState(table, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7}, new Integer[]{0});
+    assertSortState(table, CollectionUtility.arrayList(0, 1, 2, 3, 4, 5, 6, 7), CollectionUtility.arrayList(0));
     //
     //reset desktop and re-create new outline
     desktop.setOutline((IOutline) null);
     outline = new PageWithTableOutline();
-    desktop.setAvailableOutlines(new IOutline[]{outline});
+    desktop.setAvailableOutlines(Collections.singletonList(outline));
     desktop.setOutline(outline);
     page = (PageWithTable) desktop.getOutline().getActivePage();
     table = page.getTable();
-    assertSortState(table, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7}, new Integer[]{0});
+    assertSortState(table, CollectionUtility.arrayList(0, 1, 2, 3, 4, 5, 6, 7), CollectionUtility.arrayList(0));
   }
 
-  private static void assertSortState(PageWithTable.Table table, Integer[] expectedValues, Integer[] expectedExplicitSortIndices) {
+  private static void assertSortState(PageWithTable.Table table, List<Integer> expectedValues, List<Integer> expectedExplicitSortIndices) {
     /*
     System.out.println("--");
     System.out.println(Arrays.toString(table.getValueColumn().getValues()));
@@ -69,14 +72,14 @@ public class PageWithTable3Test {
       System.out.println("col " + c.getClass().getSimpleName() + ": " + c.isSortActive() + ", " + c.isSortExplicit() + ", " + c.getSortIndex() + " " + c.isSortAscending());
     }
     */
-    ArrayList<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
+    List<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
     for (IColumn<?> c : table.getColumns()) {
       if (c.isSortActive() && c.isSortExplicit()) {
         actualExplicitSortIndices.add(c.getColumnIndex());
       }
     }
-    assertArrayEquals(expectedValues, table.getValueColumn().getValues());
-    assertArrayEquals(expectedExplicitSortIndices, actualExplicitSortIndices.toArray());
+    assertTrue(CollectionUtility.equalsCollection(expectedValues, table.getValueColumn().getValues()));
+    assertTrue(CollectionUtility.equalsCollection(expectedExplicitSortIndices, actualExplicitSortIndices));
   }
 
   public static class PageWithTableOutline extends AbstractOutline {

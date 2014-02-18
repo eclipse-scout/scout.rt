@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
@@ -166,17 +169,15 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
         }
 
         @Override
-        protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
-          if (rows == null || rows.length == 0) {
-            return;
+        protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+          if (CollectionUtility.hasElements(rows)) {
+            IOutline outline = getOutlineColumn().getValue(CollectionUtility.firstElement(rows));
+            MobileDesktopUtility.activateOutline(outline);
+            getDesktop().removeForm(DefaultOutlineChooserForm.this);
+
+            clearSelectionDelayed();
           }
 
-          IOutline outline = getOutlineColumn().getValue(rows[0]);
-
-          MobileDesktopUtility.activateOutline(outline);
-          getDesktop().removeForm(DefaultOutlineChooserForm.this);
-
-          clearSelectionDelayed();
         }
       }
     }
@@ -189,8 +190,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
     protected void execLoad() throws ProcessingException {
       final OutlinesTableField.Table table = getOutlinesTableField().getTable();
 
-      IOutline[] outlines = getDesktop().getAvailableOutlines();
-      for (IOutline outline : outlines) {
+      for (IOutline outline : getDesktop().getAvailableOutlines()) {
         if (outline.isVisible() && outline.getRootNode() != null) {
           ITableRow row = table.createRow(new Object[]{outline, outline.getTitle()});
           row.setEnabled(outline.isEnabled());

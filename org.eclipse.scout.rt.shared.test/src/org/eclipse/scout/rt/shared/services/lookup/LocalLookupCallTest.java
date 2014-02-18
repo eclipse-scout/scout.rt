@@ -38,17 +38,17 @@ public class LocalLookupCallTest {
   @Test
   public void testGetDataByAll() throws Exception {
     P_LocalLookupCall lc = new P_LocalLookupCall();
-    LookupRow[] rows = lc.getDataByAll();
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
 
-    assertEquals("rows lengh", 6, rows.length);
+    assertEquals("rows lengh", 6, rows.size());
   }
 
   @Test
   public void testGetDataByText() throws Exception {
     P_LocalLookupCall lc = new P_LocalLookupCall();
-    LookupRow[] rows = lc.getDataByText();
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
 
-    assertEquals("rows length", 6, rows.length);
+    assertEquals("rows length", 6, rows.size());
   }
 
   @Test
@@ -66,9 +66,9 @@ public class LocalLookupCallTest {
   private void runGetDataByTextFiltered(int expectedLength, String text) throws ProcessingException {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setText(text);
-    LookupRow[] rows = lc.getDataByText();
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
 
-    assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.size());
   }
 
   @Test
@@ -76,16 +76,16 @@ public class LocalLookupCallTest {
     runGetDataByKey(0, null);
     runGetDataByKey(1, ROW10_KEY);
     runGetDataByKey(1, ROW31_KEY);
-    runGetDataByKey(0, "x");
+    runGetDataByKey(0, 9999999);
     runGetDataByKey(0, Integer.valueOf(0));
   }
 
-  private void runGetDataByKey(int expectedLength, Object key) throws ProcessingException {
+  private void runGetDataByKey(int expectedLength, Integer key) throws ProcessingException {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setKey(key);
-    LookupRow[] rows = lc.getDataByKey();
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByKey();
 
-    assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.size());
   }
 
   @Test
@@ -95,30 +95,30 @@ public class LocalLookupCallTest {
     runGetDataByRec(0, ROW20_KEY);
     runGetDataByRec(1, ROW30_KEY);
     runGetDataByRec(0, ROW11_KEY);
-    runGetDataByRec(0, "x");
+    runGetDataByRec(0, 799999);
 
   }
 
-  private void runGetDataByRec(int expectedLength, Object parent) throws ProcessingException {
+  private void runGetDataByRec(int expectedLength, Integer parent) throws ProcessingException {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setRec(parent);
-    LookupRow[] rows = lc.getDataByRec();
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByRec();
 
-    assertEquals("rows length", expectedLength, rows.length);
+    assertEquals("rows length", expectedLength, rows.size());
   }
 
-  private class P_LocalLookupCall extends LocalLookupCall {
+  private class P_LocalLookupCall extends LocalLookupCall<Integer> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-      List<LookupRow> list = new ArrayList<LookupRow>();
-      list.add(new LookupRow(ROW10_KEY, ROW10_TEXT));
-      list.add(new LookupRow(ROW20_KEY, ROW20_TEXT));
-      list.add(new LookupRow(ROW30_KEY, ROW30_TEXT));
-      list.add(new LookupRow(ROW11_KEY, ROW11_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow(ROW12_KEY, ROW12_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow(ROW31_KEY, ROW31_TEXT, null, null, null, null, null, true, ROW30_KEY));
+    protected List<ILookupRow<Integer>> execCreateLookupRows() throws ProcessingException {
+      List<ILookupRow<Integer>> list = new ArrayList<ILookupRow<Integer>>();
+      list.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
+      list.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));
+      list.add(new LookupRow<Integer>(ROW30_KEY, ROW30_TEXT));
+      list.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT, null, null, null, null, null, true, ROW10_KEY));
+      list.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT, null, null, null, null, null, true, ROW10_KEY));
+      list.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT, null, null, null, null, null, true, ROW30_KEY));
       return list;
     }
   }

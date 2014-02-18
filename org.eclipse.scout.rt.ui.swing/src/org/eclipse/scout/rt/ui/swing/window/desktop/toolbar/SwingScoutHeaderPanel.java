@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -69,7 +70,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
 
   @Override
   protected void initializeSwing() {
-    m_topLevelMenuCount = getScoutObject().getMenus().length;
+    m_topLevelMenuCount = getScoutObject().getMenus().size();
     final JPanelEx container = new JPanelEx(m_layout);
 
     m_navigationPanel = createNavigationPanel();
@@ -308,7 +309,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        IMenu[] scoutMenus = SERVICES.getService(INavigationHistoryService.class).getMenus();
+        List<IMenu> scoutMenus = SERVICES.getService(INavigationHistoryService.class).getMenus();
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), m_navigationPanel, m_navigationPanel.getHistoryMenuLocation(), scoutMenus).enqueue();
       }

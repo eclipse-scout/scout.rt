@@ -12,12 +12,13 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Array;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -258,7 +259,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   /**
    * Configures whether this column value belongs to the primary key of the surrounding table. The table's primary key
    * might consist of several columns. The primary key can be used to find the appropriate row by calling
-   * {@link AbstractTable#findRowByKey(Object[])}.
+   * {@link AbstractTable#findRowByKey(List)}.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    * 
@@ -946,8 +947,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public void fill(T rawValue) throws ProcessingException {
-    ITableRow[] rows = getTable().getRows();
-    for (ITableRow row : rows) {
+    for (ITableRow row : getTable().getRows()) {
       setValue(row, rawValue);
     }
   }
@@ -959,34 +959,41 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getValues() {
-    T[] values = (T[]) Array.newInstance(getDataType(), m_table.getRowCount());
-    for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
-      values[i] = getValue(m_table.getRow(i));
+  public List<T> getValues() {
+    List<T> values = new ArrayList<T>();
+    for (int i = 0; i < m_table.getRowCount(); i++) {
+      values.add(getValue(m_table.getRow(i)));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getValues(ITableRow[] rows) {
-    T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getValue(rows[i]);
+  public List<T> getValues(boolean includeDeleted) {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getRows()) {
+      if (includeDeleted || (row.getStatus() != ITableRow.STATUS_DELETED)) {
+        values.add(getValue(row));
+      }
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getSelectedValues() {
-    ITableRow[] rows = m_table.getSelectedRows();
-    T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getValue(rows[i]);
+  public List<T> getValues(Collection<? extends ITableRow> rows) {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : rows) {
+      values.add(getValue(row));
     }
-    return values;
+    return Collections.unmodifiableList(values);
+  }
+
+  @Override
+  public List<T> getSelectedValues() {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getSelectedRows()) {
+      values.add(getValue(row));
+    }
+    return Collections.unmodifiableList(values);
   }
 
   @Override
@@ -1006,12 +1013,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public String[] getDisplayTexts() {
-    String[] values = new String[m_table.getRowCount()];
-    for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
-      values[i] = getDisplayText(m_table.getRow(i));
+  public List<String> getDisplayTexts() {
+    List<String> values = new ArrayList<String>();
+    for (int i = 0; i < m_table.getRowCount(); i++) {
+      values.add(getDisplayText(m_table.getRow(i)));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
@@ -1026,72 +1033,74 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public String[] getSelectedDisplayTexts() {
-    ITableRow[] rows = m_table.getSelectedRows();
-    String[] values = new String[rows.length];
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getDisplayText(rows[i]);
+  public List<String> getSelectedDisplayTexts() {
+    List<String> values = new ArrayList<String>();
+    for (ITableRow row : m_table.getSelectedRows()) {
+      values.add(getDisplayText(row));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getInsertedValues() {
-    ITableRow[] rows = m_table.getInsertedRows();
-    T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getValue(rows[i]);
+  public List<T> getInsertedValues() {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getInsertedRows()) {
+      values.add(getValue(row));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getUpdatedValues() {
-    ITableRow[] rows = m_table.getUpdatedRows();
-    T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getValue(rows[i]);
+  public List<T> getUpdatedValues() {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getUpdatedRows()) {
+      values.add(getValue(row));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T[] getDeletedValues() {
-    ITableRow[] rows = m_table.getDeletedRows();
-    T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
-    for (int i = 0; i < rows.length; i++) {
-      values[i] = getValue(rows[i]);
+  public List<T> getDeletedValues() {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getDeletedRows()) {
+      values.add(getValue(row));
     }
-    return values;
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  public ITableRow[] findRows(T[] values) {
-    ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
-    if (values != null) {
-      for (int i = 0; i < values.length; i++) {
-        ITableRow row = findRow(values[i]);
+  public List<T> getNotDeletedValues() {
+    List<T> values = new ArrayList<T>();
+    for (ITableRow row : m_table.getNotDeletedRows()) {
+      values.add(getValue(row));
+    }
+    return Collections.unmodifiableList(values);
+  }
+
+  @Override
+  public List<ITableRow> findRows(Collection<? extends T> keys) {
+    List<ITableRow> values = new ArrayList<ITableRow>();
+    if (keys != null) {
+      for (T t : keys) {
+        ITableRow row = findRow(t);
         if (row != null) {
-          rowList.add(row);
+          values.add(row);
         }
       }
     }
-    return rowList.toArray(new ITableRow[0]);
+    return Collections.unmodifiableList(values);
   }
 
   @Override
-  public ITableRow[] findRows(T value) {
-    ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
-    for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
+  public List<ITableRow> findRows(T value) {
+    List<ITableRow> values = new ArrayList<ITableRow>();
+    for (int i = 0; i < m_table.getRowCount(); i++) {
       ITableRow row = m_table.getRow(i);
       if (CompareUtility.equals(value, getValue(row))) {
-        rowList.add(row);
+        values.add(row);
       }
     }
-    return rowList.toArray(new ITableRow[0]);
+    return Collections.unmodifiableList(values);
   }
 
   @Override
@@ -1118,7 +1127,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public boolean containsDuplicateValues() {
-    return new HashSet<T>(Arrays.asList(getValues())).size() < getValues().length;
+    return new HashSet<T>(getValues()).size() < getValues().size();
   }
 
   @Override
@@ -1630,7 +1639,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
             /*
              * Workaround for bugs 396848 & 408741
              * Currently, we set the error status and value directly on the cell before calling the decorator.
-             * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(ITableRow[] rows)}
+             * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
              * to propagate the new error status and value.
              */
             cell.clearErrorStatus();

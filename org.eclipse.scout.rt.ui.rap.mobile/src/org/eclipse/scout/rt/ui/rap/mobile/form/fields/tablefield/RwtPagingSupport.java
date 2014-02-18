@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.holders.Holder;
@@ -58,7 +59,7 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     getTable().removePropertyChangeListener(m_propertyChangeListener);
   }
 
-  public boolean handleSelection(ITableRow[] rows) {
+  public boolean handleSelection(List<? extends ITableRow> rows) {
     for (ITableRow selectedRow : rows) {
       if (selectedRow == getPreviousElementsTableRow()) {
         setPageIndex(getPageIndex() - 1);
@@ -183,7 +184,7 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     public void handleEvent(Event event) {
       if (event.type == SWT.MouseUp) {
         StructuredSelection selection = (StructuredSelection) m_uiList.getUiTableViewer().getSelection();
-        ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
+        List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
         if (handleSelection(selectedRows)) {
           event.doit = false;
         }

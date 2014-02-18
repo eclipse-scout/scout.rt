@@ -21,6 +21,7 @@ import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -82,7 +83,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   private SwingScoutStatusBar m_statusBarComposite;
   // cache
   private String m_title;
-  private IKeyStroke[] m_installedScoutKs;
+  private Set<IKeyStroke> m_installedScoutKs;
 
   public SwingScoutRootFrame(Frame frame) {
     super();
@@ -273,8 +274,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     if (component != null) {
       // remove old key strokes
       if (m_installedScoutKs != null) {
-        for (int i = 0; i < m_installedScoutKs.length; i++) {
-          IKeyStroke scoutKs = m_installedScoutKs[i];
+        for (IKeyStroke scoutKs : m_installedScoutKs) {
           KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
           //
           InputMap imap = component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -285,7 +285,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       }
       m_installedScoutKs = null;
       // add new key strokes
-      IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
+      Set<IKeyStroke> scoutKeyStrokes = getScoutObject().getKeyStrokes();
       for (IKeyStroke scoutKs : scoutKeyStrokes) {
         int swingWhen = JComponent.WHEN_IN_FOCUSED_WINDOW;
         KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);

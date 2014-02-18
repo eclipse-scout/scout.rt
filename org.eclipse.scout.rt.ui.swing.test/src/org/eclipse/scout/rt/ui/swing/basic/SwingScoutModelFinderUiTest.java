@@ -14,7 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -52,6 +54,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.swing.AbstractSwingApplication;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
@@ -312,14 +315,13 @@ public class SwingScoutModelFinderUiTest {
 
         @Override
         protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-          LookupRow[] data = new LookupRow[]{
-              new LookupRow(1L, "Element 1", null, null, null, null, null, true, null),
-              new LookupRow(2L, "Element 1a", null, null, null, null, null, true, 1L),
-              new LookupRow(3L, "Element 1b", null, null, null, null, null, true, 1L),
-              new LookupRow(4L, "Element 2", null, null, null, null, null, true, null),
-              new LookupRow(5L, "Element 2a", null, null, null, null, null, true, 4L)
-          };
-          ITreeNode[] children = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
+          List<ILookupRow<Long>> data = new ArrayList<ILookupRow<Long>>();
+          data.add(new LookupRow<Long>(1L, "Element 1", null, null, null, null, null, true, null));
+          data.add(new LookupRow<Long>(2L, "Element 1a", null, null, null, null, null, true, 1L));
+          data.add(new LookupRow<Long>(3L, "Element 1b", null, null, null, null, null, true, 1L));
+          data.add(new LookupRow<Long>(4L, "Element 2", null, null, null, null, null, true, null));
+          data.add(new LookupRow<Long>(5L, "Element 2a", null, null, null, null, null, true, 4L));
+          List<ITreeNode> children = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
           getTree().removeAllChildNodes(parentNode);
           getTree().addChildNodes(parentNode, children);
           parentNode.setChildrenLoaded(true);

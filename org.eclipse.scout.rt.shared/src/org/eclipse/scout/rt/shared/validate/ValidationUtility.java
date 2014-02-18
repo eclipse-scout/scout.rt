@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -30,7 +31,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.validate.annotations.FieldReference;
 import org.eclipse.scout.rt.shared.validate.annotations.ValidateAnnotationMarker;
 
@@ -170,7 +171,8 @@ public final class ValidationUtility {
     }
   }
 
-  public static void checkCodeTypeValue(Object codeKey, ICodeType<?> codeType) throws ProcessingException {
+  @SuppressWarnings("unchecked")
+  public static void checkCodeTypeValue(Object codeKey, ICodeType codeType) throws ProcessingException {
     if (codeKey == null || codeType == null) {
       return;
     }
@@ -179,46 +181,49 @@ public final class ValidationUtility {
     }
   }
 
-  public static void checkCodeTypeArray(Object codeKeyArray, ICodeType<?> codeType) throws ProcessingException {
-    if (codeKeyArray == null || codeType == null) {
+  @SuppressWarnings("unchecked")
+  public static void checkCodeTypeSet(Object codeKeySet, ICodeType codeType) throws ProcessingException {
+    if (codeKeySet == null || codeType == null) {
       return;
     }
-    checkArray(codeKeyArray);
-    int len = Array.getLength(codeKeyArray);
-    if (len == 0) {
+    if (!(codeKeySet instanceof Set<?>)) {
+      throw new ProcessingException("value  is not a Set");
+    }
+    Set<?> codeKeys = (Set<?>) codeKeySet;
+    if (codeKeys.isEmpty()) {
       return;
     }
-    for (int i = 0; i < len; i++) {
-      Object codeKey = Array.get(codeKeyArray, i);
+    for (Object codeKey : codeKeys) {
       if (codeType.getCode(codeKey) == null) {
         throw new ProcessingException("value  " + codeKey + " is illegal for " + codeType.getClass().getSimpleName());
       }
     }
   }
 
-  public static void checkLookupCallValue(Object lookupKey, LookupCall call) throws ProcessingException {
+  public static void checkLookupCallValue(Object lookupKey, ILookupCall call) throws ProcessingException {
     if (lookupKey == null || call == null) {
       return;
     }
     call.setKey(lookupKey);
-    if (call.getDataByKey().length == 0) {
+    if (call.getDataByKey().size() == 0) {
       throw new ProcessingException("value  " + lookupKey + " is illegal for " + call.getClass().getSimpleName());
     }
   }
 
-  public static void checkLookupCallArray(Object lookupKeyArray, LookupCall call) throws ProcessingException {
-    if (lookupKeyArray == null || call == null) {
+  public static void checkLookupCallSet(Object lookupKeySet, ILookupCall call) throws ProcessingException {
+    if (lookupKeySet == null || call == null) {
       return;
     }
-    checkArray(lookupKeyArray);
-    int len = Array.getLength(lookupKeyArray);
-    if (len == 0) {
+    if (!(lookupKeySet instanceof Set<?>)) {
+      throw new ProcessingException("value  is not a set");
+    }
+    Set<?> lookupKeys = (Set<?>) lookupKeySet;
+    if (lookupKeys.isEmpty()) {
       return;
     }
-    for (int i = 0; i < len; i++) {
-      Object lookupKey = Array.get(lookupKeyArray, i);
+    for (Object lookupKey : lookupKeys) {
       call.setKey(lookupKey);
-      if (call.getDataByKey().length == 0) {
+      if (call.getDataByKey().size() == 0) {
         throw new ProcessingException("value  " + lookupKey + " is illegal for " + call.getClass().getSimpleName());
       }
     }

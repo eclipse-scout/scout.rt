@@ -395,8 +395,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       }
 
       ArrayList<ISwtKeyStroke> newSwtKeyStrokes = new ArrayList<ISwtKeyStroke>();
-      IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-      for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
+      for (IKeyStroke scoutKeyStroke : getScoutObject().getKeyStrokes()) {
         ISwtKeyStroke[] swtStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, getEnvironment());
         for (ISwtKeyStroke swtStroke : swtStrokes) {
           getEnvironment().addKeyStroke(getSwtContainer(), swtStroke);

@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.security.Permission;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants {
@@ -27,7 +29,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * {@link #TYPE_SMART} only. Delegate of the callback {@link AbstractListBox#execPrepareLookup(LookupCall)} and
    * {@link AbstractTreeBox#execPrepareLookup(LookupCall, org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode)}
    */
-  void prepareLookup(LookupCall call) throws ProcessingException;
+  void prepareLookup(ILookupCall<?> call) throws ProcessingException;
 
   String getText();
 
@@ -41,9 +43,9 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setType(int type);
 
-  IDataModelAttributeOp[] getOperators();
+  List<IDataModelAttributeOp> getOperators();
 
-  void setOperators(IDataModelAttributeOp[] ops);
+  void setOperators(List<? extends IDataModelAttributeOp> ops);
 
   /**
    * @return array of {@link DataModelConstants#AGGREGATION_*}
@@ -74,13 +76,13 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setAggregationEnabled(boolean aggregationEnabled);
 
-  Class<? extends ICodeType> getCodeTypeClass();
+  Class<? extends ICodeType<?, ?>> getCodeTypeClass();
 
-  void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass);
+  void setCodeTypeClass(Class<? extends ICodeType<?, ?>> codeTypeClass);
 
-  LookupCall getLookupCall();
+  ILookupCall<Object> getLookupCall();
 
-  void setLookupCall(LookupCall call);
+  void setLookupCall(ILookupCall<?> call);
 
   Permission getVisiblePermission();
 

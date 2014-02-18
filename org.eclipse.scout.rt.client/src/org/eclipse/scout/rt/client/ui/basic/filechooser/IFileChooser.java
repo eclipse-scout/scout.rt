@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.io.File;
+import java.util.List;
 
 public interface IFileChooser {
 
@@ -18,7 +19,7 @@ public interface IFileChooser {
 
   String getFileName();
 
-  String[] getFileExtensions();
+  List<String> getFileExtensions();
 
   /**
    * Load or Save
@@ -42,13 +43,13 @@ public interface IFileChooser {
    * 
    * @return {@link #getFiles()}
    */
-  File[] startChooser();
+  List<File> startChooser();
 
   /**
    * set result value and close chooser
    */
-  void setFiles(File[] files);
+  void setFiles(List<File> files);
 
-  File[] getFiles();
+  List<File> getFiles();
 
 }

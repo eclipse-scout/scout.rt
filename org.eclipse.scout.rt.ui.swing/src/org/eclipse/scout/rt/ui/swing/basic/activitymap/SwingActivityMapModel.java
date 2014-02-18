@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.basic.activitymap;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTable;
 
@@ -29,12 +30,14 @@ public class SwingActivityMapModel implements ActivityMapModel {
   public SwingActivityMapModel(IActivityMap map, JTable metricsTable) {
     m_map = map;
     m_metricsTable = metricsTable;
-    Object[] resourceIds = map.getResourceIds();
-    ArrayList<SwingActivityComponent> list = new ArrayList<SwingActivityComponent>();
-    for (int i = 0; i < resourceIds.length; i++) {
-      for (ActivityCell cell : map.getActivityCells(resourceIds[i])) {
-        list.add(new SwingActivityComponent(cell, i));
+    List<SwingActivityComponent> list = new ArrayList<SwingActivityComponent>();
+    List resourceIds = map.getResourceIds();
+    int i = 0;
+    for (Object resourceId : resourceIds) {
+      for (Object cell : map.getActivityCells(resourceId)) {
+        list.add(new SwingActivityComponent((ActivityCell) cell, i));
       }
+      i++;
     }
     m_components = list.toArray(new SwingActivityComponent[list.size()]);
   }

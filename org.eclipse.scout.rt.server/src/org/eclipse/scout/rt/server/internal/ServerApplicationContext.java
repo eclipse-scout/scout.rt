@@ -60,7 +60,7 @@ public class ServerApplicationContext implements IApplicationContext {
     return null;
   }
 
-//  @Override In Eclipse 3.4 this method is not in the Interface
+  @Override
   public void setResult(Object result, IApplication application) {
   }
 

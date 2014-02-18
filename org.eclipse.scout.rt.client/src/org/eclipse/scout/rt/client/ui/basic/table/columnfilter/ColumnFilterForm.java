@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -267,11 +267,12 @@ public class ColumnFilterForm extends AbstractForm {
 
         @Override
         protected void execReloadTableData() throws ProcessingException {
-          List<LookupRow> hist = getColumnFilter().createHistogram();
-          ArrayList<ITableRow> rowList = new ArrayList<ITableRow>(hist.size() + 1);
-          for (LookupRow histRow : hist) {
+          List<?> hist = getColumnFilter().createHistogram();
+          List<ITableRow> rowList = new ArrayList<ITableRow>(hist.size() + 1);
+          for (Object o : hist) {
+            LookupRow histRow = (LookupRow) o;
             String text = StringUtility.isNullOrEmpty(StringUtility.getTag(histRow.getText(), "body")) ? histRow.getText() : HTMLUtility.getPlainText(histRow.getText());
-            TableRow tableRow = new TableRow(getTable().getColumnSet(), new Object[]{histRow.getKey(), text});
+            TableRow tableRow = new TableRow(getTable().getColumnSet(), CollectionUtility.arrayList(histRow.getKey(), text));
             tableRow.setIconId(histRow.getIconId());
             tableRow.setForegroundColor(histRow.getForegroundColor());
             tableRow.setBackgroundColor(histRow.getBackgroundColor());
@@ -279,7 +280,7 @@ public class ColumnFilterForm extends AbstractForm {
             rowList.add(tableRow);
           }
           getTable().discardAllRows();
-          getTable().addRows(rowList.toArray(new ITableRow[rowList.size()]));
+          getTable().addRows(rowList);
           //set checks
           Set<?> selectedKeys = getColumnFilter().getSelectedValues();
           if (selectedKeys != null) {
@@ -553,9 +554,9 @@ public class ColumnFilterForm extends AbstractForm {
     @SuppressWarnings("unchecked")
     @Override
     protected void execStore() throws ProcessingException {
-      Object[] checkedKeys = getValuesTableField().getTable().getKeyColumn().getValues(getValuesTableField().getTable().getCheckedRows());
-      if (checkedKeys.length > 0) {
-        getColumnFilter().setSelectedValues(new HashSet(Arrays.asList(checkedKeys)));
+      List<Object> checkedKeys = getValuesTableField().getTable().getKeyColumn().getValues(getValuesTableField().getTable().getCheckedRows());
+      if (CollectionUtility.hasElements(checkedKeys)) {
+        getColumnFilter().setSelectedValues(new HashSet(checkedKeys));
       }
       else {
         getColumnFilter().setSelectedValues(null);

@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -50,7 +51,7 @@ public class PlannerFieldTest {
     }
 
     @Override
-    protected Object[][] execLoadActivityMapData(String[] resourceIds, ITableRow[] resourceRows) throws ProcessingException {
+    protected Object[][] execLoadActivityMapData(List<? extends String> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
       return new Object[0][];
     }
 

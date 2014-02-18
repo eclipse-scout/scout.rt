@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -112,7 +111,7 @@ public abstract class AbstractCalendarDocumentBuilder {
   private Date m_startDate;
   private Date m_endDate;
   private CalendarComponent m_selectedComponent;
-  private CalendarComponent[] m_components;
+  private Set<? extends CalendarComponent> m_components;
   private int m_numContextMenus;
   private final Map<Element, Date> m_gridDateMap;
 
@@ -823,22 +822,14 @@ public abstract class AbstractCalendarDocumentBuilder {
     m_markOutOfMonthDays = markOutOfMonthDays;
   }
 
-  public CalendarComponent[] getComponents() {
-    if (m_components == null) {
-      return null;
-    }
-    return Arrays.copyOf(m_components, m_components.length);
+  public Set<? extends CalendarComponent> getComponents() {
+    return m_components;
   }
 
-  public void setComponents(CalendarComponent[] components) {
-    if (components != null) {
-      m_components = Arrays.copyOf(components, components.length);
-    }
-    else {
-      m_components = null;
-    }
+  public void setComponents(Set<? extends CalendarComponent> components) {
+    m_components = components;
 
-    HashMap<Date, Set<CalendarComponent>> map = new HashMap<Date, Set<CalendarComponent>>();
+    Map<Date, Set<CalendarComponent>> map = new HashMap<Date, Set<CalendarComponent>>();
     if (m_components != null) {
       for (CalendarComponent c : m_components) {
         for (Date d : c.getCoveredDays()) {

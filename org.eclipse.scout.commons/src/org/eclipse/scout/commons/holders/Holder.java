@@ -4,13 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons.holders;
 
 import java.io.Serializable;
+
+import org.eclipse.scout.commons.TypeCastUtility;
 
 /**
  * @since 3.0
@@ -20,6 +22,14 @@ public class Holder<T> implements IHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
   private T m_value;
   private final Class<T> m_clazz;
+
+  public Holder() {
+    this(null, null);
+  }
+
+  public Holder(T o) {
+    this(null, o);
+  }
 
   public Holder(Class<T> clazz) {
     m_clazz = clazz;
@@ -43,13 +53,33 @@ public class Holder<T> implements IHolder<T>, Serializable {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Class<T> getHolderType() {
-    return m_clazz;
+    Class<T> clazz = m_clazz;
+    if (clazz == null) {
+      clazz = TypeCastUtility.getGenericsParameterClass(this.getClass(), IHolder.class);
+    }
+    return clazz;
   }
 
   @Override
   public String toString() {
-    return "Holder<" + m_clazz.getSimpleName() + ">(" + (m_value == null ? "" : m_value.toString()) + ")";
+    StringBuilder builder = new StringBuilder();
+    builder.append("Holder<");
+    Class<T> holderType = getHolderType();
+    if (holderType != null) {
+      builder.append(holderType.getSimpleName());
+    }
+    else {
+      builder.append("not available");
+    }
+    builder.append(">(");
+    if (getValue() != null) {
+      builder.append(getValue().toString());
+    }
+    builder.append(")");
+
+    return builder.toString();
   }
 }

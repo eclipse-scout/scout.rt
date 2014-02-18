@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
@@ -185,7 +186,7 @@ public class FormDataStatementBuilderWithComposerTest {
     subAttributeNode.setOperator(DataModelConstants.OPERATOR_EQ);
     String attributeExternalId = DataModelUtility.attributePathToExternalId(m_dataModel, new EntityPath().addToEnd(entity).addToEnd(subEntity).addToEnd(subAttribute));
     subAttributeNode.setAttributeExternalId(attributeExternalId);
-    subAttributeNode.setValues(new Object[]{10L});
+    subAttributeNode.setValues(CollectionUtility.arrayList(10L));
 
     ComposerEntityNodeData subEntityNode = new ComposerEntityNodeData();
     subEntityNode.setEntityExternalId(DataModelUtility.entityPathToExternalId(m_dataModel, new EntityPath().addToEnd(entity).addToEnd(subEntity)));

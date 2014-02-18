@@ -28,6 +28,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -255,7 +256,7 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        IMenu[] a = getScoutImageField().getUIFacade().firePopupFromUI();
+        List<IMenu> a = getScoutImageField().getUIFacade().firePopupFromUI();
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), a).enqueue();
       }

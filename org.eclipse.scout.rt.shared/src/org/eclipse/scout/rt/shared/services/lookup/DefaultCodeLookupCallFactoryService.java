@@ -21,8 +21,8 @@ import org.eclipse.scout.service.AbstractService;
 public class DefaultCodeLookupCallFactoryService extends AbstractService implements ICodeLookupCallFactoryService {
 
   @Override
-  public CodeLookupCall newInstance(Class<? extends ICodeType> codeTypeClass) {
-    return new CodeLookupCall(codeTypeClass);
+  public <T> CodeLookupCall<T> newInstance(Class<? extends ICodeType<?, T>> codeTypeClass) {
+    return new CodeLookupCall<T>(codeTypeClass);
   }
 
 }

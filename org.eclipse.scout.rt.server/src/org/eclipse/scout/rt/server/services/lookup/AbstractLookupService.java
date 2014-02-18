@@ -4,17 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.lookup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -23,7 +26,7 @@ import org.eclipse.scout.service.AbstractService;
 /**
  * <h4>AbstractLookupService</h4>
  */
-public abstract class AbstractLookupService extends AbstractService implements ILookupService {
+public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends AbstractService implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
 
   /**
    * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall)}.<br>
@@ -36,7 +39,7 @@ public abstract class AbstractLookupService extends AbstractService implements I
   /**
    * @see #createLookupRowArray(Object[][], int, LookupCall)
    */
-  public static LookupRow[] createLookupRowArray(Object[][] data, LookupCall call) throws ProcessingException {
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call) throws ProcessingException {
     return createLookupRowArray(data, data != null && data.length > 0 ? data[0].length : 0, call);
   }
 
@@ -61,17 +64,17 @@ public abstract class AbstractLookupService extends AbstractService implements I
    *          <li>Boolean active (0,1) see {@link TriState#parseTriState(Object)}
    *          </ul>
    */
-  public static LookupRow[] createLookupRowArray(Object[][] data, int maxColumnIndex, LookupCall call) throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>(data.length);
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call) throws ProcessingException {
+    List<ILookupRow<KEY_TYPE>> list = new ArrayList<ILookupRow<KEY_TYPE>>(data.length);
     Boolean active = call.getActive().getBooleanValue();
     for (int i = 0; i < data.length; i++) {
-      LookupRow row = new LookupRow(data[i], maxColumnIndex);
+      LookupRow<KEY_TYPE> row = new LookupRow<KEY_TYPE>(data[i], maxColumnIndex);
       // check active flag
       if (active == null || active.booleanValue() == row.isActive()) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[list.size()]);
+    return list;
   }
 
 }

@@ -12,6 +12,8 @@ package org.eclipse.scout.commons;
 
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -132,7 +134,19 @@ public final class CompareUtility {
    * @since 3.8.1
    */
   public static boolean isOneOf(Object o, Object... elements) {
-    if (elements == null || elements.length == 0) {
+    if (elements == null) {
+      return false;
+    }
+    return isOneOf(o, Arrays.asList(elements));
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given object is in the list of the given elements. The objects are
+   *         compared using {@link #equals}.
+   * @since 3.10
+   */
+  public static boolean isOneOf(Object o, Collection<?> elements) {
+    if (CollectionUtility.isEmpty(elements)) {
       return false;
     }
     for (Object e : elements) {

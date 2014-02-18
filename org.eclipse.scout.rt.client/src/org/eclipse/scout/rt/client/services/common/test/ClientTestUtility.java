@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.test;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
@@ -37,8 +38,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.osgi.framework.Bundle;
 
 public final class ClientTestUtility {
@@ -119,8 +120,7 @@ public final class ClientTestUtility {
    */
   public static IPage gotoOutline(Class<? extends AbstractOutline> outlineClass) {
     IPage rootPage = null;
-    IOutline[] availableOutlines = getDesktop().getAvailableOutlines();
-    for (IOutline outline : availableOutlines) {
+    for (IOutline outline : getDesktop().getAvailableOutlines()) {
 
       if (outline.getClass().isAssignableFrom(outlineClass)) {
         getDesktop().setOutline(outline);
@@ -140,8 +140,7 @@ public final class ClientTestUtility {
   @SuppressWarnings("unchecked")
   public static <T extends IPage> T gotoChildPage(IPage parentPage, Class<T> childPageClass) {
     T childPage = null;
-    IPage[] childPages = parentPage.getChildPages();
-    for (IPage page : childPages) {
+    for (IPage page : parentPage.getChildPages()) {
       if (childPageClass.isAssignableFrom(page.getClass())) {
         IOutline outline = getDesktop().getOutline();
         outline.selectNode(page);
@@ -175,13 +174,13 @@ public final class ClientTestUtility {
               // Smart Field - set to 1st value
             }
             else if (formField instanceof AbstractSmartField) {
-              LookupCall lookupCall = null;
+              ILookupCall lookupCall = null;
               // SQL Lookup
-              if (((AbstractSmartField<?>) formField).getLookupCall() != null) {
+              if (((AbstractSmartField) formField).getLookupCall() != null) {
                 lookupCall = ((AbstractSmartField<?>) formField).getLookupCall();
-                ((AbstractSmartField<?>) formField).prepareKeyLookup(lookupCall, null);
-                ((AbstractSmartField<?>) formField).prepareTextLookup(lookupCall, "abc");
-                ((AbstractSmartField<?>) formField).prepareBrowseLookup(lookupCall, "abc", TriState.TRUE);
+                ((AbstractSmartField) formField).prepareKeyLookup(lookupCall, null);
+                ((AbstractSmartField) formField).prepareTextLookup(lookupCall, "abc");
+                ((AbstractSmartField) formField).prepareBrowseLookup(lookupCall, "abc", TriState.TRUE);
               }
               // CodeType Lookup
               else if (((AbstractSmartField<?>) formField).getCodeTypeClass() != null) {
@@ -197,9 +196,9 @@ public final class ClientTestUtility {
                 lookupCall.getDataByKey();
                 lookupCall.getDataByText();
                 /* Load data by all */
-                final LookupRow[] rs = lookupCall.getDataByAll();
-                if (rs.length > 0) {
-                  ((AbstractSmartField) formField).setValue(rs[0].getKey());
+                final List<ILookupRow<?>> rs = lookupCall.getDataByAll();
+                if (rs.size() > 0) {
+                  ((AbstractSmartField) formField).setValue(rs.get(0).getKey());
                 }
               }
               // Number Field
@@ -216,10 +215,10 @@ public final class ClientTestUtility {
               ((AbstractDateField) formField).setValue(new Date());
             }
             else if (formField instanceof AbstractListBox) {
-              LookupCall lookupCall = null;
+              ILookupCall lookupCall = null;
               // SQL Lookup
               if (((AbstractListBox<?>) formField).getLookupCall() != null) {
-                lookupCall = ((AbstractListBox<?>) formField).getLookupCall();
+                lookupCall = ((AbstractListBox) formField).getLookupCall();
                 ((AbstractListBox<?>) formField).prepareLookupCall(lookupCall);
               }
               // CodeType Lookup
@@ -236,10 +235,10 @@ public final class ClientTestUtility {
                 lookupCall.getDataByKey();
                 lookupCall.getDataByText();
                 /* Load data by all */
-                final LookupRow[] rs = lookupCall.getDataByAll();
-                if (rs.length > 0) {
+                final List<ILookupRow> rs = lookupCall.getDataByAll();
+                if (rs.size() > 0) {
                   if ((((AbstractListBox) formField)).getCheckedKeyCount() == 0) {
-                    ((AbstractListBox) formField).checkKey(rs[0].getKey());
+                    ((AbstractListBox) formField).checkKey(rs.get(0).getKey());
                   }
                 }
               }
@@ -249,5 +248,4 @@ public final class ClientTestUtility {
       }
     }
   }
-
 }

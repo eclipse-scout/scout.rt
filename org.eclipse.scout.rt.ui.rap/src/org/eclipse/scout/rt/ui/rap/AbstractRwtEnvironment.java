@@ -35,6 +35,7 @@ import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -749,10 +750,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   protected void applyScoutState() {
     IDesktop desktop = getScoutDesktop();
-    final IForm[] viewStack = desktop.getViewStack();
-    final IForm[] dialogs = desktop.getDialogStack();
-    final IMessageBox[] messageBoxes = desktop.getMessageBoxStack();
-    if (viewStack.length == 0 && dialogs.length == 0 && messageBoxes.length == 0) {
+    final List<IForm> viewStack = desktop.getViewStack();
+    final List<IForm> dialogs = desktop.getDialogStack();
+    final List<IMessageBox> messageBoxes = desktop.getMessageBoxStack();
+    if (CollectionUtility.isEmpty(viewStack) && CollectionUtility.isEmpty(dialogs) && CollectionUtility.isEmpty(messageBoxes)) {
       return;
     }
 

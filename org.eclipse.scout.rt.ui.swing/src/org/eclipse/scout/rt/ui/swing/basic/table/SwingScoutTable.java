@@ -34,6 +34,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +68,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -128,7 +130,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   private Job m_swingAutoOptimizeColumnWidthsJob;
 
   // cache
-  private IKeyStroke[] m_installedScoutKs;
+  private List<IKeyStroke> m_installedScoutKs;
 
   // keyboard navigation
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
@@ -237,7 +239,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              IMenu[] scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
+              List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
               // call swing menu
               new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, scoutMenus).enqueue();
             }
@@ -413,21 +415,20 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
     if (component != null) {
       // remove old key strokes
+
       if (m_installedScoutKs != null) {
-        for (int i = 0; i < m_installedScoutKs.length; i++) {
-          IKeyStroke scoutKs = m_installedScoutKs[i];
-          KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
+        for (IKeyStroke ks : m_installedScoutKs) {
+          KeyStroke swingKs = SwingUtility.createKeystroke(ks);
           //
           InputMap imap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
           imap.remove(swingKs);
           ActionMap amap = component.getActionMap();
-          amap.remove(scoutKs.getActionId());
+          amap.remove(ks.getActionId());
         }
       }
       m_installedScoutKs = null;
       // add new key strokes
-      IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-      for (IKeyStroke scoutKs : scoutKeyStrokes) {
+      for (IKeyStroke scoutKs : getScoutObject().getKeyStrokes()) {
         int swingWhen = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
         KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
         SwingScoutAction<IAction> action = new SwingScoutAction<IAction>();
@@ -438,7 +439,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         ActionMap amap = component.getActionMap();
         amap.put(scoutKs.getActionId(), action.getSwingAction());
       }
-      m_installedScoutKs = scoutKeyStrokes;
+      m_installedScoutKs = getScoutObject().getKeyStrokes();
     }
   }
 
@@ -447,7 +448,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       return;
     }
     //
-    ITableRow[] scoutRows = getScoutObject().getSelectedRows();
+    List<ITableRow> scoutRows = getScoutObject().getSelectedRows();
     ListSelectionModel lsm = getSwingTableSelectionModel();
     //
     int[] oldSwingRows = getSwingTable().getSelectedRows();
@@ -505,7 +506,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       if (getSwingTable().getSelectionModel().getValueIsAdjusting()) {
         return;
       }
-      final ITableRow[] scoutRows = swingToScoutRows(swingRows);
+      final List<ITableRow> scoutRows = swingToScoutRows(swingRows);
       // notify Scout
       Runnable t = new Runnable() {
         @Override
@@ -630,9 +631,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   /**
    * scout table observer
    */
-  protected boolean isHandleScoutTableEvent(TableEvent[] a) {
-    for (int i = 0; i < a.length; i++) {
-      switch (a[i].getType()) {
+  protected boolean isHandleScoutTableEvent(List<? extends TableEvent> events) {
+    for (TableEvent event : events) {
+      switch (event.getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
         case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
         case TableEvent.TYPE_ROWS_INSERTED:
@@ -781,7 +782,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
         }
@@ -825,7 +826,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
@@ -937,7 +938,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         @Override
         public void run() {
           // call swing menu
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
         }
       };
@@ -1039,39 +1040,23 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     return null;
   }
 
-  protected ITableRow[] swingToScoutRows(int[] swingRows) {
+  protected List<ITableRow> swingToScoutRows(int[] swingRows) {
     if (swingRows == null || swingRows.length == 0) {
-      return new ITableRow[0];
+      return Collections.emptyList();
     }
-    //
+
     ITable table = getScoutObject();
     if (table != null) {
-      int mismatchCount = 0;
-      ITableRow[] rows = new ITableRow[swingRows.length];
-      for (int i = 0; i < rows.length; i++) {
-        ITableRow row = table.getFilteredRow(swingRows[i]);
+      List<ITableRow> result = new ArrayList<ITableRow>();
+      for (int swingRowIndex : swingRows) {
+        ITableRow row = table.getFilteredRow(swingRowIndex);
         if (row != null) {
-          rows[i] = row;
-        }
-        else {
-          rows[i] = null;
-          mismatchCount++;
+          result.add(row);
         }
       }
-      if (mismatchCount > 0) {
-        ITableRow[] newRows = new ITableRow[rows.length - mismatchCount];
-        int index = 0;
-        for (ITableRow row : rows) {
-          if (row != null) {
-            newRows[index] = row;
-            index++;
-          }
-        }
-        rows = newRows;
-      }
-      return rows;
+      return Collections.unmodifiableList(result);
     }
-    return new ITableRow[0];
+    return Collections.emptyList();
   }
 
   protected int scoutToSwingRow(ITableRow row) {
@@ -1082,17 +1067,19 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     return -1;
   }
 
-  protected int[] scoutToSwingRows(ITableRow[] rows) {
-    if (rows == null || rows.length == 0) {
+  protected int[] scoutToSwingRows(List<? extends ITableRow> rows) {
+    if (!CollectionUtility.hasElements(rows)) {
       return new int[0];
     }
     //
     ITable table = getScoutObject();
     if (table != null) {
       int mismatchCount = 0;
-      int[] swingRows = new int[rows.length];
-      for (int i = 0; i < swingRows.length; i++) {
-        int scoutIndex = table.getFilteredRowIndex(rows[i]);
+      int[] swingRows = new int[rows.size()];
+      int i = 0;
+
+      for (ITableRow row : rows) {
+        int scoutIndex = table.getFilteredRowIndex(row);
         if (scoutIndex >= 0) {
           swingRows[i] = scoutIndex;
         }
@@ -1100,7 +1087,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           swingRows[i] = -1;
           mismatchCount++;
         }
+        i++;
       }
+
       if (mismatchCount > 0) {
         int[] newSwingRows = new int[swingRows.length - mismatchCount];
         int index = 0;
@@ -1606,7 +1595,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   private class P_ScoutTableListener implements TableListener {
     @Override
     public void tableChanged(final TableEvent e) {
-      if (isHandleScoutTableEvent(new TableEvent[]{e})) {
+      if (isHandleScoutTableEvent(CollectionUtility.arrayList(e))) {
         if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
           return;
         }
@@ -1629,33 +1618,32 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
 
     @Override
-    public void tableChangedBatch(final TableEvent[] a) {
-      if (isHandleScoutTableEvent(a)) {
-        final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TableEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+    public void tableChangedBatch(final List<? extends TableEvent> events) {
+      if (isHandleScoutTableEvent(events)) {
+        final List<TableEvent> filteredList = new ArrayList<TableEvent>();
+        for (TableEvent event : events) {
+          if (!isIgnoredScoutEvent(TableEvent.class, "" + event.getType())) {
+            filteredList.add(event);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
-        }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getUpdateSwingFromScoutLock().acquire();
-              //
-              for (TableEvent e : filteredList) {
-                handleScoutTableEventInSwing(e);
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                getUpdateSwingFromScoutLock().acquire();
+                //
+                for (TableEvent e : filteredList) {
+                  handleScoutTableEventInSwing(e);
+                }
+              }
+              finally {
+                getUpdateSwingFromScoutLock().release();
               }
             }
-            finally {
-              getUpdateSwingFromScoutLock().release();
-            }
-          }
-        };
-        getSwingEnvironment().invokeSwingLater(t);
+          };
+          getSwingEnvironment().invokeSwingLater(t);
+        }
       }
     }
   }// end private class

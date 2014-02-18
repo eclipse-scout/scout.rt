@@ -10,33 +10,38 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class TableColumnManager {
 
-  private IColumn<?>[] m_initialColumns;
-  private IColumn<?>[] m_currentOrder;
+  private List<IColumn<?>> m_initialColumns;
+  private List<IColumn<?>> m_currentOrder;
 
-  public void initialize(IColumn<?>[] initialColumns) {
-    m_initialColumns = initialColumns;
+  public void initialize(List<? extends IColumn<?>> initialColumns) {
+    m_initialColumns = Collections.unmodifiableList(initialColumns);
     m_currentOrder = m_initialColumns;
   }
 
-  public IColumn<?>[] getOrderedColumns(int[] columnOrder) {
-    IColumn<?>[] columns = new IColumn<?>[columnOrder.length];
-    for (int i = 0; i < columnOrder.length; i++) {
-      columns[i] = m_initialColumns[columnOrder[i]];
+  public List<IColumn<?>> getOrderedColumns(int[] columnOrder) {
+    List<IColumn<?>> result = new ArrayList<IColumn<?>>();
+    for (int index : columnOrder) {
+      result.add(m_initialColumns.get(index));
     }
-    return columns;
+    return result;
   }
 
-  public boolean applyNewOrder(IColumn<?>[] newOrder) {
+  public boolean applyNewOrder(List<? extends IColumn<?>> newOrder) {
     if (CompareUtility.equals(newOrder, m_currentOrder)) {
       return false;
     }
     else {
-      m_currentOrder = newOrder;
+      m_currentOrder = Collections.unmodifiableList(newOrder);
       return true;
     }
   }
@@ -46,12 +51,7 @@ public class TableColumnManager {
    *          beginning with 0
    */
   public IColumn<?> getColumnByModelIndex(int modelIndex) {
-    if (modelIndex >= 0 && modelIndex < m_initialColumns.length) {
-      return m_initialColumns[modelIndex];
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.getElement(m_initialColumns, modelIndex);
   }
 
   /**
@@ -59,12 +59,7 @@ public class TableColumnManager {
    *          beginning with 1
    */
   public IColumn<?> getColumnByVisualIndex(int visualIndex) {
-    if (visualIndex - 1 >= 0 && visualIndex - 1 < m_currentOrder.length) {
-      return m_currentOrder[visualIndex - 1];
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.getElement(m_currentOrder, visualIndex - 1);
   }
 
   public boolean isIconColumn(int columnIndex) {

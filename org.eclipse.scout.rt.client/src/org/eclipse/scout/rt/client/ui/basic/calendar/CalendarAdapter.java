@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
+
+import java.util.List;
 
 /**
  * inside gui handling or in non-model threads don't use this adapter because it
@@ -17,9 +19,9 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 public class CalendarAdapter implements CalendarListener {
 
   @Override
-  public void calendarChangedBatch(CalendarEvent[] batch) {
-    for (int i = 0; i < batch.length; i++) {
-      calendarChanged(batch[i]);
+  public void calendarChangedBatch(List<CalendarEvent> batch) {
+    for (CalendarEvent calendarEvent : batch) {
+      calendarChanged(calendarEvent);
     }
   }
 

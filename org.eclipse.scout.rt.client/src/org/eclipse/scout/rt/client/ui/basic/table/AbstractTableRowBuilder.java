@@ -4,24 +4,27 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public abstract class AbstractTableRowBuilder {
+public abstract class AbstractTableRowBuilder<T> {
 
-  public ITableRow createTableRow(LookupRow dataRow) throws ProcessingException {
+  public ITableRow createTableRow(ILookupRow<T> dataRow) throws ProcessingException {
     ITableRow tableRow = createEmptyTableRow();
     tableRow.setEnabled(dataRow.isEnabled());
     Cell cell = tableRow.getCellForUpdate(1);
@@ -59,11 +62,11 @@ public abstract class AbstractTableRowBuilder {
     return row;
   }
 
-  public ITableRow[] createRowsByArray(Object dataArray) throws ProcessingException {
+  public List<ITableRow> createRowsByArray(Object dataArray) throws ProcessingException {
     return createRowsByArray(dataArray, ITableRow.STATUS_INSERTED);
   }
 
-  public ITableRow[] createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException {
+  public List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException {
     if (dataArray == null) {
       dataArray = new Object[0];
     }
@@ -73,9 +76,11 @@ public abstract class AbstractTableRowBuilder {
     if (!dataArray.getClass().isArray()) {
       throw new IllegalArgumentException("argument must be a matrix value [][]");
     }
-    ITableRow[] rows = new ITableRow[Array.getLength(dataArray)];
-    for (int r = 0; r < rows.length; r++) {
-      rows[r] = createRow(new Object[]{Array.get(dataArray, r)});
+
+    int rowCount = Array.getLength(dataArray);
+    List<ITableRow> rows = new ArrayList<ITableRow>(rowCount);
+    for (int r = 0; r < rowCount; r++) {
+      rows.add(createRow(new Object[]{Array.get(dataArray, r)}));
     }
     return rows;
   }
@@ -86,7 +91,7 @@ public abstract class AbstractTableRowBuilder {
    * AtomicReference<Object>(Object[][])
    * so that the further processing can set the content of the holder to null while processing.
    */
-  public ITableRow[] createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
+  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
     return createRowsByMatrix(dataMatrixOrReference, ITableRow.STATUS_INSERTED);
   }
 
@@ -96,7 +101,7 @@ public abstract class AbstractTableRowBuilder {
    * AtomicReference<Object>(Object[][])
    * so that the further processing can set the content of the holder to null while processing.
    */
-  public ITableRow[] createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException {
+  public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException {
     Object dataMatrix;
     boolean isRef;
     if (dataMatrixOrReference instanceof AtomicReference<?>) {
@@ -114,42 +119,46 @@ public abstract class AbstractTableRowBuilder {
       throw new IllegalArgumentException("argument must be a matrix value [][]");
     }
     //
-    ITableRow[] rows = new ITableRow[Array.getLength(dataMatrix)];
+    int rowCount = Array.getLength(dataMatrix);
+    List<ITableRow> rows = new ArrayList<ITableRow>(rowCount);
     if (isRef) {
-      Object[] refData = new Object[rows.length];
-      for (int r = 0; r < rows.length; r++) {
+      Object[] refData = new Object[rowCount];
+      for (int r = 0; r < rowCount; r++) {
         refData[r] = Array.get(dataMatrix, r);
       }
       //clear the atomic reference
       dataMatrix = null;
       ((AtomicReference<?>) dataMatrixOrReference).set(null);
       dataMatrix = null;
-      for (int r = 0; r < rows.length; r++) {
-        rows[r] = createRow(refData[r]);
+      for (int r = 0; r < rowCount; r++) {
+        ITableRow row = createRow(refData[r]);
+        row.setStatus(rowStatus);
+        rows.add(row);
         //clear the row immediately to help gc
         refData[r] = null;
-        rows[r].setStatus(rowStatus);
       }
     }
     else {
-      for (int r = 0; r < rows.length; r++) {
-        rows[r] = createRow(Array.get(dataMatrix, r));
-        rows[r].setStatus(rowStatus);
+      for (int r = 0; r < rowCount; r++) {
+        ITableRow row = createRow(Array.get(dataMatrix, r));
+        row.setStatus(rowStatus);
+        rows.add(row);
       }
     }
     return rows;
   }
 
-  public ITableRow[] createRowsByCodes(ICode[] codes) throws ProcessingException {
-    ITableRow[] rows = new ITableRow[codes.length];
-    for (int i = 0; i < rows.length; i++) {
-      rows[i] = createRow(new Object[]{codes[i].getId(), codes[i].getText()});
-      rows[i].setIconId(codes[i].getIconId());
-      rows[i].setBackgroundColor(codes[i].getBackgroundColor());
-      rows[i].setForegroundColor(codes[i].getForegroundColor());
-      rows[i].setFont(codes[i].getFont());
+  public List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException {
+    List<ITableRow> result = new ArrayList<ITableRow>();
+    for (ICode<?> code : codes) {
+      ITableRow row = createRow(new Object[]{code.getId(), code.getText()});
+      row.setIconId(code.getIconId());
+      row.setBackgroundColor(code.getBackgroundColor());
+      row.setForegroundColor(code.getForegroundColor());
+      row.setFont(code.getFont());
+      result.add(row);
     }
-    return rows;
+    return Collections.unmodifiableList(result);
   }
 
   protected abstract ITableRow createEmptyTableRow();

@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -426,7 +427,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected void execAddSearchTerms(SearchFilter search) {
   }
 
-  private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
+  private List<Class<IKeyStroke>> getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
   }
@@ -982,7 +983,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public IFormField[] getAllFields() {
+  public List<IFormField> getAllFields() {
     P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -991,7 +992,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     };
     visitFields(v);
-    return v.getCollection().toArray(new IFormField[0]);
+    return v.getCollection();
   }
 
   @Override
@@ -1992,12 +1993,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         if (dir != null) {
           dir = dir.getParentFile();
         }
-        File[] a = new FileChooser(dir, new String[]{"xml"}, false).startChooser();
-        if (a.length == 0) {
+        List<File> a = new FileChooser(dir, Collections.singletonList("xml"), false).startChooser();
+        if (a.isEmpty()) {
           break;
         }
         else {
-          path = a[0];
+          path = a.get(0);
         }
       }
       // export search parameters
@@ -2021,9 +2022,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (dir != null) {
       dir = dir.getParentFile();
     }
-    File[] a = new FileChooser(dir, new String[]{"xml"}, true).startChooser();
-    if (a.length == 1) {
-      File newPath = a[0];
+    List<File> a = new FileChooser(dir, Collections.singletonList("xml"), true).startChooser();
+    if (a.size() == 1) {
+      File newPath = a.get(0);
       String text = null;
       try {
         SimpleXmlElement e = new SimpleXmlElement();
@@ -2203,7 +2204,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
-  private void fireFormEvent(FormEvent e) throws ProcessingException {
+  protected void fireFormEvent(FormEvent e) throws ProcessingException {
     EventListener[] listeners = m_listenerList.getListeners(FormListener.class);
     if (listeners != null && listeners.length > 0) {
       ProcessingException pe = null;

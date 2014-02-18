@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
@@ -41,11 +40,11 @@ public class TableRowFormHeaderActionFetcher extends FormHeaderActionFetcher {
   public List<IMenu> fetch() {
     List<IMenu> headerActions = super.fetch();
 
-    IMenu[] tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
+    List<IMenu> tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
     for (IMenu action : tableRowActions) {
       AbstractMobileAction.setHorizontalAlignment(action, IMobileAction.HORIZONTAL_ALIGNMENT_RIGHT);
     }
-    headerActions.addAll(0, Arrays.asList(tableRowActions));
+    headerActions.addAll(0, tableRowActions);
 
     return headerActions;
   }

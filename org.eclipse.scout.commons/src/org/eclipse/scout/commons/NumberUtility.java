@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -137,6 +138,16 @@ public final class NumberUtility {
     double sum = 0;
     for (double d : a) {
       sum += d;
+    }
+    return sum;
+  }
+
+  public static double sum(List<? extends Number> a) {
+    double sum = 0;
+    if (CollectionUtility.hasElements(a)) {
+      for (Number number : a) {
+        sum += number.doubleValue();
+      }
     }
     return sum;
   }

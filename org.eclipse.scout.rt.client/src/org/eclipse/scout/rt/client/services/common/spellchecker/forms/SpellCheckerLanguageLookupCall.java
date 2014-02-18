@@ -18,25 +18,26 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
 import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellCheckerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-public class SpellCheckerLanguageLookupCall extends LocalLookupCall {
+public class SpellCheckerLanguageLookupCall extends LocalLookupCall<String> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    TreeMap<String, LookupRow> sortMap = new TreeMap<String, LookupRow>();
+  protected List<ILookupRow<String>> execCreateLookupRows() throws ProcessingException {
+    TreeMap<String, ILookupRow<String>> sortMap = new TreeMap<String, ILookupRow<String>>();
     ISpellCheckerService sc = SERVICES.getService(ISpellCheckerService.class);
     if (sc != null) {
       for (String lang : sc.getAvailableLanguages()) {
         Locale loc = NlsUtility.parseLocale(lang);
-        sortMap.put(lang, new LookupRow(lang, loc.getDisplayLanguage() + " (" + loc.getDisplayCountry() + ")"));
+        sortMap.put(lang, new LookupRow<String>(lang, loc.getDisplayLanguage() + " (" + loc.getDisplayCountry() + ")"));
       }
     }
-    return new ArrayList<LookupRow>(sortMap.values());
+    return new ArrayList<ILookupRow<String>>(sortMap.values());
   }
 
   @Override

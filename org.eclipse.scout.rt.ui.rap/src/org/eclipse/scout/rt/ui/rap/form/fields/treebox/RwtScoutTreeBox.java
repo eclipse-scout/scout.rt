@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.treebox;
 
+import java.util.List;
+
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
@@ -50,10 +53,11 @@ public class RwtScoutTreeBox extends RwtScoutValueFieldComposite<ITreeBox<?>> im
     m_treeComposite.createUiField(treeContainer, getScoutObject().getTree(), getUiEnvironment());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
     // filter box
-    IFormField[] childFields = getScoutObject().getFields();
-    if (childFields.length > 0) {
-      IRwtScoutComposite filterComposite = getUiEnvironment().createFormField(container, childFields[0]);
-      LogicalGridData filterData = LogicalGridDataBuilder.createField(childFields[0].getGridData());
+    List<IFormField> childFields = getScoutObject().getFields();
+    if (CollectionUtility.hasElements(childFields)) {
+      IFormField firstField = CollectionUtility.firstElement(childFields);
+      IRwtScoutComposite filterComposite = getUiEnvironment().createFormField(container, firstField);
+      LogicalGridData filterData = LogicalGridDataBuilder.createField(firstField.getGridData());
       filterData.gridx = fieldData.gridx;
       filterData.gridy = fieldData.gridy + fieldData.gridh;
       filterData.gridw = fieldData.gridw;

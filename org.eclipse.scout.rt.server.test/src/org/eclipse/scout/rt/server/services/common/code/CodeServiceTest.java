@@ -15,6 +15,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -47,7 +48,7 @@ public class CodeServiceTest {
       ICodeService service = SERVICES.getService(ICodeService.class);
       assertSame(testService, service);
       //
-      BundleClassDescriptor[] result = service.getAllCodeTypeClasses("");
+      Set<BundleClassDescriptor> result = service.getAllCodeTypeClasses("");
       boolean testCodeType1Found = false;
       boolean testCodeType2Found = false;
       for (BundleClassDescriptor b : result) {

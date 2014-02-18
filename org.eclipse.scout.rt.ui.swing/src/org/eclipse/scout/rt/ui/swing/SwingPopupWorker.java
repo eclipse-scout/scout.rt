@@ -14,13 +14,14 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -35,14 +36,14 @@ public class SwingPopupWorker implements Runnable {
   private ISwingEnvironment m_env;
   private Component m_target;
   private Point m_point;
-  private IMenu[] m_scoutMenus;
+  private List<? extends IMenu> m_scoutMenus;
   private boolean m_isLightWeightPopup;
 
-  public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IMenu[] scoutMenus) {
+  public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, List<? extends IMenu> scoutMenus) {
     this(env, target, point, scoutMenus, true);
   }
 
-  public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IMenu[] scoutMenus, boolean isLightWeightPopup) {
+  public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, List<? extends IMenu> scoutMenus, boolean isLightWeightPopup) {
     m_env = env;
     m_target = target;
     m_point = point;
@@ -52,14 +53,14 @@ public class SwingPopupWorker implements Runnable {
 
   @Override
   public void run() {
-    if (m_scoutMenus == null || m_scoutMenus.length == 0) {
+    if (!CollectionUtility.hasElements(m_scoutMenus)) {
       return;
     }
     //
     JPopupMenu pop = new JPopupMenu();
     pop.setLightWeightPopupEnabled(m_isLightWeightPopup);
     // recursively add actions
-    m_env.appendActions(pop, Arrays.asList(m_scoutMenus));
+    m_env.appendActions(pop, m_scoutMenus);
     try {
       if (pop.getComponentCount() > 0) {
         Point whereOnTarget = m_point;

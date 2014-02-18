@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -53,7 +52,7 @@ public class TabForm extends AbstractForm {
       protected void injectFieldsInternal(List<IFormField> fieldList) {
         super.injectFieldsInternal(fieldList);
 
-        fieldList.addAll(Arrays.asList(m_tabGroupBox.getFields()));
+        fieldList.addAll(m_tabGroupBox.getFields());
       }
 
       /**

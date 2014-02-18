@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -48,7 +49,7 @@ public class ColumnFieldBuilder {
   private static final String PROP_PROPERTY_DELEGATOR = "propertyDelegator";
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColumnFieldBuilder.class);
 
-  public Map<IColumn<?>, IFormField> build(IColumn<?>[] columns, ITableRow row) throws ProcessingException {
+  public Map<IColumn<?>, IFormField> build(List<IColumn<?>> columns, ITableRow row) throws ProcessingException {
     Map<IColumn<?>, IFormField> fields = new HashMap<IColumn<?>, IFormField>();
     if (columns == null) {
       return fields;

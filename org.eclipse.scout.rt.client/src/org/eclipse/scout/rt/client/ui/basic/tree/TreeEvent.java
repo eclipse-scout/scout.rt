@@ -13,10 +13,13 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EventObject;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
@@ -112,9 +115,9 @@ public class TreeEvent extends EventObject {
 
   private final int m_type;
   private ITreeNode m_commonParentNode;
-  private ITreeNode[] m_nodes;
-  private ITreeNode[] m_deselectedNodes;
-  private ITreeNode[] m_newSelectedNodes;
+  private Collection<? extends ITreeNode> m_nodes;
+  private Collection<? extends ITreeNode> m_deselectedNodes;
+  private Collection<? extends ITreeNode> m_newSelectedNodes;
   private List<IMenu> m_popupMenus;
   private boolean m_consumed;
   private TransferObject m_dragObject;
@@ -129,12 +132,12 @@ public class TreeEvent extends EventObject {
     super(source);
     m_type = type;
     if (node != null) {
-      m_nodes = new ITreeNode[]{node};
+      m_nodes = CollectionUtility.hashSet(node);
     }
     m_commonParentNode = TreeUtility.calculateCommonParentNode(m_nodes);
   }
 
-  public TreeEvent(ITree source, int type, ITreeNode[] nodes) {
+  public TreeEvent(ITree source, int type, Collection<? extends ITreeNode> nodes) {
     super(source);
     m_type = type;
     if (nodes != null) {
@@ -143,7 +146,7 @@ public class TreeEvent extends EventObject {
     m_commonParentNode = TreeUtility.calculateCommonParentNode(m_nodes);
   }
 
-  public TreeEvent(ITree source, int type, ITreeNode parentNode, ITreeNode[] childNodes) {
+  public TreeEvent(ITree source, int type, ITreeNode parentNode, Collection<? extends ITreeNode> childNodes) {
     super(source);
     m_type = type;
     if (childNodes != null) {
@@ -168,64 +171,65 @@ public class TreeEvent extends EventObject {
   }
 
   public ITreeNode getDeselectedNode() {
-    if (m_deselectedNodes != null && m_deselectedNodes.length > 0) {
-      return m_deselectedNodes[0];
+    if (CollectionUtility.hasElements(m_deselectedNodes)) {
+      return CollectionUtility.firstElement(m_deselectedNodes);
     }
     else {
       return null;
     }
   }
 
-  public ITreeNode[] getDeselectedNodes() {
+  public Collection<ITreeNode> getDeselectedNodes() {
     if (m_deselectedNodes != null) {
-      return m_deselectedNodes;
+      return CollectionUtility.unmodifiableCollection(m_deselectedNodes);
     }
     else {
-      return new ITreeNode[0];
+      return Collections.emptySet();
     }
   }
 
-  protected void setDeselectedNodes(ITreeNode[] deselectedNodes) {
+  protected void setDeselectedNodes(Collection<ITreeNode> deselectedNodes) {
     m_deselectedNodes = deselectedNodes;
   }
 
   public ITreeNode getNewSelectedNode() {
-    if (m_newSelectedNodes != null && m_newSelectedNodes.length > 0) {
-      return m_newSelectedNodes[0];
+    if (CollectionUtility.hasElements(m_newSelectedNodes)) {
+      return CollectionUtility.firstElement(m_newSelectedNodes);
     }
     else {
       return null;
     }
   }
 
-  public ITreeNode[] getNewSelectedNodes() {
+  public Collection<ITreeNode> getNewSelectedNodes() {
+
     if (m_newSelectedNodes != null) {
-      return m_newSelectedNodes;
+      return CollectionUtility.unmodifiableCollection(m_newSelectedNodes);
     }
     else {
-      return new ITreeNode[0];
+      return Collections.emptySet();
     }
   }
 
-  protected void setNewSelectedNodes(ITreeNode[] newSelectedNodes) {
+  protected void setNewSelectedNodes(Collection<ITreeNode> newSelectedNodes) {
     m_newSelectedNodes = newSelectedNodes;
   }
 
   public ITreeNode getNode() {
-    if (m_nodes != null && m_nodes.length > 0) {
-      return m_nodes[0];
+    if (CollectionUtility.hasElements(m_nodes)) {
+      return CollectionUtility.firstElement(m_nodes);
     }
     else {
       return null;
     }
   }
 
-  public ITreeNode[] getNodes() {
+  public Collection<ITreeNode> getNodes() {
     if (m_nodes != null) {
-      return m_nodes;
+      return CollectionUtility.unmodifiableCollection(m_nodes);
     }
     else {
-      return new ITreeNode[0];
+      return Collections.emptySet();
     }
   }
 
@@ -233,7 +237,7 @@ public class TreeEvent extends EventObject {
     return getNode();
   }
 
-  public ITreeNode[] getChildNodes() {
+  public Collection<ITreeNode> getChildNodes() {
     return getNodes();
   }
 
@@ -249,24 +253,24 @@ public class TreeEvent extends EventObject {
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
-  public void addPopupMenus(IMenu[] menus) {
+  public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
         m_popupMenus = new ArrayList<IMenu>();
       }
-      m_popupMenus.addAll(Arrays.asList(menus));
+      m_popupMenus.addAll(menus);
     }
   }
 
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
-  public IMenu[] getPopupMenus() {
+  public List<IMenu> getPopupMenus() {
     if (m_popupMenus != null) {
-      return m_popupMenus.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(m_popupMenus);
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 
@@ -317,17 +321,16 @@ public class TreeEvent extends EventObject {
     StringBuffer buf = new StringBuffer();
     buf.append("TreeEvent[");
     // nodes
-    if (m_nodes != null && m_nodes.length > 0 && getTree() != null) {
-      if (m_nodes.length == 1) {
-        buf.append("\"" + m_nodes[0] + "\"");
+    if (CollectionUtility.hasElements(m_nodes) && getTree() != null) {
+      if (m_nodes.size() == 1) {
+        buf.append("\"" + CollectionUtility.firstElement(m_nodes) + "\"");
       }
       else {
         buf.append("{");
-        for (int i = 0; i < m_nodes.length; i++) {
-          if (i >= 0) {
-            buf.append(",");
-          }
-          buf.append("\"" + m_nodes[i] + "\"");
+        Iterator<? extends ITreeNode> nodeIt = m_nodes.iterator();
+        buf.append("\"").append(nodeIt.next()).append("\"");
+        while (nodeIt.hasNext()) {
+          buf.append(",").append("\"").append(nodeIt.next()).append("\"");
         }
         buf.append("}");
       }

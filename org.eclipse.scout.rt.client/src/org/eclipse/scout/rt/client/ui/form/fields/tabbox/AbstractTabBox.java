@@ -12,13 +12,19 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -26,6 +32,8 @@ import org.eclipse.scout.service.SERVICES;
 
 @ClassId("14555c41-2d65-414a-94b1-d4328cbd818c")
 public abstract class AbstractTabBox extends AbstractCompositeField implements ITabBox {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTabBox.class);
 
   private ITabBoxUIFacade m_uiFacade;
   private TabBoxGrid m_grid;
@@ -127,19 +135,21 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
     else if (!selectedBox.isVisible()) {
       int index = getFieldIndex(selectedBox);
-      IGroupBox[] boxes = getGroupBoxes();
+      List<IGroupBox> boxes = getGroupBoxes();
       // next to right side
       for (int i = index + 1; i < getFieldCount(); i++) {
-        if (boxes[i].isVisible()) {
-          setSelectedTab(boxes[i]);
+        IGroupBox box = boxes.get(i);
+        if (box.isVisible()) {
+          setSelectedTab(box);
           break;
         }
       }
       if (getSelectedTab() == selectedBox) {
         // next to left side
         for (int i = index - 1; i >= 0; i--) {
-          if (boxes[i].isVisible()) {
-            setSelectedTab(boxes[i]);
+          IGroupBox box = boxes.get(i);
+          if (box.isVisible()) {
+            setSelectedTab(box);
             break;
           }
         }
@@ -158,12 +168,17 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
-  public IGroupBox[] getGroupBoxes() {
-    IGroupBox[] a = new IGroupBox[getFieldCount()];
-    if (a.length > 0) {
-      System.arraycopy(getFields(), 0, a, 0, a.length);
+  public List<IGroupBox> getGroupBoxes() {
+    List<IGroupBox> result = new ArrayList<IGroupBox>();
+    for (IFormField field : getFields()) {
+      if (field instanceof IGroupBox) {
+        result.add((IGroupBox) field);
+      }
+      else {
+        LOG.warn("Tabboxes only allow instance of IGroupBox as inner fields. '" + field.getClass().getName() + "' is not instance of IGroupBox!");
+      }
     }
-    return a;
+    return Collections.unmodifiableList(result);
   }
 
   @Override

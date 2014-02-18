@@ -12,11 +12,14 @@ package org.eclipse.scout.rt.client.ui.basic.calendar.provider;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -24,7 +27,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
@@ -47,7 +49,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   private P_ReloadJob m_reloadJob;
 
   private boolean m_initialized;
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private Date m_minDateLoaded;
   private Date m_maxDateLoaded;
 
@@ -84,10 +86,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     return 0;
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<Class<? extends IMenu>> getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
@@ -102,7 +104,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(30)
-  protected void execLoadItems(final Date minDate, final Date maxDate, final Holder<ICalendarItem[]> resultHolder) throws ProcessingException {
+  protected void execLoadItems(final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
   }
 
   /**
@@ -113,11 +115,11 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(40)
-  protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Holder<ICalendarItem[]> resultHolder) throws ProcessingException {
+  protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
     ClientSyncJob job = new ClientSyncJob(getClass().getSimpleName() + " load items", session) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        execLoadItems(minDate, maxDate, resultHolder);
+        execLoadItems(minDate, maxDate, result);
       }
     };
     job.schedule();
@@ -151,12 +153,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     setMoveItemEnabled(getConfiguredMoveItemEnabled());
     setRefreshIntervalMillis(getConfiguredRefreshIntervallMillis());
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] ma = getConfiguredMenus();
-    for (int i = 0; i < ma.length; i++) {
+    List<IMenu> menuList = new ArrayList<IMenu>();
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, ma[i]);
-        menuList.add(menu);
+        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
@@ -169,7 +169,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = menuList;
   }
 
   /**
@@ -247,18 +247,19 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public ICalendarItem[] getItems(Date minDate, Date maxDate) {
+  public Set<ICalendarItem> getItems(Date minDate, Date maxDate) {
     ensureItemsLoadedInternal(minDate, maxDate);
-    ArrayList<ICalendarItem> list = new ArrayList<ICalendarItem>();
-    ICalendarItem[] a = (ICalendarItem[]) propertySupport.getProperty(PROP_ITEMS);
-    if (a != null) {
-      for (ICalendarItem item : a) {
+    Set<ICalendarItem> list = new HashSet<ICalendarItem>();
+    Set<ICalendarItem> allItems = propertySupport.getPropertySet(PROP_ITEMS);
+    if (CollectionUtility.hasElements(allItems)) {
+
+      for (ICalendarItem item : allItems) {
         if (item.isIntersecting(minDate, maxDate)) {
           list.add(item);
         }
       }
     }
-    return list.toArray(new ICalendarItem[list.size()]);
+    return CollectionUtility.unmodifiableSet(list);
   }
 
   @Override
@@ -266,15 +267,16 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_minDateLoaded, m_maxDateLoaded, 250);
   }
 
-  private void setItemsInternal(Date minDate, Date maxDate, ICalendarItem[] items) {
+  private void setItemsInternal(Date minDate, Date maxDate, Set<ICalendarItem> items0) {
+    Set<ICalendarItem> items = CollectionUtility.hashSetWithoutNullElements(items0);
     m_minDateLoaded = minDate;
     m_maxDateLoaded = maxDate;
-    propertySupport.setProperty(PROP_ITEMS, items);
+    propertySupport.setPropertySet(PROP_ITEMS, items);
   }
 
   @Override
-  public IMenu[] getMenus() {
-    return m_menus;
+  public List<IMenu> getMenus() {
+    return CollectionUtility.unmodifiableList(m_menus);
   }
 
   @Override
@@ -361,13 +363,13 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    * Reload Job
    */
   private class P_ReloadJob extends ClientAsyncJob {
-    private final Holder<ICalendarItem[]> m_result;
+    private final Set<ICalendarItem> m_result;
     private final Date m_loadingMinDate;
     private final Date m_loadingMaxDate;
 
     public P_ReloadJob(IClientSession session, Date loadingMinDate, Date loadingMaxDate) {
       super(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload", session);
-      m_result = new Holder<ICalendarItem[]>(null);
+      m_result = new HashSet<ICalendarItem>();
       m_loadingMinDate = loadingMinDate;
       m_loadingMaxDate = loadingMaxDate;
     }
@@ -420,7 +422,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems", ClientSyncJob.getCurrentSession()) {
             @Override
             protected void runVoid(IProgressMonitor monitor2) throws Throwable {
-              setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result.getValue());
+              setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
             }
           }.schedule();
         }

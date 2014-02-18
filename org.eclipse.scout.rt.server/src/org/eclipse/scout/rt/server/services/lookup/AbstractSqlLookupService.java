@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.lookup;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,8 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
@@ -47,7 +49,7 @@ import org.eclipse.scout.service.SERVICES;
  * Valid bind names are: Object key, String text, String all, Object rec, {@link TriState} active<br>
  * Valid xml tags are: &lt;key&gt;, &lt;text&gt;, &lt;all&gt;, &lt;rec&gt;
  */
-public abstract class AbstractSqlLookupService extends AbstractLookupService {
+public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<T> {
 
   public AbstractSqlLookupService() {
   }
@@ -75,7 +77,7 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
    */
   @ConfigOperation
   @Order(10)
-  protected LookupRow[] execLoadLookupRows(String originalSql, String preprocessedSql, LookupCall call) throws ProcessingException {
+  protected List<ILookupRow<T>> execLoadLookupRows(String originalSql, String preprocessedSql, ILookupCall<T> call) throws ProcessingException {
     Object[][] data = SQL.selectLimited(preprocessedSql, call.getMaxRowCount(), call);
     if (getConfiguredSortColumn() >= 0) {
       sortData(data, getConfiguredSortColumn());
@@ -84,13 +86,13 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
   }
 
   @Override
-  public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByKey(ILookupCall<T> call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByKey(sql), call);
   }
 
   @Override
-  public LookupRow[] getDataByText(LookupCall call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByText(ILookupCall<T> call) throws ProcessingException {
     // change wildcards * in text to db specific wildcards
     if (call.getText() != null) {
       String s = call.getText();
@@ -102,17 +104,17 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
   }
 
   @Override
-  public LookupRow[] getDataByAll(LookupCall call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByAll(ILookupCall<T> call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     if (containsRefusingAllTag(sql)) {
       throw new VetoException(ScoutTexts.get("SearchTextIsTooGeneral"));
     }
-    LookupRow[] rows = execLoadLookupRows(sql, filterSqlByAll(sql), call);
+    List<ILookupRow<T>> rows = execLoadLookupRows(sql, filterSqlByAll(sql), call);
     return rows;
   }
 
   @Override
-  public LookupRow[] getDataByRec(LookupCall call) throws ProcessingException {
+  public List<ILookupRow<T>> getDataByRec(ILookupCall<T> call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByRec(sql), call);
   }

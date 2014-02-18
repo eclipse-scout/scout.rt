@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.OfflineState;
-import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -210,8 +209,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
       ServiceTunnelResponse serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       // add accumulated client notifications as side-payload
-      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
-      serviceRes.setClientNotifications(na);
+      serviceRes.setClientNotifications(SERVICES.getService(IClientNotificationService.class).getNextNotifications(0));
       return serviceRes;
     }
     catch (Throwable t) {

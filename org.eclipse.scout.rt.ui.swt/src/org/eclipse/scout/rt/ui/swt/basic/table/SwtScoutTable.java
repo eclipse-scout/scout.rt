@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.ui.swt.basic.table;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,7 +30,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -47,7 +51,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
@@ -232,7 +236,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       return;
     }
     // Ensure multiline tooltip is not used for smartfield tables or list boxes
-    if (getScoutObject() instanceof SmartTableForm.MainBox.ResultTableField.Table || getScoutObject() instanceof DefaultListBoxTable) {
+    if (getScoutObject() instanceof ContentAssistTableForm.MainBox.ResultTableField.Table || getScoutObject() instanceof DefaultListBoxTable) {
       return;
     }
     getSwtTableViewer().getTable().setToolTipText("");
@@ -274,13 +278,13 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       dummyCol.setResizable(false);
       dummyCol.setMoveable(false);
       boolean sortEnabled = false;
-      IColumn<?>[] scoutColumnsOrdered;
+      List<IColumn<?>> scoutColumnsOrdered;
       if (getScoutObject() != null) {
         scoutColumnsOrdered = getScoutObject().getColumnSet().getVisibleColumns();
         sortEnabled = getScoutObject().isSortEnabled();
       }
       else {
-        scoutColumnsOrdered = new IColumn[0];
+        scoutColumnsOrdered = Collections.emptyList();
       }
       if (m_columnManager == null) {
         m_columnManager = new TableColumnManager();
@@ -382,23 +386,18 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   public ITableRow getSwtSelectedRow() {
-    ITableRow[] rows = getSwtSelectedRows();
-    if (rows.length > 0) {
-      return rows[0];
-    }
-    return null;
+    return CollectionUtility.firstElement(getSwtSelectedRows());
   }
 
-  public ITableRow[] getSwtSelectedRows() {
-    StructuredSelection uiSelection = (StructuredSelection) getSwtTableViewer().getSelection();
+  public List<ITableRow> getSwtSelectedRows() {
     TreeSet<ITableRow> sortedRows = new TreeSet<ITableRow>(new RowIndexComparator());
-    if (uiSelection != null && !uiSelection.isEmpty()) {
-      for (Object o : uiSelection.toArray()) {
-        ITableRow row = (ITableRow) o;
-        sortedRows.add(row);
-      }
+
+    StructuredSelection uiSelection = (StructuredSelection) getSwtTableViewer().getSelection();
+    Iterator uiSelectionIt = uiSelection.iterator();
+    while (uiSelectionIt.hasNext()) {
+      sortedRows.add((ITableRow) uiSelectionIt.next());
     }
-    return sortedRows.toArray(new ITableRow[sortedRows.size()]);
+    return Collections.unmodifiableList(new ArrayList<ITableRow>(sortedRows));
   }
 
   protected void updateKeyStrokeFormScout() {
@@ -409,9 +408,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
     }
     // add new
-    ArrayList<ISwtKeyStroke> newSwtKeyStrokes = new ArrayList<ISwtKeyStroke>();
-    IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-    for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
+    List<ISwtKeyStroke> newSwtKeyStrokes = new ArrayList<ISwtKeyStroke>();
+    for (IKeyStroke scoutKeyStroke : getScoutObject().getKeyStrokes()) {
       ISwtKeyStroke[] swtStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, getEnvironment());
       for (ISwtKeyStroke swtStroke : swtStrokes) {
         getEnvironment().addKeyStroke(getSwtField(), swtStroke);
@@ -498,8 +496,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   /**
    * scout table observer
    */
-  protected boolean isHandleScoutTableEvent(TableEvent[] a) {
-    for (TableEvent element : a) {
+  protected boolean isHandleScoutTableEvent(List<? extends TableEvent> events) {
+    for (TableEvent element : events) {
       switch (element.getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
         case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
@@ -649,23 +647,23 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     getSwtField().setReadOnly(!enabledFromScout);
   }
 
-  protected void setSelectionFromScout(ITableRow[] selectedRows) {
+  protected void setSelectionFromScout(List<? extends ITableRow> modelSelection) {
     if (getSwtField().isDisposed()) {
       return;
     }
-    ITableRow[] uiSelection = getSwtSelectedRows();
-    if (CompareUtility.equals(uiSelection, selectedRows)) {
+    List<ITableRow> uiSelection = getSwtSelectedRows();
+    if (CollectionUtility.equalsCollection(uiSelection, modelSelection)) {
       // no change
       return;
     }
     else {
-      if (selectedRows == null) {
-        selectedRows = new ITableRow[0];
+      if (modelSelection == null) {
+        modelSelection = Collections.emptyList();
       }
-      getSwtTableViewer().setSelection(new StructuredSelection(selectedRows), true);
+      getSwtTableViewer().setSelection(new StructuredSelection(modelSelection.toArray(new ITableRow[modelSelection.size()])), true);
 
-      if (selectedRows.length > 0) {
-        getSwtTableViewer().reveal(selectedRows[0]);
+      if (CollectionUtility.hasElements(modelSelection)) {
+        getSwtTableViewer().reveal(CollectionUtility.firstElement(modelSelection));
       }
     }
     //ticket 96051
@@ -980,7 +978,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     for (int i = 0; i < truncatedColOrder.length; i++) {
       truncatedColOrder[i] = uiColumnOrder[i + 1] - 1;
     }
-    final IColumn<?>[] newOrder = m_columnManager.getOrderedColumns(truncatedColOrder);
+    final List<IColumn<?>> newOrder = m_columnManager.getOrderedColumns(truncatedColOrder);
     if (m_columnManager.applyNewOrder(newOrder)) {
       m_uiColumnOrder = uiColumnOrder;
       // notify Scout
@@ -1044,9 +1042,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
 
   private class P_ScoutTableListener implements TableListener {
     @Override
-    public void tableChanged(final TableEvent e) {
-      if (isHandleScoutTableEvent(new TableEvent[]{e})) {
-        if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
+    public void tableChanged(final TableEvent event) {
+      if (isHandleScoutTableEvent(CollectionUtility.arrayList(event))) {
+        if (isIgnoredScoutEvent(TableEvent.class, "" + event.getType())) {
           return;
         }
         Runnable t = new Runnable() {
@@ -1055,7 +1053,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
             try {
               getUpdateSwtFromScoutLock().acquire();
               //
-              handleScoutTableEventInSwt(e);
+              handleScoutTableEventInSwt(event);
             }
             finally {
               getUpdateSwtFromScoutLock().release();
@@ -1067,42 +1065,41 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
 
     @Override
-    public void tableChangedBatch(final TableEvent[] a) {
+    public void tableChangedBatch(final List<? extends TableEvent> a) {
       if (isHandleScoutTableEvent(a)) {
-        final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TableEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+        final List<TableEvent> filteredList = new ArrayList<TableEvent>();
+        for (TableEvent event : a) {
+          if (!isIgnoredScoutEvent(TableEvent.class, "" + event.getType())) {
+            filteredList.add(event);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
-        }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (isDisposed()) {
-              return;
-            }
-            m_redrawHandler.pushControlChanging();
-            try {
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              if (isDisposed()) {
+                return;
+              }
+              m_redrawHandler.pushControlChanging();
               try {
-                getUpdateSwtFromScoutLock().acquire();
-                //
-                for (TableEvent element : filteredList) {
-                  handleScoutTableEventInSwt(element);
+                try {
+                  getUpdateSwtFromScoutLock().acquire();
+                  //
+                  for (TableEvent element : filteredList) {
+                    handleScoutTableEventInSwt(element);
+                  }
+                }
+                finally {
+                  getUpdateSwtFromScoutLock().release();
                 }
               }
               finally {
-                getUpdateSwtFromScoutLock().release();
+                m_redrawHandler.popControlChanging();
               }
             }
-            finally {
-              m_redrawHandler.popControlChanging();
-            }
-          }
-        };
-        getEnvironment().invokeSwtLater(t);
+          };
+          getEnvironment().invokeSwtLater(t);
+        }
       }
     }
   }// end P_ScoutTableListener
@@ -1154,9 +1151,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
               switch (event.keyCode) {
                 case ' ':
                 case SWT.CR:
-                  ITableRow[] selectedRows = SwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) swtTableViewer.getSelection());
-                  if (selectedRows != null && selectedRows.length > 0) {
-                    handleSwtRowClick(selectedRows[0]);
+                  List<ITableRow> selectedRows = SwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) swtTableViewer.getSelection());
+                  if (CollectionUtility.hasElements(selectedRows)) {
+                    handleSwtRowClick(CollectionUtility.firstElement(selectedRows));
                   }
                   event.doit = false;
                   break;
@@ -1250,7 +1247,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
 
       final boolean emptySelection = getSwtTableViewer().getSelection().isEmpty();
-      IMenu[] menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getEnvironment());
+      List<IMenu> menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getEnvironment());
 
       SwtMenuUtility.fillContextMenu(menus, m_contextMenu, getEnvironment());
     }
@@ -1288,12 +1285,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
       setContextColumnFromSwt(getSwtColumnAt(pTable));
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
-          scoutMenusRef.set(scoutMenus);
+          scoutMenusRef.set(getScoutObject().getUIFacade().fireHeaderPopupFromUI());
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);

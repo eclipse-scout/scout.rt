@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clientnotification;
 
+import java.util.Set;
+
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
@@ -27,7 +29,7 @@ public class ClientNotificationService extends AbstractService implements IClien
   }
 
   @Override
-  public IClientNotification[] getNextNotifications(long blockingTimeout) {
+  public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
     return m_clientNotificationQueue.getNextNotifications(blockingTimeout);
   }
 

@@ -170,7 +170,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return false;
     }
     //Only use the given column if there are no summary columns defined
-    if (table.getColumnSet().getSummaryColumns().length == 0) {
+    if (table.getColumnSet().getSummaryColumns().size() == 0) {
       return true;
     }
 
@@ -187,7 +187,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
 
     //Always use column if there is enough space left in m_cellDetailColumns for every remaining column
     int freeSlots = m_maxCellDetailColumns - m_cellDetailColumns.size();
-    int remainingColumns = table.getColumnSet().getVisibleColumns().length - (columnVisibleIndex + 1);
+    int remainingColumns = table.getColumnSet().getVisibleColumns().size() - (columnVisibleIndex + 1);
     if (remainingColumns < freeSlots) {
       return true;
     }

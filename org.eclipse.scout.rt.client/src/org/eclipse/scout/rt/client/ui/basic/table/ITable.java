@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -92,7 +94,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_CONTEXT_COLUMN = "contextColumn";
   /**
-   * {@link IKeyStroke}[]
+   * {@link List<IKeyStroke>}
    */
   String PROP_KEY_STROKES = "keyStroks";
   /**
@@ -135,7 +137,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException;
 
-  ITableRowFilter[] getRowFilters();
+  List<ITableRowFilter> getRowFilters();
 
   /**
    * adding a filter multiple times is supported. This only adds it the first time. The other times it just calls
@@ -192,9 +194,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * short form for getColumnSet().getColumns()
    */
-  IColumn<?>[] getColumns();
+  List<IColumn<?>> getColumns();
 
-  String[] getColumnNames();
+  List<String> getColumnNames();
 
   /**
    * Convenience for getColumnSet().getVisibleColumnCount()
@@ -207,14 +209,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   ITableRow getRow(int rowIndex);
 
-  ITableRow[] getRows(int[] rowIndexes);
+  List<ITableRow> getRows(int[] rowIndexes);
 
   /**
    * This method is Thread-Safe.
    * <p>
    * For performance reasons, this method returns the life array. Do NOT change the array contents directly!
    */
-  ITableRow[] getRows();
+  List<ITableRow> getRows();
 
   /**
    * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
@@ -222,7 +224,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * <p>
    * For performance reasons, this method returns the life array. Do NOT change the array contents directly!
    */
-  ITableRow[] getFilteredRows();
+  List<ITableRow> getFilteredRows();
 
   /**
    * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
@@ -249,27 +251,32 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   Object[][] getTableData();
 
   /**
-   * see {@link TableUtility#exportRowsAsCSV(ITableRow[], IColumn[], boolean, boolean, boolean)}
+   * see {@link TableUtility#exportRowsAsCSV(List<? extends ITableRow>, List<? extends IColumn<?>>, boolean, boolean,
+   * boolean)}
    */
-  Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn<?>[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
+  Object[][] exportTableRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
 
   int getInsertedRowCount();
 
-  ITableRow[] getInsertedRows();
+  List<ITableRow> getInsertedRows();
 
   int getUpdatedRowCount();
 
-  ITableRow[] getUpdatedRows();
+  List<ITableRow> getUpdatedRows();
 
   int getDeletedRowCount();
 
-  ITableRow[] getDeletedRows();
+  List<ITableRow> getDeletedRows();
 
-  Object[] getRowKeys(int rowIndex);
+  int getNotDeletedRowCount();
 
-  Object[] getRowKeys(ITableRow row);
+  List<ITableRow> getNotDeletedRows();
 
-  ITableRow findRowByKey(Object[] keys);
+  List<Object> getRowKeys(int rowIndex);
+
+  List<Object> getRowKeys(ITableRow row);
+
+  ITableRow findRowByKey(List<?> keys);
 
   /*
    * Service aspect
@@ -288,16 +295,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * get all menus (new, edit, both)
    */
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
    */
   <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
 
-  IKeyStroke[] getKeyStrokes();
+  List<IKeyStroke> getKeyStrokes();
 
-  void setKeyStrokes(IKeyStroke[] keyStrokes);
+  void setKeyStrokes(List<? extends IKeyStroke> keyStrokes);
 
   /**
    * Run a menu The menu is first prepared and only executed when it is visible
@@ -484,7 +491,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setEnabled(boolean b);
 
   /**
-   * This property changes the behaviour of {@link #replaceRows(ITableRow[])} and {@link #deleteRows(int[])} true
+   * This property changes the behaviour of {@link #replaceRows(List<? extends ITableRow>)} and
+   * {@link #deleteRows(int[])} true
    * discards rows when deleted, false keeps
    * them in the cache for later usage in change management Default value is
    * true for {@link IPageWithTable} and false for
@@ -550,13 +558,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void setRowState(ITableRow row, int rowState) throws ProcessingException;
 
-  void setRowState(ITableRow[] rows, int rowState) throws ProcessingException;
+  void setRowState(Collection<? extends ITableRow> rows, int rowState) throws ProcessingException;
 
   void setAllRowState(int rowState) throws ProcessingException;
 
   void updateRow(ITableRow modifiedRow);
 
-  void updateRows(ITableRow[] modifiedRows);
+  void updateRows(Collection<? extends ITableRow> modifiedRows);
 
   void updateAllRows();
 
@@ -575,7 +583,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * added to the table as a really new row 3. all existing rows that do not
    * match any newRow are deleted
    */
-  void replaceRows(ITableRow[] newRows) throws ProcessingException;
+  void replaceRows(List<? extends ITableRow> newRows) throws ProcessingException;
 
   void replaceRowsByArray(Object dataArray) throws ProcessingException;
 
@@ -591,7 +599,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   ITableRow getSelectedRow();
 
-  ITableRow[] getSelectedRows();
+  List<ITableRow> getSelectedRows();
 
   boolean isSelectedRow(ITableRow row);
 
@@ -601,9 +609,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void selectRow(ITableRow row, boolean append);
 
-  void selectRows(ITableRow[] rows);
+  void selectRows(List<? extends ITableRow> rows);
 
-  void selectRows(ITableRow[] rows, boolean append);
+  void selectRows(List<? extends ITableRow> rows, boolean append);
 
   void selectFirstRow();
 
@@ -619,7 +627,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void deselectRow(ITableRow row);
 
-  void deselectRows(ITableRow[] row);
+  void deselectRows(List<? extends ITableRow> row);
 
   void deselectAllRows();
 
@@ -629,13 +637,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   IBooleanColumn getCheckableColumn();
 
-  ITableRow[] getCheckedRows();
+  Collection<ITableRow> getCheckedRows();
 
   void checkRow(int rowIndex, boolean value) throws ProcessingException;
 
   void checkRow(ITableRow row, boolean value) throws ProcessingException;
 
-  void checkRows(ITableRow[] rows, boolean value) throws ProcessingException;
+  void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException;
 
   void checkAllRows() throws ProcessingException;
 
@@ -667,14 +675,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableRow addRow(ITableRow newRow, boolean markAsInserted) throws ProcessingException;
 
   /**
-   * calls {@link #addRows(ITableRow[], false)}
+   * calls {@link #addRows(List<? extends ITableRow>, false)}
    */
-  ITableRow[] addRows(ITableRow[] newRows) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows) throws ProcessingException;
 
   /**
-   * calls {@link #addRows(ITableRow[], markAsInserted, null)}
+   * calls {@link #addRows(List<? extends ITableRow>, markAsInserted, null)}
    */
-  ITableRow[] addRows(ITableRow[] newRows, boolean markAsInserted) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException;
 
   /**
    * all newRows are added to the table. After the add succeeds the argument
@@ -684,7 +692,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * 
    * @return added rows in order as they were passed to the method
    */
-  ITableRow[] addRows(ITableRow[] newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException;
+  List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException;
 
   /**
    * Convenience to add one row by its data
@@ -694,22 +702,22 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Convenience to add one row by its data
    */
-  ITableRow[] addRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
+  List<ITableRow> addRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
 
   /**
    * Convenience to add multiple rows by their data arrays
    */
-  ITableRow[] addRowsByMatrix(Object dataMatrix) throws ProcessingException;
+  List<ITableRow> addRowsByMatrix(Object dataMatrix) throws ProcessingException;
 
   /**
    * Convenience to add multiple rows by their data arrays
    */
-  ITableRow[] addRowsByMatrix(Object dataMatrix, int rowStatus) throws ProcessingException;
+  List<ITableRow> addRowsByMatrix(Object dataMatrix, int rowStatus) throws ProcessingException;
 
   /**
    * Convenience to add multiple rows by their single value (key value)
    */
-  ITableRow[] addRowsByArray(Object dataArray) throws ProcessingException;
+  List<ITableRow> addRowsByArray(Object dataArray) throws ProcessingException;
 
   void moveRow(int sourceIndex, int targetIndex);
 
@@ -725,7 +733,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void deleteAllRows();
 
-  void deleteRows(ITableRow[] rows);
+  void deleteRows(Collection<? extends ITableRow> rows);
 
   void discardRow(int rowIndex);
 
@@ -735,13 +743,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void discardAllRows();
 
-  void discardRows(ITableRow[] rows);
+  void discardRows(Collection<? extends ITableRow> rows);
 
   void discardAllDeletedRows();
 
   void discardDeletedRow(ITableRow deletedRow);
 
-  void discardDeletedRows(ITableRow[] deletedRows);
+  void discardDeletedRows(Collection<? extends ITableRow> deletedRows);
 
   /**
    * @return this row if it is in fact a valid table row, null otherwise
@@ -751,13 +759,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * @return this array if all rows are valid table row, reduced array otherwise
    */
-  ITableRow[] resolveRows(ITableRow[] rows);
+  List<ITableRow> resolveRows(Collection<? extends ITableRow> rows);
 
   void tablePopulated();
 
   void sort();
 
-  void sort(ITableRow[] rowsInNewOrder);
+  void sort(List<? extends ITableRow> rowsInNewOrder);
 
   boolean isSortEnabled();
 
@@ -842,7 +850,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    *          the rows whose menus should be returned
    * @return
    */
-  IMenu[] fetchMenusForRowsInternal(ITableRow[] rows);
+  List<IMenu> fetchMenusForRowsInternal(List<? extends ITableRow> rows);
 
   /*
    * UI interface

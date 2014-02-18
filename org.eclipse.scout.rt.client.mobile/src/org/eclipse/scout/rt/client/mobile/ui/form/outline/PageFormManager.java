@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -132,12 +133,7 @@ public class PageFormManager {
   }
 
   private void hidePageForms() {
-    IPageForm[] pageForms = getDesktop().findForms(IPageForm.class);
-    if (pageForms == null) {
-      return;
-    }
-
-    for (IPageForm pageForm : pageForms) {
+    for (IPageForm pageForm : getDesktop().findForms(IPageForm.class)) {
       getDesktop().removeForm(pageForm);
     }
   }
@@ -364,7 +360,7 @@ public class PageFormManager {
     pageForm.pageSelectedNotify();
   }
 
-  private void handleTreeNodesDeleted(ITreeNode[] deletedNodes) throws ProcessingException {
+  private void handleTreeNodesDeleted(Collection<ITreeNode> deletedNodes) throws ProcessingException {
     if (deletedNodes == null) {
       return;
     }

@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -79,15 +81,15 @@ public class ImageFieldTest {
 
   @Test
   public void testMenusAndKeyStrokes() {
-    IMenu[] imageFieldMenus = m_form.getImageField().getMenus();
-    Assert.assertEquals("ImageField should have 1 menu", 1, imageFieldMenus.length);
-    Assert.assertEquals("ImageFieldMenu", imageFieldMenus[0].getText());
-    Assert.assertEquals("&ImageFieldMenu", imageFieldMenus[0].getTextWithMnemonic());
-    Assert.assertEquals("control-a", imageFieldMenus[0].getKeyStroke());
+    List<IMenu> imageFieldMenus = m_form.getImageField().getMenus();
+    Assert.assertEquals("ImageField should have 1 menu", 1, imageFieldMenus.size());
+    Assert.assertEquals("ImageFieldMenu", imageFieldMenus.get(0).getText());
+    Assert.assertEquals("&ImageFieldMenu", imageFieldMenus.get(0).getTextWithMnemonic());
+    Assert.assertEquals("control-a", imageFieldMenus.get(0).getKeyStroke());
 
-    IKeyStroke[] imageFieldKeyStrokes = m_form.getImageField().getContributedKeyStrokes();
+    List<IKeyStroke> imageFieldKeyStrokes = m_form.getImageField().getContributedKeyStrokes();
     Assert.assertNotNull("KeyStrokes of ImageField should not be null", imageFieldKeyStrokes);
-    Assert.assertEquals("ImageField should have 1 keyStrokes registered", 1, imageFieldKeyStrokes.length);
+    Assert.assertEquals("ImageField should have 1 keyStrokes registered", 1, imageFieldKeyStrokes.size());
   }
 
   @After

@@ -194,16 +194,13 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   @Override
   protected void setDisplayTextFromScout(String rawHtml) {
     // create attachments
-    RemoteFile[] a = getScoutObject().getAttachments();
-    if (a != null) {
-      for (RemoteFile f : a) {
-        if (f != null && f.exists()) {
-          try {
-            writeTempFile(f.getPath(), new ByteArrayInputStream(f.extractData()));
-          }
-          catch (Exception e1) {
-            LOG.warn("could not read remote file '" + f.getName() + "'", e1);
-          }
+    for (RemoteFile f : getScoutObject().getAttachments()) {
+      if (f != null && f.exists()) {
+        try {
+          writeTempFile(f.getPath(), new ByteArrayInputStream(f.extractData()));
+        }
+        catch (Exception e1) {
+          LOG.warn("could not read remote file '" + f.getName() + "'", e1);
         }
       }
     }

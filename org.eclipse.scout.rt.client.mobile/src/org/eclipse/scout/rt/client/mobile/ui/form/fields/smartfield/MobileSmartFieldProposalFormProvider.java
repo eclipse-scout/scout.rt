@@ -11,23 +11,23 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalFormProvider;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalFormProvider;
 
 /**
  * @since 3.9.0
  */
-public class MobileSmartFieldProposalFormProvider implements ISmartFieldProposalFormProvider {
+public class MobileSmartFieldProposalFormProvider<LOOKUP_TYPE> implements IContentAssistFieldProposalFormProvider<LOOKUP_TYPE> {
 
   @Override
-  public ISmartFieldProposalForm createProposalForm(ISmartField smartField) throws ProcessingException {
-    ISmartFieldProposalForm form;
+  public IContentAssistFieldProposalForm<LOOKUP_TYPE> createProposalForm(IContentAssistField<?, LOOKUP_TYPE> smartField, boolean allowCustomText) throws ProcessingException {
+    IContentAssistFieldProposalForm<LOOKUP_TYPE> form;
     if (smartField.isBrowseHierarchy()) {
-      form = new MobileSmartTreeForm(smartField);
+      form = new MobileSmartTreeForm<LOOKUP_TYPE>(smartField, allowCustomText);
     }
     else {
-      form = new MobileSmartTableForm(smartField);
+      form = new MobileSmartTableForm<LOOKUP_TYPE>(smartField, allowCustomText);
     }
     form.setAutoAddRemoveOnDesktop(true);
 

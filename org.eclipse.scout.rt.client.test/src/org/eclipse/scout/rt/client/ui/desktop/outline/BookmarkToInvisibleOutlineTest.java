@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -38,7 +39,7 @@ public class BookmarkToInvisibleOutlineTest {
   @Test
   public void testBookmarkToInvisibleOutline() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    desktop.setAvailableOutlines(new IOutline[]{new CockpitOutline(), new AdminOutline()});
+    desktop.setAvailableOutlines(CollectionUtility.arrayList(new CockpitOutline(), new AdminOutline()));
     desktop.setOutline(CockpitOutline.class);
     Bookmark bm = desktop.createBookmark();
     //

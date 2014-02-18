@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * 
  * @see LookupCall
  */
-public class LocalLookupCall extends LookupCall {
+public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
   public LocalLookupCall() {
@@ -45,7 +46,7 @@ public class LocalLookupCall extends LookupCall {
 
   @ConfigOperation
   @Order(30)
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+  protected List<? extends ILookupRow<T>> execCreateLookupRows() throws ProcessingException {
     return null;
   }
 
@@ -66,7 +67,7 @@ public class LocalLookupCall extends LookupCall {
   }
 
   @Override
-  protected final Class<? extends ILookupService> getConfiguredService() {
+  protected final Class<? extends ILookupService<T>> getConfiguredService() {
     return null;
   }
 
@@ -74,72 +75,71 @@ public class LocalLookupCall extends LookupCall {
    * Complete override using local data
    */
   @Override
-  public LookupRow[] getDataByKey() throws ProcessingException {
+  public List<? extends ILookupRow<T>> getDataByKey() throws ProcessingException {
     if (getKey() == null) {
-      return LookupRow.EMPTY_ARRAY;
+      return Collections.emptyList();
     }
     Object key = getKey();
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
-    for (LookupRow row : execCreateLookupRows()) {
+    ArrayList<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
+    for (ILookupRow<T> row : execCreateLookupRows()) {
       if (key.equals(row.getKey())) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[list.size()]);
+    return list;
   }
 
   /**
    * Complete override using local data
    */
   @Override
-  public LookupRow[] getDataByText() throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<? extends ILookupRow<T>> getDataByText() throws ProcessingException {
+    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Pattern p = createSearchPattern(getText());
-    for (LookupRow row : execCreateLookupRows()) {
+    for (ILookupRow<T> row : execCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[list.size()]);
+    return list;
   }
 
   /**
    * Complete override using local data
    */
   @Override
-  public LookupRow[] getDataByAll() throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<? extends ILookupRow<T>> getDataByAll() throws ProcessingException {
+    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Pattern p = createSearchPattern(getAll());
-    for (LookupRow row : execCreateLookupRows()) {
+    for (ILookupRow<T> row : execCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[list.size()]);
+    return list;
   }
 
   /**
    * Complete override using local data
    */
   @Override
-  public LookupRow[] getDataByRec() throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<? extends ILookupRow<T>> getDataByRec() throws ProcessingException {
+    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     Object parentKey = getRec();
     if (parentKey == null) {
-      for (LookupRow row : execCreateLookupRows()) {
+      for (ILookupRow<T> row : execCreateLookupRows()) {
         if (row.getParentKey() == null) {
           list.add(row);
         }
       }
     }
     else {
-      for (LookupRow row : execCreateLookupRows()) {
+      for (ILookupRow<T> row : execCreateLookupRows()) {
         if (parentKey.equals(row.getParentKey())) {
           list.add(row);
         }
       }
     }
-    return list.toArray(new LookupRow[list.size()]);
+    return list;
   }
-
 }

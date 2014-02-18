@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.ui.swt.util;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -484,13 +485,15 @@ public final class SwtUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T[] getItemsOfSelection(Class<T> t, StructuredSelection selection) {
-    T[] result = (T[]) Array.newInstance(t, selection.size());
-    int i = 0;
-    for (Object o : selection.toArray()) {
-      result[i++] = (T) o;
+  public static <T> List<T> getItemsOfSelection(Class<T> t, StructuredSelection selection) {
+    List<T> result = new ArrayList<T>();
+    if (selection != null) {
+      Iterator it = selection.iterator();
+      while (it.hasNext()) {
+        result.add((T) it.next());
+      }
     }
-    return result;
+    return Collections.unmodifiableList(result);
 
   }
 

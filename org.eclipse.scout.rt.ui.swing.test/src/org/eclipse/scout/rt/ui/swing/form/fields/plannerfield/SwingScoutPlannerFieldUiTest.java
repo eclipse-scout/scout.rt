@@ -16,6 +16,8 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.Collections;
+
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
@@ -43,9 +45,9 @@ public class SwingScoutPlannerFieldUiTest {
 
     IActivityMap<?, ?> activityMap = createNiceMock(IActivityMap.class);
     activityMap.getResourceIds();
-    expectLastCall().andReturn(new Object[]{}).anyTimes();
+    expectLastCall().andReturn(Collections.emptyList()).anyTimes();
     activityMap.getSelectedResourceIds();
-    expectLastCall().andReturn(new Object[]{});
+    expectLastCall().andReturn(Collections.emptyList());
     activityMap.getTimeScale();
     expectLastCall().andReturn(new TimeScale()).anyTimes();
 
@@ -57,7 +59,7 @@ public class SwingScoutPlannerFieldUiTest {
     scoutObject.getActivityMap();
     expectLastCall().andReturn(activityMap);
     scoutObject.getKeyStrokes();
-    expectLastCall().andReturn(new IKeyStroke[]{}).anyTimes();
+    expectLastCall().andReturn(Collections.<IKeyStroke> emptyList()).anyTimes();
 
     ISwingEnvironment environment = createMock(ISwingEnvironment.class);
     environment.createTable(scoutTable); //Bug 405354: creation of the table is delegated to ISwingEnvironment

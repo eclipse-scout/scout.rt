@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.spec.client;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.spec.client.gen.PageSpecGenerator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 

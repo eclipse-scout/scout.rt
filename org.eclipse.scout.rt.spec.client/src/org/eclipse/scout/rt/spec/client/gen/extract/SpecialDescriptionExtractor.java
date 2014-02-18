@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 /**
  * An {@link IDocTextExtractor} with the fully qualified class name as text.
  */
-public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Class> implements IDocTextExtractor<Class> {
+public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Class<?>> implements IDocTextExtractor<Class<?>> {
 
   private String m_keySuffix;
 
@@ -32,7 +32,7 @@ public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Clas
    * @return fully qualified class name.
    */
   @Override
-  public String getText(Class clazz) {
+  public String getText(Class<?> clazz) {
     String doc = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix);
     // TODO ASA fix this hack: name.contains("{undefined text")
     if (doc.startsWith("{undefined text")) {

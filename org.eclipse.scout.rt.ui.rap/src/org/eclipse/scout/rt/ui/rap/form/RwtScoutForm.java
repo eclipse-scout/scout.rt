@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.IValidateRoot;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -70,7 +70,7 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (getScoutObject() instanceof ISmartFieldProposalForm) {
+    if (getScoutObject() instanceof IContentAssistFieldProposalForm) {
       getUiContainer().setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_PROPOSAL_FORM);
     }
     if (m_scoutFormListener == null) {

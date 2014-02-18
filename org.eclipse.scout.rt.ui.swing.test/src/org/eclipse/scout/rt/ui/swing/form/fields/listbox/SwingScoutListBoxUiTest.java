@@ -16,8 +16,9 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.Collections;
+
 import org.easymock.EasyMock;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -49,9 +50,9 @@ public class SwingScoutListBoxUiTest {
     scoutObject.getGridData();
     expectLastCall().andReturn(new GridData(1, 1, 1, 1, 1.0, 1.0)).anyTimes();
     scoutObject.getFields();
-    expectLastCall().andReturn(new IFormField[]{});
+    expectLastCall().andReturn(Collections.<IFormField> emptyList());
     scoutObject.getKeyStrokes();
-    expectLastCall().andReturn(new IKeyStroke[]{}).anyTimes();
+    expectLastCall().andReturn(Collections.<IFormField> emptyList()).anyTimes();
 
     ISwingEnvironment environment = createMock(ISwingEnvironment.class);
     environment.createStatusLabel(EasyMock.<IFormField> anyObject());

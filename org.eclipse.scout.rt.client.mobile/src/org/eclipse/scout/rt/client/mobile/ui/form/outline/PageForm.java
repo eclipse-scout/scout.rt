@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -213,8 +213,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     //Add buttons of the detail form to the main box
     if (m_page.getDetailForm() != null) {
-      IButton[] detailFormCustomButtons = m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons();
-      buttonList.addAll(Arrays.asList(detailFormCustomButtons));
+      buttonList.addAll(m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons());
     }
 
     m_mainboxButtons = buttonList;
@@ -273,7 +272,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
   }
 
-  private void setTableRowDrillDownStyle(ITable table, ITableRow[] rows) {
+  private void setTableRowDrillDownStyle(ITable table, List<ITableRow> rows) {
     if (rows == null) {
       return;
     }
@@ -621,7 +620,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     m_pageFormManager.pageSelectedNotify(this, rowPage);
   }
 
-  private void handleTableRowsDeleted(ITable table, ITableRow[] tableRows) throws ProcessingException {
+  private void handleTableRowsDeleted(ITable table, Collection<ITableRow> tableRows) throws ProcessingException {
     if (tableRows == null) {
       return;
     }
@@ -646,7 +645,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     outline.disposeTree();
   }
 
-  private void handleTableRowsInserted(ITable table, ITableRow[] tableRows) throws ProcessingException {
+  private void handleTableRowsInserted(ITable table, List<ITableRow> tableRows) throws ProcessingException {
     setTableRowDrillDownStyle(table, tableRows);
   }
 

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -41,17 +42,19 @@ public class PagingTableRow extends TableRow {
   }
 
   private void updateContent(ColumnSet columnSet) {
-    IColumn<?> column = columnSet.getVisibleColumns()[0];
-    String content;
-    if (Type.back.equals(m_type)) {
-      content = TEXTS.get("MobilePagingShowPrevious");
+    IColumn column = CollectionUtility.firstElement(columnSet.getVisibleColumns());
+    if (column != null) {
+      String content;
+      if (Type.back.equals(m_type)) {
+        content = TEXTS.get("MobilePagingShowPrevious");
+      }
+      else {
+        content = TEXTS.get("MobilePagingShowNext");
+      }
+      content = "<b>" + content + "</b>";
+      String output = s_htmlCellTemplate.replace("#CONTENT#", content);
+      getCellForUpdate(column).setText(output);
     }
-    else {
-      content = TEXTS.get("MobilePagingShowNext");
-    }
-    content = "<b>" + content + "</b>";
-    String output = s_htmlCellTemplate.replace("#CONTENT#", content);
-    getCellForUpdate(column).setText(output);
   }
 
   private static String initHtmlCellTemplate() throws Throwable {

@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -33,9 +34,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -52,11 +54,11 @@ public final class TableUtility {
    * <p>
    * Note that remote lookup calls are evaluated one by one, no batch processing.
    */
-  public static void resolveLookupCall(Map<LookupCall, LookupRow[]> lookupCache, ITableRow row, ISmartColumn<?> col, boolean multilineText) {
+  public static <T> void resolveLookupCall(Map<ILookupCall<T>, List<? extends ILookupRow<T>>> lookupCache, ITableRow row, ISmartColumn<T> col, boolean multilineText) {
     try {
-      LookupCall call = col.prepareLookupCall(row);
+      ILookupCall<T> call = col.prepareLookupCall(row);
       if (call != null) {
-        LookupRow[] result = null;
+        List<? extends ILookupRow<T>> result = null;
         boolean verifiedQuality = verifyLookupCallBeanQuality(call);
         //optimize local calls by caching the results
         if (verifiedQuality) {
@@ -83,7 +85,7 @@ public final class TableUtility {
    * Scout tries to help developers to find problems related to this issue and write a warning in development mode on
    * all local lookup call subclasses that do not overwrite hashCode and equals.
    */
-  public static boolean verifyLookupCallBeanQuality(LookupCall call) {
+  public static boolean verifyLookupCallBeanQuality(ILookupCall<?> call) {
     Class<?> clazz = call.getClass();
     if (LocalLookupCall.class == clazz) {
       return true;
@@ -134,18 +136,18 @@ public final class TableUtility {
     return false;
   }
 
-  public static void applyLookupResult(ITableRow row, IColumn<?> col, LookupRow[] result, boolean multilineText) {
+  public static <T> void applyLookupResult(ITableRow row, IColumn<T> col, List<? extends ILookupRow<T>> result, boolean multilineText) {
     // disable row changed trigger on row
     try {
       row.setRowChanging(true);
       //
       Cell cell = (Cell) row.getCell(col.getColumnIndex());
-      if (result.length == 1) {
-        cell.setText(result[0].getText());
+      if (result.size() == 1) {
+        cell.setText(result.get(0).getText());
       }
-      else if (result.length > 1) {
+      else if (result.size() > 1) {
         StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < result.length; i++) {
+        for (int i = 0; i < result.size(); i++) {
           if (i > 0) {
             if (multilineText) {
               buf.append("\n");
@@ -154,7 +156,7 @@ public final class TableUtility {
               buf.append(", ");
             }
           }
-          buf.append(result[i].getText());
+          buf.append(result.get(i).getText());
         }
         cell.setText(buf.toString());
       }
@@ -192,11 +194,11 @@ public final class TableUtility {
    *         <li>java.util.Date</li>
    *         </ul>
    */
-  public static Object[][] exportRowsAsCSV(ITableRow[] rows, IColumn<?>[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
-    int nr = rows.length;
-    Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.length];
-    for (int c = 0; c < columns.length; c++) {
-      IColumn<?> col = columns[c];
+  public static Object[][] exportRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
+    int nr = rows.size();
+    Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.size()];
+    for (int c = 0; c < columns.size(); c++) {
+      IColumn<?> col = columns.get(c);
       Class<?> type;
       boolean byValue;
       String format;
@@ -250,7 +252,7 @@ public final class TableUtility {
       //
       int csvRowIndex = 0;
       if (includeLineForColumnNames) {
-        a[csvRowIndex][c] = columns[c].getHeaderCell().getText();
+        a[csvRowIndex][c] = columns.get(c).getHeaderCell().getText();
         csvRowIndex++;
       }
       if (includeLineForColumnTypes) {
@@ -264,17 +266,17 @@ public final class TableUtility {
       for (int r = 0; r < nr; r++) {
         if (byValue) {
           if (type == Timestamp.class) {
-            a[csvRowIndex][c] = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Timestamp.class);
+            a[csvRowIndex][c] = TypeCastUtility.castValue(columns.get(c).getValue(rows.get(r)), Timestamp.class);
           }
           else {
-            a[csvRowIndex][c] = columns[c].getValue(rows[r]);
+            a[csvRowIndex][c] = columns.get(c).getValue(rows.get(r));
           }
         }
         else {
-          String text = columns[c].getDisplayText(rows[r]);
+          String text = columns.get(c).getDisplayText(rows.get(r));
           //special intercept for boolean
           if (type == Boolean.class) {
-            Boolean b = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Boolean.class);
+            Boolean b = TypeCastUtility.castValue(columns.get(c).getValue(rows.get(r)), Boolean.class);
             if (b != null && b.booleanValue()) {
               // only use X if no display text is set
               if (!StringUtility.hasText(text)) {

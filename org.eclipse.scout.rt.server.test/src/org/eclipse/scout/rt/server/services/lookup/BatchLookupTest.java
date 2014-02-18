@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.services.lookup;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -120,23 +122,25 @@ public class BatchLookupTest {
       batchCall.addLookupCall((LookupCall) call);
     }
     //
-    LookupCall[] callArray = batchCall.getCallBatch();
-    LookupRow[][] resultArray = new BatchLookupService().getBatchDataByKey(batchCall);
-    assertEquals(resultArray.length, callArray.length);
+    List<ILookupCall<?>> callArray = batchCall.getCallBatch();
+    List<List<ILookupRow<?>>> resultArray = new BatchLookupService().getBatchDataByKey(batchCall);
+    assertEquals(resultArray.size(), callArray.size());
     assertEquals(expectedLocalInvocations, m_localInvocations);
     assertEquals(expectedServerInvocations, m_serverInvocations);
-    for (int i = 0; i < resultArray.length; i++) {
-      assertEquals(1, resultArray[i].length);
-      assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
-      assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
+    for (int i = 0; i < resultArray.size(); i++) {
+      assertEquals(1, resultArray.get(i).size());
+      assertEquals(callArray.get(i).getKey(), resultArray.get(i).get(0).getKey());
+      assertEquals(dumpCall(callArray.get(i)), resultArray.get(i).get(0).getText());
     }
   }
 
-  private static LookupRow[] createCallResult(LookupCall call) {
-    return new LookupRow[]{new LookupRow(call.getKey(), dumpCall(call))};
+  private static List<ILookupRow> createCallResult(ILookupCall<?> call) {
+    List<ILookupRow> result = new ArrayList<ILookupRow>();
+    result.add(new LookupRow(call.getKey(), dumpCall(call)));
+    return result;
   }
 
-  private static String dumpCall(LookupCall call) {
+  private static String dumpCall(ILookupCall<?> call) {
     IFlowerLookupCall f = (IFlowerLookupCall) call;
     return "Flower[key=" + call.getKey() + ", text=" + call.getText() + ", latin=" + f.getLatinId() + "]";
   }
@@ -252,9 +256,9 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow> execCreateLookupRows() throws ProcessingException {
       m_localInvocations++;
-      return Arrays.asList(createCallResult(this));
+      return createCallResult(this);
     }
 
     @Override
@@ -277,9 +281,9 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow> execCreateLookupRows() throws ProcessingException {
       m_localInvocations++;
-      return Arrays.asList(createCallResult(this));
+      return createCallResult(this);
     }
 
     @Override
@@ -304,9 +308,9 @@ public class BatchLookupTest {
     private Long m_latinId;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow> execCreateLookupRows() throws ProcessingException {
       m_localInvocations++;
-      return Arrays.asList(createCallResult(this));
+      return createCallResult(this);
     }
 
     @Override
@@ -326,9 +330,9 @@ public class BatchLookupTest {
     private Long m_latinId;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+    protected List<ILookupRow> execCreateLookupRows() throws ProcessingException {
       m_localInvocations++;
-      return Arrays.asList(createCallResult(this));
+      return createCallResult(this);
     }
 
     @Override
@@ -373,25 +377,25 @@ public class BatchLookupTest {
   public static class FlowerLookupService extends AbstractLookupService implements IFlowerLookupService {
 
     @Override
-    public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
+    public List<ILookupRow> getDataByKey(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByText(LookupCall call) throws ProcessingException {
+    public List<ILookupRow> getDataByText(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByAll(LookupCall call) throws ProcessingException {
+    public List<ILookupRow> getDataByAll(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByRec(LookupCall call) throws ProcessingException {
+    public List<ILookupRow> getDataByRec(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }

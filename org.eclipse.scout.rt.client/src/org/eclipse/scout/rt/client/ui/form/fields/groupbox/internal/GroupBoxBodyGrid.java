@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -52,17 +53,15 @@ public class GroupBoxBodyGrid {
     int containingGridXYCount = 0;
     int notContainingGridXYCount = 0;
     // build
-    ArrayList<IFormField> fieldsExceptProcessButtons = new ArrayList<IFormField>();
-    IFormField[] fields = m_groupBox.getFields();
-    for (int i = 0; i < fields.length; i++) {
-      IFormField f = fields[i];
-      if (f.isVisible()) {
-        if ((f instanceof IButton) && (((IButton) f).isProcessButton())) {
+    List<IFormField> fieldsExceptProcessButtons = new ArrayList<IFormField>();
+    for (IFormField formField : m_groupBox.getFields()) {
+      if (formField.isVisible()) {
+        if ((formField instanceof IButton) && (((IButton) formField).isProcessButton())) {
           // ignore
         }
         else {
-          fieldsExceptProcessButtons.add(f);
-          GridData hints = f.getGridDataHints();
+          fieldsExceptProcessButtons.add(formField);
+          GridData hints = formField.getGridDataHints();
           if (hints.x >= 0 && hints.y >= 0) {
             containingGridXYCount++;
           }
@@ -72,8 +71,8 @@ public class GroupBoxBodyGrid {
         }
       }
       else {
-        GridData data = GridDataBuilder.createFromHints(f, 1);
-        f.setGridDataInternal(data);
+        GridData data = GridDataBuilder.createFromHints(formField, 1);
+        formField.setGridDataInternal(data);
       }
     }
     m_fieldsExceptProcessButtons = fieldsExceptProcessButtons.toArray(new IFormField[0]);

@@ -107,7 +107,7 @@ public final class DocGenUtility {
    *          {@link IDocEntityConfig}
    * @return {@link IDocTable}
    */
-  public static <T> IDocSection createDocSection(T[] entities, IDocEntityListConfig<T> config) {
+  public static <T> IDocSection createDocSection(List<T> entities, IDocEntityListConfig<T> config) {
     List<IDocTextExtractor<T>> textExtractors = config.getTextExtractors();
     final List<String[]> rows = new ArrayList<String[]>();
     for (T e : entities) {

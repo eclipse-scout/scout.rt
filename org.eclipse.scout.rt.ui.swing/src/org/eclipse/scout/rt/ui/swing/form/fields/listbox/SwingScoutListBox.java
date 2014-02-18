@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.listbox;
 
+import java.util.List;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
@@ -52,10 +55,11 @@ public class SwingScoutListBox extends SwingScoutValueFieldComposite<IListBox<?>
     m_tableComposite.getSwingScrollPane().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, fieldData);
     container.add(m_tableComposite.getSwingScrollPane());
     // filter box
-    IFormField[] childFields = getScoutObject().getFields();
-    if (childFields.length > 0) {
-      ISwingScoutComposite filterComposite = getSwingEnvironment().createFormField(container, childFields[0]);
-      LogicalGridData filterData = LogicalGridDataBuilder.createField(getSwingEnvironment(), childFields[0].getGridData());
+    List<IFormField> childFields = getScoutObject().getFields();
+    if (CollectionUtility.hasElements(childFields)) {
+      IFormField firstField = CollectionUtility.firstElement(childFields);
+      ISwingScoutComposite filterComposite = getSwingEnvironment().createFormField(container, firstField);
+      LogicalGridData filterData = LogicalGridDataBuilder.createField(getSwingEnvironment(), firstField.getGridData());
       filterData.gridx = fieldData.gridx;
       filterData.gridy = fieldData.gridy + fieldData.gridh;
       filterData.gridw = fieldData.gridw;

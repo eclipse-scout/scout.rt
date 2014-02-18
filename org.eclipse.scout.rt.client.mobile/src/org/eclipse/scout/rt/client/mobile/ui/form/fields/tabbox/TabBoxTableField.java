@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -92,7 +93,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
   public class Table extends AbstractMobileTable {
 
     @Override
-    protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
+    protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
       if (getSelectedRow() == null) {
         return;
       }

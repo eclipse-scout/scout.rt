@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -37,7 +39,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   private IImageFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private double m_zoomDelta;
   private double m_panDelta;
   private double m_rotateDelta;
@@ -128,15 +130,15 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected void execDropRequest(TransferObject transferObject) throws ProcessingException {
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<Class<? extends IMenu>> getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
   @Override
-  public IKeyStroke[] getContributedKeyStrokes() {
+  public List<IKeyStroke> getContributedKeyStrokes() {
     return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
@@ -155,12 +157,10 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setDropType(getConfiguredDropType());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] a = getConfiguredMenus();
-    for (int i = 0; i < a.length; i++) {
+    List<IMenu> menuList = new ArrayList<IMenu>();
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, a[i]);
-        menuList.add(menu);
+        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         LOG.warn(null, e);
@@ -177,7 +177,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
       menu.setContainerInternal(this);
     }
 
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = Collections.unmodifiableList(menuList);
   }
 
   /**
@@ -216,15 +216,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     fireImageBoxEventInternal(new ImageFieldEvent(this, ImageFieldEvent.TYPE_AUTO_FIT));
   }
 
-  private IMenu[] firePopup() {
+  private List<IMenu> firePopup() {
     ImageFieldEvent e = new ImageFieldEvent(this, ImageFieldEvent.TYPE_POPUP);
     // single observer for table-owned menus
-    IMenu[] a = getMenus();
-    for (int i = 0; i < a.length; i++) {
-      IMenu m = a[i];
-      m.prepareAction();
-      if (m.isVisible()) {
-        e.addPopupMenu(m);
+    for (IMenu menu : getMenus()) {
+      menu.prepareAction();
+      if (menu.isVisible()) {
+        e.addPopupMenu(menu);
       }
     }
     fireImageBoxEventInternal(e);
@@ -261,8 +259,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   @Override
-  public IMenu[] getMenus() {
-    return m_menus;
+  public List<IMenu> getMenus() {
+    return CollectionUtility.unmodifiableListCopy(m_menus);
   }
 
   @Override
@@ -457,7 +455,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
 
     @Override
-    public IMenu[] firePopupFromUI() {
+    public List<IMenu> firePopupFromUI() {
       return firePopup();
     }
 

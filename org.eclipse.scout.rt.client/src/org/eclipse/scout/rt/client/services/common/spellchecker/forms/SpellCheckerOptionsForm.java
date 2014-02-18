@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.services.common.spellchecker.forms;
 
 import java.util.Enumeration;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -51,7 +53,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.service.SERVICES;
 
 public class SpellCheckerOptionsForm extends AbstractForm {
@@ -185,7 +187,7 @@ public class SpellCheckerOptionsForm extends AbstractForm {
         }
 
         @Override
-        protected Class<? extends LookupCall> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
           return SpellCheckerShortcutLookupCall.class;
         }
 
@@ -204,7 +206,7 @@ public class SpellCheckerOptionsForm extends AbstractForm {
         }
 
         @Override
-        protected Class<? extends LookupCall> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
           return SpellCheckerLanguageLookupCall.class;
         }
 
@@ -332,8 +334,8 @@ public class SpellCheckerOptionsForm extends AbstractForm {
           }
 
           @Override
-          protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
-            if (rows.length > 0) {
+          protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+            if (CollectionUtility.hasElements(rows)) {
               getEditorField().setValue(getWordColumn().getSelectedValue());
             }
           }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -44,7 +45,7 @@ public final class ScoutClientAssert {
     // TODO abr check row visibility
     HashSet<Object> expectedKeys = new HashSet<Object>(Arrays.asList(keys));
     HashSet<Object> unexpectedKeys = new HashSet<Object>();
-    Object[] listBoxKeys = ((DefaultListBoxTable) listbox.getTable()).getKeyColumn().getValues();
+    List listBoxKeys = ((DefaultListBoxTable) listbox.getTable()).getKeyColumn().getValues();
     for (Object key : listBoxKeys) {
       boolean expected = expectedKeys.remove(key);
       if (strict && !expected) {

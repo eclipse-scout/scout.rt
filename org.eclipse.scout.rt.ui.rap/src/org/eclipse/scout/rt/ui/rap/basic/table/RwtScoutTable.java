@@ -13,7 +13,10 @@ package org.eclipse.scout.rt.ui.rap.basic.table;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +31,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -213,13 +218,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       dummyCol.setResizable(false);
       dummyCol.setMoveable(false);
       boolean sortEnabled = false;
-      IColumn<?>[] scoutColumnsOrdered;
+      List<IColumn<?>> scoutColumnsOrdered;
       if (getScoutObject() != null) {
         scoutColumnsOrdered = getScoutObject().getColumnSet().getVisibleColumns();
         sortEnabled = getScoutObject().isSortEnabled();
       }
       else {
-        scoutColumnsOrdered = new IColumn[0];
+        scoutColumnsOrdered = Collections.emptyList();
       }
       if (m_uiColumnManager == null) {
         m_uiColumnManager = new TableColumnManager();
@@ -350,24 +355,20 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   @Override
   public ITableRow getUiSelectedRow() {
-    ITableRow[] rows = getUiSelectedRows();
-    if (rows.length > 0) {
-      return rows[0];
-    }
-    return null;
+    return CollectionUtility.firstElement(getUiSelectedRows());
   }
 
   @Override
-  public ITableRow[] getUiSelectedRows() {
+  public List<ITableRow> getUiSelectedRows() {
     StructuredSelection uiSelection = (StructuredSelection) getUiTableViewer().getSelection();
     TreeSet<ITableRow> sortedRows = new TreeSet<ITableRow>(new RowIndexComparator());
     if (uiSelection != null && !uiSelection.isEmpty()) {
-      for (Object o : uiSelection.toArray()) {
-        ITableRow row = (ITableRow) o;
-        sortedRows.add(row);
+      Iterator uiSelectionIt = uiSelection.iterator();
+      while (uiSelectionIt.hasNext()) {
+        sortedRows.add((ITableRow) uiSelectionIt.next());
       }
     }
-    return sortedRows.toArray(new ITableRow[sortedRows.size()]);
+    return new ArrayList<ITableRow>(sortedRows);
   }
 
   protected void setKeyStrokeFormScout() {
@@ -378,9 +379,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
     }
     // add new
-    ArrayList<IRwtKeyStroke> newRwtKeyStrokes = new ArrayList<IRwtKeyStroke>();
-    IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
-    for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
+    List<IRwtKeyStroke> newRwtKeyStrokes = new ArrayList<IRwtKeyStroke>();
+    for (IKeyStroke scoutKeyStroke : getScoutObject().getKeyStrokes()) {
       if (scoutKeyStroke.isEnabled()) {
         IRwtKeyStroke[] rwtStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
         for (IRwtKeyStroke rwtStroke : rwtStrokes) {
@@ -487,8 +487,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   /**
    * scout table observer
    */
-  protected boolean isHandleScoutTableEvent(TableEvent[] a) {
-    for (TableEvent element : a) {
+  protected boolean isHandleScoutTableEvent(List<? extends TableEvent> events) {
+    for (TableEvent element : events) {
       switch (element.getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
         case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
@@ -653,18 +653,18 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     // </Workaround>
   }
 
-  protected void setSelectionFromScout(ITableRow[] selectedRows) {
+  protected void setSelectionFromScout(List<ITableRow> selectedRows) {
     if (getUiField().isDisposed()) {
       return;
     }
-    ITableRow[] uiSelection = getUiSelectedRows();
+    List<ITableRow> uiSelection = getUiSelectedRows();
     if (CompareUtility.equals(uiSelection, selectedRows)) {
       // no change
       return;
     }
     else {
       if (selectedRows == null) {
-        selectedRows = new ITableRow[0];
+        selectedRows = Collections.emptyList();
       }
       getUiTableViewer().setSelection(new StructuredSelection(selectedRows), true);
       updateScrollToSelectionFromScout();
@@ -967,7 +967,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     for (int i = 0; i < truncatedColOrder.length; i++) {
       truncatedColOrder[i] = uiColumnOrder[i + 1] - 1;
     }
-    final IColumn<?>[] newOrder = m_uiColumnManager.getOrderedColumns(truncatedColOrder);
+    final List<IColumn<?>> newOrder = m_uiColumnManager.getOrderedColumns(truncatedColOrder);
     if (m_uiColumnManager.applyNewOrder(newOrder)) {
       m_uiColumnOrder = uiColumnOrder;
       // notify Scout
@@ -1006,9 +1006,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       if (e.stateMask == 0) {
         switch (e.keyCode) {
           case ' ':
-            ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
-            if (selectedRows != null && selectedRows.length > 0) {
-              handleUiRowClick(selectedRows[0]);
+            List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
+            if (CollectionUtility.hasElements(selectedRows)) {
+              handleUiRowClick(CollectionUtility.firstElement(selectedRows));
             }
             e.doit = false;
             break;
@@ -1020,7 +1020,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   private class P_ScoutTableListener implements TableListener {
     @Override
     public void tableChanged(final TableEvent e) {
-      if (isHandleScoutTableEvent(new TableEvent[]{e})) {
+      if (isHandleScoutTableEvent(CollectionUtility.arrayList(e))) {
         if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
           return;
         }
@@ -1042,42 +1042,41 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
 
     @Override
-    public void tableChangedBatch(final TableEvent[] a) {
-      if (isHandleScoutTableEvent(a)) {
-        final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TableEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+    public void tableChangedBatch(final List<? extends TableEvent> events) {
+      if (isHandleScoutTableEvent(events)) {
+        final List<TableEvent> filteredList = new ArrayList<TableEvent>();
+        for (TableEvent event : events) {
+          if (!isIgnoredScoutEvent(TableEvent.class, "" + event.getType())) {
+            filteredList.add(event);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
-        }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (isUiDisposed()) {
-              return;
-            }
-            m_redrawHandler.pushControlChanging();
-            try {
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              if (isUiDisposed()) {
+                return;
+              }
+              m_redrawHandler.pushControlChanging();
               try {
-                getUpdateUiFromScoutLock().acquire();
-                //
-                for (TableEvent element : filteredList) {
-                  handleScoutTableEventInUi(element);
+                try {
+                  getUpdateUiFromScoutLock().acquire();
+                  //
+                  for (TableEvent element : filteredList) {
+                    handleScoutTableEventInUi(element);
+                  }
+                }
+                finally {
+                  getUpdateUiFromScoutLock().release();
                 }
               }
               finally {
-                getUpdateUiFromScoutLock().release();
+                m_redrawHandler.popControlChanging();
               }
             }
-            finally {
-              m_redrawHandler.popControlChanging();
-            }
-          }
-        };
-        getUiEnvironment().invokeUiLater(t);
+          };
+          getUiEnvironment().invokeUiLater(t);
+        }
       }
     }
   }// end P_ScoutTableListener
@@ -1257,7 +1256,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      IMenu[] menus = null;
+      List<IMenu> menus = null;
       if (m_header) {
         menus = collectHeaderMenus();
       }
@@ -1271,12 +1270,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
     }
 
-    private IMenu[] collectHeaderMenus() {
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+    private List<IMenu> collectHeaderMenus() {
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
           scoutMenusRef.set(scoutMenus);
         }
       };
@@ -1293,7 +1292,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         return scoutMenusRef.get();
       }
 
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 

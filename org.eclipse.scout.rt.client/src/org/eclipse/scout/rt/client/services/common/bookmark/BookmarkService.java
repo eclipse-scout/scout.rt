@@ -99,7 +99,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
 
         IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
         if (desktop != null) {
-          ArrayList<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
+          List<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
           for (IKeyStroke k : desktop.getKeyStrokes()) {
             if (k instanceof ActivateBookmarkKeyStroke) {
               //remove
@@ -113,7 +113,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
             k.prepareAction();
             newKeyStrokes.add(k);
           }
-          desktop.setKeyStrokes(newKeyStrokes.toArray(new IKeyStroke[newKeyStrokes.size()]));
+          desktop.setKeyStrokes(newKeyStrokes);
         }
         break;
       }

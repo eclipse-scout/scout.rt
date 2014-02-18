@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JTabbedPane;
@@ -50,17 +51,19 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     JTabbedPane swingPane = new JTabbedPaneEx();
     swingPane.setOpaque(false);
     swingPane.setFocusable(true);
-    IGroupBox[] scoutGroupBoxes = getScoutObject().getGroupBoxes();
-    for (int i = 0; i < scoutGroupBoxes.length; i++) {
-      m_scoutGroupToIndex.put(scoutGroupBoxes[i], i);
+    List<IGroupBox> scoutGroupBoxes = getScoutObject().getGroupBoxes();
+    int i = 0;
+    for (IGroupBox box : scoutGroupBoxes) {
+      m_scoutGroupToIndex.put(box, i);
+      i++;
     }
     //
     setSwingField(swingPane);
     setSwingLabel(null);
     setSwingContainer(swingPane);
     //
-    for (int i = 0; i < scoutGroupBoxes.length; i++) {
-      checkTabItemFor(scoutGroupBoxes[i]);
+    for (IGroupBox box : scoutGroupBoxes) {
+      checkTabItemFor(box);
     }
     setTabItemSelected(0, true);
     //

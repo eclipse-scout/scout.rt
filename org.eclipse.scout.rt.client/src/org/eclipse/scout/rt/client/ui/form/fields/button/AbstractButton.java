@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -42,7 +43,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_displayStyle;
   private boolean m_processButton;
   private Object m_radioValue;
-  private IMenu[] m_menus;
+  private List<IMenu> m_menus;
   private final IButtonUIFacade m_uiFacade;
   private final OptimisticLock m_uiFacadeSetSelectedLock;
 
@@ -202,15 +203,16 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected void execToggleAction(boolean selected) throws ProcessingException {
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
+  private List<? extends Class<? extends IMenu>> getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    Class<IMenu>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    List<Class<IMenu>> menuClasses = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> filteredMenuClasses = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(menuClasses, IMenu.class);
+    List<? extends Class<? extends IMenu>> a = ConfigurationUtility.removeReplacedClasses(filteredMenuClasses);
+    return a;
   }
 
   @Override
-  public IKeyStroke[] getContributedKeyStrokes() {
+  public List<IKeyStroke> getContributedKeyStrokes() {
     return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
@@ -224,15 +226,14 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setRadioValue(getConfiguredRadioValue());
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] menuArray = getConfiguredMenus();
-    for (int i = 0; i < menuArray.length; i++) {
+    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       IMenu menu;
       try {
-        menu = ConfigurationUtility.newInnerInstance(this, menuArray[i]);
+        menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("menu: " + menuArray[i].getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("menu: " + menuClazz.getName(), t));
       }
     }
     try {
@@ -241,7 +242,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = menuList;
   }
 
   /**
@@ -299,12 +300,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public boolean hasMenus() {
-    return m_menus.length > 0;
+    return m_menus.size() > 0;
   }
 
   @Override
-  public IMenu[] getMenus() {
-    return m_menus;
+  public List<IMenu> getMenus() {
+    return CollectionUtility.unmodifiableListCopy(m_menus);
   }
 
   @Override
@@ -410,15 +411,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     fireButtonEvent(new ButtonEvent(this, ButtonEvent.TYPE_REQUEST_POPUP));
   }
 
-  private IMenu[] fireButtonPopup() {
+  private List<IMenu> fireButtonPopup() {
     ButtonEvent e = new ButtonEvent(this, ButtonEvent.TYPE_POPUP);
     // single observer add our menus
-    IMenu[] a = getMenus();
-    for (int i = 0; i < a.length; i++) {
-      IMenu m = a[i];
-      m.prepareAction();
-      if (m.isVisible()) {
-        e.addPopupMenu(m);
+    for (IMenu menu : getMenus()) {
+      menu.prepareAction();
+      if (menu.isVisible()) {
+        e.addPopupMenu(menu);
       }
     }
     fireButtonEvent(e);
@@ -452,7 +451,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
 
     @Override
-    public IMenu[] fireButtonPopupFromUI() {
+    public List<IMenu> fireButtonPopupFromUI() {
       return fireButtonPopup();
     }
 

@@ -70,7 +70,7 @@ public class DefaultDocConfig implements IDocConfig {
   }
 
   @Override
-  public IDocEntityListConfig<Class> getTypesConfig() {
+  public IDocEntityListConfig<Class<?>> getTypesConfig() {
     return new DefaultTypesConfig();
   }
 

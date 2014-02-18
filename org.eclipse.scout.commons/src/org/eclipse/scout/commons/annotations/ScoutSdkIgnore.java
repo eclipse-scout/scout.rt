@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
+package org.eclipse.scout.commons.annotations;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Responsible for creating {@link ISmartFieldProposalForm}.
+ * Indicates that the type flagged with this annotation should not be shown in the Scout SDK.
  * 
- * @since 3.8.0
+ * @author Matthias Villiger
+ * @since 3.10.0 M6
  */
-public interface ISmartFieldProposalFormProvider {
-  ISmartFieldProposalForm createProposalForm(ISmartField smartField) throws ProcessingException;
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ScoutSdkIgnore {
 }

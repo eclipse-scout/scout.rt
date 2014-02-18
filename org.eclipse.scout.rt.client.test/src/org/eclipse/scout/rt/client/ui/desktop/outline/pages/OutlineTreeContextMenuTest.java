@@ -14,8 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class OutlineTreeContextMenuTest {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();
@@ -70,14 +70,13 @@ public class OutlineTreeContextMenuTest {
     outline.selectFirstNode();
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    IMenu[] menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
+    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
 
-    List<IMenu> actualMenus = Arrays.asList(menus);
     @SuppressWarnings("unchecked")
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableEmptySpaceMenu.class, PageWithTableEmptySpace2Menu.class);
 
-    assertTrue(actualMenus.containsAll(requiredMenus));
-    assertTrue(actualMenus.size() == (requiredMenus.size()));
+    assertTrue(menus.containsAll(requiredMenus));
+    assertTrue(menus.size() == (requiredMenus.size()));
   }
 
   private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
@@ -89,11 +88,10 @@ public class OutlineTreeContextMenuTest {
     outline.selectNextChildNode();
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    IMenu[] menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
-    List<IMenu> actualMenus = Arrays.asList(menus);
+    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
 
-    assertTrue(actualMenus.containsAll(requiredMenus));
-    assertTrue(actualMenus.size() == (requiredMenus.size()));
+    assertTrue(menus.containsAll(requiredMenus));
+    assertTrue(menus.size() == (requiredMenus.size()));
   }
 
   private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {

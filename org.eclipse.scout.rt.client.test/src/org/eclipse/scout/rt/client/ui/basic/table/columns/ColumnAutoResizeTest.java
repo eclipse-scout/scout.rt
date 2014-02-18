@@ -14,7 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.Collections;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -41,7 +43,7 @@ public class ColumnAutoResizeTest {
   @Test
   public void testReloadPage_multipleSummaryColumns() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
     IOutline outline = desktop.getOutline();
 
@@ -51,7 +53,7 @@ public class ColumnAutoResizeTest {
     ITable table = ((AbstractPageWithTable) page).getTable();
     assertTrue(table instanceof ColumnAutoResizeTest.PageWithTable.TestTable);
     ColumnAutoResizeTest.PageWithTable.TestTable testTable = (ColumnAutoResizeTest.PageWithTable.TestTable) table;
-    IColumn col1 = testTable.getColumns()[0];
+    IColumn col1 = CollectionUtility.firstElement(testTable.getColumns());
     int width1 = col1.getWidth();
     // when page is reloaded, the column width shall not be different afterwards
     page.reloadPage();

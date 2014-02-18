@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -438,7 +437,7 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
 
     IFormField formField = getScoutObject();
     while (formField != null) {
-      scoutKeyStrokes.addAll(Arrays.asList(formField.getKeyStrokes()));
+      scoutKeyStrokes.addAll(formField.getKeyStrokes());
 
       //We need to register the parent keystrokes as well because rap only checks the focused control
       //Seee https://bugs.eclipse.org/bugs/show_bug.cgi?id=424133

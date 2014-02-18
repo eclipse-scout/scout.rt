@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.services.lookup;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -21,6 +22,8 @@ import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -73,6 +76,7 @@ public class BatchNormalizerTest {
    * <li>Cacheable: all</li>
    * </ul>
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testNullCalls() throws Exception {
     BatchLookupCall batchCall = new BatchLookupCall();
@@ -95,6 +99,7 @@ public class BatchNormalizerTest {
    * <li>Cacheable: all</li>
    * </ul>
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testNullKeys() throws Exception {
     BatchLookupCall batchCall = new BatchLookupCall();
@@ -134,27 +139,27 @@ public class BatchNormalizerTest {
     m_serverInvocations = 0;
     //
     BatchLookupNormalizer normalizer = new BatchLookupNormalizer();
-    LookupCall[] callArray = batchCall.getCallBatch();
-    LookupCall[] normCallArray = normalizer.normalizeCalls(callArray);
-    LookupRow[][] normResultArray = new BatchLookupService().getBatchDataByKey(new BatchLookupCall(normCallArray));
-    LookupRow[][] resultArray = normalizer.denormalizeResults(normResultArray);
+    List<ILookupCall<?>> callArray = batchCall.getCallBatch();
+    List<ILookupCall<?>> normCallArray = normalizer.normalizeCalls(callArray);
+    List<List<ILookupRow<?>>> normResultArray = new BatchLookupService().getBatchDataByKey(new BatchLookupCall(normCallArray));
+    List<List<ILookupRow<?>>> resultArray = normalizer.denormalizeResults(normResultArray);
     //
-    assertEquals(resultArray.length, callArray.length);
-    assertEquals(normResultArray.length, normCallArray.length);
-    assertEquals(expectedNormalizedSize, normResultArray.length);
+    assertEquals(resultArray.size(), callArray.size());
+    assertEquals(normResultArray.size(), normCallArray.size());
+    assertEquals(expectedNormalizedSize, normResultArray.size());
     assertEquals(expectedServerInvocations, m_serverInvocations);
     int rowCount = 0;
     int nullArrayCount = 0;
-    for (int i = 0; i < resultArray.length; i++) {
-      if (resultArray[i] == null) {
+    for (int i = 0; i < resultArray.size(); i++) {
+      if (resultArray.get(i) == null) {
         nullArrayCount++;
       }
-      else if (resultArray[i].length == 1) {
+      else if (resultArray.get(i).size() == 1) {
         rowCount++;
-        assertEquals(callArray[i].getKey(), resultArray[i][0].getKey());
-        assertEquals(dumpCall(callArray[i]), resultArray[i][0].getText());
+        assertEquals(callArray.get(i).getKey(), resultArray.get(i).get(0).getKey());
+        assertEquals(dumpCall(callArray.get(i)), resultArray.get(i).get(0).getText());
       }
-      else if (resultArray[i].length > 1) {
+      else if (resultArray.get(i).size() > 1) {
         fail("result length is expected to be 0 or 1");
       }
     }
@@ -162,11 +167,13 @@ public class BatchNormalizerTest {
     assertEquals(expectedTotalResultRowCount, rowCount);
   }
 
-  private static LookupRow[] createCallResult(LookupCall call) {
-    return new LookupRow[]{new LookupRow(call.getKey(), dumpCall(call))};
+  private static List<ILookupRow<?>> createCallResult(ILookupCall call) {
+    List<ILookupRow<?>> result = new ArrayList<ILookupRow<?>>();
+    result.add(new LookupRow(call.getKey(), dumpCall(call)));
+    return result;
   }
 
-  private static String dumpCall(LookupCall call) {
+  private static String dumpCall(ILookupCall<?> call) {
     return "Fruit[key=" + call.getKey() + ", text=" + call.getText() + "]";
   }
 
@@ -207,25 +214,25 @@ public class BatchNormalizerTest {
   public static class FruitLookupService extends AbstractLookupService implements IFruitLookupService {
 
     @Override
-    public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
+    public List<ILookupRow<?>> getDataByKey(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByText(LookupCall call) throws ProcessingException {
+    public List<ILookupRow<?>> getDataByText(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByAll(LookupCall call) throws ProcessingException {
+    public List<ILookupRow<?>> getDataByAll(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }
 
     @Override
-    public LookupRow[] getDataByRec(LookupCall call) throws ProcessingException {
+    public List<ILookupRow<?>> getDataByRec(ILookupCall call) throws ProcessingException {
       m_serverInvocations++;
       return createCallResult(call);
     }

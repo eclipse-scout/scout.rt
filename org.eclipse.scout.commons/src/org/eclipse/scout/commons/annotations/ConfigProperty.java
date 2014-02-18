@@ -81,12 +81,15 @@ public @interface ConfigProperty {
    * Class&lt;? extends ICodeType&gt;
    */
   String CODE_TYPE = "CODE_TYPE";
+
+// XXX[aho]
+  String CODE_ROW = "CODE_ROW";
   /**
    * int
    */
   String COMPOSER_ATTRIBUTE_TYPE = "COMPOSER_ATTRIBUTE_TYPE";
   /**
-   * String[]
+   * List<String>
    */
   String FILE_EXTENSIONS = "FILE_EXTENSIONS";
   /**

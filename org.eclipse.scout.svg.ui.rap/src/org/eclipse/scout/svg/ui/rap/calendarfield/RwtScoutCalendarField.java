@@ -13,6 +13,7 @@ package org.eclipse.scout.svg.ui.rap.calendarfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -96,11 +97,11 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       updateSvgDocument();
     }
     else if (ICalendar.PROP_SELECTED_DATE.equals(name)) {
-      getDocBuilder().setNumContextMenus(getContextMenusFromScout().length);
+      getDocBuilder().setNumContextMenus(getContextMenusFromScout().size());
       updateSvgDocument();
     }
     else if (ICalendar.PROP_SELECTED_COMPONENT.equals(name)) {
-      getDocBuilder().setNumContextMenus(getContextMenusFromScout().length);
+      getDocBuilder().setNumContextMenus(getContextMenusFromScout().size());
       updateSvgDocument();
     }
     else if (ICalendar.PROP_COMPONENTS.equals(name)) {
@@ -147,7 +148,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
     builder.reconfigureLayout();
     builder.setShownDate(selDate);
     builder.setSelection(selDate, selComp);
-    builder.setNumContextMenus(getContextMenusFromScout().length);
+    builder.setNumContextMenus(getContextMenusFromScout().size());
     builder.setComponents(getScoutObject().getCalendar().getComponents());
     setViewRangeFromUi(builder.getStartDate(), builder.getEndDate());
   }
@@ -233,7 +234,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
     }
   }
 
-  private IMenu[] getContextMenusFromScout() {
+  private List<IMenu> getContextMenusFromScout() {
     return RwtMenuUtility.collectMenus(getScoutObject().getCalendar(), true, true, getUiEnvironment());
   }
 

@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
@@ -28,12 +29,12 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
-public class DataModelAggregationLookupCall extends LocalLookupCall {
+public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAggregationLookupCall.class);
 
   private IDataModelAttribute m_attribute;
-  private List<LookupRow> m_lookupRows;
+  private List<ILookupRow<Integer>> m_lookupRows;
 
   public void setAttribute(IDataModelAttribute attribute) {
     if (m_attribute != attribute) {
@@ -43,7 +44,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall {
       }
       catch (Throwable t) {
         LOG.error("Failed updating aggregation lookup rows for attribute " + attribute);
-        m_lookupRows = new ArrayList<LookupRow>();
+        m_lookupRows = new ArrayList<ILookupRow<Integer>>();
       }
     }
   }
@@ -53,12 +54,12 @@ public class DataModelAggregationLookupCall extends LocalLookupCall {
   }
 
   protected void updateLookupRows() throws ProcessingException {
-    List<LookupRow> result = new ArrayList<LookupRow>();
+    List<ILookupRow<Integer>> result = new ArrayList<ILookupRow<Integer>>();
     int[] ags = null;
     if (m_attribute != null) {
       if (m_attribute.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
         //add default entry
-        result.add(new LookupRow(DataModelConstants.AGGREGATION_NONE, m_attribute.getText()));
+        result.add(new LookupRow<Integer>(DataModelConstants.AGGREGATION_NONE, m_attribute.getText()));
       }
       //add valid entries
       ags = m_attribute.getAggregationTypes();
@@ -96,7 +97,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall {
               break;
             }
           }
-          result.add(new LookupRow(ag, text));
+          result.add(new LookupRow<Integer>(ag, text));
         }
       }
     }
@@ -108,12 +109,12 @@ public class DataModelAggregationLookupCall extends LocalLookupCall {
    *         Changed whenever {@link #setAttribute(IDataModelAttribute)} is called with another attribute by
    *         calling {@link #updateLookupRows()}.
    */
-  public List<LookupRow> getLookupRows() {
+  public List<ILookupRow<Integer>> getLookupRows() {
     return m_lookupRows;
   }
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<Integer>> execCreateLookupRows() throws ProcessingException {
     if (m_lookupRows != null) {
       return m_lookupRows;
     }

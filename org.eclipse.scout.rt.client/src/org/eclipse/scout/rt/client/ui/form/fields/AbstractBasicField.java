@@ -13,12 +13,14 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 
 /**
  * Implementation for {@link IBasicField}. Handle properties and event methods that deals with basic fields.
  * 
  * @since 3.10.0-M3
  */
+@ScoutSdkIgnore
 @ClassId("d5a72dd8-cb1c-4dea-a568-90d77e65854e")
 public abstract class AbstractBasicField<T> extends AbstractValueField<T> implements IBasicField<T> {
 

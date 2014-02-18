@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.window.desktop.tray;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -91,7 +93,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
     }
     //
     if (getScoutObject() != null) {
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       // notify Scout
       Runnable t = new Runnable() {
         @Override
@@ -106,7 +108,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
         //nop
       }
       // end notify
-      if (scoutMenusRef.get() != null && scoutMenusRef.get().length > 0) {
+      if (CollectionUtility.hasElements(scoutMenusRef.get())) {
         SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_popupMenu, getEnvironment());
       }
     }

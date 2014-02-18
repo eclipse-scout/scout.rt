@@ -104,7 +104,7 @@ public interface INavigationHistoryService extends IService {
   /**
    * @return the bookmarks in the history as menus.
    */
-  IMenu[] getMenus();
+  List<IMenu> getMenus();
 
   /**
    * Adds a listener for {@link NavigationHistoryEvent}

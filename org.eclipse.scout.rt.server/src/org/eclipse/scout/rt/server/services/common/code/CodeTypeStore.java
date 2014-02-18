@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,10 +16,13 @@ package org.eclipse.scout.rt.server.services.common.code;
  * @version 3.x
  */
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ServerJob;
@@ -67,8 +70,13 @@ public class CodeTypeStore {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public void unloadCodeTypeCache(Class... types) {
+  public void unloadCodeTypeCache(Class<? extends ICodeType<?, ?>> type) throws ProcessingException {
+    List<Class<? extends ICodeType<?, ?>>> codeTypeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    codeTypeList.add(type);
+    unloadCodeTypeCache(codeTypeList);
+  }
+
+  public void unloadCodeTypeCache(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);
     }

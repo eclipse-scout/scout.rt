@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -37,20 +38,20 @@ public class AbstractPagingSupport {
     setPageIndex(m_table.getPageIndex());
   }
 
-  public ITableRow[] getElementsOfCurrentPage(ITableRow[] rows) {
+  public List<ITableRow> getElementsOfCurrentPage(List<? extends ITableRow> rows) {
     initProperties();
-    if (m_pageSize <= 0 || m_currentPageStartRowIndex < 0 || m_currentPageStartRowIndex >= rows.length) {
-      return rows;
+    if (m_pageSize <= 0 || m_currentPageStartRowIndex < 0 || m_currentPageStartRowIndex >= rows.size()) {
+      return Collections.unmodifiableList(rows);
     }
-    if (m_currentPageStartRowIndex == 0 && rows.length < m_pageSize) {
-      return rows;
+    if (m_currentPageStartRowIndex == 0 && rows.size() < m_pageSize) {
+      return Collections.unmodifiableList(rows);
     }
 
-    int currentPageEndRowIndex = Math.min(m_currentPageStartRowIndex + m_pageSize, rows.length) - 1;
+    int currentPageEndRowIndex = Math.min(m_currentPageStartRowIndex + m_pageSize, rows.size()) - 1;
     int currentPageSize = currentPageEndRowIndex - m_currentPageStartRowIndex + 1;
     List<ITableRow> currentPage = new ArrayList<ITableRow>();
     for (int i = m_currentPageStartRowIndex; i <= currentPageEndRowIndex; i++) {
-      currentPage.add(rows[i]);
+      currentPage.add(rows.get(i));
     }
 
     if (m_currentPageStartRowIndex > 0) {
@@ -58,12 +59,12 @@ public class AbstractPagingSupport {
       currentPage.add(0, m_previousElementsTableRow);
     }
 
-    if (currentPageSize >= m_pageSize && m_currentPageStartRowIndex + m_pageSize < rows.length) {
+    if (currentPageSize >= m_pageSize && m_currentPageStartRowIndex + m_pageSize < rows.size()) {
       m_nextElementsTableRow = createNextElementsTableRow();
       currentPage.add(m_nextElementsTableRow);
     }
 
-    return currentPage.toArray(new ITableRow[currentPage.size()]);
+    return Collections.unmodifiableList(currentPage);
   }
 
   protected ITableRow createPreviousElementsTableRow() {

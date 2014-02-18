@@ -47,14 +47,14 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> implement
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    if (getScoutObject().getMenus().length > 0) {
+    if (getScoutObject().getMenus().size() > 0) {
       Control menu = createMainMenu(container);
       if (menu != null) {
         RowData data = new RowData(40, 25);
         menu.setLayoutData(data);
       }
     }
-    if (getScoutObject().getViewButtons().length > 0) {
+    if (getScoutObject().getViewButtons().size() > 0) {
       m_buttonBar = createButtons(container);
     }
     //layout

@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer.internal;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.services.common.search.TokenBasedSearchFilterService;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute;
@@ -37,7 +39,8 @@ public class TokenBasedComposerStatementBuilder {
     return rootTok;
   }
 
-  private void visitAndNodes(TreeNodeToken parentTok, ITreeNode[] nodes) {
+  private void visitAndNodes(TreeNodeToken parentTok, List<? extends ITreeNode> nodesList) {
+    ITreeNode[] nodes = nodesList.toArray(new ITreeNode[nodesList.size()]);
     int i = 0;
     while (i < nodes.length) {
       if (nodes[i] instanceof EntityNode) {

@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -219,9 +222,9 @@ public final class DataModelUtility {
    * @return the entity for an external id part (no '/' characters) using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName, Map<String, String> metaData) {
-    if (array != null) {
-      for (IDataModelEntity e : array) {
+  public static IDataModelEntity findEntity(List<? extends IDataModelEntity> entities, String simpleName, Map<String, String> metaData) {
+    if (entities != null) {
+      for (IDataModelEntity e : entities) {
         if (e.getClass().getSimpleName().equals(simpleName)) {
           if (CompareUtility.equals(e.getMetaDataOfEntity(), metaData)) {
             return e;
@@ -236,9 +239,9 @@ public final class DataModelUtility {
    * @return the attribute for an external id part (no '/' characters) using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static IDataModelAttribute findAttribute(IDataModelAttribute[] array, String simpleName, Map<String, String> metaData) {
-    if (array != null) {
-      for (IDataModelAttribute a : array) {
+  public static IDataModelAttribute findAttribute(List<? extends IDataModelAttribute> attributes, String simpleName, Map<String, String> metaData) {
+    if (attributes != null) {
+      for (IDataModelAttribute a : attributes) {
         if (a.getClass().getSimpleName().equals(simpleName)) {
           if (CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
             return a;
@@ -300,11 +303,12 @@ public final class DataModelUtility {
    * @return Returns the the sorted array of entities.
    * @since 3.8.0
    */
-  public static IDataModelEntity[] sortEntities(IDataModelEntity[] array) {
-    if (array == null) {
-      return null;
+  public static List<? extends IDataModelEntity> sortEntities(List<? extends IDataModelEntity> entities) {
+    if (CollectionUtility.isEmpty(entities)) {
+      return Collections.emptyList();
     }
-    Arrays.sort(array, new Comparator<IDataModelEntity>() {
+    entities = new ArrayList<IDataModelEntity>(entities);
+    Collections.sort(entities, new Comparator<IDataModelEntity>() {
       @Override
       public int compare(IDataModelEntity o1, IDataModelEntity o2) {
         if (o1 == null && o2 == null) {
@@ -319,7 +323,7 @@ public final class DataModelUtility {
         return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
       }
     });
-    return array;
+    return entities;
   }
 
   /**
@@ -330,11 +334,12 @@ public final class DataModelUtility {
    * @return Returns the sorted array of attributes.
    * @since 3.8.0
    */
-  public static IDataModelAttribute[] sortAttributes(IDataModelAttribute[] array) {
-    if (array == null) {
-      return null;
+  public static List<? extends IDataModelAttribute> sortAttributes(List<? extends IDataModelAttribute> attributes) {
+    if (CollectionUtility.isEmpty(attributes)) {
+      return Collections.emptyList();
     }
-    Arrays.sort(array, new Comparator<IDataModelAttribute>() {
+    attributes = new ArrayList<IDataModelAttribute>(attributes);
+    Collections.sort(attributes, new Comparator<IDataModelAttribute>() {
       @Override
       public int compare(IDataModelAttribute o1, IDataModelAttribute o2) {
         if (o1 == null && o2 == null) {
@@ -355,6 +360,6 @@ public final class DataModelUtility {
         return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
       }
     });
-    return array;
+    return attributes;
   }
 }

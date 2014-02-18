@@ -54,23 +54,25 @@ public final class ConfigurationUtility {
    * @throws IllegalArgumentException
    */
   @SuppressWarnings("unchecked")
-  public static <T> Class<T>[] sortFilteredClassesByOrderAnnotation(Class[] classes, Class<T> filter) {
-    TreeMap<CompositeObject, Class> orderedClassesMap = new TreeMap<CompositeObject, Class>();
-    for (int i = 0; i < classes.length; i++) {
-      if (filter.isAssignableFrom(classes[i])) {
-        if (classes[i].isAnnotationPresent(Order.class)) {
-          Order order = (Order) classes[i].getAnnotation(Order.class);
-          orderedClassesMap.put(new CompositeObject(order.value(), i), classes[i]);
+  public static <T> List<Class<? extends T>> sortFilteredClassesByOrderAnnotation(List<? extends Class> classes, Class<T> filter) {
+    TreeMap<CompositeObject, Class<T>> orderedClassesMap = new TreeMap<CompositeObject, Class<T>>();
+    int i = 0;
+    for (Class candidate : classes) {
+      if (filter.isAssignableFrom(candidate)) {
+        if (candidate.isAnnotationPresent(Order.class)) {
+          Order order = (Order) candidate.getAnnotation(Order.class);
+          orderedClassesMap.put(new CompositeObject(order.value(), i), (Class<T>) candidate);
+          i++;
         }
         else {
-          if (!classes[i].isAnnotationPresent(Replace.class)) {
-            LOG.error("missing @Order annotation: " + classes[i].getName());
+          if (!candidate.isAnnotationPresent(Replace.class)) {
+            LOG.error("missing @Order annotation: " + candidate.getName());
           }
-          orderedClassesMap.put(new CompositeObject(Double.MAX_VALUE, i), classes[i]);
+          orderedClassesMap.put(new CompositeObject(Double.MAX_VALUE, i), (Class<T>) candidate);
         }
       }
     }
-    return orderedClassesMap.values().toArray(new Class[orderedClassesMap.size()]);
+    return Collections.unmodifiableList(new ArrayList<Class<? extends T>>(orderedClassesMap.values()));
   }
 
   /**
@@ -84,7 +86,7 @@ public final class ConfigurationUtility {
    * 
    * @since 3.8.1
    */
-  public static <T> Collection<T> sortByOrder(Collection<T> list) {
+  public static <T> List<T> sortByOrder(Collection<T> list) {
     if (list == null) {
       return null;
     }
@@ -109,7 +111,7 @@ public final class ConfigurationUtility {
       sortMap.put(new CompositeObject(order, index), element);
       index++;
     }
-    return sortMap.values();
+    return Collections.unmodifiableList(new ArrayList<T>(sortMap.values()));
   }
 
   /**
@@ -158,14 +160,14 @@ public final class ConfigurationUtility {
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
-  public static <T> Class<T>[] filterClasses(Class[] classes, Class<T> filter) {
-    ArrayList<Class<T>> list = new ArrayList<Class<T>>();
+  public static <T> List<Class<T>> filterClasses(Class[] classes, Class<T> filter) {
+    List<Class<T>> result = new ArrayList<Class<T>>();
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
-        list.add(c);
+        result.add(c);
       }
     }
-    return list.toArray(new Class[0]);
+    return Collections.unmodifiableList(result);
   }
 
   /**
@@ -292,11 +294,11 @@ public final class ConfigurationUtility {
    * @since 3.8.2
    */
   @SuppressWarnings("unchecked")
-  public static <T> Class<? extends T>[] removeReplacedClasses(Class<? extends T>[] classes) {
+  public static <T> List<Class<? extends T>> removeReplacedClasses(List<? extends Class<? extends T>> classes) {
     Set<Class<? extends T>> replacingClasses = getReplacingLeafClasses(classes);
     if (replacingClasses.isEmpty()) {
       // there are no replacing classes -> return original array
-      return classes;
+      return Collections.unmodifiableList(classes);
     }
 
     // compute resulting list of ordered classes
@@ -327,7 +329,7 @@ public final class ConfigurationUtility {
       list.remove(classToBeReplaced);
     }
 
-    return list.toArray(new Class[list.size()]);
+    return Collections.unmodifiableList(list);
   }
 
   /**
@@ -352,7 +354,7 @@ public final class ConfigurationUtility {
    * @return
    * @since 3.8.2
    */
-  public static <T> Map<Class<?>, Class<? extends T>> getReplacementMapping(Class<? extends T>[] classes) {
+  public static <T> Map<Class<?>, Class<? extends T>> getReplacementMapping(List<? extends Class<? extends T>> classes) {
     Set<Class<? extends T>> replacingClasses = getReplacingLeafClasses(classes);
     if (replacingClasses.isEmpty()) {
       // there are no replacing classes -> return original array
@@ -395,7 +397,7 @@ public final class ConfigurationUtility {
    * @return Returns the set of replacing leaf classes or an empty set.
    * @since 3.8.2
    */
-  public static <T> Set<Class<? extends T>> getReplacingLeafClasses(Class<? extends T>[] classes) {
+  public static <T> Set<Class<? extends T>> getReplacingLeafClasses(List<? extends Class<? extends T>> classes) {
     // gather all replacing and replaced classes (i.e. those annotated with @Replace and their super classes)
     Set<Class<? extends T>> replacingClasses = new HashSet<Class<? extends T>>();
     Set<Class<?>> replacedClasses = new HashSet<Class<?>>();

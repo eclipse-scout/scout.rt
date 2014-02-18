@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
+
+import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -19,7 +21,7 @@ import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
  */
 public interface IImageFieldUIFacade {
 
-  IMenu[] firePopupFromUI();
+  List<IMenu> firePopupFromUI();
 
   void setImageTransformFromUI(AffineTransformSpec t);
 

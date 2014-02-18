@@ -825,13 +825,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_trayComposite = createTray(desktop);
     }
     // dialogs
-    IForm[] dialogs = desktop.getDialogStack();
-    for (IForm dialog : dialogs) {
+    for (IForm dialog : desktop.getDialogStack()) {
       // showDialogFromScout(dialogs[i]);
       showStandaloneForm(dialog);
     }
-    IMessageBox[] messageBoxes = desktop.getMessageBoxStack();
-    for (IMessageBox messageBoxe : messageBoxes) {
+    for (IMessageBox messageBoxe : desktop.getMessageBoxStack()) {
       showMessageBoxFromScout(messageBoxe);
     }
   }

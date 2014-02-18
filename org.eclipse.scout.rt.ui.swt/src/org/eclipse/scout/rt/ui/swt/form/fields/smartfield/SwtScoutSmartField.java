@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,8 +27,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
@@ -69,7 +71,7 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * @since 1.0.0 10.04.2008
  */
-public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<?>> implements ISwtScoutSmartField, IPopupSupport {
+public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutSmartField.class);
 
   private DropDownButton m_browseButton;
@@ -240,7 +242,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   }
 
-  protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
+  protected void setProposalFormFromScout(IContentAssistFieldProposalForm form) {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -255,7 +257,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void showProposalPopup(final ISmartFieldProposalForm form) {
+  protected void showProposalPopup(final IContentAssistFieldProposalForm form) {
     // close old
     if (m_proposalPopup != null) {
       if (m_proposalPopup.isVisible()) {
@@ -461,7 +463,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       setIconIdFromScout((String) newValue);
     }
     else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
-      setProposalFormFromScout((ISmartFieldProposalForm) newValue);
+      setProposalFormFromScout((IContentAssistFieldProposalForm) newValue);
     }
   }
 
@@ -601,7 +603,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
           return;
         }
       }
-      if (getSwtField().isFocusControl()) {
+      if (!getSwtField().isDisposed() && getSwtField().isFocusControl()) {
         Runnable t = new Runnable() {
           @Override
           public void run() {
@@ -624,11 +626,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       for (MenuItem item : m_contextMenu.getItems()) {
         disposeMenuItem(item);
       }
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
           scoutMenusRef.set(scoutMenus);
         }
       };

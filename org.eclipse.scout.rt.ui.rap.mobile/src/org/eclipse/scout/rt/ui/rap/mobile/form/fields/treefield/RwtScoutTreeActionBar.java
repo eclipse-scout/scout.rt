@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.treefield;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
@@ -68,14 +67,14 @@ public class RwtScoutTreeActionBar extends AbstractRwtScoutActionBar<ITreeField>
       return;
     }
 
-    IMenu[] emptySpaceMenus = RwtMenuUtility.collectEmptySpaceMenus(tree, getUiEnvironment());
+    List<IMenu> emptySpaceMenus = RwtMenuUtility.collectEmptySpaceMenus(tree, getUiEnvironment());
     if (emptySpaceMenus != null) {
-      menuList.addAll(Arrays.asList(emptySpaceMenus));
+      menuList.addAll(emptySpaceMenus);
     }
 
-    IMenu[] rowMenus = RwtMenuUtility.collectNodeMenus(tree, getUiEnvironment());
+    List<IMenu> rowMenus = RwtMenuUtility.collectNodeMenus(tree, getUiEnvironment());
     if (rowMenus != null) {
-      List<IMenu> rowMenuList = new LinkedList<IMenu>(Arrays.asList(rowMenus));
+      List<IMenu> rowMenuList = new ArrayList<IMenu>(rowMenus);
 
       ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, rowMenuList);
 

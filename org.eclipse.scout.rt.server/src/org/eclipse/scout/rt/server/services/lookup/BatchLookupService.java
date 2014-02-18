@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.lookup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
@@ -26,47 +29,47 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   }
 
   @Override
-  public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
-    LookupCall[] calls = batch.getCallBatch();
-    LookupRow[][] resultArray = new LookupRow[calls.length][];
+  public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
+    List<ILookupCall<?>> calls = batch.getCallBatch();
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
-    for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = cache.getDataByKey(calls[i]);
+    for (ILookupCall<?> call : calls) {
+      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByKey(call)));
     }
-    return resultArray;
+    return result;
   }
 
   @Override
-  public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
-    LookupCall[] calls = batch.getCallBatch();
-    LookupRow[][] resultArray = new LookupRow[calls.length][];
+  public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
+    List<ILookupCall<?>> calls = batch.getCallBatch();
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
-    for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = cache.getDataByText(calls[i]);
+    for (ILookupCall<?> call : calls) {
+      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByText(call)));
     }
-    return resultArray;
+    return result;
   }
 
   @Override
-  public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
-    LookupCall[] calls = batch.getCallBatch();
-    LookupRow[][] resultArray = new LookupRow[calls.length][];
+  public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
+    List<ILookupCall<?>> calls = batch.getCallBatch();
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
-    for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = cache.getDataByAll(calls[i]);
+    for (ILookupCall<?> call : calls) {
+      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByAll(call)));
     }
-    return resultArray;
+    return result;
   }
 
   @Override
-  public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
-    LookupCall[] calls = batch.getCallBatch();
-    LookupRow[][] resultArray = new LookupRow[calls.length][];
+  public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
+    List<ILookupCall<?>> calls = batch.getCallBatch();
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
-    for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = cache.getDataByRec(calls[i]);
+    for (ILookupCall<?> call : calls) {
+      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByRec(call)));
     }
-    return resultArray;
+    return result;
   }
 
 }

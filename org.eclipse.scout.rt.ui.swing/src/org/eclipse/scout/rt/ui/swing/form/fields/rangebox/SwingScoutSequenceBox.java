@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.form.fields.rangebox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -54,11 +55,11 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     container.add(innerFieldsContainer);
     //
     // add fields
-    IFormField[] scoutFields = getScoutObject().getFields();
+    List<IFormField> scoutFields = getScoutObject().getFields();
     int visibleCount = 0;
-    for (int i = 0; i < scoutFields.length; i++) {
+    for (IFormField field : scoutFields) {
       // create item
-      ISwingScoutFormField childSwingScoutField = getSwingEnvironment().createFormField(innerFieldsContainer, scoutFields[i]);
+      ISwingScoutFormField childSwingScoutField = getSwingEnvironment().createFormField(innerFieldsContainer, field);
       // remove label fixed width hint
       JStatusLabelEx childLabel = childSwingScoutField.getSwingLabel();
       if (childLabel != null) {
@@ -90,7 +91,7 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
         // <bsh>
       }
       // create layout constraints
-      SwingScoutFormFieldGridData data = new SwingScoutFormFieldGridData(scoutFields[i]) {
+      SwingScoutFormFieldGridData data = new SwingScoutFormFieldGridData(field) {
         @Override
         public void validate() {
           super.validate();

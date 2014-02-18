@@ -44,7 +44,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     // collect attachments for HTML field
     List<RemoteFile> attachments = collectAttachments();
     if (attachments != null && attachments.size() > 0) {
-      htmlField.setAttachments(attachments.toArray(new RemoteFile[attachments.size()]));
+      htmlField.setAttachments(attachments);
     }
   }
 

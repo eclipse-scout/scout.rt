@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -94,7 +94,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     boolean created = false;
     if (filter == null) {
       created = true;
-      if (col instanceof ISmartColumn<?>) {
+      if (col instanceof IProposalColumn<?>) {
         filter = new StringColumnFilter(col);
       }
       else if (String.class.isAssignableFrom(col.getDataType())) {

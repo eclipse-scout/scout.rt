@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.easymock.EasyMock;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,21 +30,21 @@ public class MenuUtilityTest {
     IMenu menu = EasyMock.createNiceMock(IMenu.class);
     EasyMock.expect(menu.getKeyStroke()).andReturn("f1");
     EasyMock.replay(menu);
-    IMenu[] menus = new IMenu[]{menu};
-    IKeyStroke[] keyStrokes = MenuUtility.getKeyStrokesFromMenus(menus);
-    Assert.assertEquals("should return 1 menu", keyStrokes.length, 1);
-    Assert.assertEquals("keyStroke should be f11", keyStrokes[0].getKeyStroke(), "f1");
+    List<IMenu> menus = CollectionUtility.arrayList(menu);
+    Collection<IKeyStroke> keyStrokes = MenuUtility.getKeyStrokesFromMenus(menus);
+    Assert.assertEquals("should return 1 menu", keyStrokes.size(), 1);
+    Assert.assertEquals("keyStroke should be f11", CollectionUtility.firstElement(keyStrokes).getKeyStroke(), "f1");
 
     keyStrokes = MenuUtility.getKeyStrokesFromMenus(null);
     Assert.assertNotNull(keyStrokes);
-    Assert.assertEquals("null Paramter should return empty array", keyStrokes.length, 0);
+    Assert.assertEquals("null Paramter should return empty array", keyStrokes.size(), 0);
 
     menu = EasyMock.createNiceMock(IMenu.class);
     EasyMock.expect(menu.getKeyStroke()).andReturn(" "); //invalid keyStroke definition
     EasyMock.replay(menu);
-    menus = new IMenu[]{menu};
+    menus = CollectionUtility.arrayList(menu);
     keyStrokes = MenuUtility.getKeyStrokesFromMenus(menus);
     Assert.assertNotNull(keyStrokes);
-    Assert.assertEquals("KeyStrokes should be empty, since ' ' is an invalid keyStroke", keyStrokes.length, 0);
+    Assert.assertEquals("KeyStrokes should be empty, since ' ' is an invalid keyStroke", keyStrokes.size(), 0);
   }
 }

@@ -4,13 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.window.desktop.menubar;
 
-import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JMenuBar;
 
@@ -24,7 +24,7 @@ public class SwingScoutMenuBar extends SwingScoutComposite<IDesktop> {
 
   @Override
   protected void initializeSwing() {
-    m_topLevelMenuCount = getScoutObject().getMenus().length;
+    m_topLevelMenuCount = getScoutObject().getMenus().size();
     JMenuBar menuBar = new JMenuBar();
     setSwingField(menuBar);
     rebuildMenuBar();
@@ -44,9 +44,9 @@ public class SwingScoutMenuBar extends SwingScoutComposite<IDesktop> {
   }
 
   private void rebuildMenuBar() {
-    IMenu[] toplevelMenus = getScoutObject().getMenus();
+    List<IMenu> toplevelMenus = getScoutObject().getMenus();
     JMenuBar menuBar = getSwingMenuBar();
     menuBar.removeAll();
-    getSwingEnvironment().appendActions(menuBar, Arrays.asList(toplevelMenus));
+    getSwingEnvironment().appendActions(menuBar, toplevelMenus);
   }
 }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -60,7 +61,7 @@ public class EitherOrNode extends AbstractComposerNode {
 
   @Override
   protected void execInitTreeNode() {
-    ArrayList<IMenu> menus = new ArrayList<IMenu>();
+    List<IMenu> menus = new ArrayList<IMenu>();
     for (IMenu m : getMenus()) {
       if (m.getClass() == AddEntityOnEitherOrPlaceholderMenu.class) {
         attachAddEntityMenus(menus);
@@ -69,7 +70,7 @@ public class EitherOrNode extends AbstractComposerNode {
         menus.add(m);
       }
     }
-    setMenus(menus.toArray(new IMenu[menus.size()]));
+    setMenus(menus);
   }
 
   @Override

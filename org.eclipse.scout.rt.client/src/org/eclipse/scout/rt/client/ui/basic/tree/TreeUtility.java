@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 
 /**
  * @since 3.8.0
@@ -20,23 +24,22 @@ public final class TreeUtility {
   /**
    * If every given node has the same parent, that common parent node will be returned, else null.
    */
-  public static ITreeNode calculateCommonParentNode(ITreeNode[] nodes) {
-    if (nodes == null || nodes.length == 0) {
+  public static ITreeNode calculateCommonParentNode(Collection<? extends ITreeNode> nodes) {
+    if (!CollectionUtility.hasElements(nodes)) {
       return null;
     }
 
-    if (nodes.length == 1) {
-      return nodes[0].getParentNode();
+    if (nodes.size() == 1) {
+      return CollectionUtility.firstElement(nodes).getParentNode();
     }
-
-    ITreeNode test = nodes[0].getParentNode();
-    for (int i = 1; i < nodes.length; i++) {
-      if (nodes[i].getParentNode() != test) {
+    Iterator<? extends ITreeNode> nodeIt = nodes.iterator();
+    ITreeNode test = nodeIt.next().getParentNode();
+    while (nodeIt.hasNext()) {
+      if (nodeIt.next().getParentNode() != test) {
         test = null;
         break;
       }
     }
-
     return test;
   }
 

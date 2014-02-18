@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -28,7 +31,7 @@ public class TableRow implements ITableRow {
   private int m_status = STATUS_NON_CHANGED;
   private boolean m_enabled;
   private boolean m_checked;
-  private final ArrayList<Cell> m_cells;
+  private final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
   private int m_rowChanging = 0;
 
@@ -50,14 +53,13 @@ public class TableRow implements ITableRow {
     }
   }
 
-  public TableRow(ColumnSet columnSet, Object[] values) throws ProcessingException {
+  public TableRow(ColumnSet columnSet, List<? extends Object> values) throws ProcessingException {
     this(columnSet);
-    if (values == null) {
-      values = new Object[0];
-    }
-    for (int i = 0; i < values.length; i++) {
-      Cell cell = getCellForUpdate(i);
-      cell.setValue(values[i]);
+    if (CollectionUtility.hasElements(values)) {
+      for (int i = 0; i < values.size(); i++) {
+        Cell cell = getCellForUpdate(i);
+        cell.setValue(values.get(i));
+      }
     }
   }
 
@@ -207,7 +209,7 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public Object[] getKeyValues() {
+  public List<Object> getKeyValues() {
     if (m_columnSet == null) {
       throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
     }
@@ -215,11 +217,11 @@ public class TableRow implements ITableRow {
     if (keyColumns.length == 0) {
       keyColumns = m_columnSet.getAllColumnIndexes();
     }
-    Object[] pk = new Object[keyColumns.length];
-    for (int i = 0; i < keyColumns.length; i++) {
-      pk[i] = getCellValue(keyColumns[i]);
+    List<Object> pk = new ArrayList<Object>();
+    for (int keyIndex : keyColumns) {
+      pk.add(getCellValue(keyIndex));
     }
-    return pk;
+    return Collections.unmodifiableList(pk);
   }
 
   @Override
@@ -265,13 +267,13 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public boolean setCellValues(Object[] values) throws ProcessingException {
+  public boolean setCellValues(List<? extends Object> values) throws ProcessingException {
     try {
       setRowChanging(true);
       //
       boolean changed = false;
-      for (int i = 0; i < values.length; i++) {
-        boolean b = setCellValue(i, values[i]);
+      for (int i = 0; i < values.size(); i++) {
+        boolean b = setCellValue(i, values.get(i));
         changed = changed || b;
       }
       return changed;

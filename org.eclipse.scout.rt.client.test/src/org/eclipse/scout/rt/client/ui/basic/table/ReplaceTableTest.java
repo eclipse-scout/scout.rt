@@ -92,10 +92,10 @@ public class ReplaceTableTest {
     assertSame(form.getTableField().getTable().getSecondColumn(), form.getTableField().getTable().getColumnSet().getColumn(1));
 
     // menus
-    assertEquals(2, form.getTableField().getTable().getMenus().length);
+    assertEquals(2, form.getTableField().getTable().getMenus().size());
 
-    assertSame(form.getTableField().getTable().getFirstMenu(), form.getTableField().getTable().getMenus()[0]);
-    assertSame(form.getTableField().getTable().getSecondMenu(), form.getTableField().getTable().getMenus()[1]);
+    assertSame(form.getTableField().getTable().getFirstMenu(), form.getTableField().getTable().getMenus().get(0));
+    assertSame(form.getTableField().getTable().getSecondMenu(), form.getTableField().getTable().getMenus().get(1));
   }
 
   @Test
@@ -117,11 +117,11 @@ public class ReplaceTableTest {
     assertEquals("First", form.getTableExField().getTableEx().getFirstColumn().getColumnId());
 
     // menus
-    assertEquals(3, form.getTableField().getTable().getMenus().length);
+    assertEquals(3, form.getTableField().getTable().getMenus().size());
 
-    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenus()[0]);
-    assertSame(form.getTableExField().getTableEx().getThirdMenu(), form.getTableField().getTable().getMenus()[1]);
-    assertSame(form.getTableExField().getTableEx().getSecondMenu(), form.getTableField().getTable().getMenus()[2]);
+    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenus().get(0));
+    assertSame(form.getTableExField().getTableEx().getThirdMenu(), form.getTableField().getTable().getMenus().get(1));
+    assertSame(form.getTableExField().getTableEx().getSecondMenu(), form.getTableField().getTable().getMenus().get(2));
 
     assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenu(BaseForm.MainBox.FirstGroupBox.TableField.Table.FirstMenu.class));
     assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenu(ExtendedForm.TableExField.TableEx.FirstExMenu.class));
@@ -134,23 +134,23 @@ public class ReplaceTableTest {
     assertEquals(2, form.getTabBox().getFieldCount());
 
     // Form.MainBox.TabBox.FirstGroupBox.<AbstractTemplateTableField>
-    assertEquals(3, form.getTableField1().getTable().getMenus().length);
-    assertEquals(3, form.getFirstGroupBoxEx().getTableFieldEx1().getTable().getMenus().length);
+    assertEquals(3, form.getTableField1().getTable().getMenus().size());
+    assertEquals(3, form.getFirstGroupBoxEx().getTableFieldEx1().getTable().getMenus().size());
 
-    assertSame(form.getTableField1().getTable().getFirstMenu(), form.getTableField1().getTable().getMenus()[0]);
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getThirdMenu1(), form.getTableField1().getTable().getMenus()[1]);
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenus()[2]);
+    assertSame(form.getTableField1().getTable().getFirstMenu(), form.getTableField1().getTable().getMenus().get(0));
+    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getThirdMenu1(), form.getTableField1().getTable().getMenus().get(1));
+    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenus().get(2));
 
     assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu.class));
     assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(ExtendedFormUsingTemplates.FirstGroupBoxEx.TableFieldEx1.TableEx1.SecondMenuEx1.class));
 
     // Form.MainBox.TabBox.<AbstractTableBox>.<AbstractTemplateTableField>
-    assertEquals(3, form.getSecondGroupBox().getInnerTableField().getTable().getMenus().length);
-    assertEquals(3, form.getSecondGroupBoxEx().getInnerTableFieldEx1().getTable().getMenus().length);
+    assertEquals(3, form.getSecondGroupBox().getInnerTableField().getTable().getMenus().size());
+    assertEquals(3, form.getSecondGroupBoxEx().getInnerTableFieldEx1().getTable().getMenus().size());
 
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus()[0]);
-    assertSame(form.getSecondGroupBox().getInnerTableField().getTable().getFirstMenu(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus()[1]);
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus()[2]);
+    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(0));
+    assertSame(form.getSecondGroupBox().getInnerTableField().getTable().getFirstMenu(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(1));
+    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(2));
 
     assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
     assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(ExtendedFormUsingTemplates.SecondGroupBoxEx.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));

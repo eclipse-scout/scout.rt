@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.validate.checks;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.validate.ValidationUtility;
 import org.eclipse.scout.rt.shared.validate.annotations.LookupValue;
@@ -38,8 +40,8 @@ public class LookupValueCheck implements IValidateCheck {
 
   @Override
   public void check(Object obj) throws Exception {
-    if (obj.getClass().isArray()) {
-      ValidationUtility.checkLookupCallArray(obj, m_lookupCall);
+    if (obj instanceof Set<?>) {
+      ValidationUtility.checkLookupCallSet(obj, m_lookupCall);
     }
     else {
       ValidationUtility.checkLookupCallValue(obj, m_lookupCall);

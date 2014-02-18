@@ -199,7 +199,7 @@ public class LegacyComposerAttributeInjector implements DataModelConstants {
       }
     }
     //
-    attribute.setOperators(opList.toArray(new IDataModelAttributeOp[opList.size()]));
+    attribute.setOperators(opList);
   }
 
   public void injectAggregationTypes(IComposerAttribute attribute) {

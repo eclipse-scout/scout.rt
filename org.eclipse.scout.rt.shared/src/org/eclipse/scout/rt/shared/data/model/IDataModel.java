@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.util.List;
+
 public interface IDataModel {
 
   /**
@@ -17,11 +19,11 @@ public interface IDataModel {
    */
   void init();
 
-  IDataModelAttribute[] getAttributes();
+  List<IDataModelAttribute> getAttributes();
 
   IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz);
 
-  IDataModelEntity[] getEntities();
+  List<IDataModelEntity> getEntities();
 
   IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz);
 }

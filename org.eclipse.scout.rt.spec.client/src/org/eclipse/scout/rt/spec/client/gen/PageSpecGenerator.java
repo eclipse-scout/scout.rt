@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -34,8 +36,8 @@ public class PageSpecGenerator {
     String id = tablePageConfig.getIdExtractor().getText(page);
     String title = tablePageConfig.getTitleExtractor().getText(page);
 
-    IColumn<?>[] columns = page.getTable().getColumns();
-    IMenu[] menus = page.getTable().getMenus();
+    List<IColumn<?>> columns = page.getTable().getColumns();
+    List<IMenu> menus = page.getTable().getMenus();
 
     IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig());
     IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig());

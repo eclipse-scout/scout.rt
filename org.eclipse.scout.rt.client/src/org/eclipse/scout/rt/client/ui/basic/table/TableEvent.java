@@ -13,9 +13,12 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -147,13 +150,13 @@ public class TableEvent extends java.util.EventObject {
   //next 840, check method AbstractTable.processEventBuffer
 
   private final int m_type;
-  private ITableRow[] m_rows = new ITableRow[0];
+  private List<? extends ITableRow> m_rows = Collections.emptyList();
   private List<IMenu> m_popupMenus;
   private boolean m_consumed;
   private TransferObject m_dragObject;
   private TransferObject m_dropObject;
   private TransferObject m_copyObject;
-  private IColumn[] m_columns;
+  private Collection<? extends IColumn<?>> m_columns;
   private boolean m_sortInMemoryAllowed;
 
   public TableEvent(ITable source, int type) {
@@ -161,10 +164,10 @@ public class TableEvent extends java.util.EventObject {
     m_type = type;
   }
 
-  public TableEvent(ITable source, int type, ITableRow[] rows) {
+  public TableEvent(ITable source, int type, List<? extends ITableRow> rows) {
     super(source);
     m_type = type;
-    if (rows != null && rows.length > 0) {
+    if (CollectionUtility.hasElements(rows)) {
       m_rows = rows;
     }
   }
@@ -177,24 +180,27 @@ public class TableEvent extends java.util.EventObject {
     return m_type;
   }
 
-  public ITableRow[] getRows() {
-    return m_rows;
+  public List<ITableRow> getRows() {
+    return Collections.unmodifiableList(m_rows);
   }
 
-  protected void setRows(ITableRow[] rows) {
+  protected void setRows(List<? extends ITableRow> rows) {
+    if (rows == null) {
+      m_rows = Collections.emptyList();
+    }
     m_rows = rows;
   }
 
   public int getRowCount() {
-    return m_rows != null ? m_rows.length : 0;
+    return m_rows.size();
   }
 
   public ITableRow getFirstRow() {
-    return m_rows.length > 0 ? m_rows[0] : null;
+    return CollectionUtility.firstElement(m_rows);
   }
 
   public ITableRow getLastRow() {
-    return m_rows.length > 0 ? m_rows[m_rows.length - 1] : null;
+    return CollectionUtility.lastElement(m_rows);
   }
 
   /**
@@ -212,24 +218,24 @@ public class TableEvent extends java.util.EventObject {
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
-  public void addPopupMenus(IMenu[] menus) {
+  public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
         m_popupMenus = new ArrayList<IMenu>();
       }
-      m_popupMenus.addAll(Arrays.asList(menus));
+      m_popupMenus.addAll(menus);
     }
   }
 
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
-  public IMenu[] getPopupMenus() {
+  public List<IMenu> getPopupMenus() {
     if (m_popupMenus != null) {
-      return m_popupMenus.toArray(new IMenu[0]);
+      return Collections.unmodifiableList(m_popupMenus);
     }
     else {
-      return new IMenu[0];
+      return Collections.emptyList();
     }
   }
 
@@ -290,15 +296,20 @@ public class TableEvent extends java.util.EventObject {
    * used by
    * TYPE_COLUMN_ORDER_CHANGED,TYPE_SORT_REQUEST,TYPE_COLUMN_HEADERS_CHANGED
    */
-  public IColumn[] getColumns() {
-    return m_columns;
+  public Collection<IColumn<?>> getColumns() {
+    if (m_columns != null) {
+      return Collections.unmodifiableCollection(m_columns);
+    }
+    else {
+      return Collections.emptyList();
+    }
   }
 
   public IColumn getFirstColumn() {
-    return m_columns.length > 0 ? m_columns[0] : null;
+    return CollectionUtility.firstElement(m_columns);
   }
 
-  protected void setColumns(IColumn[] columns) {
+  protected void setColumns(Collection<? extends IColumn<?>> columns) {
     m_columns = columns;
   }
 
@@ -334,17 +345,17 @@ public class TableEvent extends java.util.EventObject {
     }
     buf.append(" ");
     // rows
-    if (m_rows != null && m_rows.length > 0 && getTable() != null) {
-      if (m_rows.length == 1) {
-        buf.append("row " + m_rows[0]);
+    if (CollectionUtility.hasElements(m_rows) && getTable() != null) {
+      if (m_rows.size() == 1) {
+        buf.append("row ").append(m_rows.get(0));
       }
       else {
         buf.append("rows {");
-        for (int i = 0; i < m_rows.length; i++) {
-          if (i >= 0) {
-            buf.append(",");
-          }
-          buf.append("" + m_rows[i]);
+        Iterator<? extends ITableRow> rowIt = m_rows.iterator();
+        buf.append("" + rowIt.next());
+        while (rowIt.hasNext()) {
+          buf.append(",");
+          buf.append("" + rowIt.next());
         }
         buf.append("}");
       }

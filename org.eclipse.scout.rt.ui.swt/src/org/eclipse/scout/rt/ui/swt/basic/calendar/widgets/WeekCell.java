@@ -138,12 +138,9 @@ public class WeekCell extends AbstractCell {
     e.gc.fillRectangle(noon);
     e.gc.setBackground(SwtColors.getInstance().getWhite());
 
-    int time = getCalendar().getStartHour(); // we have 1 slot before start time
     for (int i = 0; i < slots; i++) { // we go one slot after end time
       int y = (int) Math.round(deltaY * i) + yTimed;
       e.gc.drawLine(0, y, bounds.width - 1, y);
-
-      time++;
     }
   }
 

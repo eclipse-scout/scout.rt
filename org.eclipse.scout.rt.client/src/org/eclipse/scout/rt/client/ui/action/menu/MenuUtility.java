@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -26,17 +30,20 @@ public final class MenuUtility {
    * 
    * @since 3.10.0-M4
    */
-  public static IKeyStroke[] getKeyStrokesFromMenus(IMenu[] menu) {
-    HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
+  public static List<IKeyStroke> getKeyStrokesFromMenus(List<? extends IMenu> menu) {
+    Set<String> keys = new HashSet<String>();
+    List<IKeyStroke> keyStrokes = new ArrayList<IKeyStroke>();
     if (menu != null) {
       for (IMenu m : menu) {
         String s = m.getKeyStroke();
         if (s != null && s.trim().length() > 0) {
           KeyStroke ks = new KeyStroke(s, m);
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+          if (keys.add(ks.getKeyStroke())) {
+            keyStrokes.add(ks);
+          }
         }
       }
     }
-    return ksMap.values().toArray(new IKeyStroke[ksMap.size()]);
+    return Collections.unmodifiableList(keyStrokes);
   }
 }

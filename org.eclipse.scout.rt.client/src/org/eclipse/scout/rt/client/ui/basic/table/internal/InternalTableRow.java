@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -33,7 +36,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   private boolean m_checked;
   private String m_iconId;
   private int m_status = STATUS_NON_CHANGED;
-  private Cell[] m_cells;
+  private List<Cell> m_cells;
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
   private boolean m_filterAccepted;
@@ -50,9 +53,9 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_enabled = true;
     m_status = STATUS_NON_CHANGED;
     m_filterAccepted = true;
-    m_cells = new Cell[table.getColumnCount()];
-    for (int i = 0; i < m_cells.length; i++) {
-      m_cells[i] = new Cell(this);
+    m_cells = new ArrayList<Cell>(table.getColumnCount());
+    for (int i = 0; i < table.getColumnCount(); i++) {
+      m_cells.add(new Cell(this));
     }
   }
 
@@ -62,16 +65,19 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_enabled = row.isEnabled();
     m_checked = row.isChecked();
     m_status = row.getStatus();
-    m_cells = new Cell[table.getColumnCount()];
-    for (int i = 0; i < m_cells.length; i++) {
-      m_cells[i] = new Cell(this, row.getCell(i));
+    m_cells = new ArrayList<Cell>(table.getColumnCount());
+    for (int i = 0; i < table.getColumnCount(); i++) {
+      m_cells.add(new Cell(this, row.getCell(i)));
     }
     // validate values
-    IColumn[] cols = table.getColumns();
-    for (int i = 0; i < m_cells.length && i < cols.length; i++) {
-      Object value = m_cells[i].getValue();
-      value = cols[i].parseValue(this, value);
-      m_cells[i].setValue(value);
+    List<IColumn<?>> cols = table.getColumns();
+    int i = 0;
+    for (IColumn<?> col : cols) {
+      Cell cell = m_cells.get(i);
+      Object value = cell.getValue();
+      value = col.parseValue(this, value);
+      cell.setValue(value);
+      i++;
     }
     // reset status
     m_status = row.getStatus();
@@ -159,8 +165,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
       setRowChanging(true);
       //
       m_enabled = b;
-      for (int i = 0; i < m_cells.length; i++) {
-        m_cells[i].setEnabled(m_enabled);
+      for (Cell c : m_cells) {
+        c.setEnabled(m_enabled);
       }
     }
     finally {
@@ -227,7 +233,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public int getCellCount() {
-    return m_cells.length;
+    return m_cells.size();
   }
 
   @Override
@@ -237,10 +243,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public ICell getCell(int columnIndex) {
-    if (columnIndex < 0 || columnIndex >= m_cells.length) {
-      return new Cell();
-    }
-    return m_cells[columnIndex];
+    return getCellForUpdate(columnIndex);
   }
 
   @Override
@@ -255,7 +258,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
         setRowChanging(true);
         //
         // copy all fields
-        m_cells[columnIndex] = new Cell(this, cell);
+        m_cells.set(columnIndex, new Cell(this, cell));
       }
       finally {
         setRowChanging(false);
@@ -270,23 +273,26 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public Cell getCellForUpdate(int columnIndex) {
-    return m_cells[columnIndex];
+    if (columnIndex < 0 || columnIndex >= m_cells.size()) {
+      return new Cell();
+    }
+    return m_cells.get(columnIndex);
   }
 
   @Override
   public Object getCellValue(int columnIndex) {
-    return m_cells[columnIndex].getValue();
+    return getCell(columnIndex).getValue();
   }
 
   @Override
-  public Object[] getKeyValues() {
+  public List<Object> getKeyValues() {
     int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
     if (keyColumns.length == 0) {
       keyColumns = getTable().getColumnSet().getAllColumnIndexes();
     }
-    Object[] pk = new Object[keyColumns.length];
-    for (int i = 0; i < keyColumns.length; i++) {
-      pk[i] = m_cells[keyColumns[i]].getValue();
+    List<Object> pk = new ArrayList<Object>();
+    for (int keyIndex : keyColumns) {
+      pk.add(getCell(keyIndex).getValue());
     }
     return pk;
   }
@@ -324,14 +330,14 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public boolean/* changed */setCellValue(int columnIndex, Object value) throws ProcessingException {
-    return m_cells[columnIndex].setValue(value);
+    return getCellForUpdate(columnIndex).setValue(value);
   }
 
   @Override
-  public boolean setCellValues(Object[] values) throws ProcessingException {
+  public boolean setCellValues(List<? extends Object> values) throws ProcessingException {
     boolean changed = false;
-    for (int i = 0; i < values.length; i++) {
-      boolean b = setCellValue(i, values[i]);
+    for (int i = 0; i < values.size(); i++) {
+      boolean b = setCellValue(i, values.get(i));
       changed = changed || b;
     }
     return changed;
@@ -373,8 +379,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     try {
       setRowChanging(true);
       //
-      for (int i = 0; i < m_cells.length; i++) {
-        m_cells[i].setBackgroundColor(c);
+      for (Cell cell : m_cells) {
+        cell.setBackgroundColor(c);
       }
     }
     finally {
@@ -387,8 +393,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     try {
       setRowChanging(true);
       //
-      for (int i = 0; i < m_cells.length; i++) {
-        m_cells[i].setForegroundColor(c);
+      for (Cell cell : m_cells) {
+        cell.setForegroundColor(c);
       }
     }
     finally {
@@ -401,8 +407,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     try {
       setRowChanging(true);
       //
-      for (int i = 0; i < m_cells.length; i++) {
-        m_cells[i].setFont(f);
+      for (Cell cell : m_cells) {
+        cell.setFont(f);
       }
     }
     finally {
@@ -415,8 +421,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     try {
       setRowChanging(true);
       //
-      for (int i = 0; i < m_cells.length; i++) {
-        m_cells[i].setTooltipText(s);
+      for (Cell cell : m_cells) {
+        cell.setTooltipText(s);
       }
     }
     finally {
@@ -484,8 +490,8 @@ public class InternalTableRow implements ITableRow, ICellObserver {
       // validate value
       if (getTable() != null) {
         int colIndex = -1;
-        for (int i = 0; i < m_cells.length; i++) {
-          if (m_cells[i] == cell) {
+        for (int i = 0; i < m_cells.size(); i++) {
+          if (getCell(i) == cell) {
             colIndex = i;
             break;
           }
@@ -521,6 +527,6 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + VerboseUtility.dumpObjects(m_cells) + "]";
+    return getClass().getSimpleName() + "[" + VerboseUtility.dumpObjects(m_cells.toArray()) + "]";
   }
 }

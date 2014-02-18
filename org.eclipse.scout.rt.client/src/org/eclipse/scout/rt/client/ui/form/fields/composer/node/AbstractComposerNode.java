@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -91,7 +92,7 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
       n = n.getParentNode();
     }
 
-    IDataModelEntity[] childEntitites;
+    List<IDataModelEntity> childEntitites;
     if (eNode != null) {
       childEntitites = eNode.getEntity().getEntities();
     }

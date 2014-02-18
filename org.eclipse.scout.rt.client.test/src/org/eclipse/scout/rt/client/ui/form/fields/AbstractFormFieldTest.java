@@ -84,7 +84,7 @@ public class AbstractFormFieldTest {
     verifyNoDuplicateClassIds(new TestFormWithGroupBoxes().getAllFields());
   }
 
-  private void verifyNoDuplicateClassIds(IFormField[] formFields) {
+  private void verifyNoDuplicateClassIds(List<IFormField> formFields) {
     Set<String> ids = new HashSet<String>();
     for (IFormField f : formFields) {
       String classId = f.classId();

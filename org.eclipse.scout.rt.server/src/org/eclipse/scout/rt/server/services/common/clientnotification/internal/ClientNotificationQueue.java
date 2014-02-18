@@ -4,15 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clientnotification.internal;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.EventListenerList;
@@ -68,9 +69,9 @@ public class ClientNotificationQueue {
     fireEvent(notification, filter);
   }
 
-  public IClientNotification[] getNextNotifications(long blockingTimeout) {
+  public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
     long endTime = System.currentTimeMillis() + blockingTimeout;
-    ArrayList<IClientNotification> list = new ArrayList<IClientNotification>();
+    Set<IClientNotification> list = new HashSet<IClientNotification>();
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
@@ -108,7 +109,7 @@ public class ClientNotificationQueue {
         }
       }
     }
-    return list.toArray(new IClientNotification[list.size()]);
+    return list;
   }
 
   private class QueueElement {

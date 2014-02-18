@@ -16,6 +16,8 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.Collections;
+
 import org.easymock.EasyMock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -56,7 +58,7 @@ public class SwingScoutTableFieldUiTest {
     scoutObject.getGridData();
     expectLastCall().andReturn(new GridData(1, 1, 1, 1, 1.0, 1.0)).anyTimes();
     scoutObject.getKeyStrokes();
-    expectLastCall().andReturn(new IKeyStroke[]{}).anyTimes();
+    expectLastCall().andReturn(Collections.<IKeyStroke> emptyList()).anyTimes();
     scoutObject.getTable();
     expectLastCall().andReturn(scoutTable);
     scoutObject.getLabelPosition();

@@ -14,7 +14,10 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -25,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
@@ -43,7 +45,7 @@ public class PageWithTable6Test {
   public void testMenus() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     Outline outline = new Outline();
-    desktop.setAvailableOutlines(new IOutline[]{outline});
+    desktop.setAvailableOutlines(Collections.singletonList(outline));
     desktop.setOutline(outline);
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
@@ -88,7 +90,7 @@ public class PageWithTable6Test {
   }
 
   private static void assertRowMenus(PageWithTable.Table table, String[] expectedMenus) {
-    ArrayList<String> actualMenus = new ArrayList<String>();
+    List<String> actualMenus = new ArrayList<String>();
     for (IMenu m : table.getUIFacade().fireRowPopupFromUI()) {
       if (m.isVisible() && m.isEnabled()) {
         actualMenus.add(m.getText());
@@ -116,7 +118,7 @@ public class PageWithTable6Test {
     @Override
     protected void execPopulateTable() throws ProcessingException {
       super.execPopulateTable();
-      getTable().findRowByKey(new Object[]{2}).setEnabled(false);
+      getTable().findRowByKey(CollectionUtility.arrayList((Object) Integer.valueOf(2))).setEnabled(false);
     }
 
     public class Table extends AbstractTable {

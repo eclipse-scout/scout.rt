@@ -15,7 +15,9 @@ import java.security.Permission;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -30,8 +32,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 @SuppressWarnings("deprecation")
@@ -42,14 +45,14 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private String m_id;
   private String m_text;
   private int m_type;
-  private IDataModelAttributeOp[] m_operators;
+  private List<? extends IDataModelAttributeOp> m_operators;
   private int[] m_aggregationTypes;
   private String m_iconId;
   private boolean m_allowNullOperator;
   private boolean m_allowNotOperator;
   private boolean m_aggregationEnabled;
   private Class<? extends ICodeType> m_codeTypeClass;
-  private LookupCall m_lookupCall;
+  private ILookupCall<?> m_lookupCall;
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
@@ -94,13 +97,13 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(30)
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<?>> getConfiguredLookupCall() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(40)
-  protected Class<? extends ICodeType> getConfiguredCodeType() {
+  protected Class<? extends ICodeType<?, ?>> getConfiguredCodeType() {
     return null;
   }
 
@@ -148,7 +151,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @ConfigOperation
   @Order(20)
-  protected void execPrepareLookup(LookupCall call) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<?> call) throws ProcessingException {
   }
 
   @Override
@@ -172,9 +175,9 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       setCodeTypeClass(getConfiguredCodeType());
     }
     // lazy lookup decorator
-    Class<? extends LookupCall> lsCls = getConfiguredLookupCall();
+    Class<? extends ILookupCall<?>> lsCls = getConfiguredLookupCall();
     if (lsCls != null) {
-      LookupCall call;
+      ILookupCall<?> call;
       try {
         call = lsCls.newInstance();
         setLookupCall(call);
@@ -205,7 +208,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   @Override
-  public void prepareLookup(LookupCall call) throws ProcessingException {
+  public void prepareLookup(ILookupCall<?> call) throws ProcessingException {
     execPrepareLookup(call);
   }
 
@@ -240,12 +243,12 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   @Override
-  public IDataModelAttributeOp[] getOperators() {
-    return m_operators;
+  public List<IDataModelAttributeOp> getOperators() {
+    return Collections.unmodifiableList(m_operators);
   }
 
   @Override
-  public void setOperators(IDataModelAttributeOp[] ops) {
+  public void setOperators(List<? extends IDataModelAttributeOp> ops) {
     m_operators = ops;
   }
 
@@ -306,27 +309,30 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   @Override
-  public Class<? extends ICodeType> getCodeTypeClass() {
-    return m_codeTypeClass;
+  @SuppressWarnings("unchecked")
+  public Class<? extends ICodeType<?, ?>> getCodeTypeClass() {
+    return (Class<? extends ICodeType<?, ?>>) m_codeTypeClass;
   }
 
   @Override
-  public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
+  @SuppressWarnings("unchecked")
+  public void setCodeTypeClass(Class<? extends ICodeType<?, ?>> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(m_codeTypeClass);
+      m_lookupCall = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) m_codeTypeClass);
     }
   }
 
   @Override
-  public LookupCall getLookupCall() {
-    return m_lookupCall;
+  @SuppressWarnings("unchecked")
+  public ILookupCall<Object> getLookupCall() {
+    return (ILookupCall<Object>) m_lookupCall;
   }
 
   @Override
-  public void setLookupCall(LookupCall call) {
+  public void setLookupCall(ILookupCall<?> call) {
     m_lookupCall = call;
   }
 
@@ -612,17 +618,21 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    *          Lookup call (not used if code type class is set)
    * @return Formatted value: key is resolved by code type / lookup call
    */
-  protected String formatSmart(Object rawValue, Class<? extends ICodeType> codeTypeClass, LookupCall lookupCall) {
+  @SuppressWarnings("unchecked")
+  protected String formatSmart(Object rawValue, Class<? extends ICodeType<?, ?>> codeTypeClass, ILookupCall<?> lookupCall) {
     if (codeTypeClass == null && lookupCall == null) {
       return null;
     }
 
-    LookupCall call;
+    ILookupCall<Object> call;
     if (codeTypeClass != null) {
-      call = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
+      call = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) codeTypeClass);
+    }
+    else if (lookupCall instanceof LookupCall<?>) {
+      call = (ILookupCall<Object>) ((LookupCall<Object>) lookupCall).clone();
     }
     else {
-      call = (LookupCall) lookupCall.clone();
+      return null;
     }
 
     call.setKey(rawValue);
@@ -631,17 +641,17 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     call.setRec(null);
 
     try {
-      LookupRow[] result = call.getDataByKey();
-      if (result.length == 1) {
-        return result[0].getText();
+      List<? extends ILookupRow<?>> result = call.getDataByKey();
+      if (result.size() == 1) {
+        return result.get(0).getText();
       }
-      else if (result.length > 1) {
+      else if (result.size() > 1) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < result.length; i++) {
+        for (int i = 0; i < result.size(); i++) {
           if (i > 0) {
             sb.append(", ");
           }
-          sb.append(result[i].getText());
+          sb.append(result.get(i).getText());
         }
         return sb.toString();
       }

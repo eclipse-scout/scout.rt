@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -188,13 +190,13 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
         @Override
         public void run() {
           IFileChooser fc = getScoutObject().getFileChooser();
-          final File[] files = fc.startChooser();
+          final List<File> files = fc.startChooser();
 
           Runnable swtJob = new Runnable() {
             @Override
             public void run() {
-              if (files != null && files.length > 0) {
-                getSwtField().setText(files[0].getAbsolutePath());
+              if (CollectionUtility.hasElements(files)) {
+                getSwtField().setText(CollectionUtility.firstElement(files).getAbsolutePath());
                 handleSwtInputVerifier();
               }
             }
@@ -229,12 +231,11 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
       for (MenuItem item : m_contextMenu.getItems()) {
         disposeMenuItem(item);
       }
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
+      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
-          scoutMenusRef.set(scoutMenus);
+          scoutMenusRef.set(getScoutObject().getUIFacade().firePopupFromUI());
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);

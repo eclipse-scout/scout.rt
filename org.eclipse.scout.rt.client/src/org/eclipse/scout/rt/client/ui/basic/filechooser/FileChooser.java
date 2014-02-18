@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -29,20 +31,20 @@ public class FileChooser implements IFileChooser {
 
   private File m_directory;
   private String m_fileName;
-  private String[] m_fileExtensions;
+  private List<String> m_fileExtensions;
   private boolean m_folderMode;
   private boolean m_load;
   private boolean m_multiSelect;
   // result
-  private File[] m_files;
+  private List<File> m_files;
   private final BlockingCondition m_blockingCondition = new BlockingCondition(false);
 
   public FileChooser() {
   }
 
-  public FileChooser(File directory, String[] fileExtensions, boolean load) {
+  public FileChooser(File directory, List<String> fileExtensions, boolean load) {
     m_directory = directory;
-    m_fileExtensions = fileExtensions;
+    m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_load = load;
   }
 
@@ -56,12 +58,12 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
-  public String[] getFileExtensions() {
-    return m_fileExtensions;
+  public List<String> getFileExtensions() {
+    return CollectionUtility.unmodifiableList(m_fileExtensions);
   }
 
-  public void setFileExtensions(String[] fileExtensions) {
-    this.m_fileExtensions = fileExtensions;
+  public void setFileExtensions(List<String> fileExtensions) {
+    this.m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
   }
 
   @Override
@@ -127,18 +129,18 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
-  public File[] getFiles() {
-    return m_files != null ? m_files : new File[0];
+  public List<File> getFiles() {
+    return CollectionUtility.unmodifiableListCopy(m_files);
   }
 
   @Override
-  public void setFiles(File[] f) {
-    m_files = f;
+  public void setFiles(List<File> files) {
+    m_files = CollectionUtility.arrayListWithoutNullElements(files);
     m_blockingCondition.release();
   }
 
   @Override
-  public File[] startChooser() {
+  public List<File> startChooser() {
     m_files = null;
     m_blockingCondition.setBlocking(true);
     ClientSyncJob.getCurrentSession().getDesktop().addFileChooser(this);

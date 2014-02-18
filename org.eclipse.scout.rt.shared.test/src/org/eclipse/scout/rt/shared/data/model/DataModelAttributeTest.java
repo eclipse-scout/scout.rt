@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -32,7 +33,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
+import org.eclipse.scout.rt.shared.services.common.code.MutableCode;
 import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -54,7 +58,7 @@ public class DataModelAttributeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    TestingCodeService codeService = new TestingCodeService(new AttributeTestCodeType());
+    TestingCodeService codeService = new TestingCodeService(CollectionUtility.arrayList(new AttributeTestCodeType()));
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, codeService, codeLookupCallFactoryService);
   }
@@ -83,6 +87,7 @@ public class DataModelAttributeTest {
     assertEquals("Hello World!", att.formatValue(new AttributeTestObject()));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeCodeList() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_LIST);
@@ -92,6 +97,7 @@ public class DataModelAttributeTest {
     assertEquals("Second", att.formatValue(2L));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeCodeTree() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_TREE);
@@ -101,6 +107,7 @@ public class DataModelAttributeTest {
     assertEquals("Second", att.formatValue(2L));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeNumberList() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_LIST);
@@ -110,6 +117,7 @@ public class DataModelAttributeTest {
     assertEquals("c", att.formatValue(3L));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeNumberTree() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_TREE);
@@ -355,6 +363,7 @@ public class DataModelAttributeTest {
     assertEquals("   ", att.formatValue("   "));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeSmart() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_SMART);
@@ -417,26 +426,31 @@ public class DataModelAttributeTest {
     }
   }
 
-  public static class AttributeTestLookupCall extends LocalLookupCall {
+  public static class AttributeTestLookupCall extends LocalLookupCall<Long> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-      List<LookupRow> result = new ArrayList<LookupRow>();
-      result.add(new LookupRow(1L, "a"));
-      result.add(new LookupRow(2L, "b"));
-      result.add(new LookupRow(3L, "c"));
-      result.add(new LookupRow(4L, "d"));
+    protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+      List<ILookupRow<Long>> result = new ArrayList<ILookupRow<Long>>();
+      result.add(new LookupRow<Long>(1L, "a"));
+      result.add(new LookupRow<Long>(2L, "b"));
+      result.add(new LookupRow<Long>(3L, "c"));
+      result.add(new LookupRow<Long>(4L, "d"));
       return result;
     }
   }
 
-  public static class AttributeTestCodeType extends AbstractCodeType<Long> {
+  public static class AttributeTestCodeType extends AbstractCodeType<Long, Long> {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Long getId() {
       return 42L;
+    }
+
+    @Override
+    protected AbstractCode<Long> execCreateCode(ICodeRow<Long> newRow) throws ProcessingException {
+      return new MutableCode<Long>(newRow);
     }
 
     @Order(10)

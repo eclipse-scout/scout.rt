@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -34,16 +36,16 @@ public interface IComposerField extends IFormField {
   /**
    * convenience for getDataModel().getAttributes()
    */
-  IDataModelAttribute[] getAttributes();
+  List<IDataModelAttribute> getAttributes();
 
   /**
    * convenience for getDataModel().getEntities()
    */
-  IDataModelEntity[] getEntities();
+  List<IDataModelEntity> getEntities();
 
-  EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, Object[] values, String[] texts);
+  EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts);
 
-  AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, Object[] values, String[] texts);
+  AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts);
 
   EitherOrNode addEitherNode(ITreeNode parentNode, boolean negated);
 

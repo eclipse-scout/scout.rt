@@ -29,7 +29,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import org.eclipse.scout.commons.ListUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
@@ -208,7 +208,7 @@ public class ImapAdapter {
         props.setProperty("mail.imap.socketFactory.fallback", "false");
         props.setProperty("mail.imap.socketFactory.port", "" + getPort());
 
-        if (ListUtility.length(getSSLProtocols()) > 0) {
+        if (CollectionUtility.hasElements(getSSLProtocols())) {
           props.setProperty("mail.imap.ssl.protocols", StringUtility.join(" ", getSSLProtocols()));
         }
       }

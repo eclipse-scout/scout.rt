@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -33,12 +36,12 @@ public interface IPageWithTable<T extends ITable> extends IPage {
 
   ITableRow getTableRowFor(ITreeNode childPageNode);
 
-  ITableRow[] getTableRowsFor(ITreeNode[] childPageNodes);
+  List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes);
 
   /**
    * Computes the list of linked child pages for the given table rows and updates their summary cell.
    */
-  public IPage[] getUpdatedChildPagesFor(ITableRow[] tableRows);
+  public List<IPage> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows);
 
   /**
    * @return search form that is used to filter table rows<br>

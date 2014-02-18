@@ -206,7 +206,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
 
     @Override
     public void tableChanged(TableEvent e) {
-      ITableRow[] rows = e.getRows();
+      List<ITableRow> rows = e.getRows();
       if (rows == null) {
         return;
       }

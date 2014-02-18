@@ -11,7 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -35,21 +39,22 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 public class ComposerAttributeForm extends AbstractForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ComposerAttributeForm.class);
 
-  private IDataModelAttribute[] m_validAttributes;
+  private List<IDataModelAttribute> m_validAttributes;
   /**
    * result values
    */
-  private Object[] m_selectedValues;
+  private List<Object> m_selectedValues;
   /**
    * result display values
    */
-  private String[] m_selectedDisplayValues;
+  private List<String> m_selectedDisplayValues;
 
   public ComposerAttributeForm() throws ProcessingException {
     super();
@@ -58,12 +63,12 @@ public class ComposerAttributeForm extends AbstractForm {
   /**
    * form property
    */
-  public IDataModelAttribute[] getAvailableAttributes() {
-    return m_validAttributes;
+  public List<IDataModelAttribute> getAvailableAttributes() {
+    return CollectionUtility.unmodifiableListCopy(m_validAttributes);
   }
 
-  public void setAvailableAttributes(IDataModelAttribute[] a) throws ProcessingException {
-    m_validAttributes = a;
+  public void setAvailableAttributes(List<? extends IDataModelAttribute> attributes0) throws ProcessingException {
+    m_validAttributes = CollectionUtility.arrayListWithoutNullElements(attributes0);
     // single observer, reload attributes listbox
     getAttributeField().loadListBoxData();
   }
@@ -71,30 +76,30 @@ public class ComposerAttributeForm extends AbstractForm {
   /**
    * form properties
    */
-  public Object[] getSelectedValues() {
-    return m_selectedValues;
+  public List<Object> getSelectedValues() {
+    return CollectionUtility.unmodifiableListCopy(m_selectedValues);
   }
 
-  public void setSelectedValues(Object[] o) {
+  public void setSelectedValues(List<? extends Object> o) {
     setSelectedValuesInternal(o);
     // single observer
     activateValueField();
   }
 
-  private void setSelectedValuesInternal(Object[] o) {
-    m_selectedValues = o;
+  private void setSelectedValuesInternal(List<? extends Object> values0) {
+    m_selectedValues = CollectionUtility.arrayListWithoutNullElements(values0);
   }
 
-  public String[] getSelectedDisplayValues() {
-    return m_selectedDisplayValues;
+  public List<String> getSelectedDisplayValues() {
+    return CollectionUtility.unmodifiableListCopy(m_selectedDisplayValues);
   }
 
-  public void setSelectedDisplayValues(String[] s) {
+  public void setSelectedDisplayValues(List<String> s) {
     setSelectedDisplayValuesInternal(s);
   }
 
-  private void setSelectedDisplayValuesInternal(String[] s) {
-    m_selectedDisplayValues = s;
+  private void setSelectedDisplayValuesInternal(List<String> displayValues0) {
+    m_selectedDisplayValues = CollectionUtility.arrayListWithoutNullElements(displayValues0);
   }
 
   public IDataModelAttribute getSelectedAttribute() {
@@ -124,7 +129,7 @@ public class ComposerAttributeForm extends AbstractForm {
   private void activateValueField() {
     IDataModelAttribute att = getAttributeField().getCheckedKey();
     IDataModelAttributeOp op = getOperatorField().getCheckedKey();
-    Object[] newValues = getSelectedValues();
+    List<Object> newValues = getSelectedValues();
     //
     if (att == null) {
       getValueField().clearSelectionContext();
@@ -207,18 +212,16 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected LookupRow[] execLoadTableData() throws ProcessingException {
-          IDataModelAttribute[] a = getAvailableAttributes();
-          ArrayList<LookupRow> list = new ArrayList<LookupRow>();
-          if (a != null) {
-            for (int i = 0; i < a.length; i++) {
-              if (a[i].isVisible()) {
-                list.add(new LookupRow(a[i], a[i].getText(), a[i].getIconId()));
-              }
+        protected List<ILookupRow<IDataModelAttribute>> execLoadTableData() throws ProcessingException {
+          List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>();
+          List<IDataModelAttribute> a = getAvailableAttributes();
+          for (IDataModelAttribute attribute : a) {
+            if (attribute.isVisible()) {
+              result.add(new LookupRow<IDataModelAttribute>(attribute, attribute.getText(), attribute.getIconId()));
             }
+
           }
-          LookupRow[] rows = new LookupRow[list.size()];
-          return list.toArray(rows);
+          return Collections.unmodifiableList(result);
         }
 
         @Override
@@ -249,9 +252,9 @@ public class ComposerAttributeForm extends AbstractForm {
             getOperatorField().loadListBoxData();
             getOperatorField().checkKey(oldOp);
             if (getOperatorField().getCheckedKey() == null) {
-              IDataModelAttributeOp[] ops = getOperatorField().getValue();
-              if (ops != null && ops.length > 0) {
-                getOperatorField().checkKey(ops[0]);
+              Collection<IDataModelAttributeOp> ops = getOperatorField().getValue();
+              if (CollectionUtility.hasElements(ops)) {
+                getOperatorField().checkKey(CollectionUtility.firstElement(ops));
               }
             }
           }
@@ -271,28 +274,26 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected LookupRow[] execLoadTableData() throws ProcessingException {
-          IDataModelAttributeOp[] ops = null;
+        protected List<ILookupRow<IDataModelAttributeOp>> execLoadTableData() throws ProcessingException {
+          List<IDataModelAttributeOp> ops = null;
           IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
             ops = att.getOperators();
           }
-          LookupRow[] rows = null;
+          List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>();
           if (ops != null) {
-            rows = new LookupRow[ops.length];
-            for (int i = 0; i < rows.length; i++) {
-              IDataModelAttributeOp id = ops[i];
-              String text = ops[i].getText();
+            for (IDataModelAttributeOp op : ops) {
+              String text = op.getText();
               if (text != null && text.indexOf("{0}") >= 0) {
                 text = text.replace("{0}", "n");
               }
               if (text != null && text.indexOf("{1}") >= 0) {
                 text = text.replace("{1}", "m");
               }
-              rows[i] = new LookupRow(id, text);
+              result.add(new LookupRow<IDataModelAttributeOp>(op, text));
             }
           }
-          return rows;
+          return Collections.unmodifiableList(result);
         }
 
         @Override

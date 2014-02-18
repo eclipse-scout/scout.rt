@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.tree;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -54,7 +56,8 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public Object[] getChildren(Object parentElement) {
     ITreeNode scoutNode = (ITreeNode) parentElement;
-    return scoutNode.getFilteredChildNodes();
+    List<ITreeNode> childNodes = scoutNode.getFilteredChildNodes();
+    return childNodes.toArray(new ITreeNode[childNodes.size()]);
   }
 
   @Override
@@ -76,7 +79,8 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
         return new Object[]{m_tree.getRootNode()};
       }
       else {
-        return m_tree.getRootNode().getFilteredChildNodes();
+        List<ITreeNode> childNodes = m_tree.getRootNode().getFilteredChildNodes();
+        return childNodes.toArray(new ITreeNode[childNodes.size()]);
       }
     }
     else {

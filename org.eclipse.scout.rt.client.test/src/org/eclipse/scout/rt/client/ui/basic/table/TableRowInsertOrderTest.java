@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -48,7 +50,7 @@ public class TableRowInsertOrderTest {
       table.setTableChanging(false);
     }
 
-    assertArrayEquals(table.getRows(), tableListener.getInsertedRows());
+    assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getInsertedRows()));
     //No order_change_event expected
     assertTrue(tableListener.getOrderedRows() == null);
   }
@@ -74,13 +76,13 @@ public class TableRowInsertOrderTest {
       table.setTableChanging(false);
     }
 
-    assertTrue(table.getRows()[0] != tableListener.getInsertedRows()[0]);
-    assertArrayEquals(table.getRows(), tableListener.getOrderedRows());
+    assertTrue(table.getRows().get(0) != tableListener.getInsertedRows().get(0));
+    assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getOrderedRows()));
   }
 
   private static class P_TableListener extends TableAdapter {
-    private ITableRow[] m_insertedRows;
-    private ITableRow[] m_orderedRows;
+    private List<ITableRow> m_insertedRows;
+    private List<ITableRow> m_orderedRows;
 
     @Override
     public void tableChanged(TableEvent e) {
@@ -92,11 +94,11 @@ public class TableRowInsertOrderTest {
       }
     }
 
-    public ITableRow[] getInsertedRows() {
+    public List<ITableRow> getInsertedRows() {
       return m_insertedRows;
     }
 
-    public ITableRow[] getOrderedRows() {
+    public List<ITableRow> getOrderedRows() {
       return m_orderedRows;
     }
 

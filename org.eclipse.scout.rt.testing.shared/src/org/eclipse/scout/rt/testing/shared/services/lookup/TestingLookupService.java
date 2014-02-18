@@ -11,12 +11,15 @@
 package org.eclipse.scout.rt.testing.shared.services.lookup;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.osgi.framework.ServiceRegistration;
 
@@ -26,8 +29,8 @@ import org.osgi.framework.ServiceRegistration;
  * 
  * @since 3.9.0
  */
-public class TestingLookupService implements ILookupService {
-  private LookupRow[] m_rows = new LookupRow[0];
+public class TestingLookupService implements ILookupService<Long> {
+  private List<ILookupRow<Long>> m_rows = Collections.unmodifiableList(new ArrayList<ILookupRow<Long>>());
 
   public TestingLookupService() {
   }
@@ -36,71 +39,71 @@ public class TestingLookupService implements ILookupService {
   public void initializeService(ServiceRegistration registration) {
   }
 
-  public LookupRow[] getRows() {
+  public List<ILookupRow<Long>> getRows() {
     return m_rows;
   }
 
-  public void setRows(LookupRow[] rows) {
-    m_rows = rows;
+  public void setRows(List<ILookupRow<Long>> rows) {
+    m_rows = Collections.unmodifiableList(new ArrayList<ILookupRow<Long>>(rows));
   }
 
   @Override
-  public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
+    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Object key = call.getKey();
     if (key != null) {
-      for (LookupRow row : getRows()) {
+      for (ILookupRow<Long> row : getRows()) {
         if (key.equals(row.getKey())) {
           list.add(row);
         }
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list;
   }
 
   @Override
-  public LookupRow[] getDataByRec(LookupCall call) throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) throws ProcessingException {
+    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Object parentKey = call.getRec();
     if (parentKey == null) {
-      for (LookupRow row : getRows()) {
+      for (ILookupRow<Long> row : getRows()) {
         if (row.getParentKey() == null) {
           list.add(row);
         }
       }
     }
     else {
-      for (LookupRow row : getRows()) {
+      for (ILookupRow<Long> row : getRows()) {
         if (row.getParentKey() == parentKey) {
           list.add(row);
         }
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list;
   }
 
   @Override
-  public LookupRow[] getDataByText(LookupCall call) throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
+    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Pattern p = createLowerCaseSearchPattern(call.getText());
-    for (LookupRow row : getRows()) {
+    for (ILookupRow<Long> row : getRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list;
   }
 
   @Override
-  public LookupRow[] getDataByAll(LookupCall call) throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+  public List<ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) throws ProcessingException {
+    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
     Pattern p = createLowerCaseSearchPattern(call.getAll());
-    for (LookupRow row : getRows()) {
+    for (ILookupRow<Long> row : getRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list;
   }
 
   public static Pattern createLowerCaseSearchPattern(String s) {

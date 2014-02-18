@@ -21,6 +21,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -43,7 +45,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -76,7 +78,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   private P_ScoutTreeListener m_scoutTreeListener;
   private JScrollPane m_swingScrollPane;
   // cache
-  private IKeyStroke[] m_installedScoutKs;
+  private List<IKeyStroke> m_installedScoutKs;
 
   public SwingScoutTree() {
   }
@@ -147,7 +149,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
             Runnable t = new Runnable() {
               @Override
               public void run() {
-                IMenu[] scoutMenus = getScoutObject().getUIFacade().fireNodePopupFromUI();
+                List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireNodePopupFromUI();
                 // call swing menu
                 new SwingPopupWorker(getSwingEnvironment(), source, p, scoutMenus).enqueue();
               }
@@ -266,16 +268,16 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   private void setExpansionFromScoutRec(ITreeNode scoutNode) {
-    boolean exp;
+    boolean expanded;
     if (scoutNode.getParentNode() == null) {
-      exp = true;
+      expanded = true;
     }
     else {
-      exp = scoutNode.isExpanded();
+      expanded = scoutNode.isExpanded();
     }
     //
     TreePath path = scoutNodeToTreePath(scoutNode);
-    if (exp) {
+    if (expanded) {
       getSwingTree().expandPath(path);
     }
     else {
@@ -284,10 +286,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
     }
     // children only if node was expanded
-    if (exp) {
-      ITreeNode[] childs = scoutNode.getFilteredChildNodes();
-      for (int i = 0; i < childs.length; i++) {
-        setExpansionFromScoutRec(childs[i]);
+    if (expanded) {
+      List<ITreeNode> childs = scoutNode.getFilteredChildNodes();
+      for (ITreeNode node : childs) {
+        setExpansionFromScoutRec(node);
       }
     }
   }
@@ -322,14 +324,14 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     getSwingTree().repaint();
   }
 
-  protected void setSelectionFromScout(ITreeNode[] newScoutNodes) {
-    ITreeNode[] oldScoutNodes = treePathsToScoutNodes(getSwingTree().getSelectionPaths());
-    if (!CompareUtility.equals(oldScoutNodes, newScoutNodes)) {
-      TreePath[] paths = scoutNodesToTreePaths(newScoutNodes);
+  protected void setSelectionFromScout(Collection<ITreeNode> newScoutNodes) {
+    List<ITreeNode> oldScoutNodes = treePathsToScoutNodes(CollectionUtility.arrayList(getSwingTree().getSelectionPaths()));
+    if (!CollectionUtility.equalsCollection(oldScoutNodes, newScoutNodes)) {
+      List<TreePath> paths = scoutNodesToTreePaths(newScoutNodes);
       TreePath anchorPath = getSwingTree().getAnchorSelectionPath();
       TreePath leadPath = getSwingTree().getLeadSelectionPath();
 
-      getSwingTree().setSelectionPaths(paths);
+      getSwingTree().setSelectionPaths(paths.toArray(new TreePath[paths.size()]));
 
       // restore anchor path if its last segment is still valid
       ITreeNode anchorScoutNode = treePathToScoutNode(anchorPath);
@@ -348,11 +350,11 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void revertSelectionFromScout() {
-    ITreeNode[] newScoutNodes = getScoutObject().getSelectedNodes();
-    ITreeNode[] oldScoutNodes = treePathsToScoutNodes(getSwingTree().getSelectionPaths());
-    if (!CompareUtility.equals(oldScoutNodes, newScoutNodes)) {
-      TreePath[] paths = scoutNodesToTreePaths(newScoutNodes);
-      getSwingTree().setSelectionPaths(paths);
+    Collection<ITreeNode> newScoutNodes = getScoutObject().getSelectedNodes();
+    List<ITreeNode> oldScoutNodes = treePathsToScoutNodes(CollectionUtility.arrayList(getSwingTree().getSelectionPaths()));
+    if (!CollectionUtility.equalsCollection(oldScoutNodes, newScoutNodes)) {
+      List<TreePath> paths = scoutNodesToTreePaths(newScoutNodes);
+      getSwingTree().setSelectionPaths(paths.toArray(new TreePath[paths.size()]));
     }
   }
 
@@ -364,8 +366,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     if (component != null) {
       // remove old key strokes
       if (m_installedScoutKs != null) {
-        for (int i = 0; i < m_installedScoutKs.length; i++) {
-          IKeyStroke scoutKs = m_installedScoutKs[i];
+        for (IKeyStroke scoutKs : m_installedScoutKs) {
           KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
           //
           InputMap imap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -376,7 +377,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
       m_installedScoutKs = null;
       // add new key strokes
-      IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
+      List<IKeyStroke> scoutKeyStrokes = getScoutObject().getKeyStrokes();
       for (IKeyStroke scoutKs : scoutKeyStrokes) {
         int swingWhen = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
         KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
@@ -402,7 +403,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     //
     if (getScoutObject() != null) {
       if (paths != null && paths.length > 0) {
-        final ITreeNode[] scoutNodes = treePathsToScoutNodes(paths);
+        final List<ITreeNode> scoutNodes = treePathsToScoutNodes(CollectionUtility.arrayList(paths));
         // notify Scout
         Runnable t = new Runnable() {
           @Override
@@ -577,9 +578,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * scout table observer
    */
-  protected boolean isHandleScoutTreeEvent(TreeEvent[] a) {
-    for (int i = 0; i < a.length; i++) {
-      switch (a[i].getType()) {
+  protected boolean isHandleScoutTreeEvent(List<? extends TreeEvent> events) {
+    for (TreeEvent event : events) {
+      switch (event.getType()) {
         case TreeEvent.TYPE_REQUEST_FOCUS:
         case TreeEvent.TYPE_NODE_EXPANDED:
         case TreeEvent.TYPE_NODE_COLLAPSED:
@@ -722,8 +723,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     if (getScoutObject() != null) {
       SwingTreeModel swingTreeModel = (SwingTreeModel) getSwingTree().getModel();
       swingTreeModel.fireStructureChanged(node);
-      TreePath[] paths = scoutNodesToTreePaths(getScoutObject().getSelectedNodes());
-      getSwingTree().setSelectionPaths(paths);
+      List<TreePath> paths = scoutNodesToTreePaths(getScoutObject().getSelectedNodes());
+      getSwingTree().setSelectionPaths(paths.toArray(new TreePath[paths.size()]));
     }
   }
 
@@ -819,7 +820,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IMenu[] scoutMenus;
+          List<IMenu> scoutMenus;
           if (node != null) {
             scoutMenus = getScoutObject().getUIFacade().fireNodePopupFromUI();
           }
@@ -937,13 +938,13 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     return (ITreeNode) path.getLastPathComponent();
   }
 
-  public static ITreeNode[] treePathsToScoutNodes(TreePath[] paths) {
-    if (paths == null) {
-      return new ITreeNode[0];
+  public static List<ITreeNode> treePathsToScoutNodes(Collection<? extends TreePath> paths) {
+    if (!CollectionUtility.hasElements(paths)) {
+      return Collections.emptyList();
     }
-    ITreeNode[] scoutNodes = new ITreeNode[paths.length];
-    for (int i = 0; i < paths.length; i++) {
-      scoutNodes[i] = treePathToScoutNode(paths[i]);
+    List<ITreeNode> scoutNodes = new ArrayList<ITreeNode>();
+    for (TreePath path : paths) {
+      scoutNodes.add(treePathToScoutNode(path));
     }
     return scoutNodes;
   }
@@ -956,13 +957,13 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     return new TreePath(path);
   }
 
-  public static TreePath[] scoutNodesToTreePaths(ITreeNode[] scoutNodes) {
-    if (scoutNodes == null) {
-      return new TreePath[0];
+  public static List<TreePath> scoutNodesToTreePaths(Collection<? extends ITreeNode> scoutNodes) {
+    if (!CollectionUtility.hasElements(scoutNodes)) {
+      return Collections.emptyList();
     }
-    TreePath[] paths = new TreePath[scoutNodes.length];
-    for (int i = 0; i < scoutNodes.length; i++) {
-      paths[i] = scoutNodeToTreePath(scoutNodes[i]);
+    List<TreePath> paths = new ArrayList<TreePath>();
+    for (ITreeNode node : scoutNodes) {
+      paths.add(scoutNodeToTreePath(node));
     }
     return paths;
   }
@@ -996,7 +997,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   private class P_ScoutTreeListener implements TreeListener {
     @Override
     public void treeChanged(final TreeEvent e) {
-      if (isHandleScoutTreeEvent(new TreeEvent[]{e})) {
+      if (isHandleScoutTreeEvent(CollectionUtility.arrayList(e))) {
         if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) {
           return;
         }
@@ -1019,32 +1020,31 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
 
     @Override
-    public void treeChangedBatch(final TreeEvent[] a) {
+    public void treeChangedBatch(final List<? extends TreeEvent> a) {
       //
       if (isHandleScoutTreeEvent(a)) {
-        final ArrayList<TreeEvent> filteredList = new ArrayList<TreeEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TreeEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+        final List<TreeEvent> filteredList = new ArrayList<TreeEvent>();
+        for (TreeEvent event : a) {
+          if (!isIgnoredScoutEvent(TreeEvent.class, "" + event.getType())) {
+            filteredList.add(event);
           }
         }
-        if (filteredList.size() == 0) {
-          return;
+        if (CollectionUtility.hasElements(filteredList)) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                getUpdateSwingFromScoutLock().acquire();
+                //
+                handleScoutTreeEventBatchInSwing(filteredList);
+              }
+              finally {
+                getUpdateSwingFromScoutLock().release();
+              }
+            }
+          };
+          getSwingEnvironment().invokeSwingLater(t);
         }
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getUpdateSwingFromScoutLock().acquire();
-              //
-              handleScoutTreeEventBatchInSwing(filteredList);
-            }
-            finally {
-              getUpdateSwingFromScoutLock().release();
-            }
-          }
-        };
-        getSwingEnvironment().invokeSwingLater(t);
       }
     }
   }// end private class

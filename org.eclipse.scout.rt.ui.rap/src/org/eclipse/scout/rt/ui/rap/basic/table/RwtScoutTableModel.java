@@ -39,7 +39,7 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableFon
   @Override
   public Object[] getElements(Object inputElement) {
     if (m_scoutTable != null) {
-      return m_scoutTable.getFilteredRows();
+      return m_scoutTable.getFilteredRows().toArray();
     }
     else {
       return new Object[0];

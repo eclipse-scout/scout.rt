@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -30,9 +29,9 @@ public class RwtScoutMobileOutlineFormHeader extends AbstractRwtScoutFormHeader 
 
   @Override
   protected void collectMenusForLeftButtonBar(List<IMenu> menuList) {
-    IMenu[] desktopMenus = getDesktopMenus();
+    List<IMenu> desktopMenus = getDesktopMenus();
     if (desktopMenus != null) {
-      menuList.addAll(Arrays.asList(desktopMenus));
+      menuList.addAll(desktopMenus);
     }
   }
 
@@ -60,7 +59,7 @@ public class RwtScoutMobileOutlineFormHeader extends AbstractRwtScoutFormHeader 
     return getUiEnvironment().getClientSession().getDesktop();
   }
 
-  private IMenu[] getDesktopMenus() {
+  private List<IMenu> getDesktopMenus() {
     return getDesktop().getMenus();
   }
 

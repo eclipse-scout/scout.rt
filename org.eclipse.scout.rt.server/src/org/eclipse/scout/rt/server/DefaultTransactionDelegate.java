@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -544,8 +545,8 @@ public class DefaultTransactionDelegate {
 
     @Override
     public void release() {
-      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
-      m_serviceTunnelResponse.setClientNotifications(na);
+      Set<IClientNotification> nextNotifications = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
+      m_serviceTunnelResponse.setClientNotifications(nextNotifications);
     }
 
   }

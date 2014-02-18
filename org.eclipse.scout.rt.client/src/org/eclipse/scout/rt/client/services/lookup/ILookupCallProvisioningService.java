@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -35,6 +35,6 @@ public interface ILookupCallProvisioningService extends IService {
   /**
    * @return a new cloned and provisioned instance of the lookup call template.
    */
-  LookupCall newClonedInstance(LookupCall templateCall, IProvisioningContext context);
+  <T> ILookupCall<T> newClonedInstance(ILookupCall<T> templateCall, IProvisioningContext context);
 
 }

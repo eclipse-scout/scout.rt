@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action.tree;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -36,10 +37,10 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   /*
    * Configuration
    */
-  private Class<? extends IActionNode>[] getConfiguredChildActions() {
+  private List<? extends Class<? extends IActionNode>> getConfiguredChildActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    Class[] filtered = ConfigurationUtility.filterClasses(dca, IActionNode.class);
-    Class<IActionNode>[] foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IActionNode.class);
+    List<Class<IActionNode>> filtered = ConfigurationUtility.filterClasses(dca, IActionNode.class);
+    List<Class<? extends IActionNode>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IActionNode.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
@@ -49,10 +50,11 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     super.initConfig();
     // menus
     ArrayList<T> nodeList = new ArrayList<T>();
-    Class<? extends IActionNode>[] ma = getConfiguredChildActions();
-    for (int i = 0; i < ma.length; i++) {
+    List<? extends Class<? extends IActionNode>> ma = getConfiguredChildActions();
+    for (Class<? extends IActionNode> a : ma) {
+
       try {
-        IActionNode node = ConfigurationUtility.newInnerInstance(this, ma[i]);
+        IActionNode node = ConfigurationUtility.newInnerInstance(this, a);
         node.setParent(this);
         nodeList.add((T) node);
       }
@@ -108,9 +110,8 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     }
   }
 
-  @SuppressWarnings("unchecked")
   private List<T> getChildActionsInternal() {
-    return (List<T>) propertySupport.getProperty(PROP_CHILD_ACTIONS);
+    return propertySupport.getPropertyList(PROP_CHILD_ACTIONS);
   }
 
   @Override
@@ -125,12 +126,12 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
   @Override
   public List<T> getChildActions() {
-    return new ArrayList<T>(getChildActionsInternal());
+    return CollectionUtility.unmodifiableListCopy(getChildActionsInternal());
   }
 
   @Override
   public void setChildActions(List<T> newList) {
-    propertySupport.setProperty(PROP_CHILD_ACTIONS, new ArrayList<T>(newList));
+    propertySupport.setPropertyList(PROP_CHILD_ACTIONS, CollectionUtility.arrayListWithoutNullElements(newList));
   }
 
   @Override

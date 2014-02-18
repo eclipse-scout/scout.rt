@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.ITypeWithClassId;
 
 /**
@@ -19,7 +21,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
  * If partitions are used, a context contains to a certain partition and
  * receives only his codes.
  */
-public interface ICodeType<T> extends ITypeWithClassId {
+public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends ITypeWithClassId {
 
   /**
    * property into ISharedContextService's Map to get default partitionId of
@@ -27,7 +29,7 @@ public interface ICodeType<T> extends ITypeWithClassId {
    */
   String PROP_PARTITION_ID = "partitionId";
 
-  T getId();
+  CODE_TYPE_ID getId();
 
   boolean isHierarchy();
 
@@ -40,36 +42,36 @@ public interface ICodeType<T> extends ITypeWithClassId {
   /**
    * all active top-level (root) codes
    */
-  ICode[] getCodes();
+  List<? extends ICode<CODE_ID>> getCodes();
 
   /**
    * all top-level (root) codes
    */
-  ICode[] getCodes(boolean activeOnly);
+  List<? extends ICode<CODE_ID>> getCodes(boolean activeOnly);
 
   /**
    * find the code with this id
    */
-  ICode getCode(Object id);
+  ICode<CODE_ID> getCode(CODE_ID id);
 
   /**
    * find the code with this external reference
    */
-  ICode getCodeByExtKey(Object extKey);
+  ICode<CODE_ID> getCodeByExtKey(Object extKey);
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
    *         When the code type is a tree, the top-down-left-right traversal
    *         index is used
    */
-  int getCodeIndex(final Object id);
+  int getCodeIndex(final CODE_ID id);
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
    *         When the code type is a tree, the top-down-left-right traversal
    *         index is used
    */
-  int getCodeIndex(final ICode c);
+  int getCodeIndex(final ICode<CODE_ID> c);
 
   /**
    * visits per default only the active codes
@@ -77,8 +79,8 @@ public interface ICodeType<T> extends ITypeWithClassId {
    * @param visitor
    * @return
    */
-  boolean visit(ICodeVisitor visitor);
+  <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor);
 
-  boolean visit(ICodeVisitor visitor, boolean activeOnly);
+  <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor, boolean activeOnly);
 
 }

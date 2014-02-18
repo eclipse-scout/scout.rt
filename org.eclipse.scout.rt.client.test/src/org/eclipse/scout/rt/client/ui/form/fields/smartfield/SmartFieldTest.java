@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.TestForm.MainBox.StyleField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -34,6 +36,7 @@ import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,12 +60,21 @@ public class SmartFieldTest {
       super();
     }
 
+    @Override
+    protected String getConfiguredTitle() {
+      return "SmartField Form";
+    }
+
     public void startForm() throws ProcessingException {
       startInternal(new FormHandler());
     }
 
     public StyleField getStyleField() {
       return getFieldByClass(StyleField.class);
+    }
+
+    public MainBox getMainBox() {
+      return getFieldByClass(MainBox.class);
     }
 
     @Order(10)
@@ -101,7 +113,7 @@ public class SmartFieldTest {
         }
 
         @Override
-        protected Class<? extends LookupCall> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
           return StyleLookupCall.class;
         }
 
@@ -146,20 +158,21 @@ public class SmartFieldTest {
   public static class StyleLookupService extends TestingLookupService {
     @Override
     public void initializeService(ServiceRegistration registration) {
-      setRows(new LookupRow[]{
-          new LookupRow(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")),
-          new LookupRow(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")),
-          new LookupRow(30L, "Green", ICON_FILE, "Green tooltip", "88ff88", "008800", FontSpec.parse("italic")),
-          new LookupRow(40L, "Blue", ICON_FILE, "Blue tooltip", "8888ff", "000088", FontSpec.parse("italic")),
-          new LookupRow(50L, "Empty"),});
+      List<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
+      rows.add(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(30L, "Green", ICON_FILE, "Green tooltip", "88ff88", "008800", FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(40L, "Blue", ICON_FILE, "Blue tooltip", "8888ff", "000088", FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(50L, "Empty"));
+      setRows(rows);
     }
   }
 
-  public static class StyleLookupCall extends LookupCall {
+  public static class StyleLookupCall extends LookupCall<Long> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected final Class<? extends ILookupService> getConfiguredService() {
+    protected final Class<? extends ILookupService<Long>> getConfiguredService() {
       return StyleLookupService.class;
     }
   }
@@ -173,6 +186,7 @@ public class SmartFieldTest {
 
   @Test
   public void testSmartfieldStyle() throws Throwable {
+
     StyleField f = form.getStyleField();
     //model-side test
     f.setValue(10L);
@@ -193,14 +207,15 @@ public class SmartFieldTest {
     f.getUIFacade().setTextFromUI(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
     //proposal-side test
-    f.acceptProposal(new LookupRow(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
+    f.acceptProposal(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
-    f.acceptProposal(new LookupRow(50L, "Empty"));
+    f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.acceptProposal(new LookupRow(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
+    f.acceptProposal(new LookupRow<Long>(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
     f.setValue(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+
   }
 
   @After
@@ -211,19 +226,20 @@ public class SmartFieldTest {
 
   @Test
   public void testSmartfieldMenus() {
-    IMenu[] smartfieldMenus = form.getStyleField().getMenus();
-    assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.length);
-    assertEquals("TestMenu1", smartfieldMenus[0].getText());
-    assertEquals("&TestMenu1", smartfieldMenus[0].getTextWithMnemonic());
-    assertEquals("alternate-2", smartfieldMenus[0].getKeyStroke());
 
-    assertEquals("TestMenu2", smartfieldMenus[1].getText());
-    assertEquals("T&estMenu2", smartfieldMenus[1].getTextWithMnemonic());
-    assertEquals("control-alternate-f11", smartfieldMenus[1].getKeyStroke());
+    List<IMenu> smartfieldMenus = form.getStyleField().getMenus();
+    Assert.assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
+    Assert.assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
+    Assert.assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
+    Assert.assertEquals("alternate-2", smartfieldMenus.get(0).getKeyStroke());
 
-    IKeyStroke[] smartfieldKeyStrokes = form.getStyleField().getContributedKeyStrokes();
-    assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
-    assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.length);
+    Assert.assertEquals("TestMenu2", smartfieldMenus.get(1).getText());
+    Assert.assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
+    Assert.assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
+
+    List<IKeyStroke> smartfieldKeyStrokes = form.getStyleField().getContributedKeyStrokes();
+    Assert.assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
+    Assert.assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.size());
   }
 
   private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {
@@ -231,5 +247,4 @@ public class SmartFieldTest {
     String actualStyle = f.getTooltipText() + ", " + f.getBackgroundColor() + ", " + f.getForegroundColor() + ", " + (f.getFont() != null ? f.getFont().toPattern() : null);
     assertEquals(expectedStyle, actualStyle);
   }
-
 }

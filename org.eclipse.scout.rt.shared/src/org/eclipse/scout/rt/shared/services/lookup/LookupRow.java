@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import java.io.Serializable;
-
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 
-public class LookupRow extends MemoryOptimizedObject implements Serializable {
+public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
 
   public static final LookupRow[] EMPTY_ARRAY = new LookupRow[0];
@@ -33,39 +31,39 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
   public static final int PARENT_KEY_BIT = 9;
   public static final int ACTIVE_BIT = 10;
 
-  public LookupRow(Object key, String text) {
+  public LookupRow(ID_TYPE key, String text) {
     this(key, text, null);
   }
 
-  public LookupRow(Object key, String text, String iconId) {
+  public LookupRow(ID_TYPE key, String text, String iconId) {
     this(key, text, iconId, null);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip) {
     this(key, text, iconId, tooltip, null);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor) {
     this(key, text, iconId, tooltip, backgroundColor, null);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor) {
     this(key, text, iconId, tooltip, backgroundColor, foregroundColor, null);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font) {
     this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, true);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled) {
     this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, null);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, Object parentKey) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey) {
     this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, parentKey, true);
   }
 
-  public LookupRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, Object parentKey, boolean active) {
+  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active) {
     setKey(key);
     setText(text);
     setIconId(iconId);
@@ -96,12 +94,13 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     this(cells, (cells == null ? 0 : cells.length));
   }
 
+  @SuppressWarnings("unchecked")
   public LookupRow(Object[] cells, int maxColumnIndex) {
     if (cells != null) {
       int keyIndex = 0, textIndex = 1, iconIndex = 2, ttIndex = 3, bgIndex = 4, fgIndex = 5, fontIndex = 6, enabledIndex = 7, parentKeyIndex = 8, activeIndex = 9;
       //
       if (cells.length > keyIndex && keyIndex <= maxColumnIndex && cells[keyIndex] != null) {
-        setKey(cells[keyIndex]);
+        setKey((ID_TYPE) cells[keyIndex]);
       }
       if (cells.length > textIndex && textIndex <= maxColumnIndex && cells[textIndex] != null) {
         if (cells[textIndex] != null) {
@@ -164,7 +163,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
         }
       }
       if (cells.length > parentKeyIndex && parentKeyIndex <= maxColumnIndex && cells[parentKeyIndex] != null) {
-        setParentKey(cells[parentKeyIndex]);
+        setParentKey((ID_TYPE) cells[parentKeyIndex]);
       }
       if (cells.length > activeIndex && activeIndex <= maxColumnIndex && cells[activeIndex] != null) {
         if (cells[activeIndex] instanceof Boolean) {
@@ -177,39 +176,49 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     }
   }
 
-  public Object getKey() {
-    return getValueInternal(KEY_BIT);
+  @Override
+  @SuppressWarnings("unchecked")
+  public ID_TYPE getKey() {
+    return (ID_TYPE) getValueInternal(KEY_BIT);
   }
 
-  public void setKey(Object key) {
+  public void setKey(ID_TYPE key) {
     setValueInternal(KEY_BIT, key);
   }
 
-  public Object getParentKey() {
-    return getValueInternal(PARENT_KEY_BIT);
+  @Override
+  @SuppressWarnings("unchecked")
+  public ID_TYPE getParentKey() {
+    return (ID_TYPE) getValueInternal(PARENT_KEY_BIT);
   }
 
-  public void setParentKey(Object parentKey) {
+  @Override
+  public void setParentKey(ID_TYPE parentKey) {
     setValueInternal(PARENT_KEY_BIT, parentKey);
   }
 
+  @Override
   public String getText() {
     char[] c = (char[]) getValueInternal(TEXT_BIT);
     return c != null ? new String(c) : null;
   }
 
+  @Override
   public void setText(String text) {
     setValueInternal(TEXT_BIT, text != null ? text.toCharArray() : null);
   }
 
+  @Override
   public String getIconId() {
     return (String) getValueInternal(ICON_ID_BIT);
   }
 
+  @Override
   public void setIconId(String iconId) {
     setValueInternal(ICON_ID_BIT, StringUtility.intern(iconId));
   }
 
+  @Override
   public String getTooltipText() {
     char[] c = (char[]) getValueInternal(TOOLTIP_BIT);
     return c != null ? new String(c) : null;
@@ -219,6 +228,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     setValueInternal(TOOLTIP_BIT, tooltip != null ? tooltip.toCharArray() : null);
   }
 
+  @Override
   public String getForegroundColor() {
     return (String) getValueInternal(FOREGROUD_COLOR_BIT);
   }
@@ -227,6 +237,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     setValueInternal(FOREGROUD_COLOR_BIT, StringUtility.intern(foregroundColor));
   }
 
+  @Override
   public String getBackgroundColor() {
     return (String) getValueInternal(BACKGROUD_COLOR_BIT);
   }
@@ -235,6 +246,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     setValueInternal(BACKGROUD_COLOR_BIT, StringUtility.intern(backgroundColor));
   }
 
+  @Override
   public FontSpec getFont() {
     String s = (String) getValueInternal(FONT_BIT);
     return s != null ? FontSpec.parse(s) : null;
@@ -244,6 +256,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     setValueInternal(FONT_BIT, font != null ? StringUtility.intern(font.toPattern()) : null);
   }
 
+  @Override
   public boolean isEnabled() {
     if (getValueInternal(ENABLED_BIT) == null) {
       return true;
@@ -251,10 +264,12 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     return (Boolean) getValueInternal(ENABLED_BIT);
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
     setValueInternal(ENABLED_BIT, enabled ? null : Boolean.FALSE);
   }
 
+  @Override
   public boolean isActive() {
     if (getValueInternal(ACTIVE_BIT) == null) {
       return true;
@@ -262,6 +277,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
     return (Boolean) getValueInternal(ACTIVE_BIT);
   }
 
+  @Override
   public void setActive(boolean active) {
     setValueInternal(ACTIVE_BIT, active ? null : Boolean.FALSE);
   }
@@ -271,14 +287,14 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
    * The Object[][] must contain rows with the elements in the following order: <br>
    * see {@link #LookupRow(Object[])}
    */
-  public static LookupRow[] createLookupRowArray(Object[][] data) {
+  public static ILookupRow<?>[] createLookupRowArray(Object[][] data) {
     if (data == null || data.length == 0) {
       return LookupRow.EMPTY_ARRAY;
     }
     else {
-      LookupRow[] a = new LookupRow[data.length];
+      LookupRow<?>[] a = new LookupRow<?>[data.length];
       for (int i = 0; i < data.length; i++) {
-        a[i] = new LookupRow(data[i]);
+        a[i] = new LookupRow<Object>(data[i]);
       }
       return a;
     }

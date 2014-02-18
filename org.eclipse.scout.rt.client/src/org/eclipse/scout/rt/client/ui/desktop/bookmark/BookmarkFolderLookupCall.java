@@ -18,13 +18,14 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
  * hierarchy lookup call for bookmark folder tree
  */
-public class BookmarkFolderLookupCall extends LocalLookupCall {
+public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
   private static final long serialVersionUID = 1L;
 
   private BookmarkFolder m_rootFolder;
@@ -38,8 +39,8 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
   }
 
   @Override
-  public List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    final ArrayList<LookupRow> rows = new ArrayList<LookupRow>();
+  public List<ILookupRow<BookmarkFolder>> execCreateLookupRows() throws ProcessingException {
+    final ArrayList<ILookupRow<BookmarkFolder>> rows = new ArrayList<ILookupRow<BookmarkFolder>>();
     if (m_rootFolder != null) {
       m_rootFolder.visit(new IBookmarkVisitor() {
         @Override
@@ -51,7 +52,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
               if (path.size() >= 3) {
                 parent = path.get(path.size() - 2);
               }
-              LookupRow row = new LookupRow(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNode);
+              LookupRow<BookmarkFolder> row = new LookupRow<BookmarkFolder>(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNode);
               row.setParentKey(parent);
               rows.add(row);
             }

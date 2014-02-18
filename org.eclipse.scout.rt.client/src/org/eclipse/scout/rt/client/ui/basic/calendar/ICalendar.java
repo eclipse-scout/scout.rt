@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import java.util.Date;
+import java.util.Set;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
@@ -27,7 +29,7 @@ public interface ICalendar extends IPropertyObserver {
   int DISPLAY_MODE_WORKWEEK = 4;
 
   /**
-   * type {@link CalendarComponent}[]
+   * type {@link Set<CalendarComponent>}
    */
   String PROP_COMPONENTS = "components";
   /**
@@ -116,9 +118,11 @@ public interface ICalendar extends IPropertyObserver {
   /**
    * @return a Date tupel [begin, end]
    */
-  Date[] getViewRange();
+  Range<Date> getViewRange();
 
   void setViewRange(Date viewDateStart, Date viewDateEnd);
+
+  void setViewRange(Range<Date> dateRange);
 
   Date getSelectedDate();
 
@@ -140,7 +144,7 @@ public interface ICalendar extends IPropertyObserver {
   /**
    * @return all calendar components sorted by {@link CalendarComponent#getFromDate()}
    */
-  CalendarComponent[] getComponents();
+  Set<? extends CalendarComponent> getComponents();
 
   DateTimeFormatFactory getDateTimeFormatFactory();
 

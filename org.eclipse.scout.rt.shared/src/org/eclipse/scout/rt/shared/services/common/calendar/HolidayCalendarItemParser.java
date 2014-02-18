@@ -14,14 +14,15 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -92,8 +93,8 @@ public class HolidayCalendarItemParser {
     }
   }
 
-  public ICalendarItem[] getItems(Locale loc, Date minDate, Date maxDate) throws ProcessingException {
-    ArrayList<HolidayItem> itemList = new ArrayList<HolidayItem>();
+  public Set<? extends ICalendarItem> getItems(Locale loc, Date minDate, Date maxDate) throws ProcessingException {
+    Set<HolidayItem> itemList = new HashSet<HolidayItem>();
     int startYear, endYear;
     Calendar cal = Calendar.getInstance();
     cal.setTime(minDate);
@@ -112,7 +113,7 @@ public class HolidayCalendarItemParser {
         iter.remove();
       }
     }
-    return itemList.toArray(new HolidayItem[itemList.size()]);
+    return itemList;
   }
 
   private void addHolidays(Locale loc, int year, Collection<HolidayItem> newList) {
@@ -122,7 +123,7 @@ public class HolidayCalendarItemParser {
         loc.getCountry() + "_" + loc.getLanguage() + "_" + loc.getVariant(),
         loc.getCountry() + "_" + loc.getLanguage(),
         loc.getLanguage(),
-        };
+    };
     long index = 1;
     for (Iterator holidayIt = m_xml.getChildren(HOLIDAY).iterator(); holidayIt.hasNext();) {
       SimpleXmlElement holidayElem = (SimpleXmlElement) holidayIt.next();

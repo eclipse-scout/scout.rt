@@ -4,28 +4,27 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
+package org.eclipse.scout.rt.shared.services.common.code;
 
-public class SmartFieldEvent extends java.util.EventObject {
-  private static final long serialVersionUID = 1L;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-  private int m_type;
+/**
+ *
+ */
+public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
 
-  public SmartFieldEvent(ISmartField source, int type) {
-    super(source);
-    m_type = type;
-  }
+  long getPartitionId();
 
-  public ISmartField getSmartField() {
-    return (ISmartField) getSource();
-  }
+  Number getValue();
 
-  public int getType() {
-    return m_type;
-  }
+  void setValue(Number value);
+
+  String getExtKey();
+
+  void setExtKey(String extKey);
 
 }

@@ -4,16 +4,22 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
@@ -23,39 +29,44 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
  */
 public class CodeTypeChangedNotification extends AbstractClientNotification {
   private static final long serialVersionUID = 1L;
-  private Class<? extends Serializable>[] m_codeTypes;
+  private List<Class<? extends ICodeType<?, ?>>> m_codeTypes;
 
-  public CodeTypeChangedNotification(Class<? extends Serializable>[] codeTypes) {
-    m_codeTypes = codeTypes;
+  public CodeTypeChangedNotification(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    for (Class<? extends ICodeType<?, ?>> codeTypeClazz : types) {
+      if (codeTypeClazz != null && codeTypeClazz.isAssignableFrom(Serializable.class)) {
+        throw new ProcessingException("Code type '" + codeTypeClazz.getName() + "' is not serializable!");
+      }
+    }
+    m_codeTypes = types;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public boolean coalesce(IClientNotification existingNotification) {
     CodeTypeChangedNotification n = (CodeTypeChangedNotification) existingNotification;
-    HashSet<Class<? extends Serializable>> set = new HashSet<Class<? extends Serializable>>();
-    set.addAll(Arrays.asList(this.m_codeTypes));
-    set.addAll(Arrays.asList(n.m_codeTypes));
-    m_codeTypes = set.toArray(new Class[set.size()]);
+    Set<Class<? extends ICodeType<?, ?>>> set = new HashSet<Class<? extends ICodeType<?, ?>>>();
+    set.addAll(this.m_codeTypes);
+    set.addAll(n.m_codeTypes);
+    m_codeTypes = new ArrayList<Class<? extends ICodeType<?, ?>>>(set);
     if (this.getOriginNode() != existingNotification.getOriginNode()) {
       this.setOriginNode(0);
     }
     return true;
   }
 
-  public Class<? extends Serializable>[] getCodeTypes() {
-    return m_codeTypes;
+  public List<Class<? extends ICodeType<?, ?>>> getCodeTypes() {
+    return Collections.unmodifiableList(m_codeTypes);
   }
 
   @Override
   public String toString() {
     StringBuffer b = new StringBuffer(getClass().getSimpleName());
     b.append("[");
-    for (int i = 0; i < m_codeTypes.length; i++) {
-      if (i > 0) {
-        b.append(", ");
+    if (CollectionUtility.hasElements(m_codeTypes)) {
+      Iterator<Class<? extends ICodeType<?, ?>>> codeTypeIt = m_codeTypes.iterator();
+      b.append(codeTypeIt.next().getSimpleName());
+      while (codeTypeIt.hasNext()) {
+        b.append(", ").append(codeTypeIt.next().getSimpleName());
       }
-      b.append(m_codeTypes[i].getSimpleName());
     }
     b.append("]");
     return b.toString();

@@ -4,15 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,7 +31,7 @@ public class GroupBoxProcessButtonGrid {
   private IGroupBox m_groupBox = null;
   private boolean m_includeSystemButtons;
   private boolean m_includeCustomButtons;
-  private IButton[] m_buttons;
+  private List<IButton> m_buttons;
 
   public GroupBoxProcessButtonGrid(IGroupBox groupBox, boolean includeCustomButtons, boolean includeSystemButtons) {
     m_groupBox = groupBox;
@@ -40,12 +41,12 @@ public class GroupBoxProcessButtonGrid {
 
   public void validate() {
     // reset
-    ArrayList<IButton> buttonList = new ArrayList<IButton>();
+    List<IButton> buttonList = new ArrayList<IButton>();
     if (m_includeCustomButtons) {
-      buttonList.addAll(Arrays.asList(m_groupBox.getCustomProcessButtons()));
+      buttonList.addAll(m_groupBox.getCustomProcessButtons());
     }
     if (m_includeSystemButtons) {
-      buttonList.addAll(Arrays.asList(m_groupBox.getSystemProcessButtons()));
+      buttonList.addAll(m_groupBox.getSystemProcessButtons());
     }
     // filter
     for (Iterator it = buttonList.iterator(); it.hasNext();) {
@@ -58,16 +59,18 @@ public class GroupBoxProcessButtonGrid {
         it.remove();
       }
     }
-    m_buttons = buttonList.toArray(new IButton[0]);
+    m_buttons = Collections.unmodifiableList(buttonList);
     layoutStatic();
   }
 
   private void layoutStatic() {
-    for (int i = 0; i < m_buttons.length; i++) {
-      GridData data = GridDataBuilder.createFromHints(m_buttons[i], 1);
+    int i = 0;
+    for (IButton button : m_buttons) {
+      GridData data = GridDataBuilder.createFromHints(button, 1);
       data.x = i;
       data.y = 0;
-      m_buttons[i].setGridDataInternal(data);
+      button.setGridDataInternal(data);
+      i++;
     }
   }
 }

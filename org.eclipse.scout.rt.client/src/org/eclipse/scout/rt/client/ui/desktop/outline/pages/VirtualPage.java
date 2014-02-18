@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -58,8 +61,8 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public IPage[] getChildPages() {
-    return new IPage[0];
+  public List<IPage> getChildPages() {
+    return Collections.emptyList();
   }
 
   @Override

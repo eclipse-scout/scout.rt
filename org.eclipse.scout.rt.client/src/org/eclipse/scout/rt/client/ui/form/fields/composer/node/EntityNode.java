@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -28,8 +30,8 @@ public class EntityNode extends AbstractComposerNode {
 
   private IDataModelEntity m_entity;
   private boolean m_negated = false;
-  private Object[] m_values;
-  private String[] m_texts;
+  private List<Object> m_values;
+  private List<String> m_texts;
 
   public EntityNode(IComposerField composerField, IDataModelEntity entity) {
     super(composerField, false);
@@ -39,7 +41,7 @@ public class EntityNode extends AbstractComposerNode {
 
   @Override
   protected void execInitTreeNode() {
-    ArrayList<IMenu> menus = new ArrayList<IMenu>();
+    List<IMenu> menus = new ArrayList<IMenu>();
     for (IMenu m : getMenus()) {
       if (m.getClass() == AddEntityPlaceholderOnEntityMenu.class) {
         attachAddEntityMenus(menus);
@@ -52,7 +54,7 @@ public class EntityNode extends AbstractComposerNode {
     if (menus.size() > 0 && menus.get(menus.size() - 1).getClass() == Separator2Menu.class) {
       menus.remove(menus.size() - 1);
     }
-    setMenus(menus.toArray(new IMenu[menus.size()]));
+    setMenus(menus);
   }
 
   @Override
@@ -87,20 +89,20 @@ public class EntityNode extends AbstractComposerNode {
     m_negated = b;
   }
 
-  public Object[] getValues() {
-    return m_values;
+  public List<Object> getValues() {
+    return CollectionUtility.unmodifiableListCopy(m_values);
   }
 
-  public void setValues(Object[] values) {
-    m_values = values;
+  public void setValues(List<? extends Object> values) {
+    m_values = CollectionUtility.arrayListWithoutNullElements(values);
   }
 
-  public String[] getTexts() {
-    return m_texts;
+  public List<String> getTexts() {
+    return CollectionUtility.unmodifiableListCopy(m_texts);
   }
 
-  public void setTexts(String[] a) {
-    m_texts = a;
+  public void setTexts(List<String> texts) {
+    m_texts = CollectionUtility.arrayListWithoutNullElements(texts);
   }
 
   @Order(10)
@@ -119,9 +121,9 @@ public class EntityNode extends AbstractComposerNode {
 
     @Override
     protected void execPrepareAction() throws ProcessingException {
-      IDataModelAttribute[] atts = m_entity.getAttributes();
-      IDataModelEntity[] ents = m_entity.getEntities();
-      setVisible((atts != null && atts.length > 0) || (ents != null && ents.length > 0));
+      List<IDataModelAttribute> atts = m_entity.getAttributes();
+      List<IDataModelEntity> ents = m_entity.getEntities();
+      setVisible(CollectionUtility.hasElements(atts) || CollectionUtility.hasElements(ents));
     }
 
     @Override
