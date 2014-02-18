@@ -119,6 +119,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
@@ -171,8 +172,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   private EventListenerList m_environmentListeners;
 
-  private HashMap<String, String> m_scoutPartIdToUiPartId;
-  private HashMap<IForm, ISwtScoutPart> m_openForms;
+  private Map<String, String> m_scoutPartIdToUiPartId;
+  private Map<IForm, ISwtScoutPart> m_openForms;
   private P_ScoutDesktopListener m_scoutDesktopListener;
   private P_ScoutDesktopPropertyListener m_desktopPropertyListener;
 
@@ -263,10 +264,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         };
         sendShutdownEventJob.schedule();
       }
-      else {
-        m_status = SwtEnvironmentEvent.STARTED;
-      }
-      fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STARTED));
     }
   }
 
@@ -470,6 +467,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         }
       };
       invokeScoutLater(job, 0);
+
+      // init scout props
+      updateWindowTitle();
+      updateStatusFromScout();
 
       m_status = SwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
@@ -1123,11 +1124,14 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   protected void handleDesktopPropertyChanged(String propertyName, Object oldVal, Object newValue) {
     if (IDesktop.PROP_STATUS.equals(propertyName)) {
-      setStatusFromScout();
+      updateStatusFromScout();
+    }
+    else if (IDesktop.PROP_TITLE.equals(propertyName)) {
+      updateWindowTitle();
     }
   }
 
-  protected void setStatusFromScout() {
+  protected void updateStatusFromScout() {
     if (getScoutDesktop() != null) {
       IProcessingStatus newValue = getScoutDesktop().getStatus();
       //when a tray item is available, use it, otherwise set status on views/dialogs
@@ -1181,6 +1185,23 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           message = newValue.getMessage();
         }
         setStatusLineMessage(null, message);
+      }
+    }
+  }
+
+  protected void updateWindowTitle() {
+    if (getScoutDesktop() != null) {
+      final String title = getScoutDesktop().getTitle();
+      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+        final Shell s = w.getShell();
+        if (!s.isDisposed()) {
+          s.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+              s.setText(title);
+            }
+          });
+        }
       }
     }
   }

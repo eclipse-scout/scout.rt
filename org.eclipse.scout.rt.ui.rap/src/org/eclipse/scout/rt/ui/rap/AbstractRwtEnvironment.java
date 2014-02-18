@@ -273,10 +273,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STOPPED));
     }
     finally {
-      if (m_status != RwtEnvironmentEvent.STOPPED) {
-        m_status = RwtEnvironmentEvent.STARTED;
-        fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
-      }
       notifyAll();
     }
   }

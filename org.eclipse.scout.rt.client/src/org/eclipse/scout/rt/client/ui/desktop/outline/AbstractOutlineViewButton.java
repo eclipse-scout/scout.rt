@@ -102,6 +102,42 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
     return true;
   }
 
+  /**
+   * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
+   * affect.
+   */
+  @Override
+  protected final boolean getConfiguredEnabled() {
+    return super.getConfiguredEnabled();
+  }
+
+  /**
+   * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
+   * affect.
+   */
+  @Override
+  protected final String getConfiguredIconId() {
+    return super.getConfiguredIconId();
+  }
+
+  /**
+   * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
+   * affect.
+   */
+  @Override
+  protected final String getConfiguredText() {
+    return super.getConfiguredText();
+  }
+
+  /**
+   * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
+   * affect.
+   */
+  @Override
+  protected final boolean getConfiguredVisible() {
+    return super.getConfiguredVisible();
+  }
+
   @Override
   protected void execAction() throws ProcessingException {
     if (isSelected()) {
