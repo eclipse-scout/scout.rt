@@ -15,13 +15,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JsonDesktopTest {
-  private JsonDesktopRenderer m_jsonDesktop;
+  private JsonDesktop m_jsonDesktop;
 
   @Before
   public void beforeTest() {
     IDesktop desktop = EasyMock.createMock(IDesktop.class);
     IJsonSession env = EasyMock.createMock(IJsonSession.class);
-    m_jsonDesktop = new JsonDesktopRenderer(desktop, env);
+    m_jsonDesktop = new JsonDesktop(desktop, env);
   }
 
   @Test

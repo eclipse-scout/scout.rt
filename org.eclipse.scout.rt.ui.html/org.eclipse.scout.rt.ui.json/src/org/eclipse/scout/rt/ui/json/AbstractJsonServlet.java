@@ -36,15 +36,16 @@ public abstract class AbstractJsonServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started.");
     try {
-      UIRequest uiReq = new UIRequest(toJSON(req));
-      String sessionAttributeName = "JsonUi#" + uiReq.getPortletPart();
+      JsonRequest uiReq = new JsonRequest(toJSON(req));
+      String sessionAttributeName = "JsonUi#" + uiReq.getSessionPartId();
       HttpSession httpSession = req.getSession();
       IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
         jsonSession = createJsonSession();
+        jsonSession.init();
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
-      UIResponse uiRes = jsonSession.processRequest(uiReq);
+      JsonResponse uiRes = jsonSession.processRequest(uiReq);
       String data = uiRes.toJson().toString();
 
       resp.setContentLength(data.length());

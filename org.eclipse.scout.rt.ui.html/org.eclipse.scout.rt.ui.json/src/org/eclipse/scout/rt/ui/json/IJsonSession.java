@@ -25,10 +25,10 @@ public interface IJsonSession {
   void unregisterJsonRenderer(String id);
 
   /**
-   * @return the current ui response that is collecting changes for the next {@link #processRequest(UIRequest)} cycle
+   * @return the current ui response that is collecting changes for the next {@link #processRequest(JsonRequest)} cycle
    */
-  UIResponse currentUIResponse();
+  JsonResponse currentUIResponse();
 
-  UIResponse processRequest(UIRequest req) throws JsonUIException;
+  JsonResponse processRequest(JsonRequest req) throws JsonUIException;
 
 }

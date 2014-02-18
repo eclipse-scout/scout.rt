@@ -13,16 +13,16 @@ package org.eclipse.scout.rt.ui.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UIRequest {
+public class JsonRequest {
   private final JSONObject m_event;
 
-  public UIRequest(JSONObject event) {
+  public JsonRequest(JSONObject event) {
     m_event = event;
   }
 
-  public String getPortletPart() {
+  public String getSessionPartId() {
     try {
-      return m_event.getString("pid_");
+      return m_event.getString("sessionPartId");
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -31,7 +31,7 @@ public class UIRequest {
 
   public String getEventType() {
     try {
-      return m_event.getString("type_");
+      return m_event.getString("type");
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -47,7 +47,15 @@ public class UIRequest {
     }
   }
 
-  public JSONObject getEventObject() {
-    return m_event;
+  public JSONObject getEventData() {
+    try {
+      if (m_event.has("data")) {
+        return m_event.getJSONObject("data");
+      }
+      return null;
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
   }
 }

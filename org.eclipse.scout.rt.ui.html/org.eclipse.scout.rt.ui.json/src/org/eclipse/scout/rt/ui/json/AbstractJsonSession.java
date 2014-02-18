@@ -33,11 +33,11 @@ public abstract class AbstractJsonSession implements IJsonSession {
   private IClientSession m_clientSession;
   private final Map<String, IJsonRenderer> m_jsonRenderers;
   private long m_jsonRendererSeq;
-  private UIResponse m_currentUIResponse;
+  private JsonResponse m_currentUIResponse;
 
   public AbstractJsonSession() {
     m_jsonRenderers = new HashMap<>();
-    m_currentUIResponse = new UIResponse();
+    m_currentUIResponse = new JsonResponse();
   }
 
   @Override
@@ -52,7 +52,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
       throw new JsonUIException("ClientSession is not active, there must be a problem with loading or starting");
     }
     m_clientSession = clientSession;
-    JsonDesktopRenderer jsonDesktop = new JsonDesktopRenderer(m_clientSession.getDesktop(), this);
+    JsonDesktop jsonDesktop = new JsonDesktop(m_clientSession.getDesktop(), this);
     jsonDesktop.init();
     LOG.info("JsonSession initialized.");
   }
@@ -101,13 +101,13 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   @Override
-  public UIResponse currentUIResponse() {
+  public JsonResponse currentUIResponse() {
     return m_currentUIResponse;
   }
 
   @Override
-  public UIResponse processRequest(UIRequest req) throws JsonUIException {
-    final UIResponse res = currentUIResponse();
+  public JsonResponse processRequest(JsonRequest req) throws JsonUIException {
+    final JsonResponse res = currentUIResponse();
     final String id = req.getEventId();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
@@ -121,7 +121,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
       LOG.error("Handling event. Type: " + req.getEventType() + ", Id: " + id, t);
     }
     //Clear event map when sent to client
-    m_currentUIResponse = new UIResponse();
+    m_currentUIResponse = new JsonResponse();
     return res;
   }
 

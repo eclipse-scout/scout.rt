@@ -28,20 +28,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktopRenderer extends AbstractJsonRenderer<IDesktop> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopRenderer.class);
+public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
   private static final String WIDGET_ID = "Desktop";
 
   private JSONArray m_jsonFormsArray;
   private JSONArray m_jsonPagesArray;
   private DesktopListener m_desktopListener;
-  private List<JsonViewButtonRenderer> m_jsonViewButtons;
+  private List<JsonViewButton> m_jsonViewButtons;
 
-  public JsonDesktopRenderer(IDesktop desktop, IJsonSession jsonSession) {
+  public JsonDesktop(IDesktop desktop, IJsonSession jsonSession) {
     super(desktop, jsonSession);
     m_jsonFormsArray = new JSONArray();
     m_jsonPagesArray = new JSONArray();
-    m_jsonViewButtons = new LinkedList<JsonViewButtonRenderer>();
+    m_jsonViewButtons = new LinkedList<JsonViewButton>();
   }
 
   public IDesktop getDesktop() {
@@ -76,7 +76,7 @@ public class JsonDesktopRenderer extends AbstractJsonRenderer<IDesktop> {
 
     IViewButton[] viewButtons = getDesktop().getViewButtons();
     for (IViewButton viewButton : viewButtons) {
-      JsonViewButtonRenderer button = new JsonViewButtonRenderer(viewButton, getJsonSession());
+      JsonViewButton button = new JsonViewButton(viewButton, getJsonSession());
       button.init();
       m_jsonViewButtons.add(button);
     }
@@ -110,7 +110,7 @@ public class JsonDesktopRenderer extends AbstractJsonRenderer<IDesktop> {
       jsonResponse.put("forms", m_jsonFormsArray);
       jsonResponse.put("pages", m_jsonPagesArray);
       JSONArray viewButtons = new JSONArray();
-      for (JsonViewButtonRenderer jsonViewButton : m_jsonViewButtons) {
+      for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
         viewButtons.put(jsonViewButton.toJson());
       }
       jsonResponse.put("viewButtons", viewButtons);
@@ -123,13 +123,13 @@ public class JsonDesktopRenderer extends AbstractJsonRenderer<IDesktop> {
   }
 
   @Override
-  public void handleUiEvent(UIRequest req, UIResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     if ("startup".equals(req.getEventType())) {
       handleUiStartupEvent(req, res);
     }
   }
 
-  protected void handleUiStartupEvent(UIRequest req, UIResponse res) throws JsonUIException {
+  protected void handleUiStartupEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     //Instruct gui to create desktop
     res.addCreateEvent(this.toJson());
   }

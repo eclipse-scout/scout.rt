@@ -1,11 +1,6 @@
 events:
 {
-  {type:"create", widgetType="desktop",
-    {id:"foo"}
-  },
-  {type:"update", id:"bar", selected:true },
-  {type:"create"  },
-  {type:"update",  },
-  {type:"update",  },
+  {type:"create", id:"Desktop", data:{id:"foo"} },
+  {type:"update", id:"bar", data:{selected:true} },
   {type:"destroy", id:"xyz"},
 }

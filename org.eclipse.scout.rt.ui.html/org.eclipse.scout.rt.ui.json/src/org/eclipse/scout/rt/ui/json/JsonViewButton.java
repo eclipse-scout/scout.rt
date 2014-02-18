@@ -7,9 +7,9 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonViewButtonRenderer extends AbstractJsonRenderer<IViewButton> {
+public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
 
-  public JsonViewButtonRenderer(IViewButton scoutObject,
+  public JsonViewButton(IViewButton scoutObject,
       IJsonSession jsonSession) {
     super(scoutObject, jsonSession);
   }
@@ -29,7 +29,7 @@ public class JsonViewButtonRenderer extends AbstractJsonRenderer<IViewButton> {
   }
 
   @Override
-  public void handleUiEvent(UIRequest req, UIResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     if ("click".equals(req.getEventType())) {
       handleUiClickEvent(req, res);
     }
@@ -38,7 +38,7 @@ public class JsonViewButtonRenderer extends AbstractJsonRenderer<IViewButton> {
     }
   }
 
-  protected void handleUiClickEvent(UIRequest req, UIResponse res) {
+  protected void handleUiClickEvent(JsonRequest req, JsonResponse res) {
     ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {

@@ -21,13 +21,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UIResponse {
+public class JsonResponse {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
   private final List<JSONObject> m_eventList;
   private final Map<String/*id*/, JSONObject> m_idToEventMap;
 
-  public UIResponse() {
+  public JsonResponse() {
     m_eventList = new ArrayList<>();
     m_idToEventMap = new HashMap<>();
   }
@@ -35,16 +35,19 @@ public class UIResponse {
   /**
    * event must have 'id'
    */
-  public void addCreateEvent(JSONObject e) {
-    if (e == null) {
+  public void addCreateEvent(JSONObject eventData) {
+    if (eventData == null) {
       return;
     }
     try {
-      String id = e.getString("id");
+      String id = eventData.getString("id");
       if (id == null) {
         throw new JSONException("id is null");
       }
-      e.put("type_", "create");
+      JSONObject e = new JSONObject();
+      e.put("id", id);
+      e.put("type", "create");
+      e.put("data", eventData);
       m_eventList.add(e);
       m_idToEventMap.put(id, e);
     }
@@ -67,10 +70,11 @@ public class UIResponse {
         e = new JSONObject();
         m_eventList.add(e);
         m_idToEventMap.put(id, e);
+        e.put("id", id);
+        e.put("type", "update");
+        e.put("data", new JSONObject());
       }
-      e.put("type_", "update");
-      e.put("id", id);
-      e.put(name, newValue);
+      e.getJSONObject("data").put(name, newValue);
     }
     catch (JSONException ex) {
       LOG.error("", ex);
