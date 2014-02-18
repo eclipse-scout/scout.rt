@@ -18,12 +18,43 @@
   </parent>
 
   <artifactId>org.eclipse.scout.ui.html</artifactId>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>jar</packaging>
 
-<!--
   <build>
     <plugins>
 
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>CollectWebResources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>resources/**</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>plugin.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+<!--
     <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -38,10 +69,10 @@
           <nosuffix>true</nosuffix>
         </configuration>
       </plugin>
+-->
 
     </plugins>
   </build>
--->
 
   <dependencies>
   <dependency>
