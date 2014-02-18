@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -80,11 +81,15 @@ public abstract class AbstractJsonServlet extends HttpServlet {
 
   protected abstract IJsonSession createJsonSession() throws JsonUIException;
 
+  /**
+   * default doGet returns the index.html that is assumed to be besides the projects JsonServlet.java
+   */
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.info("GET request started.");
+    URL url = getClass().getResource("index.html");
+    LOG.info("GET request started. Returning " + url);
     try {
-      InputStream is = AbstractJsonServlet.class.getResourceAsStream("index.html");
+      InputStream is = url.openStream();
       String html = new String(IOUtility.getContent(is));
       resp.setContentType("text/html");
       resp.getOutputStream().print(html);
