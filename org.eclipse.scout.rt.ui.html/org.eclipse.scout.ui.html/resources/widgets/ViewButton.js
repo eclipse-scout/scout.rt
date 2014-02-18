@@ -10,8 +10,6 @@ Scout.Desktop.ViewButton = function (scout, $viewButtonBar, viewButton) {
     };
     scout.widgetMap[viewButton.id] = this;
 
-    var selected = viewButton.selected;
-
     var state = '';
     if(viewButton.selected) {
       state='selected';

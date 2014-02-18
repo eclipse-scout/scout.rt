@@ -12,8 +12,6 @@ Scout.Desktop.OwnViewButton = function (scout, $viewButtonBar, viewButton) {
 
     scout.widgetMap[viewButton.id] = this;
 
-    var selected = viewButton.selected;
-
     var $viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
     $viewButton.
     on('click', '', onClick).

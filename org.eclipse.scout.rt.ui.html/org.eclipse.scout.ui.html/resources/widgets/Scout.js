@@ -44,13 +44,13 @@ Scout = function ($entryPoint, sessionPartId) {
         }
       }
     });
-  }
+  };
 
   this.init = function init() {
     // create all widgets for entry point
     var response = this.syncAjax('startup', $entryPoint.attr('id'));
     this.processEvents(response.events);
-  }
+  };
 
   // create single widget based on a model object
   function createWidget (scout, $parent, eventData) {
