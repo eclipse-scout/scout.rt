@@ -31,13 +31,13 @@ Scout = function ($entryPoint, sessionPartId) {
     var scout=this;
     $.each(events, function (index, event) {
       if(event.type == "create") {
-        var widget = createWidget(scout, $entryPoint, event);
+        var widget = createWidget(scout, $entryPoint, event.data);
         scout.widgetMap[event.id] = widget;
       }
       else if(event.type == "update") {
         var widget = scout.widgetMap[event.id];
         if(widget) {
-          updateWidget(scout, widget, event);
+          updateWidget(scout, widget, event.data);
         }
         else{
           log("ERROR: No widget found for id " + event.id);
@@ -53,13 +53,13 @@ Scout = function ($entryPoint, sessionPartId) {
   }
 
   // create single widget based on a model object
-  function createWidget (scout, $parent, event) {
-    if (event.id == "Desktop") {
-      return new Scout.Desktop(scout, $parent, event.data);
+  function createWidget (scout, $parent, eventData) {
+    if (eventData.id == "Desktop") {
+      return new Scout.Desktop(scout, $parent, eventData);
     }
   }
 
-  function updateWidget(scout, widget, event) {
-    widget.handleUpdate(event.data);
+  function updateWidget(scout, widget, eventData) {
+    widget.handleUpdate(eventData);
   }
 };

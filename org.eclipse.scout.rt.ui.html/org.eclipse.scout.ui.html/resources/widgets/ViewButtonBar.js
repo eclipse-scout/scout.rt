@@ -22,28 +22,11 @@ Scout.Desktop.ViewButtonBar = function (scout, $desktop, viewButtons) {
 
 
   function addOwnView (event) {
-    var name = $desktopView.children('.selected').text().split('('),
-      c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
-
-    var state = 'view-own',
-      label = name[0] + ' (' + c + ')';
-
-    //TODO method clickView is not defined yet
-    var $view = $('#ViewAdd').beforeDiv('', 'view-item ' + state, label)
-            .on('click', '', function(){/*clickView*/})
-            .selectOne();
-
-    $view.appendDiv('', 'view-remove').on('click', '', removeOwnView);
-
-    var w = $view.width();
-    $view.css('width', 0).animateAVCSD('width', w);
+    var name = $desktopView.children('.selected').text().split('()');
+    var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
+    //TODO widget id?
+    var viewButton={"id":"ownView"+c, "text":name[0] + ' (' + c + ')'};
+    new Scout.Desktop.OwnViewButton(scout, $desktopView, viewButton);
   }
 
-  function removeOwnView (event) {
-    $(this).parent()
-      .animateAVCSD('width', 0, $.removeThis)
-      .prev().click();
-
-    return false;
-  }
 };
