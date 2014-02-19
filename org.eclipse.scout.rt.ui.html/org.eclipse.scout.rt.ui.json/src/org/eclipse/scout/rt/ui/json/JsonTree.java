@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -58,7 +60,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonRenderer<T> {
     }
   }
 
-  protected void handleModelTreeEventBatch(TreeEvent[] events) {
+  protected void handleModelTreeEventBatch(List<? extends TreeEvent> events) {
 
   }
 
@@ -69,7 +71,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonRenderer<T> {
     }
 
     @Override
-    public void treeChangedBatch(final TreeEvent[] events) {
+    public void treeChangedBatch(List<? extends TreeEvent> events) {
       handleModelTreeEventBatch(events);
     }
   }

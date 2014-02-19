@@ -65,8 +65,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       }
     }.runNow(new NullProgressMonitor());
 
-    IViewButton[] viewButtons = getDesktop().getViewButtons();
-    for (IViewButton viewButton : viewButtons) {
+    for (IViewButton viewButton : getDesktop().getViewButtons()) {
       JsonViewButton button = new JsonViewButton(viewButton, getJsonSession());
       button.init();
       m_jsonViewButtons.add(button);

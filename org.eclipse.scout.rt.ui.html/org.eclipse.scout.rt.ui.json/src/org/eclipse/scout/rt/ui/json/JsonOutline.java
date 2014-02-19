@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -39,8 +38,7 @@ public class JsonOutline extends JsonTree<IOutline> {
         jsonPages.put(pageToJson(rootPage));
       }
       else {
-        IPage[] childPages = getScoutObject().getRootPage().getChildPages();
-        for (IPage childPage : childPages) {
+        for (IPage childPage : getScoutObject().getRootPage().getChildPages()) {
           jsonPages.put(pageToJson(childPage));
         }
       }
@@ -70,7 +68,7 @@ public class JsonOutline extends JsonTree<IOutline> {
   }
 
   @Override
-  protected void handleModelTreeEventBatch(TreeEvent[] events) {
+  protected void handleModelTreeEventBatch(List<? extends TreeEvent> events) {
     for (TreeEvent event : events) {
       handleModelTreeEvent(event);
     }
@@ -126,7 +124,7 @@ public class JsonOutline extends JsonTree<IOutline> {
         @Override
         public boolean visit(ITreeNode node) {
           if (node.getNodeId().equals(nodeId)) {
-            childPages.addAll(Arrays.asList(node.getChildNodes()));
+            childPages.addAll(node.getChildNodes());
             return false;
           }
           return true;
