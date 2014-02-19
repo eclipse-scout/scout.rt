@@ -13,6 +13,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
+import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
@@ -156,17 +157,28 @@ public class CoolbarButton extends Action {
   protected void handleSwtAction() {
     try {
       if (getUpdateSwtFromScoutLock().acquire()) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (getScoutObject().isToggleAction()) {
-              getScoutObject().getUIFacade().setSelectedFromUI(!getScoutObject().isSelected());
-            }
+        if (getScoutObject().isToggleAction() && getScoutObject() instanceof IViewButton && getScoutObject().isSelected()) {
+          // reset UI selection
+          updateSelectedFromScout();
+        }
+        else {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              if (getScoutObject().isToggleAction()) {
+                if (getScoutObject() instanceof IViewButton && getScoutObject().isSelected()) {
+                  // void
+                }
+                else {
+                  getScoutObject().getUIFacade().setSelectedFromUI(!getScoutObject().isSelected());
+                }
+              }
 
-            getScoutObject().getUIFacade().fireActionFromUI();
-          }
-        };
-        getEnvironment().invokeScoutLater(t, 0);
+              getScoutObject().getUIFacade().fireActionFromUI();
+            }
+          };
+          getEnvironment().invokeScoutLater(t, 0);
+        }
       }
     }
     finally {
