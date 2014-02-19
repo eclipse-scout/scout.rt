@@ -436,4 +436,22 @@ public final class SpecIOUtility {
   public static void setSpecFileConfig(SpecFileConfig specFileConfig) {
     SpecIOUtility.s_specFileConfig = specFileConfig;
   }
+
+  /**
+   * @return
+   * @throws ProcessingException
+   */
+  public static Properties loadLinkPropertiesFile() throws ProcessingException {
+    Properties p = new Properties();
+    try {
+      p.load(new FileReader(getSpecFileConfigInstance().getLinksFile()));
+    }
+    catch (FileNotFoundException e) {
+      throw new ProcessingException("Error loading links file", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error loading links file", e);
+    }
+    return p;
+  }
 }

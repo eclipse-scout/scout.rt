@@ -12,13 +12,16 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
 import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
 import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 
 /**
  * A post processor for mediawiki files which performs the following tasks:
@@ -42,12 +45,57 @@ public class MediawikiPostProcessor implements ISpecProcessor {
     }
   }
 
-  private void replaceLinks(File f) throws ProcessingException {
-    MediawikiAnchorCollector c = new MediawikiAnchorCollector(f);
-    c.replaceLinks(f, SpecIOUtility.getSpecFileConfigInstance().getLinksFile());
+  protected void replaceLinks(File mediawikiFile) throws ProcessingException {
+    Properties links = SpecIOUtility.loadLinkPropertiesFile();
+    SpecIOUtility.process(mediawikiFile, new P_LinkProcessor(links));
   }
 
-  private void replaceWikiFileLinks(File htmlFile) throws ProcessingException {
+  /**
+   * Processor for converting mediawiki links to qualified form (including filename)
+   */
+  protected static class P_LinkProcessor implements IStringProcessor {
+    private Properties m_links;
+
+    /**
+     * @param links
+     */
+    public P_LinkProcessor(Properties links) {
+      m_links = links;
+    }
+
+    @Override
+    public String processLine(String input) {
+      // $1=anchorId; $2=displayName
+      Pattern pattern = Pattern.compile("\\[\\[([A-Za-z][A-Za-z0-9_\\.-]+)\\|(.*?)]]");
+      Matcher matcher = pattern.matcher(input);
+      StringBuilder sb = new StringBuilder();
+      int index = 0;
+      while (matcher.find()) {
+        sb.append(input.substring(index, matcher.start(0)));
+        String propValue = m_links.getProperty(matcher.group(1));
+        if (propValue != null) {
+          sb.append("[[").append(propValue).append("|").append(matcher.group(2)).append("]]");
+        }
+        else {
+          sb.append(matcher.group(2));
+          LOG.warn(matcher.group(1) + " not found links properties, replacing with plain text: " + matcher.group(2));
+        }
+        index = matcher.end();
+      }
+      sb.append(input.substring(index));
+      return sb.toString();
+    }
+
+    /**
+     * @param anchorId
+     * @return
+     */
+    protected String qualifiedAnchorId(String anchorId) {
+      return anchorId;
+    }
+  }
+
+  protected void replaceWikiFileLinks(File htmlFile) throws ProcessingException {
     HashMap<String, String> map = new HashMap<String, String>();
     map.put("/wiki/", "");
     map.put(".mediawiki", ".html");
@@ -55,15 +103,10 @@ public class MediawikiPostProcessor implements ISpecProcessor {
   }
 
   protected File convertToHTML(File mediaWiki) throws ProcessingException {
-    String htmlName = mediaWiki.getName().replace(".mediawiki", "");
-    return convertToHTML(htmlName, mediaWiki);
-  }
-
-  protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
     File htmlDir = SpecIOUtility.getSpecFileConfigInstance().getHtmlDir();
-    htmlDir.mkdirs();
-    File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
+    File htmlFile = SpecIOUtility.createNewFile(htmlDir, mediaWiki.getName().replace(".mediawiki", ""), ".html");
 
+    // TODO ASA refactor: now css is copied for every file that is converted to html and can not be replaced by a custom css
     // copy css
     File css = new File(htmlDir, "default.css");
     TemplateUtility.copyDefaultCss(css);

@@ -81,7 +81,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     prefixAnchorsAndLinks();
   }
 
-  // TODO ASA unittest (also test that image links are not prefixed)
+  // TODO ASA unittest (also test that image links are not prefixed and multiple links on same line)
   protected void prefixAnchorsAndLinks() throws ProcessingException {
     SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\{\\{a:)([^}]+}})"));
     SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\[\\[)([A-Za-z][A-Za-z0-9_\\.-]+\\|)"));
