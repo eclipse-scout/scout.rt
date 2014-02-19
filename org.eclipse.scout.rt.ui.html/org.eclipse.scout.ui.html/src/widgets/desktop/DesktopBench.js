@@ -4,7 +4,7 @@
 // bench
 //
 
-Scout.Desktop.Bench = function (scout, $desktop) {
+Scout.DesktopBench = function (scout, $desktop) {
   //create container
   var $desktopBench = $desktop.appendDiv('DesktopBench');
 

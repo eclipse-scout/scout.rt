@@ -21,43 +21,31 @@
   <packaging>jar</packaging>
 
   <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}</directory>
+                  <includes>
+                    <include>resources/**</include>
+                    <include>plugin.xml</include>
+                  </includes>
+      </resource>
+    </resources>
+
     <plugins>
 
       <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>CollectWebResources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>${project.basedir}</directory>
-                  <includes>
-                    <include>resources/**</include>
-                  </includes>
-                </resource>
-                <resource>
-                  <directory>${project.basedir}</directory>
-                  <includes>
-                    <include>plugin.xml</include>
-                  </includes>
-                </resource>
-              </resources>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-              <overwrite>true</overwrite>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
       </plugin>
-
-<!--
-    <plugin>
+      <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>1.4.0</version>
         <executions>
           <execution>
             <goals>
@@ -65,24 +53,16 @@
             </goals>
           </execution>
         </executions>
+       <!--
+        -->
         <configuration>
           <nosuffix>true</nosuffix>
+          <sourceDirectory>${project.basedir}/resources</sourceDirectory>
+          <outputDirectory>${project.build.directory}/resources</outputDirectory>
         </configuration>
       </plugin>
--->
 
     </plugins>
   </build>
-
-<!--
-  <dependencies>
-  <dependency>
-    <groupId>net.alchim31.maven</groupId>
-    <artifactId>yuicompressor-maven-plugin</artifactId>
-    <version>1.4.0</version>
-    <type>maven-plugin</type>
-  </dependency>
-  </dependencies>
--->
 
 </project>

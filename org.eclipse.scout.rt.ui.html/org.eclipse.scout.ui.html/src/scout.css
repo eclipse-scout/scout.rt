@@ -89,7 +89,7 @@ float: left;
 height: 57px;
 width: 45px;
 padding: 24px 0px 0px 20px;
-margin-left: 15px; 
+margin-left: 15px;
 cursor: pointer;
 }
 
@@ -110,7 +110,7 @@ top: -10px;
 right: -10px;
 height: 25px;
 width: 10px;
-padding-left: 5px; 
+padding-left: 5px;
 }
 
 .view-item:hover .view-remove:after{
@@ -121,7 +121,7 @@ content: "\f00d";
 }
 
 .view-remove:hover:after {
-color:#FE9915 !important;	
+color:#FE9915 !important;
 }
 
 #ViewLogo {
@@ -137,8 +137,8 @@ background-size: cover;
 
 #DesktopTools{
 position: absolute;
-right: 0px; 
-top: 58px;    
+right: 0px;
+top: 58px;
 height: calc(100% - 58px);
 width: 80px;
 border-left: 1px solid #CCC;
@@ -181,8 +181,8 @@ color:#CCC;
 
 .tool-open{
 position: absolute;
-right: 80px; 
-top: 58px; 
+right: 80px;
+top: 58px;
 width: 0px;  /*animate to 300px;*/
 height: calc(100% - 58px);
 border-left:1px solid #CCC;
@@ -205,7 +205,7 @@ min-height: 100px;}
 
 #DesktopTree > .scrollbar{
 right: 19px;
-margin-top: 10px; 
+margin-top: 10px;
 margin-bottom: 10px;
 }
 
@@ -233,7 +233,7 @@ position: relative;
 float: left;
 width: 100%;
 line-height: 32px;
-padding-left: 30px; 
+padding-left: 30px;
 white-space: nowrap;
 cursor: pointer;
 overflow: hidden;
@@ -249,7 +249,7 @@ top: -2px;
 .tree-item-control:before{
 font-family: fontAwesome;
 font-size: 24px;
-padding: 3px 3px 3px 3px; 
+padding: 3px 3px 3px 3px;
 content: "\F111";
 color: #CCC;
 }
@@ -268,7 +268,7 @@ color:#FE9915 !important;
 
 .tree-item.expanded > .tree-item-control:hover:before{
 content:"\F057" !important;
-}	
+}
 
 .tree-item-menu{
 position: absolute;
@@ -368,7 +368,7 @@ color:#CCC;
 #header_menu {
 z-index: 200000;
 position: fixed;
-padding: 0px 0px 0px 0px; 
+padding: 0px 0px 0px 0px;
 border: 2px solid #0082A1;
 border: 2px solid #0082A1;
 background-color:white;
@@ -376,8 +376,8 @@ overflow: visible;
 }
 
 #header_menu_exit, #header_menu_sort_up, #header_menu_sort_down, #header_menu_filter, #header_menu_add, #header_menu_more{
-padding: 7px 8px 7px 7px; 
-cursor: pointer; 
+padding: 7px 8px 7px 7px;
+cursor: pointer;
 font-family: FontAwesome;
 font-size: 16px;
 color:#0082A1;
@@ -387,12 +387,12 @@ text-align:center;}
 color: #FE9915;
 }
 
-#header_menu_exit:before 		{content: "\F0C9";}
-#header_menu_sort_up:before 	{content: "\F160";}
-#header_menu_sort_down:before	{content: "\F161";}
-#header_menu_filter:before		{content: "\F0B0";}
-#header_menu_add:before			{content: "\F067";}
-#header_menu_more:before		{content: "\F141";}
+#header_menu_exit:before     {content: "\F0C9";}
+#header_menu_sort_up:before   {content: "\F160";}
+#header_menu_sort_down:before  {content: "\F161";}
+#header_menu_filter:before    {content: "\F0B0";}
+#header_menu_add:before      {content: "\F067";}
+#header_menu_more:before    {content: "\F141";}
 
 .header_menu_selected:before{
 color: #FE9915;
@@ -401,7 +401,7 @@ color: #FE9915;
 #table_data{
 height:calc(100% - 70px);
 width: 100%;
-overflow: hidden;	
+overflow: hidden;
 position: relative;
 }
 
@@ -411,7 +411,7 @@ position: absolute;
 }
 
 .data_row {
-overflow: hidden;	
+overflow: hidden;
 white-space: nowrap;
 position:relative;
 padding: 2px 0px 2px 0px;
@@ -459,7 +459,7 @@ border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
 border-radius: 7px;
 }
- 
+
 #row_menu{
 position: absolute;
 left: -25px;
@@ -518,7 +518,7 @@ padding: 3px;}
 
 .menu-item{
 color: #0082A1;
-cursor: pointer; 
+cursor: pointer;
 line-height: 23px;
 padding: 4px 8px 0px 9px;
 }
@@ -558,28 +558,28 @@ color: #FE9915;
 
 /* scrollbar */
 
-.scrollbar { 
-position: absolute; 
-width: 16px; 
+.scrollbar {
+position: absolute;
+width: 16px;
 height: 100%;
 z-index: 1;
 padding: 0px 3px 0px 3px;
 background-color: white;
-cursor: pointer; 
+cursor: pointer;
 }
 
-.scrollbar-thumb { 
-position: absolute; 
+.scrollbar-thumb {
+position: absolute;
 width: 10px;
 top: 0;
 z-index: 2;
-background-color: #D4D4D4; 
-cursor: pointer; 
+background-color: #D4D4D4;
+cursor: pointer;
 }
 
 .scrollbar-thumb-move, .scrollbar-thumb:hover{
-background-color: #0082A1; 
-} 
+background-color: #0082A1;
+}
 
 
 /* old stuff */

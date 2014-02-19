@@ -26,11 +26,11 @@ Scout.Desktop = function (scout, $parent, data) {
   scout.widgetMap[data.id] = this;
 
   // create all 4 containers
-  this.viewButtonBar = new Scout.Desktop.ViewButtonBar(scout, $parent, data.viewButtons);
-//  var tool = new Scout.Desktop.Tool(scout, $parent, data.tools);
+  this.viewButtonBar = new Scout.DesktopViewButtonBar(scout, $parent, data.viewButtons);
+//  var tool = new Scout.DesktopTool(scout, $parent, data.tools);
 
-  this.tree = new Scout.Desktop.Tree(scout, $parent, data.outline);
-  this.bench = new Scout.Desktop.Bench(scout, $parent);
+  this.tree = new Scout.DesktopTree(scout, $parent, data.outline);
+  this.bench = new Scout.DesktopBench(scout, $parent);
 
   // show node
 //  var nodes = scout.syncAjax('drilldown', widget.start);

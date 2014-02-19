@@ -4,7 +4,7 @@
 // tool namespace and container
 //
 
-Scout.Desktop.ToolButton = function (scout, $desktop, tools) {
+Scout.DesktopToolButton = function (scout, $desktop, tools) {
   // create container
   var $desktopTools = $desktop.appendDiv('DesktopTools');
 

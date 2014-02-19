@@ -4,7 +4,7 @@
 // desktop table namespace and element
 //
 
-Scout.Desktop.Table = function (scout, $bench) {
+Scout.DesktopTable = function (scout, $bench) {
   //create container
   var $desktopTable = $bench.appendDiv('DesktopTable');
   $desktopTable.appendDiv('DesktopTableHeader');

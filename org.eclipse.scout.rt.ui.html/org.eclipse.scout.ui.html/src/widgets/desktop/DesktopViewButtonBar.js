@@ -4,13 +4,13 @@
 // view namespace and container
 //
 
-Scout.Desktop.ViewButtonBar = function (scout, $desktop, viewButtons) {
+Scout.DesktopViewButtonBar = function (scout, $desktop, viewButtons) {
   //  create container
   var $desktopView = $desktop.appendDiv('DesktopViews');
 
   //  add view-item, all before #viewAdd
   for (var i = 0; i < viewButtons.length; i++) {
-    new Scout.Desktop.ViewButton(scout, $desktopView, viewButtons[i]);
+    new Scout.DesktopViewButton(scout, $desktopView, viewButtons[i]);
   }
 
   //  create logo and plus sign
@@ -26,7 +26,7 @@ Scout.Desktop.ViewButtonBar = function (scout, $desktop, viewButtons) {
     var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
     //TODO widget id?
     var viewButton={"id":"ownView"+c, "text":name[0] + ' (' + c + ')'};
-    new Scout.Desktop.OwnViewButton(scout, $desktopView, viewButton);
+    new Scout.DesktopOwnViewButton(scout, $desktopView, viewButton);
   }
 
 };

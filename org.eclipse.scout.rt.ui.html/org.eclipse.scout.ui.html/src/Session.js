@@ -1,10 +1,7 @@
 // SCOUT GUI 0.2
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// scout
-//
 
-Scout = function ($entryPoint, sessionPartId) {
+Scout.Session = function ($entryPoint, sessionPartId) {
   this.widgetMap = {};
 
   // server communication, data is optional

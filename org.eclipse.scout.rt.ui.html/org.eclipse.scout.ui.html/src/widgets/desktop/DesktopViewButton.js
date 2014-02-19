@@ -2,7 +2,8 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 //
 
-Scout.Desktop.ViewButton = function (scout, $viewButtonBar, viewButton) {
+Scout.DesktopViewButton = function (scout, $viewButtonBar, viewButton) {
+
     this.handleUpdate = function handleUpdate(eventData) {
       if(eventData.selected !== undefined) {
         $viewButton.select(eventData.selected);

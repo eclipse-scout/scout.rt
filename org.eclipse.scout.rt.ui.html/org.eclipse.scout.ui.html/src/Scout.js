@@ -1,13 +1,14 @@
 // SCOUT GUI 0.2
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-// my log function!
+// scout namespace
+Scout = {
+};
+
+//local log function
 var log = console.log.bind(console);
 
-//
-// extend jQuery, with all helpers
-//
-
+//extend jQuery, with all helpers
 (function ($) {
   // scout uses only divs...
     $.makeDiv = function (i, c, h) {

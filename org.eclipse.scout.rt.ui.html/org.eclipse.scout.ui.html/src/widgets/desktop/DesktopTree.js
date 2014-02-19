@@ -4,7 +4,7 @@
 // tree
 //
 
-Scout.Desktop.Tree = function (scout, $desktop, modelTree) {
+Scout.DesktopTree = function (scout, $desktop, modelTree) {
   // create container
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
@@ -112,7 +112,7 @@ Scout.Desktop.Tree = function (scout, $desktop, modelTree) {
 
     // show bench
     if (node.bench.type == 'table') {
-      new Scout.Desktop.Table(scout, $('#DesktopBench'));
+      new Scout.DesktopTable(scout, $('#DesktopBench'));
     } else{
       $('#DesktopBench').text(JSON.stringify(node.bench));
     }
