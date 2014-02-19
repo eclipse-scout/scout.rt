@@ -19,8 +19,8 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
     try {
       JSONObject json = new JSONObject();
       json.put("id", getId());
-      json.put(IViewButton.PROP_TEXT, getScoutObject().getText());
-      json.put("selected", getScoutObject().isSelected());
+      json.put(IViewButton.PROP_TEXT, getModelObject().getText());
+      json.put("selected", getModelObject().isSelected());
       return json;
     }
     catch (JSONException e) {
@@ -42,8 +42,8 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
     ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getScoutObject().getUIFacade().setSelectedFromUI(true);
-        getScoutObject().getUIFacade().fireActionFromUI();
+        getModelObject().getUIFacade().setSelectedFromUI(true);
+        getModelObject().getUIFacade().fireActionFromUI();
       }
     };
     syncJob.runNow(new NullProgressMonitor());

@@ -39,7 +39,7 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
     return m_jsonSession;
   }
 
-  protected T getScoutObject() {
+  protected T getModelObject() {
     return m_scoutObject;
   }
 

@@ -1,8 +1,15 @@
 package org.eclipse.scout.rt.ui.json;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -33,12 +40,12 @@ public class JsonOutline extends JsonTree<IOutline> {
       json.put("type", "outline");
 
       JSONArray jsonPages = new JSONArray();
-      if (getScoutObject().isRootNodeVisible()) {
-        IPage rootPage = getScoutObject().getRootPage();
+      if (getModelObject().isRootNodeVisible()) {
+        IPage rootPage = getModelObject().getRootPage();
         jsonPages.put(pageToJson(rootPage));
       }
       else {
-        for (IPage childPage : getScoutObject().getRootPage().getChildPages()) {
+        for (IPage childPage : getModelObject().getRootPage().getChildPages()) {
           jsonPages.put(pageToJson(childPage));
         }
       }
@@ -111,6 +118,9 @@ public class JsonOutline extends JsonTree<IOutline> {
     if ("drilldown".equals(req.getEventType())) {
       handleUiDrillDownEvent(req, res);
     }
+    else if ("drilldown_menu".equals(req.getEventType())) {
+      handleUiDrillDownMenuEvent(req, res);
+    }
     else {
       throw new IllegalArgumentException("unsupported event type");
     }
@@ -119,23 +129,23 @@ public class JsonOutline extends JsonTree<IOutline> {
   protected void handleUiDrillDownEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     try {
       final String nodeId = req.getEventData().getString("nodeId");
-      final List<ITreeNode> childPages = new ArrayList<>();
-      ITreeVisitor v = new ITreeVisitor() {
+      final ITreeNode node = findTreeNode(nodeId);
+      if (node == null) {
+        throw new JsonUIException("No node found for id " + nodeId);
+      }
+
+      new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
         @Override
-        public boolean visit(ITreeNode node) {
-          if (node.getNodeId().equals(nodeId)) {
-            childPages.addAll(node.getChildNodes());
-            return false;
-          }
-          return true;
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getModelObject().getUIFacade().fireNodeClickFromUI(node);
+          getModelObject().getUIFacade().setNodesSelectedFromUI(CollectionUtility.arrayList(node));
         }
-      };
-      getScoutObject().visitNode(getScoutObject().getRootNode(), v);
+      }.runNow(new NullProgressMonitor());
 
       //TODO better return nodes event driven
       JSONArray jsonPages = new JSONArray();
-      for (ITreeNode node : childPages) {
-        JSONObject jsonPage = pageToJson((IPage) node);
+      for (ITreeNode childNode : node.getChildNodes()) {
+        JSONObject jsonPage = pageToJson((IPage) childNode);
         jsonPages.put(jsonPage);
       }
       getJsonSession().currentUIResponse().addUpdateEvent(m_jsonDesktop.getId(), "nodesAdded", jsonPages);
@@ -143,9 +153,52 @@ public class JsonOutline extends JsonTree<IOutline> {
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
+  }
 
-    //TODO
-//    getScoutObject().getUIFacade().fireNodeClickFromUI(node);
+  protected void handleUiDrillDownMenuEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
+    List<IMenu> menus = collectMenus(false, true);
+
+    JSONArray jsonMenus = new JSONArray();
+    for (IMenu menu : menus) {
+      JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
+      jsonMenu.init();
+      jsonMenus.put(jsonMenu.toJson());
+    }
+
+    getJsonSession().currentUIResponse().addUpdateEvent(getId(), "menuPopup", jsonMenus);
+  }
+
+  protected List<IMenu> collectMenus(final boolean emptySpaceActions, final boolean nodeActions) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        if (emptySpaceActions) {
+          menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+        }
+        if (nodeActions) {
+          menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
+        }
+      }
+    }.runNow(new NullProgressMonitor());
+
+    return Collections.unmodifiableList(menuList);
+  }
+
+  protected ITreeNode findTreeNode(final String nodeId) {
+    final Holder<ITreeNode> nodeHolder = new Holder<>(ITreeNode.class);
+    ITreeVisitor v = new ITreeVisitor() {
+      @Override
+      public boolean visit(ITreeNode node) {
+        if (node.getNodeId().equals(nodeId)) {
+          nodeHolder.setValue(node);
+          return false;
+        }
+        return true;
+      }
+    };
+    getModelObject().visitNode(getModelObject().getRootNode(), v);
+    return nodeHolder.getValue();
   }
 
   @Override

@@ -29,7 +29,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonRenderer<T> {
     super.attachModel();
     if (m_modelTreeListener == null) {
       m_modelTreeListener = new P_ModelTreeListener();
-      getScoutObject().addUITreeListener(m_modelTreeListener);
+      getModelObject().addUITreeListener(m_modelTreeListener);
     }
   }
 
@@ -37,7 +37,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonRenderer<T> {
   protected void detachModel() throws JsonUIException {
     super.detachModel();
     if (m_modelTreeListener != null) {
-      getScoutObject().removeTreeListener(m_modelTreeListener);
+      getModelObject().removeTreeListener(m_modelTreeListener);
       m_modelTreeListener = null;
     }
   }

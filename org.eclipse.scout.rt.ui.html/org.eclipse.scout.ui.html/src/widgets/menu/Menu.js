@@ -4,12 +4,13 @@
 // menu namespace and element
 //
 
-Scout.Menu = function (scout, id, x, y) {
+Scout.Menu = function (scout, id, nodeId, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var menu = scout.syncAjax('drilldown_menu', id);
+  var response = scout.syncAjax('drilldown_menu', id, {"nodeId":nodeId});
+  var menu = response.events[0].data.menuPopup;
 
   // withou model, nothing to do
   if (menu.length === 0) return;

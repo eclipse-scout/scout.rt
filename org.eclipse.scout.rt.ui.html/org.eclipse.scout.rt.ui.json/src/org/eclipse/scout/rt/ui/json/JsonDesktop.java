@@ -43,7 +43,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   }
 
   public IDesktop getDesktop() {
-    return getScoutObject();
+    return getModelObject();
   }
 
   @Override

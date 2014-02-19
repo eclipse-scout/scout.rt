@@ -9,6 +9,8 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
   var scrollbar = new Scout.Scrollbar(scout, $desktopTreeScroll, 'y', true);
+  var self=this;
+
   $desktopTree.appendDiv('DesktopTreeResize')
     .on('mousedown', '', resizeTree);
 
@@ -63,7 +65,6 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
       var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
               .on('click', '', clickNode)
               .data('node', node)
-              .data('outlineId', this.outlineId) //TODO if fired from clickNode this == window, how to handle?
               .attr('data-level', level)
               .css('margin-left', level * 20)
               .css('width', 'calc(100% - ' + (level * 20 + 30) + 'px)');
@@ -105,7 +106,6 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
   function clickNode (event) {
     var $clicked = $(this);
     var node = $clicked.data('node');
-    var outlineId = $clicked.data('outlineId');
 
     // selected the one
     $clicked.selectOne();
@@ -120,7 +120,7 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
     // open node
     if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
       // load model and draw nodes
-      var response = scout.syncAjax('drilldown', outlineId, {"nodeId":$clicked.attr('id')});
+      var response = scout.syncAjax('drilldown', self.outlineId, {"nodeId":$clicked.attr('id')});
       var $newNodes = addNodes(response.events[0].data.nodesAdded, $clicked);
 
       if ($newNodes.length) {
@@ -172,10 +172,10 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
 
   function clickNodeMenu (event) {
     var $clicked = $(this),
-      id = $clicked.parent().attr('id'),
+      nodeId = $clicked.parent().attr('id'),
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.Menu(scout, id, x, y);
+    new Scout.Menu(scout, self.outlineId, nodeId, x, y);
   }
 };
