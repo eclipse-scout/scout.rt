@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
@@ -452,17 +451,17 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
   protected void handleSwtBrowseAction() {
     if (getSwtBrowseButton().isVisible() && getSwtBrowseButton().isEnabled()) {
-      requestProposalSupportFromSwt(ISmartField.BROWSE_ALL_TEXT, true);
+      requestProposalSupportFromSwt(IContentAssistField.BROWSE_ALL_TEXT, true);
     }
   }
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ISmartField.PROP_ICON_ID)) {
+    if (name.equals(IContentAssistField.PROP_ICON_ID)) {
       setIconIdFromScout((String) newValue);
     }
-    else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
+    else if (name.equals(IContentAssistField.PROP_PROPOSAL_FORM)) {
       setProposalFormFromScout((IContentAssistFieldProposalForm) newValue);
     }
   }
@@ -504,7 +503,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       case SWT.PAGE_UP:
         if (getSwtField().isEnabled() && getSwtField().getEditable() && getSwtField().isVisible()) {
           if (m_proposalPopup == null) {
-            requestProposalSupportFromSwt(ISmartField.BROWSE_ALL_TEXT, true);
+            requestProposalSupportFromSwt(IContentAssistField.BROWSE_ALL_TEXT, true);
           }
           else {
             Widget c = null;

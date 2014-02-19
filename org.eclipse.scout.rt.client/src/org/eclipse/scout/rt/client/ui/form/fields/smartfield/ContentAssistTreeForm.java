@@ -84,10 +84,10 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
 
   /**
    * Populate initial tree using a {@link ClientAsyncJob}. Amount of tree loaded is depending on
-   * {@link ISmartField#isBrowseLoadIncremental()}.
+   * {@link IContentAssistField#isBrowseLoadIncremental()}.
    * <p>
    * loadIncremnental only loads the roots, whereas !loadIncremental loads the complete tree. Normally the latter is
-   * configured together with {@link ISmartField#isBrowseAutoExpandAll()}
+   * configured together with {@link IContentAssistField#isBrowseAutoExpandAll()}
    * 
    * @throws ProcessingException
    */
@@ -103,7 +103,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       getStatusField().setValue(ScoutTexts.get("searchingProposals"));
       getStatusField().setVisible(true);
       //go async to fetch data
-      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_TYPE>() {
+      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_TYPE>() {
         @Override
         public void dataFetched(List<? extends ILookupRow<LOOKUP_TYPE>> rows, ProcessingException failed) {
           if (failed == null) {
@@ -517,13 +517,12 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
     return parentNode;
   }
 
-  @SuppressWarnings("unchecked")
   private ILookupRow<LOOKUP_TYPE> getLookupRowFor(LOOKUP_TYPE key) throws ProcessingException {
     if (key instanceof Number && ((Number) key).longValue() == 0) {
       key = null;
     }
     if (key != null) {
-      ISmartField<LOOKUP_TYPE> sf = (ISmartField<LOOKUP_TYPE>) getContentAssistField();
+      IContentAssistField<?, LOOKUP_TYPE> sf = (IContentAssistField<?, LOOKUP_TYPE>) getContentAssistField();
       for (ILookupRow<LOOKUP_TYPE> row : sf.callKeyLookup(key)) {
         return row;
       }

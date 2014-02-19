@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
@@ -80,7 +81,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * @since 3.8.0
  */
-public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField, IPopupSupport {
+public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssistField<?, ?>> implements IRwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutSmartField.class);
 
   private IDropDownButtonForPatch m_browseButton;

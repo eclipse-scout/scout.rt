@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartFieldProposalFormProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -31,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField {
+public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<IContentAssistField<?, ?>> implements IRwtScoutSmartField {
   private Composite m_browseIconContainer;
   private Composite m_smartContainer;
 

@@ -664,10 +664,10 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       }
     };
     if (background) {
-      callBrowseLookupInBackground(ISmartField.BROWSE_ALL_TEXT, 2, fetcher);
+      callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 2, fetcher);
     }
     else {
-      fetcher.dataFetched(callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 2), null);
+      fetcher.dataFetched(callBrowseLookup(IContentAssistField.BROWSE_ALL_TEXT, 2), null);
     }
   }
 

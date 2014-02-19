@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -251,7 +250,7 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (ISmartField.PROP_VALUE.equals(evt.getPropertyName())) {
+      if (IContentAssistField.PROP_VALUE.equals(evt.getPropertyName())) {
         if (!m_acceptingProposal) {
           getFilterField().setValue(getContentAssistField().getDisplayText());
         }

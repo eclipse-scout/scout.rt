@@ -37,7 +37,7 @@ public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
   IContentAssistFieldDataFetchResult<KEY_TYPE> getSearchResult();
 
   /**
-   * This method may call {@link ISmartField#acceptProposal(LookupRow)}
+   * This method may call {@link IContentAssistField#acceptProposal(LookupRow)}
    * 
    * @return true if a propsal was accepted (might be a single match or the
    *         selcted one that is enabled)

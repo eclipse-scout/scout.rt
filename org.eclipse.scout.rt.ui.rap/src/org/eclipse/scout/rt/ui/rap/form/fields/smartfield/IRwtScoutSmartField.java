@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 
-public interface IRwtScoutSmartField extends IRwtScoutFormField<ISmartField<?>> {
+public interface IRwtScoutSmartField extends IRwtScoutFormField<IContentAssistField<?, ?>> {
 
   String VARIANT_SMARTFIELD = "smartfield";
   String VARIANT_SMARTFIELD_DISABLED = "smartfield-disabled";

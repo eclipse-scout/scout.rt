@@ -107,11 +107,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
 
   @Override
   public void contributeOutlines(Collection<IOutline> outlines) {
-    Class<? extends IOutline>[] array = getConfiguredOutlines();
-    if (array == null) {
+    List<Class<? extends IOutline>> contributedOutlines = getConfiguredOutlines();
+    if (contributedOutlines == null) {
       return;
     }
-    for (Class<? extends IOutline> element : array) {
+    for (Class<? extends IOutline> element : contributedOutlines) {
       try {
         IOutline o = element.newInstance();
         outlines.add(o);
@@ -381,7 +381,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigProperty(ConfigProperty.OUTLINES)
   @Order(20)
-  protected Class<? extends IOutline>[] getConfiguredOutlines() {
+  protected List<Class<? extends IOutline>> getConfiguredOutlines() {
     return null;
   }
 

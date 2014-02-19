@@ -45,7 +45,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentA
     if (synchronous) {
       try {
         List<? extends ILookupRow<LOOKUP_TYPE>> rows;
-        if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
+        if (IContentAssistField.BROWSE_ALL_TEXT.equals(text)) {
           rows = getContentAssistField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
         }
         else if (text.length() == 0) {
@@ -61,7 +61,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentA
       }
     }
     else {
-      if (ISmartField.BROWSE_ALL_TEXT.equals(textNonNull)) {
+      if (IContentAssistField.BROWSE_ALL_TEXT.equals(textNonNull)) {
         m_dataLoadJob = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
       }
       else if (textNonNull.length() == 0) {

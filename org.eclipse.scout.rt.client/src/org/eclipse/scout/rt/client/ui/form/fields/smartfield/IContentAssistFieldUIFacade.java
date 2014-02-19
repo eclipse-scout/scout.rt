@@ -21,8 +21,8 @@ public interface IContentAssistFieldUIFacade {
   List<IMenu> firePopupFromUI();
 
   /**
-   * This may result in a property change {@link ISmartField#PROP_PROPOSAL_FORM} see
-   * {@link ISmartField#getProposalForm()}
+   * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
+   * {@link IContentAssistField#getProposalForm()}
    */
   void openProposalFromUI(String newText, boolean selectCurrentValue);
 
