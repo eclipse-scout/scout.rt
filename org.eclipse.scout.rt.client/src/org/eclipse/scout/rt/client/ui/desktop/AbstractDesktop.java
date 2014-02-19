@@ -194,7 +194,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   @ConfigProperty(ConfigProperty.OUTLINES)
   @Order(20)
-  protected Class<? extends IOutline>[] getConfiguredOutlines() {
+  protected List<Class<? extends IOutline>> getConfiguredOutlines() {
     return null;
   }
 
@@ -1681,9 +1681,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void contributeOutlines(Collection<IOutline> outlines) {
-      Class<?>[] a = getConfiguredOutlines();
-      if (a != null) {
-        for (Class<?> element : a) {
+      List<Class<? extends IOutline>> configuredOutlines = getConfiguredOutlines();
+      if (configuredOutlines != null) {
+        for (Class<?> element : configuredOutlines) {
           try {
             IOutline o = (IOutline) element.newInstance();
             outlines.add(o);
