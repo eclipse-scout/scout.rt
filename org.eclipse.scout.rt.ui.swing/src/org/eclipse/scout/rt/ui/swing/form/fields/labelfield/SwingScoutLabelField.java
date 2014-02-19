@@ -286,14 +286,14 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   }
 
   private class P_ResizeListener extends ComponentAdapter {
-    int oldHeight = 0;
+    int m_oldHeight = 0;
 
     @Override
     public void componentResized(ComponentEvent e) {
-      if (oldHeight == e.getComponent().getHeight()) {
+      if (m_oldHeight == e.getComponent().getHeight()) {
         return;
       }
-      oldHeight = e.getComponent().getHeight();
+      m_oldHeight = e.getComponent().getHeight();
       updateTextInGUI();
     }
   }

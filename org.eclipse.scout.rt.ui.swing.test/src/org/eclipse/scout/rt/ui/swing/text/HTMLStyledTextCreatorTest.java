@@ -29,23 +29,23 @@ import org.junit.Test;
  */
 public class HTMLStyledTextCreatorTest {
 
-  IStyledTextCreator creator;
+  IStyledTextCreator m_creator;
 
   @Before
   public void createStyledText() {
-    creator = new HTMLStyledTextCreator();
+    m_creator = new HTMLStyledTextCreator();
   }
 
   @Test
   public void testNull() {
-    creator.setText(null);
-    assertEquals("<!-- -->", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(null);
+    assertEquals("<!-- -->", StringUtility.getTag(m_creator.createStyledText(), "td"));
   }
 
   @Test
   public void testDefaultValues() {
-    creator.setText("some text");
-    String styledText = creator.createStyledText();
+    m_creator.setText("some text");
+    String styledText = m_creator.createStyledText();
     assertEquals("left", getHorizontalAlignment(styledText));
     assertEquals("top", getVerticalAlignment(styledText));
     assertEquals("", getBackgroundColor(styledText));
@@ -56,129 +56,129 @@ public class HTMLStyledTextCreatorTest {
 
   @Test
   public void testExistingHtml() {
-    creator.setText("some <b> bold </b> text");
-    assertTrue(creator.createStyledText().contains("some <b> bold </b> text"));
-    String content = StringUtility.getTag(creator.createStyledText(), "td"); //content is inside the table cell
+    m_creator.setText("some <b> bold </b> text");
+    assertTrue(m_creator.createStyledText().contains("some <b> bold </b> text"));
+    String content = StringUtility.getTag(m_creator.createStyledText(), "td"); //content is inside the table cell
     assertEquals("some <b> bold </b> text", content);
 
-    creator.setText("<html>some <b> bold </b> text</html>");
-    assertTrue(creator.createStyledText().contains("some <b> bold </b> text"));
-    content = StringUtility.getTag(creator.createStyledText(), "td"); //content is inside the table cell
+    m_creator.setText("<html>some <b> bold </b> text</html>");
+    assertTrue(m_creator.createStyledText().contains("some <b> bold </b> text"));
+    content = StringUtility.getTag(m_creator.createStyledText(), "td"); //content is inside the table cell
     assertEquals("some <b> bold </b> text", content);
 
-    creator.setText("<html><body>some <b> bold </b> text</body></html>");
-    assertTrue(creator.createStyledText().contains("some <b> bold </b> text"));
-    content = StringUtility.getTag(creator.createStyledText(), "td"); //content is inside the table cell
+    m_creator.setText("<html><body>some <b> bold </b> text</body></html>");
+    assertTrue(m_creator.createStyledText().contains("some <b> bold </b> text"));
+    content = StringUtility.getTag(m_creator.createStyledText(), "td"); //content is inside the table cell
     assertEquals("some <b> bold </b> text", content);
 
-    creator.setText("<html><body>some <b> bold </b> text</body>"); //html end-tag missing
-    assertTrue(creator.createStyledText().contains("some <b> bold </b> text"));
-    content = StringUtility.getTag(creator.createStyledText(), "td"); //content is inside the table cell
+    m_creator.setText("<html><body>some <b> bold </b> text</body>"); //html end-tag missing
+    assertTrue(m_creator.createStyledText().contains("some <b> bold </b> text"));
+    content = StringUtility.getTag(m_creator.createStyledText(), "td"); //content is inside the table cell
     assertEquals("<html><body>some <b> bold </b> text</body>", content);
 
-    creator.setText("  <html><b>textbold</b><body><i>text italic</i></body></html>  "); //body start-tag missing
-    assertTrue(creator.createStyledText().contains("<b>textbold</b><body><i>text italic</i></body>"));
-    content = StringUtility.getTag(creator.createStyledText(), "td"); //content is inside the table cell
+    m_creator.setText("  <html><b>textbold</b><body><i>text italic</i></body></html>  "); //body start-tag missing
+    assertTrue(m_creator.createStyledText().contains("<b>textbold</b><body><i>text italic</i></body>"));
+    content = StringUtility.getTag(m_creator.createStyledText(), "td"); //content is inside the table cell
     assertEquals("<b>textbold</b><body><i>text italic</i></body>", content);
   }
 
   @Test
   public void testLinebreaks() {
     String text = "some text";
-    creator.setText(text);
-    assertEquals(text, StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals(text, StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "line 1 \n line 2 \n\r line 3";
-    creator.setText(text);
-    assertEquals("line 1 <br> line 2 <br> line 3", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals("line 1 <br> line 2 <br> line 3", StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "<html><body>line 1 \n line 2 \n\r line 3</body></html>";
-    creator.setText(text);
-    assertEquals("line 1 \n line 2 \n\r line 3", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals("line 1 \n line 2 \n\r line 3", StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "<html><body>line1 <br> line2 <br /> line3 <br/> line4</body></html>";
-    creator.setText(text);
-    assertEquals("line1 <br> line2 <br /> line3 <br/> line4", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals("line1 <br> line2 <br /> line3 <br/> line4", StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "line1 <br> line2 <br /> line 3";
-    creator.setText(text);
-    assertEquals(text, StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals(text, StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "line1 <br> line2 <br /> line 3 \n line 4";
-    creator.setText(text);
-    assertEquals("line1 <br> line2 <br /> line 3 <br> line 4", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals("line1 <br> line2 <br /> line 3 <br> line 4", StringUtility.getTag(m_creator.createStyledText(), "td"));
 
     text = "<html> line 1 <br/> line 2 \n line 3</html>";
-    creator.setText(text);
-    assertEquals("line 1 <br/> line 2 \n line 3", StringUtility.getTag(creator.createStyledText(), "td"));
+    m_creator.setText(text);
+    assertEquals("line 1 <br/> line 2 \n line 3", StringUtility.getTag(m_creator.createStyledText(), "td"));
   }
 
   @Test
   public void testHorizontalAlignment() {
-    creator.setText("some text");
+    m_creator.setText("some text");
 
-    creator.setHorizontalAlignment(SwingConstants.LEFT);
-    assertEquals("left", getHorizontalAlignment(creator.createStyledText()));
+    m_creator.setHorizontalAlignment(SwingConstants.LEFT);
+    assertEquals("left", getHorizontalAlignment(m_creator.createStyledText()));
 
-    creator.setHorizontalAlignment(SwingConstants.CENTER);
-    assertEquals("center", getHorizontalAlignment(creator.createStyledText()));
+    m_creator.setHorizontalAlignment(SwingConstants.CENTER);
+    assertEquals("center", getHorizontalAlignment(m_creator.createStyledText()));
 
-    creator.setHorizontalAlignment(SwingConstants.RIGHT);
-    assertEquals("right", getHorizontalAlignment(creator.createStyledText()));
+    m_creator.setHorizontalAlignment(SwingConstants.RIGHT);
+    assertEquals("right", getHorizontalAlignment(m_creator.createStyledText()));
   }
 
   @Test
   public void testVerticalAlignment() {
-    creator.setText("some text");
+    m_creator.setText("some text");
 
-    creator.setVerticalAlignment(SwingConstants.TOP);
-    assertEquals("top", getVerticalAlignment(creator.createStyledText()));
+    m_creator.setVerticalAlignment(SwingConstants.TOP);
+    assertEquals("top", getVerticalAlignment(m_creator.createStyledText()));
 
-    creator.setVerticalAlignment(SwingConstants.CENTER);
-    assertEquals("middle", getVerticalAlignment(creator.createStyledText()));
+    m_creator.setVerticalAlignment(SwingConstants.CENTER);
+    assertEquals("middle", getVerticalAlignment(m_creator.createStyledText()));
 
-    creator.setVerticalAlignment(SwingConstants.BOTTOM);
-    assertEquals("bottom", getVerticalAlignment(creator.createStyledText()));
+    m_creator.setVerticalAlignment(SwingConstants.BOTTOM);
+    assertEquals("bottom", getVerticalAlignment(m_creator.createStyledText()));
   }
 
   @Test
   public void testBackgroundColor() {
-    creator.setText("some text");
+    m_creator.setText("some text");
 
-    creator.setBackgroundColor(null);
-    assertEquals("", getBackgroundColor(creator.createStyledText()));
+    m_creator.setBackgroundColor(null);
+    assertEquals("", getBackgroundColor(m_creator.createStyledText()));
 
-    creator.setBackgroundColor(Color.red);
-    assertEquals("#ff0000", getBackgroundColor(creator.createStyledText()));
+    m_creator.setBackgroundColor(Color.red);
+    assertEquals("#ff0000", getBackgroundColor(m_creator.createStyledText()));
   }
 
   @Test
   public void testForegroundColor() {
-    creator.setText("some text");
+    m_creator.setText("some text");
 
-    creator.setForegroundColor(null);
-    assertEquals("", getForegroundColor(creator.createStyledText()));
+    m_creator.setForegroundColor(null);
+    assertEquals("", getForegroundColor(m_creator.createStyledText()));
 
-    creator.setForegroundColor(Color.red);
-    assertEquals("#ff0000", getForegroundColor(creator.createStyledText()));
+    m_creator.setForegroundColor(Color.red);
+    assertEquals("#ff0000", getForegroundColor(m_creator.createStyledText()));
   }
 
   @Test
   public void testWrapText() {
-    creator.setText("some text");
+    m_creator.setText("some text");
 
-    creator.setTextWrap(false);
-    assertEquals(false, isTextWrap(creator.createStyledText()));
+    m_creator.setTextWrap(false);
+    assertEquals(false, isTextWrap(m_creator.createStyledText()));
 
-    creator.setTextWrap(true);
-    assertEquals(true, isTextWrap(creator.createStyledText()));
+    m_creator.setTextWrap(true);
+    assertEquals(true, isTextWrap(m_creator.createStyledText()));
   }
 
   @Test
   public void testHeight() {
-    creator.setText("some text");
-    creator.setHeight(123);
-    assertEquals(123, getHeight(creator.createStyledText()));
+    m_creator.setText("some text");
+    m_creator.setHeight(123);
+    assertEquals(123, getHeight(m_creator.createStyledText()));
   }
 
   private String getHorizontalAlignment(String styledText) {
@@ -215,7 +215,7 @@ public class HTMLStyledTextCreatorTest {
     Pattern p = Pattern.compile(".*height=\\s*\"(\\d+)\\s*px\".*");
     Matcher m = p.matcher(styledText);
     if (m.matches()) {
-      return Integer.valueOf(m.group(1));
+      return Integer.parseInt(m.group(1));
     }
     return 0;
   }
