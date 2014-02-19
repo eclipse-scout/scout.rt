@@ -20,8 +20,11 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
  */
 public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
 
-  public FormTitleExtractor() {
+  private boolean m_anchor;
+
+  public FormTitleExtractor(boolean anchor) {
     super(TEXTS.get("org.eclipse.scout.rt.spec.label"));
+    m_anchor = anchor;
   }
 
   /**
@@ -30,7 +33,16 @@ public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
    */
   @Override
   public String getText(IForm form) {
-    return MediawikiUtility.transformToWiki(form.getTitle()) + "{{" + form.getClass().getSimpleName() + "}}";
+    StringBuilder sb = new StringBuilder();
+    if (m_anchor) {
+      sb.append(MediawikiUtility.createAnchor(getAnchorId(form)));
+    }
+    sb.append(MediawikiUtility.transformToWiki(form.getTitle()));
+    return sb.toString();
+  }
+
+  public static String getAnchorId(IForm form) {
+    return "c_" + form.classId();
   }
 
 }

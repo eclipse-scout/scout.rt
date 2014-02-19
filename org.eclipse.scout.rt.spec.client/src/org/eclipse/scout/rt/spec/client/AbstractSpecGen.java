@@ -12,31 +12,21 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
-import org.eclipse.scout.rt.spec.client.link.LinkTarget;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkGen;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkTargetManager;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
 
 /**
  *
  */
 public class AbstractSpecGen {
-  private final SpecFileConfig m_fileConfig;
-
-  public AbstractSpecGen() {
-    m_fileConfig = new SpecFileConfig();
-  }
 
   protected SpecFileConfig getFileConfig() {
-    return m_fileConfig;
+    return SpecIOUtility.getSpecFileConfigInstance();
   }
 
   protected IDocConfig getConfiguration() {
@@ -52,19 +42,6 @@ public class AbstractSpecGen {
     MediawikiWriter w = new MediawikiWriter(fileWriter, section, imagePaths);
     w.write();
 
-    storeLinkTargets(section, wiki, simpleId);
-  }
-
-  /**
-   * store link targets in property file
-   */
-  protected void storeLinkTargets(IDocSection section, File wiki, String simpleId) throws ProcessingException {
-    List<ILinkTarget> links = new MediawikiLinkGen().getLinkAnchors(section, wiki.getName());
-    //add simple name to allow manual links to simple name
-    //TODO move to preprocessor
-    links.add(new LinkTarget(simpleId, simpleId, wiki.getName()));
-    MediawikiLinkTargetManager w = new MediawikiLinkTargetManager(getFileConfig().getLinksFile());
-    w.writeLinks(links);
   }
 
 }

@@ -57,7 +57,7 @@ public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField>
     extractors.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_ENABLED, TEXTS.get("org.eclipse.scout.rt.spec.enabled")));
     extractors.add(new FormFieldPropertyExtractor(IStringField.PROP_MAX_LENGTH, TEXTS.get("org.eclipse.scout.rt.spec.length")));
     if (Platform.inDevelopmentMode()) {
-      extractors.add(new SimpleTypeTextExtractor<IFormField>("[DEV] Classname"));
+      extractors.add(new SimpleTypeTextExtractor<IFormField>("#DEV# Classname"));
     }
     extractors.add(new LinkableTypeExtractor<IFormField>(FieldTypesSpecTest.ID));
     return extractors;

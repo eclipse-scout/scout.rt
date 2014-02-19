@@ -24,7 +24,7 @@ package org.eclipse.scout.commons;
  */
 public interface ITypeWithClassId {
 
-  final String ID_CONCAT_SYMBOL = "|";
+  final String ID_CONCAT_SYMBOL = "_";
 
   /**
    * @return a unique id

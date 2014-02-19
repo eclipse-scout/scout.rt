@@ -31,7 +31,7 @@ public class FormExtractorTest {
    */
   @Test
   public void testColumnHeaderTextExtractor() {
-    FormTitleExtractor ex = new FormTitleExtractor();
+    FormTitleExtractor ex = new FormTitleExtractor(true);
     final String TEST_TEXT = "TEST";
     AbstractForm form = mock(AbstractForm.class);
     when(form.getTitle()).thenReturn(TEST_TEXT);

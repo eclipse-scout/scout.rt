@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.field.TableFieldTypeWithLabelExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FieldDetailTitleExtractor;
 
 /**
  *
@@ -29,6 +29,6 @@ public class DefaultSmartFieldConfig extends DefaultEntityConfig<ISmartField<?>>
 
   @Override
   public IDocTextExtractor<ISmartField<?>> getTitleExtractor() {
-    return new TableFieldTypeWithLabelExtractor<ISmartField<?>>();
+    return new FieldDetailTitleExtractor<ISmartField<?>>();
   }
 }

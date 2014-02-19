@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.spec.client;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Properties;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -20,7 +19,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
 import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor;
 
 /**
  * A post processor for mediawiki files which performs the following tasks:
@@ -28,16 +26,16 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkPostProcessor
  * <li>Replace link tags to point to the generated files.
  * <li>Convert all mediawiki files to html files
  */
-public class MediawikiPostProcessor extends AbstractSpecGen implements ISpecProcessor {
+public class MediawikiPostProcessor implements ISpecProcessor {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiPostProcessor.class);
 
   @Override
   public void process() throws ProcessingException {
-    if (!getFileConfig().getMediawikiDir().exists()) {
-      LOG.warn("MediawikiDir does not exists! (" + getFileConfig().getMediawikiDir().getPath() + ")");
+    if (!SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().exists()) {
+      LOG.warn("MediawikiDir does not exists! (" + SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().getPath() + ")");
       return;
     }
-    for (File wiki : getFileConfig().getMediawikiDir().listFiles()) {
+    for (File wiki : SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles()) {
       replaceLinks(wiki);
       File html = convertToHTML(wiki);
       replaceWikiFileLinks(html);
@@ -46,10 +44,7 @@ public class MediawikiPostProcessor extends AbstractSpecGen implements ISpecProc
 
   private void replaceLinks(File f) throws ProcessingException {
     MediawikiAnchorCollector c = new MediawikiAnchorCollector(f);
-    c.replaceLinks(f, getFileConfig().getLinksFile());
-    Properties prop = SpecIOUtility.loadProperties(getFileConfig().getLinksFile());
-    MediawikiLinkPostProcessor postproc = new MediawikiLinkPostProcessor(prop);
-    postproc.replaceLinks(f);
+    c.replaceLinks(f, SpecIOUtility.getSpecFileConfigInstance().getLinksFile());
   }
 
   private void replaceWikiFileLinks(File htmlFile) throws ProcessingException {
@@ -65,7 +60,7 @@ public class MediawikiPostProcessor extends AbstractSpecGen implements ISpecProc
   }
 
   protected File convertToHTML(String id, File mediaWiki) throws ProcessingException {
-    File htmlDir = getFileConfig().getHtmlDir();
+    File htmlDir = SpecIOUtility.getSpecFileConfigInstance().getHtmlDir();
     htmlDir.mkdirs();
     File htmlFile = SpecIOUtility.createNewFile(htmlDir, id, ".html");
 

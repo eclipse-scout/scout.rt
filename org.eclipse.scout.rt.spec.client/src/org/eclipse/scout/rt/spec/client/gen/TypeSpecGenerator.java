@@ -27,7 +27,8 @@ public class TypeSpecGenerator {
   }
 
   public IDocSection getDocSection(Class[] types) {
-    String titleWithAnchor = MediawikiUtility.transformToWiki(m_title + "{{" + m_id + "}}");
+    String anchor = MediawikiUtility.createAnchor(m_id);
+    String titleWithAnchor = MediawikiUtility.transformToWiki(anchor + m_title);
     IDocSection typeSection = DocGenUtility.createDocSection(types, m_config.getTypesConfig());
     return new SectionWithTable(m_id, titleWithAnchor, typeSection);
   }

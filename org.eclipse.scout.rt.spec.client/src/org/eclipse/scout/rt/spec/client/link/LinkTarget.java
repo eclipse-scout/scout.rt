@@ -19,21 +19,19 @@ public class LinkTarget implements ILinkTarget {
 
   private final String m_fileName;
   private final String m_targetId;
-  private final String m_displayName;
 
   /**
    * @param targetId
    * @param displayName
    */
-  public LinkTarget(String targetId, String displayName, String fileName) {
+  public LinkTarget(String targetId, String fileName) {
     m_targetId = targetId;
     m_fileName = fileName;
-    m_displayName = displayName;
   }
 
   @Override
-  public String getDisplayName() {
-    return m_fileName + "#" + m_displayName;
+  public String getTargetIdWithFileName() {
+    return m_fileName + "#" + m_targetId;
   }
 
   @Override

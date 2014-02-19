@@ -39,10 +39,10 @@ public class MediawikiLinkTargetManager {
    * @throws ProcessingException
    */
   public void writeLinks(Collection<? extends ILinkTarget> links) throws ProcessingException {
-    //TODO check already defined links
+    //TODO JGU/ASA check already defined links
     Properties p = new Properties();
     for (ILinkTarget t : links) {
-      p.put(t.getTargetId(), t.getDisplayName());
+      p.put(t.getTargetId(), t.getTargetIdWithFileName());
     }
     storeProperties(p);
   }
