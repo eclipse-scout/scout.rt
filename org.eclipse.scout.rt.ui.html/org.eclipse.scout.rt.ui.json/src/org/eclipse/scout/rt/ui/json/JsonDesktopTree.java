@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.json.JSONObject;
 
-public class JsonTree<T extends ITree> extends AbstractJsonRenderer<T> {
+public class JsonDesktopTree<T extends ITree> extends AbstractJsonRenderer<T> {
   private P_ModelTreeListener m_modelTreeListener;
 
-  public JsonTree(T scoutObject, IJsonSession jsonSession) {
+  public JsonDesktopTree(T scoutObject, IJsonSession jsonSession) {
     super(scoutObject, jsonSession);
   }
 

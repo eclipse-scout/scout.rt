@@ -19,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonOutline extends JsonTree<IOutline> {
+public class JsonOutline extends JsonDesktopTree<IOutline> {
   private JsonDesktop m_jsonDesktop;
 
   public JsonOutline(JsonDesktop jsonDesktop, IOutline modelObject, IJsonSession jsonSession) {
