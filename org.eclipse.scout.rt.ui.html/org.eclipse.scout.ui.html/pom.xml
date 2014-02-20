@@ -21,6 +21,7 @@
   <packaging>jar</packaging>
 
   <build>
+
     <resources>
       <resource>
         <directory>${project.basedir}</directory>
@@ -40,25 +41,6 @@
           <archive>
             <manifestFile>META-INF/MANIFEST.MF</manifestFile>
           </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-          </execution>
-        </executions>
-       <!--
-        -->
-        <configuration>
-          <nosuffix>true</nosuffix>
-          <sourceDirectory>${project.basedir}/resources</sourceDirectory>
-          <outputDirectory>${project.build.directory}/resources</outputDirectory>
         </configuration>
       </plugin>
 
