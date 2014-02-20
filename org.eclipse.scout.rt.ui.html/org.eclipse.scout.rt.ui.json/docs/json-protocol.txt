@@ -10,3 +10,9 @@ function onModelPropertyChange(event){}
 //Action
 function onModelAction(event){}
 {"type_":"nodesInserted", "id":"tree77", "nodes":{...}, ... }
+
+//Authentication (http 401, 403) is sent from the form-based login servlet
+{"type_":"login"}
+
+//Server gone (http 404, 500, unreachable, ...) is created locally by javascript
+{"type_":"disconnected"}

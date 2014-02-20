@@ -18,31 +18,10 @@
   </parent>
 
   <artifactId>org.eclipse.scout.ui.html</artifactId>
-  <packaging>jar</packaging>
+  <packaging>eclipse-plugin</packaging>
 
   <build>
-
-    <resources>
-      <resource>
-        <directory>${project.basedir}</directory>
-                  <includes>
-                    <include>resources/**</include>
-                    <include>plugin.xml</include>
-                  </includes>
-      </resource>
-    </resources>
-
     <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
 
     </plugins>
   </build>

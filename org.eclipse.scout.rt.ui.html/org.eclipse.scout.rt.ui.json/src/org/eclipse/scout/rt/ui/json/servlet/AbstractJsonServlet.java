@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -25,16 +23,51 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.http.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.JsonRequest;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.ui.html.Activator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonServlet extends HttpServlet {
-
+/**
+ * Instances of this class must be registered as servlet root path "/"
+ * <p>
+ * The index.html is served as "/" or "/index.html" using HTTP GET
+ * <p>
+ * Ajax requests are processed as "/json" using HTTP POST
+ */
+public abstract class AbstractJsonServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
 
+  private final ArrayList<ResourceHandler> m_resourceHandlers;
+  private final JavascriptDebugResourceInterceptor m_jsInterceptor;
+
+  protected AbstractJsonServlet() {
+    m_resourceHandlers = new ArrayList<ResourceHandler>();
+    m_jsInterceptor = new JavascriptDebugResourceInterceptor(m_resourceHandlers);
+    getResourceHandlers().add(new ResourceHandler(Activator.getContext().getBundle(), "WebContent"));
+  }
+
+  /**
+   * @return the modifiable list of resource handlers used to find web resources in bundle directories "WebContent"
+   */
+  public ArrayList<ResourceHandler> getResourceHandlers() {
+    return m_resourceHandlers;
+  }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    //serve only /json
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null || !pathInfo.equals("/json")) {
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
     LOG.info("POST request started.");
     try {
       JsonRequest uiReq = new JsonRequest(toJSON(req));
@@ -82,25 +115,21 @@ public abstract class AbstractJsonServlet extends HttpServlet {
   protected abstract IJsonSession createJsonSession() throws JsonUIException;
 
   /**
-   * default doGet returns the index.html that is assumed to be besides the projects JsonServlet.java
+   * default doGet returns resources based on the {@link ResourceHandler} list
    */
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    URL url = getClass().getResource("index.html");
-    LOG.info("GET request started. Returning " + url);
-    try {
-      InputStream is = url.openStream();
-      String html = new String(IOUtility.getContent(is));
-      resp.setContentType("text/html");
-      resp.getOutputStream().print(html);
+    String pathInfo = req.getPathInfo();
+    if (m_jsInterceptor.handle(req, resp, pathInfo)) {
+      return;
     }
-    catch (Exception e) {
-      LOG.error("Exception while processing post request", e);
-      resp.getWriter().print("ERROR: " + e.getMessage());
+    if (pathInfo == null || pathInfo.equals("")) {
+      resp.sendRedirect(req.getRequestURI() + "/");
+      return;
     }
-    finally {
-      LOG.info("GET request finished.");
-    }
+    System.err.println("NOT_FOUND " + pathInfo);
+    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    return;
   }
 
 }
