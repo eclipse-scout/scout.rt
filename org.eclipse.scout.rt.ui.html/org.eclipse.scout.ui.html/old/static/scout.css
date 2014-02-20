@@ -14,7 +14,7 @@ font-family: fontDax;
 src: url('dax.woff') format('woff');
 }
 
-/* global section, adjust for usage as portlet*/
+/* global section, narrow to .scout for usage as portlet*/
 
 *, *:before, *:after {
 -moz-box-sizing: border-box;
@@ -33,7 +33,9 @@ font-size: 14px;
 -webkit-user-select: none;
 -moz-user-select: none;
 -ms-user-select: none;
-user-select: none;}
+user-select: none;
+cursor: default;
+}
 
 /* for all classes */
 
@@ -57,7 +59,7 @@ height: 100%;
 #DesktopViews {
 width: 100%;
 height: 57px;
-min-width: 1024px;
+white-space: nowrap;
 border-bottom: 1px solid #CCC;
 background: #FFF;
 overflow: hidden;
@@ -88,7 +90,7 @@ border-bottom: 2px solid #FE9915;
 float: left;
 height: 57px;
 width: 45px;
-padding: 24px 0px 0px 20px;
+padding: 22px 0px 0px 20px;
 margin-left: 15px; 
 cursor: pointer;
 }
@@ -139,6 +141,7 @@ background-size: cover;
 position: absolute;
 right: 0px; 
 top: 58px;    
+z-index: 10;
 height: calc(100% - 58px);
 width: 80px;
 border-left: 1px solid #CCC;
@@ -188,7 +191,7 @@ height: calc(100% - 58px);
 border-left:1px solid #CCC;
 background-color: rgba(255, 255, 255, 0.95);
 overflow: hidden;
-z-index: 1;
+z-index: 11;
 }
 
 #DesktopDialogs{
@@ -204,7 +207,7 @@ overflow:hidden;
 min-height: 100px;}
 
 #DesktopTree > .scrollbar{
-right: 19px;
+right: 18px;
 margin-top: 10px; 
 margin-bottom: 10px;
 }
@@ -214,7 +217,7 @@ position: absolute;
 top: 0px;
 width: calc(100% - 11px);
 height: 100%;
-padding: 15px 0px 0px 10px;
+padding: 12px 0px 0px 10px;
 }
 
 #DesktopTreeResize{
@@ -243,13 +246,16 @@ overflow: hidden;
 .tree-item-control{
 position: absolute;
 left: -1px;
-top: -2px;
+top: -1px;
+width: 29px;
+height: 30px;
+line-height: 24px; 
+padding: 4px 4px 4px 4px; 
 }
 
 .tree-item-control:before{
 font-family: fontAwesome;
 font-size: 24px;
-padding: 3px 3px 3px 3px; 
 content: "\F111";
 color: #CCC;
 }
@@ -272,8 +278,8 @@ content:"\F057" !important;
 
 .tree-item-menu{
 position: absolute;
-right: -1px;
-top: -2px;
+right: 1px;
+top: -1px;
 }
 
 .selected > .tree-item-menu:before, .tree-item:hover > .tree-item-menu:before{
@@ -291,7 +297,7 @@ color:#9C9C9C !important;
 #TreeItemAnimate{
 width: 100%;}
 
-/* bench */
+/* bench: form and table */
 
 #DesktopBench{
 position: absolute;
@@ -301,134 +307,118 @@ height: calc(100% - 58px);
 width: calc(100% - 380px);
 }
 
-/* main table*/
-
 #DesktopTable {
 height: 100%;
-width: 100%;}
+width: 100%;
+overflow: hidden;
+padding-top: 12px;
+}
 
-#DesktopTableHeader{
+/* main table header */
+
+#TableHeader {
 border-bottom: 1px solid #EEE;
 border-left: 2px solid #FFF;
+white-space: nowrap;
+padding-left: 4px;
 }
 
-.header-item{
+.header-item {
 position: relative;
-overflow: hidden;
 display: inline-block;
+padding: 7px 2px 0px 6px;
 font-weight: bold;
-padding: 7px 2px 2px 6px;
 cursor:pointer;
+overflow: hidden;
+line-height: 14px;
 }
 
-.header-resize{
+.header-resize {
 position: absolute;
-top: 30px;
-right: -7px;
+top: 0px;
+right: -6px;
 cursor: col-resize;
-height:29px;
-width:1px;
-background-color: #EEE;
+height: 25px;
+width: 21px;
+background-color: #FFF;
 border-left: 10px solid #FFF;
-border-right:10px solid #FFF;
-border-top:2px solid #FFF;
+border-right: 10px solid #FFF;
 }
 
-.header-item:hover .header-resize{
-top: 0px  !important;
+.header-item:hover .header-resize {
+background-color: #EEE;
 }
 
-.header-control{
+.header-control {
 position: absolute;
-top: 4px;
+top: 3px;
 right: 12px;
 cursor: pointer;
-height: 29px;
-width: 29 px;}
+padding: 3px;
+}
 
-.header-control:before{
+.header-item:hover .header-control:before {
 font-family: fontAwesome;
 font-size: 16px;
-color: #FFF;
+background-color: #FFF;
 content:"\F0C9";
-padding: 4px 4px 4px 4px;}
-
-.header-item:hover .header-control:before{
 color: #CCC;
 }
-.header-control:hover:before{
-color:#9C9C9C;
+
+.header-control:hover:before {
+color:#9C9C9C !important;
 }
 
-.header-item-up .header-control:before, .header-item-down .header-control:before{
+.header-item-up .header-control:before, .header-item-down .header-control:before {
 color:#CCC;
 }
 
-/*
-#header_menu {
-z-index: 200000;
-position: fixed;
-padding: 0px 0px 0px 0px; 
-border: 2px solid #0082A1;
-border: 2px solid #0082A1;
-background-color:white;
-overflow: visible;
-}
+/* main table data */
 
-#header_menu_exit, #header_menu_sort_up, #header_menu_sort_down, #header_menu_filter, #header_menu_add, #header_menu_more{
-padding: 7px 8px 7px 7px; 
-cursor: pointer; 
-font-family: FontAwesome;
-font-size: 16px;
-color:#0082A1;
-text-align:center;}
-
-#header_menu_exit:hover, #header_menu_sort_up:hover, #header_menu_sort_down:hover, #header_menu_filter:hover, #header_menu_add:hover, #header_menu_more:hover{
-color: #FE9915;
-}
-
-#header_menu_exit:before 		{content: "\F0C9";}
-#header_menu_sort_up:before 	{content: "\F160";}
-#header_menu_sort_down:before	{content: "\F161";}
-#header_menu_filter:before		{content: "\F0B0";}
-#header_menu_add:before			{content: "\F067";}
-#header_menu_more:before		{content: "\F141";}
-
-.header_menu_selected:before{
-color: #FE9915;
-}
-
-#table_data{
-height:calc(100% - 70px);
+#TableData {
+position: relative;
+height: calc(100% - 80px);
 width: 100%;
 overflow: hidden;	
-position: relative;
+padding-left: 4px;
 }
 
-#table_scroll{
-height:calc(100% - 70px);
+#TableData > .scrollbar {
+right: 10px;
+margin-top: 10px; 
+margin-bottom: 10px;
+height: calc(100% - 20px);
+}
+
+#TableDataScroll {
 position: absolute;
+top: 0px;
+height: 100%;
+width: calc(100% - 11px);
 }
 
-.data_row {
-overflow: hidden;	
-white-space: nowrap;
+
+.table-row {
 position:relative;
-padding: 2px 0px 2px 0px;
-border-left: 2px solid #FFF;
+overflow: hidden;	
 border-right: 2px solid #FFF;
-margin-bottom: -2px;
-}
+border-left: 2px solid #FFF;
+line-height: 26px;
+padding: 2px 0px 2px 0px;
+margin-bottom: -2px;}
 
-.data_row > div{
+.table-row > div {
 display: inline-block;
-padding: 5px 2px 3px 6px;
+padding: 3px 6px 0px 6px;
 background-color: #FFF;
+white-space: nowrap;
 border-bottom: 1px solid #EEE;
+overflow: hidden;
+text-overflow: ellipsis;
+vertical-align: top;
 }
 
-
-.data_row.row_top{
+.table-row.select-top {
 padding: 0px 0px 2px 0px !important;
 border-top: 2px solid #0082a1;
 border-left: 2px solid #0082a1;
@@ -437,12 +427,12 @@ border-top-left-radius: 7px;
 border-top-right-radius: 7px;
 }
 
-.data_row.row_middle{
+.table-row.select-middle {
 border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
 }
 
-.data_row.row_bottom{
+.table-row.select-bottom {
 padding: 2px 0px 0px 0px !important;
 border-bottom: 2px solid #0082a1;
 border-left: 2px solid #0082a1;
@@ -451,7 +441,7 @@ border-bottom-left-radius: 7px;
 border-bottom-right-radius: 7px;
 }
 
-.data_row.row_single{
+.table-row.select-single {
 padding: 0px 0px 0px 0px !important;
 border-top: 2px solid #0082a1;
 border-bottom: 2px solid #0082a1;
@@ -459,28 +449,381 @@ border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
 border-radius: 7px;
 }
- 
-#row_menu{
+
+#MenuRow {
 position: absolute;
 left: -25px;
 top: 0px;
 background-color: #FFF;
-padding: 5px 6px 3px 6px;
+width: 29px;
+height: 27px;
+padding: 3px 5px 0px 5px;
 cursor: pointer;
 border: 2px solid #0082a1;
 border-radius: 7px;}
 
-#row_menu:before{
-font-family: FontAwesome;
+#MenuRow:before {
+font-family: fontAwesome;
 font-size: 18px;
+line-height: 18px;
 content:"\F0C9";
 color: #0082a1;
 }
 
-#node_menu:hover:before{
-color:#9C9C9C !important;
+#MenuRow:hover:before {
+color:#fe9915;
 }
-/*
+
+/* main table control */
+
+#TableControl {
+position: absolute; 
+bottom: 0px;
+height: 50px;
+width: 100%;
+padding-right: 15px;
+padding-left: 10px;
+white-space: nowrap;
+}
+
+#ControlGraph, #ControlChart, #ControlMap, #ControlOrg {
+padding: 14px 18px 10px 2px;
+float: left;
+cursor: pointer; 
+}
+
+#ControlGraph:before, #ControlChart:before, #ControlMap:before, #ControlOrg:before {
+font-family: fontAwesome;
+font-size: 24px;
+color:#0082A1;
+}
+
+#ControlGraph:before {content:"\F0E8";}
+#ControlChart:before {content:"\F080";}
+#ControlMap:before {content:"\F0AC";}
+#ControlOrg:before {content:"\F013";}
+
+#ControlGraph:hover:before, #ControlChart:hover:before, #ControlMap:hover:before, #ControlOrg:hover:before  {
+color: #FE9915;
+}
+
+#ControlGraph.disabled:hover, #ControlGraph.disabled:before,
+#ControlChart.disabled:hover, #ControlChart.disabled:before,
+#ControlMap.disabled:hover, #ControlMap.disabled:before{
+cursor: default;
+color:#CCC;
+}
+
+#ControlLabel {
+float: left;
+padding-top: 18px;
+color: #0082A1;
+}
+
+.selected:before {
+color: #FE9915 !important;
+}
+
+#InfoLoad, #InfoMore, #InfoFilter, #InfoSelect {
+position:relative;
+float: right;
+margin-top: 6px;
+margin-left: 7px;
+padding: 0px 0px 0px 7px;
+display: none;
+width: 0px;
+height: 38px;
+border-left: 1px solid #CCC;
+color: #bfbfbf;
+white-space: nowrap;
+cursor: pointer;
+line-height: 21px; 
+}
+
+
+#InfoLoad:hover, #InfoMore:hover, #InfoFilter:hover, #InfoSelect:hover {
+color: #444;
+}
+
+#ControlResizeTop, #ControlResizeBottom {
+position: absolute;
+width: 100%;
+left: 0px;
+height: 17px;
+background-color: #CCC;
+border-top: 8px solid #FFF;
+border-bottom: 8px solid #FFF;
+border-right: 10px solid #FFF;
+}
+
+.resize-on #ControlResizeTop, .resize-on #ControlResizeBottom{
+cursor: row-resize;
+}
+
+#ControlResizeTop{
+top: -8px;
+}
+
+#ControlResizeBottom {
+top: 42px;
+}
+
+#ControlContainer {
+position: absolute;
+top: 60px;
+left: 0px;
+width: calc(100% - 20px);
+height: 340px;
+margin: 0px 20px 10px 10px;
+}
+
+/* chart - type select */
+
+#ChartSelect{
+float: left;
+}
+
+svg.select-chart{
+height: 65px;
+width: 80px;
+display: block;
+}
+
+rect.select-events{
+cursor: pointer;
+}
+
+rect.select-fill, circle.select-fill{
+fill: #e2e2e2;
+}
+
+path.select-fill-line, line.select-fill-line{
+stroke: #e2e2e2;
+fill: #fff;
+stroke-width: 3px;
+stroke-linejoin: round;
+stroke-linecap: round;
+}
+
+path.select-fill-pie{
+stroke: #fff;
+fill: #e2e2e2;
+stroke-width: 1px;
+stroke-linejoin: round;
+stroke-linecap: round;
+}
+
+svg.select-chart:hover rect.select-fill,
+svg.select-chart:hover circle.select-fill,
+svg.select-chart:hover path.select-fill-pie{
+fill: #ccc;
+}
+
+svg.select-chart:hover path.select-fill-line,
+svg.select-chart:hover line.select-fill-line{
+stroke: #ccc;
+}
+
+svg.select-chart.selected rect.select-fill,
+svg.select-chart.selected circle.select-fill,
+svg.select-chart.selected path.select-fill-pie{
+fill: #fe9915;
+}
+
+svg.select-chart.selected path.select-fill-line,
+svg.select-chart.selected line.select-fill-line{
+stroke: #fe9915;
+}
+
+/* chart - axis and data select */
+
+#XAxisSelect, #YAxisSelect, #DataSelect{
+float: left;
+width: 175px;
+display: inline-block;
+overflow: hidden;
+}
+
+#YAxisSelect {
+width: 0px;
+}
+
+.select-axis, .select-data{
+position: relative;
+margin:5px 10px 0px 15px;
+padding-left: 25px;
+padding-top: 4px;
+height: 26px;
+line-height: 21px;
+width: 150px;
+background-color: #e2e2e2;
+cursor: pointer;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.select-axis-group{
+position: relative;
+font-size: 10px;
+line-height: 12px;
+}
+
+.select-axis:hover, .select-data:hover{
+background-color: #ccc;
+}
+
+.select-axis.selected, .select-data.selected{
+background-color: #fe9915;
+color: #fff;
+}
+
+.select-axis:before, .select-data:before{
+color: #fff !important;
+position: absolute;
+font-size: 16px;
+line-height: 16px;
+left: 9px;
+top: 6px;
+}
+
+.select-axis:before {
+font-family: fontAwesome;
+}
+
+.axis-ver.selected:before{content: "\F175"; }
+.axis-hor.selected:before{content: "\F178"; left: 5px; }
+.axis-around.selected:before{content: "\F01E"; left: 6px; }
+.axis-up.selected:before{content: "\F176"; }
+
+.data-count.selected:before{content: "\2317"; top: 5px;}
+.data-sum.selected:before{content: "\03a3"; top: 7px;}
+.data-median.selected:before{content: "\2300"; left: 6px; top: 7px;}
+
+/* chart - main */
+#ChartMain {
+width: 1000px;
+height: 320px;
+}
+
+rect.main-chart, circle.main-chart{
+fill: #0082a1;
+stroke: #fff;
+stroke-width: 0px;
+cursor: pointer;}
+
+circle.main-chart {
+opacity: 0.7;
+}
+
+path.main-chart{
+fill: #0082a1;
+stroke: #fff;
+stroke-width: 2px;
+cursor: pointer;}
+
+
+line.main-chart{
+stroke: #0082a1;
+stroke-width: 4px;
+stroke-linejoin: round;
+stroke-linecap: round;
+}
+
+.main-chart:hover, .main-chart.selected {
+fill: #fe9915
+}	
+
+
+line.main-axis{
+stroke: #ddd;
+stroke-width: 1px;
+}
+
+text.main-axis{
+fill: #fff;
+text-anchor: middle;
+dominant-baseline: middle;
+}
+
+text.main-axis-y{
+fill: #aaa;
+text-anchor: end;
+dominant-baseline: central;
+font-size: 10px;
+}
+
+text.main-axis-x, textPath.main-axis-x{
+fill: #aaa;
+text-anchor: middle;
+dominant-baseline: middle;
+font-size: 10px;
+}
+
+
+/* graph */
+
+#GraphContainer {
+width: 100%;
+height: 100%;
+}
+
+.graph-node {
+stroke: #fff;
+stroke-width: 2px;
+cursor: pointer;
+}
+
+.graph-node.center {fill: #fe9915;}
+.graph-node.internal {fill: #bfbfbf;}
+.graph-node.person {fill: #0082a1;}
+.graph-node.department {fill: #80c1d0;}
+.graph-node.company {fill: #ffcc8a;}
+
+.graph-node-text{
+fill: #fff;
+text-anchor: middle;
+dominant-baseline: central;
+}
+
+.graph-node-text:hover{
+cursor: pointer;
+}
+
+.graph-link {
+stroke: #bfbfbf;
+stroke-width: 2;
+}
+
+.graph-link-text{
+fill: #9C9C9C;
+text-anchor: middle;
+dy: 20px;}
+
+/* map */
+
+#MapContainer {
+width: 100%;
+height: 100%;
+}
+
+.map-item {
+fill: #bfbfbf;
+cursor: pointer;
+stroke-width: 100;
+stroke: #fff;
+}
+
+.map-item.has-data {
+fill: #0082a1;
+}
+
+.map-item:hover {
+fill: #7f7f7f;
+}
+
+.map-item.selected {
+fill: #fe9915
+}	
 
 /* menu */
 
@@ -488,7 +831,7 @@ color:#9C9C9C !important;
 position: fixed;
 height: 37px;
 width: 37px;
-z-index: 4;
+z-index: 104;
 border-top: 2px solid #0082A1;
 border-left: 2px solid #0082A1;
 border-bottom: 2px solid #0082A1;
@@ -510,7 +853,7 @@ color: #FE9915;
 
 #MenuSelect{
 position: fixed;
-z-index: 3;
+z-index: 103;
 border: 2px solid #0082A1;
 background-color:white;
 white-space: nowrap;
@@ -556,14 +899,45 @@ content: attr(data-icon) '\A';
 color: #FE9915;
 }
 
+/* header menu */
+
+#MenuHeader {
+position: fixed;
+z-index: 103;
+border: 2px solid #0082A1;
+border: 2px solid #0082A1;
+background-color: #FFF;
+}
+
+#MenuHeader > div{
+padding: 7px 8px 7px 7px; 
+cursor: pointer; 
+font-family: fontAwesome;
+font-size: 16px;
+line-height: 16px;
+color: #0082A1;
+text-align: center;
+}
+
+#MenuHeaderControl:before 	{content: "\F0C9";}
+#MenuHeaderSortUp:before 	{content: "\F160";}
+#MenuHeaderSortDown:before	{content: "\F161";}
+#MenuHeaderFilter:before	{content: "\F0B0";}
+#MenuHeaderAdd:before		{content: "\F067";}
+#MenuHeaderMore:before		{content: "\F141";}
+
+#MenuHeader > div:hover, #MenuHeader > div.selected:before{
+color: #FE9915 !important;
+}
+
+
 /* scrollbar */
 
 .scrollbar { 
 position: absolute; 
-width: 16px; 
+width: 10px; 
 height: 100%;
 z-index: 1;
-padding: 0px 3px 0px 3px;
 background-color: white;
 cursor: pointer; 
 }
@@ -571,7 +945,7 @@ cursor: pointer;
 .scrollbar-thumb { 
 position: absolute; 
 width: 10px;
-top: 0;
+top: 0px;
 z-index: 2;
 background-color: #D4D4D4; 
 cursor: pointer; 

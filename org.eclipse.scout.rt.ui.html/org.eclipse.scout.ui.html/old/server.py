@@ -5,7 +5,7 @@ class BSICRM:
     @cherrypy.expose
     def index(self, **args):
         return """
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>BSI CRM 2014</title>
@@ -38,7 +38,8 @@ class BSICRM:
                                   {'id': 't4', 'label': 'Muster', 'icon': '\uf01C', 'shortcut': 'F7', 'state': 'disabled'},
                                   {'id': 't5', 'label': 'Telefon', 'icon': '\uf095', 'shortcut': 'F8'},
                                   {'id': 't6', 'label': 'Cockpit', 'icon': '\uf0E4', 'shortcut': 'F9'},
-                                  {'id': 't7', 'label': 'Prozesse', 'icon': '\uf0D0','shortcut': 'F10'}]}] 
+                                  {'id': 't7', 'label': 'Prozesse', 'icon': '\uf0D0','shortcut': 'F10'},
+                                  {'id': 't8', 'label': 'Offline', 'icon': '\uf0D0','shortcut': 'F10'}]}] 
         else:
             message = ''
                                
@@ -52,24 +53,24 @@ class BSICRM:
                         'bench': {'type': 'form'},
                         'children': [
                             {'id': 'n2', 'label': 'Firmen', 'state': 'can-expand',
-                             'bench': {'type': 'table', 'columns': COMPANY_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}},
+                             'bench': {'type': 'table', 'id': 'n2', 'columns': COMPANY_COLUMN, 'chart': 'Diagramm', 'graph': 'Netzwerk', 'map': 'Karte'}},
                             {'id': 'n3', 'label': 'Aufträge', 'state': 'can-expand',
-                             'bench': {'type': 'table', 'columns': BUSINESS_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'load'}},
+                             'bench': {'type': 'table', 'id': 'n3', 'columns': BUSINESS_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': 'Karte'}},
                             {'id': 'n4', 'label': 'Aufgaben',
-                             'bench': {'type': 'table', 'columns': TODO_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'off'}},
+                             'bench': {'type': 'table', 'id': 'n4', 'columns': TODO_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': ''}},
                             {'id': 'n5', 'label': 'Kommunikation',
-                             'bench': {'type': 'table', 'columns': COMMUNICATION_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}}
+                             'bench': {'type': 'table', 'id': 'n5', 'columns': COMMUNICATION_COLUMN, 'chart': 'Diagramm', 'off': 'load', 'map': 'Karte'}}
                              ]}]
 
         elif id == 'n1':
             message = [{'id': 'n2', 'label': 'Firmen', 'state': 'can-expand',
-                          'bench': {'type': 'table', 'columns': COMPANY_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}},
+                          'bench': {'type': 'table', 'id': 'n2', 'columns': COMPANY_COLUMN, 'chart': 'Diagramm', 'graph': 'Netzwerk', 'map': 'Karte'}},
                         {'id': 'n3', 'label': 'Aufträge', 'state': 'can-expand',
-                           'bench': {'type': 'table', 'columns': BUSINESS_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'load'}},
+                           'bench': {'type': 'table', 'id': 'n2', 'columns': BUSINESS_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': 'Karte'}},
                         {'id': 'n4', 'label': 'Aufgaben',
-                           'bench': {'type': 'table', 'columns': TODO_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'off'}},
+                           'bench': {'type': 'table', 'id': 'n4', 'columns': TODO_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': ''}},
                         {'id': 'n5', 'label': 'Kommunikation',
-                           'bench': {'type': 'table', 'columns': COMMUNICATION_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}}]
+                           'bench': {'type': 'table', 'id': 'n5', 'columns': COMMUNICATION_COLUMN, 'chart': 'Diagramm', 'off': 'load', 'map': 'Karte'}}]
 
 
         elif 'n2' in id:
@@ -77,11 +78,11 @@ class BSICRM:
                         'bench': {'type': 'form'},
                         'children': [
                             {'id': 'n31', 'label': 'Aufträge', 'state': 'can-expand',
-                             'bench': {'type': 'table', 'columns': BUSINESS_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'load'}},
+                             'bench': {'type': 'table', 'id': 'n3', 'columns': BUSINESS_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': 'Karte'}},
                             {'id': 'n41', 'label': 'Aufgaben',
-                             'bench': {'type': 'table', 'columns': TODO_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'off'}},
+                             'bench': {'type': 'table', 'id': 'n4', 'columns': TODO_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': ''}},
                             {'id': 'n51', 'label': 'Kommunikation',
-                             'bench': {'type': 'table', 'columns': COMPANY_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}}
+                             'bench': {'type': 'table', 'id': 'n5', 'columns': COMPANY_COLUMN, 'chart': 'Diagramm', 'graph': 'Netzwerk', 'map': 'Karte'}}
                             ]}]
  
         elif 'n3' in id:
@@ -89,11 +90,11 @@ class BSICRM:
                         'bench': {'type': 'form'},
                         'children': [
                             {'id': 'n22', 'label': 'Firmen', 'state': 'can-expand',
-                             'bench': {'type': 'table', 'columns': COMPANY_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'load'}},
+                             'bench': {'type': 'table', 'id': 'n2', 'columns': COMPANY_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': 'Karte'}},
                             {'id': 'n42', 'label': 'Aufgaben',
-                             'bench': {'type': 'table', 'columns': TODO_COLUMN, 'data': 'load', 'graph': 'off', 'map': 'off'}},
+                             'bench': {'type': 'table', 'id': 'n4', 'columns': TODO_COLUMN, 'chart': 'Diagramm', 'graph': '', 'map': ''}},
                             {'id': 'n52', 'label': 'Kommunikation',
-                             'bench': {'type': 'table', 'columns': COMPANY_COLUMN, 'data': 'load', 'graph': 'load', 'map': 'load'}}
+                             'bench': {'type': 'table', 'id': 'n5', 'columns': COMPANY_COLUMN, 'chart': 'Diagramm', 'graph': 'Netzwerk', 'map': 'Karte'}}
                             ]}]
         elif 'n4' in id:
             message = [{'id': 'n7', 'label': 'Kunde anrufen', 'state': '',
@@ -113,7 +114,7 @@ class BSICRM:
         if id == 'n2':
             message = COMPANY
         elif id == 'n3':
-            message = BUSINESS
+            message = BUSINESS * 10
         elif id == 'n4':
             message = TODO
         elif id == 'n5':
