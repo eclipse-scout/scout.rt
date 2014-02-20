@@ -18,6 +18,7 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
   public JSONObject toJson() throws JsonUIException {
     try {
       JSONObject json = new JSONObject();
+      json.put("objectType", "ViewButton");
       json.put("id", getId());
       json.put(IViewButton.PROP_TEXT, getModelObject().getText());
       json.put("selected", getModelObject().isSelected());
@@ -52,7 +53,7 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     if (IViewButton.PROP_SELECTED.equals(name)) {
-      getJsonSession().currentUIResponse().addUpdateEvent(getId(), name, newValue);
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
     }
     else {
       super.handleScoutPropertyChange(name, newValue);

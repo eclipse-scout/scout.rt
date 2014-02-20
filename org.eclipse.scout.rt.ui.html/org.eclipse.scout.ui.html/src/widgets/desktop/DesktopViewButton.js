@@ -4,11 +4,6 @@
 
 Scout.DesktopViewButton = function (scout, $viewButtonBar, viewButton) {
 
-    this.handleUpdate = function handleUpdate(eventData) {
-      if(eventData.selected !== undefined) {
-        $viewButton.select(eventData.selected);
-      }
-    };
     scout.widgetMap[viewButton.id] = this;
 
     var state = '';
@@ -23,4 +18,16 @@ Scout.DesktopViewButton = function (scout, $viewButtonBar, viewButton) {
       var response = scout.syncAjax('click', $(this).attr('id'));
       scout.processEvents(response.events);
     }
+
+    this.onModelPropertyChange = function onModelPropertyChange(event) {
+        if(event.selected !== undefined) {
+            if(event.selected){
+                $viewButton.selectOne();
+            }
+            return;
+        }
+    };
+
+    this.onModelAction = function onModelAction(event) {
+    };
 };

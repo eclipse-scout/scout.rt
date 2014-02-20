@@ -1,0 +1,12 @@
+//New object
+function onModelCreate(event){}
+{"type_":"create",                       "objectType":"Desktop", "id":"Desktop", ... }
+{"type_":"create", "parentId":"Desktop", "objectType":"Form", "id":"form77", "fields":{}, ...}
+
+//Property change (can be coalesced)
+function onModelPropertyChange(event){}
+{"type_":"property", "id":"field77", "selected":"true", "visible":"true", ...}
+
+//Action
+function onModelAction(event){}
+{"type_":"nodesInserted", "id":"tree77", "nodes":{...}, ... }

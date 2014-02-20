@@ -5,11 +5,13 @@ Scout.Session = function ($entryPoint, sessionPartId) {
   this.widgetMap = {};
 
   // server communication, data is optional
-  this.syncAjax = function (type, id, data) {
-  var event={"type": type, "id": id, "sessionPartId": sessionPartId};
-    if(data){
-      event.data=data;
+  this.syncAjax = function (eventType, id, event) {
+    if(!event){
+      event={};
     }
+    event.type_ = eventType;
+    event.id = id;
+    event.sessionPartId = sessionPartId;
     var url = 'http://localhost:8082/json'; // TODO URL anpassen
     var ret;
     $.ajax({
@@ -27,18 +29,37 @@ Scout.Session = function ($entryPoint, sessionPartId) {
   this.processEvents = function processEvents(events) {
     var scout=this;
     $.each(events, function (index, event) {
-      if(event.type == "create") {
-        var widget = createWidget(scout, $entryPoint, event.data);
-        scout.widgetMap[event.id] = widget;
-      }
-      else if(event.type == "update") {
-        var widget = scout.widgetMap[event.id];
-        if(widget) {
-          updateWidget(scout, widget, event.data);
+      if(event.type_ == "create") {
+        if(event.parentId === undefined){
+          createTopLevelWidget(scout, $entryPoint, event);
         }
         else{
-          log("ERROR: No widget found for id " + event.id);
+            var widget = scout.widgetMap[event.parentId];
+            if(widget) {
+                widget.onModelCreate(event);
+            }
+            else{
+                log("ERROR: No widget found for parentId " + event.parentId);
+            }
         }
+      }
+      else if(event.type_ == "propertyChange") {
+          var widget = scout.widgetMap[event.id];
+          if(widget) {
+              widget.onModelPropertyChange(event);
+          }
+          else{
+            log("ERROR: No widget found for id " + event.id);
+          }
+      }
+      else {
+          var widget = scout.widgetMap[event.id];
+          if(widget) {
+              widget.onModelAction(event);
+          }
+          else{
+            log("ERROR: No widget found for id " + event.id);
+          }
       }
     });
   };
@@ -50,13 +71,11 @@ Scout.Session = function ($entryPoint, sessionPartId) {
   };
 
   // create single widget based on a model object
-  function createWidget (scout, $parent, eventData) {
-    if (eventData.id == "Desktop") {
-      return new Scout.Desktop(scout, $parent, eventData);
+  function createTopLevelWidget (scout, $parent, event) {
+    if (event.objectType == "Desktop") {
+      return new Scout.Desktop(scout, $parent, event);
     }
+    return undefined;
   }
 
-  function updateWidget(scout, widget, eventData) {
-    widget.handleUpdate(eventData);
-  }
 };

@@ -24,6 +24,7 @@ public class JsonMenu extends AbstractJsonRenderer<IMenu> {
   public JSONObject toJson() throws JsonUIException {
     try {
       JSONObject json = new JSONObject();
+      json.put("objectType", "Menu");
       json.put("id", getId());
       json.put("label", getModelObject().getText());//TODO renameIMenu.PROP_TEXT
       return json;

@@ -33,11 +33,11 @@ public abstract class AbstractJsonSession implements IJsonSession {
   private IClientSession m_clientSession;
   private final Map<String, IJsonRenderer> m_jsonRenderers;
   private long m_jsonRendererSeq;
-  private JsonResponse m_currentUIResponse;
+  private JsonResponse m_currentJsonResponse;
 
   public AbstractJsonSession() {
     m_jsonRenderers = new HashMap<>();
-    m_currentUIResponse = new JsonResponse();
+    m_currentJsonResponse = new JsonResponse();
   }
 
   @Override
@@ -101,13 +101,13 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   @Override
-  public JsonResponse currentUIResponse() {
-    return m_currentUIResponse;
+  public JsonResponse currentJsonResponse() {
+    return m_currentJsonResponse;
   }
 
   @Override
   public JsonResponse processRequest(JsonRequest req) throws JsonUIException {
-    final JsonResponse res = currentUIResponse();
+    final JsonResponse res = currentJsonResponse();
     final String id = req.getEventId();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
@@ -121,7 +121,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
       LOG.error("Handling event. Type: " + req.getEventType() + ", Id: " + id, t);
     }
     //Clear event map when sent to client
-    m_currentUIResponse = new JsonResponse();
+    m_currentJsonResponse = new JsonResponse();
     return res;
   }
 

@@ -36,8 +36,8 @@ public class JsonOutline extends JsonTree<IOutline> {
   public JSONObject toJson() throws JsonUIException {
     try {
       JSONObject json = new JSONObject();
+      json.put("objectType", "Outline");
       json.put("id", getId());
-      json.put("type", "outline");
 
       JSONArray jsonPages = new JSONArray();
       if (getModelObject().isRootNodeVisible()) {
@@ -68,7 +68,7 @@ public class JsonOutline extends JsonTree<IOutline> {
 //          jsonPages.put(jsonPage);
 //        }
 //        //TODO currently sent as desktop event
-//        getJsonSession().currentUIResponse().addUpdateEvent(m_jsonDesktop.getId(), "nodesAdded", jsonPages);
+//        getJsonSession().currentJsonResponse().addUpdateEvent(m_jsonDesktop.getId(), "nodesAdded", jsonPages);
 //        break;
 //      }
 //    }
@@ -128,7 +128,7 @@ public class JsonOutline extends JsonTree<IOutline> {
 
   protected void handleUiDrillDownEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     try {
-      final String nodeId = req.getEventData().getString("nodeId");
+      final String nodeId = req.getEventObject().getString("nodeId");
       final ITreeNode node = findTreeNode(nodeId);
       if (node == null) {
         throw new JsonUIException("No node found for id " + nodeId);
@@ -148,7 +148,9 @@ public class JsonOutline extends JsonTree<IOutline> {
         JSONObject jsonPage = pageToJson((IPage) childNode);
         jsonPages.put(jsonPage);
       }
-      getJsonSession().currentUIResponse().addUpdateEvent(m_jsonDesktop.getId(), "nodesAdded", jsonPages);
+      JSONObject event = new JSONObject();
+      event.put("nodes", jsonPages);
+      getJsonSession().currentJsonResponse().addActionEvent("nodesAdded", m_jsonDesktop.getId(), event);
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
@@ -156,16 +158,21 @@ public class JsonOutline extends JsonTree<IOutline> {
   }
 
   protected void handleUiDrillDownMenuEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
-    List<IMenu> menus = collectMenus(false, true);
-
-    JSONArray jsonMenus = new JSONArray();
-    for (IMenu menu : menus) {
-      JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
-      jsonMenu.init();
-      jsonMenus.put(jsonMenu.toJson());
+    try {
+      List<IMenu> menus = collectMenus(false, true);
+      JSONArray jsonMenus = new JSONArray();
+      for (IMenu menu : menus) {
+        JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
+        jsonMenu.init();
+        jsonMenus.put(jsonMenu.toJson());
+      }
+      JSONObject event = new JSONObject();
+      event.put("menus", jsonMenus);
+      getJsonSession().currentJsonResponse().addActionEvent("menuPopup", getId(), event);
     }
-
-    getJsonSession().currentUIResponse().addUpdateEvent(getId(), "menuPopup", jsonMenus);
+    catch (JSONException e) {
+      throw new JsonUIException(e.getMessage(), e);
+    }
   }
 
   protected List<IMenu> collectMenus(final boolean emptySpaceActions, final boolean nodeActions) {

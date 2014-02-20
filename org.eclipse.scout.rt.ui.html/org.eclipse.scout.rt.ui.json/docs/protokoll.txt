@@ -1,6 +1,0 @@
-events:
-{
-  {type:"create", id:"Desktop", data:{id:"foo"} },
-  {type:"update", id:"bar", data:{selected:true} },
-  {type:"destroy", id:"xyz"},
-}

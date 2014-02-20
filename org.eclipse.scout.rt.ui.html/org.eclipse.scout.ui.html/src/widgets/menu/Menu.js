@@ -10,10 +10,15 @@ Scout.Menu = function (scout, id, nodeId, x, y) {
 
   // load model
   var response = scout.syncAjax('drilldown_menu', id, {"nodeId":nodeId});
-  var menu = response.events[0].data.menuPopup;
+  if(response.events.length === 0){
+    return;
+  }
+  var menu = response.events[0].menus;
 
   // withou model, nothing to do
-  if (menu.length === 0) return;
+  if (!menu){
+    return;
+  }
 
   // create 2 container, animate do not allow overflow
   var $menuSelect = $('body').appendDiv('MenuSelect')

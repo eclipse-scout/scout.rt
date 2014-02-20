@@ -27,7 +27,7 @@ public interface IJsonSession {
   /**
    * @return the current ui response that is collecting changes for the next {@link #processRequest(JsonRequest)} cycle
    */
-  JsonResponse currentUIResponse();
+  JsonResponse currentJsonResponse();
 
   JsonResponse processRequest(JsonRequest req) throws JsonUIException;
 

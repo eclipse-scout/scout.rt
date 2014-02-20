@@ -25,31 +25,36 @@ public class JsonResponse {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
   private final List<JSONObject> m_eventList;
-  private final Map<String/*id*/, JSONObject> m_idToEventMap;
+  private final Map<String/*id*/, JSONObject> m_idToPropertyChangeEventMap;
 
   public JsonResponse() {
     m_eventList = new ArrayList<>();
-    m_idToEventMap = new HashMap<>();
+    m_idToPropertyChangeEventMap = new HashMap<>();
   }
 
   /**
-   * event must have 'id'
+   * @param parentId
+   * @param object
+   *          must have an 'id' and a 'objectType'
    */
-  public void addCreateEvent(JSONObject eventData) {
-    if (eventData == null) {
+  public void addCreateEvent(String parentId, JSONObject object) {
+    if (object == null) {
       return;
     }
     try {
-      String id = eventData.getString("id");
+      String id = object.getString("id");
       if (id == null) {
         throw new JSONException("id is null");
       }
-      JSONObject e = new JSONObject();
-      e.put("id", id);
-      e.put("type", "create");
-      e.put("data", eventData);
-      m_eventList.add(e);
-      m_idToEventMap.put(id, e);
+      String objectType = object.getString("objectType");
+      if (objectType == null) {
+        throw new JSONException("objectType is null");
+      }
+      object.put("type_", "create");
+      if (parentId != null) {
+        object.put("parentId", parentId);
+      }
+      m_eventList.add(object);
     }
     catch (JSONException ex) {
       LOG.error("", ex);
@@ -57,24 +62,42 @@ public class JsonResponse {
   }
 
   /**
-   * event must have 'id'
+   * event must have an 'id'
    */
-  public void addUpdateEvent(String id, String name, Object newValue) {
+  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     try {
       if (id == null) {
         throw new JSONException("id is null");
       }
       //coalesce
-//      JSONObject e = m_idToEventMap.get(id); //TODO does not work when having update and create events for the same id
-//      if (e == null) {
-      JSONObject e = new JSONObject();
-      m_eventList.add(e);
-      m_idToEventMap.put(id, e);
-      e.put("id", id);
-      e.put("type", "update");
-      e.put("data", new JSONObject());
-//      }
-      e.getJSONObject("data").put(name, newValue);
+      JSONObject event = m_idToPropertyChangeEventMap.get(id);
+      if (event == null) {
+        event = new JSONObject();
+        event.put("id", id);
+        event.put("type_", "property");
+        m_eventList.add(event);
+        m_idToPropertyChangeEventMap.put(id, event);
+      }
+      event.put(propertyName, newValue);
+    }
+    catch (JSONException ex) {
+      LOG.error("", ex);
+    }
+  }
+
+  /**
+   * event must have an 'id'
+   */
+  public void addActionEvent(String eventType, String id, JSONObject eventData) {
+    try {
+      if (id == null) {
+        throw new JSONException("id is null");
+      }
+      //coalesce
+      JSONObject event = eventData != null ? eventData : new JSONObject();
+      event.put("id", id);
+      event.put("type_", eventType);
+      m_eventList.add(event);
     }
     catch (JSONException ex) {
       LOG.error("", ex);

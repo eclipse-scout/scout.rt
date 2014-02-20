@@ -5,24 +5,7 @@
 //
 
 Scout.Desktop = function (scout, $parent, data) {
-  this.handleUpdate = function handleUpdate(event) {
-    if(event.outline !== undefined) {
-      this.tree.outlineId = event.outline.id;
-      this.tree.clearNodes();
-      this.tree.addNodes(event.outline.pages);
-    }
-    else if(event.nodesAdded !== undefined) {
-      var nodes = event.nodesAdded;
-     //TODO work with e.getCommonParentNode()
-      //TODO move to outline/tree.js?
-      for(var i in nodes) {
-        var $parentNode = this.tree.$div.find("#"+ nodes[i].parentNodeId);
-        var tmpNodes = new Array();
-        tmpNodes[0]=nodes[i];
-        this.tree.addNodes(tmpNodes,$parentNode);
-      }
-    }
-  };
+
   scout.widgetMap[data.id] = this;
 
   // create all 4 containers
@@ -35,5 +18,30 @@ Scout.Desktop = function (scout, $parent, data) {
   // show node
 //  var nodes = scout.syncAjax('drilldown', widget.start);
 //  tree.addNodes(nodes);
+
+  this.onModelPropertyChange = function onModelPropertyChange(event) {
+  };
+
+  this.onModelAction = function onModelAction(event) {
+    if(event.type_=="outlineChanged") {
+      this.tree.outlineId = event.outline.id;
+      this.tree.clearNodes();
+      this.tree.addNodes(event.outline.pages);
+      return;
+    }
+    if(event.type_=="nodesAdded") {
+      //TODO work with e.getCommonParentNode()
+      //TODO move to outline/tree.js?
+      var nodes = event.nodes;
+      for(var i in nodes) {
+        var $parentNode = this.tree.$div.find("#"+ nodes[i].parentNodeId);
+        var tmpNodes = new Array();
+        tmpNodes[0]=nodes[i];
+        this.tree.addNodes(tmpNodes,$parentNode);
+      }
+      return;
+    }
+  };
+
 };
 

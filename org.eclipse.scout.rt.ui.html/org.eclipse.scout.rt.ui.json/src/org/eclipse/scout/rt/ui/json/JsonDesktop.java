@@ -94,18 +94,19 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
   @Override
   public JSONObject toJson() throws JsonUIException {
-    JSONObject jsonResponse = new JSONObject();
+    JSONObject json = new JSONObject();
     try {
-      jsonResponse.put("id", getId());
-      jsonResponse.put("forms", m_jsonFormsArray);
+      json.put("objectType", "Desktop");
+      json.put("id", getId());
+      json.put("forms", m_jsonFormsArray);
       JSONArray viewButtons = new JSONArray();
       for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
         viewButtons.put(jsonViewButton.toJson());
       }
-      jsonResponse.put("viewButtons", viewButtons);
-      jsonResponse.put("outline", m_jsonOutline.toJson());
+      json.put("viewButtons", viewButtons);
+      json.put("outline", m_jsonOutline.toJson());
 
-      return jsonResponse;
+      return json;
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
@@ -121,7 +122,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
   protected void handleUiStartupEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     //Instruct gui to create desktop
-    res.addCreateEvent(this.toJson());
+    res.addCreateEvent(null, this.toJson());
   }
 
   protected JSONObject formToJson(IForm form) throws JsonUIException {
@@ -158,28 +159,35 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   private class P_DesktopListener implements DesktopListener {
     @Override
     public void desktopChanged(final DesktopEvent e) {
-      switch (e.getType()) {
-        case DesktopEvent.TYPE_OUTLINE_CHANGED:
-          m_jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
-          m_jsonOutline.init();//TODO read outline from widget cache? map modelId jsonId? send create event?
-//          getJsonSession().currentUIResponse().addCreateEvent(m_jsonOutline.toJson());
-          getJsonSession().currentUIResponse().addUpdateEvent(getId(), "outline", m_jsonOutline.toJson());
-          break;
-        case DesktopEvent.TYPE_FORM_ADDED: {
+      try {
+        switch (e.getType()) {
+          case DesktopEvent.TYPE_OUTLINE_CHANGED:
+            m_jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
+            m_jsonOutline.init();//TODO read outline from widget cache? map modelId jsonId? send create event?
+//          getJsonSession().currentJsonResponse().addCreateEvent(m_jsonOutline.toJson());
+            JSONObject event = new JSONObject();
+            event.put("outline", m_jsonOutline.toJson());
+            getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), event);
+            break;
+          case DesktopEvent.TYPE_FORM_ADDED: {
 
-          IForm form = e.getForm();
-          JSONObject jsonForm;
-          try {
-            jsonForm = formToJson(form);
-            m_jsonFormsArray.put(jsonForm);
-          }
-          catch (JsonUIException e1) {
-            LOG.error("", e1);
-          }
+            IForm form = e.getForm();
+            JSONObject jsonForm;
+            try {
+              jsonForm = formToJson(form);
+              m_jsonFormsArray.put(jsonForm);
+            }
+            catch (JsonUIException e1) {
+              LOG.error("", e1);
+            }
 
-          LOG.info("Form added.");
-          break;
+            LOG.info("Form added.");
+            break;
+          }
         }
+      }
+      catch (JSONException ex) {
+        throw new JsonUIException(ex.getMessage(), ex);
       }
     }
   }

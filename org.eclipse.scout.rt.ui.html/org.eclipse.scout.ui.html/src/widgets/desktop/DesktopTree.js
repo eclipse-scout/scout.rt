@@ -121,7 +121,7 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
     if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
       // load model and draw nodes
       var response = scout.syncAjax('drilldown', self.outlineId, {"nodeId":$clicked.attr('id')});
-      var $newNodes = addNodes(response.events[0].data.nodesAdded, $clicked);
+      var $newNodes = addNodes(response.events[0].nodes, $clicked);
 
       if ($newNodes.length) {
         // animated opening ;)

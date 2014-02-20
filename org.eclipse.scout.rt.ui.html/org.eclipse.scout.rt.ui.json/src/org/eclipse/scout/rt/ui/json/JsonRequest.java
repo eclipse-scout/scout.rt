@@ -31,7 +31,7 @@ public class JsonRequest {
 
   public String getEventType() {
     try {
-      return m_event.getString("type");
+      return m_event.getString("type_");
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -47,15 +47,7 @@ public class JsonRequest {
     }
   }
 
-  public JSONObject getEventData() {
-    try {
-      if (m_event.has("data")) {
-        return m_event.getJSONObject("data");
-      }
-      return null;
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e);
-    }
+  public JSONObject getEventObject() {
+    return m_event;
   }
 }
