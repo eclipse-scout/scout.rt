@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -200,7 +199,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         setExpansionFromScout(node);
       }
     }
-    setSelectionFromScout(CollectionUtility.toList(getScoutObject().getSelectedNodes()));
+    setSelectionFromScout(CollectionUtility.arrayList(getScoutObject().getSelectedNodes()));
     setKeyStrokeFormScout();
     setNodeHeightFromScout();
     attachDndSupport();
@@ -361,7 +360,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           break;
         }
         case TreeEvent.TYPE_NODES_SELECTED: {
-          setSelectionFromScout(CollectionUtility.toList(e.getNodes()));
+          setSelectionFromScout(CollectionUtility.arrayList(e.getNodes()));
           break;
         }
         case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
@@ -536,7 +535,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         break;
       }
       case TreeEvent.TYPE_NODES_SELECTED: {
-        setSelectionFromScout(CollectionUtility.toList(e.getNodes()));
+        setSelectionFromScout(CollectionUtility.arrayList(e.getNodes()));
         break;
       }
       case TreeEvent.TYPE_SCROLL_TO_SELECTION: {

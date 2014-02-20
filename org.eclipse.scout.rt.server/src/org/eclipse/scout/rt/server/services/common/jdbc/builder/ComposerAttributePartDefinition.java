@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
  * @deprecated use {@link DataModelAttributePartDefinition}. Will be removed in the M-Release
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class ComposerAttributePartDefinition extends DataModelAttributePartDefinition {
 
   public ComposerAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, boolean plainBind) {

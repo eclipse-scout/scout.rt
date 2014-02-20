@@ -24,6 +24,7 @@ import org.eclipse.scout.service.SERVICES;
  * @deprecated Use {@link SearchFilter} instead. Will be removed in the M-Release.
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class LegacySearchFilter extends SearchFilter implements Cloneable {
   private static final long serialVersionUID = 0L;
 

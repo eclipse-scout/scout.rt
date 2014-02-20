@@ -184,7 +184,7 @@ public abstract class AbstractWorkflowData implements Serializable {
 
   public void setStepDataList(Collection<AbstractWorkflowStepData> c) {
     if (c != null && c.size() > 0) {
-      m_stepList = CollectionUtility.copyList(c);
+      m_stepList = CollectionUtility.arrayList(c);
     }
     else {
       m_stepList.clear();

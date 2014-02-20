@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatemen
 /**
  * Utility for building statements with {@link EntityContribution}
  */
+@SuppressWarnings("deprecation")
 public final class EntityContributionUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(EntityContributionUtility.class);
 

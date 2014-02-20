@@ -56,6 +56,7 @@ import org.eclipse.scout.service.IServiceInventory;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractSqlService extends AbstractService implements ISqlService, ILegacySqlQueryService, IAdaptable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1048576; // = 1MB default

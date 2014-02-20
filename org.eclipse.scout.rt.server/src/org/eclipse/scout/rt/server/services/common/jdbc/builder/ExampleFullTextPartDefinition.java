@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * the part is registered with {@link FormDataStatementBuilder#setPartDefinition(Class, new
  * PartDefinition("LAST_NAME"))}
  */
+@SuppressWarnings("deprecation")
 public class ExampleFullTextPartDefinition extends BasicPartDefinition {
 
   /**

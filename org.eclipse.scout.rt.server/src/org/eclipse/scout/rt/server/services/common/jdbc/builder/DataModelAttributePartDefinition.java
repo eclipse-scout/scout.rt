@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 /**
  * Definition of a attribute-to-sql mapping for {@link IDataModelAttribute}
  */
+@SuppressWarnings("deprecation")
 public class DataModelAttributePartDefinition implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAttributePartDefinition.class);
 

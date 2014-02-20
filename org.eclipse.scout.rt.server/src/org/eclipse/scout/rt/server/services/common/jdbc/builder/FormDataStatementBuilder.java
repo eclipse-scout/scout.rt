@@ -120,6 +120,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * @deprecated. Will be removed in the M-Release.
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
@@ -387,6 +388,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * @deprecated use setBasicDefinition instead
    */
+
   @Deprecated
   public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator));

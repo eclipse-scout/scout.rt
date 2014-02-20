@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeD
  * @deprecated Will be removed in the M-Release
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public interface IFormDataStatementBuilderInjection {
 
   /**

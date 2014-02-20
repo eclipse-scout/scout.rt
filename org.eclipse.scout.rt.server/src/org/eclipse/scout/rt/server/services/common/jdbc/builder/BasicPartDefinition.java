@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * data, to finally call {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)} to retrieve the
  * statement contribution. In its simplest form, the result is just a whereClause.
  */
+@SuppressWarnings("deprecation")
 public class BasicPartDefinition implements DataModelConstants {
   private final ClassIdentifier[] m_valueTypeClassIdentifiers;
   private final String m_sqlAttribute;

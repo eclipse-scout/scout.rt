@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 /**
  * Definition of a entity-to-sql mapping for {@link IDataModelEntity}
  */
+@SuppressWarnings("deprecation")
 public class DataModelEntityPartDefinition implements DataModelConstants {
   private final Class<? extends IDataModelEntity> m_entityType;
   private final String m_whereClause;

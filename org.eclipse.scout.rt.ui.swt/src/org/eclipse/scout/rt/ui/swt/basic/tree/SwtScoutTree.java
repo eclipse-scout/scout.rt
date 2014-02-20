@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -434,7 +433,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       case TreeEvent.TYPE_NODES_UPDATED: {
         //in case a virtual node was resolved, check if selection still valid
         ISelection oldSelection = getSwtTreeViewer().getSelection();
-        ISelection newSelection = new StructuredSelection(CollectionUtility.copyList(getScoutObject().getSelectedNodes()));
+        ISelection newSelection = new StructuredSelection(CollectionUtility.arrayList(getScoutObject().getSelectedNodes()));
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
         if (!newSelection.equals(oldSelection)) {
           getSwtTreeViewer().setSelection(newSelection);

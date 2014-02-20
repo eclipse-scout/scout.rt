@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
@@ -308,7 +309,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     if (fld != null) {
       Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_BACKGROUND);
       boolean initOpaque = ((Boolean) getClientProperty(fld, CLIENT_PROP_INITIAL_OPAQUE)).booleanValue();
-      Color c = SwingUtility.createColor(scoutColor);
+      Color c = ColorUtility.createColor(scoutColor);
       boolean opaque = (c != null ? true : initOpaque);
       if (c == null) {
         c = initCol;
@@ -322,7 +323,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     JComponent fld = getSwingField();
     if (fld != null) {
       Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_FOREGROUND);
-      Color c = SwingUtility.createColor(scoutColor);
+      Color c = ColorUtility.createColor(scoutColor);
       if (c == null) {
         c = initCol;
       }
@@ -347,7 +348,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     if (fld != null) {
       Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
       boolean initOpaque = ((Boolean) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_OPAQUE)).booleanValue();
-      Color c = SwingUtility.createColor(scoutColor);
+      Color c = ColorUtility.createColor(scoutColor);
       boolean opaque = (c != null ? true : initOpaque);
       if (c == null) {
         c = initCol;
@@ -361,7 +362,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     JComponent fld = getSwingLabel();
     if (fld != null) {
       Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
-      Color c = SwingUtility.createColor(scoutColor);
+      Color c = ColorUtility.createColor(scoutColor);
       if (c == null) {
         c = initCol;
       }

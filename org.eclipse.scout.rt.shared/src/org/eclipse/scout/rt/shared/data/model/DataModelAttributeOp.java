@@ -202,7 +202,6 @@ public final class DataModelAttributeOp implements DataModelConstants {
       String text2 = null;
       if (valueTexts != null && valueTexts.size() > 1) {
         text2 = valueTexts.get(1);
-        ;
       }
       StringBuilder b = new StringBuilder();
       if (aggregationType != null) {

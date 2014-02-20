@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.holders.NVPair;
  * @deprecated Will be removed in the M-Release.
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public final class LegacySearchUtility {
 
   private LegacySearchUtility() {

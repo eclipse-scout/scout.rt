@@ -22,6 +22,7 @@ import org.junit.Test;
 /**
  * test {@link EntityContributionUtility}
  */
+@SuppressWarnings("deprecation")
 public class EntityContributionUtilityTest {
 
   @Test

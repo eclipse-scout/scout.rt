@@ -87,7 +87,6 @@ public class DataModelAttributeTest {
     assertEquals("Hello World!", att.formatValue(new AttributeTestObject()));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeCodeList() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_LIST);
@@ -97,7 +96,6 @@ public class DataModelAttributeTest {
     assertEquals("Second", att.formatValue(2L));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeCodeTree() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_TREE);
@@ -107,7 +105,6 @@ public class DataModelAttributeTest {
     assertEquals("Second", att.formatValue(2L));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeNumberList() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_LIST);
@@ -117,7 +114,6 @@ public class DataModelAttributeTest {
     assertEquals("c", att.formatValue(3L));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeNumberTree() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_TREE);
@@ -363,7 +359,6 @@ public class DataModelAttributeTest {
     assertEquals("   ", att.formatValue("   "));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testFormatAttributeTypeSmart() {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_SMART);

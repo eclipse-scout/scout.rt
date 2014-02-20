@@ -34,5 +34,6 @@ public interface ILegacySqlQueryService extends IService {
 
   void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException;
 
+  @SuppressWarnings("deprecation")
   LegacySearchFilter.WhereToken resolveSpecialConstraint(Object specialConstraint) throws ProcessingException;
 }

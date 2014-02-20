@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * @deprecated use the more general {@link BasicPartDefinition} instead. Will be removed in the M-Release
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class ValuePartDefinition extends BasicPartDefinition {
 
   /**

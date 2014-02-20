@@ -18,6 +18,7 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
@@ -54,7 +55,7 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
   protected void setForegroundFromScout(String scoutColor) {
     JComponent fld = getSwingField();
     if (fld != null && scoutColor != null && fld instanceof JTextComponent) {
-      setDisabledTextColor(SwingUtility.createColor(scoutColor), (JTextComponent) fld);
+      setDisabledTextColor(ColorUtility.createColor(scoutColor), (JTextComponent) fld);
     }
     super.setForegroundFromScout(scoutColor);
   }

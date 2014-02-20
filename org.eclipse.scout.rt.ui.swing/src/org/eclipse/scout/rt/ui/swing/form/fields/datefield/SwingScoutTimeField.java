@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
@@ -325,7 +326,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
   protected void setForegroundFromScout(String scoutColor) {
     JComponent fld = getSwingField();
     if (fld != null && scoutColor != null && fld instanceof JTextComponent) {
-      setDisabledTextColor(SwingUtility.createColor(scoutColor), (JTextComponent) fld);
+      setDisabledTextColor(ColorUtility.createColor(scoutColor), (JTextComponent) fld);
     }
     super.setForegroundFromScout(scoutColor);
   }

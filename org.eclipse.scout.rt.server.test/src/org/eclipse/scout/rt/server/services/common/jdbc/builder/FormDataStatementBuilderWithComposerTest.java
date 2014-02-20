@@ -40,6 +40,7 @@ import org.junit.Test;
 /**
  * @since 3.8.1
  */
+@SuppressWarnings("deprecation")
 public class FormDataStatementBuilderWithComposerTest {
 
   private FormDataStatementBuilder m_builder;
