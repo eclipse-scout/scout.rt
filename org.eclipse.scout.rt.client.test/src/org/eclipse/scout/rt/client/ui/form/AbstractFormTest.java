@@ -40,6 +40,7 @@ public class AbstractFormTest {
   public void testClassIdAnnotated() throws ProcessingException {
     TestFormWithClassId form = new TestFormWithClassId();
     assertEquals(FORM_TEST_CLASS_ID, form.classId());
+    testClassIdSetter(form, FORM_TEST_CLASS_ID);
   }
 
   /**
@@ -48,7 +49,16 @@ public class AbstractFormTest {
   @Test
   public void testClassIdNoAnnotation() throws ProcessingException {
     TestFormWithoutClassId form = new TestFormWithoutClassId();
-    assertFalse("classId should always be set.", StringUtility.isNullOrEmpty(form.classId()));
+    assertFalse("ClassId should always be set.", StringUtility.isNullOrEmpty(form.classId()));
+    testClassIdSetter(form, form.classId());
+  }
+
+  private void testClassIdSetter(IForm form, String expectedDefaultClassId) {
+    String customClassId = "customClassId";
+    form.setClassId(customClassId);
+    assertEquals("Expected custom classId set by setClassId().", customClassId, form.classId());
+    form.setClassId(null);
+    assertEquals("Expected default classId after setClassId(null).", expectedDefaultClassId, form.classId());
   }
 
   /**
@@ -59,8 +69,8 @@ public class AbstractFormTest {
     WrapperTestFormWithClassId form = new WrapperTestFormWithClassId();
     form.getEmbeddedField().setInnerForm(new TestFormWithClassId());
     String classId = form.getEmbeddedField().getInnerForm().classId();
-    assertTrue("classid of innerform should contain outerFormField id", classId.contains(WRAPPER_FORM_FIELD_ID));
-    assertTrue("classid of innerform should contain formid", classId.contains(FORM_TEST_CLASS_ID));
+    assertTrue("ClassId of innerform should contain outerFormField id.", classId.contains(WRAPPER_FORM_FIELD_ID));
+    assertTrue("ClassId of innerform should contain formid.", classId.contains(FORM_TEST_CLASS_ID));
   }
 
   // Test classes

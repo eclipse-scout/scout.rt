@@ -40,7 +40,6 @@ public class BundleBrowser {
   //context as members (performance)
   private HashSet<String> m_set;
   private String m_prefix;
-  private int m_prefixLen;
   /**
    * fix: when running in dev mode, all classes are spidered twice, but even worse
    * if the prefix is /bin/ then the enum returns paths such as bin/... without the leading /
@@ -60,7 +59,7 @@ public class BundleBrowser {
   }
 
   /**
-   * @return all found classes in side the bundle
+   * @return all found classes inside the bundle
    *         If the bundle is a binary bundle, simply visits all its classes, otherwise visits the /bin, the /classes or
    *         the /target/classes folder
    */
@@ -72,21 +71,20 @@ public class BundleBrowser {
       String path = removeLeadingSlash(m_packagePath);
       m_prefix = "/bin/";
       m_doubleCheckPrefix = true;
-      Enumeration<String> en = getResourcesEnumeration(m_bundle, m_prefix + path);
-      if (en == null) {
+      Enumeration<String> sourceClasses = getResourcesEnumeration(m_bundle, m_prefix + path);
+      if (sourceClasses == null) {
         m_prefix = "/classes/";
-        en = getResourcesEnumeration(m_bundle, m_prefix + path);
+        sourceClasses = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
-      if (en == null) {
+      if (sourceClasses == null) {
         m_prefix = "/target/classes/";
-        en = getResourcesEnumeration(m_bundle, m_prefix + path);
+        sourceClasses = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
-      if (en == null) {
-        m_prefix = "/";
-        en = getResourcesEnumeration(m_bundle, m_prefix + path);
-      }
-      m_prefixLen = m_prefix.length();
-      visit(en);
+      visit(sourceClasses);
+
+      m_prefix = "/";
+      Enumeration<String> binaryClasses = getResourcesEnumeration(m_bundle, m_prefix + path);
+      visit(binaryClasses);
     }
     return m_set.toArray(new String[m_set.size()]);
   }
@@ -143,14 +141,14 @@ public class BundleBrowser {
           String className;
           if (m_doubleCheckPrefix) {
             if (path.startsWith(m_prefix)) {
-              className = path.substring(m_prefixLen, path.length() - 6);
+              className = path.substring(m_prefix.length(), path.length() - 6);
             }
             else {
-              className = path.substring(m_prefixLen - 1, path.length() - 6);
+              className = path.substring(m_prefix.length() - 1, path.length() - 6);
             }
           }
           else {
-            className = path.substring(m_prefixLen, path.length() - 6);
+            className = path.substring(m_prefix.length(), path.length() - 6);
           }
           if (path.indexOf("$") < 0 || m_includeInnerTypes) {
             className = className.replaceAll("[/]", ".");

@@ -10,20 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
-import java.util.HashSet;
-
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
+import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
-import org.eclipse.scout.rt.spec.client.internal.Activator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.junit.Test;
-import org.osgi.framework.Bundle;
 
 /**
  * Abstract spec test for creating a spec file with a table describing types (eg. form fields, columns, ...)
@@ -56,31 +51,12 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
   }
 
   protected Class[] getAllClasses() throws ProcessingException {
-    HashSet<Class> discoveredClasses = new HashSet<Class>();
-    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
-      // Skip fragments, because classes from fragments are read when browsing the host bundle
-      if (Platform.isFragment(bundle)) {
-        continue;
+    return BundleInspector.getAllClasses(new BundleInspector.IClassFilter() {
+      @Override
+      public boolean accept(Class c) {
+        return acceptClass(c);
       }
-      String[] classNames;
-      BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
-      classNames = bundleBrowser.getClasses(false, true);
-      Class c = null;
-      for (String className : classNames) {
-        try {
-          c = bundle.loadClass(className);
-        }
-        catch (Throwable t) {
-          // nop: we are only interested in loadable classes
-        }
-        if (acceptClass(c)) {
-          discoveredClasses.add(c);
-        }
-      }
-    }
-
-    Class[] fieldTypes = discoveredClasses.toArray(new Class[discoveredClasses.size()]);
-    return fieldTypes;
+    });
   }
 
   protected boolean acceptClass(Class c) {
