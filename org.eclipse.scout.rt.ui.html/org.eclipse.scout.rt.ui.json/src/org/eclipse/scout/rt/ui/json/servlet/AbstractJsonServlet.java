@@ -80,13 +80,13 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
       JsonResponse uiRes = jsonSession.processRequest(uiReq);
-      String data = uiRes.toJson().toString();
+      String jsonText = uiRes.toJson().toString();
+      byte[] data = jsonText.getBytes("UTF-8");
+      resp.setContentLength(data.length);
+      resp.setContentType("application/json; charset=utf-8");
+      resp.getOutputStream().write(data);
 
-      resp.setContentLength(data.length());
-      resp.setContentType("application/json");
-      resp.getOutputStream().print(data);
-
-      LOG.debug("Returning: " + data);
+      LOG.debug("Returning: " + jsonText);
     }
     catch (Exception e) {
       LOG.error("Exception while processing post request", e);
