@@ -1,24 +1,16 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// menu namespace and element
-//
 
 Scout.Menu = function (scout, id, nodeId, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var response = scout.syncAjax('drilldown_menu', id, {"nodeId":nodeId});
+  var response = scout.syncAjax('menu', id, {"nodeId":nodeId});
   if(response.events.length === 0){
     return;
   }
   var menu = response.events[0].menus;
-
-  // withou model, nothing to do
-  if (!menu){
-    return;
-  }
 
   // create 2 container, animate do not allow overflow
   var $menuSelect = $('body').appendDiv('MenuSelect')

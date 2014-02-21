@@ -1,14 +1,11 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// tree
-//
 
-Scout.DesktopTree = function (scout, $desktop, modelTree) {
+Scout.DesktopTree = function (scout, $desktop) {
   // create container
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
-  var scrollbar = new Scout.Scrollbar(scout, $desktopTreeScroll, 'y', true);
+  var scrollbar = new Scout.Scrollbar($desktopTreeScroll, 'y');
   var self=this;
 
   $desktopTree.appendDiv('DesktopTreeResize')
@@ -18,9 +15,7 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
   this.$div = $desktopTreeScroll;
   this.addNodes = addNodes;
   this.clearNodes = clearNodes;
-  this.outlineId = modelTree.id;
-
-  this.addNodes(modelTree.pages);
+  this.outlineId;
 
   // named  funktions
   function resizeTree (event) {
@@ -58,16 +53,16 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
         state='expanded ';
       }
       if(!node.leaf) {
-        state+='can-expand '; //TODO rename
+        state+='can-expand '; //TODO rename to leaf
       }
       level = $parent ? $parent.data('level') + 1 : 0;
 
       var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
               .on('click', '', clickNode)
-              .data('node', node)
+              .data('bench', node.bench)
               .attr('data-level', level)
               .css('margin-left', level * 20)
-              .css('width', 'calc(100% - ' + (level * 20 + 30) + 'px)');
+              .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
 
       // decorate with (close) control
       var $control = $node.appendDiv('', 'tree-item-control')
@@ -104,30 +99,24 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
   }
 
   function clickNode (event) {
-    var $clicked = $(this);
-    var node = $clicked.data('node');
+    var $clicked = $(this),
+      bench = $clicked.data('bench'),
+      nodeId = $clicked.attr('id');
 
     // selected the one
     $clicked.selectOne();
 
-    // show bench
-    if (node.bench.type == 'table') {
-      new Scout.DesktopTable(scout, $('#DesktopBench'));
-    } else{
-      $('#DesktopBench').text(JSON.stringify(node.bench));
-    }
-
     // open node
     if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
       // load model and draw nodes
-      var response = scout.syncAjax('drilldown', self.outlineId, {"nodeId":$clicked.attr('id')});
+      var response = scout.syncAjax('drilldown', self.outlineId, {"nodeId":nodeId});
       var $newNodes = addNodes(response.events[0].nodes, $clicked);
 
       if ($newNodes.length) {
         // animated opening ;)
         $newNodes.wrapAll('<div id="TreeItemAnimate"></div>)');
         var h = $newNodes.height() * $newNodes.length,
-          removeContainer = function () {$(this).replaceWith($(this).contents());};
+          removeContainer = function () {$(this).replaceWith($(this).contents()); scrollbar.initThumb();};
 
         $('#TreeItemAnimate').css('height', 0)
           .animateAVCSD('height', h, removeContainer, scrollbar.initThumb);
@@ -143,6 +132,17 @@ Scout.DesktopTree = function (scout, $desktop, modelTree) {
           .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl);
       }
     }
+
+    // show bench
+    $('#DesktopBench').html('');
+    if (bench.type == 'table') {
+      bench.nodeId = nodeId;
+      bench.outlineId = self.outlineId;
+      new Scout.DesktopTable(scout, $('#DesktopBench'), bench);
+    } else{
+      $('#DesktopBench').text(JSON.stringify(bench));
+    }
+
   }
 
   function clickNodeControl (event) {

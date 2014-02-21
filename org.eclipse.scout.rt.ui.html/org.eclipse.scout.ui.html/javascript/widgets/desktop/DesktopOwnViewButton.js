@@ -1,6 +1,5 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
 
 Scout.DesktopOwnViewButton = function (scout, $viewButtonBar, viewButton) {
 

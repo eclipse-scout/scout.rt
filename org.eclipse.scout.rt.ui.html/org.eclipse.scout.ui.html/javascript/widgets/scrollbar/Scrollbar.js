@@ -1,10 +1,7 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// scrollbar namespace and element
-//
 
-Scout.Scrollbar = function (scout, $container, axis, trackResize) {
+Scout.Scrollbar = function ($container, axis) {
   var dir = (axis === "x" ? "left" : "top"),
     dim = (axis === "x" ? "Width" : "Height"),
     begin = 0, beginDefault = 0,
@@ -18,7 +15,7 @@ Scout.Scrollbar = function (scout, $container, axis, trackResize) {
   $container.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
   $thumb.on('mousedown', '', scrollStart);
   $scrollbar.on('mousedown', scrollEnd);
-  if (trackResize) $(window).on('load resize', initThumb);
+  $(window).on('load resize', initThumb);
 
   // set this for later usage
   this.initThumb = initThumb;
@@ -27,8 +24,8 @@ Scout.Scrollbar = function (scout, $container, axis, trackResize) {
   function initThumb () {
     var offset = $container[0]["offset" + dim],
       scroll = $container[0]["scroll" + dim],
-      margin = parseInt($scrollbar.css('margin-top'), 0),
-      topContainer = parseInt($container.css(dir), 0);
+      margin = parseFloat($scrollbar.css('margin-top')),
+      topContainer = parseFloat($container.css(dir));
 
     // when needed: move container to right position
     if (offset - topContainer >= scroll){

@@ -1,47 +1,66 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// desktop: contains viewButtons, main_tree, (empty) bench, tools
-//
 
-Scout.Desktop = function (scout, $parent, data) {
-
-  scout.widgetMap[data.id] = this;
+Scout.Desktop = function (scout, $parent, widget) {
+  scout.widgetMap[widget.id] = this;
 
   // create all 4 containers
-  this.viewButtonBar = new Scout.DesktopViewButtonBar(scout, $parent, data.viewButtons);
-//  var tool = new Scout.DesktopTool(scout, $parent, data.tools);
+  var view = new Scout.DesktopViewButtonBar(scout, $parent, widget.viewButtons);
+  if(widget.toolButtons) {
+    var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
+  }
+  var tree = new Scout.DesktopTree(scout, $parent);
+  var bench = new Scout.DesktopBench(scout, $parent);
 
-  this.tree = new Scout.DesktopTree(scout, $parent, data.outline);
-  this.bench = new Scout.DesktopBench(scout, $parent);
+  // show nodes
+  tree.outlineId = widget.outline.id;
+  tree.addNodes(widget.outline.pages);
 
-  // show node
-//  var nodes = scout.syncAjax('drilldown', widget.start);
-//  tree.addNodes(nodes);
+  // key handling
 
-  this.onModelPropertyChange = function onModelPropertyChange(event) {
-  };
 
-  this.onModelAction = function onModelAction(event) {
+  // alt and f1-help
+  $('body').keydown(function (event)  {
+    log(event);
+    if (event.which == 18) {
+      $('.key-box').remove();
+
+      // keys for views
+      $('.view-item', view.$div).each(function (i) {
+          log(1);
+          $(this).appendDiv('', '.key-box', '');
+        });
+
+      // keys for tools
+
+      // keys for tree
+
+      // keys for table
+
+    }
+  });
+
+  $('body').keyup(function (event)  {
+    log(1);
+    if (event.which == 18) {
+      $('.key_box').remove();
+    }
+  });
+
+  this.onModelAction = onModelAction;
+  this.onModelPropertyChange =  onModelPropertyChange;
+
+  function onModelPropertyChange(event) {
+  }
+
+  function onModelAction(event) {
     if(event.type_=="outlineChanged") {
-      this.tree.outlineId = event.outline.id;
-      this.tree.clearNodes();
-      this.tree.addNodes(event.outline.pages);
+      tree.outlineId = event.outline.id;
+      tree.clearNodes();
+      tree.addNodes(event.outline.pages);
       return;
     }
-    if(event.type_=="nodesAdded") {
-      //TODO work with e.getCommonParentNode()
-      //TODO move to outline/tree.js?
-      var nodes = event.nodes;
-      for(var i in nodes) {
-        var $parentNode = this.tree.$div.find("#"+ nodes[i].parentNodeId);
-        var tmpNodes = new Array();
-        tmpNodes[0]=nodes[i];
-        this.tree.addNodes(tmpNodes,$parentNode);
-      }
-      return;
-    }
-  };
+  }
 
 };
 

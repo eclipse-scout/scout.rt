@@ -1,21 +1,18 @@
-// SCOUT GUI 0.2
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-//
-// tool namespace and container
-//
 
-Scout.DesktopToolButton = function (scout, $desktop, tools) {
+Scout.DesktopToolButton = function (scout, $desktop, toolButtons) {
   // create container
   var $desktopTools = $desktop.appendDiv('DesktopTools');
 
   // create tool-items
-  for (var i = 0; i < tools.length; i++) {
-    var state = tools[i].state || '',
-      icon = tools[i].icon || '',
-      shortcut = tools[i].shortcut || '';
+  for (var i = 0; i < toolButtons.length; i++) {
+    var state = toolButtons[i].state || '',
+      icon = toolButtons[i].icon || '',
+      shortcut = toolButtons[i].shortcut || '';
 
     var $tool = $desktopTools
-      .appendDiv(tools[i].id, 'tool-item ' + state, tools[i].label)
+      .appendDiv(toolButtons[i].id, 'tool-item ' + state, toolButtons[i].label)
       .attr('data-icon', icon).attr('data-shortcut', shortcut);
 
     if (!$tool.hasClass('disabled')) {
