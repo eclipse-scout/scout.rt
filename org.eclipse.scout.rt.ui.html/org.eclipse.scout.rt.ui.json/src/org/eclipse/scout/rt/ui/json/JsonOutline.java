@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.ui.json;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -38,7 +41,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       "                           {\"label\": \"Umsatz 2014 [CHF]\", \"type\": \"float\", \"width\": 80}," +
       "                           {\"label\": \"Branche\", \"type\": \"text\", \"width\": 80}]";
 
-  private String TODO = "[" +
+  private String TASKS = "[" +
       "             [123, \"Kunde Anrufen\", \"Christian Rusche\", \"NESTLE\", \"Karl Maag\", \"Hoch\", \"12.04.2014\", \"\"]," +
       "             [124, \"Offerte schreiben\", \"Christian Rusche\", \"NESTLE\", \"Karl Maag\", \"Hoch\", \"14.04.2014\", \"\"]," +
       "             [125, \"Abklärungen Preis\", \"Christian Rusche\", \"ABB SCHWEIZ\", \"Rita Suter\", \"Normal\", \"11.02.2014\", \"\"]," +
@@ -47,7 +50,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       "             [128, \"Abklärung abschliessen\", \"Christian Rusche\", \"SCHERING\", \"Maximilian Richter\", \"Normal\", \"20.11.2014\", \"\"]" +
       "         ]";
 
-  private String TODO_COLUMN = "[{\"label\": \"\", \"type\": \"key\", \"width\": 0}," +
+  private String TASKS_COLUMN = "[{\"label\": \"\", \"type\": \"key\", \"width\": 0}," +
       "                           {\"label\": \"Betreff\", \"type\": \"text\", \"width\": 200}," +
       "                           {\"label\": \"Verantwortlich\", \"type\": \"text\", \"width\": 200}," +
       "                           {\"label\": \"Firma\", \"type\": \"text\", \"width\": 100}," +
@@ -283,7 +286,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       "                           {\"source\": 6, \"target\": 8, \"label\": \"Mitarbeiter\"}," +
       "                           {\"source\": 7, \"target\": 8, \"label\": \"Mitarbeiter\"}]}";
 
-  private String BUSINESS = "[" +
+  private String BUSINESS = "" +
       "         [0, \"2002 PRD CTMS Sup & Maint Jan-Feb\", \"02-0L\", \"Bodyleasing\", \"JNJ PRD\", \"Vo-Schneider, Phuong\", \"USA\", \"Lieferung\", \"212940\", \"01.01.2002\", \"31.03.2002\"]," +
       "         [1, \"2002 PRD CTMS Sup & Maint March-June\", \"02-1D\", \"Bodyleasing\", \"JNJ PRD\", \"Vo-Schneider, Phuong\", \"USA\", \"Lieferung\", \"126412\", \"01.03.2002\", \"30.06.2002\"]," +
       "         [2, \"Elvin Thalund: Admin CTMS Contract\", \"02-35\", \"Bodyleasing\", \"JNJ PRD\", \"Vo-Schneider, Phuong\", \"USA\", \"Lieferung\", \"1690\", \"01.03.2002\", \"31.03.2003\"]," +
@@ -366,7 +369,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       "         [79, \"BSI CTMS ROCHE, Ablösung Siebel.\", \"13-7U\", \"Fixpreis\", \"ROCHE CH\", \"Thuesen, Jens\", \"Schweiz\", \"Potenzial\", \"2500000\", \"01.04.2014\", \"30.04.2015\"]," +
       "         [80, \"BSI CTMS Assign\", \"12-3B\", \"Fixpreis\", \"ASSIGN CLINICAL RESEARCH\", \"Nielsen, Jan Klint\", \"Österreich\", \"Potenzial\", \"108465.3\", \"01.07.2014\", \"28.11.2014\"]," +
       "         [81, \"BSI CTMS Allergopharma Wartung 2012\", \"11-B8\", \"Wartung\", \"ALLERGOPHARMA\", \"Nielsen, Jan Klint\", \"Deutschland\", \"Lieferung\", \"33686.01\", \"01.03.2012\", \"31.12.2012\"]," +
-      "         [82, \"BSI CTMS Allergopharma Wartung 2013\", \"13-0A\", \"Wartung\", \"ALLERGOPHARMA\", \"Nielsen, Jan Klint\", \"Deutschland\", \"Bestellung\", \"63635.61326\", \"01.01.2013\", \"31.12.2013\"]]";
+      "         [82, \"BSI CTMS Allergopharma Wartung 2013\", \"13-0A\", \"Wartung\", \"ALLERGOPHARMA\", \"Nielsen, Jan Klint\", \"Deutschland\", \"Bestellung\", \"63635.61326\", \"01.01.2013\", \"31.12.2013\"]";
 
   private String BUSINESS_COLUMN = "[{\"label\": \"\", \"type\": \"key\", \"width\": 0}," +
       "                           {\"label\": \"Betreff\", \"type\": \"text\", \"width\": 200}," +
@@ -419,7 +422,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
 
   @Override
   protected void handleModelTreeEvent(TreeEvent event) {
-    //TODO move to super class
+    //FIXME move to super class
 //    switch (event.getType()) {
 //      case TreeEvent.TYPE_NODES_INSERTED: {
 //        JSONArray jsonPages = new JSONArray();
@@ -427,7 +430,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
 //          JSONObject jsonPage = pageToJson((IPage) node);
 //          jsonPages.put(jsonPage);
 //        }
-//        //TODO currently sent as desktop event
+//        //FIXME currently sent as desktop event
 //        getJsonSession().currentJsonResponse().addUpdateEvent(m_jsonDesktop.getId(), "nodesAdded", jsonPages);
 //        break;
 //      }
@@ -457,7 +460,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       }
       json.put("childPages", jsonChildPages);
 
-      //TODO bench
+      //FIXME bench
       JSONObject bench = new JSONObject();
       bench.put("type", "table");
       String jsonColumnsRaw = "[]";
@@ -466,13 +469,13 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
         bench.put("graph", "Netzwerk");
         bench.put("map", "Karte");
       }
-      else if ("BusinessTablePage".equals(page.getNodeId())) {
+      else if ("BusinessTablePage".equals(page.getNodeId()) || "BusinessLargeTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = BUSINESS_COLUMN;
         bench.put("graph", "");
         bench.put("map", "");
       }
       else if ("TaskTablePage".equals(page.getNodeId())) {
-        jsonColumnsRaw = TODO_COLUMN;
+        jsonColumnsRaw = TASKS_COLUMN;
         bench.put("graph", "");
         bench.put("map", "");
       }
@@ -509,6 +512,9 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
     else if ("map".equals(req.getEventType())) {
       handleUiMapEvent(req, res);
     }
+    else if ("dataModel".equals(req.getEventType())) {
+      handleUiDataModelEvent(req, res);
+    }
     else {
       throw new IllegalArgumentException("unsupported event type");
     }
@@ -530,7 +536,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
         }
       }.runNow(new NullProgressMonitor());
 
-      //TODO better return nodes event driven
+      //FIXME better return nodes event driven
       JSONArray jsonPages = new JSONArray();
       for (ITreeNode childNode : node.getChildNodes()) {
         JSONObject jsonPage = pageToJson((IPage) childNode);
@@ -552,13 +558,17 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       jsonRaw = COMPANY;
     }
     else if ("BusinessTablePage".equals(nodeId)) {
-      jsonRaw = "";
-      for (int i = 0; i < 10; i++) {
-        jsonRaw += BUSINESS;
+      jsonRaw = "[" + BUSINESS + "]";
+    }
+    else if ("BusinessLargeTablePage".equals(nodeId)) {
+      jsonRaw = "[";
+      for (int i = 0; i < 9; i++) {
+        jsonRaw += BUSINESS + ",";
       }
+      jsonRaw += BUSINESS + "]";
     }
     else if ("TaskTablePage".equals(nodeId)) {
-      jsonRaw = TODO;
+      jsonRaw = TASKS;
     }
     else if ("CommunicationTablePage".equals(nodeId)) {
       jsonRaw = COMMUNICATION;
@@ -628,6 +638,19 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
+    }
+    getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), event);
+  }
+
+  protected void handleUiDataModelEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
+    JSONObject event;
+    try {
+      event = new JSONObject();
+      String jsonData = new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/dummy_data_model.json").openStream()), "utf-8");
+      event.put("dataModel", new JSONObject(jsonData));
+    }
+    catch (JSONException | ProcessingException | IOException e) {
+      throw new JsonUIException(e);
     }
     getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), event);
   }

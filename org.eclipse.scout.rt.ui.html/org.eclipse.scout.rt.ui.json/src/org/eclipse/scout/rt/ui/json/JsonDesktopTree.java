@@ -20,8 +20,8 @@ import org.json.JSONObject;
 public class JsonDesktopTree<T extends ITree> extends AbstractJsonRenderer<T> {
   private P_ModelTreeListener m_modelTreeListener;
 
-  public JsonDesktopTree(T scoutObject, IJsonSession jsonSession) {
-    super(scoutObject, jsonSession);
+  public JsonDesktopTree(T modelObject, IJsonSession jsonSession) {
+    super(modelObject, jsonSession);
   }
 
   @Override

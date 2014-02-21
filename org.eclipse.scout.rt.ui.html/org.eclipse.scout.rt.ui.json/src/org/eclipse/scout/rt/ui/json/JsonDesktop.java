@@ -113,7 +113,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       }
       json.put("viewButtons", viewButtons);
       json.put("outline", m_jsonOutline.toJson());
-      json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //TODO
+      json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME
 
       return json;
     }
@@ -172,7 +172,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
         switch (e.getType()) {
           case DesktopEvent.TYPE_OUTLINE_CHANGED:
             m_jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
-            m_jsonOutline.init();//TODO read outline from widget cache? map modelId jsonId? send create event?
+            m_jsonOutline.init();//FIXME read outline from widget cache? map modelId jsonId? send create event?
 //          getJsonSession().currentJsonResponse().addCreateEvent(m_jsonOutline.toJson());
             JSONObject event = new JSONObject();
             event.put("outline", m_jsonOutline.toJson());

@@ -26,7 +26,7 @@ public class JsonMenu extends AbstractJsonRenderer<IMenu> {
       JSONObject json = new JSONObject();
       json.put("objectType", "Menu");
       json.put("id", getId());
-      json.put("label", getModelObject().getText());//TODO renameIMenu.PROP_TEXT
+      json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
       return json;
     }
     catch (JSONException e) {

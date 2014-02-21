@@ -15,3 +15,4 @@ Require-Bundle: org.eclipse.scout.rt.client;bundle-version="4.0.0",
  org.eclipse.scout.ui.html;bundle-version="4.0.0";visibility:=reexport
 Export-Package: org.eclipse.scout.rt.ui.json,
  org.eclipse.scout.rt.ui.json.servlet
+Bundle-Activator: org.eclipse.scout.rt.ui.json.Activator

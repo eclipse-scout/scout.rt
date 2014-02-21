@@ -103,7 +103,7 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
       LOG.debug("Received: " + jsonData);
 
       if (StringUtility.isNullOrEmpty(jsonData)) {
-        jsonData = "{}"; // TODO
+        jsonData = "{}"; // FIXME
       }
       return new JSONObject(jsonData);
     }

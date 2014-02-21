@@ -17,15 +17,15 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 
 public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implements IJsonRenderer {
   private final IJsonSession m_jsonSession;
-  private final T m_scoutObject;
+  private final T m_modelObject;
   private final String m_id;
   private P_PropertyChangeListener m_propertyChangeListener;
 
-  public AbstractJsonRenderer(T scoutObject, IJsonSession jsonSession) {
-    if (scoutObject == null) {
-      throw new IllegalArgumentException("scoutObject must not be null");
+  public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession) {
+    if (modelObject == null) {
+      throw new IllegalArgumentException("modelObject must not be null");
     }
-    m_scoutObject = scoutObject;
+    m_modelObject = modelObject;
     m_jsonSession = jsonSession;
     m_id = jsonSession.createUniqueIdFor(this);
   }
@@ -40,7 +40,7 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
   }
 
   protected T getModelObject() {
-    return m_scoutObject;
+    return m_modelObject;
   }
 
   @Override
@@ -52,7 +52,7 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
   protected void attachModel() throws JsonUIException {
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();
-      m_scoutObject.addPropertyChangeListener(m_propertyChangeListener);
+      m_modelObject.addPropertyChangeListener(m_propertyChangeListener);
     }
   }
 
@@ -64,7 +64,7 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
 
   protected void detachModel() throws JsonUIException {
     if (m_propertyChangeListener != null) {
-      m_scoutObject.removePropertyChangeListener(m_propertyChangeListener);
+      m_modelObject.removePropertyChangeListener(m_propertyChangeListener);
       m_propertyChangeListener = null;
     }
   }

@@ -9,9 +9,8 @@ import org.json.JSONObject;
 
 public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
 
-  public JsonViewButton(IViewButton scoutObject,
-      IJsonSession jsonSession) {
-    super(scoutObject, jsonSession);
+  public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession) {
+    super(modelObject, jsonSession);
   }
 
   @Override

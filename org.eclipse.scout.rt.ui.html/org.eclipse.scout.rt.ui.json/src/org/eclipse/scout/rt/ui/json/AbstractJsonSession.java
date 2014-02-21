@@ -58,7 +58,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   protected UserAgent createUserAgent() {
-    //TODO create UiLayer.Json, or better let deliver from real gui -> html?
+    //FIXME create UiLayer.Json, or better let deliver from real gui -> html?
     return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
   }
 
@@ -69,7 +69,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   public void dispose() throws JsonUIException {
-    //TODO call dispose (from session invalidation listener and desktop close event?)
+    //FIXME call dispose (from session invalidation listener and desktop close event?)
     for (IJsonRenderer renderer : m_jsonRenderers.values()) {
       renderer.dispose();
     }
@@ -82,7 +82,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
 
   @Override
   public String createUniqueIdFor(IJsonRenderer renderer) {
-    //TODO create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
+    //FIXME create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
     return "" + (++m_jsonRendererSeq);
   }
 
