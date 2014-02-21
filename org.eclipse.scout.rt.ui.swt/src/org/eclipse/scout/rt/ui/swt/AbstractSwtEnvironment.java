@@ -332,11 +332,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           view = findViewPart(viewId);
 
           if (view == null) {
-            view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId);
+            view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
           }
         }
         else {
-          view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
+          view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId, secondaryId, IWorkbenchPage.VIEW_VISIBLE);
         }
         if (!(view instanceof AbstractScoutView)) {
           LOG.warn("views used in scout's enviromnent must be extensions of AbstractScoutView");

@@ -358,10 +358,6 @@ public abstract class AbstractCell extends Composite implements PaintListener {
       return;
     }
 
-    if (selected) {
-      setFocus();
-    }
-
     m_isSelected = selected;
     redraw();
   }

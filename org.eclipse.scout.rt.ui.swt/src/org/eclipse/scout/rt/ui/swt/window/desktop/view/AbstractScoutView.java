@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -438,10 +437,9 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
 
   @Override
   public boolean isSaveOnCloseNeeded() {
+    // ensure the focus owning field is validated
     Control focusControl = m_rootArea.getDisplay().getFocusControl();
-    if (focusControl != null && !focusControl.isDisposed()) {
-      focusControl.traverse(SWT.TRAVERSE_TAB_NEXT);
-    }
+    SwtUtility.runSwtInputVerifier(focusControl);
     return isDirty();
   }
 

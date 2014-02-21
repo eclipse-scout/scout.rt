@@ -269,11 +269,9 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   @Override
   public boolean close() {
     m_opened = false;
-    // ensure the traversal is done to write eventually changes to model
+    // ensure the current input is validated
     Control focusControl = getShell().getDisplay().getFocusControl();
-    if (focusControl != null && !focusControl.isDisposed()) {
-      focusControl.traverse(SWT.TRAVERSE_TAB_NEXT);
-    }
+    SwtUtility.runSwtInputVerifier(focusControl);
     Runnable job = new Runnable() {
       @Override
       public void run() {

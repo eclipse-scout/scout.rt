@@ -55,7 +55,7 @@ public class StyledTextEx extends StyledText {
       updateVerticalScrollbarVisibility();
     }
     if ((style & SWT.MULTI) != 0) {
-      attachListeners();
+      attachMultiLineListeners();
     }
 
     m_copyPasteMenu = new Menu(getShell(), SWT.POP_UP);
@@ -181,12 +181,12 @@ public class StyledTextEx extends StyledText {
     }
   }
 
-  protected void attachListeners() {
+  protected void attachMultiLineListeners() {
     addListener(SWT.Traverse, m_traversHandlingListener);
     addListener(SWT.Verify, m_traversHandlingListener);
   }
 
-  protected void dettachListeners() {
+  protected void dettachMultiLineListeners() {
     removeListener(SWT.Traverse, m_traversHandlingListener);
     removeListener(SWT.Verify, m_traversHandlingListener);
   }
@@ -225,6 +225,7 @@ public class StyledTextEx extends StyledText {
           }
           break;
         case SWT.Verify: {
+          // handle the tab key as traverse
           if (event.text.equals("\t") && event.stateMask == 0) {
             m_timestamp = event.time;
             event.doit = false;

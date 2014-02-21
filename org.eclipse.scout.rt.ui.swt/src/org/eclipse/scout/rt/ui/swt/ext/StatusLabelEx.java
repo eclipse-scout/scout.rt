@@ -53,7 +53,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   private String m_nonMandatoryText = "";
 
   public StatusLabelEx(Composite parent, int style, ISwtEnvironment environment) {
-    super(parent, SWT.NONE);
+    super(parent, SWT.NO_FOCUS);
     m_environment = environment;
     m_infoImg = Activator.getIcon(AbstractIcons.StatusInfo);
     m_warningImg = Activator.getIcon(AbstractIcons.StatusWarning);
