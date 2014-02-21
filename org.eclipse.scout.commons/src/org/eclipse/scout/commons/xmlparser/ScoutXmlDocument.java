@@ -39,7 +39,10 @@ import org.xml.sax.Attributes;
  * Title : Scout XML Document
  * 
  * @version 2.0
+ * @deprecated Will be removed with the M-Release (scout 5).
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ScoutXmlDocument implements Serializable {
 
   private static final long serialVersionUID = 1L;

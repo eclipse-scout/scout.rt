@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
  * 
  * @version 1.0
+ * @deprecated Will be removed with the M-Release (scout 5).
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ScoutXmlParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutXmlParser.class);
   private static boolean warnedDefaultParserNotFound;

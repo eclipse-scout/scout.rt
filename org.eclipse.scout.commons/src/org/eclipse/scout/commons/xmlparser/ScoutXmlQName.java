@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,9 +14,11 @@ package org.eclipse.scout.commons.xmlparser;
  * Title : Scout XML QName Description: QName (qualified name) support for
  * ScoutXml elements and attributes Copyright : Copyright (c) 2006 BSI AG, ETH
  * Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
- * 
+ *
  * @version 1.0
+ * @deprecated Will be removed with the M-Release (scout 5).
  */
+@Deprecated
 public class ScoutXmlQName implements Comparable {
   private String m_namespaceURI;
   private String m_localName;
@@ -215,7 +217,7 @@ public class ScoutXmlQName implements Comparable {
 
   /**
    * Returns the expanded form, e.g. {namespace}localpart, of this QName.
-   * 
+   *
    * @since 1.0
    */
   @Override

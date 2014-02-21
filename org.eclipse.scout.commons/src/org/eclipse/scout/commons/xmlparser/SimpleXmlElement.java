@@ -34,7 +34,10 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
 /**
  * Simple xml parser/writer. Very efficient and performant when handling xml
  * content without care of namespaces.
+ * 
+ * @deprecated Will be removed with the M-Release (scout 5).
  */
+@Deprecated
 public class SimpleXmlElement {
   private static final HashMap<String, String> ENTITIES;
   private static final HashMap<String, String> INVERSE_ENTITIES;

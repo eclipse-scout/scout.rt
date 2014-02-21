@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,9 +13,11 @@ package org.eclipse.scout.commons.xmlparser;
 /**
  * Title : Scout XML Exception Description: Copyright : Copyright (c) 2006 BSI
  * AG, ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
- * 
+ *
  * @version 1.0
+ * @deprecated Will be removed with the M-Release (scout 5).
  */
+@Deprecated
 public class ScoutXmlException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
