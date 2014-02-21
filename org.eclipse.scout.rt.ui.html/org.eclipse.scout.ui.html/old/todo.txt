@@ -49,10 +49,8 @@ GRAPH
 - Switch zwischen Netz, Baum (als graue Knöpfe)
 
 CHART, MAP
-- CTR selektiert meherere
 
 SCROLLBAR
-- überall animate: now muss geplante grösse sein/merken
 
 KEY
 - alt-links/rechts bewegt tree, alt-hoch/runter in der Tabelle
@@ -61,7 +59,6 @@ KEY
 ALLGEMEIN
 - synAyax: wait Curosr, etwa Farbeffekt mit Logo
 - Organise machen!
-- easing/animate bei mosueover effekten? (tree-menu, header-menu)
 
 ---- form -----------------------------------------------------------------------------
 
@@ -101,7 +98,6 @@ INFO & HELP
 - backside: ganzeinfaches CRM: zentrale Suche über alle Elemente, Proezssstart
 - backside: emotionales cockpit: kalender, schnellsuche etc.?
 - tutorial, wie in eien Spiel
-- Infos (mehr zu laden etc.) erst schwarz, dann grau faden
 - Wenn Suche nötig die direkt einblenden und/oder besser visualisieren
 - prozesse sauber denken und machen, auch ohne personenwahl
 
@@ -140,28 +136,12 @@ INFO & HELP
 ---- good to know ---------------------------------------------------------------------
 
 https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet#RULE_.232_-_JavaScript_Escape_Before_Inserting_Untrusted_Data_into_HTML_Attribute_Subcontext_within_the_Execution_Context
-
 http://uxdesign.smashingmagazine.com/2013/10/23/smart-transitions-in-user-experience-design/
-
 http://www.ui-transitions.com/
-
-new-> this und returniert this / ohne new -> this ist parent
-slow: loop collection&length
-closure=lexical binding
-
-Performance-Tuning: closure compiler, firebug, profiler, pagespeed, fiddlet, dynatrace, yslow	
-
-Aufteilen in Files pro Widget, Versionsnummer
-
-Promise:
-- http://www.htmlgoodies.com/beyond/javascript/making-promises-with-jquery-deferred.html
-- http://www.bitstorm.org/weblog/2012-1/Deferred_and_promise_in_jQuery.html
-
-http://www.benknowscode.com/2012/09/using-svg-elements-with-jquery_6812.html?m=1
-
 http://cs.brown.edu/~rt/gdhandbook/chapters/force-directed.pdf
 
-http://closure-compiler.appspot.com/home 	
+
+Performance-Tuning: closure compiler, firebug, profiler, pagespeed, fiddlet, dynatrace, yslow	
 
 
 ---- farben----------------------------------------------------------------------------
@@ -175,10 +155,7 @@ grau 		# 127 127 127   #7f7f7f
 grau hell	# 191 191 191   #bfbfbf
 
 
+---- todo today -----------------------------------------------------------------------
 
-
--- todo
- graph blau einfärben
- filter im scatter richtig machen: beide spalten
- filter scrollbar richtig machen
+ filter -> scrollbar richtig machen
   

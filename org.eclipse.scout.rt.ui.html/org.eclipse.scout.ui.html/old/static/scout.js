@@ -159,6 +159,7 @@ var profile = {
 	
 	// converter functions constants
 	// todo: holen aus kleinem Array
+	// todo: verschiebene aller locale dinge nach Scout.Locale
 	
 	$.DEC = '.';
 	$.GROUP = "'";
@@ -249,6 +250,38 @@ Scout.Desktop = function ($parent, widget) {
 	// show node
 	var nodes = $.syncAjax('drilldown', {id : widget.start});
 	tree.addNodes(nodes);
+	
+	// key handling
+
+
+	// alt and f1-help
+	$('body').keydown(function (event)  {
+		log(event);
+		if (event.which == 18) {
+			$('.key-box').remove();
+			
+			// keys for views
+			$('.view-item', view.$div).each(function (i) {
+					log(1);
+					$(this).appendDiv('', '.key-box', '');
+				});
+			
+			// keys for tools
+			
+			// keys for tree
+			
+			// keys for table
+			
+		}
+	});
+		
+	$('body').keyup(function (event)  {
+		log(1);
+		if (event.which == 18) {
+			$('.key_box').remove();
+		}
+	});
+	
 };
 
 //
@@ -804,7 +837,8 @@ Scout.Desktop.Table = function ($bench, model) {
 	
 	function selectionBorder () {
 		// remove nice border 
-			$('.select-middle, .select-top, .select-bottom, .select-single').removeClass('select-middle select-top select-bottom select-single');
+			$('.select-middle, .select-top, .select-bottom, .select-single')
+				.removeClass('select-middle select-top select-bottom select-single');
 
 		// draw nice border
 		$rowSelected = $('.row-selected');
@@ -904,7 +938,7 @@ Scout.Desktop.Table = function ($bench, model) {
 	function resetFilter (event) {
 		$('.table-row', $tableData).each(function (i) { showRow($(this)); });
 		$infoFilter.animateAVCSD('width', 0, function () {$(this).hide(); });
-		$('.main-chart.selected').attr('class', 'main-chart');
+		$('.main-chart.selected').removeClassSVG('selected');
 	}
 
 	function showRow ($row) {
@@ -1021,7 +1055,8 @@ Scout.Desktop.Table.Header = function ($tableHeader, columns) {
 Scout.Desktop.Table.Chart = function ($controlContainer, columns, table, filterCallback) {
 	// group functions for dates
 	// todo
-	var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag', 'gruppiert nach Monat', 'gruppiert nach Jahr'],
+	var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
+			 'gruppiert nach Monat', 'gruppiert nach Jahr'],
 		countDesc = 'Anzahl';
 		
 	var removeChart = null,
@@ -1049,7 +1084,7 @@ Scout.Desktop.Table.Chart = function ($controlContainer, columns, table, filterC
 		.click(drawChart);
 		
 	// first chart type is preselected
-	$('svg.select-chart').first().attr('class', 'select-chart selected');
+	$('svg.select-chart').first().addClassSVG('selected');
 					
 	// create container for x/y-axis
 	var $xAxisSelect = $controlContainer.appendDiv('XAxisSelect'),
@@ -1184,8 +1219,8 @@ Scout.Desktop.Table.Chart = function ($controlContainer, columns, table, filterC
 	function chartSelect ($chart) {
 		var chart = $chart.attr('id');
 		
-		$chart.siblings().attr('class', 'select-chart');
-		$chart.attr('class', 'select-chart selected');
+		$chart.siblings().removeClassSVG('selected');
+		$chart.addClassSVG('selected');
 		
 		if (chart == 'ChartScatter') {
 			$yAxisSelect.animateAVCSD('width', 175);
@@ -1384,7 +1419,8 @@ Scout.Desktop.Table.Chart = function ($controlContainer, columns, table, filterC
 		var delta = xAxis.max - xAxis.min,
 			labelsX;
 		if (xAxis.length > 14) {
-			labelsX = [xAxis.min, xAxis.min + delta / 4, xAxis.min + delta / 2, xAxis.min + delta / 4 * 3, xAxis.max];
+			labelsX = [xAxis.min, xAxis.min + delta / 4, xAxis.min + delta / 2, 
+							xAxis.min + delta / 4 * 3, xAxis.max];
 		} else {
 			labelsX = xAxis;
 		}
@@ -1598,30 +1634,46 @@ Scout.Desktop.Table.Chart = function ($controlContainer, columns, table, filterC
 		
 		// change state
 		if (event.ctrlKey) {
-			if ($clicked.attr('class').indexOf('selected') != -1) {
-				$clicked.attr('class', 'main-chart');
+			if ($clicked.hasClassSVG('selected')) {
+				$clicked.removeClassSVG('selected');;
 			} else {
-				$clicked.attr('class', 'main-chart selected');
+				$clicked.addClassSVG('selected');
 			}
 		} else {
-			$clicked.attr('class', 'main-chart selected');
-			$clicked.siblings('.main-chart').attr('class', 'main-chart');
+			$clicked.addClassSVG('selected');
+			$clicked.siblings('.main-chart').removeClassSVG('selected');
 		}
-		
-		// find filter values
-		var filters = [];
+
+		//  prepare filter
+		var filters = [],
+			oneDim = $('.selected', $chartSelect).attr('id') != 'ChartScatter';
+
+		//  find all filter
 		$('.main-chart.selected').each( function () {
 			var dX = parseFloat($(this).attr('data-xAxis'));
-			filters.push(dX); 
+			
+			if (oneDim) {
+				filters.push(dX);
+			} else {				
+				dY = parseFloat($(this).attr('data-yAxis'));
+				filters.push(JSON.stringify([dX, dY]));
+			}
 		});		
 
-		//  filter function
+		//  filter function 
 		var testFunc = function ($row) { 
-			var text = $row.children().eq(xAxis.column).text(),
-				n = xAxis.norm(text);
-			return (filters.indexOf(n) > -1);
-		};
-		
+			var textX = $row.children().eq(xAxis.column).text(),
+				nX = xAxis.norm(textX);
+			
+			if (oneDim) {			
+				return (filters.indexOf(nX) > -1);
+			} else {
+				var textY = $row.children().eq(yAxis.column).text(),
+					nY = yAxis.norm(textY);
+				return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
+			}
+		}; 
+
 		// callback to table
 		filterCallback(testFunc);
 	}
@@ -2089,6 +2141,26 @@ Scout.Desktop.Table.Map = function ($controlContainer, id, columns, table, filte
 			$clicked.addClassSVG('selected');
 			$clicked.siblings('.selected').removeClassSVG('selected');
 		}
+		
+		// find filter values
+		var countries = [];
+		$('.map-item.selected').each( function () {
+			countries.push($(this).attr('id')); 
+		});	
+				
+		//  filter function
+		var testFunc = function ($row) { 
+			for (var c = 0; c < columns.length; c++) {
+				var text = $row.children().eq(c).text();
+				if (countries.indexOf(text) > -1) return true;
+			}
+			return false;
+		};
+		
+		// callback to table
+		filterCallback(testFunc);
+		
+		
 	}
 };
 

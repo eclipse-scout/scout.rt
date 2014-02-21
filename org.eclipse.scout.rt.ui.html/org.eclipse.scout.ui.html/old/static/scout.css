@@ -955,7 +955,25 @@ cursor: pointer;
 background-color: #0082A1; 
 } 
 
+/* key handling */
 
-/* old stuff */
+.view-item.key-box {
+position: absolute;
+left: -17px;
+top: 0px;
+width: 10px;
+height: 10px;
+line-height: 10px;
+background-color:#FE9915;
+z-index: 100;	
+padding: 2px;
+color: #FFF;
+font-weight: normal;
+font-size: 10px;
+text-align:center;
+}
 
+.view-item.key-box {
+
+}
 
