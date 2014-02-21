@@ -6,12 +6,11 @@ Scout.DesktopOwnViewButton = function (scout, $viewButtonBar, viewButton) {
     scout.widgetMap[viewButton.id] = this;
 
     var $viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
-    $viewButton.
-    on('click', '', onClick).
-    appendDiv('', 'view-remove').
-    on('click', '', removeOwnView).
-    selectOne().
-    css('width', 0);
+    $viewButton.on('click', '', onClick)
+    	.appendDiv('', 'view-remove')
+    	.on('click', '', removeOwnView)
+    	.selectOne()
+    	.css('width', 0);
 
     $viewButton=$viewButton.animateAVCSD('width', $viewButton.width());
 

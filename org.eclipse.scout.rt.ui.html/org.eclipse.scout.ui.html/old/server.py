@@ -35,11 +35,10 @@ class BSICRM:
                         'tools': [{'id': 't1', 'label': 'Suche', 'icon': '\uf002', 'shortcut': 'F3'},
                                   {'id': 't2', 'label': 'Zugriff', 'icon': '\uf144', 'shortcut': 'F4'},
                                   {'id': 't3', 'label': 'Favoriten', 'icon': '\uf005', 'shortcut': 'F6'},
-                                  {'id': 't4', 'label': 'Muster', 'icon': '\uf01C', 'shortcut': 'F7', 'state': 'disabled'},
+                                  {'id': 't4', 'label': 'Offline', 'icon': '\uf01C', 'shortcut': 'F7', 'state': 'disabled'},
                                   {'id': 't5', 'label': 'Telefon', 'icon': '\uf095', 'shortcut': 'F8'},
                                   {'id': 't6', 'label': 'Cockpit', 'icon': '\uf0E4', 'shortcut': 'F9'},
-                                  {'id': 't7', 'label': 'Prozesse', 'icon': '\uf0D0','shortcut': 'F10'},
-                                  {'id': 't8', 'label': 'Offline', 'icon': '\uf0D0','shortcut': 'F10'}]}] 
+                                  {'id': 't7', 'label': 'Prozesse', 'icon': '\uf0D0','shortcut': 'F10'}]}] 
         else:
             message = ''
                                

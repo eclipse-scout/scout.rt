@@ -463,20 +463,26 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       String jsonColumnsRaw = "[]";
       if ("CompanyTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = COMPANY_COLUMN;
+        bench.put("graph", "Netzwerk");
+        bench.put("map", "Karte");
       }
       else if ("BusinessTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = BUSINESS_COLUMN;
+        bench.put("graph", "");
+        bench.put("map", "");
       }
       else if ("TaskTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = TODO_COLUMN;
+        bench.put("graph", "");
+        bench.put("map", "");
       }
       else if ("CommunicationTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = COMMUNICATION_COLUMN;
+        bench.put("graph", "");
+        bench.put("map", "");
       }
       bench.put("columns", new JSONArray(jsonColumnsRaw));
-      bench.put("data", "load");
-      bench.put("graph", "load");
-      bench.put("map", "load");
+      bench.put("chart", "Diagramm");
       json.put("bench", bench);
 
       return json;

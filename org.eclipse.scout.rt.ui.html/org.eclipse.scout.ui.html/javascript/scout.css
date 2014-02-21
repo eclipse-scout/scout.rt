@@ -1,4 +1,4 @@
-/* SCOUT GUI*/
+/* SCOUT GUI 0.2 */
 /* (c) Copyright 2013-2014, BSI Business Systems Integration AG */
 /* position, size, look, others */
 
@@ -91,7 +91,7 @@ float: left;
 height: 57px;
 width: 45px;
 padding: 22px 0px 0px 20px;
-margin-left: 15px;
+margin-left: 15px; 
 cursor: pointer;
 }
 
@@ -112,7 +112,7 @@ top: -10px;
 right: -10px;
 height: 25px;
 width: 10px;
-padding-left: 5px;
+padding-left: 5px; 
 }
 
 .view-item:hover .view-remove:after{
@@ -123,7 +123,7 @@ content: "\f00d";
 }
 
 .view-remove:hover:after {
-color:#FE9915 !important;
+color:#FE9915 !important;	
 }
 
 #ViewLogo {
@@ -139,8 +139,8 @@ background-size: cover;
 
 #DesktopTools{
 position: absolute;
-right: 0px;
-top: 58px;
+right: 0px; 
+top: 58px;    
 z-index: 10;
 height: calc(100% - 58px);
 width: 80px;
@@ -150,6 +150,7 @@ overflow: hidden;
 }
 
 .tool-item{
+position: relative;
 float: right;
 height: 58px;
 width: 80px;
@@ -184,8 +185,8 @@ color:#CCC;
 
 .tool-open{
 position: absolute;
-right: 80px;
-top: 58px;
+right: 80px; 
+top: 58px; 
 width: 0px;  /*animate to 300px;*/
 height: calc(100% - 58px);
 border-left:1px solid #CCC;
@@ -208,7 +209,7 @@ min-height: 100px;}
 
 #DesktopTree > .scrollbar{
 right: 18px;
-margin-top: 10px;
+margin-top: 10px; 
 margin-bottom: 10px;
 }
 
@@ -236,11 +237,10 @@ position: relative;
 float: left;
 width: 100%;
 line-height: 32px;
-padding-left: 30px;
+padding-left: 30px; 
 white-space: nowrap;
 cursor: pointer;
 overflow: hidden;
-
 }
 
 .tree-item-control{
@@ -249,8 +249,8 @@ left: -1px;
 top: -1px;
 width: 29px;
 height: 30px;
-line-height: 24px;
-padding: 4px 4px 4px 4px;
+line-height: 24px; 
+padding: 4px 4px 4px 4px; 
 }
 
 .tree-item-control:before{
@@ -274,7 +274,7 @@ color:#FE9915 !important;
 
 .tree-item.expanded > .tree-item-control:hover:before{
 content:"\F057" !important;
-}
+}	
 
 .tree-item-menu{
 position: absolute;
@@ -379,13 +379,13 @@ color:#CCC;
 position: relative;
 height: calc(100% - 80px);
 width: 100%;
-overflow: hidden;
+overflow: hidden;	
 padding-left: 4px;
 }
 
 #TableData > .scrollbar {
-right: 10px;
-margin-top: 10px;
+right: 7px;
+margin-top: 10px; 
 margin-bottom: 10px;
 height: calc(100% - 20px);
 }
@@ -400,7 +400,7 @@ width: calc(100% - 11px);
 
 .table-row {
 position:relative;
-overflow: hidden;
+overflow: hidden;	
 border-right: 2px solid #FFF;
 border-left: 2px solid #FFF;
 line-height: 26px;
@@ -477,7 +477,7 @@ color:#fe9915;
 /* main table control */
 
 #TableControl {
-position: absolute;
+position: absolute; 
 bottom: 0px;
 height: 50px;
 width: 100%;
@@ -489,7 +489,7 @@ white-space: nowrap;
 #ControlGraph, #ControlChart, #ControlMap, #ControlOrganize {
 padding: 14px 18px 10px 2px;
 float: left;
-cursor: pointer;
+cursor: pointer; 
 }
 
 #ControlGraph:before, #ControlChart:before, #ControlMap:before, #ControlOrganize:before {
@@ -537,7 +537,7 @@ border-left: 1px solid #CCC;
 color: #bfbfbf;
 white-space: nowrap;
 cursor: pointer;
-line-height: 21px;
+line-height: 21px; 
 }
 
 
@@ -731,7 +731,7 @@ stroke-linecap: round;
 
 .main-chart:hover, .main-chart.selected {
 fill: #fe9915
-}
+}	
 
 
 line.main-axis{
@@ -823,7 +823,7 @@ fill: #7f7f7f;
 
 .map-item.selected {
 fill: #fe9915
-}
+}	
 
 /* menu */
 
@@ -861,7 +861,7 @@ padding: 3px;}
 
 .menu-item{
 color: #0082A1;
-cursor: pointer;
+cursor: pointer; 
 line-height: 23px;
 padding: 4px 8px 0px 9px;
 }
@@ -910,8 +910,8 @@ background-color: #FFF;
 }
 
 #MenuHeader > div{
-padding: 7px 8px 7px 7px;
-cursor: pointer;
+padding: 7px 8px 7px 7px; 
+cursor: pointer; 
 font-family: fontAwesome;
 font-size: 16px;
 line-height: 16px;
@@ -919,12 +919,12 @@ color: #0082A1;
 text-align: center;
 }
 
-#MenuHeaderControl:before   {content: "\F0C9";}
-#MenuHeaderSortUp:before   {content: "\F160";}
-#MenuHeaderSortDown:before  {content: "\F161";}
-#MenuHeaderFilter:before  {content: "\F0B0";}
-#MenuHeaderAdd:before    {content: "\F067";}
-#MenuHeaderMore:before    {content: "\F141";}
+#MenuHeaderControl:before 	{content: "\F0C9";}
+#MenuHeaderSortUp:before 	{content: "\F160";}
+#MenuHeaderSortDown:before	{content: "\F161";}
+#MenuHeaderFilter:before	{content: "\F0B0";}
+#MenuHeaderAdd:before		{content: "\F067";}
+#MenuHeaderMore:before		{content: "\F141";}
 
 #MenuHeader > div:hover, #MenuHeader > div.selected:before{
 color: #FE9915 !important;
@@ -933,46 +933,75 @@ color: #FE9915 !important;
 
 /* scrollbar */
 
-.scrollbar {
-position: absolute;
-width: 10px;
+.scrollbar { 
+position: absolute; 
+width: 10px; 
 height: 100%;
 z-index: 1;
 background-color: white;
-cursor: pointer;
+cursor: pointer; 
 }
 
-.scrollbar-thumb {
-position: absolute;
+.scrollbar-thumb { 
+position: absolute; 
 width: 10px;
 top: 0px;
 z-index: 2;
-background-color: #D4D4D4;
-cursor: pointer;
+background-color: #D4D4D4; 
+cursor: pointer; 
 }
 
 .scrollbar-thumb-move, .scrollbar-thumb:hover{
-background-color: #0082A1;
-}
+background-color: #0082A1; 
+} 
 
 /* key handling */
 
-.view-item.key-box {
+.key-box {
 position: absolute;
-left: -17px;
-top: 0px;
-width: 10px;
-height: 10px;
-line-height: 10px;
-background-color:#FE9915;
-z-index: 100;
-padding: 2px;
+height: 14px;
+z-index: 100;	
+padding-top: 3px;
 color: #FFF;
-font-weight: normal;
-font-size: 10px;
+font-size: 11px;
+line-height: 11px;
 text-align:center;
+background-color:#FE9915;
 }
 
-.view-item.key-box {
-
+.view-item .key-box {
+left: -18px;
+top: -8px;
+width: 14px;
 }
+
+.tool-item .key-box {
+left: 4px;
+top: 8px;
+width: 22px;}
+
+.tool-item.disabled .key-box{
+background-color:#CCC;
+}
+
+.tree-item .key-box {
+left: 3px;
+top: 7px;
+width: 20px;
+}
+
+.key-box.large{
+font-size: 20px;
+}
+
+#TableData .key-box {
+right: 24px;
+width: 32px;
+}
+
+#TableData .key-box.top3 { top: 10px;}
+#TableData .key-box.top2 { top: 32px;}
+#TableData .key-box.top1 { top: 54px;}
+#TableData .key-box.bottom1 { bottom: 54px;}
+#TableData .key-box.bottom2 { bottom: 32px;}
+#TableData .key-box.bottom3 { bottom: 10px;}

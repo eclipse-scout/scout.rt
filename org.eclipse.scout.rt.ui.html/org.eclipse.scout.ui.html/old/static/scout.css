@@ -150,6 +150,7 @@ overflow: hidden;
 }
 
 .tool-item{
+position: relative;
 float: right;
 height: 58px;
 width: 80px;
@@ -240,7 +241,6 @@ padding-left: 30px;
 white-space: nowrap;
 cursor: pointer;
 overflow: hidden;
-
 }
 
 .tree-item-control{
@@ -384,7 +384,7 @@ padding-left: 4px;
 }
 
 #TableData > .scrollbar {
-right: 10px;
+right: 7px;
 margin-top: 10px; 
 margin-bottom: 10px;
 height: calc(100% - 20px);
@@ -957,23 +957,51 @@ background-color: #0082A1;
 
 /* key handling */
 
-.view-item.key-box {
+.key-box {
 position: absolute;
-left: -17px;
-top: 0px;
-width: 10px;
-height: 10px;
-line-height: 10px;
-background-color:#FE9915;
+height: 14px;
 z-index: 100;	
-padding: 2px;
+padding-top: 3px;
 color: #FFF;
-font-weight: normal;
-font-size: 10px;
+font-size: 11px;
+line-height: 11px;
 text-align:center;
+background-color:#FE9915;
 }
 
-.view-item.key-box {
-
+.view-item .key-box {
+left: -18px;
+top: -8px;
+width: 14px;
 }
 
+.tool-item .key-box {
+left: 4px;
+top: 8px;
+width: 22px;}
+
+.tool-item.disabled .key-box{
+background-color:#CCC;
+}
+
+.tree-item .key-box {
+left: 3px;
+top: 7px;
+width: 20px;
+}
+
+.key-box.large{
+font-size: 20px;
+}
+
+#TableData .key-box {
+right: 24px;
+width: 32px;
+}
+
+#TableData .key-box.top3 { top: 10px;}
+#TableData .key-box.top2 { top: 32px;}
+#TableData .key-box.top1 { top: 54px;}
+#TableData .key-box.bottom1 { bottom: 54px;}
+#TableData .key-box.bottom2 { bottom: 32px;}
+#TableData .key-box.bottom3 { bottom: 10px;}

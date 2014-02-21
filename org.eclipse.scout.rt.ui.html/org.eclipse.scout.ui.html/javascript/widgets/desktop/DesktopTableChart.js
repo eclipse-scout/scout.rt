@@ -10,7 +10,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
 
   var removeChart = null,
     xAxis,
-    yAxis;
+	yAxis;
 
   // create container
   var $chartSelect = $controlContainer.empty().appendDiv('ChartSelect');
