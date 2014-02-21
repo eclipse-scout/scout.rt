@@ -82,61 +82,69 @@ Scout.Desktop = function (scout, $parent, widget) {
     //todo: make clicked row visible
     //todo: first select one ow then fire;
     if ([38, 40, 36, 35, 33, 34].indexOf(event.which) > -1){
-      // up: up in table
+      var $rowsAll = $('.table-row', bench.$div),
+        $rowsSelected = $('.row-selected', bench.$div),
+        $rowClick;
+      
+      // up: move up
       if (event.which == 38){
-        var $row = $('.row-selected', bench.$div).first();
-        if ($row.length > 0) {
-          $row.prev().trigger('mousedown').trigger('mouseup');
+        if ($rowsSelected.length > 0) {
+          $rowClick = $rowsSelected.first().prev();
         } else {
-          $('.table-row', bench.$div).last().trigger('mousedown').trigger('mouseup');
+          $rowClick = $rowsAll.last();
         }
       }
 
-      // up: down in table
+      // down: move down
       if (event.which == 40){
-        var $row = $('.row-selected', bench.$div).last();
-        if ($row.length > 0) {
-          $row.next().trigger('mousedown').trigger('mouseup');
+        var $row = $('.row-selected', bench.$div);
+        if ($rowsSelected.length > 0) {
+          $rowClick = $rowsSelected.last().next();
         } else {
-          $('.table-row', bench.$div).first().trigger('mousedown').trigger('mouseup');
+          $rowClick = $rowsAll.first();
         }
       }
 
-      // home: down in table
+      // home: top of table
       if (event.which == 36){
-        var $row = $('.table-row', bench.$div).first();
-        $row.trigger('mousedown');
+        $rowClick = $rowsAll.first();
       }
 
-      // end: down in table
+      // end: bottom of table
       if (event.which == 35){
-        var $row = $('.table-row', bench.$div).last();
-        $row.trigger('mousedown');
+        $rowClick = $rowsAll.last();
       }
 
-      // pgup: move up
+      // pgup: jump up
       if (event.which == 33){
-        var $row = $('.row-selected', bench.$div).first();
-        if ($row.length > 0) {
-          $('.table-row', bench.$div).first().trigger('mousedown');
-          $row.prevAll().eq(10).trigger('mousedown');
+        if ($rowsSelected.length > 0) {
+          var $prev = $rowsSelected.first().prevAll();
+          if ($prev.length > 10) {
+            $rowClick = $prev.eq(10);
+          } else { 
+            $rowClick = $rowsAll.first();
+          }
         } else {
-          $('.table-row', bench.$div).last().trigger('mousedown');
+          $rowClick = $rowsAll.last();
         }
       }
 
-      // pgdn: move down
+      // pgdn: jump down
       if (event.which == 34){
-        var $row = $('.row-selected', bench.$div).last();
-        if ($row.length > 0) {
-          $('.table-row', bench.$div).last().trigger('mousedown');
-          $row.nextAll().eq(10).trigger('mousedown');
+        if ($rowsSelected.length > 0) {
+          var $prev = $rowsSelected.last().nextAll();
+          if ($prev.length > 10) {
+            $rowClick = $prev.eq(10);
+          } else { 
+            $rowClick = $rowsAll.last();
+          }
         } else {
-          $('.table-row', bench.$div).first().trigger('mousedown');
+          $rowClick = $rowsAll.first();
         }
       }
+      
+      $rowClick.trigger('mousedown').trigger('mouseup');
     }
-
   });
 
   this.onModelAction = onModelAction;
