@@ -23,6 +23,7 @@ import org.xml.sax.SAXException;
 /**
  * Soap round trip as JUnit test, using {@link ScoutXmlDocument}, {@link ScoutXmlParser} and {@link ScoutXmlElement}
  */
+@SuppressWarnings("deprecation")
 public class ScoutXmlSoapTest {
 
   @Test

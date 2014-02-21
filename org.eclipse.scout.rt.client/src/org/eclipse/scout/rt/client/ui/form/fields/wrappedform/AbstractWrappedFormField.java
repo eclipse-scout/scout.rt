@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
+@SuppressWarnings("deprecation")
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
 public abstract class AbstractWrappedFormField<T extends IForm> extends AbstractFormField implements IWrappedFormField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWrappedFormField.class);

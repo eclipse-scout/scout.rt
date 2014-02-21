@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * <b>handler</b> is reponsible for loading from data and storing data. This usually involves calling process services
  * on the server. These will in turn contact a persistence layer such as a database.
  */
+@SuppressWarnings("deprecation")
 public interface IForm extends IPropertyObserver, ITypeWithClassId {
 
   String PROP_TITLE = "title";

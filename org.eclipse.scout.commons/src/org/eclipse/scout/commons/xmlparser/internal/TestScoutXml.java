@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlParser;
 
+@SuppressWarnings("deprecation")
 public final class TestScoutXml {
   private ScoutXmlDocument testDocument1;
   private ScoutXmlDocument testDocument2;
