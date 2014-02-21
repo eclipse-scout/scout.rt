@@ -36,6 +36,14 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   private List<JsonViewButton> m_jsonViewButtons;
   private JsonOutline m_jsonOutline;
 
+  private String TOOL_BUTTONS = "[{\"id\": \"t1\", \"label\": \"Suche\", \"icon\": \"\uf002\", \"shortcut\": \"F3\"}," +
+      "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
+      "          {\"id\": \"t3\", \"label\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
+      "          {\"id\": \"t4\", \"label\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
+      "          {\"id\": \"t5\", \"label\": \"Telefon\", \"icon\": \"\uf095\", \"shortcut\": \"F8\"}," +
+      "          {\"id\": \"t6\", \"label\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
+      "          {\"id\": \"t7\", \"label\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
+
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession) {
     super(desktop, jsonSession);
     m_jsonFormsArray = new JSONArray();
@@ -105,6 +113,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       }
       json.put("viewButtons", viewButtons);
       json.put("outline", m_jsonOutline.toJson());
+      json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //TODO
 
       return json;
     }

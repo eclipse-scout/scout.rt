@@ -58,6 +58,6 @@ Scout.DesktopTableHeader = function ($tableHeader, columns) {
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.Menu.Header(x, y);
+    new Scout.MenuHeader(x, y);
   }
 };

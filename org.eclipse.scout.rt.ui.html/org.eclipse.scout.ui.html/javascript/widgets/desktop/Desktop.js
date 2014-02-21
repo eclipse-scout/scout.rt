@@ -6,9 +6,7 @@ Scout.Desktop = function (scout, $parent, widget) {
 
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(scout, $parent, widget.viewButtons);
-  if(widget.toolButtons) {
-    var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
-  }
+  var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
   var tree = new Scout.DesktopTree(scout, $parent);
   var bench = new Scout.DesktopBench(scout, $parent);
 
