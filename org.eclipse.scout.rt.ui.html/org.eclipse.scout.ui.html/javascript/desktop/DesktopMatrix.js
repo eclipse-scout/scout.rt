@@ -9,18 +9,22 @@ Scout.DesktopMatrix = function (columns, table) {
   this.addData = addData;
   this.addAxis = addAxis;
   this.calculateCube = calculateCube;
+  this.columnCount = columnCount;
 
-  // return (empty) matrix
-  return this;
-
+  //add Data Axis 
   function addData (data, dataGroup) {
     var dataAxis = [];
 
+    // collect all axis
     allData.push(dataAxis);
+
+    // copy column for later access    
     dataAxis.column = data;
 
+    // data always is number  
     dataAxis.format = function (n) {return $.numberToString(n, 0); };
 
+    // count, sum, avg 
     if (dataGroup == -1) {
       dataAxis.norm = function (f) {return 1; };
       dataAxis.group = function (array) {return array.length; };
@@ -35,16 +39,24 @@ Scout.DesktopMatrix = function (columns, table) {
     return dataAxis;
   }
 
+  //add x or y Axis
   function addAxis (axis, axisGroup) {
     var keyAxis = [];
 
+    // collect all axis
     allAxis.push(keyAxis);
     keyAxis.column = axis;
-    keyAxis.normTable = [];
 
+    // normalized sring data
+    keyAxis.normTable = [];
+    
+    // add a key to the axis
     keyAxis.add = function (k) { if (keyAxis.indexOf(k) == -1) keyAxis.push(k); };
+    
+    // default sorts function
     keyAxis.reorder = function () { keyAxis.sort(); };
 
+    // norm and format depends of datatype and group functionality
     if (columns[axis].type == 'date') {
       if (axisGroup === 0) {
         keyAxis.norm = function (f) {return $.stringToDate(f).getTime(); };
@@ -86,6 +98,7 @@ Scout.DesktopMatrix = function (columns, table) {
 
     // collect data from table
     for (r = 0; r < table.length; r++) {
+      // collect keys of x, y axis from row
       var keys = [];
       for (k = 0; k < allAxis.length; k++) {
         key = table[r][allAxis[k].column];
@@ -96,6 +109,7 @@ Scout.DesktopMatrix = function (columns, table) {
       }
       keys = JSON.stringify(keys);
 
+      // collect values of data axis from row      
       var values = [];
       for (v = 0; v < allData.length; v++) {
         data = table[r][allData[v].column];
@@ -104,6 +118,7 @@ Scout.DesktopMatrix = function (columns, table) {
         values.push(normData);
       }
 
+      // build cube
       if (cube[keys]) {
         cube[keys].push(values);
       } else {
@@ -111,7 +126,7 @@ Scout.DesktopMatrix = function (columns, table) {
       }
     }
 
-    // group data
+    // group values and find sum, min and max of data axis 
     for (v = 0; v < allData.length; v++) {
       data = allData[v];
 
@@ -143,7 +158,7 @@ Scout.DesktopMatrix = function (columns, table) {
       data.max = Math.ceil(data.max / 4) * 4;
     }
 
-    // find dimensions and sort
+    // find dimensions and sort for x, y axis
     for (k = 0; k < allAxis.length; k++) {
       key = allAxis[k];
 
@@ -153,7 +168,7 @@ Scout.DesktopMatrix = function (columns, table) {
       key.reorder();
     }
 
-    // acces function
+    // acces function used by chart
     cube.getValue = function (keys) {
       keys = JSON.stringify(keys);
 
@@ -165,5 +180,22 @@ Scout.DesktopMatrix = function (columns, table) {
     };
 
     return cube;
+  }
+  
+  function columnCount () {
+    var colCount = [];
+    
+    for (var c = 0; c < columns.length; c++) {
+      colCount.push([c, []]);
+      if (columns[c].type != 'key') {
+        for (r = 0; r < table.length; r++) {
+          var v = table[r][c];
+          if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
+        }
+        
+         colCount[c][1] = colCount[c][1].length;
+      }
+    }
+    return colCount;
   }
 };

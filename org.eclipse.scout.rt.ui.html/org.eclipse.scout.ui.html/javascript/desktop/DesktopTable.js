@@ -155,7 +155,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function controlOrganize (event) {
-    new Scout.DesktopTableOrganize($controlContainer,  model.columns, table);
+    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.columns, table);
   }
 
   function resizeControl (event) {

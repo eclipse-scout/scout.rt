@@ -62,11 +62,22 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
     .click(axisSelect)
     .click(drawChart);
 
-  // find best x and y axis
-  // todo with data/matrix
-  $xAxisSelect.children().eq(0).addClass('selected');
-  $yAxisSelect.children().eq(1).addClass('selected');
-
+  // find best x and y axis: best is 9 different entries
+  var matrix = new Scout.DesktopMatrix(columns, table),
+    columnCount = matrix.columnCount(),
+    comp = function (a, b) { return Math.abs(a[1] - 9) - Math.abs(b[1] - 9); };
+  
+  columnCount.sort(comp);
+  log(columnCount, columnCount[0][0], columnCount[1][0])
+  
+  $xAxisSelect.children().each(function () {
+      if ($(this).data('column') == columnCount[0][0]) $(this).addClass('selected');
+  });
+ 
+  $yAxisSelect.children().each(function () {
+    if ($(this).data('column') == columnCount[1][0]) $(this).addClass('selected');
+  });
+  
   // create container for data
   var $dataSelect = $controlContainer.appendDiv('DataSelect');
   $dataSelect.appendDiv('', 'select-data data-count', countDesc)
