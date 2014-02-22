@@ -79,8 +79,8 @@ Scout.Desktop = function (scout, $parent, widget) {
       return false;
     }
 
-    //todo: make clicked row visible
-    //todo: first select one ow then fire;
+    // table handling
+    // todo: make clicked row visible
     if ([38, 40, 36, 35, 33, 34].indexOf(event.which) > -1){
       var $rowsAll = $('.table-row', bench.$div),
         $rowsSelected = $('.row-selected', bench.$div),
@@ -205,7 +205,6 @@ Scout.Desktop = function (scout, $parent, widget) {
     }
 
     // keys for table
-
     var node = $('#TableData', bench.$div);
     if (node) {
       node.appendDiv('', 'key-box top3', 'Home');
