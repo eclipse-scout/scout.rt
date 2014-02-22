@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopOwnViewButton = function (scout, $viewButtonBar, viewButton) {
+Scout.DesktopViewButtonOwn = function (scout, $viewButtonBar, viewButton) {
 
     scout.widgetMap[viewButton.id] = this;
 
@@ -9,10 +9,10 @@ Scout.DesktopOwnViewButton = function (scout, $viewButtonBar, viewButton) {
     $viewButton.on('click', '', onClick)
     	.appendDiv('', 'view-remove')
     	.on('click', '', removeOwnView)
-    	.selectOne()
-    	.css('width', 0);
+    	.selectOne();
 
-    $viewButton=$viewButton.animateAVCSD('width', $viewButton.width());
+    var w = $viewButton.width();
+    $viewButton.css('width', 0).animateAVCSD('width', w); 
 
     function onClick (event) {
       $viewButton.selectOne();

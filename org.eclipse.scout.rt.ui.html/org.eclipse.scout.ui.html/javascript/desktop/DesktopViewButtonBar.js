@@ -23,7 +23,7 @@ Scout.DesktopViewButtonBar = function (scout, $desktop, viewButtons) {
     var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
     //TODO widget id?
     var viewButton={"id":"ownView"+c, "text":name[0] + ' (' + c + ')'};
-    new Scout.DesktopOwnViewButton(scout, $desktopView, viewButton);
+    new Scout.DesktopViewButtonOwn(scout, $desktopView, viewButton);
   }
 
 };
