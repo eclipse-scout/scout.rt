@@ -197,10 +197,18 @@ Scout.DesktopTable = function (scout, $bench, model) {
       var row = table[r];
 
       rowString += '<div class="table-row">';
+      
       for (var c = 0; c < row.length; c++) {
-        var width = model.columns[c].width,
-          style = (width === 0) ? 'display: none' : 'width: ' + width + 'px';
-        rowString += '<div style = "' + style + ';">' + row[c] + '</div>';
+        var column = model.columns[c],
+          width = column.width,
+          style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
+          allign = (column.type == 'int' || column.type == 'float') ? 'text-align: right; ' : '';
+          value = row[c];   
+
+        if (column.type == 'int') value = $.numberToString(parseFloat(value), 0);
+        if (column.type == 'float') value = $.numberToString(parseFloat(value), 2);
+        
+        rowString += '<div style = "' + style + allign + '">' + value + '</div>';
       }
 
       rowString += '</div>';
