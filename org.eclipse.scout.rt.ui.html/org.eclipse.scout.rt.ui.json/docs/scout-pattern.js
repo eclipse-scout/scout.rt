@@ -19,14 +19,20 @@ var log = console.log.bind(console);
 Scout = function (sessionPartId) {
   
   // session handling, singleton
-  session = function Session (sessionPartId) {
+  session = new function Session (sessionPartId) {
+    var server = 'localhost';
+    this.id = sessionPartId;
+    
+    this.fetch () {
+      log(server, this.id)
+    };
   }();
 
   
   // interface to outside
-  this.add = function add (sessionPartId) {
+  this.add = function add ($div) {
     // create widget ...
-  }($div);
+  };
   
   
   // each 'class' in one file
