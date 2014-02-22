@@ -1,7 +1,7 @@
 //local log function
 var log = console.log.bind(console);
 
-// extend jqueray
+// extend jquery
 (function ($) {
 
   $.fn.doIt = function (a, v) {
@@ -74,7 +74,7 @@ $(document).ready(function () {
   
   $('.scout').each(function () {
     var portletPartId = $(this).data('partid') || '0',
-      sessionPartId = '' + portletPartId + '.' + tabId,
+      sessionPartId = [portletPartId, tabId].join('.'),
       scout;
     
     if (scouts[sessionPartId]) { 
