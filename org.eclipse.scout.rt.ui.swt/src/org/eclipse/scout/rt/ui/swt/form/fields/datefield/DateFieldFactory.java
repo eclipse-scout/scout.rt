@@ -23,12 +23,7 @@ public class DateFieldFactory implements IFormFieldFactory {
   public ISwtScoutFormField<?> createFormField(Composite parent, IFormField field, ISwtEnvironment environment) {
     if (field instanceof IDateField) {
       IDateField d = (IDateField) field;
-      if (d.isHasDate() && d.isHasTime()) {
-        SwtScoutDateField ui = new SwtScoutDateField();
-        ui.createField(parent, d, environment);
-        return ui;
-      }
-      else if (d.isHasDate()) {
+      if (d.isHasDate()) {
         SwtScoutDateField ui = new SwtScoutDateField();
         ui.createField(parent, d, environment);
         return ui;
@@ -41,5 +36,4 @@ public class DateFieldFactory implements IFormFieldFactory {
     }
     return null;
   }
-
 }

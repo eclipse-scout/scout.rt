@@ -1336,6 +1336,26 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           invokeSwtLater(t);
           break;
         }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_NEXT: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(true);
+            }
+          };
+          invokeSwtLater(t);
+          break;
+        }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_PREVIOUS: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(false);
+            }
+          };
+          invokeSwtLater(t);
+          break;
+        }
         case DesktopEvent.TYPE_FIND_FOCUS_OWNER: {
           final Object lock = new Object();
           Runnable t = new Runnable() {
@@ -1596,8 +1616,19 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return called;
   }
 
-  protected void handleScoutPrintInSwt(DesktopEvent e) {
+  protected void handleTraverseFocusFromScout(boolean forward) {
+    Control comp = getDisplay().getFocusControl();
+    if (comp != null) {
+      if (forward) {
+        comp.traverse(SWT.TRAVERSE_TAB_NEXT);
+      }
+      else {
+        comp.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+      }
+    }
+  }
 
+  protected void handleScoutPrintInSwt(DesktopEvent e) {
     final WidgetPrinter wp = new WidgetPrinter(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());//getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS));
     try {
       wp.print(e.getPrintDevice(), e.getPrintParameters());

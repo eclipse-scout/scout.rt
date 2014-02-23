@@ -138,7 +138,7 @@ public class SequenceBoxTest {
           /**
            * force field check
            */
-          public void execCheckFromTo(int changedIndex) throws ProcessingException {
+          protected void execCheckFromTo(int changedIndex) throws ProcessingException {
             super.execCheckFromTo(new AbstractDateField[]{getStartField(), getEndField()}, changedIndex);
           }
 

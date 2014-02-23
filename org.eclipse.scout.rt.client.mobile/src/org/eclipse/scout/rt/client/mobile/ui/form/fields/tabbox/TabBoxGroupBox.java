@@ -64,7 +64,7 @@ public class TabBoxGroupBox extends AbstractGroupBox {
   public class TableField extends TabBoxTableField {
 
     @Override
-    public ITabBox getConfiguredTabBox() {
+    protected ITabBox getConfiguredTabBox() {
       return TabBoxGroupBox.this.getTabBox();
     }
 

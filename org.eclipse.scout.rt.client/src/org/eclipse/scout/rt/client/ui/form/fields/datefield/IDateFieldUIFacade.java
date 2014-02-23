@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.util.Date;
 
-public interface IDateFieldUIFacade {
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
+
+public interface IDateFieldUIFacade extends IBasicFieldUIFacade {
 
   boolean setDateTimeTextFromUI(String newText);
 

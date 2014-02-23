@@ -104,7 +104,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     propertySupport.setPropertyString(PROP_DEFAULT_DRILL_DOWN_STYLE, drillDownStyle);
   }
 
-  public String getConfiguredDefaultDrillDownStyle() {
+  protected String getConfiguredDefaultDrillDownStyle() {
     return null;
   }
 

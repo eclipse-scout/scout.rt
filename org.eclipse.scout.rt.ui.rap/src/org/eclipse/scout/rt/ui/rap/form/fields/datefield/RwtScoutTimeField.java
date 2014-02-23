@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
-import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser.TimeChooserDialog;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
+public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
 
   private Button m_dropDownButton;
   private TextFieldEditableSupport m_editableSupport;

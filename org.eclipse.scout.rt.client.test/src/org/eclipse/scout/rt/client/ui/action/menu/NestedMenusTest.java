@@ -51,7 +51,7 @@ public class NestedMenusTest {
     public class FileMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText() {
+      protected String getConfiguredText() {
         return TEXTS.get("FileMenu");
       }
 
@@ -59,12 +59,12 @@ public class NestedMenusTest {
       public class ExitMenu extends AbstractMenu {
 
         @Override
-        public String getConfiguredText() {
+        protected String getConfiguredText() {
           return TEXTS.get("ExitMenu");
         }
 
         @Override
-        public void execAction() throws ProcessingException {
+        protected void execAction() throws ProcessingException {
           ClientSyncJob.getCurrentSession(TestEnvironmentClientSession.class).stopSession();
         }
       }
@@ -73,12 +73,12 @@ public class NestedMenusTest {
       public class DebugMenu extends AbstractMenu {
 
         @Override
-        public String getConfiguredText() {
+        protected String getConfiguredText() {
           return "Debug";
         }
 
         @Override
-        public void execAction() throws ProcessingException {
+        protected void execAction() throws ProcessingException {
         }
       }
     }
@@ -87,7 +87,7 @@ public class NestedMenusTest {
     public class ToolsMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText() {
+      protected String getConfiguredText() {
         return TEXTS.get("ToolsMenu");
       }
     }
@@ -96,7 +96,7 @@ public class NestedMenusTest {
     public class HelpMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText() {
+      protected String getConfiguredText() {
         return TEXTS.get("HelpMenu");
       }
 
@@ -104,12 +104,12 @@ public class NestedMenusTest {
       public class AboutMenu extends AbstractMenu {
 
         @Override
-        public String getConfiguredText() {
+        protected String getConfiguredText() {
           return TEXTS.get("AboutMenu");
         }
 
         @Override
-        public void execAction() throws ProcessingException {
+        protected void execAction() throws ProcessingException {
           ScoutInfoForm form = new ScoutInfoForm();
           form.startModify();
         }

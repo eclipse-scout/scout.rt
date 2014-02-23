@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
-import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.DateChooserDialog;
 import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.TimeChooserDialog;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
@@ -34,12 +34,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> implements ISwtScoutDateField, IPopupSupport {
+public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> implements ISwtScoutDateField, IPopupSupport {
   public static final int TYPE_TIME_CHOOSER = 1;
   public static final int TYPE_DATE_CHOOSER = 2;
 
@@ -66,6 +67,8 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
     timeChooserButton.setVisible(getScoutObject().isHasTime());
     container.setTabList(new Control[]{textField});
+
+    addModifyListenerForBasicField(textField);
 
     // ui key strokes
     getEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke());
@@ -136,6 +139,41 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
   }
 
   @Override
+  protected String getText() {
+    return getSwtField().getText();
+  }
+
+  @Override
+  protected void setText(String text) {
+    getSwtField().setText(text);
+  }
+
+  @Override
+  protected Point getSelection() {
+    return getSwtField().getSelection();
+  }
+
+  @Override
+  protected void setSelection(int startIndex, int endIndex) {
+    getSwtField().setSelection(startIndex, endIndex);
+  }
+
+  @Override
+  protected int getCaretOffset() {
+    return getSwtField().getCaretOffset();
+  }
+
+  @Override
+  protected void setCaretOffset(int caretPosition) {
+    getSwtField().setCaretOffset(caretPosition);
+  }
+
+  @Override
+  protected TextFieldEditableSupport createEditableSupport() {
+    return new TextFieldEditableSupport(getSwtField());
+  }
+
+  @Override
   protected boolean handleSwtInputVerifier() {
     final String text = getSwtField().getText();
     // only handle if text has changed
@@ -166,29 +204,12 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
   @Override
   protected void handleSwtFocusGained() {
     super.handleSwtFocusGained();
-
     scheduleSelectAll();
   }
 
   @Override
   protected void handleSwtFocusLost() {
     getSwtField().setSelection(0, 0);
-  }
-
-  protected void scheduleSelectAll() {
-    getEnvironment().getDisplay().asyncExec(new Runnable() {
-
-      @Override
-      public void run() {
-        if (getSwtField().isDisposed()) {
-          return;
-        }
-
-        getSwtField().setSelection(0, getSwtField().getText().length());
-      }
-
-    });
-
   }
 
   private void notifyPopupEventListeners(int eventType) {

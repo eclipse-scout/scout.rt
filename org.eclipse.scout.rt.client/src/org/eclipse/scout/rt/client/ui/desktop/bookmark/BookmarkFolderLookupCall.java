@@ -39,7 +39,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
   }
 
   @Override
-  public List<ILookupRow<BookmarkFolder>> execCreateLookupRows() throws ProcessingException {
+  protected List<ILookupRow<BookmarkFolder>> execCreateLookupRows() throws ProcessingException {
     final ArrayList<ILookupRow<BookmarkFolder>> rows = new ArrayList<ILookupRow<BookmarkFolder>>();
     if (m_rootFolder != null) {
       m_rootFolder.visit(new IBookmarkVisitor() {

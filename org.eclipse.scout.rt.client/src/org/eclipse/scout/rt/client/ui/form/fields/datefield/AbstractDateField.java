@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -80,7 +80,7 @@ import org.eclipse.scout.service.SERVICES;
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 @ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
-public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
+public abstract class AbstractDateField extends AbstractBasicField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 
   private static enum ParseContext {
@@ -975,6 +975,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newDate != null && newDate.length() == 0) {
         newDate = null;
       }
+      setWhileTyping(false);
       if (!isHasTime()) {
         return parseValue(newDate);
       }
@@ -1000,6 +1001,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newTime != null && newTime.length() == 0) {
         newTime = null;
       }
+      setWhileTyping(false);
       if (!isHasDate()) {
         return parseValue(newTime);
       }
@@ -1019,6 +1021,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
         newText = null;
       }
       // parse always, validity might change even if text is same
+      setWhileTyping(false);
       return parseValue(newText);
     }
 
@@ -1114,6 +1117,16 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       catch (Throwable t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
       }
+    }
+
+    @Override
+    public boolean setTextFromUI(String newText, boolean whileTyping) {
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
+      // parse always, validity might change even if text is same
+      setWhileTyping(whileTyping);
+      return parseValue(newText);
     }
   }
 }

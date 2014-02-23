@@ -141,7 +141,6 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
 
   protected void scheduleSelectAll() {
     getEnvironment().getDisplay().asyncExec(new Runnable() {
-
       @Override
       public void run() {
         if (getSwtField().isDisposed()) {

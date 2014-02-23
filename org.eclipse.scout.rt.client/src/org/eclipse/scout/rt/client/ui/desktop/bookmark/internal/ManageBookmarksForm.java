@@ -187,17 +187,17 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     }
 
     @Override
-    public void execPostLoad() throws ProcessingException {
+    protected void execPostLoad() throws ProcessingException {
       touch();
     }
 
     @Override
-    public void execStore() throws ProcessingException {
+    protected void execStore() throws ProcessingException {
       SERVICES.getService(IBookmarkService.class).storeBookmarks();
     }
 
     @Override
-    public void execDiscard() throws ProcessingException {
+    protected void execDiscard() throws ProcessingException {
       //revert all changes
       SERVICES.getService(IBookmarkService.class).loadBookmarks();
     }

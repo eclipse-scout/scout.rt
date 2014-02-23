@@ -555,4 +555,12 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Override
+  public void traverseFocusNext() {
+  }
+
+  @Override
+  public void traverseFocusPrevious() {
+  }
+
 }

@@ -1186,6 +1186,26 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           invokeUiLater(t);
           break;
         }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_NEXT: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(true);
+            }
+          };
+          invokeUiLater(t);
+          break;
+        }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_PREVIOUS: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(false);
+            }
+          };
+          invokeUiLater(t);
+          break;
+        }
         case DesktopEvent.TYPE_FIND_FOCUS_OWNER: {
           final Object lock = new Object();
           Runnable t = new Runnable() {
@@ -1341,6 +1361,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     if (!(getDisplay().getThread() == Thread.currentThread())) {
       throw new IllegalStateException("Must be called in rwt thread");
     }
+  }
+
+  protected void handleTraverseFocusFromScout(boolean forward) {
+    // not supported in RAP
   }
 
   protected void handleScoutPrintInRwt(DesktopEvent e) {

@@ -13,12 +13,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
-public interface IDateField extends IValueField<Date> {
+public interface IDateField extends IBasicField<Date> {
   String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";
 
+  @Override
   IDateFieldUIFacade getUIFacade();
 
   void setFormat(String s);

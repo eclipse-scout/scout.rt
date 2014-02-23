@@ -224,7 +224,7 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
       public class EnterKeyStroke extends AbstractKeyStroke {
 
         @Override
-        public void execAction() throws ProcessingException {
+        protected void execAction() throws ProcessingException {
           getUiContainer().getDisplay().asyncExec(new Runnable() {
 
             @Override
@@ -235,7 +235,7 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
         }
 
         @Override
-        public String getConfiguredKeyStroke() {
+        protected String getConfiguredKeyStroke() {
           return "ctrl-enter";
         }
       }

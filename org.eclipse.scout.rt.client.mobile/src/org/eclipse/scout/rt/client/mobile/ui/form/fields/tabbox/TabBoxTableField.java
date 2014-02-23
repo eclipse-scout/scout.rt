@@ -46,7 +46,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
     m_tabBox = getConfiguredTabBox();
   }
 
-  public ITabBox getConfiguredTabBox() {
+  protected ITabBox getConfiguredTabBox() {
     return null;
   }
 

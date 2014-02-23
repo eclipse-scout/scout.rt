@@ -45,12 +45,12 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithTransparentIcon;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser;
-import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
 
-public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateField> implements ISwingScoutDateField {
+public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateField> implements ISwingScoutDateField {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDateField.class);
 
@@ -87,6 +87,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
     }
     JTextField dateField = createDateField(container);
     Document doc = dateField.getDocument();
+    addInputListenersForBasicField(dateField, doc);
     if (doc instanceof AbstractDocument) {
       ((AbstractDocument) doc).setDocumentFilter(new BasicDocumentFilter(60));
     }
@@ -328,6 +329,16 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       setDisabledTextColor(ColorUtility.createColor(scoutColor), (JTextComponent) fld);
     }
     super.setForegroundFromScout(scoutColor);
+  }
+
+  @Override
+  protected void setSelectionFromSwing() {
+    //Nothing to do: Selection is not stored in model for DateField.
+  }
+
+  @Override
+  protected boolean isSelectAllOnFocusInScout() {
+    return true; //No such property in Scout for DateField.
   }
 
   /*

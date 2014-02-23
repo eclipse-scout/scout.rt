@@ -614,7 +614,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * Add a {@link FormListener}. These listeners will be called
-   * when the form is activated, closed, discared, before loading,
+   * when the form is activated, closed, discarded, before loading,
    * after loading, before storing, after storing, when the structure changes, when it is
    * printed, etc.
    */

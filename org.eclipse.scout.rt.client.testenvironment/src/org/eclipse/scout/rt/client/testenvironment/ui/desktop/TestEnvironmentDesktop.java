@@ -43,7 +43,7 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
    * do NOT change the title of the app
    */
   @Override
-  public String getConfiguredTitle() {
+  protected String getConfiguredTitle() {
     return "Test Application";
   }
 
@@ -63,7 +63,7 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class FileMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText() {
+    protected String getConfiguredText() {
       return TEXTS.get("FileMenu");
     }
 
@@ -71,12 +71,12 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
     public class ExitMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText() {
+      protected String getConfiguredText() {
         return TEXTS.get("ExitMenu");
       }
 
       @Override
-      public void execAction() throws ProcessingException {
+      protected void execAction() throws ProcessingException {
         ClientSyncJob.getCurrentSession(
             TestEnvironmentClientSession.class).stopSession();
       }

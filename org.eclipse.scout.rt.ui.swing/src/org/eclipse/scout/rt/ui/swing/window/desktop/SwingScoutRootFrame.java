@@ -418,6 +418,18 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     m_swingFrame.dispose();
   }
 
+  protected void handleTraverseFocusFromScout(boolean forward) {
+    Component comp = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    if (comp != null) {
+      if (forward) {
+        comp.transferFocus();
+      }
+      else {
+        comp.transferFocusBackward();
+      }
+    }
+  }
+
   protected void handleScoutPrintInSwing(DesktopEvent e) {
     final WidgetPrinter cp = new WidgetPrinter(getSwingFrame());
     try {
@@ -488,6 +500,26 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
             }
           };
           getSwingEnvironment().invokeSwingAndWait(t, 60000);
+          break;
+        }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_NEXT: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(true);
+            }
+          };
+          getSwingEnvironment().invokeSwingLater(t);
+          break;
+        }
+        case DesktopEvent.TYPE_TRAVERSE_FOCUS_PREVIOUS: {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              handleTraverseFocusFromScout(false);
+            }
+          };
+          getSwingEnvironment().invokeSwingLater(t);
           break;
         }
       }

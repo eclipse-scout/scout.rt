@@ -1349,6 +1349,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
+  public void traverseFocusNext() {
+    fireTransferFocusNext();
+  }
+
+  @Override
+  public void traverseFocusPrevious() {
+    fireTransferFocusPrevious();
+  }
+
+  private void fireTransferFocusNext() {
+    fireDesktopEvent(new DesktopEvent(this, DesktopEvent.TYPE_TRAVERSE_FOCUS_NEXT));
+  }
+
+  private void fireTransferFocusPrevious() {
+    fireDesktopEvent(new DesktopEvent(this, DesktopEvent.TYPE_TRAVERSE_FOCUS_PREVIOUS));
+  }
+
   private void fireDesktopClosed() {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_DESKTOP_CLOSED);
     fireDesktopEvent(e);

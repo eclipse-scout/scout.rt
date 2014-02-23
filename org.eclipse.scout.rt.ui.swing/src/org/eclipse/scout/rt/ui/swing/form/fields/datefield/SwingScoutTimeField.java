@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithTransparentIcon;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.TimeChooser;
-import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
 /**
  * time field in combination with a date field to create a date/time field
  */
-public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateField> implements ISwingScoutDateField {
+public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateField> implements ISwingScoutDateField {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTimeField.class);
 
@@ -77,6 +77,16 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
 
   public void setDateTimeCompositeMember(boolean dateTimeCompositeMember) {
     m_dateTimeCompositeMember = dateTimeCompositeMember;
+  }
+
+  @Override
+  protected void setSelectionFromSwing() {
+    //Nothing to do: Selection is not stored in model for DateField.
+  }
+
+  @Override
+  protected boolean isSelectAllOnFocusInScout() {
+    return true; //No such property in Scout for DecimalField.
   }
 
   @Override
@@ -109,6 +119,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
         setInputDirty(true);
       }
     });
+    addInputListenersForBasicField(timeField, doc);
     container.add(timeField);
     // key mappings
     InputMap inputMap = timeField.getInputMap(JTextField.WHEN_FOCUSED);

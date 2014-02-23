@@ -36,13 +36,13 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   }
 
   @Override
-  public void execLoadSession() throws ProcessingException {
+  protected void execLoadSession() throws ProcessingException {
     //do not enable client notifications, do not add service tunnel
     setDesktop(new TestEnvironmentDesktop());
   }
 
   @Override
-  public void execStoreSession() throws ProcessingException {
+  protected void execStoreSession() throws ProcessingException {
   }
 
   /**

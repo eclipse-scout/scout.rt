@@ -473,4 +473,24 @@ public interface IDesktop extends IPropertyObserver {
    *         closing process.
    */
   boolean doBeforeClosingInternal();
+
+  /**
+   * Transfers the keyboard focus to the next possible location. The next location is defined as the default focus
+   * traversal
+   * as defined by the UI layer.<br>
+   * This operation is not supported in the RAP UI!
+   * 
+   * @since 4.0.0
+   */
+  void traverseFocusNext();
+
+  /**
+   * Transfers the keyboard focus to the previous location. The previous location is defined as the default backwards
+   * focus
+   * traversal as defined by the UI layer.<br>
+   * This operation is not supported in the RAP UI!
+   * 
+   * @since 4.0.0
+   */
+  void traverseFocusPrevious();
 }

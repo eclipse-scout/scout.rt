@@ -210,7 +210,7 @@ public class DocGenUtilityTest {
      * test documentation
      */
     @Override
-    public String getConfiguredDoc() {
+    protected String getConfiguredDoc() {
       return TEST_DOC;
     }
   }
