@@ -17,12 +17,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
-@Ignore
 public class BundleInspectorTest extends AbstractBundleTest {
 
   @Test
@@ -195,4 +199,28 @@ public class BundleInspectorTest extends AbstractBundleTest {
       uninstallBundles(bundle, fragment);
     }
   }
+
+  @Test
+  public void testGetAllClasses() throws ProcessingException {
+    List<Class> classList = Arrays.asList(BundleInspector.getAllClasses(new IClassFilter() {
+      @Override
+      public boolean accept(Class c) {
+        return true;
+      }
+    }));
+
+    System.out.println("getAllClasses found: " + classList);
+    assertTrue(classList.contains(BundleInspector.class));
+    assertTrue(classList.contains(BundleInspectorTest.class));
+    assertTrue(classList.contains(Platform.class));
+    assertTrue(classList.contains(BundleInspectorTestNested.class));
+    assertTrue(classList.contains(BundleInspectorTestStaticNested.class));
+  }
+
+  public class BundleInspectorTestNested {
+  }
+
+  public static class BundleInspectorTestStaticNested {
+  }
+
 }

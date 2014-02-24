@@ -38,6 +38,7 @@
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-surefire-plugin</artifactId>
             <configuration>
+              <!-- <debugPort>18081</debugPort> -->
               <excludes>
                 <exclude>**/Mail*Test.java</exclude>
               </excludes>
@@ -58,6 +59,7 @@
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-surefire-plugin</artifactId>
             <configuration>
+               <!-- <debugPort>18081</debugPort> -->
               <includes>
                 <include>**/*Test.java</include>
               </includes>

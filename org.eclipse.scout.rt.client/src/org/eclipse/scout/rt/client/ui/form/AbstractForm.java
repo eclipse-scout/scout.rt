@@ -143,6 +143,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   // field replacement support
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
 
+  private String m_classId;
+
   public AbstractForm() throws ProcessingException {
     this(true);
   }
@@ -924,16 +926,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * If the class is annotated with {@link ClassId}, the annotation value is returned.<br/>
-   * Otherwise the class name.
+   * <p>
+   * <li>If a classId was set with {@link #setClassId(String)} this value is returned.
+   * <li>Else if the class is annotated with {@link ClassId}, the annotation value is returned.
+   * <li>Otherwise the class name is returned.
    */
   @Override
   public String classId() {
+    if (m_classId != null) {
+      return m_classId;
+    }
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
     if (getOuterFormField() != null) {
       return simpleClassId + ID_CONCAT_SYMBOL + getOuterFormField().classId();
     }
     return simpleClassId;
+  }
+
+  @Override
+  public void setClassId(String classId) {
+    m_classId = classId;
   }
 
   @Override

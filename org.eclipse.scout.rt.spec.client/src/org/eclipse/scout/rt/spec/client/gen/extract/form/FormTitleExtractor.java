@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 /**
  * Extracts the title texts for a {@link IForm}
  */
+// TODO ASA refactor: rename to EntityPageTitleExtractor and use for TablePages as well
 public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
 
   private boolean m_anchor;
@@ -42,7 +43,12 @@ public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
   }
 
   public static String getAnchorId(IForm form) {
-    return "c_" + form.classId();
+    String classId = form.classId();
+    return getAnchorId(classId);
+  }
+
+  public static String getAnchorId(String classId) {
+    return "c_" + classId;
   }
 
 }

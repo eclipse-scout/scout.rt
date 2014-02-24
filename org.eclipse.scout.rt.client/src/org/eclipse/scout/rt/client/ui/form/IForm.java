@@ -14,7 +14,7 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.ITypeWithSettableClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * on the server. These will in turn contact a persistence layer such as a database.
  */
 @SuppressWarnings("deprecation")
-public interface IForm extends IPropertyObserver, ITypeWithClassId {
+public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   String PROP_TITLE = "title";
   String PROP_MINIMIZE_ENABLED = "minimizeEnabled";

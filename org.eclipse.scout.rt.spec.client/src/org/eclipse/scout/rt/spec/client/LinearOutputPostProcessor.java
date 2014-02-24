@@ -35,7 +35,7 @@ import org.osgi.framework.Bundle;
  */
 public class LinearOutputPostProcessor implements ISpecProcessor {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(LinearOutputPostProcessor.class);
-  private static final String ANCHOR_PREFIX = "lo_";
+  public static final String ANCHOR_PREFIX = "lo_";
   private File m_configFile;
   private File m_outputFile;
 
