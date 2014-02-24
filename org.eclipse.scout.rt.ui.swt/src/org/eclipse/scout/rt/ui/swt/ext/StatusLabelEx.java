@@ -90,7 +90,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
           if (mnemonic == '\0') {
             return;
           }
-          if (Character.toLowerCase(event.character) != mnemonic) {
+          if (Character.toUpperCase(event.character) != Character.toUpperCase(mnemonic)) {
             return;
           }
           event.doit = false;
