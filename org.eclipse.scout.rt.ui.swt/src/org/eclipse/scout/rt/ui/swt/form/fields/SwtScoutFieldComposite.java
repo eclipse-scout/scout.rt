@@ -63,6 +63,19 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
 
       m_swtLabel.setLayoutData(statusLabelGridData);
     }
+    updateMnemonicFocusControl();
+  }
+
+  @Override
+  protected void setSwtField(Control swtField) {
+    super.setSwtField(swtField);
+    updateMnemonicFocusControl();
+  }
+
+  protected void updateMnemonicFocusControl() {
+    if (getSwtLabel() != null && getSwtField() != null) {
+      getSwtLabel().setMnemonicFocusControl(getSwtField());
+    }
   }
 
   public Color getMandatoryFieldBackgroundColor() {

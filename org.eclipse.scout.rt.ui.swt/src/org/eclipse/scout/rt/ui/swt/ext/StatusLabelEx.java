@@ -30,7 +30,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 
 public class StatusLabelEx extends Composite implements ILabelComposite {
   private final ISwtEnvironment m_environment;
@@ -51,6 +53,8 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   private Color m_nonMandatoryForegroundColor;
   protected Color m_mandatoryForegroundColor;
   private String m_nonMandatoryText = "";
+
+  private Control m_mnemonicFocusControl;
 
   public StatusLabelEx(Composite parent, int style, ISwtEnvironment environment) {
     super(parent, SWT.NO_FOCUS);
@@ -78,6 +82,24 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
   protected void createContent(Composite parent, int style) {
     m_label = new CLabelEx(parent, style | m_environment.getFormToolkit().getFormToolkit().getOrientation());
+    m_label.addListener(SWT.Traverse, new Listener() {
+      @Override
+      public void handleEvent(Event event) {
+        if (event.widget == m_label && event.detail == SWT.TRAVERSE_MNEMONIC) {
+          char mnemonic = findMnemonicCharakter(getText());
+          if (mnemonic == '\0') {
+            return;
+          }
+          if (Character.toLowerCase(event.character) != mnemonic) {
+            return;
+          }
+          event.doit = false;
+          if (getMnemonicFocusControl() != null && !getMnemonicFocusControl().isDisposed()) {
+            getMnemonicFocusControl().setFocus();
+          }
+        }
+      }
+    });
     m_environment.getFormToolkit().getFormToolkit().adapt(m_label, false, false);
 
     m_statusLabel = new Label(parent, SWT.NONE);
@@ -122,11 +144,42 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
         }
       }
     }
+  }
 
+  protected char findMnemonicCharakter(String string) {
+    int index = 0;
+    if (StringUtility.isNullOrEmpty(string)) {
+      return '\0';
+    }
+    int length = string.length();
+    do {
+      while (index < length && string.charAt(index) != '&') {
+        index++;
+      }
+      if (++index >= length) {
+        return '\0';
+      }
+      if (string.charAt(index) != '&') {
+        return string.charAt(index);
+      }
+      index++;
+    }
+    while (index < length);
+    return '\0';
   }
 
   public ISwtEnvironment getEnvironment() {
     return m_environment;
+  }
+
+  @Override
+  public Control getMnemonicFocusControl() {
+    return m_mnemonicFocusControl;
+  }
+
+  @Override
+  public void setMnemonicFocusControl(Control mnemonicFocusControl) {
+    m_mnemonicFocusControl = mnemonicFocusControl;
   }
 
   @Override

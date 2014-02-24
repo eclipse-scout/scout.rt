@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.ext;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>ILabelComposite</h3> ...
@@ -57,4 +58,14 @@ public interface ILabelComposite {
   Font getFont();
 
   void setFont(Font f);
+
+  /**
+   * @param mnemonicFocusControl
+   */
+  void setMnemonicFocusControl(Control mnemonicFocusControl);
+
+  /**
+   * @return
+   */
+  Control getMnemonicFocusControl();
 }
