@@ -41,7 +41,7 @@ public class DefaultTypesConfig implements IDocEntityListConfig<Class<?>> {
 
   @Override
   public String getTitle() {
-    return TEXTS.get("org.eclipse.scout.rt.spec.types");
+    return null;
   }
 
 }
