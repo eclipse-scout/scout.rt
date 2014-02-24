@@ -16,12 +16,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.osgi.framework.Bundle;
 
@@ -30,8 +33,9 @@ import org.osgi.framework.Bundle;
  * <p>
  * The generated output files will have the same base filename as the configuration file with differnt ending.
  */
-public class LinearOutputPostProcessor extends AbstractSpecGen implements ISpecProcessor {
+public class LinearOutputPostProcessor implements ISpecProcessor {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(LinearOutputPostProcessor.class);
+  private static final String ANCHOR_PREFIX = "lo_";
   private File m_configFile;
   private File m_outputFile;
 
@@ -44,13 +48,13 @@ public class LinearOutputPostProcessor extends AbstractSpecGen implements ISpecP
    * @throws ProcessingException
    */
   public LinearOutputPostProcessor(String configFile) throws ProcessingException {
-    List<Bundle> sourceBundles = getFileConfig().getSourceBundles();
+    List<Bundle> sourceBundles = SpecIOUtility.getSpecFileConfigInstance().getSourceBundles();
     Collections.reverse(sourceBundles);
     for (Bundle bundle : sourceBundles) {
-      List<String> fileList = SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeSourceDirPath(), getConfigFileFilter(configFile));
+      List<String> fileList = SpecIOUtility.listFiles(bundle, SpecIOUtility.getSpecFileConfigInstance().getRelativeSourceDirPath(), getConfigFileFilter(configFile));
       if (fileList.size() > 0) {
-        m_configFile = new File(getFileConfig().getSpecDir(), configFile);
-        SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeSourceDirPath() + File.separator + configFile, m_configFile);
+        m_configFile = new File(SpecIOUtility.getSpecFileConfigInstance().getSpecDir(), configFile);
+        SpecIOUtility.copyFile(bundle, SpecIOUtility.getSpecFileConfigInstance().getRelativeSourceDirPath() + File.separator + configFile, m_configFile);
         break;
       }
     }
@@ -73,11 +77,50 @@ public class LinearOutputPostProcessor extends AbstractSpecGen implements ISpecP
     if (m_configFile == null || !m_configFile.exists()) {
       return;
     }
+    concatenateFiles();
+    prefixAnchorsAndLinks();
+  }
+
+  // TODO ASA unittest (also test that image links are not prefixed)
+  protected void prefixAnchorsAndLinks() throws ProcessingException {
+    SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\{\\{a:)([^}]+}})"));
+    SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\[\\[)([A-Za-z][A-Za-z0-9_\\.-]+\\|)"));
+  }
+
+  protected static class P_AnchorProcessor implements IStringProcessor {
+
+    private String m_twoGroupRegex;
+
+    /**
+     * @param string
+     */
+    public P_AnchorProcessor(String twoGroupRegex) {
+      m_twoGroupRegex = twoGroupRegex;
+    }
+
+    @Override
+    public String processLine(String input) {
+      Pattern pattern = Pattern.compile(m_twoGroupRegex);
+      Matcher matcher = pattern.matcher(input);
+      StringBuilder sb = new StringBuilder();
+      int index = 0;
+      while (matcher.find()) {
+        sb.append(input.substring(index, matcher.start(0)));
+        sb.append(matcher.group(1)).append(ANCHOR_PREFIX).append(matcher.group(2));
+        index = matcher.end();
+      }
+      sb.append(input.substring(index));
+      return sb.toString();
+    }
+
+  }
+
+  private void concatenateFiles() throws ProcessingException {
     String outputFileName = m_configFile.getName().replace(".config", "");
     List<String> sourceFiles = IOUtility.readLines(m_configFile);
     if (!StringUtility.isNullOrEmpty(outputFileName)) {
       PrintWriter writer = null;
-      m_outputFile = new File(getFileConfig().getMediawikiDir(), outputFileName + ".mediawiki");
+      m_outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), outputFileName + ".mediawiki");
       m_outputFile.delete();
       try {
         m_outputFile.createNewFile();
@@ -85,8 +128,14 @@ public class LinearOutputPostProcessor extends AbstractSpecGen implements ISpecP
         for (String sourceFile : sourceFiles) {
           String mediawikiFile = sourceFile + ".mediawiki";
           LOG.info("appending file. " + mediawikiFile);
-          IOUtility.appendFile(writer, new File(getFileConfig().getMediawikiDir(), mediawikiFile));
-          writer.flush();
+          File file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), mediawikiFile);
+          if (file.exists()) {
+            IOUtility.appendFile(writer, file);
+            writer.flush();
+          }
+          else {
+            LOG.warn("File does not exist: " + file.getPath() + " Skipping...");
+          }
         }
       }
       catch (IOException e) {
@@ -99,18 +148,5 @@ public class LinearOutputPostProcessor extends AbstractSpecGen implements ISpecP
       }
     }
   }
-
-  // TODO ASA what about links?
-//  private void replaceLinks(File f) throws ProcessingException {
-//    MediawikiAnchorCollector c = new MediawikiAnchorCollector(f);
-//    c.replaceLinks(f, getFileConfig().getLinksFile());
-//  }
-//
-//  private void replaceWikiFileLinks(File htmlFile) throws ProcessingException {
-//    HashMap<String, String> map = new HashMap<String, String>();
-//    map.put("/wiki/", "");
-//    map.put(".mediawiki", ".html");
-//    SpecIOUtility.replaceAll(htmlFile, map);
-//  }
 
 }

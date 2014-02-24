@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.spec.client.gen;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 public class TypeSpecGenerator {
   private final IDocConfig m_config;
@@ -28,9 +28,10 @@ public class TypeSpecGenerator {
     m_title = title;
   }
 
-  public IDocSection getDocSection(List<Class<?>> fieldTypes) {
-
-    IDocSection typeSection = DocGenUtility.createDocSection(fieldTypes, m_config.getTypesConfig());
-    return new SectionWithTable("org.eclipse.scout.rt.spec.types", TEXTS.get("org.eclipse.scout.rt.spec.types"), typeSection);
+  public IDocSection getDocSection(List<Class<?>> types) {
+    String anchor = MediawikiUtility.createAnchor(m_id);
+    String titleWithAnchor = MediawikiUtility.transformToWiki(anchor + m_title);
+    IDocSection typeSection = DocGenUtility.createDocSection(types, m_config.getTypesConfig());
+    return new SectionWithTable(m_id, titleWithAnchor, typeSection);
   }
 }

@@ -52,4 +52,15 @@ public final class MediawikiUtility {
     sb.append("[[").append(id).append("|").append(name).append("]]");
     return sb.toString();
   }
+
+  /**
+   * create an anchor
+   * 
+   * @param id
+   * @return
+   */
+  // TODO ASA unittest
+  public static String createAnchor(String id) {
+    return "{{a:" + id + "}}";
+  }
 }

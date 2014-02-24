@@ -40,7 +40,12 @@ public class SpecJob extends Job {
   private final ISpecProcessor[] m_postProcessors;
 
   public SpecJob(Class<? extends IClientSession> clientSessionClass, String pluginName) throws ProcessingException {
-    this(clientSessionClass, STARTUP_TIMEOUT_IN_MS, new LinearOutputPostProcessor("SpecComplete.config"), new MediawikiPostProcessor());
+    this(clientSessionClass,
+        STARTUP_TIMEOUT_IN_MS,
+        new LinearOutputPostProcessor("SpecComplete.config"),
+        new MediawikiAnchorPostProcessor(),
+        new MediawikiPostProcessor(),
+        new HtmlFilePostProcessor("SpecComplete.html"));
   }
 
   /**

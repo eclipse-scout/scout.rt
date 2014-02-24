@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiAnchorCollector;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
@@ -45,7 +44,6 @@ public class ManualSpecTest extends AbstractSpecGen {
       for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeMediawikiSourceDirPath(), getFilter())) {
         File destFile = new File(dest, file);
         SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeMediawikiSourceDirPath() + File.separator + file, destFile);
-        new MediawikiAnchorCollector(destFile).storeAnchors(getFileConfig().getLinksFile());
       }
     }
   }

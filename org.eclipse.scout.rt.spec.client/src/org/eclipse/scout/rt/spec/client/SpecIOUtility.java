@@ -44,6 +44,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.osgi.framework.Bundle;
 
 /**
@@ -52,6 +53,7 @@ import org.osgi.framework.Bundle;
 public final class SpecIOUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecIOUtility.class);
   public static final String ENCODING = "utf-8";
+  private static SpecFileConfig s_specFileConfig;
 
   private SpecIOUtility() {
   }
@@ -231,29 +233,61 @@ public final class SpecIOUtility {
     }
   }
 
-  public static void replaceAll(File in, Map<String, String> m) throws ProcessingException {
+  public static void replaceAll(File in, final Map<String, String> m) throws ProcessingException {
+    process(in, new IStringProcessor() {
+      @Override
+      public String processLine(String input) {
+        return replaceAll(input, m);
+      }
+    });
+  }
+
+  /**
+   * Interface for processing a String
+   */
+  public static interface IStringProcessor {
+    /**
+     * @param input
+     *          String input
+     * @return the processed String
+     */
+    String processLine(String input);
+  }
+
+  /**
+   * Process all lines of a file with a line-processor.
+   * <p>
+   * Processed lines are written in a temporary file. When all lines are processed, the temporary file is copied back to
+   * the original file and the temporary file is deleted.
+   * 
+   * @param file
+   * @param processor
+   * @throws ProcessingException
+   */
+  // TODO ASA unitTest process(File file, IStringProcessor processor)
+  public static void process(File file, IStringProcessor processor) throws ProcessingException {
     FileReader reader = null;
     FileWriter writer = null;
     BufferedReader br = null;
-    File temp = new File(in.getParent(), in.getName() + "_temp");
+    File temp = new File(file.getParent(), file.getName() + "_temp");
 
     try {
-      reader = new FileReader(in);
+      reader = new FileReader(file);
       writer = new FileWriter(temp);
       br = new BufferedReader(reader);
 
       String line;
       while ((line = br.readLine()) != null) {
-        String repl = replaceAll(line, m);
+        String repl = processor.processLine(line);
         writer.write(repl);
         writer.write(System.getProperty("line.separator"));
       }
     }
     catch (FileNotFoundException e) {
-      e.printStackTrace();
+      throw new ProcessingException("Error processing file", e);
     }
     catch (IOException e) {
-      e.printStackTrace();
+      throw new ProcessingException("Error processing file", e);
     }
     finally {
       try {
@@ -274,7 +308,7 @@ public final class SpecIOUtility {
         // NOP
       }
     }
-    SpecIOUtility.copy(temp, in);
+    SpecIOUtility.copy(temp, file);
     temp.delete();
   }
 
@@ -387,5 +421,19 @@ public final class SpecIOUtility {
       }
     }
     return list;
+  }
+
+  /**
+   * @return
+   */
+  public static SpecFileConfig getSpecFileConfigInstance() {
+    if (s_specFileConfig == null) {
+      s_specFileConfig = new SpecFileConfig();
+    }
+    return s_specFileConfig;
+  }
+
+  public static void setSpecFileConfig(SpecFileConfig specFileConfig) {
+    SpecIOUtility.s_specFileConfig = specFileConfig;
   }
 }

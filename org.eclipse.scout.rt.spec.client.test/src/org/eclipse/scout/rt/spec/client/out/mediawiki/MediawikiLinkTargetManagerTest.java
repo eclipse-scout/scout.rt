@@ -60,10 +60,11 @@ public class MediawikiLinkTargetManagerTest {
   @Test
   public void testWriteLinks() throws Exception {
     ArrayList<ILinkTarget> links = new ArrayList<ILinkTarget>();
-    links.add(new LinkTarget("target1", "value1", ""));
-    links.add(new LinkTarget("target2", "value2", ""));
+    links.add(new LinkTarget("target1", "fileA"));
+    links.add(new LinkTarget("target2", "fileB"));
     m_writer.writeLinks(links);
-    assertEquals("#value1", m_writer.readLinks().get("target1"));
+    assertEquals("fileA#target1", m_writer.readLinks().get("target1"));
+    assertEquals("fileB#target2", m_writer.readLinks().get("target2"));
   }
 
 }

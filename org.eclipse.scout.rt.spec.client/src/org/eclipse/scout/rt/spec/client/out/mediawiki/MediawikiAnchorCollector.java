@@ -16,20 +16,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.SpecIOUtility;
 import org.eclipse.scout.rt.spec.client.link.DocLink;
 
 /**
  *
  */
+// TODO ASA cleanup/rename MediawikiAnchorCollector; consolidate with MediawikiLinkTargetManager
 public class MediawikiAnchorCollector {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiAnchorCollector.class);
   private final File m_input;
 
   private static final String LINK_START = "[[";
@@ -38,45 +38,6 @@ public class MediawikiAnchorCollector {
 
   public MediawikiAnchorCollector(File input) {
     m_input = input;
-  }
-
-  /**
-   * @param in
-   *          a file containing anchors
-   * @param out
-   *          the links Property file
-   * @throws ProcessingException
-   */
-  public void storeAnchors(File out) throws ProcessingException {
-    Properties props = getAnchorProperties();
-    FileWriter writer = null;
-    try {
-      writer = new FileWriter(out, true);
-      props.store(writer, null);
-    }
-    catch (IOException e) {
-      try {
-        if (writer != null) {
-          writer.close();
-        }
-      }
-      catch (IOException e1) {
-        //nop
-      }
-    }
-  }
-
-  /**
-   * Read all anchors {{XY}} in a file and creates properties of the form
-   * XY=fileName#XY for them.
-   **/
-  public Properties getAnchorProperties() throws ProcessingException {
-    List<String> anchors = collectAnchors(m_input);
-    Properties props = new Properties();
-    for (String a : anchors) {
-      props.setProperty(a, m_input.getName() + "#" + a);
-    }
-    return props;
   }
 
   public void replaceLinks(File in, File linksFile) throws ProcessingException {
@@ -93,8 +54,9 @@ public class MediawikiAnchorCollector {
       p.load(new FileReader(linksFile));
 
       String line;
+      // TODO ASA refactor: use SpecIOUtility.process(...)
       while ((line = br.readLine()) != null) {
-        String repl = replaceText(line, p);
+        String repl = replaceLink(line, p);
         writer.write(repl);
         writer.write(System.getProperty("line.separator"));
       }
@@ -128,7 +90,7 @@ public class MediawikiAnchorCollector {
     temp.delete();
   }
 
-  public String replaceText(String s, Properties p) {
+  protected String replaceLink(String s, Properties p) {
 
     int startPos = 0;
     boolean finished = false;
@@ -166,7 +128,7 @@ public class MediawikiAnchorCollector {
       return toWikiString(newLink);
     }
     if (!tag.startsWith("#") && !tag.startsWith("Image")) {
-      System.out.println(tag + " not found in file " + m_input.getName() + ", replacing with plain text: " + link.getDisplayName());
+      LOG.warn(tag + " not found in file " + m_input.getName() + ", replacing with plain text: " + link.getDisplayName());
       return link.getDisplayName();
     }
     return toWikiString(link);
@@ -176,55 +138,4 @@ public class MediawikiAnchorCollector {
     return LINK_START + link.getTargetId() + LINK_TARGET_END + link.getDisplayName() + LINK_END;
   }
 
-  /**
-   * Collects all anchors: texts in double braces: {{ }} in a file
-   **/
-  public List<String> collectAnchors(File in) throws ProcessingException {
-    FileReader reader = null;
-    BufferedReader br = null;
-    try {
-      reader = new FileReader(in);
-      br = new BufferedReader(reader);
-      ArrayList<String> list = new ArrayList<String>();
-
-      String line;
-      while ((line = br.readLine()) != null) {
-        String tag = readAnchorTag(line);
-        if (!tag.isEmpty()) {
-          list.add(tag);
-        }
-      }
-      return list;
-    }
-    catch (FileNotFoundException e) {
-      throw new ProcessingException("Error replacing links", e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("Error replacing links", e);
-    }
-    finally {
-      try {
-        if (br != null) {
-          br.close();
-        }
-      }
-      catch (IOException e) {
-        // NOP
-      }
-    }
-  }
-
-  /**
-   * @param inputLine
-   * @return text enclosed in double braces: {{ }}
-   */
-  public String readAnchorTag(String inputLine) {
-    String anchorPattern = "\\{\\{([^\\{\\}]+?)\\}\\}";
-    Pattern p = Pattern.compile(anchorPattern);
-    Matcher m = p.matcher(inputLine);
-    if (m.find()) {
-      return m.group().replaceAll("\\{", "").replaceAll("\\}", "").trim();
-    }
-    return "";
-  }
 }

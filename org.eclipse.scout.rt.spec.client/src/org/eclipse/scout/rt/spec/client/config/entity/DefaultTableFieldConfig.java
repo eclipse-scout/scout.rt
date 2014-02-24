@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.field.TableFieldTypeWithLabelExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FieldDetailTitleExtractor;
 
 /**
  *
@@ -30,7 +30,7 @@ public class DefaultTableFieldConfig extends DefaultEntityConfig<ITableField<? e
 
   @Override
   public IDocTextExtractor<ITableField<? extends ITable>> getTitleExtractor() {
-    return new TableFieldTypeWithLabelExtractor<ITableField<? extends ITable>>();
+    return new FieldDetailTitleExtractor<ITableField<? extends ITable>>();
   }
 
 }

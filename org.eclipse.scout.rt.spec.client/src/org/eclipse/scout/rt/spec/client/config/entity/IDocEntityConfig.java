@@ -47,6 +47,7 @@ public interface IDocEntityConfig<T> {
   /**
    * Configuration describing an extractor for the title of the entity
    * 
+   * @param string
    * @return {@link IDocTextExtractor}
    */
   IDocTextExtractor<T> getTitleExtractor();

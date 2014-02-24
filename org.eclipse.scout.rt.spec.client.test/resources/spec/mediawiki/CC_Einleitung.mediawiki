@@ -1,6 +1,6 @@
-== Einleitung {{CC:Intro}} ==
+== Einleitung {{a:CC.Intro}} ==
 This is an introduction to the contact center. Bla bla...
 
-New anchor {{CC:New}}
+New anchor {{a:CC.New}}
 
 bla

@@ -19,6 +19,6 @@ public interface ILinkTarget {
   String getTargetId();
 
   /** Display name of the link */
-  String getDisplayName();
+  String getTargetIdWithFileName();
 
 }

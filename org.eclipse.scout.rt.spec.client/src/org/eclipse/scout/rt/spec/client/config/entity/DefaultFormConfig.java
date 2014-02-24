@@ -27,7 +27,7 @@ public class DefaultFormConfig extends DefaultEntityConfig<IForm> {
   @Override
   public List<IDocTextExtractor<IForm>> getPropertyTextExtractors() {
     List<IDocTextExtractor<IForm>> propertyTemplate = new ArrayList<IDocTextExtractor<IForm>>();
-    propertyTemplate.add(new FormTitleExtractor());
+    propertyTemplate.add(new FormTitleExtractor(false));
     propertyTemplate.add(new DescriptionExtractor<IForm>());
     propertyTemplate.add(new TypeExtractor<IForm>());
     return propertyTemplate;
@@ -35,7 +35,7 @@ public class DefaultFormConfig extends DefaultEntityConfig<IForm> {
 
   @Override
   public IDocTextExtractor<IForm> getTitleExtractor() {
-    return new FormTitleExtractor();
+    return new FormTitleExtractor(true);
   }
 
 }
