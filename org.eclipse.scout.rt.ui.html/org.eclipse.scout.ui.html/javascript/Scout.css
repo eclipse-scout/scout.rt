@@ -825,6 +825,77 @@ fill: #7f7f7f;
 fill: #fe9915
 }	
 
+/* organize table */
+/* chart - axis and data select */
+
+#OrganizeColumn{
+float: left;
+display: inline-block;
+}
+
+.column-item{
+position: relative;
+margin:5px 0px 0px 0px;
+padding-left: 7px;
+padding-top: 4px;
+height: 26px;
+line-height: 21px;
+width: 500px;
+background-color: #e2e2e2;
+cursor: pointer;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.column-item:hover{
+background-color: #ccc;
+}
+
+.column-item.selected{
+background-color: #fe9915;
+color: #fff;
+}
+
+.column-command {
+display: inline-block;
+float: right;
+width: 26px;
+heigth: 26px;
+color: #fff;
+padding-left: 4px; 
+font-family: fontAwesome;
+font-size: 16px;
+line-height: 20px;
+}
+
+.column-separator {
+display: inline-block;
+float: right;
+padding: 7px;
+}
+
+.column-command.selected {
+color: #fe9915  !important;
+}
+
+.column-command.active {
+color: #0082A1
+}
+	
+.column-command.sort-up:before { content: "\F160";}
+.column-command.sort-down:before { content: "\F161";}
+.column-command.filter:before { content: "\F0B0";}
+.column-command.add:before { content: "\F067";}
+.column-command.remove:before { content: "\F00D";}
+.column-command.change:before { content: "\F0AD";}
+.column-command.move-up:before { content: "\F077";}
+.column-command.move-down:before { content: "\F078";}
+
+.column-command:hover {
+color: #fe9915  !important;
+}
+
+
 /* menu */
 
 #MenuControl{
@@ -1005,3 +1076,4 @@ width: 32px;
 #TableData .key-box.bottom1 { bottom: 54px;}
 #TableData .key-box.bottom2 { bottom: 32px;}
 #TableData .key-box.bottom3 { bottom: 10px;}
+

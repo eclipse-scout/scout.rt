@@ -43,7 +43,7 @@ Scout = function (sessionPartId) {
     // 2. instance variables 
     this.variable = variable;
     return this
-    
+        
     // 3. named functions used for construction or event handling
     function onClick () {
       // direct access to 'variable'
@@ -55,7 +55,7 @@ Scout = function (sessionPartId) {
   }
   
   //instance functions
-  DesktopTable.prototpye.laterUsage = function () {
+  DesktopTable.prototype.laterUsage = function () {
     // access to 'this.variable'
     log(this.variable);
     
