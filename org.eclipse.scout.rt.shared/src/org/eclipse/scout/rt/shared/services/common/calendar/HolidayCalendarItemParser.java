@@ -52,7 +52,6 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
  * }
  * </pre>
  */
-@SuppressWarnings("deprecation")
 @Priority(-1)
 public class HolidayCalendarItemParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarItemParser.class);

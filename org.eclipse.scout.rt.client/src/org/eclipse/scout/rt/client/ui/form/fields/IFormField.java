@@ -61,7 +61,6 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * 
  * @see IForm
  */
-@SuppressWarnings("deprecation")
 public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   /*
    * Properties
