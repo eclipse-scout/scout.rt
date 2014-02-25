@@ -27,6 +27,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -94,6 +95,12 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
               // separate popup window, e.g. a context-menu to copy, cut or paste text
               return;
             }
+            if (w instanceof JDialog) {
+              if (w.getOwner() == getSwingWindow().getOwner()) {
+                //If a JDialog was opened, the JDialog must be closed by the user before we can continue
+                return;
+              }
+            }
             Point p = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), getSwingOwnerComponent());
             if (!getSwingOwnerComponent().contains(p)) {
               closeWindow(getSwingWindow());
@@ -130,7 +137,7 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
       Toolkit.getDefaultToolkit().removeAWTEventListener(m_awtListener);
       m_awtListener = null;
     }
-    
+
     if (m_focusComponent != null) {
       if (m_focusFocusListener != null) {
         m_focusComponent.removeFocusListener(m_focusFocusListener);
