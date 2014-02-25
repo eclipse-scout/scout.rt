@@ -27,8 +27,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.IGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalGroupBoxBodyGrid;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
@@ -41,7 +43,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   private List<IGroupBox> m_groupBoxes;
   private List<IButton> m_customButtons;
   private List<IButton> m_systemButtons;
-  private GroupBoxBodyGrid m_bodyGrid;
+  private IGroupBoxBodyGrid m_bodyGrid;
   private GroupBoxProcessButtonGrid m_customProcessButtonGrid;
   private GroupBoxProcessButtonGrid m_systemProcessButtonGrid;
 
@@ -74,6 +76,17 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Order(200)
   protected int getConfiguredGridColumnCount() {
     return -1;
+  }
+
+  /**
+   * <code>true</code> to layout row first <code>false</code> to layout column first
+   * 
+   * @return
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  protected boolean getConfiguredGridLayoutHorizontal() {
+    return false;
   }
 
   /**
@@ -225,7 +238,12 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
-    m_bodyGrid = new GroupBoxBodyGrid(this);
+    if (getConfiguredGridLayoutHorizontal()) {
+      m_bodyGrid = new HorizontalGroupBoxBodyGrid(this);
+    }
+    else {
+      m_bodyGrid = new VerticalGroupBoxBodyGrid(this);
+    }
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
     m_systemProcessButtonGrid = new GroupBoxProcessButtonGrid(this, false, true);
     super.initConfig();

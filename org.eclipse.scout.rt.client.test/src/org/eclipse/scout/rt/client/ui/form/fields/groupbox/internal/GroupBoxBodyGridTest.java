@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.junit.Test;
 
 /**
- * JUnit tests for {@link GroupBoxBodyGrid}
+ * JUnit tests for {@link VerticalGroupBoxBodyGrid}
  */
 public class GroupBoxBodyGridTest {
 
@@ -80,7 +80,7 @@ public class GroupBoxBodyGridTest {
   @Test
   public void testLayout3x3() {
     GroupBox g = new GroupBox();
-    GroupBoxBodyGrid grid = new GroupBoxBodyGrid(g);
+    VerticalGroupBoxBodyGrid grid = new VerticalGroupBoxBodyGrid(g);
     grid.validate();
     assertEquals(2, grid.getGridRowCount());
     assertEquals(2, grid.getGridColumnCount());

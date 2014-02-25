@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
+
+import java.io.PrintStream;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -164,6 +166,24 @@ public class GridCell {
     else {
       return false;
     }
+  }
+
+  void printCell(PrintStream out, String pref) {
+    out.println(pref + "field: " + getField());
+    if (m_up != null) {
+      out.println(pref + "-up: " + m_up.getField());
+//      m_up.printCell(out, pref + "  ");
+    }
+    if (m_right != null) {
+      out.println(pref + "-right: " + m_right.getField());
+      m_right.printCell(out, pref + "  ");
+    }
+    if (m_down != null) {
+
+      out.println(pref + "-down: " + m_down.getField());
+      m_down.printCell(out, pref + "  ");
+    }
+
   }
 
   @Override
