@@ -27,16 +27,24 @@ Scout = function (sessionPartId) {
       log(server, this.id)
     };
   }();
-
   
   // interface to outside
   this.add = function add ($div) {
     // create widget ...
+    // use session
+
+    // append classes dynamiacly
+    // if (typeof this.MySuperField === 'undefined') {
+    // $.getScript('XXX.js');
+    // DesktopTable.prototype.newFunc() {};
+    // this.MySuperField = function ()....
+    // }
+  
   };
   
   
   // each 'class' in one file
-  DesktopTable = function Desktop () {
+  DesktopTable = function DesktopTable () {
     // 1. construction code
     var variable;
     
