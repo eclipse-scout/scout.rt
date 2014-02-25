@@ -823,7 +823,12 @@ fill: #7f7f7f;
 
 .map-item.selected {
 fill: #fe9915
-}	
+}
+
+.map-item.has-data:hover {
+fill: #fe9915 !important;
+}
+	
 
 /* organize table */
 /* chart - axis and data select */
