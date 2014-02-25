@@ -197,17 +197,17 @@ Scout.DesktopTable = function (scout, $bench, model) {
       var row = table[r];
 
       rowString += '<div class="table-row">';
-      
+
       for (var c = 0; c < row.length; c++) {
         var column = model.columns[c],
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
           allign = (column.type == 'int' || column.type == 'float') ? 'text-align: right; ' : '';
-          value = row[c];   
+          value = row[c];
 
         if (column.type == 'int') value = $.numberToString(parseFloat(value), 0);
         if (column.type == 'float') value = $.numberToString(parseFloat(value), 2);
-        
+
         rowString += '<div style = "' + style + allign + '">' + value + '</div>';
       }
 
@@ -305,6 +305,9 @@ Scout.DesktopTable = function (scout, $bench, model) {
     // selection
     $rowSelected = $('.row-selected');
 
+    //FIXME added by cgu to make sure clickRowMenu is registered for every instance of DesktopTable
+    $('#MenuRow').remove();
+
     // make menu - if not already there
     var $menuRow = $('#MenuRow');
     if ($menuRow.length === 0) {
@@ -334,11 +337,11 @@ Scout.DesktopTable = function (scout, $bench, model) {
 
   function clickRowMenu (event) {
     var $clicked = $(this),
-      id = model.id,
+      nodeId = model.nodeId,
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.Menu(scout, model.outlineId, id, x, y);
+    new Scout.Menu(scout, model.outlineId, nodeId, x, y);
   }
 
   function toggleSelect () {

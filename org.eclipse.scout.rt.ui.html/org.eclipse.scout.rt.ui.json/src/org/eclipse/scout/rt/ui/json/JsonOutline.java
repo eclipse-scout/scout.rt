@@ -13,11 +13,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -472,7 +474,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       else if ("BusinessTablePage".equals(page.getNodeId()) || "BusinessLargeTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = BUSINESS_COLUMN;
         bench.put("graph", "");
-        bench.put("map", "");
+        bench.put("map", "Karte");
       }
       else if ("TaskTablePage".equals(page.getNodeId())) {
         jsonColumnsRaw = TASKS_COLUMN;
@@ -602,7 +604,27 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
 
   protected void handleUiMenuEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
     try {
-      List<IMenu> menus = collectMenus(false, true);
+      String nodeId = extractNodeId(req);
+//      final String rowId = req.getEventObject().getString("rowId");
+      final ITreeNode node = findTreeNode(nodeId);
+      List<IMenu> menus = null;
+      if (node instanceof IPageWithTable) {
+        final ITable table = ((IPageWithTable) node).getTable();
+
+//        new ClientSyncJob("Table row click", getJsonSession().getClientSession()) {
+//          @Override
+//          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+//            ITableRow row = table.getRow(Integer.parseInt(rowId));
+//            table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
+//          }
+//        }.runNow(new NullProgressMonitor());
+
+        menus = collectRowMenus(table, true, false);
+      }
+      else {
+        menus = collectMenus(false, true);
+      }
+
       JSONArray jsonMenus = new JSONArray();
       for (IMenu menu : menus) {
         JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
@@ -665,6 +687,23 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
         }
         if (nodeActions) {
           menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
+        }
+      }
+    }.runNow(new NullProgressMonitor());
+
+    return Collections.unmodifiableList(menuList);
+  }
+
+  protected List<IMenu> collectRowMenus(final ITable table, final boolean emptySpaceActions, final boolean nodeActions) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        if (emptySpaceActions) {
+          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
+        }
+        if (nodeActions) {
+          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
         }
       }
     }.runNow(new NullProgressMonitor());
