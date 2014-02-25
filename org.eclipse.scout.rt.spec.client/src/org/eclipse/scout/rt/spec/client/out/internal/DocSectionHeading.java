@@ -10,34 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.out.internal;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.spec.client.out.IDocSectionHeading;
 
 /**
  * {@link IDocSectionHeading}
  */
 public class DocSectionHeading implements IDocSectionHeading {
-  private final String m_id;
   private String m_name;
 
-  public DocSectionHeading(String id, String name) {
-    m_id = id;
+  public DocSectionHeading(String name) {
     m_name = name;
-  }
-
-  @Override
-  public String getId() {
-    return m_id;
   }
 
   @Override
   public String getName() {
     return m_name;
-  }
-
-  @Override
-  public boolean isValid() {
-    return !StringUtility.isNullOrEmpty(getId()) && !StringUtility.isNullOrEmpty(getName());
   }
 
 }

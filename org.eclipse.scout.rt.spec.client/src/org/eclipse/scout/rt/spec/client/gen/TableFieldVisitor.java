@@ -42,23 +42,22 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
   }
 
   private IDocSection createDocSection(ITableField<?> field) {
-    String id = m_config.getTableFieldConfig().getIdExtractor().getText(field);
     String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
     IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuConfig());
     IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnConfig());
     // TODO ASA refactor if/else cascade
     if (menuSection != null) {
       if (columnsSection != null) {
-        return new SectionWithTable(id, title, menuSection, columnsSection);
+        return new SectionWithTable(title, menuSection, columnsSection);
       }
       else {
-        return new SectionWithTable(id, title, menuSection);
+        return new SectionWithTable(title, menuSection);
       }
     }
     if (columnsSection != null) {
-      return new SectionWithTable(id, title, columnsSection);
+      return new SectionWithTable(title, columnsSection);
     }
-    return new SectionWithTable(id, title);
+    return new SectionWithTable(title);
   }
 
   @Override

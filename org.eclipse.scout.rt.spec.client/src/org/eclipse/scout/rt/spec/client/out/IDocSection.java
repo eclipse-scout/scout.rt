@@ -16,11 +16,6 @@ package org.eclipse.scout.rt.spec.client.out;
 public interface IDocSection {
 
   /**
-   * @return a unique id
-   */
-  String getId();
-
-  /**
    * @return a title or heading of the section
    */
   String getTitle();

@@ -15,19 +15,26 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.gen.PageSpecGenerator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
+import org.junit.Test;
 
 /**
  *
  */
 public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
 
-  public void printAllFields() throws ProcessingException {
-    IPageWithTable<? extends ITable> page = createAndStartTablePage();
-    IDocSection doc = generate(page);
-    write(doc, page.classId(), new String[]{}, page.getClass().getSimpleName());
+  @Override
+  @Test
+  public void generateSpec() throws ProcessingException {
+    IPageWithTable<? extends ITable> page = createAndInitTablePage();
+    IDocSection doc = generateDocSection(page);
+    writeMediawikiFile(doc, getFileBaseName(page), new String[]{});
   }
 
-  protected IDocSection generate(IPageWithTable<? extends ITable> page) {
+  protected String getFileBaseName(IPageWithTable<? extends ITable> page) {
+    return page.getClass().getSimpleName() + "_" + page.classId();
+  }
+
+  protected IDocSection generateDocSection(IPageWithTable<? extends ITable> page) {
     PageSpecGenerator g = new PageSpecGenerator(getConfiguration());
     return g.getDocSection(page);
   }
@@ -35,6 +42,6 @@ public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
   /**
    * @return
    */
-  public abstract IPageWithTable<? extends ITable> createAndStartTablePage() throws ProcessingException;
+  public abstract IPageWithTable<? extends ITable> createAndInitTablePage() throws ProcessingException;
 
 }

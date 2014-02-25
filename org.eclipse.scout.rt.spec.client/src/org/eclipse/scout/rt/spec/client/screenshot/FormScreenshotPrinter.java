@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.spec.client.screenshot;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -27,21 +27,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.spec.client.FormFieldUtility;
 
 /**
- *
+ * Screenshot printer for forms which allows generation of screenshots of an entire forms as well as screenshots of
+ * hidden tabboxes.
  */
-public class FormPrinter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintFormListener.class);
+public class FormScreenshotPrinter {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintScreenshotsFormListener.class);
   private final File m_destinationFolder;
   private final String m_contentType;
 
-  public FormPrinter(File destinationFolder) {
+  public FormScreenshotPrinter(File destinationFolder) {
     this(destinationFolder, "image/jpg");
   }
 
-  /**
-   *
-   */
-  public FormPrinter(File destinationFolder, String contentType) {
+  public FormScreenshotPrinter(File destinationFolder, String contentType) {
     m_destinationFolder = destinationFolder;
     m_contentType = contentType;
   }
@@ -55,8 +53,7 @@ public class FormPrinter {
   }
 
   /**
-   * Returns all
-   * Adds form and fields to print queues.
+   * Returns form and tab boxes for print queue.
    * <p>
    * Collects hidden tab boxes (not selected) to be printed, because they do not appear on the print of the form, and
    * add them to the print queue.
@@ -64,9 +61,9 @@ public class FormPrinter {
    * 
    * @param form
    */
-  public Map<File, Object> getPrintObjects(IForm form) {
-    LinkedHashMap<File, Object> printMap = new LinkedHashMap<File, Object>();
-    printMap.put(getPrintFile(form), form);
+  public List<Object> getPrintObjects(IForm form) {
+    ArrayList<Object> printMap = new ArrayList<Object>();
+    printMap.add(form);
     for (IFormField field : form.getAllFields()) {
       if (field instanceof ITabBox && field.isVisible()) {
         final ITabBox tabBox = (ITabBox) field;
@@ -78,18 +75,13 @@ public class FormPrinter {
         if (tabBox.isVisible()) {
           for (final IGroupBox g : tabBox.getGroupBoxes()) {
             if (g != selectedTab) {
-              printMap.put(getPrintFile(g), g);
+              printMap.add(g);
             }
           }
         }
       }
     }
     return printMap;
-  }
-
-  public File[] getPrintFiles(IForm form) {
-    Map<File, Object> printObjects = getPrintObjects(form);
-    return CollectionUtility.toArray(printObjects.keySet(), File.class);
   }
 
   protected File getPrintFile(Object o) {
@@ -107,9 +99,8 @@ public class FormPrinter {
     return new File(getDestinationFolder(), name + "." + ext);
   }
 
-  protected void printGroupBox(IGroupBox g) {
-    File out = getPrintFile(g);
-    LOG.info("Printing: {}", out.getPath());
+  protected void printGroupBox(IGroupBox g, File file) {
+    LOG.info("Printing: {}", file.getPath());
     ICompositeField parentTab = g.getParentField();
     if (!g.isVisible()) {
       g.setVisible(true);
@@ -117,28 +108,27 @@ public class FormPrinter {
     if (parentTab instanceof ITabBox) {
       ((ITabBox) parentTab).setSelectedTab(g);
     }
-    getDestinationFolder().mkdirs();
-    Map<String, Object> parameters = createPrintParams(out);
+    Map<String, Object> parameters = createPrintParams(file);
     parentTab.printField(PrintDevice.File, parameters);
   }
 
-  protected void printForm(IForm form) {
-    File out = getPrintFile(form);
-    LOG.info("Printing: {}", out.getPath());
-    getDestinationFolder().mkdirs();
-    Map<String, Object> parameters = createPrintParams(out);
+  protected void printForm(IForm form, File file) {
+    LOG.info("Printing: {}", file.getPath());
+    Map<String, Object> parameters = createPrintParams(file);
     form.printForm(PrintDevice.File, parameters);
   }
 
   protected void print(Object o) {
+    File file = getPrintFile(o);
+    getDestinationFolder().mkdirs();
     if (o instanceof IForm) {
-      printForm((IForm) o);
+      printForm((IForm) o, file);
     }
-    else if (o instanceof IFormField) {
-      printGroupBox((IGroupBox) o);
+    else if (o instanceof IGroupBox) {
+      printGroupBox((IGroupBox) o, file);
     }
     else {
-      LOG.error("Could not print field {}", o);
+      LOG.error("Could not print object {}", o);
     }
   }
 

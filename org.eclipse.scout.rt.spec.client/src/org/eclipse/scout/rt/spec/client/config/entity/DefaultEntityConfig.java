@@ -45,12 +45,6 @@ public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEnti
   }
 
   @Override
-  // TODO ASA do we need getIdExtractor(); or could we use classId() directly instead?
-  public IDocTextExtractor<T> getIdExtractor() {
-    return new TypeExtractor<T>();
-  }
-
-  @Override
   public IDocTextExtractor<T> getTitleExtractor() {
     return new SimpleTypeTextExtractor<T>();
   }

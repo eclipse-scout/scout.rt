@@ -43,11 +43,12 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
     m_supertype = supertype;
   }
 
+  @Override
   @Test
-  public void generateFieldTypeSpec() throws ProcessingException {
+  public void generateSpec() throws ProcessingException {
     Class[] fieldTypes = getAllClasses();
     IDocSection doc = generate(fieldTypes);
-    write(doc, m_id, new String[]{}, m_id);
+    writeMediawikiFile(doc, m_id, new String[]{});
   }
 
   protected Class[] getAllClasses() throws ProcessingException {

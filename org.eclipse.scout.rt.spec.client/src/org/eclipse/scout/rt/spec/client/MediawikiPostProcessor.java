@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.FormTitleExtractor;
@@ -45,7 +46,7 @@ public class MediawikiPostProcessor implements ISpecProcessor {
       // TODO ASA accept other types that needs to be linked like [[CompanyForm|Company]
       @Override
       public boolean accept(Class c) {
-        return IForm.class.isAssignableFrom(c);
+        return IForm.class.isAssignableFrom(c) || IPage.class.isAssignableFrom(c);
       }
     });
     for (Class c : classes) {

@@ -17,19 +17,19 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 public class TypeSpecGenerator {
   private final IDocConfig m_config;
-  private String m_id;
+  private String m_anchorId;
   private String m_title;
 
-  public TypeSpecGenerator(IDocConfig config, String id, String title) {
+  public TypeSpecGenerator(IDocConfig config, String anchorId, String title) {
     m_config = config;
-    m_id = id;
+    m_anchorId = anchorId;
     m_title = title;
   }
 
   public IDocSection getDocSection(Class[] types) {
-    String anchor = MediawikiUtility.createAnchor(m_id);
+    String anchor = MediawikiUtility.createAnchor(m_anchorId);
     String titleWithAnchor = MediawikiUtility.transformToWiki(anchor + m_title);
     IDocSection typeSection = DocGenUtility.createDocSection(types, m_config.getTypesConfig());
-    return new SectionWithTable(m_id, titleWithAnchor, typeSection);
+    return new SectionWithTable(titleWithAnchor, typeSection);
   }
 }

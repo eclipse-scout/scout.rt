@@ -120,7 +120,7 @@ public final class DocGenUtility {
       String[][] rowArray = CollectionUtility.toArray(rows, String[].class);
       String[] headers = getHeaders(textExtractors);
       IDocTable table = new DocTable(headers, rowArray);
-      return new SectionWithTable(null, config.getTitle(), table);
+      return new SectionWithTable(config.getTitle(), table);
     }
     return null;
   }

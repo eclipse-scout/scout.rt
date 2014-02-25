@@ -20,8 +20,9 @@ import org.osgi.framework.Bundle;
 // TODO ASA javadoc
 public class ManualSpecTest extends AbstractSpecGen {
 
+  @Override
   @Test
-  public void copy() throws ProcessingException {
+  public void generateSpec() throws ProcessingException {
     copyMediawikiFiles();
     copyImages();
   }

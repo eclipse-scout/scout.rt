@@ -22,12 +22,12 @@ public class SectionWithTable implements IDocSection {
   private final IDocSection[] m_subSections;
   private final DocSectionHeading m_docSectionHeading;
 
-  public SectionWithTable(String id, String title, IDocSection... subSections) {
-    this(id, title, null, subSections);
+  public SectionWithTable(String title, IDocSection... subSections) {
+    this(title, null, subSections);
   }
 
-  public SectionWithTable(String id, String title, IDocTable table, IDocSection... subSections) {
-    m_docSectionHeading = new DocSectionHeading(id, title);
+  public SectionWithTable(String title, IDocTable table, IDocSection... subSections) {
+    m_docSectionHeading = new DocSectionHeading(title);
     m_table = table;
     m_subSections = subSections;
   }
@@ -35,11 +35,6 @@ public class SectionWithTable implements IDocSection {
   @Override
   public String getTitle() {
     return m_docSectionHeading.getName();
-  }
-
-  @Override
-  public String getId() {
-    return m_docSectionHeading.getId();
   }
 
   @Override

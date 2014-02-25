@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultEntityConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  *
@@ -36,11 +36,6 @@ public class TestConfigIgnoreDoc extends DefaultEntityConfig<IFormField> {
     ArrayList<IDocTextExtractor<IFormField>> p = new ArrayList<IDocTextExtractor<IFormField>>();
     p.add(new TypeExtractor<IFormField>());
     return p;
-  }
-
-  @Override
-  public IDocTextExtractor<IFormField> getIdExtractor() {
-    return null;
   }
 
 }

@@ -47,12 +47,12 @@ public class MediawikiWriter {
    */
   public void write() throws ProcessingException {
     try {
-      LOG.info("writing section " + m_section.getId());
+      LOG.info("writing section " + m_section.getTitle());
       appendSection(m_section, 2, true);
       m_wikiWriter.flush();
     }
     catch (IOException e) {
-      String errorText = "Unable to write wikimedia file for " + m_section.getId();
+      String errorText = "Unable to write wikimedia file for " + m_section.getTitle();
       LOG.error(errorText);
       throw new ProcessingException(errorText, e);
     }
@@ -68,7 +68,7 @@ public class MediawikiWriter {
 
   private void appendSection(IDocSection section, int headingLevel, boolean appendImages) throws IOException {
     if (section.isDisplayed()) {
-      LOG.info("writing section " + section.getId());
+      LOG.info("writing section " + section.getTitle());
       appendHeading(section, headingLevel);
       appendTable(section);
       if (appendImages) {
