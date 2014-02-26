@@ -54,7 +54,7 @@ public class ResourceHandler {
     if (pathInfo.equals("/")) {
       pathInfo = "/index.html";
     }
-    return getBundle().getResource(getBundleWebContentFolder() + pathInfo);
+    return getBundle().getEntry(getBundleWebContentFolder() + pathInfo);
   }
 
   public boolean handle(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws ServletException, IOException {

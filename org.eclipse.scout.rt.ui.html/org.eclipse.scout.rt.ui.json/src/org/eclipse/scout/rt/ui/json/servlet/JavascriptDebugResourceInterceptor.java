@@ -15,15 +15,19 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.ui.html.ITextFileLoader;
+import org.eclipse.scout.ui.html.ScriptProcessor;
 
 /**
- * intercept js and css files and process #include directives
+ * intercept scout-4.0.0.min.css and scout-4.0.0.min.js and replace by processing the source scout-4.0.0.css and
+ * scout-4.0.0.js
  * <p>
  * The interception can be turned on and off using the url param ?debug=true
  */
 public class JavascriptDebugResourceInterceptor {
   private static final long serialVersionUID = 1L;
-  private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/res/(\\w+/)*)([^/]+\\.(js|css))");
+  //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4=".min", $5=".js" or ".css"
+  private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/res/(\\w+/)*)([^/]+)(\\.min)(\\.(js|css))");
 
   private final List<ResourceHandler> m_resourceHandlers;
 
@@ -36,7 +40,10 @@ public class JavascriptDebugResourceInterceptor {
       if (pathInfo != null) {
         Matcher mat = SCRIPT_FILE_PAT.matcher(pathInfo);
         if (mat.matches()) {
-          if (handleInterception(req, resp, mat.group(1) + "src-" + mat.group(3))) {
+          String pathInfo2 = mat.group(1) + mat.group(3) + mat.group(5);
+          //remove ".min" token and check if such a raw file exists
+          if (handleInterception(req, resp, pathInfo2)) {
+            System.out.println("replacing " + pathInfo + " by live processing " + pathInfo2);
             return true;
           }
         }
@@ -86,35 +93,27 @@ public class JavascriptDebugResourceInterceptor {
     if (handler == null || url == null) {
       return false;
     }
+    final ResourceHandler fHandler = handler;
     //process
-    String content = processIncludeDirectives(handler, url);
-    byte[] contentBytes = content.getBytes("UTF-8");
+    String input = textFileContent(url);
+    ScriptProcessor processor = new ScriptProcessor();
+    processor.setInput(pathInfo, input);
+    processor.setIncludeFileLoader(new ITextFileLoader() {
+      @Override
+      public String read(String path) throws IOException {
+        return textFileContent(fHandler.getBundle().getEntry(path));
+      }
+    });
+    byte[] outputBytes = processor.process().getBytes("UTF-8");
     int lastDot = pathInfo.lastIndexOf('.');
     String contentType = FileUtility.getContentTypeForExtension(lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo);
-
     resp.setDateHeader("Last-Modified", System.currentTimeMillis());
-    resp.setContentLength(contentBytes.length);
+    resp.setContentLength(outputBytes.length);
     if (contentType != null) {
       resp.setContentType(contentType);
     }
-    resp.getOutputStream().write(contentBytes);
+    resp.getOutputStream().write(outputBytes);
     return true;
-  }
-
-  protected static final Pattern INCLUDE_PAT = Pattern.compile("\\$include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
-
-  protected String processIncludeDirectives(ResourceHandler handler, URL url) throws IOException {
-    String content = textFileContent(url);
-    StringBuilder buf = new StringBuilder();
-    Matcher mat = INCLUDE_PAT.matcher(content);
-    int pos = 0;
-    while (mat.find()) {
-      buf.append(content.substring(pos, mat.start()));
-      buf.append(textFileContent(handler.getBundle().getResource(mat.group(1))));
-      pos = mat.end();
-    }
-    buf.append(content.substring(pos));
-    return buf.toString();
   }
 
   protected String textFileContent(URL url) throws IOException {
