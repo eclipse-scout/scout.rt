@@ -26,8 +26,8 @@ import org.eclipse.scout.ui.html.ScriptProcessor;
  */
 public class JavascriptDebugResourceInterceptor {
   private static final long serialVersionUID = 1L;
-  //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4=".min", $5=".js" or ".css"
-  private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/res/(\\w+/)*)([^/]+)(\\.min)(\\.(js|css))");
+  //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4="-min", $5=".js" or ".css"
+  private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/res/(\\w+/)*)([^/]+)(\\-min)(\\.(js|css))");
 
   private final List<ResourceHandler> m_resourceHandlers;
 
@@ -40,8 +40,8 @@ public class JavascriptDebugResourceInterceptor {
       if (pathInfo != null) {
         Matcher mat = SCRIPT_FILE_PAT.matcher(pathInfo);
         if (mat.matches()) {
-          String pathInfo2 = mat.group(1) + mat.group(3) + mat.group(5);
-          //remove ".min" token and check if such a raw file exists
+          String pathInfo2 = mat.group(1) + mat.group(3) + "-template" + mat.group(5);
+          //replace "-min" by "-template"
           if (handleInterception(req, resp, pathInfo2)) {
             System.out.println("replacing " + pathInfo + " by live processing " + pathInfo2);
             return true;

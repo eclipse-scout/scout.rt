@@ -27,7 +27,7 @@
         <version>1.6</version>
         <executions>
           <execution>
-            <phase>process-resources</phase>
+            <phase>package</phase>
             <configuration>
               <target>
                 <property name="process_script_dir" value="${project.build.directory}/process_script" />
@@ -36,15 +36,15 @@
                 <exec dir="${project.basedir}" executable="java" failonerror="true">
                   <arg line="-classpath ${compile_classpath}" />
                   <arg line="org.eclipse.scout.ui.html.ScriptProcessor" />
-                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.0.css" />
-                  <arg line="--o ${process_script_dir}/scout-4.0.0.css" />
+                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.1-template.css" />
+                  <arg line="--o ${process_script_dir}/scout-4.0.1.css" />
                   <arg line="--root ${project.basedir}" />
                 </exec>
                 <exec dir="${project.basedir}" executable="java" failonerror="true">
                   <arg line="-classpath ${compile_classpath}" />
                   <arg line="org.eclipse.scout.ui.html.ScriptProcessor" />
-                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.0.js" />
-                  <arg line="--o ${process_script_dir}/scout-4.0.0.js" />
+                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.1-template.js" />
+                  <arg line="--o ${process_script_dir}/scout-4.0.1.js" />
                   <arg line="--root ${project.basedir}" />
                 </exec>
               </target>
@@ -62,7 +62,7 @@
         <version>1.4.0</version>
         <executions>
           <execution>
-            <phase>process-resources</phase>
+            <phase>package</phase>
             <goals>
               <goal>compress</goal>
             </goals>
@@ -73,7 +73,7 @@
           <suffix>.min</suffix>
           <force>true</force>
           <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
-          <outputDirectory>${project.build.directory}/WebContent/res</outputDirectory>
+          <outputDirectory>${project.basedir}/WebContent/res</outputDirectory>
         </configuration>
       </plugin>
 
