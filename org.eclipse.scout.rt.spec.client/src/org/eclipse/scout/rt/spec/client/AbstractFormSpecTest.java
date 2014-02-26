@@ -23,12 +23,8 @@ import org.eclipse.scout.rt.spec.client.gen.FormSpecGenerator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.screenshot.FormScreenshotPrinter;
 import org.eclipse.scout.rt.spec.client.screenshot.PrintScreenshotsFormListener;
-import org.junit.Test;
 
-/**
- *
- */
-public abstract class AbstractFormSpecTest extends AbstractSpecGen {
+public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
 
   /**
    * Generate form spec as mediawiki file
@@ -36,7 +32,6 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGen {
    * @throws ProcessingException
    */
   @Override
-  @Test
   public void generateSpec() throws ProcessingException {
     List<File> screenshots = printScreenshots();
     IForm form = createAndStartForm(Collections.<FormListener> emptyList());
@@ -45,8 +40,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGen {
     form.doClose();
   }
 
-  // TODO ASA change private methods to protected
-  private List<File> printScreenshots() throws ProcessingException {
+  protected List<File> printScreenshots() throws ProcessingException {
     ArrayList<FormListener> formListeners = new ArrayList<FormListener>();
     PrintScreenshotsFormListener listener = new PrintScreenshotsFormListener(new FormScreenshotPrinter(getFileConfig().getImageDir()));
     formListeners.add(listener);
@@ -81,7 +75,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGen {
    * @return
    * @throws ProcessingException
    */
-  private String[] getImagePaths(List<File> screenshots) throws ProcessingException {
+  protected String[] getImagePaths(List<File> screenshots) throws ProcessingException {
     File[] files = CollectionUtility.toArray(screenshots, File.class);
     return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(files, getFileConfig().getSpecDir()), "../");
   }

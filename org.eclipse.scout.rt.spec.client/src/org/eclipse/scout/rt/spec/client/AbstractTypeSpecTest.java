@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.junit.Test;
 
 /**
  * Abstract spec test for creating a spec file with a table describing types (eg. form fields, columns, ...)
@@ -31,7 +30,7 @@ import org.junit.Test;
  * - Name: filled with doc text with the key "[types classid]_name"<br>
  * - Description: filled with doc text with the key "[types classid]_description"
  */
-public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
+public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTypeSpecTest.class);
   private Class<?> m_supertype;
   private String m_id;
@@ -44,7 +43,6 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
   }
 
   @Override
-  @Test
   public void generateSpec() throws ProcessingException {
     Class[] fieldTypes = getAllClasses();
     IDocSection doc = generate(fieldTypes);

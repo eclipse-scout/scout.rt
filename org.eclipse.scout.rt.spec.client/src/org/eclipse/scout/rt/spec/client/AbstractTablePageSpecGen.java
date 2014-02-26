@@ -15,15 +15,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.gen.PageSpecGenerator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.junit.Test;
 
 /**
  *
  */
-public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
+public abstract class AbstractTablePageSpecGen extends AbstractSpecGenTest {
 
   @Override
-  @Test
   public void generateSpec() throws ProcessingException {
     IPageWithTable<? extends ITable> page = createAndInitTablePage();
     IDocSection doc = generateDocSection(page);

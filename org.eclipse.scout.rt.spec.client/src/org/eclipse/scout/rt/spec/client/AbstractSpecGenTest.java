@@ -19,20 +19,22 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
+import org.eclipse.scout.testing.client.runner.ScoutClientGUITestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Base class for all spec test
  */
-public abstract class AbstractSpecGen {
+@RunWith(ScoutClientGUITestRunner.class)
+public abstract class AbstractSpecGenTest {
 
   /**
    * Generate spec in one or more mediawiki files
-   * <p>
-   * ATTENTION: implementations need to be annotated with @{@link Test}
    * 
    * @throws ProcessingException
    */
+  @Test
   abstract public void generateSpec() throws ProcessingException;
 
   protected SpecFileConfig getFileConfig() {

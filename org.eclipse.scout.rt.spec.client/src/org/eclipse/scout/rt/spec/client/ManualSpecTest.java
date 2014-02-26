@@ -14,14 +14,12 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 // TODO ASA javadoc
-public class ManualSpecTest extends AbstractSpecGen {
+public class ManualSpecTest extends AbstractSpecGenTest {
 
   @Override
-  @Test
   public void generateSpec() throws ProcessingException {
     copyMediawikiFiles();
     copyImages();
