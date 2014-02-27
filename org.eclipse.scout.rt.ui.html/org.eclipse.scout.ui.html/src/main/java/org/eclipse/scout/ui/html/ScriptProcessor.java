@@ -2,12 +2,6 @@ package org.eclipse.scout.ui.html;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import com.phloc.css.ECSSVersion;
-import com.phloc.css.decl.CSSStyleRule;
-import com.phloc.css.decl.CascadingStyleSheet;
-import com.phloc.css.reader.CSSReader;
 
 /**
  * Process JS and CSS scripts such as <code>/WebContent/res/scout-4.0.0.css</code> and
@@ -98,8 +92,6 @@ public class ScriptProcessor {
     String content = m_input;
     content = replaceIncludeDirectives(content);
     content = replaceConstants(content);
-    //XXX cgu: when activated then tree icons are missing
-    //content = makeCanonical(content);
     return content;
   }
 
@@ -110,23 +102,5 @@ public class ScriptProcessor {
   protected String replaceConstants(String content) throws IOException {
     //TODO imo
     return content;
-  }
-
-  /**
-   * Merges all the selectors including its properties so every selector appears only once in the file.
-   * <p>
-   * The properties of the lower selectors have higher priority and therefore override existing properties when merged.
-   */
-  protected String makeCanonical(String content) throws IOException {
-    CascadingStyleSheet styleSheet = CSSReader.readFromString(content, "utf-8", ECSSVersion.CSS30);
-    if (styleSheet == null) {
-      throw new IOException("Parsing file failed. Please check if the input file contains valid css.");
-    }
-    List<CSSStyleRule> styleRules = styleSheet.getAllStyleRules();
-    CanonicalStyleMap styleMap = new CanonicalStyleMap();
-    for (CSSStyleRule styleRule : styleRules) {
-      styleMap.put(styleRule);
-    }
-    return styleMap.generateStyleSheetText();
   }
 }

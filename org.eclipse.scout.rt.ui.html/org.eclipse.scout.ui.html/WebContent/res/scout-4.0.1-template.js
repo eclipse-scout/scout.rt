@@ -2,25 +2,25 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 //
 
-//@include("javascript/Scout.js");
-//@include("javascript/Session.js");
-//@include("javascript/desktop/Desktop.js");
-//@include("javascript/desktop/DesktopBench.js");
-//@include("javascript/desktop/DesktopMatrix.js");
-//@include("javascript/desktop/DesktopTable.js");
-//@include("javascript/desktop/DesktopTableChart.js");
-//@include("javascript/desktop/DesktopTableGraph.js");
-//@include("javascript/desktop/DesktopTableHeader.js");
-//@include("javascript/desktop/DesktopTableMap.js");
-//@include("javascript/desktop/DesktopTableOrganize.js");
-//@include("javascript/desktop/DesktopToolButton.js");
-//@include("javascript/desktop/DesktopTree.js");
-//@include("javascript/desktop/DesktopViewButton.js");
-//@include("javascript/desktop/DesktopViewButtonBar.js");
-//@include("javascript/desktop/DesktopViewButtonOwn.js");
-//@include("javascript/menu/Menu.js");
-//@include("javascript/menu/MenuHeader.js");
-//@include("javascript/scrollbar/Scrollbar.js");
+//@include("src/main/js/Scout.js");
+//@include("src/main/js/Session.js");
+//@include("src/main/js/desktop/Desktop.js");
+//@include("src/main/js/desktop/DesktopBench.js");
+//@include("src/main/js/desktop/DesktopMatrix.js");
+//@include("src/main/js/desktop/DesktopTable.js");
+//@include("src/main/js/desktop/DesktopTableChart.js");
+//@include("src/main/js/desktop/DesktopTableGraph.js");
+//@include("src/main/js/desktop/DesktopTableHeader.js");
+//@include("src/main/js/desktop/DesktopTableMap.js");
+//@include("src/main/js/desktop/DesktopTableOrganize.js");
+//@include("src/main/js/desktop/DesktopToolButton.js");
+//@include("src/main/js/desktop/DesktopTree.js");
+//@include("src/main/js/desktop/DesktopViewButton.js");
+//@include("src/main/js/desktop/DesktopViewButtonBar.js");
+//@include("src/main/js/desktop/DesktopViewButtonOwn.js");
+//@include("src/main/js/menu/Menu.js");
+//@include("src/main/js/menu/MenuHeader.js");
+//@include("src/main/js/scrollbar/Scrollbar.js");
 
 $(document).ready(function () {
     var tabId = '' + new Date().getTime();
