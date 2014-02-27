@@ -30,7 +30,7 @@
       <executions>
         <execution>
           <id>process-css</id>
-          <phase>package</phase>
+          <phase>test</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -49,7 +49,7 @@
         </execution>
         <execution>
           <id>process-js</id>
-          <phase>package</phase>
+          <phase>test</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -76,7 +76,7 @@
       <executions>
         <execution>
           <id>minify</id>
-          <phase>package</phase>
+          <phase>test</phase>
           <goals>
             <goal>compress</goal>
           </goals>
@@ -87,7 +87,7 @@
         <suffix>-min</suffix>
         <force>true</force>
         <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
-        <outputDirectory>${project.basedir}/WebContent/res</outputDirectory>
+        <outputDirectory>${project.build.directory}/classes/WebContent/res</outputDirectory>
       </configuration>
     </plugin>
 
