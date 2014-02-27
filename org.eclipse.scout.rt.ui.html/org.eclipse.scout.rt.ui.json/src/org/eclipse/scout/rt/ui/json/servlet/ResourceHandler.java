@@ -36,27 +36,6 @@ public class ResourceHandler {
     m_bundleWebContentFolder = webContentFolder;
   }
 
-  protected Bundle getBundle() {
-    return m_bundle;
-  }
-
-  protected String getBundleWebContentFolder() {
-    return m_bundleWebContentFolder;
-  }
-
-  /**
-   * resolve a web path /res/scout.css to a bundle resource WebContent/res/scout.css
-   */
-  public URL resolveBundleResource(String pathInfo) {
-    if (pathInfo == null) {
-      return null;
-    }
-    if (pathInfo.equals("/")) {
-      pathInfo = "/index.html";
-    }
-    return getBundle().getEntry(getBundleWebContentFolder() + pathInfo);
-  }
-
   public boolean handle(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws ServletException, IOException {
     URL url = resolveBundleResource(pathInfo);
     if (url == null) {
@@ -74,6 +53,27 @@ public class ResourceHandler {
     resp.setContentLength(content.length);
     resp.getOutputStream().write(content);
     return true;
+  }
+
+  protected Bundle getBundle() {
+    return m_bundle;
+  }
+
+  protected String getBundleWebContentFolder() {
+    return m_bundleWebContentFolder;
+  }
+
+  /**
+   * resolve a web path /res/scout.css to a bundle resource WebContent/res/scout.css
+   */
+  protected URL resolveBundleResource(String pathInfo) {
+    if (pathInfo == null) {
+      return null;
+    }
+    if (pathInfo.equals("/")) {
+      pathInfo = "/index.html";
+    }
+    return getBundle().getEntry(getBundleWebContentFolder() + pathInfo);
   }
 
   protected int setResponseHeaders(final HttpServletRequest req, final HttpServletResponse resp, String contentType, long lastModified, int contentLength) {

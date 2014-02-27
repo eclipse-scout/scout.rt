@@ -21,7 +21,7 @@ public class ScriptProcessor {
       }
       if ("--root".equals(args[i])) {
         final File rootDir = new File(args[i + 1]);
-        processor.includeFileLoader = new ITextFileLoader() {
+        processor.m_includeFileLoader = new ITextFileLoader() {
           @Override
           public String read(String path) throws IOException {
             return TextFileUtil.readUTF8(new File(rootDir, path));
@@ -39,7 +39,7 @@ public class ScriptProcessor {
       System.exit(-1);
       return;
     }
-    if (processor.includeFileLoader == null) {
+    if (processor.m_includeFileLoader == null) {
       usage("missing --root");
       System.exit(-1);
       return;
@@ -57,7 +57,8 @@ public class ScriptProcessor {
 
   private String m_input;
   private String m_inputType;
-  private ITextFileLoader includeFileLoader;
+  private ITextFileLoader m_includeFileLoader;
+  private boolean m_showLineNumbers = false;
 
   /**
    * @param input
@@ -71,7 +72,11 @@ public class ScriptProcessor {
   }
 
   public void setIncludeFileLoader(ITextFileLoader includeFileLoader) {
-    this.includeFileLoader = includeFileLoader;
+    m_includeFileLoader = includeFileLoader;
+  }
+
+  public void setShowLineNumbers(boolean showLineNumbers) {
+    m_showLineNumbers = showLineNumbers;
   }
 
   public String process() throws IOException {
@@ -100,11 +105,60 @@ public class ScriptProcessor {
   }
 
   protected String replaceIncludeDirectives(String content) throws IOException {
-    return TextFileUtil.processIncludeDirectives(content, includeFileLoader);
+    ITextFileLoader loader = m_includeFileLoader;
+    if (m_showLineNumbers) {
+      loader = new ITextFileLoader() {
+        @Override
+        public String read(String path) throws IOException {
+          String text = m_includeFileLoader.read(path);
+          String name = path;
+          int i = name.lastIndexOf('/');
+          if (i >= 0) {
+            name = name.substring(i + 1);
+          }
+          i = name.lastIndexOf('.');
+          if (i >= 0) {
+            name = name.substring(0, i);
+          }
+          int lineNo = 1;
+          boolean insideBlockComment = false;
+          StringBuilder buf = new StringBuilder();
+          for (String line : text.split("[\\n]")) {
+            if (lineIsBeginOfMultilineBlockComment(line)) {
+              //also if line is endMLBC AND beginMLBC
+              insideBlockComment = true;
+            }
+            else if (lineIsEndOfMultilineBlockComment(line)) {
+              insideBlockComment = false;
+            }
+            else if (!insideBlockComment) {
+              buf.append("/*" + name + ":" + lineNo + "*/");
+            }
+            buf.append(line);
+            buf.append("\n");
+            lineNo++;
+          }
+          return buf.toString();
+        }
+      };
+    }
+    return TextFileUtil.processIncludeDirectives(content, loader);
   }
 
   protected String replaceConstants(String content) throws IOException {
     //TODO imo
     return content;
+  }
+
+  protected boolean lineIsBeginOfMultilineBlockComment(String line) {
+    int a = line.lastIndexOf("/*");
+    int b = line.lastIndexOf("*/");
+    return a >= 0 && (b < 0 || b < a);
+  }
+
+  protected boolean lineIsEndOfMultilineBlockComment(String line) {
+    int a = line.indexOf("/*");
+    int b = line.indexOf("*/");
+    return b >= 0 && (a < 0 || a > b);
   }
 }

@@ -38,7 +38,7 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${project.basedir}/WebContent/res/scout-4.0.1-template.css</argument>
+              <argument>${project.basedir}/src/main/js/scout-4.0.1-template.css</argument>
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-4.0.1.css</argument>
               <argument>--root</argument>
@@ -57,7 +57,7 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${project.basedir}/WebContent/res/scout-4.0.1-template.js</argument>
+              <argument>${project.basedir}/src/main/js/scout-4.0.1-template.js</argument>
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-4.0.1.js</argument>
               <argument>--root</argument>
