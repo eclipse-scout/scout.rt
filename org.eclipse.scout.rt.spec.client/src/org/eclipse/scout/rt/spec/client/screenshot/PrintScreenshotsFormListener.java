@@ -49,6 +49,7 @@ public class PrintScreenshotsFormListener implements FormListener {
   @Override
   public void formChanged(FormEvent e) throws ProcessingException {
     if (e.getType() == FormEvent.TYPE_ACTIVATED) {
+      m_formPrinter.setForm(e.getForm());
       enqueuePrintObjects(e.getForm());
       scheduleNextPrintJob();
     }

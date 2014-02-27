@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.spec.client.FormFieldUtility;
 
 /**
  * Screenshot printer for forms which allows generation of screenshots of an entire forms as well as screenshots of
@@ -34,6 +33,7 @@ public class FormScreenshotPrinter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintScreenshotsFormListener.class);
   private final File m_destinationFolder;
   private final String m_contentType;
+  private IForm m_form;
 
   public FormScreenshotPrinter(File destinationFolder) {
     this(destinationFolder, "image/jpg");
@@ -85,18 +85,18 @@ public class FormScreenshotPrinter {
   }
 
   protected File getPrintFile(Object o) {
-    String name = o.getClass().getName();
-    return getPrintFile(o, name);
+    // TODO ASA refactor in scout 4.0: when createAndStartForm(...) in AbstractFormSpecTest is split,
+    //          form can be provided in constructor and this check will be obsolet
+    if (m_form == null) {
+      String name = o.getClass().getName();
+      return getPrintFile(name);
+    }
+    return getPrintFile(m_form.classId() + "_" + o.getClass().getName());
   }
 
-  protected File getPrintFile(IFormField field) {
-    String name = FormFieldUtility.getUniqueFieldId(field);
-    return getPrintFile(field, name);
-  }
-
-  private File getPrintFile(Object o, String name) {
+  protected File getPrintFile(String baseName) {
     String ext = getContentType().substring(getContentType().lastIndexOf("/") + 1);
-    return new File(getDestinationFolder(), name + "." + ext);
+    return new File(getDestinationFolder(), baseName + "." + ext);
   }
 
   protected void printGroupBox(IGroupBox g, File file) {
@@ -137,6 +137,13 @@ public class FormScreenshotPrinter {
     parameters.put("file", out);
     parameters.put("contentType", getContentType());
     return parameters;
+  }
+
+  /**
+   * @param form
+   */
+  public void setForm(IForm form) {
+    m_form = form;
   }
 
 }

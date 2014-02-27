@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldIdExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.junit.Test;
@@ -218,7 +218,7 @@ public class DocGenUtilityTest {
   private List<IDocTextExtractor<IFormField>> getTestProperties() {
     List<IDocTextExtractor<IFormField>> testProperties = new ArrayList<IDocTextExtractor<IFormField>>();
     testProperties.add(new DescriptionExtractor<IFormField>());
-    testProperties.add(new FormFieldIdExtractor());
+    testProperties.add(new SimpleTypeTextExtractor<IFormField>());
     return testProperties;
   }
 
