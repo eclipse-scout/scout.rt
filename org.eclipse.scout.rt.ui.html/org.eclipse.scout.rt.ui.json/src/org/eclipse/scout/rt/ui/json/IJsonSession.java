@@ -24,6 +24,8 @@ public interface IJsonSession {
 
   void unregisterJsonRenderer(String id);
 
+  IJsonRenderer getJsonRenderer(String id);
+
   /**
    * @return the current ui response that is collecting changes for the next {@link #processRequest(JsonRequest)} cycle
    */

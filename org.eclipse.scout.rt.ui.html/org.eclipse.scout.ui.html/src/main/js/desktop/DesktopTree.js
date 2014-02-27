@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTree = function (scout, $desktop) {
+Scout.DesktopTree = function (scout, $desktop, jsonOutline) {
   // create container
   var $desktopTree = $desktop.appendDiv('DesktopTree');
   var $desktopTreeScroll = $desktopTree.appendDiv('DesktopTreeScroll');
@@ -13,9 +13,15 @@ Scout.DesktopTree = function (scout, $desktop) {
 
   // set this for later usage
   this.$div = $desktopTreeScroll;
+
+  this.outline = new Scout.Outline(scout, this, jsonOutline);
+  addNodes_(jsonOutline.pages);
+
+  this.setOutline = setOutline;
   this.addNodes = addNodes;
+  this.setNodeExpandedById = setNodeExpandedById;
+  this.setNodeSelectedById = setNodeSelectedById;
   this.clearNodes = clearNodes;
-  this.outlineId;
 
   // named  funktions
   function resizeTree (event) {
@@ -39,10 +45,101 @@ Scout.DesktopTree = function (scout, $desktop) {
   }
 
   function clearNodes() {
-    this.$div.find("div").remove();
+    $desktopTreeScroll.find("div").remove();
   }
 
-  function addNodes (nodes, $parent) {
+  function addNodes (nodes, parentNodeId) {
+    var $parent = $desktopTreeScroll.find('#'+parentNodeId);
+    var parentNode = $parent.data('node');
+    if(parentNode === undefined) {
+      throw "No parentNode found for id " + parentNodeId;
+    }
+
+    //update parent with new child nodes
+    parentNode.childNodes.push.apply(parentNode.childNodes, nodes);
+
+    if(parentNode.expanded) {
+      addNodes_(nodes, $parent);
+    }
+  }
+
+  function setNodeExpandedById (nodeId, expanded) {
+    var $node = $desktopTreeScroll.find('#'+nodeId);
+    setNodeExpanded($node, expanded);
+  }
+
+  function setNodeExpanded ($node, expanded) {
+    if (expanded == $node.hasClass('expanded')) {
+      return true;
+    }
+
+    var node = $node.data('node');
+    node.expanded = expanded;
+    if (expanded) {
+      if(node.childNodes.length>0) {
+        addNodes_(node.childNodes,$node);
+
+        // open node
+        if ($node.hasClass('can-expand') && !$node.hasClass('expanded')) {
+          var level = $node.attr('data-level');
+          var $newNodes = $node.nextUntil(
+            function() {
+              return $(this).attr("data-level") <= level;
+            }
+          );
+          if ($newNodes.length) {
+            // animated opening ;)
+            $newNodes.wrapAll('<div id="TreeItemAnimate"></div>)');
+            var h = $newNodes.height() * $newNodes.length,
+              removeContainer = function () {$(this).replaceWith($(this).contents()); scrollbar.initThumb();};
+
+            $('#TreeItemAnimate').css('height', 0)
+              .animateAVCSD('height', h, removeContainer, scrollbar.initThumb);
+
+            // animated control, at the end: parent is expanded
+            var $control = $node.children('.tree-item-control'),
+              rotateControl = function (now, fx) {
+                $control.css('transform', 'rotate(' + now + 'deg)'); },
+              addExpanded = function () {
+                $node.addClass('expanded');};
+
+            $control.css('borderSpacing', 0)
+              .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl);
+          }
+        }
+      }
+    }
+    else {
+      // click always select, even if closed
+      $node.selectOne().removeClass('expanded');
+
+      // animated closing ;)
+      $node.nextUntil(function() {return $(this).attr("data-level") <= level;})
+        .wrapAll('<div id="TreeItemAnimate"></div>)');
+      $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, scrollbar.initThumb);
+
+      // animated control
+      var $control = $node.children('.tree-item-control'),
+        rotateControl = function(now, fx){$control.css('transform', 'rotate(' + now + 'deg)');};
+      $control.css('borderSpacing', 90)
+        .animateAVCSD('borderSpacing', 0, null, rotateControl);
+     }
+  }
+
+  function setNodeSelectedById(nodeId) {
+    var $node = $desktopTreeScroll.find('#'+nodeId),
+     node = $node.data('node');
+
+    $('#DesktopBench').html('');
+    if (node.type == 'table') {
+      node.outlineId = self.outline.jsonOutline.id;
+      new Scout.DesktopTable(scout, $('#DesktopBench'), node);
+    } else{
+      $('#DesktopBench').text(JSON.stringify(node));
+    }
+  }
+
+  function addNodes_ (nodes, $parent) {
     var $allNodes = $('');
 
     for (var i =  nodes.length - 1; i >= 0; i--) {
@@ -59,7 +156,7 @@ Scout.DesktopTree = function (scout, $desktop) {
 
       var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
               .on('click', '', clickNode)
-              .data('bench', node.bench)
+              .data('node', node)
               .attr('data-level', level)
               .css('margin-left', level * 20)
               .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
@@ -88,8 +185,8 @@ Scout.DesktopTree = function (scout, $desktop) {
       $allNodes = $allNodes.add($node);
 
       // if model demands children, create them
-      if (node.children) {
-        var $n = addNodes(node.children, $node);
+      if (node.expanded && node.childNodes) {
+        var $n = addNodes_(node.childNodes, $node);
         $allNodes = $allNodes.add($n);
       }
     }
@@ -100,71 +197,31 @@ Scout.DesktopTree = function (scout, $desktop) {
 
   function clickNode (event) {
     var $clicked = $(this),
-      bench = $clicked.data('bench'),
+      node = $clicked.data('node'),
       nodeId = $clicked.attr('id');
 
     // selected the one
     $clicked.selectOne();
 
-    // open node
-    if ($clicked.hasClass('can-expand') && !$clicked.hasClass('expanded')) {
-      // load model and draw nodes
-      var response = scout.syncAjax('drilldown', self.outlineId, {"nodeId":nodeId});
-      var $newNodes = addNodes(response.events[0].nodes, $clicked);
-
-      if ($newNodes.length) {
-        // animated opening ;)
-        $newNodes.wrapAll('<div id="TreeItemAnimate"></div>)');
-        var h = $newNodes.height() * $newNodes.length,
-          removeContainer = function () {$(this).replaceWith($(this).contents()); scrollbar.initThumb();};
-
-        $('#TreeItemAnimate').css('height', 0)
-          .animateAVCSD('height', h, removeContainer, scrollbar.initThumb);
-
-        // animated control, at the end: parent is expanded
-        var $control = $clicked.children('.tree-item-control'),
-          rotateControl = function (now, fx) {
-            $control.css('transform', 'rotate(' + now + 'deg)'); },
-          addExpanded = function () {
-            $clicked.addClass('expanded');};
-
-        $control.css('borderSpacing', 0)
-          .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl);
-      }
+    //FIXME should be sent in one server call
+    if (!$clicked.hasClass('expanded')) {
+      var response = scout.syncAjax('nodeExpanded', self.outline.jsonOutline.id, {"nodeId":node.id, "expanded":true});
+      scout.processEvents(response.events);
     }
-
-    // show bench
-    $('#DesktopBench').html('');
-    if (bench.type == 'table') {
-      bench.nodeId = nodeId;
-      bench.outlineId = self.outlineId;
-      new Scout.DesktopTable(scout, $('#DesktopBench'), bench);
-    } else{
-      $('#DesktopBench').text(JSON.stringify(bench));
-    }
-
+    var response = scout.syncAjax('nodeClicked', self.outline.jsonOutline.id, {"nodeId":nodeId});
+    scout.processEvents(response.events);
   }
 
   function clickNodeControl (event) {
-    var $close = $(this).parent(),
-      level = $close.attr('data-level');
+    var $node = $(this).parent(),
+      expanded = !$node.hasClass('expanded'),
+      node = $node.data('node');
 
-    // only go further (and return false) if expanded
-    if (!$close.hasClass('expanded')) return true;
+    setNodeExpanded($node, expanded);
 
-    // click always select, even if closed
-    $close.selectOne().removeClass('expanded');
-
-    // animated closing ;)
-    $close.nextUntil(function() {return $(this).attr("data-level") <= level;})
-      .wrapAll('<div id="TreeItemAnimate"></div>)');
-    $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, scrollbar.initThumb);
-
-    // animated control
-    var $control = $close.children('.tree-item-control'),
-      rotateControl = function(now, fx){$control.css('transform', 'rotate(' + now + 'deg)');};
-    $control.css('borderSpacing', 90)
-      .animateAVCSD('borderSpacing', 0, null, rotateControl);
+    //FIXME really necessary? maybe property sync back
+    var response = scout.syncAjax('nodeExpanded', self.outline.jsonOutline.id, {"nodeId":node.id, "expanded":expanded});
+    scout.processEvents(response.events);
 
     // prevent immediately reopening
     return false;
@@ -176,6 +233,13 @@ Scout.DesktopTree = function (scout, $desktop) {
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.Menu(scout, self.outlineId, nodeId, x, y);
+    new Scout.Menu(scout, self.outline.jsonOutline.id, nodeId, x, y);
   }
+
+  function setOutline(outlineId) {
+    this.outline = scout.widgetMap[outlineId];
+    clearNodes();
+    addNodes_(this.outline.jsonOutline.pages);
+  }
+
 };

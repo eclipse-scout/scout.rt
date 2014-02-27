@@ -6,16 +6,12 @@ Scout.Desktop = function (scout, $parent, widget) {
 
   // main container
   var view, tool, tree, bench;
-  
+
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(scout, $parent, widget.viewButtons);
   var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
-  var tree = new Scout.DesktopTree(scout, $parent);
+  var tree = new Scout.DesktopTree(scout, $parent, widget.outline);
   var bench = new Scout.DesktopBench(scout, $parent);
-
-  // show nodes
-  tree.outlineId = widget.outline.id;
-  tree.addNodes(widget.outline.pages);
 
   // alt and f1-help
   $(window).keydown(function (event)  {
@@ -85,7 +81,7 @@ Scout.Desktop = function (scout, $parent, widget) {
       var $rowsAll = $('.table-row', bench.$div),
         $rowsSelected = $('.row-selected', bench.$div),
         $rowClick;
-      
+
       // up: move up
       if (event.which == 38){
         if ($rowsSelected.length > 0) {
@@ -121,7 +117,7 @@ Scout.Desktop = function (scout, $parent, widget) {
           var $prev = $rowsSelected.first().prevAll();
           if ($prev.length > 10) {
             $rowClick = $prev.eq(10);
-          } else { 
+          } else {
             $rowClick = $rowsAll.first();
           }
         } else {
@@ -135,30 +131,32 @@ Scout.Desktop = function (scout, $parent, widget) {
           var $prev = $rowsSelected.last().nextAll();
           if ($prev.length > 10) {
             $rowClick = $prev.eq(10);
-          } else { 
+          } else {
             $rowClick = $rowsAll.last();
           }
         } else {
           $rowClick = $rowsAll.first();
         }
       }
-      
+
       $rowClick.trigger('mousedown').trigger('mouseup');
     }
   });
 
   this.onModelAction = onModelAction;
+  this.onModelCreate = onModelCreate;
   this.onModelPropertyChange = onModelPropertyChange;
 
   function onModelPropertyChange(event) {
   }
 
+  function onModelCreate(event) {
+    new Scout.Outline(scout, tree, event);
+  }
+
   function onModelAction(event) {
     if (event.type_ == 'outlineChanged') {
-      tree.outlineId = event.outline.id;
-      tree.clearNodes();
-      tree.addNodes(event.outline.pages);
-      return;
+      tree.setOutline(event.outlineId);
     }
   }
 
@@ -179,7 +177,7 @@ Scout.Desktop = function (scout, $parent, widget) {
         $(e).appendDiv('', 'key-box', $(e).attr('data-shortcut'));
       });
     }
-   
+
     // keys for tree
     var node = $('.selected', tree.$div),
       prev = node.prev(),

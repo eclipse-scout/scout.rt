@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -22,7 +24,9 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +38,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   private JSONArray m_jsonFormsArray;
   private DesktopListener m_desktopListener;
   private List<JsonViewButton> m_jsonViewButtons;
-  private JsonOutline m_jsonOutline;
+  private Map<IOutline, JsonOutline> m_jsonOutlines;
 
   private String TOOL_BUTTONS = "[{\"id\": \"t1\", \"label\": \"Suche\", \"icon\": \"\uf002\", \"shortcut\": \"F3\"}," +
       "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
@@ -78,8 +82,10 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       button.init();
       m_jsonViewButtons.add(button);
     }
-    m_jsonOutline = new JsonOutline(this, getDesktop().getOutline(), getJsonSession());
-    m_jsonOutline.init();
+    m_jsonOutlines = new HashMap<IOutline, JsonOutline>();
+    JsonOutline jsonOutline = new JsonOutline(this, getDesktop().getOutline(), getJsonSession());
+    jsonOutline.init();
+    m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
 
     //FIXME add listener afterwards -> don't handle events, refactor
     super.attachModel();
@@ -112,7 +118,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
         viewButtons.put(jsonViewButton.toJson());
       }
       json.put("viewButtons", viewButtons);
-      json.put("outline", m_jsonOutline.toJson());
+      json.put("outline", m_jsonOutlines.get(getDesktop().getOutline()).toJson());
       json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME
 
       return json;
@@ -171,11 +177,16 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       try {
         switch (e.getType()) {
           case DesktopEvent.TYPE_OUTLINE_CHANGED:
-            m_jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
-            m_jsonOutline.init();//FIXME read outline from widget cache? map modelId jsonId? send create event?
-//          getJsonSession().currentJsonResponse().addCreateEvent(m_jsonOutline.toJson());
+            JsonOutline jsonOutline = m_jsonOutlines.get(e.getOutline());
+            if (jsonOutline == null) {
+              jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
+              jsonOutline.init();
+              m_jsonOutlines.put(e.getOutline(), jsonOutline);
+              getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());
+            }
+
             JSONObject event = new JSONObject();
-            event.put("outline", m_jsonOutline.toJson());
+            event.put("outlineId", jsonOutline.getId());
             getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), event);
             break;
           case DesktopEvent.TYPE_FORM_ADDED: {
@@ -191,6 +202,19 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
             }
 
             LOG.info("Form added.");
+            break;
+          }
+          case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
+            final IMessageBox messageBox = e.getMessageBox();
+            new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
+              @Override
+              protected void runVoid(IProgressMonitor monitor) throws Throwable {
+                //FIXME implement
+                //for the moment auto close messagebox to not block the model thread
+                messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
+              }
+            }.runNow(new NullProgressMonitor());
+
             break;
           }
         }

@@ -6,7 +6,7 @@ Scout.DesktopTableHeader = function ($tableHeader, columns) {
 
   // create header based on model
   for (var i = 0; i < columns.length; i++) {
-    var $header = $tableHeader.appendDiv('', 'header-item', columns[i].label)
+    var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('type', columns[i].type)
       .css('width', columns[i].width);
 

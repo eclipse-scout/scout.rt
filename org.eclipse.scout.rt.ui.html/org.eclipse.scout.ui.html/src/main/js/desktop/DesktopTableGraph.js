@@ -14,7 +14,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, bench) {
     hContainer = $graphContainer.height();
 
   // create container
-  var response = scout.syncAjax('graph', bench.outlineId, {"nodeId":bench.nodeId});
+  var response = scout.syncAjax('graph', node.outlineId, {"nodeId":node.id});
   graph = response.events[0].graph;
 
   // create all links with label

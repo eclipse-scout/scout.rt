@@ -46,7 +46,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   var table;
 
   // create header
-  var tableHeader = new Scout.DesktopTableHeader($tableHeader, model.columns);
+  var tableHeader = new Scout.DesktopTableHeader($tableHeader, model.table.columns);
 
   // load data and create rows
   loadData();
@@ -143,7 +143,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function controlChart (event) {
-    new Scout.DesktopTableChart(scout, $controlContainer, model.columns, table, filterCallback);
+    new Scout.DesktopTableChart(scout, $controlContainer, model.table.columns, table, filterCallback);
   }
 
   function controlGraph (event) {
@@ -155,7 +155,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function controlOrganize (event) {
-    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.columns, table);
+    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, table);
   }
 
   function resizeControl (event) {
@@ -182,7 +182,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function loadData () {
-    var response = scout.syncAjax('table', model.outlineId, {"nodeId":model.nodeId});
+    var response = scout.syncAjax('table', model.outlineId, {"nodeId":model.id});
     table = response.events[0].rows;
     $('.table-row').remove();
     drawData(0);
@@ -199,7 +199,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
       rowString += '<div class="table-row">';
 
       for (var c = 0; c < row.length; c++) {
-        var column = model.columns[c],
+        var column = model.table.columns[c],
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
           allign = (column.type == 'int' || column.type == 'float') ? 'text-align: right; ' : '';
@@ -337,7 +337,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
 
   function clickRowMenu (event) {
     var $clicked = $(this),
-      nodeId = model.nodeId,
+      nodeId = model.id,
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 

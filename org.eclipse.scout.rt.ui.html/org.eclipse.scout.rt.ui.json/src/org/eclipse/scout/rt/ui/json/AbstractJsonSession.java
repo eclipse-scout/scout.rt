@@ -96,7 +96,8 @@ public abstract class AbstractJsonSession implements IJsonSession {
     m_jsonRenderers.remove(id);
   }
 
-  protected IJsonRenderer getJsonRenderer(String id) {
+  @Override
+  public IJsonRenderer getJsonRenderer(String id) {
     return m_jsonRenderers.get(id);
   }
 

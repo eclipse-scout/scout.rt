@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="*-template.js" kind="src" path="src/main/js"/>
-	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="libjs"/>
-	<classpathentry kind="output" path=""/>
+  <classpathentry excluding="*-template.js" kind="src" path="src/main/js"/>
+  <classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="lib" path="libjs"/>
+  <classpathentry kind="output" path=""/>
+  <classpathentry exported="true" kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary"/>
 </classpath>

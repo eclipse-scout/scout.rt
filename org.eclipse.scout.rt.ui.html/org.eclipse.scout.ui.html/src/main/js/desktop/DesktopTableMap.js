@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableMap = function (scout, $controlContainer, bench, table, filterCallback) {
+Scout.DesktopTableMap = function (scout, $controlContainer, node, table, filterCallback) {
   // create container
   $mapContainer = $controlContainer.empty()
     .appendSVG('svg', 'MapContainer')
@@ -10,14 +10,14 @@ Scout.DesktopTableMap = function (scout, $controlContainer, bench, table, filter
 
 
   // create container
-  var response = scout.syncAjax('map', bench.outlineId, {"nodeId":bench.nodeId});
+  var response = scout.syncAjax('map', node.outlineId, {"nodeId":node.id});
   var map = response.events[0].map;
   var countries = map.objects.countries.geometries;
 
   // find all countires in table
   var tableCountries = [];
-  for (var i = 0; i < bench.columns.length; i++) {
-    if (bench.columns[i].type == 'geo') {
+  for (var i = 0; i < node.table.columns.length; i++) {
+    if (node.table.columns[i].type == 'geo') {
       for (var r = 0; r < table.length; r++) {
         var value = table[r][i];
         if ( tableCountries.indexOf(value) == -1) tableCountries.push(value);
@@ -104,7 +104,7 @@ Scout.DesktopTableMap = function (scout, $controlContainer, bench, table, filter
 
     //  filter function
     var testFunc = function ($row) {
-      for (var c = 0; c < bench.columns.length; c++) {
+      for (var c = 0; c < node.table.columns.length; c++) {
         var text = $row.children().eq(c).text();
         if (countries.indexOf(text) > -1) return true;
       }

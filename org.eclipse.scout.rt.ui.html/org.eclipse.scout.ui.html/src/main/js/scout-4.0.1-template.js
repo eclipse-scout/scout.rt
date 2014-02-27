@@ -18,6 +18,7 @@
 //@include("src/main/js/desktop/DesktopViewButton.js");
 //@include("src/main/js/desktop/DesktopViewButtonBar.js");
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
+//@include("src/main/js/desktop/Outline.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/menu/MenuHeader.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");

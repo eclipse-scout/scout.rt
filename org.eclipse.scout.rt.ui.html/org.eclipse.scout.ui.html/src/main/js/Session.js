@@ -28,7 +28,8 @@ Scout.Session = function ($entryPoint, sessionPartId) {
 
   this.processEvents = function processEvents(events) {
     var scout=this;
-    $.each(events, function (index, event) {
+    for(var i=0; i < events.length; i++) {
+      var event = events[i];
       if(event.type_ == "create") {
         if(event.parentId === undefined){
           createTopLevelWidget(scout, $entryPoint, event);
@@ -61,7 +62,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
             log("ERROR: No widget found for id " + event.id);
           }
       }
-    });
+    }
   };
 
   this.init = function init() {
