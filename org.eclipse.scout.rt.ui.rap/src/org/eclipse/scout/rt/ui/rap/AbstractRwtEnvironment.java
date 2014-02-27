@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1442,7 +1443,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   }
 
-  private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener {
+  private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener, Serializable {
+    private static final long serialVersionUID = 7099577980770179637L;
     private final IClientSession m_clientSession;
     private final AbstractRwtEnvironment m_environment;
 

@@ -4,18 +4,21 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.html.view;
+
+import java.io.Serializable;
 
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.IView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 
-public class TopView extends DefaultView {
+public class TopView extends DefaultView implements Serializable {
+  private static final long serialVersionUID = -4145097068331865304L;
   private MessagesView m_messagesView;
   private GeneralView m_generalView;
   private ServicesView m_servicesView;
@@ -88,20 +91,22 @@ public class TopView extends DefaultView {
           p.raw("</b>");
         }
         else {
-          final IView finalV = v;
-          p.startLinkAction(
-              new AbstractHtmlAction("tab." + v.getClass().getSimpleName()) {
-                @Override
-                public void run() {
-                  m_activeView = finalV;
-                  if (m_activeView != null) {
-                    m_activeView.activated();
+            final IView finalV = v;
+            p.startLinkAction(
+                new AbstractHtmlAction("tab." + v.getClass().getSimpleName()) {
+                  private static final long serialVersionUID = 2904441773328750585L;
+
+                  @Override
+                  public void run() {
+                    m_activeView = finalV;
+                    if (m_activeView != null) {
+                      m_activeView.activated();
+                    }
                   }
                 }
-              }
-              );
-          v.produceTitle(p);
-          p.endLinkAction();
+                );
+            v.produceTitle(p);
+            p.endLinkAction();
         }
         p.raw("&nbsp;");
         p.raw("&nbsp;");

@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.ui;
 
+import java.io.Serializable;
+
 /**
  * @since 3.8.0
  */
-public interface IUiLayer {
+public interface IUiLayer extends Serializable {
   String getIdentifier();
 
   boolean isWebUi();

@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class SessionsView extends DefaultView {
+  private static final long serialVersionUID = 4697127041507442841L;
   private SessionInspector m_selectedSession;
   private SortInfo m_table1SortInfo;
 
@@ -55,6 +56,9 @@ public class SessionsView extends DefaultView {
   @Override
   public void produceBody(HtmlComponent p) {
     p.linkAction("Clear sessions", new AbstractHtmlAction("clearSessions") {
+
+      private static final long serialVersionUID = -4212688129915270659L;
+
       @Override
       public void run() {
         ProcessInspector.getDefault().clearSessionInspectors();
@@ -113,6 +117,9 @@ public class SessionsView extends DefaultView {
       p.focusAnchor();
     }
     p.startLinkAction(new AbstractHtmlAction("selectSession" + session.getInfo().getSessionId()) {
+
+      private static final long serialVersionUID = 898464700226491147L;
+
       @Override
       public void run() {
         m_selectedSession = session;
@@ -123,6 +130,9 @@ public class SessionsView extends DefaultView {
     p.endTableCell();
     p.startTableCell();
     p.startLinkAction(new AbstractHtmlAction("showServicesOf" + session.getInfo().getSessionId()) {
+
+      private static final long serialVersionUID = 9010809462756614037L;
+
       @Override
       public void run() {
         m_selectedSession = session;
@@ -133,6 +143,9 @@ public class SessionsView extends DefaultView {
     p.endLinkAction();
     p.raw("&nbsp;");
     p.startLinkAction(new AbstractHtmlAction("showCallsOf" + session.getInfo().getSessionId()) {
+
+      private static final long serialVersionUID = -7595683661385397351L;
+
       @Override
       public void run() {
         m_selectedSession = session;
