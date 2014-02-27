@@ -14,13 +14,15 @@ Scout.DesktopTableMap = function (scout, $controlContainer, node, table, filterC
   var map = response.events[0].map;
   var countries = map.objects.countries.geometries;
 
-  // find all countires in table
+  // find all countries in table
   var tableCountries = [];
   for (var i = 0; i < node.table.columns.length; i++) {
-    if (node.table.columns[i].type == 'geo') {
-      for (var r = 0; r < table.length; r++) {
-        var value = table[r][i];
-        if ( tableCountries.indexOf(value) == -1) tableCountries.push(value);
+    for (var j = 0; j < node.map.columnIds.length; j++){
+      if (node.table.columns[i].id == node.map.columnIds[j]) {
+        for (var r = 0; r < table.length; r++) {
+          var value = table[r][i];
+          if ( tableCountries.indexOf(value) == -1) tableCountries.push(value);
+        }
       }
     }
   }
@@ -32,13 +34,13 @@ Scout.DesktopTableMap = function (scout, $controlContainer, node, table, filterC
 
     // per country: loop boundaries
     for (var b = 0; b < borders.length; b++) {
-      // inconsistent: if ony more than one boundary exists, hidden in sub array
+      // inconsistent: if any more than one boundary exists, hidden in sub array
       var border = (typeof borders[b][0] != 'number') ? borders[b][0] : borders[b],
         mainArray = [];
 
       // build arcs of every boundary
       for (var a = 0; a < border.length; a++) {
-        // negativ arc-numbers are in reverse order
+        // negative arc-numbers are in reverse order
         var reverse = (border[a] < 0),
           arc = reverse ? ~border[a] : border[a],
           localArray = [],

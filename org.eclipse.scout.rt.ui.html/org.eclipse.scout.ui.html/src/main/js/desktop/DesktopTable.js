@@ -52,14 +52,16 @@ Scout.DesktopTable = function (scout, $bench, model) {
   loadData();
 
   // update chart button
-  $controlChart.data('label', model.chart)
-    .hover(controlIn, controlOut)
-    .click(controlClick)
-    .click(controlChart);
+  if(model.chart) {
+    $controlChart.data('label', model.chart.label)
+      .hover(controlIn, controlOut)
+      .click(controlClick)
+      .click(controlChart);
+  }
 
   // update or disable graph button
   if (model.graph) {
-    $controlGraph.data('label', model.graph)
+    $controlGraph.data('label', model.graph.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlGraph);
@@ -69,7 +71,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
 
   // update or disable map button
   if (model.map) {
-    $controlMap.data('label', model.map)
+    $controlMap.data('label', model.map.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlMap);
@@ -190,7 +192,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function drawData (startRow) {
-    // this function hast to be fast
+    // this function has to be fast
     var rowString = '';
 
     for (var r = startRow; r < Math.min(table.length, startRow + 100); r++) {
@@ -202,11 +204,8 @@ Scout.DesktopTable = function (scout, $bench, model) {
         var column = model.table.columns[c],
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
-          allign = (column.type == 'int' || column.type == 'float') ? 'text-align: right; ' : '';
+          allign = (column.type == 'number') ? 'text-align: right; ' : '';
           value = row[c];
-
-        if (column.type == 'int') value = $.numberToString(parseFloat(value), 0);
-        if (column.type == 'float') value = $.numberToString(parseFloat(value), 2);
 
         rowString += '<div style = "' + style + allign + '">' + value + '</div>';
       }

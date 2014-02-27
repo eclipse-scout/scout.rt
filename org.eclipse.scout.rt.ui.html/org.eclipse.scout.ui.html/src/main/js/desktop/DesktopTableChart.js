@@ -45,7 +45,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
 
     if (column1.type == 'key') continue;
 
-    var $div = $.makeDiv('', 'select-axis', column1.label)
+    var $div = $.makeDiv('', 'select-axis', column1.text)
       .data('column', c1);
 
     if (column1.type == 'date') {
@@ -66,18 +66,18 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
   var matrix = new Scout.DesktopMatrix(columns, table),
     columnCount = matrix.columnCount(),
     comp = function (a, b) { return Math.abs(a[1] - 9) - Math.abs(b[1] - 9); };
-  
+
   columnCount.sort(comp);
   log(columnCount, columnCount[0][0], columnCount[1][0])
-  
+
   $xAxisSelect.children().each(function () {
       if ($(this).data('column') == columnCount[0][0]) $(this).addClass('selected');
   });
- 
+
   $yAxisSelect.children().each(function () {
     if ($(this).data('column') == columnCount[1][0]) $(this).addClass('selected');
   });
-  
+
   // create container for data
   var $dataSelect = $controlContainer.appendDiv('DataSelect');
   $dataSelect.appendDiv('', 'select-data data-count', countDesc)
@@ -88,7 +88,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
     var column2 = columns[c2];
 
     if ((column2.type == 'float') || (column2.type == 'int')) {
-      $dataSelect.appendDiv('', 'select-data data-sum', column2.label)
+      $dataSelect.appendDiv('', 'select-data data-sum', column2.text)
         .data('column', c2);
     }
   }

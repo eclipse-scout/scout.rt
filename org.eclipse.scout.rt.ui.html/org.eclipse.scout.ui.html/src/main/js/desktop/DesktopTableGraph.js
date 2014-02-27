@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableGraph = function (scout, $controlContainer, bench) {
+Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
   // create container
   $graphContainer = $controlContainer.empty()
     .appendSVG('svg', 'GraphContainer');

@@ -235,7 +235,7 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
       JSONObject json = new JSONObject();
       json.put("id", column.getColumnId());
       json.put("text", column.getHeaderCell().getText());
-      json.put("dataType", column.getDataType());
+      json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
       //FIXME complete
       return json;
@@ -245,13 +245,24 @@ public class JsonOutline extends JsonDesktopTree<IOutline> {
     }
   }
 
-  protected String getCustomJson(String propName) {
+  @SuppressWarnings("unchecked")
+  protected String computeColumnType(IColumn column) {
+    if (column.getDataType().isAssignableFrom(Number.class)) {
+      return "number";
+    }
+    return "text";
+  }
+
+  protected JSONObject getCustomJson(String propName) throws JSONException {
     @SuppressWarnings("unchecked")
     Map<String, String> map = (Map<String, String>) getModelObject().getProperty(PROP_CUSTOM_JSON);
     if (map != null) {
-      return map.get(propName);
+      String propValue = map.get(propName);
+      if (propValue != null) {
+        return new JSONObject(propValue);
+      }
     }
-    return "";
+    return null;
   }
 
   @Override
