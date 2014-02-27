@@ -35,7 +35,8 @@ public class JavascriptDebugResourceInterceptor {
   }
 
   public boolean handle(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws IOException, ServletException {
-    if (interceptionEnabled(req, resp)) {
+    boolean debugEnabled = checkDebugEnabled(req, resp);
+    if (debugEnabled) {
       if (pathInfo != null) {
         Matcher mat = SCRIPT_FILE_PAT.matcher(pathInfo);
         if (mat.matches()) {
@@ -61,7 +62,7 @@ public class JavascriptDebugResourceInterceptor {
     return handleDefault(req, resp, pathInfo);
   }
 
-  protected boolean interceptionEnabled(HttpServletRequest req, HttpServletResponse resp) {
+  protected boolean checkDebugEnabled(HttpServletRequest req, HttpServletResponse resp) {
     HttpSession session = req.getSession(true);
     if (session == null) {
       return false;
