@@ -21,67 +21,82 @@
   <packaging>eclipse-plugin</packaging>
 
 <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <configuration>
-              <target>
-                <property name="process_script_dir" value="${project.build.directory}/process_script" />
-                <property name="compile_classpath" refid="maven.compile.classpath" />
-                <mkdir dir="${process_script_dir}" />
-                <exec dir="${project.basedir}" executable="java" failonerror="true">
-                  <arg line="-classpath ${compile_classpath}" />
-                  <arg line="org.eclipse.scout.ui.html.ScriptProcessor" />
-                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.1-template.css" />
-                  <arg line="--o ${process_script_dir}/scout-4.0.1.css" />
-                  <arg line="--root ${project.basedir}" />
-                </exec>
-                <exec dir="${project.basedir}" executable="java" failonerror="true">
-                  <arg line="-classpath ${compile_classpath}" />
-                  <arg line="org.eclipse.scout.ui.html.ScriptProcessor" />
-                  <arg line="--i ${project.basedir}/WebContent/res/scout-4.0.1-template.js" />
-                  <arg line="--o ${process_script_dir}/scout-4.0.1.js" />
-                  <arg line="--root ${project.basedir}" />
-                </exec>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+  <plugins>
 
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nosuffix>false</nosuffix>
-          <suffix>-min</suffix>
-          <force>true</force>
-          <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
-          <outputDirectory>${project.basedir}/WebContent/res</outputDirectory>
-        </configuration>
-      </plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>1.2.1</version>
+      <executions>
+        <execution>
+          <id>process-css</id>
+          <phase>package</phase>
+          <goals>
+            <goal>java</goal>
+          </goals>
+          <configuration>
+            <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
+            <arguments>
+              <argument>--i</argument>
+              <argument>${project.basedir}/WebContent/res/scout-4.0.1-template.css</argument>
+              <argument>--o</argument>
+              <argument>${project.build.directory}/process_script/scout-4.0.1.css</argument>
+              <argument>--root</argument>
+              <argument>${project.basedir}</argument>
+            </arguments>
+            <classpathScope>compile</classpathScope>
+          </configuration>
+        </execution>
+        <execution>
+          <id>process-js</id>
+          <phase>package</phase>
+          <goals>
+            <goal>java</goal>
+          </goals>
+          <configuration>
+            <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
+            <arguments>
+              <argument>--i</argument>
+              <argument>${project.basedir}/WebContent/res/scout-4.0.1-template.js</argument>
+              <argument>--o</argument>
+              <argument>${project.build.directory}/process_script/scout-4.0.1.js</argument>
+              <argument>--root</argument>
+              <argument>${project.basedir}</argument>
+            </arguments>
+            <classpathScope>compile</classpathScope>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
 
-    </plugins>
+    <plugin>
+      <groupId>net.alchim31.maven</groupId>
+      <artifactId>yuicompressor-maven-plugin</artifactId>
+      <version>1.4.0</version>
+      <executions>
+        <execution>
+          <id>minify</id>
+          <phase>package</phase>
+          <goals>
+            <goal>compress</goal>
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <nosuffix>false</nosuffix>
+        <suffix>-min</suffix>
+        <force>true</force>
+        <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
+        <outputDirectory>${project.basedir}/WebContent/res</outputDirectory>
+      </configuration>
+    </plugin>
+
+  </plugins>
 
   <pluginManagement>
     <plugins>
-      <!-- No stupid jgit warning in workspace, when some files are not yet committed -->
+      <!-- No stupid jgit warning in workspace, when some files are not yet
+        committed -->
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-packaging-plugin</artifactId>
@@ -93,58 +108,41 @@
 
       <!-- No stupid error message in m2e. This long xml section is only necessary
         in tycho to make it not display a red error marker... -->
-      <!--This plugin's configuration is used to store Eclipse m2e settings only.
-        It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.apache.maven.plugins
-                    </groupId>
-                    <artifactId>
-                      maven-antrun-plugin
-                    </artifactId>
-                    <versionRange>[1.6,)</versionRange>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      net.alchim31.maven
-                    </groupId>
-                    <artifactId>
-                      yuicompressor-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.4.0,)
-                    </versionRange>
-                    <goals>
-                      <goal>compress</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
+      <!--This plugin's configuration is used to store Eclipse m2e settings
+        only. It has no influence on the Maven build itself. -->
+      <plugin>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>lifecycle-mapping</artifactId>
+        <version>1.0.0</version>
+        <configuration>
+          <lifecycleMappingMetadata>
+            <pluginExecutions>
+              <pluginExecution>
+                <pluginExecutionFilter>
+                  <groupId>
+                    net.alchim31.maven
+                  </groupId>
+                  <artifactId>
+                    yuicompressor-maven-plugin
+                  </artifactId>
+                  <versionRange>
+                    [1.4.0,)
+                  </versionRange>
+                  <goals>
+                    <goal>compress</goal>
+                  </goals>
+                </pluginExecutionFilter>
+                <action>
+                  <ignore></ignore>
+                </action>
+              </pluginExecution>
+            </pluginExecutions>
+          </lifecycleMappingMetadata>
+        </configuration>
+      </plugin>
     </plugins>
   </pluginManagement>
 
-  </build>
+</build>
 
 </project>

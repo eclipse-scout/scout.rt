@@ -32,15 +32,19 @@ public class ScriptProcessor {
     if (processor.m_input == null) {
       usage("missing --i");
       System.exit(-1);
+      return;
     }
     if (outputFile == null) {
       usage("missing --o");
       System.exit(-1);
+      return;
     }
     if (processor.includeFileLoader == null) {
       usage("missing --root");
       System.exit(-1);
+      return;
     }
+    outputFile.getAbsoluteFile().getParentFile().mkdirs();
     TextFileUtil.writeUTF8(outputFile, processor.process());
   }
 
