@@ -25,11 +25,7 @@ public abstract class AbstractTablePageSpecGen extends AbstractSpecGenTest {
   public void generateSpec() throws ProcessingException {
     IPageWithTable<? extends ITable> page = createAndInitTablePage();
     IDocSection doc = generateDocSection(page);
-    writeMediawikiFile(doc, getFileBaseName(page), new String[]{});
-  }
-
-  protected String getFileBaseName(IPageWithTable<? extends ITable> page) {
-    return page.getClass().getSimpleName() + "_" + page.classId();
+    writeMediawikiFile(doc, SpecUtility.getSpecFileBaseName(page), new String[]{});
   }
 
   protected IDocSection generateDocSection(IPageWithTable<? extends ITable> page) {

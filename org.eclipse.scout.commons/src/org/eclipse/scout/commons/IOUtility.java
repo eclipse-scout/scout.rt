@@ -670,14 +670,14 @@ public final class IOUtility {
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
   public static List<String> readLines(File file) throws ProcessingException {
-    ArrayList<String> sourceFiles;
-    sourceFiles = new ArrayList<String>();
+    ArrayList<String> lines;
+    lines = new ArrayList<String>();
     BufferedReader bufferedReader = null;
     try {
       bufferedReader = new BufferedReader(new FileReader(file));
       String line;
       while ((line = bufferedReader.readLine()) != null) {
-        sourceFiles.add(line);
+        lines.add(line);
       }
     }
     catch (IOException e) {
@@ -693,7 +693,7 @@ public final class IOUtility {
         }
       }
     }
-    return sourceFiles;
+    return lines;
   }
 
 }

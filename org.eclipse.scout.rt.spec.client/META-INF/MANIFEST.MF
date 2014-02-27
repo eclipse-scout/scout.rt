@@ -19,9 +19,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.mylyn.wikitext.mediawiki.core,
  org.eclipse.scout.rt.extension.client,
  org.eclipse.scout.commons,
- org.eclipse.scout.rt.testing.shared
-Import-Package: org.eclipse.scout.testing.client.runner,
- org.junit;version="[4.9.0,5.0.0)",
+ org.eclipse.scout.rt.testing.shared,
+ org.eclipse.scout.rt.testing.client
+Import-Package: org.junit;version="[4.9.0,5.0.0)",
  org.junit.runner;version="[4.9.0,5.0.0)",
  org.junit.runners;version="[4.9.0,5.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

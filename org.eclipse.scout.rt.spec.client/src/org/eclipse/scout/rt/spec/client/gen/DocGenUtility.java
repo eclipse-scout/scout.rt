@@ -13,10 +13,16 @@ package org.eclipse.scout.rt.spec.client.gen;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -168,6 +174,20 @@ public final class DocGenUtility {
       }
     }
     return true;
+  }
+
+  /**
+   * @return all doc entity classes (forms, pages, ...) in all available bundles
+   * @throws ProcessingException
+   */
+  public static Set<Class> getAllDocEntityClasses() throws ProcessingException {
+    return SpecUtility.getAllClasses(new IClassFilter() {
+      // TODO ASA accept other types that needs to be linked like [[CompanyForm|Company]
+      @Override
+      public boolean accept(Class c) {
+        return IForm.class.isAssignableFrom(c) || IPage.class.isAssignableFrom(c);
+      }
+    });
   }
 
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
@@ -26,10 +28,10 @@ public class TypeSpecGenerator {
     m_title = title;
   }
 
-  public IDocSection getDocSection(Class[] types) {
+  public IDocSection getDocSection(Set<Class> types) {
     String anchor = MediawikiUtility.createAnchor(m_anchorId);
     String titleWithAnchor = MediawikiUtility.transformToWiki(anchor + m_title);
-    IDocSection typeSection = DocGenUtility.createDocSection(types, m_config.getTypesConfig());
+    IDocSection typeSection = DocGenUtility.createDocSection(types.toArray(new Class[types.size()]), m_config.getTypesConfig());
     return new SectionWithTable(titleWithAnchor, typeSection);
   }
 }

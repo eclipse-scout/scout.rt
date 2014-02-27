@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import java.util.Set;
+
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -44,13 +46,12 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
 
   @Override
   public void generateSpec() throws ProcessingException {
-    Class[] fieldTypes = getAllClasses();
-    IDocSection doc = generate(fieldTypes);
+    IDocSection doc = generate(getAllClasses());
     writeMediawikiFile(doc, m_id, new String[]{});
   }
 
-  protected Class[] getAllClasses() throws ProcessingException {
-    return BundleInspector.getAllClasses(new BundleInspector.IClassFilter() {
+  protected Set<Class> getAllClasses() throws ProcessingException {
+    return SpecUtility.getAllClasses(new BundleInspector.IClassFilter() {
       @Override
       public boolean accept(Class c) {
         return acceptClass(c);
@@ -66,7 +67,7 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
     return typeDescription != null;
   }
 
-  protected IDocSection generate(Class[] fieldTypes) {
+  protected IDocSection generate(Set<Class> fieldTypes) {
     TypeSpecGenerator g = new TypeSpecGenerator(getConfiguration(), m_id, m_title);
     return g.getDocSection(fieldTypes);
   }

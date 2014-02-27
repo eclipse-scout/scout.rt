@@ -382,13 +382,13 @@ public final class BundleInspector {
   }
 
   /**
-   * get all classes from all available bundles
+   * get all loadable classes from all available bundles
    * 
    * @param filter
    * @return
    * @throws ProcessingException
    */
-  public static Class[] getAllClasses(IClassFilter filter) throws ProcessingException {
+  public static Set<Class> getAllClasses(IClassFilter filter) throws ProcessingException {
     HashSet<Class> discoveredClasses = new HashSet<Class>();
     for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
       // Skip fragments, because classes from fragments are read when browsing the host bundle
@@ -398,21 +398,20 @@ public final class BundleInspector {
       String[] classNames;
       BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
       classNames = bundleBrowser.getClasses(true, true);
-      Class c = null;
       for (String className : classNames) {
+        Class c = null;
         try {
           c = bundle.loadClass(className);
+          if (filter.accept(c)) {
+            discoveredClasses.add(c);
+          }
         }
         catch (Throwable t) {
           // nop: we are only interested in loadable classes
         }
-        if (filter.accept(c)) {
-          discoveredClasses.add(c);
-        }
       }
     }
 
-    Class[] fieldTypes = discoveredClasses.toArray(new Class[discoveredClasses.size()]);
-    return fieldTypes;
+    return discoveredClasses;
   }
 }

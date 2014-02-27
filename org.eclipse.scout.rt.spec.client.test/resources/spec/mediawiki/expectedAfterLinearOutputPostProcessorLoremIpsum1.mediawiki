@@ -1,5 +1,5 @@
-== Lorem ipsum 1 {{a:LoremIpsum1}} ==
+== Lorem ipsum 1 {{a:lo_LoremIpsum1}} ==
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-{{a:AnchorA}}A {{a:AnchorB}}B
-[[LoremIpsum2|Lorem Ipsum 2]] [[LoremIpsum3|Lorem Ipsum 3]]
+{{a:lo_AnchorA}}A {{a:lo_AnchorB}}B
+[[lo_LoremIpsum2|Lorem Ipsum 2]] [[lo_LoremIpsum3|Lorem Ipsum 3]]
 [[Image:../images/testImage.png|Test Image]]

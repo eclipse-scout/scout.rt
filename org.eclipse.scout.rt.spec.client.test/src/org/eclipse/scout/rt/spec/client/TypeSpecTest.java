@@ -14,7 +14,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
@@ -55,7 +54,7 @@ public class TypeSpecTest {
 
   @Test
   public void testGetAllClassesColumnTypeSpec() throws ProcessingException {
-    assertTrue("Expected AbstractBooleanColumn to be found.", Arrays.asList(m_columnTypesSpecTest.getAllClasses()).contains(AbstractBooleanColumn.class));
+    assertTrue("Expected AbstractBooleanColumn to be found.", m_columnTypesSpecTest.getAllClasses().contains(AbstractBooleanColumn.class));
   }
 
   @Test
@@ -63,7 +62,7 @@ public class TypeSpecTest {
     ArrayList<Class> expectedClasses = new ArrayList<Class>();
     expectedClasses.add(AbstractStringField.class);
     expectedClasses.add(AbstractDateField.class);
-    assertTrue("Expected AbstractStringField to be found.", Arrays.asList(m_fieldTypesSpecTest.getAllClasses()).containsAll(expectedClasses));
+    assertTrue("Expected AbstractStringField to be found.", m_fieldTypesSpecTest.getAllClasses().containsAll(expectedClasses));
   }
 
   private class TestStringField extends AbstractStringField {

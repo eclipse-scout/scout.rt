@@ -135,7 +135,7 @@ public class SpecIOUtilityTest {
 
     @Override
     public boolean accept(File dir, String name) {
-      return name.contains("LoremIpsum") && !name.contains("LoremIpsum3");
+      return "LoremIpsum1.mediawiki".equals(name) || "LoremIpsum2.mediawiki".equals(name);
     }
 
   }

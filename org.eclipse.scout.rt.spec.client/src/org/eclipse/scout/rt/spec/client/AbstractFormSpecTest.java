@@ -36,7 +36,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
     List<File> screenshots = printScreenshots();
     IForm form = createAndStartForm(Collections.<FormListener> emptyList());
     IDocSection doc = generateDocSection(form);
-    writeMediawikiFile(doc, getFileBaseName(form), getImagePaths(screenshots));
+    writeMediawikiFile(doc, SpecUtility.getSpecFileBaseName(form), getImagePaths(screenshots));
     form.doClose();
   }
 
@@ -62,10 +62,6 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
   protected IDocSection generateDocSection(IForm form) {
     FormSpecGenerator g = new FormSpecGenerator(getConfiguration());
     return g.getDocSection(form);
-  }
-
-  protected String getFileBaseName(IForm form) {
-    return form.getClass().getSimpleName() + "_" + form.classId();
   }
 
   /**

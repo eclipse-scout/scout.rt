@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
 import org.osgi.framework.Bundle;
 
 /**
@@ -37,7 +39,6 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(LinearOutputPostProcessor.class);
   public static final String ANCHOR_PREFIX = "lo_";
   private File m_configFile;
-  private File m_outputFile;
 
   /**
    * @param configFile
@@ -63,7 +64,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     }
   }
 
-  private FilenameFilter getConfigFileFilter(final String configFile) {
+  protected FilenameFilter getConfigFileFilter(final String configFile) {
     return new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
@@ -77,14 +78,13 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     if (m_configFile == null || !m_configFile.exists()) {
       return;
     }
-    concatenateFiles();
-    prefixAnchorsAndLinks();
+    File outputFile = concatenateFiles();
+    prefixAnchorsAndLinks(outputFile);
   }
 
-  // TODO ASA unittest (also test that image links are not prefixed and multiple links on same line)
-  protected void prefixAnchorsAndLinks() throws ProcessingException {
-    SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\{\\{a:)([^}]+}})"));
-    SpecIOUtility.process(m_outputFile, new P_AnchorProcessor("(\\[\\[)([A-Za-z][A-Za-z0-9_\\.-]+\\|)"));
+  protected void prefixAnchorsAndLinks(File outputFile) throws ProcessingException {
+    SpecIOUtility.process(outputFile, new P_AnchorProcessor("(\\{\\{a:)([^}]+}})"));
+    SpecIOUtility.process(outputFile, new P_AnchorProcessor("(\\[\\[)([A-Za-z][A-Za-z0-9_\\.-]+\\|)"));
   }
 
   protected static class P_AnchorProcessor implements IStringProcessor {
@@ -115,26 +115,25 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
 
   }
 
-  private void concatenateFiles() throws ProcessingException {
+  protected File concatenateFiles() throws ProcessingException {
+    File outputFile = null;
     String outputFileName = m_configFile.getName().replace(".config", "");
-    List<String> sourceFiles = IOUtility.readLines(m_configFile);
+    List<String> configEntries = IOUtility.readLines(m_configFile);
     if (!StringUtility.isNullOrEmpty(outputFileName)) {
       PrintWriter writer = null;
-      m_outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), outputFileName + ".mediawiki");
-      m_outputFile.delete();
+      outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), outputFileName + ".mediawiki");
+      outputFile.delete();
       try {
-        m_outputFile.createNewFile();
-        writer = new PrintWriter(m_outputFile);
-        for (String sourceFile : sourceFiles) {
-          String mediawikiFile = sourceFile + ".mediawiki";
-          LOG.info("appending file. " + mediawikiFile);
-          File file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), mediawikiFile);
-          if (file.exists()) {
+        outputFile.createNewFile();
+        writer = new PrintWriter(outputFile);
+        for (String configEntry : configEntries) {
+          File file = findFileForConfigEntry(configEntry);
+          if (file != null) {
             IOUtility.appendFile(writer, file);
             writer.flush();
           }
           else {
-            LOG.warn("File does not exist: " + file.getPath() + " Skipping...");
+            LOG.warn("No file found for config entry: " + configEntry + ". Skipping...");
           }
         }
       }
@@ -147,6 +146,26 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
         }
       }
     }
+    return outputFile;
   }
 
+  protected File findFileForConfigEntry(String configEntry) throws ProcessingException {
+    // priority 1: try if entry is a file base name
+    File file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), configEntry + ".mediawiki");
+    if (file.exists()) {
+      return file;
+    }
+    // priority 2: try doc entity class name
+    Set<Class> allClasses = DocGenUtility.getAllDocEntityClasses();
+    for (Class c : allClasses) {
+      if (configEntry.equals(c.getSimpleName()) || configEntry.equals(c.getName())) {
+        file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), SpecUtility.getSpecFileBaseName(c) + ".mediawiki");
+        if (file.exists()) {
+          return file;
+        }
+        break;
+      }
+    }
+    return null;
+  }
 }
