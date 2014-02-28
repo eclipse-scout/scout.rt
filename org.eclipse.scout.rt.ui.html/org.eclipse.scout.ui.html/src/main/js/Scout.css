@@ -357,7 +357,9 @@ cursor: pointer;
 padding: 3px;
 }
 
-.header-item:hover .header-control:before {
+.header-item:hover .header-control:before, 
+.header-item.sort-up > .header-control:before, 
+.header-item.sort-down > .header-control:before {
 font-family: fontAwesome;
 font-size: 16px;
 background-color: #FFF;
@@ -369,9 +371,7 @@ color: #CCC;
 color:#9C9C9C !important;
 }
 
-.header-item-up .header-control:before, .header-item-down .header-control:before {
-color:#CCC;
-}
+
 
 /* main table data */
 
@@ -387,7 +387,7 @@ padding-left: 4px;
 right: 7px;
 margin-top: 10px; 
 margin-bottom: 10px;
-height: calc(100% - 20px);
+height: calc(100% - 23px);
 }
 
 #TableDataScroll {
@@ -405,7 +405,8 @@ border-right: 2px solid #FFF;
 border-left: 2px solid #FFF;
 line-height: 26px;
 padding: 2px 0px 2px 0px;
-margin-bottom: -2px;}
+margin-bottom: -2px;
+}
 
 .table-row > div {
 display: inline-block;
@@ -833,7 +834,7 @@ fill: #fe9915 !important;
 /* organize table */
 /* chart - axis and data select */
 
-#OrganizeColumn{
+#OrganizeColumn, #OrganizeCommand, #OrganizeDialog{
 float: left;
 display: inline-block;
 }
@@ -845,7 +846,7 @@ padding-left: 7px;
 padding-top: 4px;
 height: 26px;
 line-height: 21px;
-width: 500px;
+width: 250px;
 background-color: #e2e2e2;
 cursor: pointer;
 overflow: hidden;
@@ -861,7 +862,7 @@ background-color: #fe9915;
 color: #fff;
 }
 
-.column-command {
+.column-flag {
 display: inline-block;
 float: right;
 width: 26px;
@@ -871,30 +872,34 @@ padding-left: 4px;
 font-family: fontAwesome;
 font-size: 16px;
 line-height: 20px;
-}
-
-.column-separator {
-display: inline-block;
-float: right;
-padding: 7px;
-}
-
-.column-command.selected {
-color: #fe9915  !important;
-}
-
-.column-command.active {
 color: #0082A1
 }
+
+.command-item{
+width: 35px;
+heigth: 35px;
+padding: 3px;
+margin-left: 15px;
+font-family: fontAwesome;
+font-size: 24px;
+line-height: 30px;
+color: #0082A1;
+cursor: pointer;
+}
+
+.command-item:hover, .command-item.selected{
+color: #fe9915
+}
 	
-.column-command.sort-up:before { content: "\F160";}
-.column-command.sort-down:before { content: "\F161";}
-.column-command.filter:before { content: "\F0B0";}
-.column-command.add:before { content: "\F067";}
-.column-command.remove:before { content: "\F00D";}
-.column-command.change:before { content: "\F0AD";}
-.column-command.move-up:before { content: "\F077";}
-.column-command.move-down:before { content: "\F078";}
+.column-flag.sort-up:before, .command-item.sort-up:before { content: "\F160";}
+.column-flag.sort-down:before, .command-item.sort-down:before { content: "\F161";}
+.command-item.filter:before { content: "\F0B0";}
+.command-item.group:before { content: "g";}
+.command-item.add:before { content: "\F067";}
+.command-item.remove:before { content: "\F00D";}
+.command-item.change:before { content: "\F0AD";}
+.command-item.move-up:before { content: "\F077";}
+.command-item.move-down:before { content: "\F078";}
 
 .column-command:hover {
 color: #fe9915  !important;
@@ -1003,6 +1008,18 @@ text-align: center;
 #MenuHeaderMore:before		{content: "\F141";}
 
 #MenuHeader > div:hover, #MenuHeader > div.selected:before{
+color: #FE9915 !important;
+}
+
+#MenuHeader > div:hover, #MenuHeader > div.selected:before{
+color: #FE9915 !important;
+}
+
+#MenuHeader.sort-up > #MenuHeaderSortUp:before{
+color: #FE9915 !important;
+}
+
+#MenuHeader.sort-down > #MenuHeaderSortDown:before{
 color: #FE9915 !important;
 }
 

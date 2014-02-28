@@ -1,14 +1,15 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableHeader = function ($tableHeader, columns) {
+Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
   var  totalWidth = 0;
 
   // create header based on model
   for (var i = 0; i < columns.length; i++) {
     var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('type', columns[i].type)
-      .css('width', columns[i].width);
+      .css('width', columns[i].width)
+      .on('click', '', desktopTable.sortToggle);
 
     if (columns[i].width === 0) $header.hide();
 
@@ -19,6 +20,8 @@ Scout.DesktopTableHeader = function ($tableHeader, columns) {
 
     $header.appendDiv('', 'header-resize', '')
       .on('mousedown', '', resizeHeader);
+
+    columns[i].$div = $header;
   }
 
   this.totalWidth = totalWidth;
@@ -58,6 +61,8 @@ Scout.DesktopTableHeader = function ($tableHeader, columns) {
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.MenuHeader(x, y);
+    new Scout.MenuHeader($clicked.parent(), desktopTable,  x, y);
+
+    return false;
   }
 };

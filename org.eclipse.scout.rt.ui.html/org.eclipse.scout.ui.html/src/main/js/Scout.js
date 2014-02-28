@@ -109,6 +109,7 @@ var log = console.log.bind(console);
     if (complete) options.complete = complete;
     if (step) options.step = step;
     if (duration) options.duration = duration;
+    options.queue = false;
 
     this.animate(properties, options);
     return this;

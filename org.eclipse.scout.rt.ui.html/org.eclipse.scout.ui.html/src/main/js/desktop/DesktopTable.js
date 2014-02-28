@@ -5,6 +5,11 @@ Scout.DesktopTable = function (scout, $bench, model) {
   var textOrganize = 'Spaltenverwaltung',
     textClose = 'schliessen';
 
+  // instance methods and variables
+  this.sortToggle = sortToggle;
+  this.sortUp = sortUp;
+  this.sortDown = sortDown;
+
   //create container
   var $desktopTable = $bench.appendDiv('DesktopTable'),
     $tableHeader = $desktopTable.appendDiv('TableHeader'),
@@ -46,7 +51,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   var table;
 
   // create header
-  var tableHeader = new Scout.DesktopTableHeader($tableHeader, model.table.columns);
+  var tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, model.table.columns);
 
   // load data and create rows
   loadData();
@@ -360,8 +365,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
       $rowSelected = $('.row-selected', $tableData),
       $allRows = $('.table-row', $tableDataScroll);
 
-    $rowSelected.removeClass('row-selected');
-    selectionBorder();
+    resetSelection();
 
     $allRows.detach();
     $allRows.each(function (i) {
@@ -385,7 +389,9 @@ Scout.DesktopTable = function (scout, $bench, model) {
   function resetFilter (event) {
     $('.table-row', $tableData).each(function (i) { showRow($(this)); });
     $infoFilter.animateAVCSD('width', 0, function () {$(this).hide(); });
-    $('.main-chart.selected').removeClassSVG('selected');
+    $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
+    log($('.main-chart.selected'));
+    resetSelection();
   }
 
   function showRow ($row) {
@@ -425,6 +431,128 @@ Scout.DesktopTable = function (scout, $bench, model) {
       return 'Eine Zeile';
     } else {
       return n + ' Zeilen';
+    }
+  }
+
+  function resetSelection () {
+    $('.row-selected', $tableData).removeClass('row-selected');
+    selectionBorder();
+    $('#MenuRow').remove();
+  }
+
+  function sortToggle (event) {
+     // find new sort direction
+    var $clicked = $(this),
+      dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+
+    // change sort order of clicked header
+    $clicked.removeClass('sort-up sort-down')
+      .addClass('sort-' + dir);
+
+    // when shift pressed: add, otherwise reset
+    if (event.shiftKey) {
+      var clickOrder = $clicked.data('sort-order'),
+        maxOrder = -1,
+        newOrder;
+
+      $('.header-item').each(function() {
+        var value = $(this).data('sort-order');
+        maxOrder = (value > maxOrder) ? value : maxOrder;
+      });
+
+      if (clickOrder != undefined) {
+        newOrder = clickOrder;
+      } else if (maxOrder > -1) {
+        newOrder = maxOrder + 1;
+      } else {
+        newOrder = 0;
+      }
+
+      $clicked.data('sort-order', newOrder);
+
+    } else {
+      $clicked.data('sort-order', 0)
+        .siblings()
+        .removeClass('sort-up sort-down')
+        .data('sort-order', null);
+    }
+
+    // sort and visualize
+    sort();
+  }
+
+  function sortUp ($header) {
+    $header.removeClass('sort-up sort-down')
+      .addClass('sort-up');
+
+    $header.data('sort-order', 0)
+      .siblings()
+      .removeClass('sort-up sort-down')
+      .data('sort-order', null);
+
+    sort();
+  }
+
+  function sortDown ($header) {
+   $header.removeClass('sort-up sort-down')
+      .addClass('sort-down');
+
+    $header.data('sort-order', 0)
+      .siblings()
+      .removeClass('sort-up sort-down')
+      .data('sort-order', null);
+
+    sort();
+  }
+
+  function sort () {
+    var sortColumns = [];
+
+    // remove selection
+    resetSelection();
+
+    // find all sort columns
+    for (var c = 0; c < model.table.columns.length; c++) {
+      var column = model.table.columns[c],
+        order = column.$div.data('sort-order'),
+        dir =  column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
+        sortColumns[order] = {index : c, dir : dir};
+    }
+
+    // compare rows
+    function compare (a, b) {
+      for (s = 0; s < sortColumns.length; s++) {
+        var index = sortColumns[s].index,
+          dir = sortColumns[s].dir == 'up' ? -1 : 1;
+
+        if (a.children[index].innerHTML < b.children[index].innerHTML) {
+          return dir;
+        } else if (a.children[index].innerHTML > b.children[index].innerHTML) {
+          return -1 * dir;
+        }
+      }
+
+      return 0;
+    }
+
+    // find all rows
+    var $rows = $('.table-row');
+
+    // store old position
+    $rows.each(function () {
+      $(this).data('old-top', $(this).offset().top);
+    });
+
+    // change order in dom
+    $rows = $rows.sort(compare);
+    $tableDataScroll.append($rows);
+
+    // for less than 100 rows: move to old position and then animate
+    if ($rows.length < 100) {
+      $rows.each(function (i) {
+        $(this).css('top', $(this).data('old-top') - $(this).offset().top)
+          .animateAVCSD('top', 0);
+      });
     }
   }
 

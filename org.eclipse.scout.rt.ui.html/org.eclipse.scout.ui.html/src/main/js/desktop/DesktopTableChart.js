@@ -10,7 +10,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
 
   var removeChart = null,
     xAxis,
-	yAxis;
+  yAxis;
 
   // create container
   var $chartSelect = $controlContainer.empty().appendDiv('ChartSelect');
@@ -68,7 +68,6 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
     comp = function (a, b) { return Math.abs(a[1] - 9) - Math.abs(b[1] - 9); };
 
   columnCount.sort(comp);
-  log(columnCount, columnCount[0][0], columnCount[1][0])
 
   $xAxisSelect.children().each(function () {
       if ($(this).data('column') == columnCount[0][0]) $(this).addClass('selected');

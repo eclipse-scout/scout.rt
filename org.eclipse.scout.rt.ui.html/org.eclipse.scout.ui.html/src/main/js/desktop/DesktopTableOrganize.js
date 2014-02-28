@@ -2,12 +2,13 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns, table) {
-  var response = scout.syncAjax('dataModel', model.outlineId, {"nodeId": model.nodeId}),
-    dataModel = response.events[0].dataModel;
+//  var response = scout.syncAjax('dataModel', model.outlineId, {"nodeId": model.nodeId}),
+//    dataModel = response.events[0].dataModel;
 
   $controlContainer.empty();
   var $organizeColumn = $controlContainer.appendDiv('OrganizeColumn'),
-    $organizeDialog = $controlContainer.appendDiv('OrganizeCommand');
+    $organizeCommand = $controlContainer.appendDiv('OrganizeCommand'),
+    $organizeDialog = $controlContainer.appendDiv('OrganizeDialog');
 
   // draw all columns
   for (var c = 0; c < columns.length; c++) {
@@ -16,27 +17,44 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     if (column.type == 'key') continue;
 
     $column = $organizeColumn.appendDiv('', 'column-item', column.text)
-      .data('column', c);
+      .data('column', c)
+      .on('click', '', selectColumn);
 
-    $column.appendDiv('', 'column-command move-down');
-    $column.appendDiv('', 'column-command move-up');
-    $column.appendDiv('', 'column-separator');
-    $column.appendDiv('', 'column-command change');
-    $column.appendDiv('', 'column-command remove');
-    $column.appendDiv('', 'column-command add');
-    $column.appendDiv('', 'column-separator');
-    $column.appendDiv('', 'column-command filter');
-    $column.appendDiv('', 'column-separator');
-    $column.appendDiv('', 'column-command sort-down');
-    $column.appendDiv('', 'column-command sort-up');
+
+    if (column.$div.hasClass('sort-up')) {
+      $column.appendDiv('', 'column-flag sort-up');
+    }
+
+    if (column.$div.hasClass('sort-down')) {
+      $column.appendDiv('', 'column-flag sort-down');
+    }
+
+    if (column.$div.hasClass('sort-filter')) {
+      $column.appendDiv('', 'column-flag sort-filter');
+    }
   }
+
+  $organizeCommand.appendDiv('', 'command-item sort-up');
+  $organizeCommand.appendDiv('', 'command-item sort-down');
+  $organizeCommand.appendDiv('', 'command-item filter');
+  $organizeCommand.appendDiv('', 'command-item group');
+  $organizeCommand.appendDiv('', 'command-item add');
+  $organizeCommand.appendDiv('', 'command-item remove');
+  $organizeCommand.appendDiv('', 'command-item change');
+  $organizeCommand.appendDiv('', 'command-item move-up');
+  $organizeCommand.appendDiv('', 'command-item move-down');
 
   // draw all commands
 
   // prepare command section
 
+  function selectColumn () {
+    var $clicked = $(this);
+    $clicked.selectOne('selected');
+  }
+
   // test
-  exportExcel('Datenblatt', table)
+  // exportExcel('Datenblatt', table);
 
   function exportExcel (name, table) {
       // http://jsfiddle.net/cmewv/537/
@@ -83,6 +101,4 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
       template = window.btoa(unescape(encodeURIComponent(template)));
       window.location.href = uri + template;
     };
-
-
 };

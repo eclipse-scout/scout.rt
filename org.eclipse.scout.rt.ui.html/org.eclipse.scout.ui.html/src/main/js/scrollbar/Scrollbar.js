@@ -64,7 +64,7 @@ Scout.Scrollbar = function ($container, axis) {
 
   function scrollWheel (event) {
     event = event.originalEvent || window.event.originalEvent;
-    var w = event.wheelDelta ? - event.wheelDelta / 4 : event.detail * 30;
+    var w = event.wheelDelta ? - event.wheelDelta / 8 : event.detail * 15;
     setThumb(w);
     return false;
   }
