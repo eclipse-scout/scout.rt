@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.http.servletfilter.ServletFilterDelegate;
+import org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate;
 
 /**
  * This filter is registered under the extension point <code>org.eclipse.equinox.http.registry.filters</code> and

@@ -22,9 +22,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.scout.http.servletfilter.ServletFilterDelegate;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
+import org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate;
 
 /**
  * Runs the request in a Subject context.

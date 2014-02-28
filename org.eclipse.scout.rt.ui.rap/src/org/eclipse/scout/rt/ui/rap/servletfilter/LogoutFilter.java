@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 
 /**
  * Filter which checks for a query parameter called "doLogout" and invalidates the session if the parameter is set.

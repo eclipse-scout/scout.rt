@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.http.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.osgi.framework.Bundle;
 
 /**
@@ -182,7 +182,7 @@ public class ResourceServlet extends HttpServletEx {
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, String contentType, long lastModified, int contentLength) {
     String etag = null;
     if (lastModified != -1 && contentLength != -1)
-     {
+    {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 

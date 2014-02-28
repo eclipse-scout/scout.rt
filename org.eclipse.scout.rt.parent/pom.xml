@@ -30,7 +30,7 @@
 
     <module>../org.eclipse.scout.commons</module>
     <module>../org.eclipse.scout.service</module>
-    <module>../org.eclipse.scout.http.servletfilter</module>
+    <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.net</module>
 

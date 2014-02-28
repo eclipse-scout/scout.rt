@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,8 @@ public class HtmlTable extends HtmlComponent {
       sortId = m_tableId + ".sortCol." + columnIndex;
     }
     startLinkAction(new AbstractHtmlAction(sortId) {
+      private static final long serialVersionUID = -4385730186131757304L;
+
       @Override
       public void run() {
         if (m_sortInfo.getColumnIndex() == columnIndex) {

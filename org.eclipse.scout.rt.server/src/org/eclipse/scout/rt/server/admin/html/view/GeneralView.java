@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class GeneralView extends DefaultView {
-
+  private static final long serialVersionUID = -5324529296371616980L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GeneralView.class);
 
   public GeneralView(AdminSession as) {
@@ -129,6 +129,8 @@ public class GeneralView extends DefaultView {
       p.br();
       if (inst.acceptCall(IPingService.class.getName(), "ping")) {
         p.linkAction("IPingService.ping (click to toggle)", new AbstractHtmlAction("IPingService.ignore") {
+          private static final long serialVersionUID = -7667956603352457067L;
+
           @Override
           public void run() {
             inst.getIgnoredCallSet().clear();
@@ -138,6 +140,8 @@ public class GeneralView extends DefaultView {
       }
       else {
         p.startLinkAction(new AbstractHtmlAction("IPingService.accept") {
+          private static final long serialVersionUID = 8429237856017595619L;
+
           @Override
           public void run() {
             inst.getIgnoredCallSet().clear();
@@ -210,6 +214,8 @@ public class GeneralView extends DefaultView {
     }
 
     AbstractHtmlAction action = new AbstractHtmlAction("level=" + logLevel) {
+      private static final long serialVersionUID = -6006327487856760793L;
+
       @Override
       public void run() {
         if (logLevel >= 0 && logLevel <= 5) {
@@ -224,6 +230,7 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_EnableAction extends AbstractHtmlAction {
+    private static final long serialVersionUID = 3594131240310244266L;
     private boolean m_enabled;
 
     public P_EnableAction(boolean b) {
@@ -238,6 +245,7 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_SetTimeoutAction extends AbstractHtmlAction {
+    private static final long serialVersionUID = -2870869345515125996L;
     private long m_minutes;
 
     public P_SetTimeoutAction(long minutes) {
@@ -253,6 +261,7 @@ public class GeneralView extends DefaultView {
 
   private final class P_ToggleGlobalLoggingAction extends AbstractHtmlAction {
 
+    private static final long serialVersionUID = -4255964683807066677L;
     private boolean m_activate;
 
     public P_ToggleGlobalLoggingAction(boolean activate) {

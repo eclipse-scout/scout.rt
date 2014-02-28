@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.http.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.service.SERVICES;
@@ -56,12 +56,12 @@ public class RemoteFileServlet extends HttpServletEx {
     if (f != null) {
       f = f.replaceAll("\\\\", "/"); //$NON-NLS-1$
       while (f.startsWith("/"))
-       {
-        f = f.substring(1); //$NON-NLS-1$
+      {
+        f = f.substring(1);
       }
       while (f.endsWith("/"))
-       {
-        f = f.substring(0, f.lastIndexOf('/')); //$NON-NLS-1$
+      {
+        f = f.substring(0, f.lastIndexOf('/'));
       }
       m_folder = '/' + f;
     }
@@ -88,8 +88,8 @@ public class RemoteFileServlet extends HttpServletEx {
     if (StringUtility.isNullOrEmpty(pathInfo) || pathInfo.replaceAll("\\\\", "/").endsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
       String prefix = "/"; //$NON-NLS-1$
       if (pathInfo != null && pathInfo.replaceAll("\\\\", "/").endsWith("/"))
-       {
-        prefix = pathInfo.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      {
+        prefix = pathInfo.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
       }
       fileList = Arrays.asList(
           prefix + "index.html", //$NON-NLS-1$
@@ -145,7 +145,7 @@ public class RemoteFileServlet extends HttpServletEx {
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath, String contentType, long lastModified, int contentLength) {
     String etag = null;
     if (lastModified != -1 && contentLength != -1)
-     {
+    {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 

@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class MessagesView extends DefaultView {
 
+  private static final long serialVersionUID = -2617599437449773944L;
+
   public MessagesView(AdminSession as) {
     super(as);
   }
