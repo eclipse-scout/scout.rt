@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.field;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.FieldTypesSpecTest;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.FormTitleExtractor;
@@ -30,7 +29,7 @@ public class FieldDetailTitleExtractor<T extends IFormField> extends AbstractNam
     StringBuilder sb = new StringBuilder();
     sb.append(MediawikiUtility.createAnchor(createAnchorId(field)));
     sb.append(new FormFieldLabelExtractor(false, null).getLabelOrSubstituteWhenEmpty(field));
-    sb.append(" (").append(new LinkableTypeExtractor<IFormField>(FieldTypesSpecTest.ID).getText(field)).append(")");
+    sb.append(" (").append(new LinkableTypeExtractor<IFormField>().getText(field)).append(")");
     return sb.toString();
   }
 

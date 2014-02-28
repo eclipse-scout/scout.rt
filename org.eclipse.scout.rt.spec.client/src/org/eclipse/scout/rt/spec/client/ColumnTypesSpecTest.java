@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
- * Concrete implementation of {@link AbstractTypeSpecTest} for columns
+ * implementation of {@link AbstractTypeSpecTest} for columns
  */
 public class ColumnTypesSpecTest extends AbstractTypeSpecTest {
 
