@@ -23,5 +23,4 @@
 
   <artifactId>org.eclipse.scout.jaxws216</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>2.1.6-SNAPSHOT</version>
 </project>

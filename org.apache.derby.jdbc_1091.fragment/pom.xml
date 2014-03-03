@@ -21,6 +21,6 @@
   </parent>
 
   <artifactId>org.apache.derby.jdbc_1091.fragment</artifactId>
-  <version>10.9.1-SNAPSHOT</version>
+  <version>10.9.1.0</version>
   <packaging>eclipse-plugin</packaging>
 </project>

@@ -135,7 +135,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.w3c.dom.svg.fragment"
+         id="org.eclipse.scout.org.w3c.dom.svg.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"

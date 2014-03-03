@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Derby JDBC Fragment Version 10.9.1.0
 Bundle-SymbolicName: org.apache.derby.jdbc_1091.fragment
-Bundle-Version: 10.9.1.qualifier
+Bundle-Version: 10.9.1.0
 Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: system.bundle
 Bundle-ClassPath: lib/derby.jar,

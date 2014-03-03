@@ -79,7 +79,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.jdbc.derby"
+         id="org.eclipse.scout.rt.jdbc.derby10"
          download-size="0"
          install-size="0"
          version="0.0.0"
