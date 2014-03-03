@@ -32,9 +32,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -537,31 +535,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
     }
-
-    @Order(40)
-    public class DeleteKeyStroke extends AbstractKeyStroke {
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "DELETE";
-      }
-
-      @Override
-      protected void execAction() throws ProcessingException {
-        ITreeNode node = getSelectedNode();
-        if (node != null) {
-          for (IMenu m : node.getMenus()) {
-            if (m.getClass().getSimpleName().equals("DeleteMenu")) {
-              m.prepareAction();
-              if (m.isVisible() && m.isEnabled()) {
-                m.doAction();
-              }
-              break;
-            }
-          }
-        }
-      }
-    }
-
   }
 
   private class FolderNode extends AbstractTreeNode {
@@ -610,6 +583,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected String getConfiguredText() {
         return ScoutTexts.get("DeleteFolderMenu");
+      }
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return "delete";
       }
 
       @Override
@@ -862,6 +840,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected String getConfiguredText() {
         return ScoutTexts.get("DeleteBookmarkMenu");
+      }
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return "delete";
       }
 
       @Override

@@ -31,8 +31,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -881,42 +879,5 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
       }
     }
-
-    @Order(10)
-    public class DeleteKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "delete";
-      }
-
-      @Override
-      protected void execAction() throws ProcessingException {
-        ITree tree = getTree();
-        if (tree != null) {
-          ITreeNode node = tree.getSelectedNode();
-          //check if already deleted
-          if (node != null && node.getTree() == tree) {
-            IMenu menu = null;
-            if (node instanceof AttributeNode) {
-              menu = node.getMenu(AttributeNode.DeleteAttributeMenu.class);
-            }
-            else if (node instanceof EntityNode) {
-              menu = node.getMenu(EntityNode.DeleteEntityMenu.class);
-            }
-            else if (node instanceof EitherOrNode) {
-              menu = node.getMenu(EitherOrNode.DeleteEitherOrMenu.class);
-            }
-            if (menu != null) {
-              menu.prepareAction();
-              if (menu.isVisible() && menu.isEnabled()) {
-                menu.doAction();
-              }
-            }
-          }
-        }
-      }
-    }
   }
-
 }

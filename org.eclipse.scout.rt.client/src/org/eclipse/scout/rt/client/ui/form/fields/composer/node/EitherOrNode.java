@@ -150,6 +150,11 @@ public class EitherOrNode extends AbstractComposerNode {
     }
 
     @Override
+    protected String getConfiguredKeyStroke() {
+      return "delete";
+    }
+
+    @Override
     protected void execAction() throws ProcessingException {
       ITreeNode next = getSiblingAfter();
       if (isBeginOfEitherOr()) {

@@ -160,6 +160,11 @@ public class EntityNode extends AbstractComposerNode {
     }
 
     @Override
+    protected String getConfiguredKeyStroke() {
+      return "delete";
+    }
+
+    @Override
     protected void execAction() throws ProcessingException {
       getTree().selectPreviousParentNode();
       getTree().removeNode(EntityNode.this);
