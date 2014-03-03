@@ -4,7 +4,7 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.apache.derby.jdbc_1091.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.http.servletfilter"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.commons"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.net"/>
@@ -97,7 +97,7 @@
 <item elementID="=org.eclipse.scout.rt.extension.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.service" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.http.servletfilter" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.jdbc.derby" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
