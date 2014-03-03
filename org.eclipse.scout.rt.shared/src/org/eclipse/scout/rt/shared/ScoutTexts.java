@@ -76,7 +76,7 @@ public class ScoutTexts {
   }
 
   public final String getText(Locale locale, String key, String... messageArguments) {
-    return getTextInternal(locale, key, messageArguments);
+    return getTextInternal(locale, key, getDefaultFallback(key), messageArguments);
   }
 
   public Map<String, String> getTextMap(Locale locale) {
@@ -92,13 +92,26 @@ public class ScoutTexts {
     return m_textProviders;
   }
 
-  protected String getTextInternal(Locale locale, String key, String... messageArguments) {
+  protected String getTextInternal(Locale locale, String key, String fallback, String... messageArguments) {
     for (ITextProviderService provider : getTextProviders()) {
       String result = provider.getText(locale, key, messageArguments);
       if (result != null) {
         return result;
       }
     }
+    return fallback;
+  }
+
+  protected String getDefaultFallback(String key) {
     return "{undefined text " + key + "}";
+  }
+
+  /**
+   * @param key
+   * @param fallback
+   * @return
+   */
+  public String getTextWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
+    return getTextInternal(locale, key, fallback, messageArguments);
   }
 }

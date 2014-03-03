@@ -57,9 +57,8 @@ public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Clas
    */
   @Override
   public String getText(Class clazz) {
-    String text = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix);
-    // TODO ASA fix this hack: name.contains("{undefined text")
-    if (text.startsWith("{undefined text")) {
+    String text = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix, null);
+    if (text == null) {
       return null;
     }
     return m_createAnchor ? MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz)) + text : text;

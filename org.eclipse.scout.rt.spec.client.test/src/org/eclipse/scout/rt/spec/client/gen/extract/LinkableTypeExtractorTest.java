@@ -48,7 +48,7 @@ public class LinkableTypeExtractorTest {
 
   @Test
   public void testGetTextDocsAvailable() {
-    List<ServiceRegistration> registerServices = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
+    List<ServiceRegistration> service = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
     try {
       testGetTextInternal(new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName());
@@ -58,7 +58,7 @@ public class LinkableTypeExtractorTest {
       testGetTextInternal(new TestSubClassWithOwnClassIdAndOwnDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestSubClassWithOwnClassIdAndOwnDoc.class));
     }
     finally {
-      TestingUtility.unregisterServices(registerServices);
+      TestingUtility.unregisterServices(service);
     }
   }
 

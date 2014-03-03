@@ -35,9 +35,8 @@ public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> impl
     Class type = o.getClass();
     StringBuilder specType = new StringBuilder();
     while (type != null) {
-      String name = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name");
-      // TODO ASA fix this hack: name.contains("{undefined text")
-      if (!name.contains("{undefined text")) {
+      String name = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name", null);
+      if (name != null) {
         specType.append(MediawikiUtility.createLink("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(type), name));
         break;
       }

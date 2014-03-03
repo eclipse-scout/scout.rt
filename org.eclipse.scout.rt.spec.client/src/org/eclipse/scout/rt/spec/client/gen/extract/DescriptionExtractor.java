@@ -47,12 +47,7 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
    * @return
    */
   private String getDocAssociatedWithClassId(T o) {
-    String doc = TEXTS.get(o.classId());
-    // TODO ASA fix this hack: name.contains("{undefined text")
-    if (!doc.startsWith("{undefined text")) {
-      return doc;
-    }
-    return "";
+    return TEXTS.getWithFallback(o.classId(), "");
   }
 
   /**
