@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -28,6 +29,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * @see LookupCall
  */
+@ClassId("bf3702b8-ee95-4c7b-870d-105b9d0deec2")
 public class CodeLookupCall extends LocalLookupCall implements Serializable {
   private static final long serialVersionUID = 0L;
 

@@ -35,8 +35,7 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * When using (a) the configured property getConfiguredService is non-null <br>
  * When using (b) the method execCreateLookupRows() is non-empty. The subclass CodeLookupCall is implementing this
- * method <br>
- * by using data from a code type (enum).
+ * method by using data from a code type (enum).
  * <p>
  * The following three examples illustrate these cases
  * <p>

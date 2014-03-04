@@ -674,7 +674,7 @@ public final class IOUtility {
     lines = new ArrayList<String>();
     BufferedReader bufferedReader = null;
     try {
-      bufferedReader = new BufferedReader(new FileReader(file));
+      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
       String line;
       while ((line = bufferedReader.readLine()) != null) {
         lines.add(line);
