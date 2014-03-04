@@ -357,7 +357,7 @@
       </filter>
   </extension>
 
-  <extension point="org.eclipse.scout.http.servletfilter.filters">
+  <extension point="org.eclipse.scout.rt.server.commons.filters">
     <filter aliases="/" class="org.eclipse.scout.http.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
        <init-param
              name="active"
