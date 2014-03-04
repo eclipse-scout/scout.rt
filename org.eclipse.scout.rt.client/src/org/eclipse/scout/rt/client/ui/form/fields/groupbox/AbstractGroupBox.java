@@ -393,6 +393,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_bodyGrid = bodyGrid;
   }
 
+  @Override
   public IGroupBoxBodyGrid getBodyGrid() {
     return m_bodyGrid;
   }

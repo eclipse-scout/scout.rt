@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.IGroupBoxBodyGrid;
 
 public interface IGroupBox extends ICompositeField {
 
@@ -127,6 +128,11 @@ public interface IGroupBox extends ICompositeField {
   void setBackgroundImageHorizontalAlignment(int a);
 
   /**
+   * @return
+   */
+  IGroupBoxBodyGrid getBodyGrid();
+
+  /**
    * column count for this composite box<br>
    * see {@value #GRID_COLUMN_COUNT_INHERITED} for inherited column count
    */
@@ -160,4 +166,5 @@ public interface IGroupBox extends ICompositeField {
   void setExpanded(boolean b);
 
   IGroupBoxUIFacade getUIFacade();
+
 }
