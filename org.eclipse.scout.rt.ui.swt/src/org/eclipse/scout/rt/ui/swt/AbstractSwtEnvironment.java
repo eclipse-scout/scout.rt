@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
@@ -65,6 +66,7 @@ import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.SwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
+import org.eclipse.scout.rt.ui.swt.internal.debug.layout.spy.LogicalGridLayoutSpy;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
 import org.eclipse.scout.rt.ui.swt.keystroke.KeyStrokeManager;
@@ -455,6 +457,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           addGlobalKeyStroke(swtStroke);
         }
       }
+
+      // developmentKeyStroke
+      initGlobalKeyStrokes();
       // environment shutdownhook
       m_workbenchListener = new P_WorkbenchListener();
       PlatformUI.getWorkbench().addWorkbenchListener(m_workbenchListener);
@@ -481,6 +486,29 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         m_status = SwtEnvironmentEvent.STOPPED;
         fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
       }
+    }
+  }
+
+  protected void initGlobalKeyStrokes() {
+    if (Platform.inDevelopmentMode()) {
+      addGlobalKeyStroke(new ISwtKeyStroke() {
+
+        @Override
+        public void handleSwtAction(Event e) {
+          new LogicalGridLayoutSpy(getDisplay().getActiveShell()).activate();
+
+        }
+
+        @Override
+        public int getStateMask() {
+          return SWT.ALT | SWT.SHIFT;
+        }
+
+        @Override
+        public int getKeyCode() {
+          return SWT.F2;
+        }
+      });
     }
   }
 

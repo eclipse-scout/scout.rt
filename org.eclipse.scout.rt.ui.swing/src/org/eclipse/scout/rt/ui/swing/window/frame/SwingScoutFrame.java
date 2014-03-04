@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.ComponentSpyAction;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
+import org.eclipse.scout.rt.ui.swing.ext.internal.LogicalGridLayoutSpyAction;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.window.DependentCloseListener;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
@@ -99,6 +101,11 @@ public class SwingScoutFrame implements ISwingScoutView {
     if (contentPane instanceof JComponent) {
       (contentPane).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("shift alt F1"), "componentSpy");
       (contentPane).getActionMap().put("componentSpy", new ComponentSpyAction());
+      // register layout spy
+      if (Platform.inDevelopmentMode()) {
+        ((JComponent) contentPane).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("shift alt F2"), "layoutSpy");
+        ((JComponent) contentPane).getActionMap().put("layoutSpy", new LogicalGridLayoutSpyAction());
+      }
     }
   }
 

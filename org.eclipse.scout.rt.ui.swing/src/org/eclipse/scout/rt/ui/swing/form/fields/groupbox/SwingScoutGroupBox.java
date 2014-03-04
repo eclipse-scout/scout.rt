@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JSection;
+import org.eclipse.scout.rt.ui.swing.ext.internal.LogicalGridLayoutSpyAction;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData;
@@ -64,6 +65,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     m_swingBodyPart = new JPanelEx();
     m_swingBodyPart.setName("Synth.GroupBoxBody");
     m_swingBodyPart.setOpaque(false);
+    m_swingBodyPart.putClientProperty(LogicalGridLayoutSpyAction.GROUP_BOX_MARKER, Boolean.TRUE);
     m_swingButtonBarPart = createButtonBarPart();
     // main panel: NORTH=sectionHeader, CENTER=bodyPanel, SOUTH=buttonPanel
     JPanelEx swingBox = new JPanelEx();

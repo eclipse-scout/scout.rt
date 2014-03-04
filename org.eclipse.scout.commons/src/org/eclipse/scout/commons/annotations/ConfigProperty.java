@@ -78,6 +78,11 @@ public @interface ConfigProperty {
    */
   String BUTTON_SYSTEM_TYPE = "BUTTON_SYSTEM_TYPE";
   /**
+   * Class&lt;? extends LookupCall&gt;
+   */
+  String GROUP_BOX_BODY_GRID = "GROUP_BOX_BODY_GRID";
+
+  /**
    * Class&lt;? extends ICodeType&gt;
    */
   String CODE_TYPE = "CODE_TYPE";

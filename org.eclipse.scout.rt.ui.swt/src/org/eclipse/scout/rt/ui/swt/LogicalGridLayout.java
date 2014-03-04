@@ -52,6 +52,10 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     m_vgap = vgap;
   }
 
+  public LogicalGridLayoutInfo getInfo() {
+    return m_info;
+  }
+
   @Override
   public int computeMinimumWidth(Composite parent, boolean changed) {
     return computeMinimumSize(parent, changed).x;
@@ -204,7 +208,6 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
       }
       comp.setBounds(r);
     }
-
   }
 
   public void setDebug(boolean b) {

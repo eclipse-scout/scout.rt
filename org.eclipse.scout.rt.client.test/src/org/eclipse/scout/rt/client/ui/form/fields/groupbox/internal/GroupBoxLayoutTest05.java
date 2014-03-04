@@ -47,8 +47,8 @@ public class GroupBoxLayoutTest05 extends AbstractGroupBoxLayoutTest {
   @Test
   public void testVerticalLayout() throws Exception {
     MainBox groupBox = new MainBox();
-    IGroupBoxBodyGrid grid = new VerticalGroupBoxBodyGrid(groupBox);
-    grid.validate();
+    IGroupBoxBodyGrid grid = new VerticalSmartGroupBoxBodyGrid();
+    grid.validate(groupBox);
 
     // groupbox
     assertEquals(3, grid.getGridColumnCount());
@@ -68,8 +68,8 @@ public class GroupBoxLayoutTest05 extends AbstractGroupBoxLayoutTest {
   @Test
   public void testHorizontalLayout() throws Exception {
     MainBox groupBox = new MainBox();
-    IGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid(groupBox);
-    grid.validate();
+    IGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid();
+    grid.validate(groupBox);
 
     // groupbox
     assertEquals(3, grid.getGridColumnCount());

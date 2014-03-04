@@ -25,17 +25,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
  */
 public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
 
-  private IGroupBox m_groupBox;
   private int m_gridRows;
   private int m_gridColumns;
-  private List<IFormField> m_fieldsExceptProcessButtons;
 
-  public AbstractGroupBoxBodyGrid(IGroupBox groupBox) {
-    m_groupBox = groupBox;
-  }
-
-  public IGroupBox getGroupBox() {
-    return m_groupBox;
+  public AbstractGroupBoxBodyGrid() {
   }
 
   protected void setGridColumns(int gridColumns) {
@@ -56,35 +49,19 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
     return m_gridRows;
   }
 
-  public List<IFormField> getFieldsExceptProcessButtons() {
-    return m_fieldsExceptProcessButtons;
-  }
-
   @Override
-  public void validate() {
+  public void validate(IGroupBox groupBox) {
     // reset old state
     setGridRows(0);
     // STEP 0: column count
-    int gridColumns = -1;
-    IGroupBox tmp = m_groupBox;
-    while (gridColumns < 0 && tmp != null) {
-      gridColumns = tmp.getGridColumnCountHint();
-      tmp = tmp.getParentGroupBox();
-    }
-    if (gridColumns < 0) {
-      gridColumns = 2;
-    }
-    setGridColumns(gridColumns);
+    setGridColumns(computGridColumnCount(groupBox));
     int containingGridXYCount = 0;
     int notContainingGridXYCount = 0;
     // build
     List<IFormField> fieldsExceptProcessButtons = new ArrayList<IFormField>();
-    for (IFormField formField : m_groupBox.getFields()) {
+    for (IFormField formField : groupBox.getFields()) {
       if (formField.isVisible()) {
-        if ((formField instanceof IButton) && (((IButton) formField).isProcessButton())) {
-          // ignore
-        }
-        else {
+        if (!isProcessButton(formField)) {
           fieldsExceptProcessButtons.add(formField);
           GridData hints = formField.getGridDataHints();
           if (hints.x >= 0 && hints.y >= 0) {
@@ -100,29 +77,53 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
         formField.setGridDataInternal(data);
       }
     }
-    m_fieldsExceptProcessButtons = fieldsExceptProcessButtons;
     boolean isContainingXAndY = (containingGridXYCount > 0 && notContainingGridXYCount == 0);
     if (isContainingXAndY) {
-      layoutAllStatic();
+      layoutAllStatic(fieldsExceptProcessButtons);
     }
     else {
-      layoutAllDynamic();
+      layoutAllDynamic(fieldsExceptProcessButtons);
     }
+  }
+
+  /**
+   * @param formField
+   * @return
+   */
+  protected boolean isProcessButton(IFormField formField) {
+    return (formField instanceof IButton) && (((IButton) formField).isProcessButton());
+  }
+
+  /**
+   * @param groupBox
+   * @return
+   */
+  protected int computGridColumnCount(IGroupBox groupBox) {
+    int gridColumns = -1;
+    IGroupBox tmp = groupBox;
+    while (gridColumns < 0 && tmp != null) {
+      gridColumns = tmp.getGridColumnCountHint();
+      tmp = tmp.getParentGroupBox();
+    }
+    if (gridColumns < 0) {
+      gridColumns = 2;
+    }
+    return gridColumns;
   }
 
   /**
    * Make layout based on grid-x, grid-y, grid-w and grid-h No auto-layout
    */
-  private void layoutAllStatic() {
+  private void layoutAllStatic(List<IFormField> fields) {
     int totalGridW = 1;
     int totalGridH = 0;
-    for (IFormField f : m_fieldsExceptProcessButtons) {
+    for (IFormField f : fields) {
       GridData hints = GridDataBuilder.createFromHints(f, 1);
       totalGridW = Math.max(totalGridW, hints.x + hints.w);
       totalGridH = Math.max(totalGridH, hints.y + hints.h);
     }
 
-    for (IFormField f : m_fieldsExceptProcessButtons) {
+    for (IFormField f : fields) {
       GridData hints = GridDataBuilder.createFromHints(f, totalGridW);
       f.setGridDataInternal(hints);
     }
@@ -133,11 +134,19 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
   /**
    *
    */
-  protected abstract void layoutAllDynamic();
+  protected abstract void layoutAllDynamic(List<IFormField> fields);
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + getGridRowCount() + " " + getGridColumnCount() + "]";
   }
 
+  /**
+   * if grid w greater than group box column count. Grid w will be set to group box column count.
+   */
+  public static GridData getGridDataFromHints(IFormField field, int groupBoxColumnCount) {
+    GridData data = GridDataBuilder.createFromHints(field, groupBoxColumnCount);
+    data.w = Math.min(groupBoxColumnCount, data.w);
+    return data;
+  }
 }

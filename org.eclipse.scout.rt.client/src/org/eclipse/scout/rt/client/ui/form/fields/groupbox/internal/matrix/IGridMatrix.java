@@ -8,20 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.internal;
+package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.matrix;
 
-import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-public final class GridDataBuilder {
-  private GridDataBuilder() {
-  }
+/**
+ * @author Andreas Hoegger
+ * @since 4.0.0 M6 25.02.2014
+ */
+public interface IGridMatrix {
 
-  public static GridData createFromHints(IFormField f, int gridColumnCount) {
-    GridData data = new GridData(f.getGridDataHints());
-    if (data.w == IFormField.FULL_WIDTH) {
-      data.w = gridColumnCount;
-    }
-    return data;
-  }
+  boolean computeGridData(List<IFormField> fields);
+
 }

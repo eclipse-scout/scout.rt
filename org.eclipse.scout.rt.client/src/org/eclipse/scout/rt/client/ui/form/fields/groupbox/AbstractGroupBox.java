@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEscapeKeyStroke;
@@ -28,12 +30,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.IGroupBoxBodyGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractGroupBox.class);
 
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;
@@ -83,10 +85,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * 
    * @return
    */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @ConfigProperty(ConfigProperty.GROUP_BOX_BODY_GRID)
   @Order(210)
-  protected boolean getConfiguredGridLayoutHorizontal() {
-    return false;
+  protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
+    return VerticalSmartGroupBoxBodyGrid.class;
   }
 
   /**
@@ -238,11 +240,19 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
-    if (getConfiguredGridLayoutHorizontal()) {
-      m_bodyGrid = new HorizontalGroupBoxBodyGrid(this);
-    }
-    else {
-      m_bodyGrid = new VerticalGroupBoxBodyGrid(this);
+    Class<? extends IGroupBoxBodyGrid> bodyGridClazz = getConfiguredBodyGrid();
+    if (bodyGridClazz != null) {
+      IGroupBoxBodyGrid bodyGrid;
+      try {
+        bodyGrid = bodyGridClazz.newInstance();
+        setBodyGrid(bodyGrid);
+      }
+      catch (InstantiationException e) {
+        LOG.warn(null, e);
+      }
+      catch (IllegalAccessException e) {
+        LOG.warn(null, e);
+      }
     }
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
     m_systemProcessButtonGrid = new GroupBoxProcessButtonGrid(this, false, true);
@@ -319,7 +329,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public void rebuildFieldGrid() {
-    m_bodyGrid.validate();
+    m_bodyGrid.validate(this);
     m_customProcessButtonGrid.validate();
     m_systemProcessButtonGrid.validate();
     if (isInitialized()) {
@@ -377,6 +387,14 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public List<IButton> getSystemProcessButtons() {
     return CollectionUtility.unmodifiableListCopy(m_systemButtons);
+  }
+
+  public void setBodyGrid(IGroupBoxBodyGrid bodyGrid) {
+    m_bodyGrid = bodyGrid;
+  }
+
+  public IGroupBoxBodyGrid getBodyGrid() {
+    return m_bodyGrid;
   }
 
   @Override

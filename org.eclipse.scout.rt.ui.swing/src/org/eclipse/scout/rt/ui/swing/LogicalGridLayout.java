@@ -98,6 +98,10 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
     m_info = new LogicalGridLayoutInfo(m_env, visibleComps.toArray(new Component[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap);
   }
 
+  public LogicalGridLayoutInfo getInfo() {
+    return m_info;
+  }
+
   public void dumpLayoutInfo(Container parent) {
     dumpLayoutInfo(parent, new PrintWriter(System.out));
   }

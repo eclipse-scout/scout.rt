@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
+import org.eclipse.scout.rt.ui.swt.internal.debug.layout.spy.LogicalGridLayoutSpy;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -88,6 +89,7 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
         }
       }
     });
+    m_swtBodyPart.setData(LogicalGridLayoutSpy.GROUP_BOX_MARKER, Boolean.TRUE);
     createButtonbar(rootPane);
 
     IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();

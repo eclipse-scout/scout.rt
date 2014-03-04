@@ -25,6 +25,18 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.junit.Test;
 
 /**
+ * <h4>Vertical</h4>
+ * 
+ * <pre>
+ * -----------------------------------------
+ *    Field01   |   Field02   |   Field05
+ * -----------------------------------------
+ *    Field03   |   Field03   |
+ * -----------------------------------------
+ *    Field04   |   Field06   |   Field06
+ * -----------------------------------------
+ * </pre>
+ * 
  * <h4>Horizontal</h4>
  * 
  * <pre>
@@ -33,7 +45,7 @@ import org.junit.Test;
  * -----------------------------------------
  *    Field03   |   Field03   |   Field04
  * -----------------------------------------
- *    Field05   |   Field05   |   Field06
+ *    Field05   |   Field06   |   Field06
  * -----------------------------------------
  * </pre>
  * 
@@ -43,10 +55,39 @@ import org.junit.Test;
 public class GroupBoxLayoutTest02 extends AbstractGroupBoxLayoutTest {
 
   @Test
+  public void testVerticalLayout() {
+    MainBox groupBox = new MainBox();
+    VerticalSmartGroupBoxBodyGrid grid = new VerticalSmartGroupBoxBodyGrid();
+    grid.validate(groupBox);
+
+    // groupbox
+    assertEquals(3, grid.getGridColumnCount());
+    assertEquals(3, grid.getGridRowCount());
+
+    // field01
+    assertGridData(0, 0, 1, 1, groupBox.getFieldByClass(Field01.class).getGridData());
+
+    // field02
+    assertGridData(1, 0, 1, 1, groupBox.getFieldByClass(Field02.class).getGridData());
+
+    // field03
+    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(Field03.class).getGridData());
+
+    // field04
+    assertGridData(0, 2, 1, 1, groupBox.getFieldByClass(Field04.class).getGridData());
+
+    // field05
+    assertGridData(2, 0, 1, 1, groupBox.getFieldByClass(Field05.class).getGridData());
+
+    // field06
+    assertGridData(1, 2, 2, 1, groupBox.getFieldByClass(Field06.class).getGridData());
+  }
+
+  @Test
   public void testHorizontalLayout() {
     MainBox groupBox = new MainBox();
-    HorizontalGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid(groupBox);
-    grid.validate();
+    HorizontalGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid();
+    grid.validate(groupBox);
 
     // groupbox
     assertEquals(3, grid.getGridColumnCount());

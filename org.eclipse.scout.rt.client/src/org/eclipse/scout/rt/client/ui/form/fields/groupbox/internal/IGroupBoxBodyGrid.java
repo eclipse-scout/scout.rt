@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+
 /**
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
@@ -19,7 +21,7 @@ public interface IGroupBoxBodyGrid {
   /**
    *
    */
-  void validate();
+  void validate(IGroupBox groupBox);
 
   /**
    * @return

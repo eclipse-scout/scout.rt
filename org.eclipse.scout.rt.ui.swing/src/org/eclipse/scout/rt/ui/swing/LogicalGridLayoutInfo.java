@@ -16,7 +16,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.TreeSet;
 
-class LogicalGridLayoutInfo {
+public class LogicalGridLayoutInfo {
   LogicalGridData[/* component count */] gridDatas;
   Component[/* component count */] components;
   int cols;/* number of cells horizontally */
@@ -27,6 +27,7 @@ class LogicalGridLayoutInfo {
   double[/* row */] weightY;
   private int m_hgap;
   private int m_vgap;
+  private Rectangle[][] m_cellBounds;
 
   LogicalGridLayoutInfo(ISwingEnvironment env, Component[] components, LogicalGridData[] cons, int hgap, int vgap) {
     this.components = components;
@@ -369,19 +370,23 @@ class LogicalGridLayoutInfo {
   Rectangle[][] layoutCellBounds(Dimension size, Insets insets) {
     int[] w = layoutSizes(size.width - insets.left - insets.right - Math.max(0, (cols - 1) * m_hgap), width, weightX);
     int[] h = layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (rows - 1) * m_vgap), height, weightY);
-    Rectangle[][] cellBounds = new Rectangle[rows][cols];
+    m_cellBounds = new Rectangle[rows][cols];
     int y = insets.top;
-    for (int r = 0; r < cellBounds.length; r++) {
+    for (int r = 0; r < m_cellBounds.length; r++) {
       int x = insets.left;
-      for (int c = 0; c < cellBounds[r].length; c++) {
-        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
+      for (int c = 0; c < m_cellBounds[r].length; c++) {
+        m_cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
         x += w[c];
         x += m_hgap;
       }
       y += h[r];
       y += m_vgap;
     }
-    return cellBounds;
+    return m_cellBounds;
+  }
+
+  public Rectangle[][] getCellBounds() {
+    return m_cellBounds;
   }
 
   private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {

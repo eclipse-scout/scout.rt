@@ -20,7 +20,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
-class LogicalGridLayoutInfo {
+public class LogicalGridLayoutInfo {
 //CHECKSTYLE:OFF
   LogicalGridData[/* component count */] gridDatas;
   Control[/* component count */] components;
@@ -36,6 +36,7 @@ class LogicalGridLayoutInfo {
   int[/*column*/] widthHints;
   double[/* column */] weightX;
   double[/* row */] weightY;
+  private Rectangle[][] m_cellBounds;
 
 //CHECKSTYLE:ON
 
@@ -402,19 +403,23 @@ class LogicalGridLayoutInfo {
   Rectangle[][] layoutCellBounds(Point size) {
     int[] w = layoutSizes(size.x - Math.max(0, (cols - 1) * m_hgap), width, weightX);
     int[] h = layoutSizes(size.y - Math.max(0, (rows - 1) * m_vgap), height, weightY);
-    Rectangle[][] cellBounds = new Rectangle[rows][cols];
+    m_cellBounds = new Rectangle[rows][cols];
     int y = 0;
-    for (int r = 0; r < cellBounds.length; r++) {
+    for (int r = 0; r < m_cellBounds.length; r++) {
       int x = 0;
-      for (int c = 0; c < cellBounds[r].length; c++) {
-        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
+      for (int c = 0; c < m_cellBounds[r].length; c++) {
+        m_cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
         x += w[c];
         x += m_hgap;
       }
       y += h[r];
       y += m_vgap;
     }
-    return cellBounds;
+    return m_cellBounds;
+  }
+
+  public Rectangle[][] getCellBounds() {
+    return m_cellBounds;
   }
 
   private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
