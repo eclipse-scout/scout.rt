@@ -243,6 +243,7 @@ public class BundleListClassLoader extends ClassLoader {
     Vector<URL> urlList = new Vector<URL>();
     for (Bundle b : m_bundles) {
       try {
+        @SuppressWarnings("unchecked")
         Enumeration<URL> en = b.getResources(name);
         if (en != null && en.hasMoreElements()) {
           while (en.hasMoreElements()) {

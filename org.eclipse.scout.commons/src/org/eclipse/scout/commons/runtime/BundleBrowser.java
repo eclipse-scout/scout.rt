@@ -133,6 +133,7 @@ public class BundleBrowser {
     return Collections.enumeration(paths);
   }
 
+  @SuppressWarnings("unchecked")
   private void visit(Enumeration<String> en) {
     if (en != null) {
       while (en.hasMoreElements()) {

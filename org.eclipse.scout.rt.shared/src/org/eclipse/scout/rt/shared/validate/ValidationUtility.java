@@ -200,6 +200,7 @@ public final class ValidationUtility {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static void checkLookupCallValue(Object lookupKey, ILookupCall call) throws ProcessingException {
     if (lookupKey == null || call == null) {
       return;
@@ -210,6 +211,7 @@ public final class ValidationUtility {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static void checkLookupCallSet(Object lookupKeySet, ILookupCall call) throws ProcessingException {
     if (lookupKeySet == null || call == null) {
       return;

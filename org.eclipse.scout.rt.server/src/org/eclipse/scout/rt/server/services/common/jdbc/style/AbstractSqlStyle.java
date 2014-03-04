@@ -308,7 +308,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
     else if (Clob.class.isAssignableFrom(c)) {
       return new SqlBind(Types.CLOB, o);
     }
-    else if (c.isArray()) {
+    else if (c != null && c.isArray()) {
       return new SqlBind(Types.ARRAY, o);
     }
     else {

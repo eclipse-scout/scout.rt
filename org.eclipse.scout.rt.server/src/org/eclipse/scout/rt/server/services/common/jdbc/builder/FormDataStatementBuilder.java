@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1176,7 +1175,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return s;
   }
 
-  @SuppressWarnings("cast")
   public EntityContribution buildComposerAttributeNode(final ComposerAttributeNodeData node, AttributeStrategy attributeStrategy) throws ProcessingException {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
@@ -1200,7 +1198,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     List<Object> bindValues = new ArrayList<Object>();
     if (node.getValues() != null) {
-      bindValues.addAll(Arrays.asList(node.getValues()));
+      bindValues.addAll(node.getValues());
     }
     List<String> bindNames = new ArrayList<String>(bindValues.size());
     for (int i = 0; i < bindValues.size(); i++) {

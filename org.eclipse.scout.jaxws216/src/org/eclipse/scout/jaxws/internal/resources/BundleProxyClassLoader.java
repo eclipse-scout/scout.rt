@@ -131,6 +131,7 @@ public class BundleProxyClassLoader extends ClassLoader {
     @Override
     public Enumeration<URL> resolve(Bundle bundle) throws ResourceNotFoundException {
       try {
+        @SuppressWarnings("unchecked")
         Enumeration<URL> urls = bundle.getResources(m_name);
         if (urls != null && urls.hasMoreElements()) {
           return urls;
@@ -160,6 +161,7 @@ public class BundleProxyClassLoader extends ClassLoader {
     @Override
     public Enumeration<URL> resolve(Bundle bundle) throws ResourceNotFoundException {
       try {
+        @SuppressWarnings("unchecked")
         Enumeration<URL> urls = bundle.getResources(m_name);
         if (urls != null && urls.hasMoreElements()) {
           return urls;
