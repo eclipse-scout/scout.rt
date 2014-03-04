@@ -189,7 +189,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function loadData () {
-    var response = scout.syncAjax('table', model.outlineId, {"nodeId":model.id});
+    var response = scout.send('table', model.outlineId, {"nodeId":model.id});
     table = response.events[0].rows;
     $('.table-row').remove();
     drawData(0);

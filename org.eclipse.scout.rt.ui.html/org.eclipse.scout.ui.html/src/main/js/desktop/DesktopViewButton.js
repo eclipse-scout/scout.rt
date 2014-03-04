@@ -14,7 +14,7 @@ Scout.DesktopViewButton = function (scout, $viewButtonBar, viewButton) {
 
     function onClick (event) {
       $viewButton.selectOne();
-      var response = scout.syncAjax('click', $(this).attr('id'));
+      var response = scout.send('click', $(this).attr('id'));
       scout.processEvents(response.events);
     }
 

@@ -109,21 +109,27 @@ public abstract class AbstractJsonSession implements IJsonSession {
   @Override
   public JsonResponse processRequest(JsonRequest req) throws JsonUIException {
     final JsonResponse res = currentJsonResponse();
-    final String id = req.getEventId();
+    for (JsonEvent action : req.getEvents()) {
+      processAction(action, res);
+    }
+    //Clear event map when sent to client
+    m_currentJsonResponse = new JsonResponse();
+    return res;
+  }
+
+  protected void processAction(JsonEvent  event, JsonResponse res) {
+    final String id = event.getEventId();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
       throw new JsonUIException("No renderer found for id " + id);
     }
     try {
-      LOG.info("Handling event. Type: " + req.getEventType() + ", Id: " + id);
-      jsonRenderer.handleUiEvent(req, res);
+      LOG.info("Handling event. Type: " + event.getEventType() + ", Id: " + id);
+      jsonRenderer.handleUiEvent( event, res);
     }
     catch (Throwable t) {
-      LOG.error("Handling event. Type: " + req.getEventType() + ", Id: " + id, t);
+      LOG.error("Handling event. Type: " +  event.getEventType() + ", Id: " + id, t);
     }
-    //Clear event map when sent to client
-    m_currentJsonResponse = new JsonResponse();
-    return res;
   }
 
 }

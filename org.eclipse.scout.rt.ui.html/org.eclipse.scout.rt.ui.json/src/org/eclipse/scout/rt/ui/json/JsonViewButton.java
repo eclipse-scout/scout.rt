@@ -29,16 +29,16 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
   }
 
   @Override
-  public void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
-    if ("click".equals(req.getEventType())) {
-      handleUiClickEvent(req, res);
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+    if ("click".equals(event.getEventType())) {
+      handleUiClickEvent(event, res);
     }
     else {
       throw new IllegalArgumentException("unsupported event type");
     }
   }
 
-  protected void handleUiClickEvent(JsonRequest req, JsonResponse res) {
+  protected void handleUiClickEvent(JsonEvent event, JsonResponse res) {
     ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {

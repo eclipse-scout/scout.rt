@@ -10,45 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonRequest {
-  private final JSONObject m_request;
+public class JsonEvent {
+  private final JSONObject m_event;
 
-  public JsonRequest(JSONObject request) {
-    m_request = request;
+  public JsonEvent(JSONObject event) {
+    m_event = event;
   }
 
-  public String getSessionPartId() {
+  public String getEventType() {
     try {
-      return m_request.getString("sessionPartId");
+      return m_event.getString("type_");
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
     }
   }
 
-  public List<JsonEvent> getEvents() {
+  public String getEventId() {
     try {
-      JSONArray events = m_request.getJSONArray("events");
-      List<JsonEvent> actionList = new ArrayList<>();
-      for (int i = 0; i < events.length(); i++) {
-        actionList.add(new JsonEvent(events.getJSONObject(i)));
-      }
-      return Collections.unmodifiableList(actionList);
+      return m_event.getString("id");
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
     }
   }
 
-  public JSONObject getRequestObject() {
-    return m_request;
+  public JSONObject getEventObject() {
+    return m_event;
   }
 }

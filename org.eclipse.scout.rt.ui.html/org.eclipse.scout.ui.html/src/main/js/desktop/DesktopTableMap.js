@@ -10,7 +10,7 @@ Scout.DesktopTableMap = function (scout, $controlContainer, node, table, filterC
 
 
   // create container
-  var response = scout.syncAjax('map', node.outlineId, {"nodeId":node.id});
+  var response = scout.send('map', node.outlineId, {"nodeId":node.id});
   var map = response.events[0].map;
   var countries = map.objects.countries.geometries;
 

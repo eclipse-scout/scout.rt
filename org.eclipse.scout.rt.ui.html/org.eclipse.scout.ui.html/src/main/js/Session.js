@@ -4,15 +4,16 @@
 Scout.Session = function ($entryPoint, sessionPartId) {
   this.widgetMap = {};
 
-  // server communication, data is optional
-  this.syncAjax = function (eventType, id, event) {
-    if(!event){
-      event={};
-    }
-    event.type_ = eventType;
-    event.id = id;
-    event.sessionPartId = sessionPartId;
-    var url = 'http://localhost:8082/json'; // TODO URL anpassen
+  this.send = function (type, id, data) {
+    return this.sendEvents([new Scout.Event(type, id, data)]);
+  };
+
+  this.sendEvents = function (events) {
+    var request={
+      events : events,
+      sessionPartId : sessionPartId
+    };
+    var url = 'json';
     var ret;
     $.ajax({
       async : false,
@@ -20,7 +21,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
       dataType : "json",
       cache : false,
       url : url,
-      data : JSON.stringify(event),
+      data : JSON.stringify(request),
       success : function (message) {ret = message; }
     });
     return ret;
@@ -67,7 +68,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
 
   this.init = function init() {
     // create all widgets for entry point
-    var response = this.syncAjax('startup', $entryPoint.attr('id'));
+    var response = this.send('startup', $entryPoint.attr('id'));
     this.processEvents(response.events);
   };
 

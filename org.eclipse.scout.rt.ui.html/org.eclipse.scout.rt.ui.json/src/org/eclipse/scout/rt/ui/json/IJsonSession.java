@@ -27,7 +27,8 @@ public interface IJsonSession {
   IJsonRenderer getJsonRenderer(String id);
 
   /**
-   * @return the current ui response that is collecting changes for the next {@link #processRequest(JsonRequest)} cycle
+   * @return the current ui response that is collecting changes for the next {@link #processRequest(Jsoneventuest)}
+   *         cycle
    */
   JsonResponse currentJsonResponse();
 

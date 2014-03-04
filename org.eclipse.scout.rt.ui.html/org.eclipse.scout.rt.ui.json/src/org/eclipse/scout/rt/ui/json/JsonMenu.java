@@ -36,9 +36,9 @@ public class JsonMenu extends AbstractJsonRenderer<IMenu> {
   }
 
   @Override
-  public void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
   }
 
-  protected void handleUiDrillDownEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
+  protected void handleUiDrillDownEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
   }
 }

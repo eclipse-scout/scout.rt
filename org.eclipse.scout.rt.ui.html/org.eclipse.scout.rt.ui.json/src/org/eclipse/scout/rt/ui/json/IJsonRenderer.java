@@ -12,5 +12,5 @@ public interface IJsonRenderer {
 
   JSONObject toJson() throws JsonUIException;
 
-  void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException;
+  void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException;
 }

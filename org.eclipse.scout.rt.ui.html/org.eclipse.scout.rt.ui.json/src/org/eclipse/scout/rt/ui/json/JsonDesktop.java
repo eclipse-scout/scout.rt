@@ -38,7 +38,7 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   private JSONArray m_jsonFormsArray;
   private DesktopListener m_desktopListener;
   private List<JsonViewButton> m_jsonViewButtons;
-  private Map<IOutline, JsonOutline> m_jsonOutlines;
+  private Map<IOutline, JsonDesktopTree> m_jsonOutlines;
 
   private String TOOL_BUTTONS = "[{\"id\": \"t1\", \"label\": \"Suche\", \"icon\": \"\uf002\", \"shortcut\": \"F3\"}," +
       "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
@@ -82,8 +82,8 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       button.init();
       m_jsonViewButtons.add(button);
     }
-    m_jsonOutlines = new HashMap<IOutline, JsonOutline>();
-    JsonOutline jsonOutline = new JsonOutline(this, getDesktop().getOutline(), getJsonSession());
+    m_jsonOutlines = new HashMap<IOutline, JsonDesktopTree>();
+    JsonDesktopTree jsonOutline = new JsonDesktopTree(this, getDesktop().getOutline(), getJsonSession());
     jsonOutline.init();
     m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
 
@@ -129,13 +129,13 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
   }
 
   @Override
-  public void handleUiEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
-    if ("startup".equals(req.getEventType())) {
-      handleUiStartupEvent(req, res);
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+    if ("startup".equals(event.getEventType())) {
+      handleUiStartupEvent(event, res);
     }
   }
 
-  protected void handleUiStartupEvent(JsonRequest req, JsonResponse res) throws JsonUIException {
+  protected void handleUiStartupEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     //Instruct gui to create desktop
     res.addCreateEvent(null, this.toJson());
   }
@@ -177,9 +177,9 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
       try {
         switch (e.getType()) {
           case DesktopEvent.TYPE_OUTLINE_CHANGED:
-            JsonOutline jsonOutline = m_jsonOutlines.get(e.getOutline());
+            JsonDesktopTree jsonOutline = m_jsonOutlines.get(e.getOutline());
             if (jsonOutline == null) {
-              jsonOutline = new JsonOutline(JsonDesktop.this, e.getOutline(), getJsonSession());
+              jsonOutline = new JsonDesktopTree(JsonDesktop.this, e.getOutline(), getJsonSession());
               jsonOutline.init();
               m_jsonOutlines.put(e.getOutline(), jsonOutline);
               getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());

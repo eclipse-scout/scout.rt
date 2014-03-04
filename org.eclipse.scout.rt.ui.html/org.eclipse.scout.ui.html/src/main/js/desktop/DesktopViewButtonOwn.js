@@ -18,7 +18,7 @@ Scout.DesktopViewButtonOwn = function (scout, $viewButtonBar, viewButton) {
       $viewButton.selectOne();
       //TODO what to do on scout?
       /*
-      var response = scout.syncAjax('click', viewButton.id);
+      var response = scout.send('click', viewButton.id);
       scout.processEvents(response.events);
        */
     }

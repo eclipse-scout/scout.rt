@@ -4,14 +4,13 @@
 Scout.Desktop = function (scout, $parent, widget) {
   scout.widgetMap[widget.id] = this;
 
-  // main container
-  var view, tool, tree, bench;
-
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(scout, $parent, widget.viewButtons);
   var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
-  var tree = new Scout.DesktopTree(scout, $parent, widget.outline);
+  var tree = new Scout.DesktopTreeContainer(scout, $parent, widget.outline);
   var bench = new Scout.DesktopBench(scout, $parent);
+
+  tree.attachModel();
 
   // alt and f1-help
   $(window).keydown(function (event)  {
@@ -151,12 +150,12 @@ Scout.Desktop = function (scout, $parent, widget) {
   }
 
   function onModelCreate(event) {
-    new Scout.Outline(scout, tree, event);
+    tree.handleOutlineCreated(event);
   }
 
   function onModelAction(event) {
     if (event.type_ == 'outlineChanged') {
-      tree.setOutline(event.outlineId);
+      tree.handleOutlineChanged(event.outlineId);
     }
   }
 

@@ -6,7 +6,7 @@ Scout.Menu = function (scout, id, nodeId, x, y) {
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var response = scout.syncAjax('menu', id, {"nodeId":nodeId});
+  var response = scout.send('menu', id, {"nodeId":nodeId});
   if(response.events.length === 0){
     return;
   }

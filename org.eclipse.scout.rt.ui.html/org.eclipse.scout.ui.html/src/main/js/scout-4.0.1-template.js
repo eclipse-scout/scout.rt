@@ -4,6 +4,7 @@
 
 //@include("src/main/js/Scout.js");
 //@include("src/main/js/Session.js");
+//@include("src/main/js/Event.js");
 //@include("src/main/js/desktop/Desktop.js");
 //@include("src/main/js/desktop/DesktopBench.js");
 //@include("src/main/js/desktop/DesktopMatrix.js");
@@ -14,11 +15,11 @@
 //@include("src/main/js/desktop/DesktopTableMap.js");
 //@include("src/main/js/desktop/DesktopTableOrganize.js");
 //@include("src/main/js/desktop/DesktopToolButton.js");
+//@include("src/main/js/desktop/DesktopTreeContainer.js");
 //@include("src/main/js/desktop/DesktopTree.js");
 //@include("src/main/js/desktop/DesktopViewButton.js");
 //@include("src/main/js/desktop/DesktopViewButtonBar.js");
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
-//@include("src/main/js/desktop/Outline.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/menu/MenuHeader.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
