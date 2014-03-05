@@ -14,11 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldBooleanPropertyExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldIdExtractor;
 import org.junit.Test;
 
 /**
@@ -56,63 +54,6 @@ public class DocPropertyTest {
     String actualText = p.getText(field);
     String expectedText = TEXTS.get(FormFieldBooleanPropertyExtractor.DOC_ID_FALSE);
     assertEquals("Boolean Doc Text Invalid", expectedText, actualText);
-  }
-
-//  /**
-//   * Tests the {@link LinkableTypeProperty} for a simple form field
-//   */
-//  @Test
-//  public void testLinkableTypeProperty() {
-//    IFormField field = new TestFormField();
-//    LinkableTypeProperty<IFormField> linkableTypeProperty = new LinkableTypeProperty<IFormField>();
-//    String text = linkableTypeProperty.getText(field);
-//    String expectedResult = "" +
-//        "<" + LinkableTypeProperty.REPLACE_TAG_NAME + ">" +
-//        "<" + LinkableTypeProperty.LINK_TAG_NAME + ">" +
-//        "<" + LinkableTypeProperty.ID_TAG_NAME + ">" +
-//        TestFormField.class.getName() +
-//        "<" + LinkableTypeProperty.ID_TAG_NAME + "/>" +
-//        "<" + LinkableTypeProperty.NAME_TAG_NAME + ">" +
-//        TestFormField.class.getSimpleName() +
-//        "<" + LinkableTypeProperty.NAME_TAG_NAME + "/>" +
-//        "<" + LinkableTypeProperty.LINK_TAG_NAME + "/>" +
-//        "<" + LinkableTypeProperty.REPLACE_TAG_NAME + "/>";
-//    assertEquals(expectedResult, text);
-//  }
-//
-//  /**
-//   * Tests the {@link LinkableTypeProperty} for a {@link AbstractStringField}
-//   */
-//  @Test
-//  public void testLinkableTypePropertyStringField() {
-//    IFormField field = new TestStringField();
-//    LinkableTypeProperty<IFormField> linkableTypeProperty = new LinkableTypeProperty<IFormField>();
-//    String text = linkableTypeProperty.getText(field);
-//    String expectedResult =
-//        linkableTypeProperty.getStartTag(LinkableTypeProperty.REPLACE_TAG_NAME) +
-//            linkableTypeProperty.createLink(TestStringField.class.getName(), TestStringField.class.getSimpleName()) +
-//            linkableTypeProperty.createLink(AbstractStringField.class.getName(), AbstractStringField.class.getSimpleName()) +
-//            linkableTypeProperty.createLink(AbstractValueField.class.getName(), AbstractValueField.class.getSimpleName())
-//            + linkableTypeProperty.getEndTag(LinkableTypeProperty.REPLACE_TAG_NAME);
-//    assertEquals(expectedResult, text);
-//  }
-
-  /**
-   * The id of a simple Field should be its class name.
-   */
-  @Test
-  public void testIDText() {
-    IFormField testField = new TestFormField();
-    FormFieldIdExtractor p = new FormFieldIdExtractor("Id");
-
-    String actualText = p.getText(testField);
-    assertEquals("Doc Text Invalid", TestFormField.class.getName(), actualText);
-  }
-
-  class TestFormField extends AbstractFormField {
-  }
-
-  class TestStringField extends AbstractStringField {
   }
 
 }

@@ -21,15 +21,16 @@ import org.eclipse.scout.rt.spec.client.out.IDocSection;
 /**
  *
  */
-public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
+public abstract class AbstractTablePageSpecGen extends AbstractSpecGenTest {
 
-  public void printAllFields() throws ProcessingException {
-    IPageWithTable<? extends ITable> page = createAndStartTablePage();
-    IDocSection doc = generate(page);
-    write(doc, page.classId(), new String[]{}, page.getClass().getSimpleName());
+  @Override
+  public void generateSpec() throws ProcessingException {
+    IPageWithTable<? extends ITable> page = createAndInitTablePage();
+    IDocSection doc = generateDocSection(page);
+    writeMediawikiFile(doc, SpecUtility.getSpecFileBaseName(page), new String[]{});
   }
 
-  protected IDocSection generate(IPageWithTable<? extends ITable> page) {
+  protected IDocSection generateDocSection(IPageWithTable<? extends ITable> page) {
     PageSpecGenerator g = new PageSpecGenerator(getConfiguration());
     return g.getDocSection(page);
   }
@@ -37,6 +38,6 @@ public abstract class AbstractTablePageSpecGen extends AbstractSpecGen {
   /**
    * @return
    */
-  public abstract IPageWithTable<? extends ITable> createAndStartTablePage() throws ProcessingException;
+  public abstract IPageWithTable<? extends ITable> createAndInitTablePage() throws ProcessingException;
 
 }

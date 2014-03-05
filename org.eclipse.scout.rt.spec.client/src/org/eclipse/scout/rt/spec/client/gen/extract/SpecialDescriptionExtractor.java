@@ -11,21 +11,45 @@
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
- * An {@link IDocTextExtractor} with the fully qualified class name as text.
+ * An {@link IDocTextExtractor} for classes that extracts special descriptions
+ * <p>
+ * Special descriptions are DocTexts which are retrieved from the TextProviderService with the classId + a suffix as
+ * key.
+ * <p>
+ * For example there are two special descriptions available for {@link AbstractStringField}:<br>
+ * d8b1f73a-4415-4477-8408-e6ada9e69551_name<br>
+ * d8b1f73a-4415-4477-8408-e6ada9e69551_description
  */
 public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Class<?>> implements IDocTextExtractor<Class<?>> {
 
-  private String m_keySuffix;
+  protected String m_keySuffix;
+  protected boolean m_createAnchor;
 
   /**
-   * @param string
+   * @param name
+   * @param keySuffix
+   * @param createAnchor
+   *          if true the extracted text starts with an anchor with ["c_" + classId] as id
    */
-  public SpecialDescriptionExtractor(String name, String keySuffix) {
+  public SpecialDescriptionExtractor(String name, String keySuffix, boolean createAnchor) {
     super(name);
     m_keySuffix = keySuffix;
+    m_createAnchor = createAnchor;
+  }
+
+  /**
+   * convenience for {@link #SpecialDescriptionExtractor(name, keySuffix, false)}
+   * 
+   * @param name
+   * @param keySuffix
+   */
+  public SpecialDescriptionExtractor(String name, String keySuffix) {
+    this(name, keySuffix, false);
   }
 
   /**
@@ -33,12 +57,11 @@ public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Clas
    */
   @Override
   public String getText(Class<?> clazz) {
-    String doc = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix);
-    // TODO ASA fix this hack: name.contains("{undefined text")
-    if (doc.startsWith("{undefined text")) {
+    String text = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix, null);
+    if (text == null) {
       return null;
     }
-    return doc;
+    return m_createAnchor ? MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz)) + text : text;
   }
 
 }

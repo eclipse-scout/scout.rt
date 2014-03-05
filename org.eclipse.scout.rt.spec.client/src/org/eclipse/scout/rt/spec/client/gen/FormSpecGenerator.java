@@ -34,6 +34,7 @@ public class FormSpecGenerator {
   public IDocSection getDocSection(IForm form) {
     //general form info
     IDocEntityConfig<IForm> formConfig = m_config.getFormConfig();
+    IDocTable formSpec = DocGenUtility.createDocTable(form, formConfig);
 
     //fields
     IDocFormFieldVisitor[] visitors = new IDocFormFieldVisitor[]{
@@ -42,14 +43,8 @@ public class FormSpecGenerator {
         new SmartFieldVisitor(m_config)
     };
     IDocSection[] subSections = getSubSections(form, visitors);
-
-    IDocTable formSpec = DocGenUtility.createDocTable(form, formConfig);
-    // TODO ASA cleanup
-//    String id = formConfig.getIdExtractor().getText(form);
-    String id = form.classId();
     String title = formConfig.getTitleExtractor().getText(form);
-
-    return new SectionWithTable(id, title, formSpec, subSections);
+    return new SectionWithTable(title, formSpec, subSections);
   }
 
   private IDocSection[] getSubSections(IForm form, IDocFormFieldVisitor... visitors) {

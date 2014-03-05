@@ -54,7 +54,7 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
     IDocTable table = new DocTable(headers, rowArray);
     String title = TEXTS.get("org.eclipse.scout.rt.spec.fields");
     ArrayList<IDocSection> sections = new ArrayList<IDocSection>();
-    sections.add(new SectionWithTable(title, title, table));
+    sections.add(new SectionWithTable(title, table));
     return sections;
   }
 

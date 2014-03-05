@@ -76,15 +76,19 @@ public final class SpecIOUtility {
   }
 
   /**
-   * @param out
-   * @param id
+   * create new file
+   * <p>
+   * If the file already exists, it will be deleted first.
+   * 
+   * @param directory
+   * @param baseName
    * @param fileExtension
    * @return
    * @throws ProcessingException
    */
-  public static File createNewFile(File out, String id, String fileExtension) throws ProcessingException {
-    out.mkdirs();
-    File file = new File(out, id + fileExtension);
+  public static File createNewFile(File directory, String baseName, String fileExtension) throws ProcessingException {
+    directory.mkdirs();
+    File file = new File(directory, baseName + fileExtension);
     try {
       if (file.exists()) {
         file.delete();
@@ -95,11 +99,6 @@ public final class SpecIOUtility {
     catch (IOException e) {
       throw new ProcessingException("Error creating file.", e);
     }
-  }
-
-  public static Writer createWriter(File out, String id, String fileExtension) throws ProcessingException {
-    File file = createNewFile(out, id, fileExtension);
-    return createWriter(file);
   }
 
   public static Writer createWriter(File file) throws ProcessingException {

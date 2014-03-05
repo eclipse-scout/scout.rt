@@ -34,17 +34,17 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class DescriptionExtractorTest {
 
-  private List<ServiceRegistration> m_registerServices;
+  private List<ServiceRegistration> m_testTextService;
 
   @Before
   public void before() throws InterruptedException {
-    m_registerServices = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
+    m_testTextService = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterServices(m_registerServices);
+    TestingUtility.unregisterServices(m_testTextService);
     TextsThreadLocal.set(null);
   }
 

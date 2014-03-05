@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
-import org.eclipse.scout.rt.spec.client.FieldTypesSpecTest;
 import org.eclipse.scout.rt.spec.client.text.SpecTestDocsTextProviderService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
@@ -35,7 +34,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class LinkableTypeExtractorTest {
 
-  private LinkableTypeExtractor<Object> m_extractor = new LinkableTypeExtractor<Object>(FieldTypesSpecTest.ID);
+  private LinkableTypeExtractor<Object> m_extractor = new LinkableTypeExtractor<Object>();
 
   @Before
   public void before() {
@@ -49,7 +48,7 @@ public class LinkableTypeExtractorTest {
 
   @Test
   public void testGetTextDocsAvailable() {
-    List<ServiceRegistration> registerServices = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
+    List<ServiceRegistration> service = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
     try {
       testGetTextInternal(new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName());
@@ -59,7 +58,7 @@ public class LinkableTypeExtractorTest {
       testGetTextInternal(new TestSubClassWithOwnClassIdAndOwnDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestSubClassWithOwnClassIdAndOwnDoc.class));
     }
     finally {
-      TestingUtility.unregisterServices(registerServices);
+      TestingUtility.unregisterServices(service);
     }
   }
 

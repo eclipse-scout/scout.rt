@@ -12,11 +12,18 @@ package org.eclipse.scout.rt.spec.client.gen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -107,7 +114,7 @@ public final class DocGenUtility {
    *          {@link IDocEntityConfig}
    * @return {@link IDocTable}
    */
-  public static <T> IDocSection createDocSection(List<T> entities, IDocEntityListConfig<T> config) {
+  public static <T> IDocSection createDocSection(Collection<T> entities, IDocEntityListConfig<T> config) {
     List<IDocTextExtractor<T>> textExtractors = config.getTextExtractors();
     final List<String[]> rows = new ArrayList<String[]>();
     for (T e : entities) {
@@ -120,7 +127,7 @@ public final class DocGenUtility {
       String[][] rowArray = CollectionUtility.toArray(rows, String[].class);
       String[] headers = getHeaders(textExtractors);
       IDocTable table = new DocTable(headers, rowArray);
-      return new SectionWithTable(null, config.getTitle(), table);
+      return new SectionWithTable(config.getTitle(), table);
     }
     return null;
   }
@@ -168,6 +175,20 @@ public final class DocGenUtility {
       }
     }
     return true;
+  }
+
+  /**
+   * @return all doc entity classes (forms, pages, ...) in all available bundles
+   * @throws ProcessingException
+   */
+  public static Set<Class<?>> getAllDocEntityClasses() throws ProcessingException {
+    return SpecUtility.getAllClasses(new IClassFilter() {
+      // TODO ASA accept other types that needs to be linked like [[CompanyForm|Company]
+      @Override
+      public boolean accept(Class c) {
+        return IForm.class.isAssignableFrom(c) || IPage.class.isAssignableFrom(c);
+      }
+    });
   }
 
 }

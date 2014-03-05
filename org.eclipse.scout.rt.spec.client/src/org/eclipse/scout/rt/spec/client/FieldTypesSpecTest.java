@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
- * Concrete implementation of {@link AbstractTypeSpecTest} for form fields
+ * implementation of {@link AbstractTypeSpecTest} for form fields
  */
 public class FieldTypesSpecTest extends AbstractTypeSpecTest {
 

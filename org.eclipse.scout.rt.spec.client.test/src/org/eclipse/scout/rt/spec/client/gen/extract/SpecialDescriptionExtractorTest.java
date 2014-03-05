@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -28,5 +30,14 @@ public class SpecialDescriptionExtractorTest {
     SpecialDescriptionExtractor descriptionExtractor = new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.doc"), "_description");
     assertTrue("Name for AbstractStringField could not be extracted!", !StringUtility.isNullOrEmpty(nameExtractor.getText(AbstractStringField.class)));
     assertTrue("Description for AbstractStringField could not be extracted!", !StringUtility.isNullOrEmpty(descriptionExtractor.getText(AbstractStringField.class)));
+  }
+
+  @Test
+  public void testGetTextAnchor() {
+    SpecialDescriptionExtractor anchorNameExtractor = new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name", true);
+    SpecialDescriptionExtractor nameExtractor = new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name");
+    String anchor = "{{a:c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(AbstractStringField.class) + "}}";
+    assertFalse("Extracted text should not start with anchor.", nameExtractor.getText(AbstractStringField.class).startsWith("{{"));
+    assertTrue("Extracted text should start with anchor.", anchorNameExtractor.getText(AbstractStringField.class).startsWith(anchor));
   }
 }

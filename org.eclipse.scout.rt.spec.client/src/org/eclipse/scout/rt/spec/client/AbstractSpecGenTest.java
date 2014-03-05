@@ -19,11 +19,23 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
+import org.eclipse.scout.testing.client.runner.ScoutClientGUITestRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
- *
+ * Base class for all spec test
  */
-public class AbstractSpecGen {
+@RunWith(ScoutClientGUITestRunner.class)
+public abstract class AbstractSpecGenTest {
+
+  /**
+   * Generate spec in one or more mediawiki files
+   * 
+   * @throws ProcessingException
+   */
+  @Test
+  abstract public void generateSpec() throws ProcessingException;
 
   protected SpecFileConfig getFileConfig() {
     return SpecIOUtility.getSpecFileConfigInstance();
@@ -33,15 +45,18 @@ public class AbstractSpecGen {
     return new DefaultDocConfig();
   }
 
-  protected void write(IDocSection section, String id, String[] imagePaths, String simpleId) throws ProcessingException {
-    File out = getFileConfig().getSpecDir();
-    out.mkdirs();
-
-    File wiki = SpecIOUtility.createNewFile(getFileConfig().getMediawikiDir(), id, ".mediawiki");
+  /**
+   * @param section
+   * @param fileBaseName
+   *          file name without extension
+   * @param imagePaths
+   * @throws ProcessingException
+   */
+  protected void writeMediawikiFile(IDocSection section, String fileBaseName, String[] imagePaths) throws ProcessingException {
+    File wiki = SpecIOUtility.createNewFile(getFileConfig().getMediawikiDir(), fileBaseName, ".mediawiki");
     Writer fileWriter = SpecIOUtility.createWriter(wiki);
     MediawikiWriter w = new MediawikiWriter(fileWriter, section, imagePaths);
     w.write();
-
   }
 
 }

@@ -38,13 +38,6 @@ public interface IDocEntityConfig<T> {
   List<IDocFilter<T>> getFilters();
 
   /**
-   * Configuration describing a unique id of the entity
-   * 
-   * @return {@link IDocTextExtractor}
-   */
-  IDocTextExtractor<T> getIdExtractor();
-
-  /**
    * Configuration describing an extractor for the title of the entity
    * 
    * @param string

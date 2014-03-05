@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.spec.client.screenshot;
 
 import java.io.File;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -32,28 +32,30 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  * <li>closes the form when it is printed</li>
  * <ul>
  */
-public class PrintFormListener implements FormListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintFormListener.class);
+public class PrintScreenshotsFormListener implements FormListener {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintScreenshotsFormListener.class);
 
   /** All scout objects that need to be printed */
   private final Queue<Object> m_printQueue = new LinkedBlockingDeque<Object>();
 
-  private final FormPrinter m_formPrinter;
+  private final FormScreenshotPrinter m_formPrinter;
 
-  /**
-   *
-   */
-  public PrintFormListener(FormPrinter formPrinter) {
+  private List<File> m_printedFiles = new ArrayList<File>();
+
+  public PrintScreenshotsFormListener(FormScreenshotPrinter formPrinter) {
     m_formPrinter = formPrinter;
   }
 
   @Override
   public void formChanged(FormEvent e) throws ProcessingException {
     if (e.getType() == FormEvent.TYPE_ACTIVATED) {
-      enqueueFields(e.getForm());
+      m_formPrinter.setForm(e.getForm());
+      enqueuePrintObjects(e.getForm());
       scheduleNextPrintJob();
     }
     else if (e.getType() == FormEvent.TYPE_PRINTED) {
+      // TODO ASA check if file exists and size > 0 (because FormEvent.TYPE_PRINTED is also thrown when an exception occurs)
+      m_printedFiles.add(e.getPrintedFile());
       if (m_printQueue.isEmpty()) {
         IForm form = e.getForm();
         LOG.info("Closing form : {}", form);
@@ -80,7 +82,7 @@ public class PrintFormListener implements FormListener {
   }
 
   /**
-   * Adds form and fields to print queues.
+   * Adds form and fields to print queue.
    * <p>
    * Collects hidden tab boxes (not selected) to be printed, because they do not appear on the print of the form, and
    * add them to the print queue.
@@ -89,12 +91,19 @@ public class PrintFormListener implements FormListener {
    * @param form
    *          form containing tab boxes
    */
-  private void enqueueFields(IForm form) {
-    Map<File, Object> printObjects = m_formPrinter.getPrintObjects(form);
-    for (Entry<File, Object> e : printObjects.entrySet()) {
-      m_printQueue.add(e.getValue());
-      LOG.info("Adding files to print: {}", e.getKey().getName());
+  private void enqueuePrintObjects(IForm form) {
+    List<Object> printObjects = m_formPrinter.getPrintObjects(form);
+    for (Object o : printObjects) {
+      m_printQueue.add(o);
+      LOG.info("Adding object to print: {}", o);
     }
+  }
+
+  /**
+   * @return
+   */
+  public List<File> getPrintedFiles() {
+    return m_printedFiles;
   }
 
 }

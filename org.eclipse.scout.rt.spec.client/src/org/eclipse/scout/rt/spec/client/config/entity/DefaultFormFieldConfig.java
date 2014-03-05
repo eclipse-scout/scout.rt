@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.FieldTypesSpecTest;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
@@ -59,7 +58,7 @@ public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField>
     if (Platform.inDevelopmentMode()) {
       extractors.add(new SimpleTypeTextExtractor<IFormField>("#DEV# Classname"));
     }
-    extractors.add(new LinkableTypeExtractor<IFormField>(FieldTypesSpecTest.ID));
+    extractors.add(new LinkableTypeExtractor<IFormField>());
     return extractors;
   }
 

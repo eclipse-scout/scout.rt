@@ -11,23 +11,14 @@
 package org.eclipse.scout.rt.spec.client.out;
 
 /**
- * A section heading containing an id that can be referenced and a title to be displayed.
+ * A section heading containing a title to be displayed.
  */
+// TODO ASA refactor: is IDocSectionHeading still needed
 public interface IDocSectionHeading {
-
-  /**
-   * @return a unique id
-   */
-  String getId();
 
   /**
    * @return a name of the heading
    */
   String getName();
-
-  /**
-   * @return <code>true</code>, if heading contains a valid id and name
-   */
-  boolean isValid();
 
 }

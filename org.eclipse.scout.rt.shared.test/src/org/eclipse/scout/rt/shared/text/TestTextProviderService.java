@@ -8,28 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client.out;
+package org.eclipse.scout.rt.shared.text;
+
+import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
+import org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService;
 
 /**
- *
+ * Text provider service for texts used by org.eclipse.scout.rt.shared.test plugin.
  */
-public interface IDocSection {
-
-  /**
-   * @return a title or heading of the section
-   */
-  String getTitle();
-
-  IDocSectionHeading getHeading();
-
-  IDocTable getTable();
-
-  IDocSection[] getSubSections();
-
-  boolean hasSubSections();
-
-  boolean hasTableCellTexts();
-
-  boolean isDisplayed();
-
+public class TestTextProviderService extends AbstractDynamicNlsTextProviderService implements IDocumentationTextProviderService {
+  @Override
+  protected String getDynamicNlsBaseName() {
+    return "resources.texts.Texts";
+  }
 }

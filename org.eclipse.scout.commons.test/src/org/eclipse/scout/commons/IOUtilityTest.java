@@ -211,6 +211,21 @@ public class IOUtilityTest {
     }
   }
 
+  @Test
+  public void testReadLinesUTF8() throws ProcessingException, FileNotFoundException {
+    File tempFile = null;
+    try {
+      tempFile = TestUtility.createTempFileFromFilename("ioUtilityTestUtf8.txt", getClass());
+
+      List<String> readLines = IOUtility.readLines(tempFile);
+      String[] readLinesArray = readLines.toArray(new String[readLines.size()]);
+      assertTrue(StringUtility.equalsIgnoreCase(readLinesArray[0], "TestTestöäü"));
+    }
+    finally {
+      TestUtility.deleteTempFile(tempFile);
+    }
+  }
+
   private File createTextTempFile() throws ProcessingException, FileNotFoundException {
     File tempFile;
     tempFile = IOUtility.createTempFile(FILENAME, EXTENSION, null);

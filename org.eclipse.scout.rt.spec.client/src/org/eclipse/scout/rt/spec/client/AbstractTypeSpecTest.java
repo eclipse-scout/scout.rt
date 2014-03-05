@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.junit.Test;
 
 /**
  * Abstract spec test for creating a spec file with a table describing types (eg. form fields, columns, ...)
@@ -34,7 +33,7 @@ import org.junit.Test;
  * - Name: filled with doc text with the key "[types classid]_name"<br>
  * - Description: filled with doc text with the key "[types classid]_description"
  */
-public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
+public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTypeSpecTest.class);
   private Class<?> m_supertype;
   private String m_id;
@@ -46,15 +45,14 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
     m_supertype = supertype;
   }
 
-  @Test
-  public void generateFieldTypeSpec() throws ProcessingException {
-    Class[] fieldTypes = getAllClasses();
-    IDocSection doc = generate(fieldTypes);
-    write(doc, m_id, new String[]{}, m_id);
+  @Override
+  public void generateSpec() throws ProcessingException {
+    IDocSection doc = generate(getAllClasses());
+    writeMediawikiFile(doc, m_id, new String[]{});
   }
 
-  protected Class[] getAllClasses() throws ProcessingException {
-    return BundleInspector.getAllClasses(new BundleInspector.IClassFilter() {
+  protected Set<Class<?>> getAllClasses() throws ProcessingException {
+    return SpecUtility.getAllClasses(new BundleInspector.IClassFilter() {
       @Override
       public boolean accept(Class c) {
         return acceptClass(c);
@@ -70,10 +68,9 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGen {
     return typeDescription != null;
   }
 
-  protected IDocSection generate(Class[] fieldTypes) {
+  protected IDocSection generate(Collection<Class<?>> fieldTypes) {
     TypeSpecGenerator g = new TypeSpecGenerator(getConfiguration(), m_id, m_title);
-    List<Class<?>> fieldTypeList = CollectionUtility.<Class<?>> arrayList(fieldTypes);
-    return g.getDocSection(fieldTypeList);
+    return g.getDocSection(fieldTypes);
   }
 
 }

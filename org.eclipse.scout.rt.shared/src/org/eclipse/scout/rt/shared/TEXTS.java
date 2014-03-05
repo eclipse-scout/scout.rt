@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
 import java.util.Locale;
@@ -76,4 +86,23 @@ public class TEXTS {
   public static String get(Locale locale, String key, String... messageArguments) {
     return ScoutTexts.getInstance().getText(locale, key, messageArguments);
   }
+
+  /**
+   * Gets the translation for the given key and the default locale.<br>
+   * The default locale is defined as the locale set on the current thread or <code>Locale.getLocale()</code> if the
+   * thread locale is null.
+   * 
+   * @param key
+   * @param fallback
+   *          The fallback is returned when the text for the given key is undefinded.
+   * @return
+   */
+  public static String getWithFallback(String key, String fallback) {
+    return getWithFallback(null, key, fallback);
+  }
+
+  public static String getWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
+    return ScoutTexts.getInstance().getTextWithFallback(locale, key, fallback, messageArguments);
+  }
+
 }

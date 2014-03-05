@@ -28,7 +28,7 @@ public class DefaultTypesConfig implements IDocEntityListConfig<Class<?>> {
   public List<IDocTextExtractor<Class<?>>> getTextExtractors() {
     List<IDocTextExtractor<Class<?>>> extractors = new ArrayList<IDocTextExtractor<Class<?>>>();
 
-    extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name"));
+    extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name", true));
     extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.doc"), "_description"));
     return extractors;
   }

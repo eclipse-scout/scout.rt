@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.spec.client.gen.extract;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -48,12 +47,7 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
    * @return
    */
   private String getDocAssociatedWithClassId(T o) {
-    String doc = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(o.getClass()));
-    // TODO ASA fix this hack: name.contains("{undefined text")
-    if (!doc.startsWith("{undefined text")) {
-      return doc;
-    }
-    return "";
+    return TEXTS.getWithFallback(o.classId(), "");
   }
 
   /**

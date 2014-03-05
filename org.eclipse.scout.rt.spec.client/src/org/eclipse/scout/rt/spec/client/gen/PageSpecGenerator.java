@@ -33,7 +33,6 @@ public class PageSpecGenerator {
 
   public IDocSection getDocSection(IPageWithTable<? extends ITable> page) {
     IDocEntityConfig<IPageWithTable<? extends ITable>> tablePageConfig = m_config.getTablePageConfig();
-    String id = tablePageConfig.getIdExtractor().getText(page);
     String title = tablePageConfig.getTitleExtractor().getText(page);
 
     List<IColumn<?>> columns = page.getTable().getColumns();
@@ -41,6 +40,6 @@ public class PageSpecGenerator {
 
     IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig());
     IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig());
-    return new SectionWithTable(id, title, menuSection, columnSection);
+    return new SectionWithTable(title, menuSection, columnSection);
   }
 }

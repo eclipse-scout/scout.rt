@@ -26,15 +26,8 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
   public static final String LINKS_TAG_NAME = "links";
 
-  private String m_typeDocSectionId;
-
-  /**
-   * @param typeDocSectionId
-   *          Id of the doc section where the type is explained.
-   */
-  public LinkableTypeExtractor(String typeDocSectionId) {
+  public LinkableTypeExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.type"));
-    m_typeDocSectionId = typeDocSectionId;
   }
 
   @Override
@@ -42,10 +35,9 @@ public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> impl
     Class type = o.getClass();
     StringBuilder specType = new StringBuilder();
     while (type != null) {
-      String name = TEXTS.get(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name");
-      // TODO ASA fix this hack: name.contains("{undefined text")
-      if (!name.contains("{undefined text")) {
-        specType.append(MediawikiUtility.createLink(m_typeDocSectionId, name));
+      String name = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name", null);
+      if (name != null) {
+        specType.append(MediawikiUtility.createLink("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(type), name));
         break;
       }
       type = type.getSuperclass();

@@ -9,15 +9,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
- * implementation of {@link AbstractTypeSpecTest} for columns
+ * implementation of {@link AbstractTypeSpecTest} for lookup calls
  */
-public class ColumnTypesSpecTest extends AbstractTypeSpecTest {
+public class LookupCallTypesSpecTest extends AbstractTypeSpecTest {
 
-  public ColumnTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.columntypes", TEXTS.get("org.eclipse.scout.rt.spec.columntypes"), IColumn.class);
+  public LookupCallTypesSpecTest() {
+    super("org.eclipse.scout.rt.spec.lookupcalltypes", TEXTS.get("org.eclipse.scout.rt.spec.lookupcalltypes"), LookupCall.class);
   }
 }

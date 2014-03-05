@@ -21,10 +21,8 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.FormTitleExtractor;
 import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
 import org.eclipse.scout.rt.spec.client.out.html.TemplateUtility;
@@ -41,14 +39,7 @@ public class MediawikiPostProcessor implements ISpecProcessor {
   protected HashMap<String, String> m_classIdTargets = new HashMap<String, String>();
 
   public MediawikiPostProcessor() throws ProcessingException {
-    Class[] classes = BundleInspector.getAllClasses(new IClassFilter() {
-      // TODO ASA accept other types that needs to be linked like [[CompanyForm|Company]
-      @Override
-      public boolean accept(Class c) {
-        return IForm.class.isAssignableFrom(c);
-      }
-    });
-    for (Class c : classes) {
+    for (Class c : DocGenUtility.getAllDocEntityClasses()) {
       m_classIdTargets.put(c.getSimpleName(), FormTitleExtractor.getAnchorId(ConfigurationUtility.getAnnotatedClassIdWithFallback(c)));
       m_classIdTargets.put(c.getName(), FormTitleExtractor.getAnchorId(ConfigurationUtility.getAnnotatedClassIdWithFallback(c)));
     }
