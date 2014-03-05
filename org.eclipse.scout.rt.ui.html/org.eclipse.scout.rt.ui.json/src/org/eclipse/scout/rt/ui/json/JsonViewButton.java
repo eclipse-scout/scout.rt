@@ -42,7 +42,6 @@ public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
     ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().setSelectedFromUI(true);
         getModelObject().getUIFacade().fireActionFromUI();
       }
     };
