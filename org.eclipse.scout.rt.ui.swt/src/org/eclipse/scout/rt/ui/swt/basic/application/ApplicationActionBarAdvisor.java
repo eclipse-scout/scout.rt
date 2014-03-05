@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironmentListener;
 import org.eclipse.scout.rt.ui.swt.SwtEnvironmentEvent;
-import org.eclipse.scout.rt.ui.swt.basic.application.coolbar.CoolbarButton;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutToolbarAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.application.ActionBarAdvisor;
@@ -63,16 +63,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     if (d != null) {
       for (IViewButton scoutViewButton : d.getViewButtons()) {
         if (scoutViewButton.isVisible() && scoutViewButton.isVisibleGranted()) {
-          System.out.println("viewButton " + scoutViewButton.getText());
-          CoolbarButton swtAction = new CoolbarButton(scoutViewButton, m_toolbar, getEnvironment());
+          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutViewButton, m_toolbar, getEnvironment());
           contributeToCoolBar(swtAction);
         }
       }
 
       for (IToolButton scoutToolButton : d.getToolButtons()) {
         if (scoutToolButton.isVisible() && scoutToolButton.isVisibleGranted()) {
-          System.out.println("toolbutton " + scoutToolButton.getText());
-          CoolbarButton swtAction = new CoolbarButton(scoutToolButton, m_toolbar, getEnvironment());
+          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutToolButton, m_toolbar, getEnvironment());
           contributeToCoolBar(swtAction);
         }
       }

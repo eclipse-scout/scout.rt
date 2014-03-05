@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.IGroupBoxBodyGrid;
 
 public interface IGroupBox extends ICompositeField {
 

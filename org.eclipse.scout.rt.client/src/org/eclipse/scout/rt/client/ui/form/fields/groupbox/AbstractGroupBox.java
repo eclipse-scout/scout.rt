@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
@@ -30,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
@@ -81,9 +81,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
-   * <code>true</code> to layout row first <code>false</code> to layout column first
-   * 
-   * @return
+   * @return the body grid responsible to set {@link GridData} to the fields in this group box.
    */
   @ConfigProperty(ConfigProperty.GROUP_BOX_BODY_GRID)
   @Order(210)
@@ -318,10 +316,24 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         }
       }
       if (!hasEnter) {
-        list.add(new DefaultFormEnterKeyStroke(getForm()));
+        try {
+          DefaultFormEnterKeyStroke enterKeyStroke = new DefaultFormEnterKeyStroke(getForm());
+          enterKeyStroke.initAction();
+          list.add(enterKeyStroke);
+        }
+        catch (ProcessingException e) {
+          LOG.error("could not initialize enter key stroke.", e);
+        }
       }
       if (!hasEscape) {
-        list.add(new DefaultFormEscapeKeyStroke(getForm()));
+        try {
+          DefaultFormEscapeKeyStroke escKeyStroke = new DefaultFormEscapeKeyStroke(getForm());
+          escKeyStroke.initAction();
+          list.add(escKeyStroke);
+        }
+        catch (ProcessingException e) {
+          LOG.error("could not initialize esc key stroke.", e);
+        }
       }
     }
     return Collections.unmodifiableList(list);

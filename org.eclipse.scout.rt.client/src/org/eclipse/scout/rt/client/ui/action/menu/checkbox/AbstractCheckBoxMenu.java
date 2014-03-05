@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 
 public abstract class AbstractCheckBoxMenu extends AbstractMenu implements ICheckBoxMenu {
 
+  private boolean m_supportedChangeToggleBehaviour;
+
   public AbstractCheckBoxMenu() {
     super();
   }
@@ -22,13 +24,32 @@ public abstract class AbstractCheckBoxMenu extends AbstractMenu implements IChec
     super(callInitializer);
   }
 
-  /*
-   * Runtime
-   */
+  @Override
+  protected void initConfig() {
+    // enable setToggleAction for super init
+    try {
+      m_supportedChangeToggleBehaviour = true;
+      super.initConfig();
+    }
+    finally {
+      m_supportedChangeToggleBehaviour = false;
+    }
+  }
 
   @Override
-  protected void execAction() {
-    setSelected(!isSelected());
+  protected final boolean getConfiguredToggleAction() {
+    return true;
+  }
+
+  @Override
+  public final void setToggleAction(boolean b) {
+    if (m_supportedChangeToggleBehaviour) {
+      super.setToggleAction(b);
+    }
+    else {
+      throw new UnsupportedOperationException("setToggleAction on " + AbstractCheckBoxMenu.class.getSimpleName() + " is not supported!");
+    }
+    // void here
   }
 
 }

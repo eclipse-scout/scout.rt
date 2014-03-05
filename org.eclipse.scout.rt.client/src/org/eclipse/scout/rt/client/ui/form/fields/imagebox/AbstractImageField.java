@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -178,6 +179,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
 
     m_menus = Collections.unmodifiableList(menuList);
+  }
+
+  @Override
+  protected void initFieldInternal() throws ProcessingException {
+    super.initFieldInternal();
+    // init actions
+    ActionUtility.initActions(getMenus());
   }
 
   /**

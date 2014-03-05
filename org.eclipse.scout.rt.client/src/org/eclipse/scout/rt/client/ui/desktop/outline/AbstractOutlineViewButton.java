@@ -97,6 +97,16 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
         );
   }
 
+  /**
+   * allow only to set on true on view buttons
+   */
+  @Override
+  protected void doActionInternal() throws ProcessingException {
+    if (!isSelected()) {
+      super.doActionInternal();
+    }
+  }
+
   @Override
   protected boolean getConfiguredToggleAction() {
     return true;

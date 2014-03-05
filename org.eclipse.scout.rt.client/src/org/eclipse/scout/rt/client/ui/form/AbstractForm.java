@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StoppableThread;
@@ -58,7 +60,9 @@ import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -122,6 +126,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
   private P_SystemButtonListener m_systemButtonListener;
+  private List<IToolButton> m_toolbuttons;
 
   private IFormHandler m_handler;
   // access control
@@ -143,6 +148,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
 
   private String m_classId;
+
+  private int m_toolbarLocation;
 
   public AbstractForm() throws ProcessingException {
     this(true);
@@ -267,6 +274,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Order(160)
   protected String getConfiguredIconId() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
+  @Order(170)
+  public int getConfiguredToobarLocation() {
+    return TOOLBAR_FORM_HEADER;
   }
 
   /**
@@ -444,10 +457,28 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
   }
 
+  protected List<Class<? extends IToolButton>> getConfiguredToolButtons() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(Arrays.asList(dca), IToolButton.class);
+  }
+
   protected void initConfig() throws ProcessingException {
     m_uiFacade = new P_UIFacade();
     m_scoutTimerMap = new HashMap<String, P_Timer>();
     m_autoRegisterInDesktopOnStart = true;
+    setToolbarLocation(getConfiguredToobarLocation());
+    // toolbuttons
+    List<IToolButton> toolButtonList = new ArrayList<IToolButton>();
+    for (Class<? extends IToolButton> clazz : getConfiguredToolButtons()) {
+      try {
+        IToolButton b = ConfigurationUtility.newInnerInstance(this, clazz);
+        toolButtonList.add(b);
+      }// end try
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("toobutton: " + clazz.getName(), t));
+      }
+    }
+    m_toolbuttons = toolButtonList;
     // prepare injected fields
     Class<? extends IFormField>[] fieldArray = getConfiguredInjectedFields();
     DefaultFormFieldInjection injectedFields = null;
@@ -595,6 +626,33 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setPerspectiveId(String perspectiveId) {
     propertySupport.setPropertyString(PROP_PERSPECTIVE_ID, perspectiveId);
+  }
+
+  @Override
+  public List<IToolButton> getToolbuttons() {
+    return CollectionUtility.unmodifiableListCopy(m_toolbuttons);
+  }
+
+  /**
+   * @param configuredToolbuttonLocation
+   */
+  private void setToolbarLocation(int toolbarLocation) {
+    m_toolbarLocation = toolbarLocation;
+  }
+
+  @Override
+  public int getToolbarLocation() {
+    return m_toolbarLocation;
+  }
+
+  @Override
+  public IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz) {
+    for (IToolButton b : m_toolbuttons) {
+      if (b.getClass() == clazz) {
+        return b;
+      }
+    }
+    return null;
   }
 
   /**
@@ -1187,6 +1245,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     initFormInternal();
     // fields
     FormUtility.initFormFields(this);
+    ActionUtility.initActions(getToolbuttons());
     // custom
     execInitForm();
   }

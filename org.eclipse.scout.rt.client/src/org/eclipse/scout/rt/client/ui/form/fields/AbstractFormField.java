@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -802,6 +803,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       //
       initFieldInternal();
       execInitField();
+      // init key strokes
+      ActionUtility.initActions(getKeyStrokes());
     }
     finally {
       setValueChangeTriggerEnabled(true);
@@ -1756,6 +1759,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       IKeyStroke ks;
       try {
         ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
+        ks.initAction();
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {

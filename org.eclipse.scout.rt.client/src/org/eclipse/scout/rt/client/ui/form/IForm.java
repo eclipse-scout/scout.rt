@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -84,6 +85,9 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    * SWT: View, Editor, , Wizard Editor
    */
   int DISPLAY_HINT_VIEW = 20;
+
+  int TOOLBAR_FORM_HEADER = 30;
+  int TOOLBAR_VIEW_PART = 31;
 
   String VIEW_ID_N = "N";
   String VIEW_ID_NE = "NE";
@@ -527,6 +531,10 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    */
   void setFormStored(boolean b);
 
+  List<IToolButton> getToolbuttons();
+
+  IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz);
+
   Object getProperty(String name);
 
   /**
@@ -629,4 +637,10 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   IEventHistory<FormEvent> getEventHistory();
 
   IFormUIFacade getUIFacade();
+
+  /**
+   * @return
+   */
+  int getToolbarLocation();
+
 }

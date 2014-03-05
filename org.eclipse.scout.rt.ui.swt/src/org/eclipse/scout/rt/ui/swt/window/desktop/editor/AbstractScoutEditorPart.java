@@ -12,18 +12,23 @@ package org.eclipse.scout.rt.ui.swt.window.desktop.editor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutToolbarAction;
 import org.eclipse.scout.rt.ui.swt.busy.AnimatedBusyImage;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
@@ -91,6 +96,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   protected void attachScout() {
+    updateToolbarActionsFromScout();
     IForm form = getForm();
     setTitleFromScout(form.getTitle());
     setImageFromScout(form.getIconId());
@@ -120,6 +126,24 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
       m_editorListener = new P_EditorListener();
     }
     getSite().getPage().addPartListener(m_editorListener);
+  }
+
+  /**
+  *
+  */
+  protected void updateToolbarActionsFromScout() {
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolbuttons());
+    if (!toolbuttons.isEmpty()) {
+      IToolBarManager toolBarManager = getRootForm().getToolBarManager();
+      if (getForm().getToolbarLocation() == IForm.TOOLBAR_VIEW_PART) {
+        toolBarManager = getEditorSite().getActionBars().getToolBarManager();
+      }
+      for (IToolButton b : toolbuttons) {
+        toolBarManager.add(new SwtScoutToolbarAction(b, toolBarManager, getSwtEnvironment()));
+      }
+      toolBarManager.update(true);
+    }
+
   }
 
   protected void detachScout() {

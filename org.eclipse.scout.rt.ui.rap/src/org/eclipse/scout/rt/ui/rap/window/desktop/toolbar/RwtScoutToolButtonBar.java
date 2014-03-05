@@ -187,7 +187,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
       public void run() {
         for (IToolButton scoutButton : getScoutObject().getToolButtons()) {
           if (scoutButton.isSelected()) {
-            scoutButton.getUIFacade().setSelectedFromUI(false);
+            scoutButton.getUIFacade().fireActionFromUI();
           }
         }
       }

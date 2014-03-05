@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -185,7 +186,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     setMarkOutOfMonthDays(getConfiguredMarkOutOfMonthDays());
 
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
+    List<IMenu> menuList = new ArrayList<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
@@ -251,6 +252,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    */
   @Override
   public void initCalendar() throws ProcessingException {
+    // init menus
+    ActionUtility.initActions(getMenus());
     execInitCalendar();
     /*
      * add property change listener to - reload calendar items when view range

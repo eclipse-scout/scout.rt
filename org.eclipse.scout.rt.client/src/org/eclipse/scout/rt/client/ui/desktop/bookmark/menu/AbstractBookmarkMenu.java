@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
@@ -44,8 +43,6 @@ import org.eclipse.scout.service.SERVICES;
 @Order(1f)
 public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBookmarkMenu.class);
-
-  private ArrayList<IKeyStroke> m_keyStrokes;
 
   public AbstractBookmarkMenu() {
   }
@@ -123,7 +120,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private void handleBookmarksChanged() {
     IBookmarkService service = SERVICES.getService(IBookmarkService.class);
     List<IMenu> oldList = getChildActions();
-    ArrayList<IMenu> newList = new ArrayList<IMenu>();
+    List<IMenu> newList = new ArrayList<IMenu>();
     for (IMenu m : oldList) {
       if (m.getClass() == AddUserBookmarkMenu.class) {
         newList.add(m);

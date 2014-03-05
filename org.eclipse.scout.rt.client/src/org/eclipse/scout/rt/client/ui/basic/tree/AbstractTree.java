@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -434,6 +435,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public final void initTree() throws ProcessingException {
     initTreeInternal();
+    ActionUtility.initActions(getMenus());
     execInitTree();
   }
 
@@ -742,8 +744,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(m_baseKeyStrokes);
     for (IMenu menu : menus) {
       if (menu.getKeyStroke() != null) {
-        IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
-        ksList.add(ks);
+        try {
+          IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
+          ks.initAction();
+          ksList.add(ks);
+        }
+        catch (ProcessingException e) {
+          LOG.error("could not initialize key stroke '" + menu.getKeyStroke() + "'", e);
+        }
       }
     }
 

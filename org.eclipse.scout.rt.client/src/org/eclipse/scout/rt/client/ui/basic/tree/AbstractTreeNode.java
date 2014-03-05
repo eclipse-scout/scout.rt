@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -218,6 +219,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
    */
   @Override
   public void initTreeNode() {
+    // init menus
+    try {
+      ActionUtility.initActions(getMenus());
+    }
+    catch (ProcessingException e) {
+      LOG.error("could not initialize actions.", e);
+    }
     execInitTreeNode();
   }
 

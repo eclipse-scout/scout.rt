@@ -13,12 +13,16 @@ package org.eclipse.scout.rt.ui.swt.window.dialog;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
+import java.util.List;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -26,6 +30,7 @@ import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.SwtShellValidateRoot;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutToolbarAction;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
@@ -131,6 +136,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   protected void attachScout(IForm form) {
+    updateToolbarActionsFromScout();
     setTitleFromScout(form.getTitle());
     setImageFromScout(form.getIconId());
     setMaximizeEnabledFromScout(form.isMaximizeEnabled());
@@ -155,6 +161,21 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     setCloseEnabledFromScout(closable);
     // listeners
     form.addPropertyChangeListener(m_formPropertyListener);
+  }
+
+  /**
+  *
+  */
+  protected void updateToolbarActionsFromScout() {
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolbuttons());
+    if (!toolbuttons.isEmpty()) {
+      IToolBarManager toolBarManager = getRootForm().getToolBarManager();
+      for (IToolButton b : toolbuttons) {
+        toolBarManager.add(new SwtScoutToolbarAction(b, toolBarManager, getEnvironment()));
+      }
+      toolBarManager.update(true);
+    }
+
   }
 
   protected void detachScout(IForm form) {

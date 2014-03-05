@@ -1,13 +1,13 @@
 /**
  *
  */
-package org.eclipse.scout.rt.ui.swt.basic.application.coolbar;
+package org.eclipse.scout.rt.ui.swt.action;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 
-public class CoolbarButton extends Action {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CoolbarButton.class);
+public class SwtScoutToolbarAction extends Action {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutToolbarAction.class);
 
   private IAction m_scoutAction;
   private ISwtEnvironment m_swtEnvironment;
@@ -28,9 +28,9 @@ public class CoolbarButton extends Action {
 
   private P_ScoutPropertyChangeListener m_scoutPropertyListener;
 
-  private ToolBarManager m_toolbarMananger;
+  private IToolBarManager m_toolbarMananger;
 
-  public CoolbarButton(IAction scoutAction, ToolBarManager manager, ISwtEnvironment environment) {
+  public SwtScoutToolbarAction(IAction scoutAction, IToolBarManager manager, ISwtEnvironment environment) {
     super((scoutAction.getText() == null) ? (" ") : scoutAction.getText(), transformScoutStyle(scoutAction));
     m_toolbarMananger = manager;
     m_swtEnvironment = environment;
@@ -165,14 +165,14 @@ public class CoolbarButton extends Action {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              if (getScoutObject().isToggleAction()) {
-                if (getScoutObject() instanceof IViewButton && getScoutObject().isSelected()) {
-                  // void
-                }
-                else {
-                  getScoutObject().getUIFacade().setSelectedFromUI(!getScoutObject().isSelected());
-                }
-              }
+//              if (getScoutObject().isToggleAction()) {
+//                if (getScoutObject() instanceof IViewButton && getScoutObject().isSelected()) {
+//                  // void
+//                }
+//                else {
+//                  getScoutObject().getUIFacade().setSelectedFromUI(!getScoutObject().isSelected());
+//                }
+//              }
 
               getScoutObject().getUIFacade().fireActionFromUI();
             }

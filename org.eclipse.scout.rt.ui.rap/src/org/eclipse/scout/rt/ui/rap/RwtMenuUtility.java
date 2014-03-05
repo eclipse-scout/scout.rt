@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,19 +33,11 @@ public final class RwtMenuUtility {
 
   private RwtMenuUtility() {
   }
-  
 
-  public static void fillContextMenu(IMenu[] scoutMenus, IRwtEnvironment uiEnvironment, Menu menu) {
+  public static void fillContextMenu(List<? extends IMenu> scoutMenus, IRwtEnvironment uiEnvironment, Menu menu) {
     MenuFactory menuFactory = uiEnvironment.getMenuFactory();
     if (menuFactory != null) {
       menuFactory.fillContextMenu(menu, scoutMenus, uiEnvironment);
-    }
-  }
-
-  public static void fillContextMenu(List<? extends IActionNode> scoutActionNodes, IRwtEnvironment uiEnvironment, Menu menu) {
-    MenuFactory menuFactory = uiEnvironment.getMenuFactory();
-    if (menuFactory != null) {
-      menuFactory.fillContextMenu(menu, scoutActionNodes, uiEnvironment);
     }
   }
 
@@ -196,14 +189,14 @@ public final class RwtMenuUtility {
    * 
    * @since 3.8.1
    */
-  public static List<IActionNode> cleanup(List<? extends IActionNode> scoutActionNodes) {
+  public static <T extends IActionNode<?>> List<T> cleanup(List<T> scoutActionNodes) {
     if (scoutActionNodes == null) {
       return null;
     }
 
-    List<IActionNode> cleanedActions = new LinkedList<IActionNode>();
+    List<T> cleanedActions = new ArrayList<T>(scoutActionNodes.size());
     for (int i = 0; i < scoutActionNodes.size(); i++) {
-      IActionNode actionNode = scoutActionNodes.get(i);
+      T actionNode = scoutActionNodes.get(i);
       //Ignore invisible actions
       if (!actionNode.isVisible()) {
         continue;

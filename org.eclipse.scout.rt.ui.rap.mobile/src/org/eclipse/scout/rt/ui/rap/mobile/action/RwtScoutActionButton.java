@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -326,9 +328,15 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
       if (actions == null) {
         return;
       }
+      List<IMenu> scoutMenus = new ArrayList<IMenu>(actions.size());
+      for (IActionNode a : actions) {
+        if (a instanceof IMenu) {
+          scoutMenus.add((IMenu) a);
+        }
+      }
 
       Menu menu = ((Menu) e.getSource());
-      RwtMenuUtility.fillContextMenu(actions, getUiEnvironment(), menu);
+      RwtMenuUtility.fillContextMenu(scoutMenus, getUiEnvironment(), menu);
     }
 
   }

@@ -18,6 +18,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -32,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  * {@link #getRelevantSystemTypesForRightHeader()})
  */
 public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormHeaderActionFetcher.class);
 
   public FormHeaderActionFetcher(IForm form) {
     super(form);
@@ -96,7 +100,12 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
     List<IMobileAction> sortedActions = new ArrayList<IMobileAction>();
     for (IButton scoutButton : array) {
       if (relevantSystemTypes.contains(scoutButton.getSystemType())) {
-        sortedActions.add(ActionButtonBarUtility.convertButtonToAction(scoutButton));
+        try {
+          sortedActions.add(ActionButtonBarUtility.convertButtonToAction(scoutButton));
+        }
+        catch (ProcessingException e) {
+          LOG.error("could not initialize actions.", e);
+        }
       }
     }
     return Collections.unmodifiableList(sortedActions);
@@ -114,7 +123,12 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
       actions.addAll(systemActions);
     }
 
-    actions.addAll(convertCustomProcessButtons());
+    try {
+      actions.addAll(convertCustomProcessButtons());
+    }
+    catch (ProcessingException e) {
+      LOG.error("could not initialze actions.", e);
+    }
 
     return actions;
   }

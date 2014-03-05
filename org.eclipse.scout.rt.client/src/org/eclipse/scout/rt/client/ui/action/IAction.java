@@ -43,6 +43,11 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
   String PROP_SEPARATOR = "separator";
 
   /**
+   * @throws ProcessingException
+   */
+  void initAction() throws ProcessingException;
+
+  /**
    * called to perform action
    */
   void doAction() throws ProcessingException;

@@ -78,11 +78,9 @@ public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IR
 
   protected void handleUiSelection() {
     //notify Scout
-    final boolean selected = getUiField().getSelection();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setSelectedFromUI(selected);
         getScoutObject().getUIFacade().fireActionFromUI();
       }
     };

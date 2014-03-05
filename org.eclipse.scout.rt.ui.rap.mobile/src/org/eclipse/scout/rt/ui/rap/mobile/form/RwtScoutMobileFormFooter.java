@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -91,9 +92,14 @@ public class RwtScoutMobileFormFooter extends AbstractRwtScoutActionBar<IForm> i
         if (actionFetcher == null) {
           actionFetcher = new FormFooterActionFetcher(getScoutObject());
         }
-        List<IMenu> actions = actionFetcher.fetch();
-        if (actions != null) {
-          actionList.addAll(actions);
+        try {
+          List<IMenu> actions = actionFetcher.fetch();
+          if (actions != null) {
+            actionList.addAll(actions);
+          }
+        }
+        catch (ProcessingException e) {
+          LOG.error("could not initialze actions.", e);
         }
       }
     };

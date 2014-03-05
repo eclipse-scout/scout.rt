@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.action;
 
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
@@ -18,11 +18,11 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class RwtScoutCheckboxMenu extends AbstractRwtMenuAction {
 
-  public RwtScoutCheckboxMenu(Menu uiMenu, ICheckBoxMenu scoutMenu, IRwtEnvironment uiEnvironment, boolean callInitializer) {
+  public RwtScoutCheckboxMenu(Menu uiMenu, IMenu scoutMenu, IRwtEnvironment uiEnvironment, boolean callInitializer) {
     super(uiMenu, scoutMenu, uiEnvironment, callInitializer);
   }
 
-  public RwtScoutCheckboxMenu(Menu uiMenu, ICheckBoxMenu scoutMenu, IRwtEnvironment uiEnvironment) {
+  public RwtScoutCheckboxMenu(Menu uiMenu, IMenu scoutMenu, IRwtEnvironment uiEnvironment) {
     this(uiMenu, scoutMenu, uiEnvironment, true);
   }
 
@@ -50,7 +50,7 @@ public class RwtScoutCheckboxMenu extends AbstractRwtMenuAction {
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ICheckBoxMenu.PROP_SELECTED)) {
+    if (name.equals(IMenu.PROP_SELECTED)) {
       setSelectedFromScout();
     }
   }

@@ -12,9 +12,13 @@ package org.eclipse.scout.rt.ui.rap.window;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -22,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.action.RwtScoutToolbarAction;
+import org.eclipse.ui.forms.widgets.Form;
 
 /**
  * Abstract rwt scout part composite for a form.
@@ -100,6 +106,7 @@ public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
   }
 
   protected void attachScout() {
+    updateToolbarActionsFromScout();
     IForm form = getScoutObject();
     // listeners
     form.addPropertyChangeListener(m_formPropertyListener);
@@ -126,6 +133,25 @@ public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
       }
     }
     setCloseEnabledFromScout(closable);
+  }
+
+  /**
+  *
+  */
+  protected void updateToolbarActionsFromScout() {
+    Form uiForm = getUiForm();
+    if (uiForm == null) {
+      return;
+    }
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getScoutObject().getToolbuttons());
+    if (!toolbuttons.isEmpty()) {
+      IToolBarManager toolBarManager = uiForm.getToolBarManager();
+      for (IToolButton b : toolbuttons) {
+        toolBarManager.add(new RwtScoutToolbarAction(b, toolBarManager, getUiEnvironment()));
+      }
+      toolBarManager.update(true);
+    }
+
   }
 
   protected void detachScout() {

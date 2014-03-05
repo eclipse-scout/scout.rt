@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.menu;
+package org.eclipse.scout.rt.ui.swt.action;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -759,7 +759,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
 
       final boolean emptySpace = (getSwtField().getContextItem() == null);
       List<IMenu> menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getEnvironment());
-
       SwtMenuUtility.fillContextMenu(menus, m_contextMenu, getEnvironment());
     }
 

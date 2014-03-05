@@ -15,7 +15,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarConstants;
@@ -32,6 +31,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 
 /**
  * This class represents an SWT calendar widget.<br>
@@ -414,14 +414,14 @@ public class SwtCalendar extends Composite implements PaintListener {
    * do nothing in the JCalendar version, needs to be overriden to do smth
    * e.g. in SWTScoutCalendar
    */
-  public void showGeneralContextMenu(IMenuManager manager) {
+  public void showGeneralContextMenu(Menu manager) {
   }
 
   /**
    * do nothing in the JCalendar version, needs to be overriden to do smth
    * e.g. in SWTScoutCalendar
    */
-  public void showItemContextMenu(IMenuManager manager, Object item) {
+  public void showItemContextMenu(Menu manager, Object item) {
   }
 
   @Override

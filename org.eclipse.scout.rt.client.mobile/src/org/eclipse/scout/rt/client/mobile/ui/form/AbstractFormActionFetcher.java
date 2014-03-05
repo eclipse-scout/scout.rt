@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
@@ -30,11 +30,9 @@ public abstract class AbstractFormActionFetcher implements IActionFetcher {
     return m_form;
   }
 
-  @Override
-  public abstract List<IMenu> fetch();
-
-  protected List<IMobileAction> convertCustomProcessButtons() {
+  protected List<IMobileAction> convertCustomProcessButtons() throws ProcessingException {
     List<IButton> customProcessButtons = getForm().getRootGroupBox().getCustomProcessButtons();
+
     if (CollectionUtility.hasElements(customProcessButtons)) {
       return ActionButtonBarUtility.convertButtonsToActions(getForm().getRootGroupBox().getCustomProcessButtons());
     }

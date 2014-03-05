@@ -48,6 +48,11 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
+  public void initAction() throws ProcessingException {
+    m_menu.initAction();
+  }
+
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     m_menu.addPropertyChangeListener(listener);
   }

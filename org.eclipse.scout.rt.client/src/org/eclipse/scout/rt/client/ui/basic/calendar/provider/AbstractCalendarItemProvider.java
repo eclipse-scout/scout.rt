@@ -156,7 +156,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     List<IMenu> menuList = new ArrayList<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
+        IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+        menu.initAction();
+        menuList.add(menu);
       }
       catch (Exception e) {
         LOG.warn(null, e);

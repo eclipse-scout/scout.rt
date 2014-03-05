@@ -358,13 +358,13 @@
   </extension>
 
   <extension point="org.eclipse.scout.rt.server.commons.filters">
-    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
+    <filter aliases="/" class="org.eclipse.scout.rt.server.commons.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
        <init-param
              name="active"
              value="true">
        </init-param>
     </filter>
-    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter" ranking="1000010">
+    <filter aliases="/" class="org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter" ranking="1000010">
        <init-param
              name="active"
              value="true">

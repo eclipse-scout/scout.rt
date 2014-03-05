@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.action;
 
-import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
@@ -32,49 +31,35 @@ public class MenuFactory {
     m_addKeyStrokeTextEnabled = true;
   }
 
-  public void fillContextMenu(Menu menu, IMenu[] scoutMenus, IRwtEnvironment uiEnvironment) {
-    if (scoutMenus == null || scoutMenus.length == 0) {
+  public void fillContextMenu(Menu menu, List<? extends IMenu> scoutActionNodes, IRwtEnvironment uiEnvironment) {
+    if (CollectionUtility.isEmpty(scoutActionNodes)) {
       menu.setVisible(false);
       return;
     }
 
-    List<IActionNode> scoutActionNodes = new LinkedList<IActionNode>();
-    for (IMenu scoutMenu : scoutMenus) {
-      scoutActionNodes.add(scoutMenu);
-    }
-
-    fillContextMenu(menu, scoutActionNodes, uiEnvironment);
-  }
-
-  public void fillContextMenu(Menu menu, List<? extends IActionNode> scoutActionNodes, IRwtEnvironment uiEnvironment) {
-    if (scoutActionNodes == null || scoutActionNodes.size() == 0) {
-      menu.setVisible(false);
-      return;
-    }
-
-    List<IActionNode> cleanedScoutActions = RwtMenuUtility.cleanup(scoutActionNodes);
-    for (IActionNode scoutActionNode : cleanedScoutActions) {
+    List<? extends IMenu> cleanedScoutActions = RwtMenuUtility.cleanup(scoutActionNodes);
+    for (IMenu scoutActionNode : cleanedScoutActions) {
       fillContextMenuRec(menu, scoutActionNode, uiEnvironment);
     }
 
   }
 
-  private void fillContextMenuRec(Menu menu, IActionNode<?> scoutActionNode, IRwtEnvironment uiEnvironment) {
+  private void fillContextMenuRec(Menu menu, IMenu scoutActionNode, IRwtEnvironment uiEnvironment) {
     if (!scoutActionNode.isVisible()) {
       return;
     }
     if (scoutActionNode.isSeparator()) {
       new MenuItem(menu, SWT.SEPARATOR);
     }
-    else if (scoutActionNode instanceof ICheckBoxMenu) {
+    else if (scoutActionNode.isToggleAction()) {
       createCheckBoxMenuAction(menu, scoutActionNode, uiEnvironment);
     }
     else if (scoutActionNode.getChildActionCount() > 0) {
       AbstractRwtMenuAction group = createMenuGroup(menu, scoutActionNode, uiEnvironment);
       Menu subMenu = new Menu(menu);
       group.getUiMenuItem().setMenu(subMenu);
-      List<IActionNode> childActions = RwtMenuUtility.cleanup(scoutActionNode.getChildActions());
-      for (IActionNode<?> subAction : childActions) {
+      List<IMenu> childActions = RwtMenuUtility.cleanup(scoutActionNode.getChildActions());
+      for (IMenu subAction : childActions) {
         fillContextMenuRec(subMenu, subAction, uiEnvironment);
       }
     }
@@ -90,8 +75,8 @@ public class MenuFactory {
     return group;
   }
 
-  protected AbstractRwtMenuAction createCheckBoxMenuAction(Menu menu, IActionNode<?> scoutActionNode, IRwtEnvironment uiEnvironment) {
-    RwtScoutCheckboxMenu action = new RwtScoutCheckboxMenu(menu, (ICheckBoxMenu) scoutActionNode, uiEnvironment, false);
+  protected AbstractRwtMenuAction createCheckBoxMenuAction(Menu menu, IMenu scoutActionNode, IRwtEnvironment uiEnvironment) {
+    RwtScoutCheckboxMenu action = new RwtScoutCheckboxMenu(menu, scoutActionNode, uiEnvironment, false);
     action.setAddKeyStrokeTextEnabled(isAddKeyStrokeTextEnabled());
     action.init();
     return action;

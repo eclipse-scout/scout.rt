@@ -642,9 +642,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       }
       // grab the actions out of the job, when the actions are providden within
       // the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
-      }
+      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {

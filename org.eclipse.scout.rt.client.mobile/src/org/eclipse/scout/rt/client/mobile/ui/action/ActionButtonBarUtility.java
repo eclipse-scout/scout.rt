@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.AutoLeafPageWithNodes;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -26,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  */
 public class ActionButtonBarUtility {
 
-  public static List<IMobileAction> convertButtonsToActions(List<IButton> buttons) {
+  public static List<IMobileAction> convertButtonsToActions(List<IButton> buttons) throws ProcessingException {
     List<IMobileAction> menuList = new ArrayList<IMobileAction>();
     for (IButton button : buttons) {
       IMobileAction action = convertButtonToAction(button);
@@ -38,12 +39,14 @@ public class ActionButtonBarUtility {
     return menuList;
   }
 
-  public static IMobileAction convertButtonToAction(IButton button) {
+  public static IMobileAction convertButtonToAction(IButton button) throws ProcessingException {
     if (button == null) {
       return null;
     }
 
-    return new ButtonWrappingAction(button);
+    ButtonWrappingAction mAction = new ButtonWrappingAction(button);
+    mAction.initAction();
+    return mAction;
   }
 
   /**

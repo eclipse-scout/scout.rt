@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -977,6 +978,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           setTableChanging(true);
           //
           initTableInternal();
+          ActionUtility.initActions(getMenus());
           execInitTable();
         }
         finally {

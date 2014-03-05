@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.menu;
+package org.eclipse.scout.rt.ui.swt.action;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
@@ -89,7 +88,7 @@ public abstract class AbstractSwtScoutMenu {
     if (scoutMenu.hasChildActions()) {
       flags = SWT.CASCADE;
     }
-    else if (getScoutMenu() instanceof ICheckBoxMenu) {
+    else if (getScoutMenu().isToggleAction()) {
       flags = SWT.CHECK;
     }
     MenuItem swtMenuItem = new MenuItem(parentMenu, flags);

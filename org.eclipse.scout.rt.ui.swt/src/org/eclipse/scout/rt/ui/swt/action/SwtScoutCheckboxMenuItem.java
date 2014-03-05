@@ -4,50 +4,49 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.action;
 
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
-public class SwtScoutCheckboxMenu extends AbstractSwtMenuAction {
+/**
+ *
+ */
+public class SwtScoutCheckboxMenuItem extends SwtScoutMenuItem {
 
-  public SwtScoutCheckboxMenu(Menu swtMenu, ICheckBoxMenu scoutMenu, ISwtEnvironment environment) {
-    super(swtMenu, scoutMenu, true, environment);
+  private boolean m_handleSelectionPending;
+
+  /**
+   * @param scoutMenu
+   * @param parentMenu
+   * @param environment
+   */
+  public SwtScoutCheckboxMenuItem(IMenu scoutMenu, Menu parentMenu, ISwtEnvironment environment) {
+    super(scoutMenu, parentMenu, environment);
   }
 
   @Override
-  protected void initializeSwt(Menu swtMenu) {
-    MenuItem item = new MenuItem(swtMenu, SWT.CHECK);
-    setSwtMenuItem(item);
+  protected void attachScout() {
+    super.attachScout();
+    updateSelectedFromScout();
   }
 
-  @Override
-  protected void applyScoutProperties() {
-    super.applyScoutProperties();
-    setSelectedFromScout();
-  }
-
-  private void setSelectedFromScout() {
-    if (!getSwtMenuItem().isDisposed()) {
-      getSwtMenuItem().setSelection(getScoutAction().isSelected());
+  protected void updateSelectedFromScout() {
+    if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
+      getSwtMenuItem().setSelection(getScoutMenu().isSelected());
     }
   }
 
-  /**
-   * in swt thread
-   */
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ICheckBoxMenu.PROP_SELECTED)) {
-      setSelectedFromScout();
+    if (name.equals(IMenu.PROP_SELECTED)) {
+      updateSelectedFromScout();
     }
   }
 

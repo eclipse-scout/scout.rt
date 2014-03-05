@@ -31,7 +31,7 @@ public interface ITreeNode {
   int STATUS_UPDATED = 2;
   int STATUS_DELETED = 3;
 
-  void initTreeNode();
+  void initTreeNode() throws ProcessingException;
 
   String getNodeId();
 

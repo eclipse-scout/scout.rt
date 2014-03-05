@@ -64,14 +64,17 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   protected void callInitializer() {
     if (!m_initialized) {
       initConfig();
-      try {
-        execInitAction();
-      }
-      catch (Throwable t) {
-        LOG.warn("Action " + getClass().getName(), t);
-      }
       m_initialized = true;
     }
+  }
+
+  /**
+   * This is the init of the runtime model after the environment (form, fields, ..) are built
+   * and configured
+   */
+  @Override
+  public final void initAction() throws ProcessingException {
+    execInitAction();
   }
 
   /*
@@ -268,13 +271,25 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     if (isEnabled() && isVisible()) {
       try {
         setEnabledProcessingAction(false);
-
-        execAction();
+        doActionInternal();
       }
       finally {
         setEnabledProcessingAction(true);
       }
     }
+  }
+
+  /**
+   * Please double check if implementing this method!
+   * Consider using {@link #execAction()} instead. If no other option ensure super call when overriding this method.
+   * 
+   * @throws ProcessingException
+   */
+  protected void doActionInternal() throws ProcessingException {
+    if (isToggleAction()) {
+      setSelected(!isSelected());
+    }
+    execAction();
   }
 
   @Override
@@ -407,8 +422,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public void setSelected(boolean b) {
-    boolean changed = propertySupport.setPropertyBool(PROP_SELECTED, b);
-    if (changed) {
+    if (setSelectedInternal(b)) {
       try {
         execToggleAction(b);
       }
@@ -416,6 +430,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
     }
+  }
+
+  protected boolean setSelectedInternal(boolean b) {
+    return propertySupport.setPropertyBool(PROP_SELECTED, b);
   }
 
   @Override
@@ -643,6 +661,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setSelectedFromUI(boolean b) {
       setSelected(b);

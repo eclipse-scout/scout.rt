@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.FormFooterActionFetcher;
@@ -34,7 +35,7 @@ public class PageFormFooterActionFetcher extends FormFooterActionFetcher {
   }
 
   @Override
-  public List<IMenu> fetch() {
+  public List<IMenu> fetch() throws ProcessingException {
     List<IMenu> footerActions = super.fetch();
     IPage page = getForm().getPage();
 

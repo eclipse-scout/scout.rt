@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -225,7 +226,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setIconId(getConfiguredIconId());
     setRadioValue(getConfiguredRadioValue());
     // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
+    List<IMenu> menuList = new ArrayList<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       IMenu menu;
       try {
@@ -243,6 +244,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     m_menus = menuList;
+  }
+
+  @Override
+  protected void initFieldInternal() throws ProcessingException {
+    super.initFieldInternal();
+    // init actions
+    ActionUtility.initActions(getMenus());
   }
 
   /**

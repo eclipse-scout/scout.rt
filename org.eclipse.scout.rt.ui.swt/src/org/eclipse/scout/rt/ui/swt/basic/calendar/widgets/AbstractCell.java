@@ -20,9 +20,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TreeSet;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -31,6 +28,8 @@ import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarItemContainer;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -45,6 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Abstract SWT component for a calendar (week or month) cell.
@@ -77,9 +77,6 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   private String m_weekText = null;
   private String m_dayText = null;
 
-  /** manager for context menu regarding this cell */
-  private MenuManager m_menuManager;
-
   /** cached CalendarItemContainer */
   private TreeSet<CalendarItemContainer> m_itemsCached;
 
@@ -89,6 +86,8 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   /** number of timeless items within that cell */
   private int m_countTimeless;
 
+  private Menu m_contextMenu;
+
   public AbstractCell(Composite parent, int style) {
     super(parent, style);
 
@@ -96,15 +95,16 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
     m_isSelected = false;
 
+    // contextMenu
     setupMenu();
   }
 
   /** create context menu (dynamically, gets filled when used) */
   protected void setupMenu() {
-    m_menuManager = new MenuManager();
-    m_menuManager.setRemoveAllWhenShown(true);
-    Menu contextMenu = m_menuManager.createContextMenu(this);
-    this.setMenu(contextMenu);
+    // context menu
+    m_contextMenu = new Menu(getShell(), SWT.POP_UP);
+
+    setMenu(m_contextMenu);
   }
 
   /** get calendar items corresponding to that cell */
@@ -306,18 +306,12 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     });
 
     // menu listener for context menu
-    m_menuManager.addMenuListener(new IMenuListener() {
-      @Override
-      public void menuAboutToShow(IMenuManager manager) {
-        m_calendar.showGeneralContextMenu(manager);
-      }
-    });
+    m_contextMenu.addMenuListener(new P_ContextMenuListener());
 
     // tab traversal of cells
     this.addTraverseListener(new TraverseListener() {
       @Override
       public void keyTraversed(TraverseEvent e) {
-//        System.out.println(toString() + " got event " + e);
         switch (e.detail) {
           case SWT.TRAVERSE_TAB_NEXT:
           case SWT.TRAVERSE_ARROW_NEXT:
@@ -348,6 +342,13 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     addListener(SWT.KeyDown, new Listener() {
       @Override
       public void handleEvent(Event e) {
+      }
+    });
+    addListener(SWT.Dispose, new Listener() {
+
+      @Override
+      public void handleEvent(Event event) {
+        dispose();
       }
     });
   }
@@ -525,4 +526,32 @@ public abstract class AbstractCell extends Composite implements PaintListener {
       return "BoundsOrganizer[" + m_cc + "]";
     }
   }//end class
+
+  private class P_ContextMenuListener extends MenuAdapter {
+    @Override
+    public void menuShown(MenuEvent e) {
+      // clear all previous
+      // Windows BUG: fires menu hide before the selection on the menu item is
+      // propagated.
+      if (m_contextMenu != null) {
+        for (MenuItem item : m_contextMenu.getItems()) {
+          disposeMenuItem(item);
+        }
+      }
+      m_calendar.showGeneralContextMenu(m_contextMenu);
+
+    }
+
+    private void disposeMenuItem(MenuItem item) {
+      Menu menu = item.getMenu();
+      if (menu != null) {
+        for (MenuItem childItem : menu.getItems()) {
+          disposeMenuItem(childItem);
+        }
+        menu.dispose();
+      }
+      item.dispose();
+    }
+
+  } // end class P_ContextMenuListener
 }

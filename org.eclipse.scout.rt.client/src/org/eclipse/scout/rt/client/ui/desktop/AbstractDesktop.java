@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -449,6 +450,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (menu.getKeyStroke() != null) {
         try {
           IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
+          ks.initAction();
           actionList.add(ks);
         }
         catch (Throwable t) {
@@ -465,6 +467,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_toolButtons = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(toolButtonList).toArray(new IToolButton[toolButtonList.size()]));
     //add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
+    for (IKeyStroke ks : ksList) {
+      try {
+        ks.initAction();
+      }
+      catch (ProcessingException e) {
+        LOG.error("could not initialize key stroke '" + ks + "'.", e);
+      }
+    }
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
     //init outlines
     for (IOutline o : m_availableOutlines) {
@@ -517,6 +527,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           LOG.error("extension " + ext);
         }
       }
+      // init actions
+      ActionUtility.initActions(getMenus());
+      ActionUtility.initActions(getToolButtons());
+      ActionUtility.initActions(getViewButtons());
     }
   }
 

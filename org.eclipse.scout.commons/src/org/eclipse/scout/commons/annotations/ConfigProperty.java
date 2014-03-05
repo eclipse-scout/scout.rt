@@ -219,4 +219,9 @@ public @interface ConfigProperty {
    * java.math.RoundingMode
    */
   String ROUNDING_MODE = "ROUNDING_MODE";
+
+  /**
+   * int one of [TOOLBAR_FORM_HEADER, TOOLBAR_VIEW_PART] of IForm
+   */
+  String TOOLBAR_LOCATION = "TOOLBAR_LOCATION";
 }

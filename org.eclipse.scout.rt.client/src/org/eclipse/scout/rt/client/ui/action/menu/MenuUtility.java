@@ -16,6 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 
@@ -25,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
  * @since 3.10.0-M4
  */
 public final class MenuUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MenuUtility.class);
+
   /**
    * Collects all keyStrokes from an array of menus
    * 
@@ -37,9 +42,15 @@ public final class MenuUtility {
       for (IMenu m : menu) {
         String s = m.getKeyStroke();
         if (s != null && s.trim().length() > 0) {
-          KeyStroke ks = new KeyStroke(s, m);
-          if (keys.add(ks.getKeyStroke())) {
-            keyStrokes.add(ks);
+          try {
+            KeyStroke ks = new KeyStroke(s, m);
+            ks.initAction();
+            if (keys.add(ks.getKeyStroke())) {
+              keyStrokes.add(ks);
+            }
+          }
+          catch (ProcessingException e) {
+            LOG.error("could not initialize enter key stroke.", e);
           }
         }
       }

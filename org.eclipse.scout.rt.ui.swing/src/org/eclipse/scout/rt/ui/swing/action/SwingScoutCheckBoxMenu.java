@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,10 +17,10 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 
-public class SwingScoutCheckBoxMenu<T extends ICheckBoxMenu> extends SwingScoutComposite<T> implements ISwingScoutAction<T> {
+public class SwingScoutCheckBoxMenu<T extends IMenu> extends SwingScoutComposite<T> implements ISwingScoutAction<T> {
   private SwingScoutAction<T> m_actionComposite;
 
   @Override
@@ -69,7 +69,7 @@ public class SwingScoutCheckBoxMenu<T extends ICheckBoxMenu> extends SwingScoutC
   @Override
   protected void attachScout() {
     super.attachScout();
-    ICheckBoxMenu scoutAction = getScoutObject();
+    IMenu scoutAction = getScoutObject();
     setSelectedFromScout(scoutAction.isSelected());
   }
 
@@ -83,7 +83,7 @@ public class SwingScoutCheckBoxMenu<T extends ICheckBoxMenu> extends SwingScoutC
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ICheckBoxMenu.PROP_SELECTED)) {
+    if (name.equals(IMenu.PROP_SELECTED)) {
       setSelectedFromScout(((Boolean) newValue).booleanValue());
     }
   }

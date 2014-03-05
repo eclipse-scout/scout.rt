@@ -40,6 +40,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -333,6 +334,8 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   public final void initActivityMap() throws ProcessingException {
     initActivityMapInternal();
     execInitActivityMap();
+    // init actions
+    ActionUtility.initActions(getMenus());
   }
 
   protected void initActivityMapInternal() throws ProcessingException {

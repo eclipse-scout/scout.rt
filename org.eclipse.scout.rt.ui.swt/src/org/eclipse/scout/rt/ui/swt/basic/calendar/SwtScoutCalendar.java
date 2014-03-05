@@ -17,23 +17,17 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.widgets.SwtCalendar;
 import org.eclipse.scout.rt.ui.swt.form.fields.calendar.SwtScoutCalendarField;
 import org.eclipse.swt.SWT;
@@ -42,6 +36,7 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 
 /**
  * @author Michael Rudolf, Andreas Hoegger
@@ -98,38 +93,13 @@ public class SwtScoutCalendar extends SwtCalendar {
   }
 
   @Override
-  public void showGeneralContextMenu(IMenuManager manager) {
-    // pop up with a general menu
-    List<IMenu> scoutMenus = SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment());
-    if (scoutMenus != null) {
-      for (IMenu menuItem : scoutMenus) {
-        if (menuItem instanceof IMenu) {
-          if (menuItem.isSeparator()) {
-            manager.add(new Separator());
-          }
-          else {
-            manager.add(new SwtScoutAction(menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
-          }
-        }
-      }
-    }
+  public void showGeneralContextMenu(Menu manager) {
+    SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
   }
 
   @Override
-  public void showItemContextMenu(IMenuManager manager, Object item) {
-    List<IMenu> scoutMenus = SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment());
-    if (scoutMenus != null) {
-      for (IMenu menuItem : scoutMenus) {
-        if (menuItem instanceof IMenu) {
-          if (menuItem.isSeparator()) {
-            manager.add(new Separator());
-          }
-          else {
-            manager.add(new SwtScoutAction(menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
-          }
-        }
-      }
-    }
+  public void showItemContextMenu(Menu manager, Object item) {
+    SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
   }
 
   @Override

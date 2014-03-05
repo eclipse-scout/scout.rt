@@ -205,10 +205,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
       // grab the actions out of the job, when the actions are provided within
       // the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        Menu menu = ((Menu) e.getSource());
-        SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), menu, SwtScoutImageField.this.getEnvironment());
-      }
+      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), ((Menu) e.getSource()), SwtScoutImageField.this.getEnvironment());
     }
   }
 

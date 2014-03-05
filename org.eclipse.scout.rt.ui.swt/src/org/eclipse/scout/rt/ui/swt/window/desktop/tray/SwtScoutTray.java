@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swt.window.desktop.tray;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -108,9 +107,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
         //nop
       }
       // end notify
-      if (CollectionUtility.hasElements(scoutMenusRef.get())) {
-        SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_popupMenu, getEnvironment());
-      }
+      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_popupMenu, getEnvironment());
     }
   }
 

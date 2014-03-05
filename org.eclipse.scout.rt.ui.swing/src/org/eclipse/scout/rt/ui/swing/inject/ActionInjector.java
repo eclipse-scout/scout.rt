@@ -15,7 +15,7 @@ import javax.swing.JComponent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -44,9 +44,9 @@ public class ActionInjector {
     else if (action instanceof IViewButton) {
       return createSwingScoutViewButton((IViewButton) action, env);
     }
-    else if (action instanceof ICheckBoxMenu) {
-      ISwingScoutAction<ICheckBoxMenu> ui = new SwingScoutCheckBoxMenu<ICheckBoxMenu>();
-      ui.createField((ICheckBoxMenu) action, env);
+    else if (action instanceof IMenu && action.isToggleAction()) {
+      ISwingScoutAction<IMenu> ui = new SwingScoutCheckBoxMenu<IMenu>();
+      ui.createField((IMenu) action, env);
       return ui;
     }
     else if (action instanceof IActionNode) {
