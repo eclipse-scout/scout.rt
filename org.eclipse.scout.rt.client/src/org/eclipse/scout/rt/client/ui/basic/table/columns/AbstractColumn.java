@@ -87,7 +87,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Used for mutable tables to keep last valid value per row and column.
    */
   // TODO: Move cache to AbstractTable with bug 414646
-  private Map<InternalTableRow, T> m_validatedValues = new HashMap<InternalTableRow, T>();
+  private final Map<InternalTableRow, T> m_validatedValues = new HashMap<InternalTableRow, T>();
 
   public AbstractColumn() {
     m_headerCell = new HeaderCell();
@@ -1554,12 +1554,22 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       return;
     }
     for (ITableRow row : getTable().getRows()) {
-      validateColumnValue(row, null, true, getValue(row));
+      validateColumnValue(row, null, true, getValueOfCell(row));
     }
   }
 
   public void validateColumnValue(ITableRow row) {
-    validateColumnValue(row, null, false, getValue(row));
+    validateColumnValue(row, null, false, getValueOfCell(row));
+  }
+
+  /**
+   * @return The real value of the cell that belongs to the given {@link ITableRow}. Does not consider
+   *         {@link #m_validatedValues}.
+   * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=424511
+   */
+  @SuppressWarnings("unchecked")
+  protected T getValueOfCell(ITableRow row) {
+    return (T) row.getCell(this).getValue();
   }
 
   /**
