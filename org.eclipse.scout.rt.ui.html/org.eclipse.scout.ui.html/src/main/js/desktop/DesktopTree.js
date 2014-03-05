@@ -96,8 +96,13 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
 Scout.DesktopTree.prototype.setNodeSelectedById = function (nodeId) {
   var $node = undefined;
   if(nodeId) {
-    $node = this._$desktopTreeScroll.find('#'+nodeId);
+    $node = this._$desktopTreeScroll.find('#' + nodeId);
+    if($node.data('node') === undefined) {
+      //FIXME happens if tree with a selected node gets collapsed selected node should be showed again after outline switch.
+      throw "No node found for id " + nodeId;
+    }
   }
+
   this._setNodesSelected($node);
 };
 
@@ -124,7 +129,7 @@ Scout.DesktopTree.prototype._setNodesSelected = function ($node) {
   }
 };
 
-Scout.DesktopTree.prototype.addNodes = function (nodes, parentNodeId) {
+Scout.DesktopTree.prototype._onNodesInserted = function (nodes, parentNodeId) {
   var $parent = this._$desktopTreeScroll.find('#'+parentNodeId);
   var parentNode = $parent.data('node');
   if(parentNode === undefined) {
@@ -135,7 +140,7 @@ Scout.DesktopTree.prototype.addNodes = function (nodes, parentNodeId) {
   parentNode.childNodes.push.apply(parentNode.childNodes, nodes);
 
   if(parentNode.expanded) {
-    this._addNodes(nodes, $parent);
+    this._setNodeExpanded($parent, true);
   }
 };
 
@@ -252,7 +257,11 @@ Scout.DesktopTree.prototype.onModelPropertyChange = function (event) {
 
 Scout.DesktopTree.prototype.onModelAction = function (event) {
   if (event.type_ == 'nodesInserted') {
-    this.addNodes(event.nodes, event.commonParentNodeId);
+    this._onNodesInserted(event.nodes, event.commonParentNodeId);
+  }
+  if (event.type_ == 'nodesDeleted') {
+    //FIXME implement
+//    this.removeNodes(event.nodeIds);
   }
   else if (event.type_ == 'nodesSelected') {
     this.setNodeSelectedById(event.nodeIds[0]);
