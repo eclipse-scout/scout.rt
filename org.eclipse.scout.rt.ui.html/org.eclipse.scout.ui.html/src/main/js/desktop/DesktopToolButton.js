@@ -23,9 +23,6 @@ Scout.DesktopToolButton = function (scout, $desktop, toolButtons) {
   // create container for dialogs
   $desktopTools.appendDiv('DesktopDialogs');
 
-  // set this for later usage
-  this.$div = $desktopTools;
-
   // named event funktions
   function clickTool (event) {
     var $clicked = $(this);

@@ -1,16 +1,16 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableMap = function (scout, $controlContainer, node, table, filterCallback) {
+Scout.DesktopTableMap = function (scout, $parent, node, table, filterCallback) {
   // create container
-  $mapContainer = $controlContainer.empty()
+  $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG("preserveAspectRatio", "xMidYMid");
 
 
   // create container
-  var response = scout.send('map', node.outlineId, {"nodeId":node.id});
+  var response = scout.sendSync('map', node.outlineId, {"nodeId":node.id});
   var map = response.events[0].map;
   var countries = map.objects.countries.geometries;
 

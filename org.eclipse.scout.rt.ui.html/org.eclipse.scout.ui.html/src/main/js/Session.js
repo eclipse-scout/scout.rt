@@ -4,25 +4,44 @@
 Scout.Session = function ($entryPoint, sessionPartId) {
   this.widgetMap = {};
 
-  this.send = function (type, id, data) {
-    return this.sendEvents([new Scout.Event(type, id, data)]);
+  this.sendSync = function (type, id, data) {
+    return this.send(type, id, data, false);
   };
 
-  this.sendEvents = function (events) {
+  this.send = function (type, id, data, async) {
+    return this.sendEvents([new Scout.Event(type, id, data)], async);
+  };
+
+  this.sendEventsSync = function (events) {
+    return this.sendEventsSync(events, false);
+  };
+
+  this.sendEvents = function (events, async) {
+    if(async === undefined) {
+      async = true;
+    }
     var request={
       events : events,
       sessionPartId : sessionPartId
     };
     var url = 'json';
     var ret;
+    var that = this;
     $.ajax({
-      async : false,
+      async : async,
       type : "POST",
       dataType : "json",
       cache : false,
       url : url,
       data : JSON.stringify(request),
-      success : function (message) {ret = message; }
+      success : function (message) {
+        if (async) {
+          that.processEvents(message.events);
+        }
+        else {
+          ret = message;
+        }
+      }
     });
     return ret;
   };
@@ -68,8 +87,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
 
   this.init = function init() {
     // create all widgets for entry point
-    var response = this.send('startup', $entryPoint.attr('id'));
-    this.processEvents(response.events);
+    this.send('startup', $entryPoint.attr('id'));
   };
 
   // create single widget based on a model object

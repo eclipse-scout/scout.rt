@@ -1,16 +1,19 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Desktop = function (scout, $parent, widget) {
-  scout.widgetMap[widget.id] = this;
+Scout.Desktop = function (scout, $parent, model) {
+  this.scout = scout;
+  this.tree;
+  this.scout.widgetMap[model.id] = this;
 
   // create all 4 containers
-  var view = new Scout.DesktopViewButtonBar(scout, $parent, widget.viewButtons);
-  var tool = new Scout.DesktopToolButton(scout, $parent, widget.toolButtons);
-  var tree = new Scout.DesktopTreeContainer(scout, $parent, widget.outline);
-  var bench = new Scout.DesktopBench(scout, $parent);
+  var view = new Scout.DesktopViewButtonBar(this.scout, $parent, model.viewButtons);
+  var tool = new Scout.DesktopToolButton(this.scout, $parent, model.toolButtons);
+  var tree = new Scout.DesktopTreeContainer(this.scout, $parent, model.outline);
+  var bench = new Scout.DesktopBench(this.scout, $parent);
 
-  tree.attachModel();
+  this.tree = tree;
+  this.tree.attachModel();
 
   // alt and f1-help
   $(window).keydown(function (event)  {
@@ -142,23 +145,6 @@ Scout.Desktop = function (scout, $parent, widget) {
     }
   });
 
-  this.onModelAction = onModelAction;
-  this.onModelCreate = onModelCreate;
-  this.onModelPropertyChange = onModelPropertyChange;
-
-  function onModelPropertyChange(event) {
-  }
-
-  function onModelCreate(event) {
-    tree.handleOutlineCreated(event);
-  }
-
-  function onModelAction(event) {
-    if (event.type_ == 'outlineChanged') {
-      tree.handleOutlineChanged(event.outlineId);
-    }
-  }
-
   function removeKeyBox () {
     $('.key-box').remove();
     $('.tree-item-control').show();
@@ -212,7 +198,17 @@ Scout.Desktop = function (scout, $parent, widget) {
       node.appendDiv('', 'key-box bottom3', 'End');
     }
   }
-
-
 };
 
+Scout.Desktop.prototype.onModelPropertyChange = function () {
+};
+
+Scout.Desktop.prototype.onModelCreate = function (event) {
+  this.tree.onOutlineCreated(event);
+};
+
+Scout.Desktop.prototype.onModelAction = function (event) {
+  if (event.type_ == 'outlineChanged') {
+    this.tree.onOutlineChanged(event.outlineId);
+  }
+};

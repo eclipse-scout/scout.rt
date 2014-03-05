@@ -1,42 +1,44 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTable = function (scout, $bench, model) {
-  var textOrganize = 'Spaltenverwaltung',
-    textClose = 'schliessen';
+Scout.DesktopTable = function (scout, $parent, model) {
+  this.model = model;
+  // data and a row-pointer is used by many functions, may be very large
+  this._table;
+  this._$tableData;
+  this._$tableDataScroll;
+  this._$infoSelect;
+  this._$infoFilter;
+  this._$infoLoad;
 
-  // instance methods and variables
-  this.sortToggle = sortToggle;
-  this.sortUp = sortUp;
-  this.sortDown = sortDown;
+  var that = this;
 
   //create container
-  var $desktopTable = $bench.appendDiv('DesktopTable'),
+  var $desktopTable = $parent.appendDiv('DesktopTable'),
     $tableHeader = $desktopTable.appendDiv('TableHeader'),
     $tableData = $desktopTable.appendDiv('TableData'),
     $tableFooter = $desktopTable.appendDiv('TableFooter'),
     $tableControl = $desktopTable.appendDiv('TableControl');
+  this._$tableData = $tableData;
 
-  var $tableDataScroll = $tableData.appendDiv('TableDataScroll');
+  var $tableDataScroll = $tableData.appendDiv('TableDataScroll'),
     scrollbar = new Scout.Scrollbar($tableDataScroll, 'y');
+  this._$tableDataScroll = $tableDataScroll;
 
-  var $controlResizeTop = $tableControl.appendDiv('ControlResizeTop'),
-    $controlResizeBottom = $tableControl.appendDiv('ControlResizeBottom');
-
-  var  $controlChart = $tableControl.appendDiv('ControlChart'),
+  var $controlContainer = $tableControl.appendDiv('ControlContainer'),
+    $controlResizeTop = $tableControl.appendDiv('ControlResizeTop'),
+    $controlResizeBottom = $tableControl.appendDiv('ControlResizeBottom'),
+    $controlChart = $tableControl.appendDiv('ControlChart'),
     $controlGraph = $tableControl.appendDiv('ControlGraph'),
     $controlMap = $tableControl.appendDiv('ControlMap'),
     $controlOrganize = $tableControl.appendDiv('ControlOrganize'),
     $controlLabel = $tableControl.appendDiv('ControlLabel');
 
-  var $controlContainer = $tableControl.appendDiv('ControlContainer');
+  this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
+  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', resetFilter);
+  this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', loadData);
 
-  var $infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect),
-    $infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', resetFilter),
-    $infoMore = $tableControl.appendDiv('InfoMore'),
-    $infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', loadData);
-
-  // control buttons has mouse over effects
+  // control buttons have mouse over effects
   $("body").on("mouseenter", "#control_graph, #control_chart, #control_map, #control_organise",
     function() {
       $('#control_label').text($(this).data('label'));
@@ -46,9 +48,6 @@ Scout.DesktopTable = function (scout, $bench, model) {
     function() {
       $('#control_label').text('');
     });
-
-  // data and a row-pointer is used by many functions, may be very large
-  var table;
 
   // create header
   var tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, model.table.columns);
@@ -85,13 +84,14 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   // organize button
+  var textOrganize = 'Spaltenverwaltung',
+  textClose = 'schliessen';
   $controlOrganize.data('label', textOrganize)
     .hover(controlIn, controlOut)
     .click(controlClick)
     .click(controlOrganize);
 
-  // named funktions
-
+  // named functions
   function controlIn (event) {
     var close = $(event.target).hasClass('selected') ? ' ' + textClose : '';
     $controlLabel.text($(event.target).data('label') + close);
@@ -117,7 +117,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
       $tableData.animateAVCSD('height',
         parseFloat($desktopTable.css('height')) - 80,
         function () {$(this).css('height', 'calc(100% - 80px'); },
-        scrollbar.initThumb,
+        scrollbar.initThumb.bind(scrollbar),
         500);
 
       // visual: reset label and close control
@@ -135,7 +135,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
       $tableData.animateAVCSD('height',
         parseFloat($desktopTable.css('height')) - 430,
         function () {$(this).css('height', 'calc(100% - 430px'); },
-        scrollbar.initThumb,
+        scrollbar.initThumb.bind(scrollbar),
         500);
 
       // visual: update label, size container and control
@@ -150,7 +150,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function controlChart (event) {
-    new Scout.DesktopTableChart(scout, $controlContainer, model.table.columns, table, filterCallback);
+    new Scout.DesktopTableChart(scout, $controlContainer, model.table.columns, that._table, filterCallback);
   }
 
   function controlGraph (event) {
@@ -158,11 +158,11 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function controlMap (event) {
-    new Scout.DesktopTableMap(scout, $controlContainer, model, table, filterCallback);
+    new Scout.DesktopTableMap(scout, $controlContainer, model, that._table, filterCallback);
   }
 
   function controlOrganize (event) {
-    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, table);
+    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, that._table);
   }
 
   function resizeControl (event) {
@@ -173,7 +173,7 @@ Scout.DesktopTable = function (scout, $bench, model) {
     var offset = (this.id == 'ControlResizeTop')  ? 58 : 108;
 
     function resizeMove(event){
-      var h = $bench.outerHeight() - event.pageY + offset;
+      var h = $parent.outerHeight() - event.pageY + offset;
       $tableControl.height(h);
       $tableData.height('calc(100% - ' + (h + 30) + 'px)');
       $controlContainer.height(h - 60);
@@ -189,19 +189,19 @@ Scout.DesktopTable = function (scout, $bench, model) {
   }
 
   function loadData () {
-    var response = scout.send('table', model.outlineId, {"nodeId":model.id});
-    table = response.events[0].rows;
+    var response = scout.sendSync('table', model.outlineId, {"nodeId":model.id});
+    that._table = response.events[0].rows;
     $('.table-row').remove();
     drawData(0);
-    setInfoSelect(0, false);
+    that._setInfoSelect(0, false);
   }
 
   function drawData (startRow) {
     // this function has to be fast
     var rowString = '';
 
-    for (var r = startRow; r < Math.min(table.length, startRow + 100); r++) {
-      var row = table[r];
+    for (var r = startRow; r < Math.min(that._table.length, startRow + 100); r++) {
+      var row = that._table[r];
 
       rowString += '<div class="table-row">';
 
@@ -225,11 +225,11 @@ Scout.DesktopTable = function (scout, $bench, model) {
       .width(tableHeader.totalWidth + 4);
 
     // update info and scrollbar
-    setInfoLoad(r);
+    that._setInfoLoad(r);
     scrollbar.initThumb();
 
     // repaint and append next block
-    if (r < table.length) {
+    if (r < that._table.length) {
       setTimeout(function() { drawData(startRow + 100); }, 0);
     }
   }
@@ -277,32 +277,11 @@ Scout.DesktopTable = function (scout, $bench, model) {
       }
 
       // draw nice border
-      selectionBorder();
+      that._selectionBorder();
 
       // open and animate menu
       selectionMenu(event.pageX, event.pageY);
     }
-  }
-
-  function selectionBorder () {
-    // remove nice border
-      $('.select-middle, .select-top, .select-bottom, .select-single')
-        .removeClass('select-middle select-top select-bottom select-single');
-
-    // draw nice border
-    $rowSelected = $('.row-selected');
-    $rowSelected.each(function (i) {
-      var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
-        hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
-
-      if (hasPrev && hasNext) $(this).addClass('select-middle');
-      if (!hasPrev && hasNext) $(this).addClass('select-top');
-      if (hasPrev && !hasNext) $(this).addClass('select-bottom');
-      if (!hasPrev && !hasNext) $(this).addClass('select-single');
-    });
-
-    // show count
-    setInfoSelect($rowSelected.length, $rowSelected.length == table.length);
   }
 
   function selectionMenu (x, y) {
@@ -351,21 +330,21 @@ Scout.DesktopTable = function (scout, $bench, model) {
   function toggleSelect () {
     var $rowSelected = $('.row-selected', $tableData);
 
-    if ($rowSelected.length == table.length) {
+    if ($rowSelected.length == that._table.length) {
       $rowSelected.removeClass('row-selected');
     } else {
       $('.table-row', $tableData).addClass('row-selected');
     }
 
-    selectionBorder();
+    that._selectionBorder();
   }
 
   function filterCallback (testFunc) {
     var rowCount = 0,
       $rowSelected = $('.row-selected', $tableData),
-      $allRows = $('.table-row', $tableDataScroll);
+      $allRows = $('.table-row', that._$tableDataScroll);
 
-    resetSelection();
+    that._resetSelection();
 
     $allRows.detach();
     $allRows.each(function (i) {
@@ -381,17 +360,17 @@ Scout.DesktopTable = function (scout, $bench, model) {
       scrollbar.initThumb();
     });
 
-    setInfoFilter(rowCount);
-    $allRows.appendTo($tableDataScroll);
+    that.setInfoFilter(rowCount);
+    $allRows.appendTo(that._$tableDataScroll);
     scrollbar.initThumb();
   }
 
   function resetFilter (event) {
     $('.table-row', $tableData).each(function (i) { showRow($(this)); });
-    $infoFilter.animateAVCSD('width', 0, function () {$(this).hide(); });
+    that._$infoFilter.animateAVCSD('width', 0, function () {$(this).hide(); });
     $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
     log($('.main-chart.selected'));
-    resetSelection();
+    that._resetSelection();
   }
 
   function showRow ($row) {
@@ -405,155 +384,177 @@ Scout.DesktopTable = function (scout, $bench, model) {
           {complete: function() {$(this).hide();}});
   }
 
-  function setInfoLoad (count) {
-    $infoLoad.html(findInfo(count) + ' geladen</br>Daten neu laden');
-    $infoLoad.show().widthToContent();
+};
+
+Scout.DesktopTable.prototype._setInfoLoad = function (count) {
+  this._$infoLoad.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
+  this._$infoLoad.show().widthToContent();
+};
+
+Scout.DesktopTable.prototype._setInfoMore = function (count) {
+};
+
+Scout.DesktopTable.prototype._setInfoFilter = function (count) {
+  this._$infoFilter.html(this._findInfo(count) + ' gefiltert</br>Filter entfernen');
+  this._$infoFilter.show().widthToContent();
+};
+
+Scout.DesktopTable.prototype._setInfoSelect = function (count, all) {
+  var allText = all ? 'Keine' : 'Alle';
+  this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren');
+  this._$infoSelect.show().widthToContent();
+};
+
+Scout.DesktopTable.prototype._findInfo = function (n) {
+  if (n === 0 ) {
+    return 'Keine Zeile';
+  } else if (n == 1) {
+    return 'Eine Zeile';
+  } else {
+    return n + ' Zeilen';
+  }
+};
+
+Scout.DesktopTable.prototype._selectionBorder = function () {
+  // remove nice border
+    $('.select-middle, .select-top, .select-bottom, .select-single')
+      .removeClass('select-middle select-top select-bottom select-single');
+
+  // draw nice border
+  $rowSelected = $('.row-selected');
+  $rowSelected.each(function (i) {
+    var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
+      hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
+
+    if (hasPrev && hasNext) $(this).addClass('select-middle');
+    if (!hasPrev && hasNext) $(this).addClass('select-top');
+    if (hasPrev && !hasNext) $(this).addClass('select-bottom');
+    if (!hasPrev && !hasNext) $(this).addClass('select-single');
+  });
+
+  // show count
+  this._setInfoSelect($rowSelected.length, $rowSelected.length == this._table.length);
+};
+
+Scout.DesktopTable.prototype._resetSelection = function () {
+  $('.row-selected', this._$tableData).removeClass('row-selected');
+  this._selectionBorder();
+  $('#MenuRow').remove();
+};
+
+Scout.DesktopTable.prototype._sort = function () {
+  var sortColumns = [];
+
+  // remove selection
+  this._resetSelection();
+
+  // find all sort columns
+  for (var c = 0; c < this.model.table.columns.length; c++) {
+    var column = this.model.table.columns[c],
+      order = column.$div.data('sort-order'),
+      dir =  column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
+      sortColumns[order] = {index : c, dir : dir};
   }
 
-  function setInfoMore (count) {
-  }
+  // compare rows
+  function compare (a, b) {
+    for (var s = 0; s < sortColumns.length; s++) {
+      var index = sortColumns[s].index,
+        dir = sortColumns[s].dir == 'up' ? -1 : 1;
 
-  function setInfoFilter (count) {
-    $infoFilter.html(findInfo(count) + ' gefiltert</br>Filter entfernen');
-    $infoFilter.show().widthToContent();
-  }
-
-  function setInfoSelect (count, all) {
-    var allText = all ? 'Keine' : 'Alle';
-    $infoSelect.html(findInfo(count) + ' selektiert</br>' + (all ? 'Keine' : 'Alle') + ' selektieren');
-    $infoSelect.show().widthToContent();
-  }
-
-  function findInfo (n) {
-    if (n === 0 ) {
-      return 'Keine Zeile';
-    } else if (n == 1) {
-      return 'Eine Zeile';
-    } else {
-      return n + ' Zeilen';
+      if (a.children[index].innerHTML < b.children[index].innerHTML) {
+        return dir;
+      } else if (a.children[index].innerHTML > b.children[index].innerHTML) {
+        return -1 * dir;
+      }
     }
+
+    return 0;
   }
 
-  function resetSelection () {
-    $('.row-selected', $tableData).removeClass('row-selected');
-    selectionBorder();
-    $('#MenuRow').remove();
-  }
+  // find all rows
+  var $rows = $('.table-row');
 
-  function sortToggle (event) {
-     // find new sort direction
-    var $clicked = $(this),
-      dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+  // store old position
+  $rows.each(function () {
+    $(this).data('old-top', $(this).offset().top);
+  });
 
-    // change sort order of clicked header
-    $clicked.removeClass('sort-up sort-down')
-      .addClass('sort-' + dir);
+  // change order in dom
+  $rows = $rows.sort(compare);
+  this._$tableDataScroll.append($rows);
 
-    // when shift pressed: add, otherwise reset
-    if (event.shiftKey) {
-      var clickOrder = $clicked.data('sort-order'),
-        maxOrder = -1,
-        newOrder;
-
-      $('.header-item').each(function() {
-        var value = $(this).data('sort-order');
-        maxOrder = (value > maxOrder) ? value : maxOrder;
+  // for less than 100 rows: move to old position and then animate
+  if ($rows.length < 100) {
+    $rows.each(function (i) {
+      $(this).css('top', $(this).data('old-top') - $(this).offset().top)
+        .animateAVCSD('top', 0);
       });
-
-      if (clickOrder != undefined) {
-        newOrder = clickOrder;
-      } else if (maxOrder > -1) {
-        newOrder = maxOrder + 1;
-      } else {
-        newOrder = 0;
-      }
-
-      $clicked.data('sort-order', newOrder);
-
-    } else {
-      $clicked.data('sort-order', 0)
-        .siblings()
-        .removeClass('sort-up sort-down')
-        .data('sort-order', null);
     }
+};
 
-    // sort and visualize
-    sort();
-  }
 
-  function sortUp ($header) {
-    $header.removeClass('sort-up sort-down')
-      .addClass('sort-up');
+Scout.DesktopTable.prototype.sortToggle = function (event, $clicked) {
+  //find new sort direction
+  var dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
 
-    $header.data('sort-order', 0)
-      .siblings()
-      .removeClass('sort-up sort-down')
-      .data('sort-order', null);
+  // change sort order of clicked header
+  $clicked.removeClass('sort-up sort-down')
+    .addClass('sort-' + dir);
 
-    sort();
-  }
+  // when shift pressed: add, otherwise reset
+  if (event.shiftKey) {
+    var clickOrder = $clicked.data('sort-order'),
+      maxOrder = -1,
+      newOrder;
 
-  function sortDown ($header) {
-   $header.removeClass('sort-up sort-down')
-      .addClass('sort-down');
-
-    $header.data('sort-order', 0)
-      .siblings()
-      .removeClass('sort-up sort-down')
-      .data('sort-order', null);
-
-    sort();
-  }
-
-  function sort () {
-    var sortColumns = [];
-
-    // remove selection
-    resetSelection();
-
-    // find all sort columns
-    for (var c = 0; c < model.table.columns.length; c++) {
-      var column = model.table.columns[c],
-        order = column.$div.data('sort-order'),
-        dir =  column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
-        sortColumns[order] = {index : c, dir : dir};
-    }
-
-    // compare rows
-    function compare (a, b) {
-      for (s = 0; s < sortColumns.length; s++) {
-        var index = sortColumns[s].index,
-          dir = sortColumns[s].dir == 'up' ? -1 : 1;
-
-        if (a.children[index].innerHTML < b.children[index].innerHTML) {
-          return dir;
-        } else if (a.children[index].innerHTML > b.children[index].innerHTML) {
-          return -1 * dir;
-        }
-      }
-
-      return 0;
-    }
-
-    // find all rows
-    var $rows = $('.table-row');
-
-    // store old position
-    $rows.each(function () {
-      $(this).data('old-top', $(this).offset().top);
+    $('.header-item').each(function() {
+      var value = $(this).data('sort-order');
+      maxOrder = (value > maxOrder) ? value : maxOrder;
     });
 
-    // change order in dom
-    $rows = $rows.sort(compare);
-    $tableDataScroll.append($rows);
-
-    // for less than 100 rows: move to old position and then animate
-    if ($rows.length < 100) {
-      $rows.each(function (i) {
-        $(this).css('top', $(this).data('old-top') - $(this).offset().top)
-          .animateAVCSD('top', 0);
-      });
+    if (clickOrder != undefined) {
+      newOrder = clickOrder;
+    } else if (maxOrder > -1) {
+      newOrder = maxOrder + 1;
+    } else {
+      newOrder = 0;
     }
+
+    $clicked.data('sort-order', newOrder);
+
+  } else {
+    $clicked.data('sort-order', 0)
+      .siblings()
+      .removeClass('sort-up sort-down')
+      .data('sort-order', null);
   }
 
+  // sort and visualize
+  this._sort();
+};
+
+
+Scout.DesktopTable.prototype.sortUp = function ($header) {
+  $header.removeClass('sort-up sort-down')
+  .addClass('sort-up');
+
+  $header.data('sort-order', 0)
+    .siblings()
+    .removeClass('sort-up sort-down')
+    .data('sort-order', null);
+
+  this._sort();
+};
+
+Scout.DesktopTable.prototype.sortDown = function ($header) {
+  $header.removeClass('sort-up sort-down')
+  .addClass('sort-down');
+
+  $header.data('sort-order', 0)
+    .siblings()
+    .removeClass('sort-up sort-down')
+    .data('sort-order', null);
+
+  this._sort();
 };

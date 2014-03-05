@@ -1,9 +1,12 @@
-Scout.DesktopTreeContainer = function (scout, $desktop, model) {
-  var $container = $desktop.appendDiv('DesktopTree');
-  $container.appendDiv('DesktopTreeResize')
+Scout.DesktopTreeContainer = function (scout, $parent, model) {
+  this.scout = scout;
+  this._$desktopTree = $parent.appendDiv('DesktopTree');
+  this.desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, model);
+
+  this._$desktopTree.appendDiv('DesktopTreeResize')
     .on('mousedown', '', resizeTree);
 
-  // named  functions
+  var that = this;
   function resizeTree (event) {
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
@@ -11,8 +14,8 @@ Scout.DesktopTreeContainer = function (scout, $desktop, model) {
 
     function resizeMove(event){
       var w = event.pageX + 11;
-      $container.width(w);
-      $container.next().width('calc(100% - ' + (w + 80) + 'px)')
+      that._$desktopTree.width(w);
+      that._$desktopTree.next().width('calc(100% - ' + (w + 80) + 'px)')
         .css('left', w);
     }
 
@@ -22,28 +25,21 @@ Scout.DesktopTreeContainer = function (scout, $desktop, model) {
     }
     return false;
   }
+};
 
-  this.handleOutlineCreated = handleOutlineCreated;
-  this.handleOutlineChanged = handleOutlineChanged;
-  this.attachModel = attachModel;
+Scout.DesktopTreeContainer.prototype.onOutlineCreated = function (event) {
+  var desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, event);
+  desktopTree.attachModel();
+};
 
-  this.desktopTree = new Scout.DesktopTree(scout, $container, model);
+Scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
+  this.desktopTree.detach();
+  this.desktopTree = this.scout.widgetMap[outlineId];
+  this.desktopTree.attach(this._$desktopTree);
+  this.desktopTree.attachModel();
+};
 
-  function handleOutlineCreated(event) {
-    var desktopTree = new Scout.DesktopTree(scout, $container, event);
-    desktopTree.attachModel();
-  }
-
-  function handleOutlineChanged(outlineId) {
-    this.desktopTree.$container.detach();
-
-    this.desktopTree = scout.widgetMap[outlineId];
-    this.desktopTree.$container.appendTo($container);
-  }
-
+Scout.DesktopTreeContainer.prototype.attachModel = function () {
   //TODO attachModel only necessary because setNodeSelection relies on desktop bench which is created later, is there a better way?
-  function attachModel() {
-    this.desktopTree.attachModel();
-  }
-
+  this.desktopTree.attachModel();
 };

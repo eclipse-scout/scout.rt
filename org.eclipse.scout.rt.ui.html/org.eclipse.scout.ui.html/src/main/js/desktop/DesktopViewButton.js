@@ -1,32 +1,30 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopViewButton = function (scout, $viewButtonBar, viewButton) {
+Scout.DesktopViewButton = function (scout, $parent, viewButton) {
+  scout.widgetMap[viewButton.id] = this;
 
-    scout.widgetMap[viewButton.id] = this;
+  var state = '';
+  if(viewButton.selected) {
+    state='selected';
+  }
+  var $viewButton = $parent.appendDiv(viewButton.id, 'view-item ' + state, viewButton.text);
+  $viewButton.on('click', '', onClick);
 
-    var state = '';
-    if(viewButton.selected) {
-      state='selected';
-    }
-    var $viewButton = $viewButtonBar.appendDiv(viewButton.id, 'view-item ' + state, viewButton.text);
-    $viewButton.on('click', '', onClick);
+  function onClick (event) {
+    $viewButton.selectOne();
+    scout.send('click', $(this).attr('id'));
+  }
 
-    function onClick (event) {
+};
+
+Scout.DesktopViewButton.prototype.onModelPropertyChange = function (event) {
+  if(event.selected !== undefined) {
+    if(event.selected){
       $viewButton.selectOne();
-      var response = scout.send('click', $(this).attr('id'));
-      scout.processEvents(response.events);
     }
+  }
+};
 
-    this.onModelPropertyChange = function onModelPropertyChange(event) {
-        if(event.selected !== undefined) {
-            if(event.selected){
-                $viewButton.selectOne();
-            }
-            return;
-        }
-    };
-
-    this.onModelAction = function onModelAction(event) {
-    };
+Scout.DesktopViewButton.prototype.onModelAction = function (event) {
 };
