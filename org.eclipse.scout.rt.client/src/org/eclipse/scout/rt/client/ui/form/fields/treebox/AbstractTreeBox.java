@@ -625,13 +625,24 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
+  public boolean isContentValid() {
+    boolean valid = super.isContentValid();
+    if (valid && isMandatory()) {
+      if (getValue() == null || getValue().isEmpty()) {
+        return false;
+      }
+    }
+    return valid;
+  }
+
+  @Override
   public Set<T> getValue() {
-    return Collections.unmodifiableSet(CollectionUtility.hashSet(super.getValue()));
+    return CollectionUtility.unmodifiableSetCopy(super.getValue());
   }
 
   @Override
   public Set<T> getInitValue() {
-    return Collections.unmodifiableSet(CollectionUtility.hashSet(super.getInitValue()));
+    return CollectionUtility.unmodifiableSetCopy(super.getInitValue());
   }
 
   @Override

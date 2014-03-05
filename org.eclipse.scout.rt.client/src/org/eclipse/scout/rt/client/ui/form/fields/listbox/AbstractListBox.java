@@ -592,6 +592,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
+  public boolean isContentValid() {
+    boolean valid = super.isContentValid();
+    if (valid && isMandatory()) {
+      if (getValue() == null || getValue().isEmpty()) {
+        return false;
+      }
+    }
+    return valid;
+  }
+
+  @Override
   public Set<T> getValue() {
     return CollectionUtility.unmodifiableSetCopy(super.getValue());
   }
