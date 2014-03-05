@@ -13,6 +13,11 @@ package org.eclipse.scout.rt.ui.swt.ext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -24,12 +29,17 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ImageViewer extends Canvas {
 
+  protected static final int FOCUS_BORDER_OFFSET_PX = 2;
+  protected static final Rectangle FOCUS_BORDER_OFFSET = new Rectangle(FOCUS_BORDER_OFFSET_PX, FOCUS_BORDER_OFFSET_PX, -2 * FOCUS_BORDER_OFFSET_PX, -2 * FOCUS_BORDER_OFFSET_PX);
+  protected static final Rectangle NO_FOCUS_BORDER_OFFSET = new Rectangle(0, 0, 0, 0);
+
   private int m_xAglin = SWT.CENTER;
   private int m_yAglin = SWT.CENTER;
   private boolean m_autoFit = false;
 
   private Image m_image;
   private Image m_scaledImage;
+  private KeyListener m_keyListener; // if added, makes the canvas focusable
 
   public ImageViewer(Composite parent) {
     super(parent, SWT.NONE);
@@ -45,6 +55,17 @@ public class ImageViewer extends Canvas {
         freeResources();
       }
     });
+    addFocusListener(new FocusListener() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        redraw();
+      }
+
+      @Override
+      public void focusGained(FocusEvent e) {
+        redraw();
+      }
+    });
   }
 
   private void freeResources() {
@@ -57,10 +78,16 @@ public class ImageViewer extends Canvas {
   private Image scaleImage(Image img) {
     freeResources();
     if (m_autoFit && img != null) {
-      Point swtFieldSize = getSize();
+      Rectangle clientArea = getClientArea();
+      if (clientArea.width == 0 || clientArea.height == 0) {
+        return img;
+      }
       Rectangle imageBounds = img.getBounds();
-      double scaleFactor = (double) swtFieldSize.x / (double) imageBounds.width;
-      scaleFactor = Math.min(scaleFactor, (double) swtFieldSize.y / (double) img.getBounds().height);
+      if (imageBounds.width == 0 || imageBounds.height == 0) {
+        return null;
+      }
+      double scaleFactor = (double) clientArea.width / (double) imageBounds.width;
+      scaleFactor = Math.min(scaleFactor, (double) clientArea.height / (double) img.getBounds().height);
       m_scaledImage = new Image(getDisplay(), img.getImageData().scaledTo((int) (scaleFactor * img.getBounds().width), (int) (scaleFactor * img.getBounds().height)));
       return m_scaledImage;
     }
@@ -69,46 +96,84 @@ public class ImageViewer extends Canvas {
     }
   }
 
+  /**
+   * Returns the client area available for the image. This is the original (full) client area minus the space used by
+   * the focus border.
+   */
+  @Override
+  public Rectangle getClientArea() {
+    Rectangle clientArea = super.getClientArea();
+
+    if (isFocusable()) {
+      // make space for the focus border
+      clientArea.x += FOCUS_BORDER_OFFSET.x;
+      clientArea.y += FOCUS_BORDER_OFFSET.y;
+      clientArea.width += FOCUS_BORDER_OFFSET.width;
+      clientArea.height += FOCUS_BORDER_OFFSET.height;
+    }
+
+    return clientArea;
+  }
+
+  protected Point getImageLocation(Rectangle bounds, Rectangle imgBounds) {
+    Rectangle focusBorderOffset = getFocusBorderOffset();
+    Point location = new Point(focusBorderOffset.x, focusBorderOffset.y);
+    if (imgBounds.width <= bounds.width) {
+      switch (getAlignmentX()) {
+        case SWT.CENTER:
+          location.x = (bounds.width - imgBounds.width + focusBorderOffset.width) / 2;
+          break;
+        case SWT.RIGHT:
+          location.x = bounds.width - imgBounds.width + focusBorderOffset.width;
+          break;
+        default:
+          location.x = focusBorderOffset.x;
+          break;
+      }
+    }
+    if (imgBounds.height <= bounds.height) {
+      switch (getAlignmentY()) {
+        case SWT.NONE:
+          location.y = (bounds.height - imgBounds.height + focusBorderOffset.height) / 2;
+          break;
+        case SWT.BOTTOM:
+          location.y = bounds.height - imgBounds.height + focusBorderOffset.height;
+          break;
+        default:
+          location.y = focusBorderOffset.y;
+          break;
+      }
+    }
+    return location;
+  }
+
   protected void handleSwtPaintEvent(GC gc) {
     Image img = getImage();
-    Rectangle bounds = gc.getClipping();
+
     if (img != null) {
       // scale img
       if (isAutoFit()) {
         img = scaleImage(img);
       }
       Rectangle imgBounds = img.getBounds();
-      int x = 0;
-      if (imgBounds.width <= bounds.width) {
-        switch (getAlignmentX()) {
-          case SWT.CENTER:
-            x = (bounds.width - imgBounds.width) / 2;
-            break;
-          case SWT.RIGHT:
-            x = bounds.width - imgBounds.width;
-            break;
-          default:
-            x = 0;
-            break;
-        }
-      }
-      int y = 0;
-      if (imgBounds.height <= bounds.height) {
-        switch (getAlignmentY()) {
-          case SWT.CENTER:
-            y = (bounds.height - imgBounds.height) / 2;
-            break;
-          case SWT.RIGHT:
-            y = bounds.height - imgBounds.height;
-            break;
-          default:
-            y = 0;
-            break;
-        }
-      }
+      Rectangle focusBorderOffset = getFocusBorderOffset();
+      Point imageLocation = getImageLocation(gc.getClipping(), imgBounds);
+
       // draw
-      gc.drawImage(img, x, y);
+      gc.drawImage(img, imageLocation.x, imageLocation.y);
+
+      if (isFocusable() && isFocusControl()) {
+        // draw focus border
+        gc.drawFocus(imageLocation.x - focusBorderOffset.x, imageLocation.y - focusBorderOffset.y, imgBounds.width - focusBorderOffset.width, imgBounds.height - focusBorderOffset.height);
+      }
     }
+  }
+
+  protected Rectangle getFocusBorderOffset() {
+    if (isFocusable()) {
+      return FOCUS_BORDER_OFFSET;
+    }
+    return NO_FOCUS_BORDER_OFFSET;
   }
 
   @Override
@@ -136,6 +201,30 @@ public class ImageViewer extends Canvas {
 
   public int getAlignmentY() {
     return m_yAglin;
+  }
+
+  public synchronized boolean isFocusable() {
+    return m_keyListener != null;
+  }
+
+  public synchronized void setFocusable(boolean focusable) {
+    if (focusable) {
+      if (m_keyListener == null) {
+        m_keyListener = new KeyAdapter() {
+          @Override
+          public void keyReleased(KeyEvent e) {
+            traverse(SWT.TRAVERSE_NONE, e);
+          }
+        };
+        addKeyListener(m_keyListener);
+      }
+    }
+    else {
+      if (m_keyListener != null) {
+        removeKeyListener(m_keyListener);
+        m_keyListener = null;
+      }
+    }
   }
 
   public boolean isAutoFit() {

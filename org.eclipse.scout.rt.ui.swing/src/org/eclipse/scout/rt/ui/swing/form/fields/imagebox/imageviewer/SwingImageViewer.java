@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.ui.swing.form.fields.imagebox.imageviewer;
 /**
  * , Samuel Moser
  */
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
@@ -42,6 +45,10 @@ public class SwingImageViewer extends JComponent {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingImageViewer.class);
 
+  protected static final int FOCUS_BORDER_OFFSET_PX = 2;
+
+  protected static final int NO_FOCUS_BORDER_OFFSET_PX = 0;
+
   private EventListenerList m_eventListenerList;
 
   private Image m_origImg;
@@ -62,14 +69,13 @@ public class SwingImageViewer extends JComponent {
 
   private boolean m_autoFit = false;
 
-  private boolean m_focusVisible = false;
-
   private boolean m_insideValidateTreeProcess;
+
+  private Point m_imageLocation;
 
   public SwingImageViewer() {
     super();
     m_eventListenerList = new EventListenerList();
-    setFocusable(true);
     addMouseListener(new MouseAdapter() {
       MouseClickedBugFix fix;
 
@@ -81,9 +87,7 @@ public class SwingImageViewer extends JComponent {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (fix != null) {
-          if(fix!=null) {
-            fix.mouseReleased(this, e);
-          }
+          fix.mouseReleased(this, e);
         }
       }
 
@@ -129,16 +133,6 @@ public class SwingImageViewer extends JComponent {
 
   public boolean isAutoFit() {
     return m_autoFit;
-  }
-
-  public void setFocusVisible(boolean b) {
-    m_focusVisible = b;
-    repaint();
-
-  }
-
-  public boolean isFocusVisible() {
-    return m_focusVisible;
   }
 
   /**
@@ -354,56 +348,81 @@ public class SwingImageViewer extends JComponent {
       try {
         AffineTransform af = calculateCurrentTransformation();
         g2.transform(af);
-        int x = 0;
-        int y = 0;
-        // XXX implement layout with autofit
-        if (!isAutoFit()) {
-          Rectangle clipingBounds = getBounds();
-          int imgW = m_origImg.getWidth(this);
-          int imgH = m_origImg.getHeight(this);
-          if (imgW >= clipingBounds.width) {
-            x = 0;
-          }
-          else if (Math.abs(getAlignmentX() - 0.5) < EPS) {
-            x = (clipingBounds.width - imgW) / 2;
-          }
-          else if (getAlignmentX() > 0.5) {
-            x = (clipingBounds.width - imgW);
-          }
-          else {
-            x = 0;
-          }
-          if (imgH >= clipingBounds.height) {
-            // top
-            y = 0;
-          }
-          else if (Math.abs(getAlignmentY() - 0.5) < EPS) {
-            y = (clipingBounds.height - imgH) / 2;
-          }
-          else if (getAlignmentY() > 0.5) {
-            y = (clipingBounds.height - imgH);
-          }
-          else {
-            y = 0;
-          }
-        }
-        g2.drawImage(m_origImg, x, y, this);
+        int imgW = m_origImg.getWidth(this);
+        int imgH = m_origImg.getHeight(this);
+        setImageLocation(getImageLocation(imgW, imgH));
+
+        g2.drawImage(m_origImg, getImageLocation().x, getImageLocation().y, this);
         if (m_analysisRect != null) {
           g.setColor(getForeground());
           g2.drawRect(m_analysisRect.x, m_analysisRect.y, m_analysisRect.width, m_analysisRect.height);
+        }
+
+        // focus lines
+        if (hasFocus() && isFocusable()) {
+          Color origColor = g.getColor();
+          Stroke origStroke = g2.getStroke();
+          try {
+            int focusBorderOffset = getFocusBorderOffset();
+            g.setColor(Color.BLUE);
+            g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[]{1.0f}, 0.0f));
+            g2.drawRect(getImageLocation().x - focusBorderOffset, getImageLocation().y - focusBorderOffset, imgW + (2 * focusBorderOffset), imgH + (2 * focusBorderOffset));
+          }
+          finally {
+            // restore
+            g.setColor(origColor);
+            g2.setStroke(origStroke);
+          }
         }
       }
       finally {
         g2.setTransform(oldAt);
         g2.setColor(oldColor);
       }
-      // guide lines
-      /*
-       * XXX if(hasFocus()&&m_focusVisible){ int w=d.width; int h=d.height;
-       * g.setColor(Color.lightGray); g2.drawLine(0, h/2, w, h/2);
-       * g2.drawLine(w/2, 0, w/2, h); }
-       */
+
     }
+  }
+
+  protected int getFocusBorderOffset() {
+    if (isFocusable()) {
+      return FOCUS_BORDER_OFFSET_PX;
+    }
+    return NO_FOCUS_BORDER_OFFSET_PX;
+  }
+
+  protected Point getImageLocation(int imgW, int imgH) {
+    Point location = new Point();
+    // XXX implement layout with autofit
+    if (!isAutoFit()) {
+      int focusBorderOffset = getFocusBorderOffset();
+      Rectangle clipingBounds = getBounds();
+      if (imgW >= clipingBounds.width) {
+        location.x = focusBorderOffset;
+      }
+      else if (Math.abs(getAlignmentX() - 0.5) < EPS) {
+        location.x = (clipingBounds.width - imgW - (2 * focusBorderOffset)) / 2;
+      }
+      else if (getAlignmentX() > 0.5) {
+        location.x = (clipingBounds.width - imgW - (2 * focusBorderOffset));
+      }
+      else {
+        location.x = focusBorderOffset;
+      }
+      if (imgH >= clipingBounds.height) {
+        // top
+        location.y = focusBorderOffset;
+      }
+      else if (Math.abs(getAlignmentY() - 0.5) < EPS) {
+        location.y = (clipingBounds.height - imgH - (2 * focusBorderOffset)) / 2;
+      }
+      else if (getAlignmentY() > 0.5) {
+        location.y = (clipingBounds.height - imgH - (2 * focusBorderOffset));
+      }
+      else {
+        location.y = focusBorderOffset;
+      }
+    }
+    return location;
   }
 
   /**
@@ -471,6 +490,14 @@ public class SwingImageViewer extends JComponent {
         ((ImageTransformListener) eventlisters[i]).transformChanged(event);
       }
     }
+  }
+
+  public Point getImageLocation() {
+    return m_imageLocation;
+  }
+
+  protected void setImageLocation(Point imageLocation) {
+    m_imageLocation = imageLocation;
   }
 
 }

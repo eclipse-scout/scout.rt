@@ -69,8 +69,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  /**
+   * @deprecated Will be removed in 5.0 release. This property never had any effect and can safely be removed without
+   *             replacement.
+   */
   @Order(310)
+  @Deprecated
   protected boolean getConfiguredFocusVisible() {
     return true;
   }
@@ -85,6 +89,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Order(330)
   protected double getConfiguredZoomDelta() {
     return 1.25;
+  }
+
+  @Override
+  @Order(190)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredFocusable() {
+    return false;
   }
 
   @ConfigProperty(ConfigProperty.DOUBLE)
@@ -317,11 +328,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isFocusVisible() {
     return propertySupport.getPropertyBool(PROP_FOCUS_VISIBLE);
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setFocusVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_FOCUS_VISIBLE, b);
   }

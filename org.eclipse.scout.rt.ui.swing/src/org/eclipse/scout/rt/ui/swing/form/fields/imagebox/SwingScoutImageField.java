@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.ui.swing.form.fields.imagebox;
 /**
  * , Samuel Moser
  */
+import java.awt.Component;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -25,6 +27,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -71,6 +75,7 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     SwingImageViewer imageViewer = new SwingImageViewer();
     SwingUtility.installDefaultFocusHandling(imageViewer);
     imageViewer.addMouseListener(new P_SwingPopupListener());
+    imageViewer.addKeyListener(new P_SwingKeyPopupListener());
     imageViewer.addImageTransformListener(new P_SwingTransformListener());
     if (getScoutObject().isScrollBarEnabled() && !getScoutObject().isAutoFit()) {
       JScrollPaneEx scrollPane = new JScrollPaneEx(imageViewer);
@@ -112,7 +117,6 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     setImageFromScout(imageField.getImageId(), imageField.getImage());
     setAnalysisRectangleFromScout(imageField.getAnalysisRectangle());
     setImageTransformFromScout(imageField.getImageTransform());
-    setFocusVisibleFromScout(imageField.isFocusVisible());
     setAutoFitFromScout(imageField.isAutoFit());
     updateDropTransferTypesFromScout();
     updateDragTransferTypesFromScout();
@@ -148,6 +152,14 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     getSwingImageViewer().setAlignmentY(swingAlignY);
   }
 
+  @Override
+  protected void setFocusableFromScout(boolean b) {
+    SwingImageViewer swingImageViewer = getSwingImageViewer();
+    if (swingImageViewer != null) {
+      swingImageViewer.setFocusable(b);
+    }
+  }
+
   protected void setAnalysisRectangleFromScout(BoundsSpec r) {
     Rectangle swingRect = SwingUtility.createRectangle(r);
     getSwingImageViewer().setAnalysisRect(swingRect);
@@ -155,10 +167,6 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
 
   protected void setAutoFitFromScout(boolean b) {
     getSwingImageViewer().setAutoFit(b);
-  }
-
-  protected void setFocusVisibleFromScout(boolean b) {
-    getSwingImageViewer().setFocusVisible(b);
   }
 
   protected void setImageTransformFromScout(AffineTransformSpec at) {
@@ -217,9 +225,6 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     else if (name.equals(IImageField.PROP_AUTO_FIT)) {
       setAutoFitFromScout(((Boolean) newValue).booleanValue());
     }
-    else if (name.equals(IImageField.PROP_FOCUS_VISIBLE)) {
-      setFocusVisibleFromScout(((Boolean) newValue).booleanValue());
-    }
     else if (name.equals(ITable.PROP_DRAG_TYPE)) {
       updateDragTransferTypesFromScout();
     }
@@ -251,14 +256,14 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     }
   }
 
-  protected void handleSwingPopup(final MouseEvent e) {
+  protected void handleSwingPopup(final Component target, final Point point) {
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
         List<IMenu> a = getScoutImageField().getUIFacade().firePopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), a).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), target, point, a).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -338,17 +343,26 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     public void mousePressed(MouseEvent e) {
       // Mac popup
       if (e.isPopupTrigger() && e.getComponent().isEnabled()) {
-        handleSwingPopup(e);
+        handleSwingPopup(e.getComponent(), e.getPoint());
       }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
       if (e.isPopupTrigger() && e.getComponent().isEnabled()) {
-        handleSwingPopup(e);
+        handleSwingPopup(e.getComponent(), e.getPoint());
       }
     }
   }// end private class
+
+  private class P_SwingKeyPopupListener extends KeyAdapter {
+    @Override
+    public void keyReleased(KeyEvent e) {
+      if (KeyEvent.VK_CONTEXT_MENU == e.getKeyCode()) {
+        handleSwingPopup(e.getComponent(), getSwingImageViewer().getImageLocation());
+      }
+    }
+  }
 
   private class P_SwingTransformListener implements ImageTransformListener {
     @Override

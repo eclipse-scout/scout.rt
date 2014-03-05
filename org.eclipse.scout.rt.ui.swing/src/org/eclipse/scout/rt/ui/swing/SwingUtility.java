@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -780,10 +781,18 @@ public final class SwingUtility {
     comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ctrl INSERT"), "copy-to-clipboard");
   }
 
-  public static void installCopyPasteMenu(JTextComponent pane) {
+  public static void installCopyPasteMenu(final JTextComponent pane) {
     CopyPasteMenuSupport menu = new CopyPasteMenuSupport(pane);
     pane.addMouseListener(menu);
     pane.addFocusListener(menu);
+    pane.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(KeyEvent e) {
+        if (KeyEvent.VK_CONTEXT_MENU == e.getKeyCode()) {
+          onSwingPopup(pane, pane.getLocation().x, pane.getLocation().y, pane.isEnabled() && pane.isEditable() && pane.isShowing());
+        }
+      }
+    });
   }
 
   public static void installDevelopmentShortcuts(JComponent pane) {
@@ -1308,10 +1317,10 @@ public final class SwingUtility {
       if (isLocationOnText(e.getPoint())) {
         if (e.isPopupTrigger()) {
           if (m_comp.isEnabled() && m_comp.isEditable()) {
-            onSwingPopup(e, true);
+            onSwingPopup(m_comp, e.getX(), e.getY(), true);
           }
           else {
-            onSwingPopup(e, false);
+            onSwingPopup(m_comp, e.getX(), e.getY(), false);
           }
         }
       }
@@ -1322,10 +1331,10 @@ public final class SwingUtility {
       if (isLocationOnText(e.getPoint())) {
         if (e.isPopupTrigger()) {
           if (m_comp.isEnabled() && m_comp.isEditable()) {
-            onSwingPopup(e, true);
+            onSwingPopup(m_comp, e.getX(), e.getY(), true);
           }
           else {
-            onSwingPopup(e, false);
+            onSwingPopup(m_comp, e.getX(), e.getY(), false);
           }
         }
       }
@@ -1341,63 +1350,6 @@ public final class SwingUtility {
       }
     }
 
-    private void onSwingPopup(MouseEvent e, boolean pasteEnabled) {
-      JPopupMenu pop = new JPopupMenu();
-
-      if (pasteEnabled) {
-        JMenuItem cutItem = new JMenuItem(SwingUtility.getNlsText("Cut"));
-        cutItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
-        cutItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            m_comp.cut();
-          }
-        });
-        pop.add(cutItem);
-      }
-
-      JMenuItem copyItem = new JMenuItem(SwingUtility.getNlsText("Copy"));
-      if (m_comp.isEnabled() && m_comp.isEditable()) {
-        copyItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
-      }
-      copyItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-          if (m_comp.isEnabled() && m_comp.isEditable()) {
-            m_comp.copy();
-          }
-          else {
-            //Ticket 86'427: Kopieren - Einfügen
-            boolean hasSelection = StringUtility.hasText(m_comp.getSelectedText());
-            if (hasSelection) {
-              m_comp.copy();
-            }
-            else {
-              m_comp.selectAll();
-              m_comp.copy();
-              m_comp.select(0, 0);
-            }
-          }
-        }
-      });
-      pop.add(copyItem);
-
-      if (pasteEnabled) {
-        JMenuItem pasteItem = new JMenuItem(SwingUtility.getNlsText("Paste"));
-        pasteItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            m_comp.paste();
-          }
-        });
-        pop.add(pasteItem);
-      }
-
-      m_comp.requestFocus();
-      m_comp.setComponentPopupMenu(pop);
-      pop.show(m_comp, e.getX(), e.getY());
-    }
-
     @Override
     public void focusGained(FocusEvent e) {
       m_comp.setComponentPopupMenu(null);
@@ -1410,4 +1362,60 @@ public final class SwingUtility {
     }
   }// end class
 
+  private static void onSwingPopup(final JTextComponent comp, int x, int y, boolean pasteEnabled) {
+    JPopupMenu pop = new JPopupMenu();
+
+    if (pasteEnabled) {
+      JMenuItem cutItem = new JMenuItem(SwingUtility.getNlsText("Cut"));
+      cutItem.setEnabled(StringUtility.hasText(comp.getSelectedText()));
+      cutItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+          comp.cut();
+        }
+      });
+      pop.add(cutItem);
+    }
+
+    JMenuItem copyItem = new JMenuItem(SwingUtility.getNlsText("Copy"));
+    if (comp.isEnabled() && comp.isEditable()) {
+      copyItem.setEnabled(StringUtility.hasText(comp.getSelectedText()));
+    }
+    copyItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent event) {
+        if (comp.isEnabled() && comp.isEditable()) {
+          comp.copy();
+        }
+        else {
+          //Ticket 86'427: Kopieren - Einfügen
+          boolean hasSelection = StringUtility.hasText(comp.getSelectedText());
+          if (hasSelection) {
+            comp.copy();
+          }
+          else {
+            comp.selectAll();
+            comp.copy();
+            comp.select(0, 0);
+          }
+        }
+      }
+    });
+    pop.add(copyItem);
+
+    if (pasteEnabled) {
+      JMenuItem pasteItem = new JMenuItem(SwingUtility.getNlsText("Paste"));
+      pasteItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+          comp.paste();
+        }
+      });
+      pop.add(pasteItem);
+    }
+
+    comp.requestFocus();
+    comp.setComponentPopupMenu(pop);
+    pop.show(comp, x, y);
+  }
 }

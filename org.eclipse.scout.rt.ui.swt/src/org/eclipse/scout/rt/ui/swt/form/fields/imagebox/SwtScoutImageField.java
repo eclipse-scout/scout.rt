@@ -127,7 +127,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
   protected void attachScout() {
     super.attachScout();
     getImageViewer().setAlignmentX(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
-    getImageViewer().setAlignmentY(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().verticalAlignment));
+    getImageViewer().setAlignmentY(SwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment));
     updateAutoFitFromScout();
     updateImageFromScout();
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
@@ -151,6 +151,14 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
   protected void updateAutoFitFromScout() {
     getImageViewer().setAutoFit(getScoutObject().isAutoFit());
+  }
+
+  @Override
+  protected void setFocusableFromScout(boolean b) {
+    ImageViewer imageViewer = getImageViewer();
+    if (imageViewer != null) {
+      imageViewer.setFocusable(b);
+    }
   }
 
   @Override

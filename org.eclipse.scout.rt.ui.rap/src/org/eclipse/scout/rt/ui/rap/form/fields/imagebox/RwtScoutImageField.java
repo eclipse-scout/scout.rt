@@ -95,7 +95,7 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
   protected void attachScout() {
     super.attachScout();
     getUiField().setAlignmentX(RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
-    getUiField().setAlignmentY(RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().verticalAlignment));
+    getUiField().setAlignmentY(RwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment));
     updateAutoFitFromScout();
     updateImageFromScout();
     attachDndSupport();
@@ -125,6 +125,14 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
 
   protected void updateAutoFitFromScout() {
     getUiField().setAutoFit(getScoutObject().isAutoFit());
+  }
+
+  @Override
+  protected void setFocusableFromScout(boolean b) {
+    ImageViewer imageViewer = getUiField();
+    if (imageViewer != null) {
+      imageViewer.setFocusable(b);
+    }
   }
 
   @Override

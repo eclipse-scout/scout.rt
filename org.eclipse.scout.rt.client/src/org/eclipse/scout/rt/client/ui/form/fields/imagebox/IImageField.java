@@ -40,7 +40,14 @@ public interface IImageField extends IFormField, IDNDSupport {
   String PROP_IMAGE_TRANSFORM = "imageTransform";
   String PROP_ANALYSIS_RECTANGLE = "analysisRectangle";
   String PROP_AUTO_FIT = "autoFit";
+
+  /**
+   * @deprecated Will be removed in 5.0 release. This property never had any effect and can safely be removed without
+   *             replacement.
+   */
+  @Deprecated
   String PROP_FOCUS_VISIBLE = "focusVisible";
+
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
 
   String getImageId();
@@ -72,8 +79,18 @@ public interface IImageField extends IFormField, IDNDSupport {
 
   void setImageTransform(AffineTransformSpec t);
 
+  /**
+   * @deprecated Will be removed in 5.0 release. This property never had any effect and can safely be removed without
+   *             replacement.
+   */
+  @Deprecated
   boolean isFocusVisible();
 
+  /**
+   * @deprecated Will be removed in 5.0 release. This property never had any effect and can safely be removed without
+   *             replacement.
+   */
+  @Deprecated
   void setFocusVisible(boolean b);
 
   void addImageFieldListener(ImageFieldListener listener);
