@@ -260,6 +260,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     finally {
       getInternalTable().setTableChanging(false);
     }
+    execPageDataLoaded();
   }
 
   @Override

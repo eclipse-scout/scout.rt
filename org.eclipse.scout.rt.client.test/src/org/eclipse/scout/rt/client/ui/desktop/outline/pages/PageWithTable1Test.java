@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -58,7 +59,25 @@ public class PageWithTable1Test {
     page.reloadPage();
   }
 
+  /**
+   * Tests that {@link AbstractPage#execPageDataLoaded()} is called correctly on a {@link AbstractTablePage}
+   */
+  @Test
+  public void testExecPageDataLoaded() throws ProcessingException {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
+    desktop.setOutline(PageWithTableOutline.class);
+    IOutline outline = desktop.getOutline();
+    PageWithTable page = (PageWithTable) outline.getActivePage();
+    Assert.assertEquals(1, page.m_execPageDataLoadedCalled);
+    page.reloadPage();
+    page.reloadPage();
+    page.reloadPage();
+    Assert.assertEquals(4, page.m_execPageDataLoadedCalled);
+  }
+
   public static class PageWithTableOutline extends AbstractOutline {
+
     @Override
     protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
       pageList.add(new PageWithTable());
@@ -67,9 +86,17 @@ public class PageWithTable1Test {
 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
+    public int m_execPageDataLoadedCalled = 0;
+
     @Override
     protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
       return new Object[][]{new Object[]{"a", "b"}};
+    }
+
+    @Override
+    protected void execPageDataLoaded() throws ProcessingException {
+      super.execPageDataLoaded();
+      m_execPageDataLoadedCalled++;
     }
 
     @Override

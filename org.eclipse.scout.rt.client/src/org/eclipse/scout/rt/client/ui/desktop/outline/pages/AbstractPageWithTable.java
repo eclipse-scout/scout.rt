@@ -841,6 +841,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (desktop != null) {
       desktop.afterTablePageLoaded(this);
     }
+    execPageDataLoaded();
   }
 
   private void linkTableRowWithPage(ITableRow tableRow, IPage page) {

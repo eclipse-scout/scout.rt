@@ -282,8 +282,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * Called after this page has (re)loaded its data. This method is called after {@link #loadChildren()} has been
-   * called.
+   * Called after this page has (re)loaded its data.
    * <p>
    * Subclasses can override this method. The default does nothing.
    * 
@@ -571,7 +570,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         // do NOT unload page, because this will clear the selection
         // //getOutline().unloadNode(this);
         loadChildren();
-        execPageDataLoaded();
       }
       finally {
         tree.setTreeChanging(false);
