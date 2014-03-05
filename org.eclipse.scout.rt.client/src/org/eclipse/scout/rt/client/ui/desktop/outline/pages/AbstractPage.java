@@ -282,7 +282,8 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * Called after this page has (re)loaded its data.
+   * Called after this page has (re)loaded its data. This method is called after {@link #loadChildren()} has
+   * been called.
    * <p>
    * Subclasses can override this method. The default does nothing.
    * 
@@ -575,6 +576,12 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         tree.setTreeChanging(false);
       }
     }
+  }
+
+  @Override
+  public void loadChildren() throws ProcessingException {
+    super.loadChildren();
+    execPageDataLoaded();
   }
 
   @Override
