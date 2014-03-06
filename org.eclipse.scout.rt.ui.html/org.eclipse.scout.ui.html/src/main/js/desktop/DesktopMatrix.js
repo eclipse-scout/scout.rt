@@ -25,14 +25,30 @@ Scout.DesktopMatrix.prototype.addData = function (data, dataGroup) {
 
   // count, sum, avg
   if (dataGroup == -1) {
-    dataAxis.norm = function (f) {return 1; };
-    dataAxis.group = function (array) {return array.length; };
+    dataAxis.norm = function (f) {
+      return 1;
+    };
+    dataAxis.group = function (array) {
+      return array.length;
+    };
   } else if (dataGroup == 1) {
-    dataAxis.norm = function (f) {return parseFloat(f); };
-    dataAxis.group = function (array) {return array.reduce(function(a, b) {return a + b; }); };
+    dataAxis.norm = function (f) {
+      return parseFloat(f);
+    };
+    dataAxis.group = function (array) {
+      return array.reduce(function(a, b) {
+        return a + b;
+      });
+    };
   } else if (dataGroup == 2) {
-    dataAxis.norm = function (f) {return parseFloat(f); };
-    dataAxis.group = function (array) {return array.reduce(function(a, b) {return a + b; }) / array.length; };
+    dataAxis.norm = function (f) {
+      return parseFloat(f);
+    };
+    dataAxis.group = function (array) {
+      return array.reduce(function(a, b) {
+        return a + b;
+      }) / array.length;
+    };
   }
 
   return dataAxis;
@@ -46,7 +62,7 @@ Scout.DesktopMatrix.prototype.addAxis = function (axis, axisGroup) {
   this._allAxis.push(keyAxis);
   keyAxis.column = axis;
 
-  // normalized sring data
+  // normalized string data
   keyAxis.normTable = [];
 
   // add a key to the axis
@@ -58,24 +74,49 @@ Scout.DesktopMatrix.prototype.addAxis = function (axis, axisGroup) {
   // norm and format depends of datatype and group functionality
   if (this._columns[axis].type == 'date') {
     if (axisGroup === 0) {
-      keyAxis.norm = function (f) {return $.stringToDate(f).getTime(); };
-      keyAxis.format = function (n) {return $.dateToString(new Date(n)); };
+      keyAxis.norm = function (f) {
+        if (f) {
+          return new Date(f).getTime();
+        }
+      };
+      keyAxis.format = function (n) {
+        return $.dateToString(new Date(n));
+      };
     } else if (axisGroup === 1) {
-      keyAxis.norm = function (f) {return ($.stringToDate(f).getDay() + 6) % 7; };
-      keyAxis.format = function (n) {return $.WEEKDAY_LONG[n]; };
+      keyAxis.norm = function (f) {
+        if (f) {
+          return (new Date(f).getDay() + 6) % 7;
+        }
+      };
+      keyAxis.format = function (n) {
+        return $.WEEKDAY_LONG[n];
+      };
     } else if (axisGroup === 2) {
-      keyAxis.norm = function (f) {return $.stringToDate(f).getMonth(); };
-      keyAxis.format = function (n) {return $.MONTH_LONG[n]; };
+      keyAxis.norm = function (f) {
+        if (f) {
+          return new Date(f).getMonth();
+        }
+      };
+      keyAxis.format = function (n) {
+        return $.MONTH_LONG[n];
+      };
     } else if (axisGroup === 3) {
-      keyAxis.norm = function (f) {return $.stringToDate(f).getFullYear(); };
-      keyAxis.format = function (n) {return String(n); };
+      keyAxis.norm = function (f) {
+        if (f) {
+          return new Date(f).getFullYear();
+        }
+      };
+      keyAxis.format = function (n) {
+        return String(n);
+      };
     }
-  } else if (this._columns[axis].type == 'int'){
-    keyAxis.norm = function (f) {return parseInt(f, 10); };
-    keyAxis.format = function (n) {return $.numberToString(n, 0); };
-  } else if (this._columns[axis].type == 'float'){
-    keyAxis.norm = function (f) {return parseFloat(f); };
-    keyAxis.format = function (n) {return $.numberToString(n, 0); };
+  } else if (this._columns[axis].type == 'number'){
+    keyAxis.norm = function (f) {
+      return parseFloat(f);
+    };
+    keyAxis.format = function (n) {
+      return $.numberToString(n, 0);
+    };
   } else {
     keyAxis.norm = function (f) {var index =  keyAxis.normTable.indexOf(f);
                   if (index == -1) {
@@ -93,28 +134,31 @@ Scout.DesktopMatrix.prototype.addAxis = function (axis, axisGroup) {
 
 Scout.DesktopMatrix.prototype.calculateCube = function () {
   var cube = {},
-    r, v, k, data;
+    r, v, k, data,
+    getCellValue = Scout.DesktopMatrix.getCellValue;
 
   // collect data from table
   for (r = 0; r < this._table.length; r++) {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = this._table[r][this._allAxis[k].column];
+      key = getCellValue(this._table[r][this._allAxis[k].column]);
       normKey = this._allAxis[k].norm(key);
-
-      this._allAxis[k].add(normKey);
-      keys.push(normKey);
+      if (normKey) {
+        this._allAxis[k].add(normKey);
+        keys.push(normKey);
+      }
     }
     keys = JSON.stringify(keys);
 
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = this._table[r][this._allData[v].column];
+      data = getCellValue(this._table[r][this._allData[v].column]);
       normData = this._allData[v].norm(data);
-
-      values.push(normData);
+      if (normData) {
+        values.push(normData);
+      }
     }
 
     // build cube
@@ -182,13 +226,14 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
 };
 
 Scout.DesktopMatrix.prototype.columnCount = function () {
-  var colCount = [];
+  var colCount = [],
+    getCellValue = Scout.DesktopMatrix.getCellValue;
 
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
     if (this._columns[c].type != 'key') {
       for (var r = 0; r < this._table.length; r++) {
-        var v = this._table[r][c];
+        var v = getCellValue(this._table[r][c]);
         if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
       }
 
@@ -196,4 +241,14 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
     }
   }
   return colCount;
+};
+
+Scout.DesktopMatrix.getCellValue = function (cell) {
+  if (!cell) {
+    return null;
+  }
+  if (cell.value) {
+    return cell.value;
+  }
+  return cell.text;
 };

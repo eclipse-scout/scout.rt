@@ -86,7 +86,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
   for (var c2 = 0; c2 < columns.length; c2++) {
     var column2 = columns[c2];
 
-    if ((column2.type == 'float') || (column2.type == 'int')) {
+    if ((column2.type == 'number')) {
       $dataSelect.appendDiv('', 'select-data data-sum', column2.text)
         .data('column', c2);
     }

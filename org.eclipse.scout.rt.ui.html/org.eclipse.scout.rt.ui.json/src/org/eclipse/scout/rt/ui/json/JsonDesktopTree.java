@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.json;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +16,11 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -274,13 +277,46 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
   }
 
   protected JSONArray tableRowToJson(ITableRow row) throws JsonUIException {
-    //FIXME Array not sufficient because cell has more info than text -> foreground color, font, icon etc)
     JSONArray jsonCells = new JSONArray();
     for (int cellIndex = 0; cellIndex < row.getCellCount(); cellIndex++) {
-      jsonCells.put(row.getCell(cellIndex).getText());
+      IColumn column = row.getTable().getColumnSet().getColumn(cellIndex);
+      jsonCells.put(tableCellToJson(row.getCell(cellIndex), column));
     }
 
     return jsonCells;
+  }
+
+  protected JSONObject tableCellToJson(ICell cell, IColumn column) throws JsonUIException {
+
+    JSONObject jsonCell = new JSONObject();
+    try {
+      jsonCell.put("value", getCellValue(cell, column));
+      jsonCell.put("text", cell.getText());
+      jsonCell.put("foregroundColor", cell.getForegroundColor());
+      jsonCell.put("backgroundColor", cell.getBackgroundColor());
+      //FIXME implement missing
+      return jsonCell;
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  protected Object getCellValue(ICell cell, IColumn column) {
+    if (column instanceof IDateColumn) {
+      Date date = (Date) cell.getValue();
+      if (date != null) {
+        return date.getTime();
+      }
+    }
+    else if (Number.class.isAssignableFrom(column.getDataType())) {
+      Object value = cell.getValue();
+      //not necessary to send duplicate values
+      if (value != null && !String.valueOf(value).equals(cell.getText())) {
+        return value;
+      }
+    }
+    return null;
   }
 
   protected JSONObject tableToJson(ITable table) throws JsonUIException {
@@ -315,10 +351,12 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected String computeColumnType(IColumn column) {
-    if (column.getDataType().isAssignableFrom(Number.class)) {
+    if (Number.class.isAssignableFrom(column.getDataType())) {
       return "number";
+    }
+    if (Date.class.isAssignableFrom(column.getDataType())) {
+      return "date";
     }
     return "text";
   }

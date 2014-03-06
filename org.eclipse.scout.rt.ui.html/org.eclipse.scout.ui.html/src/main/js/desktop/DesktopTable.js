@@ -61,6 +61,8 @@ Scout.DesktopTable = function (scout, $parent, model) {
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlChart);
+  } else {
+    $controlChart.addClass('disabled');
   }
 
   // update or disable graph button
@@ -210,7 +212,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
           allign = (column.type == 'number') ? 'text-align: right; ' : '';
-          value = row[c];
+          value = row[c].text;
 
         rowString += '<div style = "' + style + allign + '">' + value + '</div>';
       }
@@ -360,7 +362,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
       scrollbar.initThumb();
     });
 
-    that.setInfoFilter(rowCount);
+    that._setInfoFilter(rowCount);
     $allRows.appendTo(that._$tableDataScroll);
     scrollbar.initThumb();
   }

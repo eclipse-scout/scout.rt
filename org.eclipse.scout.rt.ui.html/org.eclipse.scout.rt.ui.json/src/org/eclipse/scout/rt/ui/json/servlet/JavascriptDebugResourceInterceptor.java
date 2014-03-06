@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.ui.html.ITextFileLoader;
 import org.eclipse.scout.ui.html.ScriptProcessor;
 import org.eclipse.scout.ui.html.TextFileUtil;
@@ -27,6 +29,7 @@ public class JavascriptDebugResourceInterceptor {
   private static final long serialVersionUID = 1L;
   //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4="-min", $5=".js" or ".css"
   private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/(\\w+/)*)([^/]+)([-.]min)(\\.(js|css))");
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JavascriptDebugResourceInterceptor.class);
 
   private final List<ResourceHandler> m_resourceHandlers;
 
@@ -44,7 +47,7 @@ public class JavascriptDebugResourceInterceptor {
           String bundlePath = "src/main/js/" + mat.group(3) + "-template" + mat.group(5);
           ResourceHandler h = findHandlerFor(bundlePath);
           if (h != null) {
-            System.out.println("replacing " + pathInfo + " by live processing /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
+            LOG.info("replacing " + pathInfo + " by live processing /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
             handleScriptTemplate(req, resp, h, bundlePath);
             return true;
           }
@@ -52,7 +55,7 @@ public class JavascriptDebugResourceInterceptor {
           bundlePath = "libjs/" + mat.group(3) + mat.group(5);
           h = findHandlerFor(bundlePath);
           if (h != null) {
-            System.out.println("replacing " + pathInfo + " by the uncompressed /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
+            LOG.info("replacing " + pathInfo + " by the uncompressed /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
             handleScriptLibrary(req, resp, h, bundlePath);
             return true;
           }
