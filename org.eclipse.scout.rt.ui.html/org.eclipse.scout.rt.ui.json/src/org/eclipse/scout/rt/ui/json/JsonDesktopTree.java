@@ -12,6 +12,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -278,9 +279,11 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
 
   protected JSONArray tableRowToJson(ITableRow row) throws JsonUIException {
     JSONArray jsonCells = new JSONArray();
-    for (int cellIndex = 0; cellIndex < row.getCellCount(); cellIndex++) {
-      IColumn column = row.getTable().getColumnSet().getColumn(cellIndex);
-      jsonCells.put(tableCellToJson(row.getCell(cellIndex), column));
+    for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
+      IColumn column = row.getTable().getColumnSet().getColumn(colIndex);
+      if (column.isDisplayable()) {
+        jsonCells.put(tableCellToJson(row.getCell(colIndex), column));
+      }
     }
 
     return jsonCells;
@@ -303,18 +306,25 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
   }
 
   protected Object getCellValue(ICell cell, IColumn column) {
+    Object retVal = null;
     if (column instanceof IDateColumn) {
       Date date = (Date) cell.getValue();
       if (date != null) {
-        return date.getTime();
+        IDateColumn dateColumn = (IDateColumn) column;
+        if (dateColumn.isHasDate() && !dateColumn.isHasTime()) {
+          retVal = DateUtility.format(date, "yyyy-MM-dd");
+        }
+        else {
+          retVal = date.getTime();
+        }
       }
     }
     else if (Number.class.isAssignableFrom(column.getDataType())) {
-      Object value = cell.getValue();
-      //not necessary to send duplicate values
-      if (value != null && !String.valueOf(value).equals(cell.getText())) {
-        return value;
-      }
+      retVal = cell.getValue();
+    }
+    //not necessary to send duplicate values
+    if (retVal != null && !String.valueOf(retVal).equals(cell.getText())) {
+      return retVal;
     }
     return null;
   }
@@ -325,7 +335,9 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
 
       JSONArray jsonColumns = new JSONArray();
       for (IColumn<?> column : table.getColumns()) {
-        jsonColumns.put(columnToJson(column));
+        if (column.isDisplayable()) {
+          jsonColumns.put(columnToJson(column));
+        }
       }
       json.put("columns", jsonColumns);
 
