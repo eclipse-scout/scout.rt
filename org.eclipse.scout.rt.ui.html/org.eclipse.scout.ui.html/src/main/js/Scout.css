@@ -359,7 +359,8 @@ padding: 3px;
 
 .header-item:hover .header-control:before, 
 .header-item.sort-up > .header-control:before, 
-.header-item.sort-down > .header-control:before {
+.header-item.sort-down > .header-control:before, 
+.header-item.filter > .header-control:before {
 font-family: fontAwesome;
 font-size: 16px;
 background-color: #FFF;
@@ -837,6 +838,7 @@ fill: #fe9915 !important;
 #OrganizeColumn, #OrganizeCommand, #OrganizeDialog{
 float: left;
 display: inline-block;
+margin-right: 30px;
 }
 
 .column-item{
@@ -865,9 +867,8 @@ color: #fff;
 .column-flag {
 display: inline-block;
 float: right;
-width: 26px;
+width: 21px;
 heigth: 26px;
-color: #fff;
 padding-left: 4px; 
 font-family: fontAwesome;
 font-size: 16px;
@@ -875,36 +876,109 @@ line-height: 20px;
 color: #0082A1
 }
 
-.command-item{
-width: 35px;
-heigth: 35px;
-padding: 3px;
-margin-left: 15px;
-font-family: fontAwesome;
-font-size: 24px;
-line-height: 30px;
+.column-flag:after {
+content: attr(data-sort-order);
+position: relative;
+left: 1px;
+top: -6px;
+font-size: 10px;
+line-height: 10px;
+}
+
+.column-flag.filter{
+padding-left: 1px; 	
+}
+
+.command-group{
+width: 250px;
+height: 60px;
+}
+
+.command-text{
+clear: both;
 color: #0082A1;
+}
+
+.command-item{
+float: left;
+width: 55px;
+margin-right: 7px;
+heigth: 26px;
+font-family: fontAwesome;
+font-size: 17px;
+line-height: 26px;
+color: #fff;
+background-color: #e2e2e2;
 cursor: pointer;
+text-align: center;	
 }
 
-.command-item:hover, .command-item.selected{
-color: #fe9915
-}
-	
-.column-flag.sort-up:before, .command-item.sort-up:before { content: "\F160";}
-.column-flag.sort-down:before, .command-item.sort-down:before { content: "\F161";}
-.command-item.filter:before { content: "\F0B0";}
-.command-item.group:before { content: "g";}
-.command-item.add:before { content: "\F067";}
-.command-item.remove:before { content: "\F00D";}
-.command-item.change:before { content: "\F0AD";}
-.command-item.move-up:before { content: "\F077";}
-.command-item.move-down:before { content: "\F078";}
-
-.column-command:hover {
-color: #fe9915  !important;
+.command-item:after {
+position: relative;
+left: 3px;	
+top: -6px;
+font-size: 10px;
+line-height: 10px;
 }
 
+.command-item:hover{
+background-color: #ccc;
+}
+
+.command-item.selected{
+background-color: #fe9915
+}
+
+.column-flag.sort-up:before, 
+.command-item.sort-up:before, 
+.command-item.sort-up-add:before { 
+content: "\F175";
+}
+
+.column-flag.sort-down:before, 
+.command-item.sort-down:before,
+.command-item.sort-down-add:before { 
+content: "\F176";
+}
+
+.command-item.sort-up-add:after, .command-item.sort-down-add:after {
+content: "\F067";
+}  
+
+.column-flag:before, .command-item.filter:before, .command-item.filter-remove:before {
+content: "\F0B0";
+}  
+
+.command-item.filter:after {content: "\F067";}
+.command-item.filter-remove:after {content: "\F00D";}
+
+.command-item.group-all:before, .command-item.group-sort:before, .command-item.group-remove:before {
+position: relative;
+top: 1px;
+font-family: sans-serif;	
+content: "\03a3";
+font-size: 20px;
+}
+
+
+.command-item.group-sort:after {content: "\F00B";}
+.command-item.group-remove:after {content: "\F00D";}
+
+
+.command-item.column-add:before { content: "\F067";}
+.command-item.column-change:before { content: "\F0AD";}
+.command-item.column-remove:before { content: "\F00D";}
+
+.command-item.move-up, .command-item.move-down, 
+.command-item.move-top, .command-item.move-bottom {
+text-align: center;
+font-size: 26px;
+}
+
+.command-item.move-up:before { content: "\F106";}
+.command-item.move-down:before { content: "\F107";}
+.command-item.move-top:before { content: "\F102";}
+.command-item.move-bottom:before { content: "\F103";}
 
 /* menu */
 
@@ -1001,8 +1075,8 @@ text-align: center;
 }
 
 #MenuHeaderControl:before 	{content: "\F0C9";}
-#MenuHeaderSortUp:before 	{content: "\F160";}
-#MenuHeaderSortDown:before	{content: "\F161";}
+#MenuHeaderSortUp:before 	{content: "\F175";}
+#MenuHeaderSortDown:before	{content: "\F176";}
 #MenuHeaderFilter:before	{content: "\F0B0";}
 #MenuHeaderAdd:before		{content: "\F067";}
 #MenuHeaderMore:before		{content: "\F141";}
@@ -1023,6 +1097,9 @@ color: #FE9915 !important;
 color: #FE9915 !important;
 }
 
+#MenuHeader.filter > #MenuHeaderFilter:before{
+color: #FE9915 !important;
+}
 
 /* scrollbar */
 

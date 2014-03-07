@@ -9,19 +9,27 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
     var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('type', columns[i].type)
       .css('width', columns[i].width)
-      .on('click', '', function () {desktopTable.sortToggle(event, $(this));});
+      .on('mousedown', '', sortToggle);
 
     if (columns[i].width === 0) $header.hide();
 
     this.totalWidth += columns[i].width;
 
     $header.appendDiv('', 'header-control', '')
-      .on('click', '', clickHeaderMenu);
+      .on('mousedown', '', clickHeaderMenu);
 
     $header.appendDiv('', 'header-resize', '')
       .on('mousedown', '', resizeHeader);
 
     columns[i].$div = $header;
+  }
+
+  function sortToggle (event) {
+    // find new sort direction
+   var $clicked = $(this),
+     dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+
+   desktopTable.sortChange($clicked.index(), dir, event.shiftKey || event.ctrlKey);
   }
 
   function resizeHeader (event) {
@@ -51,6 +59,8 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
     function resizeEnd (event){
       $('body').off('mousemove')
         .removeClass('col-resize');
+
+      return false;
     }
   }
 

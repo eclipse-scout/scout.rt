@@ -9,9 +9,9 @@ Scout.MenuHeader = function ($header, desktopTable, x, y) {
   // create buttons inside
   $menuHeader.appendDiv('MenuHeaderControl');
   $menuHeader.appendDiv('MenuHeaderSortUp').
-    on('click', '', function () { desktopTable.sortUp($header); });
+    on('click', '', function () { desktopTable.sortChange($header.index(), 'up', false); });
   $menuHeader.appendDiv('MenuHeaderSortDown').
-    on('click', '', function () { desktopTable.sortDown($header); });
+    on('click', '', function () { desktopTable.sortChange($header.index(), 'down', false); });
   $menuHeader.appendDiv('MenuHeaderFilter');
   $menuHeader.appendDiv('MenuHeaderAdd');
   $menuHeader.appendDiv('MenuHeaderMore');

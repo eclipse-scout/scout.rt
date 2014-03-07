@@ -11,8 +11,10 @@ Scout.DesktopTable = function (scout, $parent, model) {
   this._$infoFilter;
   this._$infoLoad;
 
-  var that = this;
+  this.sortChange = sortChange;
 
+  var that = this;
+  
   //create container
   var $desktopTable = $parent.appendDiv('DesktopTable'),
     $tableHeader = $desktopTable.appendDiv('TableHeader'),
@@ -164,7 +166,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
   }
 
   function controlOrganize (event) {
-    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, that._table);
+    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, that);
   }
 
   function resizeControl (event) {
@@ -176,6 +178,8 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
     function resizeMove(event){
       var h = $parent.outerHeight() - event.pageY + offset;
+      if ($bench.height() < h + 50) return false;
+
       $tableControl.height(h);
       $tableData.height('calc(100% - ' + (h + 30) + 'px)');
       $controlContainer.height(h - 60);
@@ -183,6 +187,10 @@ Scout.DesktopTable = function (scout, $parent, model) {
     }
 
     function resizeEnd(event){
+      if ($controlContainer.height() < 50) {
+        $('.selected', $tableControl).click();
+      }
+
       $('body').off('mousemove')
         .removeClass('row-resize');
     }
@@ -238,10 +246,13 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
   function clickData (event) {
     var $row = $(event.delegateTarget),
-      add = true;
+      add = true,
+      first;
 
     // click without ctrl always starts new selection, with ctrl toggle
-    if (event.ctrlKey) {
+    if (event.shiftKey) {
+      first = $('.row-selected').first().index();
+    } else if (event.ctrlKey) {
       add = !$row.hasClass('row-selected');
     } else {
       $('.row-selected').removeClass('row-selected');
@@ -263,11 +274,13 @@ Scout.DesktopTable = function (scout, $parent, model) {
     // action for all affected rows
     function selectData (event) {
       // affected rows between $row and Target
-      var firstIndex = $row.index(),
+      var firstIndex = first || $row.index(),
         lastIndex = $(event.delegateTarget).index();
 
       var startIndex = Math.min(firstIndex, lastIndex),
         endIndex = Math.max(firstIndex, lastIndex) + 1;
+
+      log(firstIndex, lastIndex);
 
       var $actionRow = $('.table-row', $tableData).slice(startIndex, endIndex);
 
@@ -496,67 +509,95 @@ Scout.DesktopTable.prototype._sort = function () {
 };
 
 
-Scout.DesktopTable.prototype.sortToggle = function (event, $clicked) {
-  //find new sort direction
-  var dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+  function sortChange (index, dir, additional) {
+    // find new sort direction
+    var $header = $('.header-item').eq(index);
 
-  // change sort order of clicked header
-  $clicked.removeClass('sort-up sort-down')
-    .addClass('sort-' + dir);
+    // change sort order of clicked header
+    $header.removeClass('sort-up sort-down')
+      .addClass('sort-' + dir);
 
-  // when shift pressed: add, otherwise reset
-  if (event.shiftKey) {
-    var clickOrder = $clicked.data('sort-order'),
-      maxOrder = -1,
-      newOrder;
+    // when shift pressed: add, otherwise reset
+    if (additional) {
+      var clickOrder = $header.data('sort-order'),
+        maxOrder = -1,
+        newOrder;
 
-    $('.header-item').each(function() {
-      var value = $(this).data('sort-order');
-      maxOrder = (value > maxOrder) ? value : maxOrder;
-    });
+      $('.header-item').each(function() {
+        var value = $(this).data('sort-order');
+        maxOrder = (value > maxOrder) ? value : maxOrder;
+      });
 
-    if (clickOrder != undefined) {
-      newOrder = clickOrder;
-    } else if (maxOrder > -1) {
-      newOrder = maxOrder + 1;
+      if (clickOrder != undefined) {
+        newOrder = clickOrder;
+      } else if (maxOrder > -1) {
+        newOrder = maxOrder + 1;
+      } else {
+        newOrder = 0;
+      }
+
+      $header.data('sort-order', newOrder);
+
     } else {
-      newOrder = 0;
+      $header.data('sort-order', 0)
+        .siblings()
+        .removeClass('sort-up sort-down')
+        .data('sort-order', null);
     }
 
-    $clicked.data('sort-order', newOrder);
-
-  } else {
-    $clicked.data('sort-order', 0)
-      .siblings()
-      .removeClass('sort-up sort-down')
-      .data('sort-order', null);
+    // sort and visualize
+    sort();
   }
 
-  // sort and visualize
-  this._sort();
-};
+  function sort () {
+    var sortColumns = [];
+
+    // remove selection
+    resetSelection();
+
+    // find all sort columns
+    for (var c = 0; c < model.table.columns.length; c++) {
+      var column = model.table.columns[c],
+        order = column.$div.data('sort-order'),
+        dir =  column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
+        sortColumns[order] = {index : c, dir : dir};
+    }
+
+    // compare rows
+    function compare (a, b) {
+      for (s = 0; s < sortColumns.length; s++) {
+        var index = sortColumns[s].index,
+          dir = sortColumns[s].dir == 'up' ? -1 : 1;
+
+        if (a.children[index].innerHTML < b.children[index].innerHTML) {
+          return dir;
+        } else if (a.children[index].innerHTML > b.children[index].innerHTML) {
+          return -1 * dir;
+        }
+      }
+
+      return 0;
+    }
+
+    // find all rows
+    var $rows = $('.table-row');
+
+    // store old position
+    $rows.each(function () {
+      $(this).data('old-top', $(this).offset().top);
+    });
+
+    // change order in dom
+    $rows = $rows.sort(compare);
+    $tableDataScroll.append($rows);
+
+    // for less than 100 rows: move to old position and then animate
+    if ($rows.length < 100) {
+      $rows.each(function (i) {
+        $(this).css('top', $(this).data('old-top') - $(this).offset().top)
+          .animateAVCSD('top', 0);
+      });
+    }
+  }
 
 
-Scout.DesktopTable.prototype.sortUp = function ($header) {
-  $header.removeClass('sort-up sort-down')
-  .addClass('sort-up');
-
-  $header.data('sort-order', 0)
-    .siblings()
-    .removeClass('sort-up sort-down')
-    .data('sort-order', null);
-
-  this._sort();
-};
-
-Scout.DesktopTable.prototype.sortDown = function ($header) {
-  $header.removeClass('sort-up sort-down')
-  .addClass('sort-down');
-
-  $header.data('sort-order', 0)
-    .siblings()
-    .removeClass('sort-up sort-down')
-    .data('sort-order', null);
-
-  this._sort();
-};
