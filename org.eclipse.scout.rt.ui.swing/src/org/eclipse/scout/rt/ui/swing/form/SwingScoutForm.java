@@ -363,9 +363,29 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     if (modelField == null) {
       return;
     }
-    Component comp = findUiField(modelField);
-    if (comp != null && comp.isShowing()) {
-      comp.requestFocus();
+    final Component comp = findUiField(modelField);
+    if (comp != null) {
+      if (comp.isShowing()) {
+        comp.requestFocus();
+      }
+      else if (force) {
+        // the component is not showing already. Maybe we are still opening (e.g. when we have DISPLAY_HINT_VIEW).
+        // queue runnable to set initial focus when the component is ready. See bugzilla 424603.
+        Runnable r = new Runnable() {
+          @Override
+          public void run() {
+            getSwingEnvironment().invokeSwingLater(new Runnable() {
+              @Override
+              public void run() {
+                if (comp.isShowing()) {
+                  comp.requestFocus();
+                }
+              }
+            });
+          }
+        };
+        getSwingEnvironment().invokeScoutLater(r, 0);
+      }
     }
   }
 
