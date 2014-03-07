@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -289,16 +290,23 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
     return jsonCells;
   }
 
-  protected JSONObject tableCellToJson(ICell cell, IColumn column) throws JsonUIException {
+  protected Object tableCellToJson(ICell cell, IColumn column) throws JsonUIException {
 
     JSONObject jsonCell = new JSONObject();
     try {
       jsonCell.put("value", getCellValue(cell, column));
-      jsonCell.put("text", cell.getText());
       jsonCell.put("foregroundColor", cell.getForegroundColor());
       jsonCell.put("backgroundColor", cell.getBackgroundColor());
       //FIXME implement missing
-      return jsonCell;
+
+      if (jsonCell.length() > 0) {
+        jsonCell.put("text", cell.getText());
+        return jsonCell;
+      }
+      else {
+        //Don't generate an object if only the text is returned to reduce the amount of data
+        return cell.getText();
+      }
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -355,6 +363,10 @@ public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
       json.put("text", column.getHeaderCell().getText());
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
+
+      if (column instanceof INumberColumn<?>) {
+        json.put("format", ((INumberColumn) column).getFormat().toLocalizedPattern());
+      }
       //FIXME complete
       return json;
     }

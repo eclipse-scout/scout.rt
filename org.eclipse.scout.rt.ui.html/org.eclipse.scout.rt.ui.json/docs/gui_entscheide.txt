@@ -1,0 +1,6 @@
+Baum
+- Selektion des Nodes bei Klick auf den Kreis vor dem Element?
+  In Windows und aktuellen CRM ist es nicht so.
+  Neu habe wir aber einen markanten Kreis inkl. Hover Effekt.
+  Selektieren würde bedeuten, mann könnte nicht durch den Baum Browsen, ohne die Selektion zu ändern.
+  Eventuell selektieren, wenn expand/collapse nicht möglich ist?

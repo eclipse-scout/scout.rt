@@ -247,8 +247,18 @@ Scout.DesktopMatrix.getCellValue = function (cell) {
   if (!cell) {
     return null;
   }
-  if (cell.value) {
-    return cell.value;
+  if (typeof cell !== 'object') {
+    return cell;
+  }
+  return cell.value || cell.text;
+};
+
+Scout.DesktopMatrix.getCellText = function (cell) {
+  if (!cell) {
+    return '';
+  }
+  if (typeof cell !== 'object') {
+    return cell;
   }
   return cell.text;
 };

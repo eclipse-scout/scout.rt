@@ -73,13 +73,14 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
       JsonRequest uiReq = new JsonRequest(toJSON(req));
       String sessionAttributeName = "JsonUi#" + uiReq.getSessionPartId();
       HttpSession httpSession = req.getSession();
+      //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
       IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
         jsonSession = createJsonSession();
-        jsonSession.init();
+        jsonSession.init(req);
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
-      JsonResponse uiRes = jsonSession.processRequest(uiReq);
+      JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
       String jsonText = uiRes.toJson().toString();
       byte[] data = jsonText.getBytes("UTF-8");
       resp.setContentLength(data.length);

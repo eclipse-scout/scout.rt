@@ -2,8 +2,11 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 Scout.DesktopToolButton = function (scout, $desktop, toolButtons) {
+  this.$div;
+
   // create container
   var $desktopTools = $desktop.appendDiv('DesktopTools');
+  this.$div = $desktopTools;
 
   // create tool-items
   for (var i = 0; i < toolButtons.length; i++) {

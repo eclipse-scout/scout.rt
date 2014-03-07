@@ -218,7 +218,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
           allign = (column.type == 'number') ? 'text-align: right; ' : '';
-          value = row[c].text;
+          value = Scout.DesktopMatrix.getCellText(row[c]);
 
         rowString += '<div style = "' + style + allign + '">' + value + '</div>';
       }

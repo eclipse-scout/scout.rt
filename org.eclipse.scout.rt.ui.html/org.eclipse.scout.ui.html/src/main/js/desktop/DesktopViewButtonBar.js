@@ -2,8 +2,11 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 Scout.DesktopViewButtonBar = function (scout, $parent, viewButtons) {
+  this.$div;
+
   //  create container
   var $desktopView = $parent.appendDiv('DesktopViews');
+  this.$div = $desktopView;
 
   //  add view-item, all before #viewAdd
   for (var i = 0; i < viewButtons.length; i++) {

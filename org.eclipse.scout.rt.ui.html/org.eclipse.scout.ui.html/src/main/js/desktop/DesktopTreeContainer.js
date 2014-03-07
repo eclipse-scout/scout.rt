@@ -1,6 +1,7 @@
 Scout.DesktopTreeContainer = function (scout, $parent, model) {
   this.scout = scout;
   this._$desktopTree = $parent.appendDiv('DesktopTree');
+  this.$div = this._$desktopTree;
   this.desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, model);
 
   this._$desktopTree.appendDiv('DesktopTreeResize')

@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.eclipse.scout.rt.client.IClientSession;
 
 public interface IJsonSession {
 
-  void init() throws JsonUIException;
+  void init(HttpServletRequest request) throws JsonUIException;
 
   IClientSession getClientSession();
 
@@ -32,6 +34,8 @@ public interface IJsonSession {
    */
   JsonResponse currentJsonResponse();
 
-  JsonResponse processRequest(JsonRequest req) throws JsonUIException;
+  HttpServletRequest currentHttpRequest();
+
+  JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonUIException;
 
 }
