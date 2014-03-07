@@ -136,12 +136,26 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
   }
 
   function groupAll () {
+    if (!$(this).hasClass('selected')) {
+      $(this).selectOne('selected');
+      desktopTable.sumData(true);
+      drawColumns();
+    }
   }
 
   function groupSort () {
+    $(this).selectOne('selected');
+
+    var id = $('.selected', $organizeColumn).index();
+    desktopTable.sortChange(id, 'up', false);
+    desktopTable.sumData(true, id);
+
+    drawColumns();
   }
 
   function groupRemove () {
+    $(this).siblings().removeClass('selected');
+    desktopTable.sumData(false);
   }
 
   function columnAdd () {

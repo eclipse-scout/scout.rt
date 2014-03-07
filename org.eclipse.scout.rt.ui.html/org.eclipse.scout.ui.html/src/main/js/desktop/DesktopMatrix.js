@@ -231,14 +231,13 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
 
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
-    if (this._columns[c].type != 'key') {
-      for (var r = 0; r < this._table.length; r++) {
-        var v = getCellValue(this._table[r][c]);
-        if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
-      }
 
-      colCount[c][1] = colCount[c][1].length;
+    for (var r = 0; r < this._table.length; r++) {
+      var v = getCellValue(this._table[r][c]);
+      if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
+
+    colCount[c][1] = colCount[c][1].length;
   }
   return colCount;
 };

@@ -72,7 +72,6 @@ Scout = function (sessionPartId) {
 
   //instance functions
   DesktopTable.prototype._privateFunc = function () {
-
   };
 
   DesktopTable.prototype.publicFunc = function () {
@@ -86,7 +85,7 @@ Scout = function (sessionPartId) {
 
   // next class, next file
   // ...
-}
+}();
 
 // scan index and start scout
 $(document).ready(function () {

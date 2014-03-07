@@ -10,6 +10,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
   this._$infoSelect;
   this._$infoFilter;
   this._$infoLoad;
+  this.sumData = sumData;
 
   var that = this;
 
@@ -117,8 +118,8 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
       //adjust table
       $tableData.animateAVCSD('height',
-        parseFloat($desktopTable.css('height')) - 80,
-        function () {$(this).css('height', 'calc(100% - 80px'); },
+        parseFloat($desktopTable.css('height')) - 93,
+        function () {$(this).css('height', 'calc(100% - 85px'); },
         scrollbar.initThumb.bind(scrollbar),
         500);
 
@@ -135,7 +136,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
       //adjust table
       $tableData.animateAVCSD('height',
-        parseFloat($desktopTable.css('height')) - 430,
+        parseFloat($desktopTable.css('height')) - 444,
         function () {$(this).css('height', 'calc(100% - 430px'); },
         scrollbar.initThumb.bind(scrollbar),
         500);
@@ -185,7 +186,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
     }
 
     function resizeEnd(event){
-      if ($controlContainer.height() < 50) {
+      if ($controlContainer.height() < 75) {
         $('.selected', $tableControl).click();
       }
 
@@ -240,6 +241,58 @@ Scout.DesktopTable = function (scout, $parent, model) {
     if (r < that._table.length) {
       setTimeout(function() { drawData(startRow + 100); }, 0);
     }
+  }
+
+  function sumData (draw, groupColumn) {
+    $('.table-row-sum', $tableDataScroll).animateAVCSD('height', 0, $.removeThis);
+
+    if (draw) {
+      var groupValue,
+        $rows = $('.table-row', $tableDataScroll);
+        $sumRow = $.makeDiv('', 'table-row-sum'),
+        sum = [];
+
+      for (var r = 0; r < $rows.length; r++) {
+        var $cells = $rows.eq(r).children();
+
+        for (var c = 0; c < model.table.columns.length; c++) {
+          var value = $cells.eq(c).text();
+          if ( model.table.columns[c].type == 'number') {
+            sum[c] = (sum[c] || 0) + parseFloat(value);
+          }
+        }
+
+        if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
+            (r == $rows.length - 1)) && sum.length > 0) {
+          for (var c = 0; c < model.table.columns.length; c++) {
+            var $div;
+
+            if (typeof sum[c] == 'number')
+              $div = $.makeDiv('', '', sum[c])
+                .css('text-align', 'right');
+            else if (c == groupColumn) {
+              $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
+              .css('text-align', 'left');
+            } else {
+              $div = $.makeDiv('', '', '&nbsp')
+            }
+
+            $div.appendTo($sumRow).width(model.table.columns[c].width);
+          }
+
+          $sumRow.insertAfter($rows.eq(r))
+            .width(tableHeader.totalWidth + 4)
+            .css('height', 0)
+            .animateAVCSD('height', 34);
+
+          $sumRow = $.makeDiv('', 'table-row-sum');
+          sum = [];
+        }
+      }
+    }
+
+    // update scrollbar
+    scrollbar.initThumb();
   }
 
   function clickData (event) {
@@ -495,7 +548,7 @@ Scout.DesktopTable.prototype._sort = function () {
 
   // change order in dom
   $rows = $rows.sort(compare);
-  this._$tableDataScroll.append($rows);
+  this._$tableDataScroll.prepend($rows);
 
   // for less than 100 rows: move to old position and then animate
   if ($rows.length < 100) {
@@ -546,4 +599,3 @@ Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
   // sort and visualize
   this._sort();
 };
-

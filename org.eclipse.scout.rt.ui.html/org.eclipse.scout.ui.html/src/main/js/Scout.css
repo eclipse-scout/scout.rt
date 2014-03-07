@@ -378,7 +378,7 @@ color:#9C9C9C !important;
 
 #TableData {
 position: relative;
-height: calc(100% - 80px);
+height: calc(100% - 85px);
 width: 100%;
 overflow: hidden;	
 padding-left: 4px;
@@ -399,7 +399,7 @@ width: calc(100% - 11px);
 }
 
 
-.table-row {
+.table-row, .table-row-sum {
 position:relative;
 overflow: hidden;	
 border-right: 2px solid #FFF;
@@ -409,7 +409,7 @@ padding: 2px 0px 2px 0px;
 margin-bottom: -2px;
 }
 
-.table-row > div {
+.table-row > div, .table-row-sum > div {
 display: inline-block;
 padding: 3px 6px 0px 6px;
 background-color: #FFF;
@@ -418,6 +418,14 @@ border-bottom: 1px solid #EEE;
 overflow: hidden;
 text-overflow: ellipsis;
 vertical-align: top;
+}
+
+.table-row-sum > div {
+font-weight: bold;
+}
+
+.table-row-sum:last-child > div {
+border-bottom: none;
 }
 
 .table-row.select-top {
@@ -960,10 +968,8 @@ content: "\03a3";
 font-size: 20px;
 }
 
-
 .command-item.group-sort:after {content: "\F00B";}
 .command-item.group-remove:after {content: "\F00D";}
-
 
 .command-item.column-add:before { content: "\F067";}
 .command-item.column-change:before { content: "\F0AD";}
@@ -979,6 +985,10 @@ font-size: 26px;
 .command-item.move-down:before { content: "\F107";}
 .command-item.move-top:before { content: "\F102";}
 .command-item.move-bottom:before { content: "\F103";}
+
+.command-item.selected:after, .command-item.selected:before {
+color: #fff ! important;
+}
 
 /* menu */
 
