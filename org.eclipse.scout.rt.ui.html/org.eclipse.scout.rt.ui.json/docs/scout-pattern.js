@@ -1,6 +1,8 @@
 //local log function
 var log = console.log.bind(console);
 
+Function.prototype.that = function (context) {that = context; return this.bind(context);}
+
 // extend jquery
 (function ($) {
 
@@ -106,3 +108,8 @@ $(document).ready(function () {
     scout.add($(this));
   });
 });
+
+
+
+
+//----------------- new -----------------------

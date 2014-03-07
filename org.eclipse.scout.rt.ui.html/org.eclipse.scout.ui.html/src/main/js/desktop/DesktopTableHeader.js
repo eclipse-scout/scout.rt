@@ -41,9 +41,7 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
-
-    return false;
+      .one('mouseup', '', resizeEnd);   return false;
 
     function resizeMove (event) {
       var diff = event.pageX - startX;
@@ -52,8 +50,8 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
         $header.css('width', headerWidth + diff);
         $('.table-row > div:nth-of-type(' + colNum + ' )').css('width', headerWidth + diff);
         $('.table-row').width(totalWidth + diff);
-
-      }
+   
+   }
     }
 
     function resizeEnd (event){
