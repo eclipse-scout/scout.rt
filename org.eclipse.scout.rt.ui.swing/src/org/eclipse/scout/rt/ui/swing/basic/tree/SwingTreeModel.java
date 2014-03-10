@@ -123,11 +123,17 @@ public class SwingTreeModel implements TreeModel {
     m_listenerList.remove(TreeModelListener.class, l);
   }
 
+  /**
+   * @param scoutParent
+   * @param scoutChildren
+   *          If <code>scoutParam</code> is the root node, <code>scoutChildren</code> can be null to indicate the root
+   *          node has changed
+   */
   protected void fireTreeNodesChanged(ITreeNode scoutParent, List<ITreeNode> scoutChildren) {
     clearCache();
     EventListener[] listeners = m_listenerList.getListeners(TreeModelListener.class);
     if (listeners != null && listeners.length > 0) {
-      TreeModelEvent e = new TreeModelEvent(this, SwingScoutTree.scoutNodeToTreePath(scoutParent), scoutNodesToSwingIndexes(scoutParent, scoutChildren), scoutChildren.toArray());
+      TreeModelEvent e = new TreeModelEvent(this, SwingScoutTree.scoutNodeToTreePath(scoutParent), scoutNodesToSwingIndexes(scoutParent, scoutChildren), (scoutChildren != null) ? scoutChildren.toArray() : null);
       for (int i = 0; i < listeners.length; i++) {
         ((TreeModelListener) listeners[i]).treeNodesChanged(e);
       }
