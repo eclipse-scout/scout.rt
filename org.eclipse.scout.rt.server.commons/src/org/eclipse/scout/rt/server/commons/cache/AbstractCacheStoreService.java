@@ -46,6 +46,28 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
     return m_defaultExpirationTime;
   }
 
+  @Override
+  public void setClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Object value) {
+    setClientAttribute(req, res, key, value, getExpiration());
+  }
+
+  @Override
+  public Object getClientAttributeAndTouch(HttpServletRequest req, HttpServletResponse res, String key) {
+    return getClientAttributeAndTouch(req, res, key, getExpiration());
+  }
+
+  @Override
+  public void touchClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
+    touchClientAttribute(req, res, key, getExpiration());
+  }
+
+  @Override
+  public Object getClientAttributeAndTouch(HttpServletRequest req, HttpServletResponse res, String key, Integer expiration) {
+    Object clientAttribute = getClientAttribute(req, res, key);
+    touchClientAttribute(req, res, key, expiration);
+    return clientAttribute;
+  }
+
   /**
    * returns the session id of the HTTP-Request. If no session id is set a new id will be generated and set.
    * 
@@ -180,7 +202,7 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
 
     @Override
     public boolean isActive() {
-      return (m_creationTime + m_expiration < System.currentTimeMillis());
+      return (m_creationTime + m_expiration > System.currentTimeMillis());
     }
 
     @Override

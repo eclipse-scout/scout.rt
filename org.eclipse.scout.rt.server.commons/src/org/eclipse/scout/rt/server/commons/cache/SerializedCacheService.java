@@ -29,16 +29,7 @@ import org.eclipse.scout.commons.StringUtility;
 public class SerializedCacheService extends AbstractCacheStoreService {
 
   @Override
-  public void setClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Object value) {
-    setClientAttribute(req, key, value, getExpiration());
-  }
-
-  @Override
   public void setClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Object value, Integer expiration) {
-    setClientAttribute(req, key, value, expiration);
-  }
-
-  private void setClientAttribute(HttpServletRequest req, String key, Object value, Integer expiration) {
     if (value != null) {
       req.getSession().setAttribute(key, StringUtility.bytesToHex(serialize(new CacheElement(value, expiration))));
     }
@@ -46,49 +37,26 @@ public class SerializedCacheService extends AbstractCacheStoreService {
 
   @Override
   public Object getClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    return getClientAttribute(req, key);
-  }
-
-  @Override
-  public Object getClientAttributeAndTouch(HttpServletRequest req, HttpServletResponse res, String key, Integer expiration) {
-    return null;
-  }
-
-  private Object getClientAttribute(HttpServletRequest req, String key) {
     String hex = (String) req.getSession().getAttribute(key);
     if (hex != null) {
-      CacheElement e = (CacheElement) deserialize(StringUtility.hexToBytes(hex));
+      ICacheElement e = (ICacheElement) deserialize(StringUtility.hexToBytes(hex));
       if (e != null && e.isActive()) {
         return e.getValue();
       }
       else if (e != null) {
-        removeClientAttribute(req, key);
-        return null;
-      }
-      else {
-        return null;
+        removeClientAttribute(req, res, key);
       }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   @Override
   public void removeClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    removeClientAttribute(req, key);
-  }
-
-  private void removeClientAttribute(HttpServletRequest req, String key) {
     req.getSession().removeAttribute(key);
   }
 
   @Override
   public void touchClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Integer expiration) {
-    touchClientAttribute(req, key, expiration);
-  }
-
-  private void touchClientAttribute(HttpServletRequest req, String key, Integer expiration) {
     String hex = (String) req.getSession().getAttribute(key);
     if (hex != null) {
       ICacheElement e = (ICacheElement) deserialize(StringUtility.hexToBytes(hex));
@@ -98,20 +66,10 @@ public class SerializedCacheService extends AbstractCacheStoreService {
           e.resetCreationTime();
         }
         else {
-          removeClientAttribute(req, key);
+          removeClientAttribute(req, res, key);
         }
       }
     }
-  }
-
-  @Override
-  public Object getClientAttributeAndTouch(HttpServletRequest req, HttpServletResponse res, String key) {
-    return getClientAttributeAndTouch(req, res, key, getExpiration());
-  }
-
-  @Override
-  public void touchClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    touchClientAttribute(req, res, key, getExpiration());
   }
 
 }
