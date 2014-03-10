@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonViewButton extends AbstractJsonRenderer<IViewButton> {
+public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewButton> {
 
   public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);

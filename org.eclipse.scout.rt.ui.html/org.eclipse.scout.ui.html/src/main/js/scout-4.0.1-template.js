@@ -5,6 +5,7 @@
 //@include("src/main/js/Scout.js");
 //@include("src/main/js/Session.js");
 //@include("src/main/js/Event.js");
+//@include("src/main/js/Locale.js");
 //@include("src/main/js/desktop/Desktop.js");
 //@include("src/main/js/desktop/DesktopBench.js");
 //@include("src/main/js/desktop/DesktopMatrix.js");
@@ -23,6 +24,8 @@
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/menu/MenuHeader.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
+//@include("src/main/js/text/DecimalFormat.js");
+//@include("src/main/js/text/DecimalFormatSymbols.js");
 
 $(document).ready(function () {
     var tabId = '' + new Date().getTime();

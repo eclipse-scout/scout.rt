@@ -31,7 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
+public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
   private static final String WIDGET_ID = "Desktop";
 
@@ -130,14 +130,6 @@ public class JsonDesktop extends AbstractJsonRenderer<IDesktop> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    if ("startup".equals(event.getEventType())) {
-      handleUiStartupEvent(event, res);
-    }
-  }
-
-  protected void handleUiStartupEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    //Instruct gui to create desktop
-    res.addCreateEvent(null, this.toJson());
   }
 
   protected JSONObject formToJson(IForm form) throws JsonUIException {

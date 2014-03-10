@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 
 public interface IJsonSession {
 
-  void init(HttpServletRequest request) throws JsonUIException;
+  void init(HttpServletRequest request, String sessionId) throws JsonUIException;
 
   IClientSession getClientSession();
 

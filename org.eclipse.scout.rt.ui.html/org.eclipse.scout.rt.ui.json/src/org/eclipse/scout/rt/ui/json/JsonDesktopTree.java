@@ -33,7 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktopTree extends AbstractJsonRenderer<IOutline> {
+public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutline> {
   private JsonDesktop m_jsonDesktop;
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;

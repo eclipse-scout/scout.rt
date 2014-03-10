@@ -5,6 +5,7 @@ Scout.Desktop = function (scout, $parent, model) {
   this.scout = scout;
   this.tree;
   this.scout.widgetMap[model.id] = this;
+//  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple scout divs with multiple desktops
 
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(this.scout, $parent, model.viewButtons);

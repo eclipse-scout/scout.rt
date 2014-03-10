@@ -10,24 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-
-public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implements IJsonRenderer {
+public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRenderer {
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
   private final String m_id;
-  private P_PropertyChangeListener m_propertyChangeListener;
 
   public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession) {
+    this(modelObject, jsonSession, null);
+  }
+
+  public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession, String id) {
     if (modelObject == null) {
       throw new IllegalArgumentException("modelObject must not be null");
     }
     m_modelObject = modelObject;
     m_jsonSession = jsonSession;
-    m_id = jsonSession.createUniqueIdFor(this);
+    if (id == null) {
+      id = jsonSession.createUniqueIdFor(this);
+    }
+    m_id = id;
   }
 
   @Override
@@ -50,10 +51,6 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
   }
 
   protected void attachModel() throws JsonUIException {
-    if (m_propertyChangeListener == null) {
-      m_propertyChangeListener = new P_PropertyChangeListener();
-      m_modelObject.addPropertyChangeListener(m_propertyChangeListener);
-    }
   }
 
   @Override
@@ -63,19 +60,6 @@ public abstract class AbstractJsonRenderer<T extends IPropertyObserver> implemen
   }
 
   protected void detachModel() throws JsonUIException {
-    if (m_propertyChangeListener != null) {
-      m_modelObject.removePropertyChangeListener(m_propertyChangeListener);
-      m_propertyChangeListener = null;
-    }
   }
 
-  protected void handleScoutPropertyChange(String name, Object newValue) {
-  }
-
-  private class P_PropertyChangeListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(final PropertyChangeEvent e) {
-      handleScoutPropertyChange(e.getPropertyName(), e.getNewValue());
-    }
-  }
 }

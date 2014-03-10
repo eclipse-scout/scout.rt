@@ -10,35 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.json.JSONException;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.json.JSONObject;
 
-public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
+public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITable> {
 
-  public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
+  public JsonDesktopTable(ITable modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
   }
 
   @Override
   public JSONObject toJson() throws JsonUIException {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("objectType", "Menu");
-      json.put("id", getId());
-      json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
-      json.put("icon", getModelObject().getIconId());//FIXME how to handle resources?
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
+    return null;
   }
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
   }
 
-  protected void handleUiDrillDownEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-  }
 }

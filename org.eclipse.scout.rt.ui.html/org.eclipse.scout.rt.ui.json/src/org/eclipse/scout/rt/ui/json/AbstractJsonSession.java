@@ -19,13 +19,10 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.ILocaleListener;
-import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
@@ -36,22 +33,19 @@ public abstract class AbstractJsonSession implements IJsonSession {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
-  private IClientSession m_clientSession;
+  private JsonClientSession m_jsonClientSession;
   private final Map<String, IJsonRenderer> m_jsonRenderers;
   private long m_jsonRendererSeq;
   private JsonResponse m_currentJsonResponse;
   private HttpServletRequest m_currentHttpRequest;
-  private ILocaleListener m_localeListener;
-  private Boolean m_localeManagedByModel;
 
   public AbstractJsonSession() {
     m_jsonRenderers = new HashMap<>();
     m_currentJsonResponse = new JsonResponse();
-    m_localeManagedByModel = false;
   }
 
   @Override
-  public void init(HttpServletRequest request) throws JsonUIException {
+  public void init(HttpServletRequest request, String sessionId) throws JsonUIException {
     UserAgent userAgent = createUserAgent();
     Subject subject = Subject.getSubject(AccessController.getContext());
     if (subject == null) {
@@ -61,26 +55,10 @@ public abstract class AbstractJsonSession implements IJsonSession {
     if (!clientSession.isActive()) {
       throw new JsonUIException("ClientSession is not active, there must be a problem with loading or starting");
     }
-    m_clientSession = clientSession;
-    attachModel();
 
-    JsonDesktop jsonDesktop = new JsonDesktop(m_clientSession.getDesktop(), this);
-    jsonDesktop.init();
+    m_jsonClientSession = new JsonClientSession(clientSession, this, sessionId); //FIXME use sessionId use createUniqueIdFor? duplicates possible?
+    m_jsonClientSession.init();
     LOG.info("JsonSession initialized.");
-  }
-
-  protected void attachModel() {
-    if (m_localeListener == null) {
-      m_localeListener = new P_LocaleListener();
-      m_clientSession.addLocaleListener(m_localeListener);
-    }
-  }
-
-  protected void detachModel() {
-    if (m_localeListener != null) {
-      m_clientSession.removeLocaleListener(m_localeListener);
-      m_localeListener = null;
-    }
   }
 
   protected UserAgent createUserAgent() {
@@ -101,7 +79,6 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   public void dispose() throws JsonUIException {
-    detachModel();
     //FIXME call dispose (from session invalidation listener and desktop close event?)
     for (IJsonRenderer renderer : m_jsonRenderers.values()) {
       renderer.dispose();
@@ -110,7 +87,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
 
   @Override
   public IClientSession getClientSession() {
-    return m_clientSession;
+    return m_jsonClientSession.getModelObject();
   }
 
   @Override
@@ -149,7 +126,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
     m_currentHttpRequest = httpReq;
 
     //FIXME should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
-    processRequestLocale(httpReq.getLocale());
+    m_jsonClientSession.processRequestLocale(httpReq.getLocale());
 
     final JsonResponse res = currentJsonResponse();
     for (JsonEvent action : jsonReq.getEvents()) {
@@ -172,27 +149,6 @@ public abstract class AbstractJsonSession implements IJsonSession {
     }
     catch (Throwable t) {
       LOG.error("Handling event. Type: " + event.getEventType() + ", Id: " + id, t);
-    }
-  }
-
-  protected void processRequestLocale(Locale locale) {
-    synchronized (m_localeManagedByModel) {
-      if (!m_localeManagedByModel && !getClientSession().getLocale().equals(locale)) {
-        getClientSession().setLocale(locale);
-      }
-    }
-  }
-
-  private class P_LocaleListener implements ILocaleListener {
-    @Override
-    public void localeChanged(LocaleChangeEvent event) {
-      final Locale locale = event.getLocale();
-      //FIXME cgu eigentlich müsste noch getLocale, setLocale auf ClientSession synchronisiert werden, nicht? Gibt es eine elegantere lösung (uifacade?)
-      synchronized (m_localeManagedByModel) {
-        if (!m_localeManagedByModel && !CompareUtility.equals(currentHttpRequest().getLocale(), locale)) {
-          m_localeManagedByModel = true;
-        }
-      }
     }
   }
 

@@ -77,7 +77,7 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
       IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
         jsonSession = createJsonSession();
-        jsonSession.init(req);
+        jsonSession.init(req, uiReq.getSessionPartId());
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
       JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
