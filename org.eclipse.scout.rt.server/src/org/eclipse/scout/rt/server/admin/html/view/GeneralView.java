@@ -16,20 +16,26 @@ import java.util.Date;
 import java.util.Iterator;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
+import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.service.SERVICES;
 
 public class GeneralView extends DefaultView {
+
   private static final long serialVersionUID = -5324529296371616980L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GeneralView.class);
 
@@ -61,11 +67,29 @@ public class GeneralView extends DefaultView {
     p.br();
     p.print("You connect from: " + p.getRequest().getRemoteAddr() + " / " + p.getRequest().getRemoteHost());
     p.p();
-    // show jaas context
-    p.print("Session ID: " + p.getRequest().getSession().getId());
+
+    HttpSession session = p.getRequest().getSession(false);
+    if (session != null) {
+      p.print("Session ID: " + session.getId());
+      p.br();
+      p.print("Session Created: " + new Date(session.getCreationTime()));
+    }
+    else {
+      p.print("There is no HTTP-Session needed ");
+    }
     p.br();
-    p.print("Session Created: " + new Date(p.getRequest().getSession().getCreationTime()));
+    IServerSession serverSession = ThreadContext.getServerSession();
+    if (serverSession != null) {
+      p.print("Session ID (ThreadContext): " + serverSession.getId());
+    }
+    else {
+      p.print("There is no Session found");
+    }
+
+    String sessionID = SERVICES.getService(IClientIdentificationService.class).getClientId(ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
     p.br();
+    p.print("Session ID (IClientIdentificationService): " + sessionID);
+    p.p();
     p.print("JAAS Context");
     p.br();
     p.print("&nbsp;&nbsp;remoteUser: " + p.getRequest().getRemoteUser());
@@ -261,7 +285,7 @@ public class GeneralView extends DefaultView {
 
   private final class P_ToggleGlobalLoggingAction extends AbstractHtmlAction {
 
-    private static final long serialVersionUID = -4255964683807066677L;
+    private static final long serialVersionUID = -4106119434491057505L;
     private boolean m_activate;
 
     public P_ToggleGlobalLoggingAction(boolean activate) {

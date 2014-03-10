@@ -15,11 +15,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.inspector.info.SessionInfo;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 
@@ -34,13 +31,8 @@ public class SessionInspector {
     m_parent = parent;
     m_session = session;
     m_info = new SessionInfo();
-    HttpServletRequest httpReq = ThreadContext.getHttpServletRequest();
-    HttpSession httpSession = (httpReq != null ? httpReq.getSession() : null);
-    if (httpSession != null) {
-      m_info.setSessionId(httpSession.getId());
-      m_info.setCreationTime(httpSession.getCreationTime());
-      m_info.setLastAccessedTime(httpSession.getLastAccessedTime());
-    }
+
+    m_info.setSessionId(session.getId());
     m_info.setUserId(session.getUserId());
     m_info.setUserAgent(session.getUserAgent());
     try {

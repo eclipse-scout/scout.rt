@@ -15,11 +15,21 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.osgi.framework.Bundle;
 
 /**
- * The base implementation {@link org.eclipse.scout.rt.server.servlet.DeploymentServiceConfig} uses the
- * scout.xml file for setting deployment specific service properties
+ * Server-side session
  */
 public interface IServerSession extends ISession {
 
   void loadSession(Bundle bundle) throws ProcessingException;
 
+  /**
+   * Set the session id. Should only be done during initialization.
+   * 
+   * @param id
+   */
+  public void setIdInternal(String id);
+
+  /**
+   * @return a unique id
+   */
+  public String getId();
 }

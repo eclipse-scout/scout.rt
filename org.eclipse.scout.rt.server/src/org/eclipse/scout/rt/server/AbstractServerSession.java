@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.server;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -19,6 +22,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -39,22 +43,25 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
-public abstract class AbstractServerSession implements IServerSession {
-
+public abstract class AbstractServerSession implements IServerSession, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
 
-  private Bundle m_bundle;
+  private static final long serialVersionUID = 1L;
+
+  private transient Bundle m_bundle;
   private boolean m_initialized;
   private boolean m_active;
   private Locale m_locale;
   private final HashMap<String, Object> m_attributes;
-  private final Object m_attributesLock;
+  private transient Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
   private boolean m_singleThreadSession;
-  private ScoutTexts m_scoutTexts;
+  private transient ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
   private String m_virtualSessionId;
   private Subject m_subject;
+  private String m_sessionId;
+  private String m_symbolicBundleName;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
@@ -63,6 +70,22 @@ public abstract class AbstractServerSession implements IServerSession {
     m_sharedVariableMap = new SharedVariableMap();
     if (autoInitConfig) {
       initConfig();
+    }
+  }
+
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+    ois.defaultReadObject();
+    if (m_bundle == null && m_symbolicBundleName != null) {
+      m_bundle = Platform.getBundle(m_symbolicBundleName);
+    }
+
+    if (m_scoutTexts == null) {
+      m_scoutTexts = new ScoutTexts();
+      TextsThreadLocal.set(m_scoutTexts);
+    }
+
+    if (m_attributesLock == null) {
+      m_attributesLock = new Object();
     }
   }
 
@@ -187,6 +210,7 @@ public abstract class AbstractServerSession implements IServerSession {
       throw new IllegalArgumentException("bundle must not be null");
     }
     m_bundle = bundle;
+    m_symbolicBundleName = bundle.getSymbolicName();
     m_active = true;
     m_scoutTexts = new ScoutTexts();
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
@@ -243,4 +267,13 @@ public abstract class AbstractServerSession implements IServerSession {
     m_subject = subject;
   }
 
+  @Override
+  public void setIdInternal(String sessionId) {
+    m_sessionId = sessionId;
+  }
+
+  @Override
+  public String getId() {
+    return m_sessionId;
+  }
 }
