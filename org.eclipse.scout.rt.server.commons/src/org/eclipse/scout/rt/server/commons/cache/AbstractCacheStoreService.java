@@ -16,6 +16,8 @@ import java.util.WeakHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
@@ -81,48 +83,6 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
     return SERVICES.getService(IClientIdentificationService.class).getClientId(req, res);
   }
 
-  /**
-   * Serializes objects
-   * 
-   * @param obj
-   *          Object to serialize
-   * @return bytestream
-   */
-  protected byte[] serialize(Object obj) {
-    byte[] bytes = null;
-    try {
-      bytes = m_objs.serialize(obj);
-    }
-    catch (IOException e) {
-      LOG.error("Error during serialization ", e);
-    }
-    return bytes;
-  }
-
-  /**
-   * deserializes bytestreams
-   * 
-   * @param bytes
-   *          bytestream
-   * @return deserialized Object
-   */
-  protected Object deserialize(byte[] bytes) {
-    Object obj = null;
-    try {
-      if (bytes != null) {
-        obj = m_objs.deserialize(bytes, Object.class);
-      }
-    }
-    catch (ClassNotFoundException e) {
-      LOG.error("Error during deserializization ", e);
-
-    }
-    catch (IOException e) {
-      LOG.error("Error during deserializization ", e);
-    }
-    return obj;
-  }
-
   @Override
   public void setGlobalAttribute(String key, Object value) {
     m_node_cache.put(key, new CacheElement(value, m_defaultExpirationTime));
@@ -181,44 +141,47 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
     e.resetCreationTime();
   }
 
-  protected class CacheElement implements ICacheElement {
-    private final Object m_value;
-    private long m_creationTime;
-    private long m_expiration;
-
-    /**
-     * Element to be stored in the cache
-     * 
-     * @param value
-     *          to be stored
-     * @param expiration
-     *          time in seconds
-     */
-    CacheElement(Object value, Integer expiration) {
-      m_creationTime = System.currentTimeMillis();
-      m_value = value;
-      setExpiration(expiration);
+  /**
+   * Serializes cache element
+   * 
+   * @param e
+   *          Object to serialize
+   * @return {@link String}
+   */
+  protected String serializedString(ICacheElement e) throws ProcessingException {
+    try {
+      byte[] bytes = m_objs.serialize(e);
+      return StringUtility.bytesToHex(bytes);
     }
-
-    @Override
-    public boolean isActive() {
-      return (m_creationTime + m_expiration > System.currentTimeMillis());
+    catch (IOException ex) {
+      throw new ProcessingException("Error during Serialization ", ex);
     }
+  }
 
-    @Override
-    public Object getValue() {
-      return m_value;
+  /**
+   * deserializes bytestreams
+   * 
+   * @param bytes
+   *          bytestream
+   * @return deserialized Object
+   */
+  protected ICacheElement deserializeCacheElement(String s) {
+    if (s == null) {
+      return null;
     }
-
-    @Override
-    public void setExpiration(Integer expiration) {
-      m_expiration = expiration * 1000l;
+    try {
+      byte[] bytes = StringUtility.hexToBytes(s);
+      if (bytes != null) {
+        return m_objs.deserialize(bytes, ICacheElement.class);
+      }
     }
-
-    @Override
-    public void resetCreationTime() {
-      m_creationTime = System.currentTimeMillis();
+    catch (ClassNotFoundException e) {
+      LOG.error("Error during deserializization ", e);
     }
+    catch (IOException e) {
+      LOG.error("Error during deserializization ", e);
+    }
+    return null;
   }
 
 }

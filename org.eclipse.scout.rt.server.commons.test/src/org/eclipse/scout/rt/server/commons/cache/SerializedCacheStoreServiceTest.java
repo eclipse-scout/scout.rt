@@ -10,30 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.cache;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 /**
- * Test for {@link StickySessionCacheStoreService}
+ * Test for {@link SerializedCacheStoreService}
  */
-public class SingleNodeCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
+public class SerializedCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
 
   @Test
-  public void testTouchAttribute() {
-    ICacheElement mockCacheElement = mock(ICacheElement.class);
-    when(mockCacheElement.isActive()).thenReturn(true);
-    m_testSession.setAttribute(m_testKey, mockCacheElement);
+  public void testTouchAttribute() throws ProcessingException {
+    CacheElement cacheElemSpy = new CacheElement(m_testValue, testExpiration, -1);
+    assertEquals(-1, cacheElemSpy.getCreationTime());
+    m_testSession.setAttribute(m_testKey, m_cacheService.serializedString(cacheElemSpy));
     m_cacheService.touchClientAttribute(m_requestMock, m_responseMock, m_testKey);
-    verify(mockCacheElement, times(1)).resetCreationTime();
+    assertEquals(-1, cacheElemSpy.getCreationTime());
   }
 
   @Override
   protected AbstractCacheStoreService createCacheService() {
-    return new StickySessionCacheStoreService();
+    return new SerializedCacheStoreService();
   }
 
 }

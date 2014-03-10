@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.server.commons.cache;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -61,7 +62,7 @@ class TestHttpSession implements HttpSession {
 
   @Override
   public Enumeration getAttributeNames() {
-    return null;
+    return Collections.enumeration(m_sessionAttributes.keySet());
   }
 
   @Override

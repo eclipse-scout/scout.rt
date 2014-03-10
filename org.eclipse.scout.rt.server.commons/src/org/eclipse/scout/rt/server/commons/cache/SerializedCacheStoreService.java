@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.server.commons.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * This Service is used for storing server side data in distributed systems with HTTP-Session synchronization by
@@ -26,26 +28,29 @@ import org.eclipse.scout.commons.StringUtility;
  * @author tsw
  * @since 4.0.0
  */
-public class SerializedCacheService extends AbstractCacheStoreService {
+public class SerializedCacheStoreService extends AbstractCacheStoreService {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SerializedCacheStoreService.class);
 
   @Override
   public void setClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Object value, Integer expiration) {
     if (value != null) {
-      req.getSession().setAttribute(key, StringUtility.bytesToHex(serialize(new CacheElement(value, expiration))));
+      try {
+        req.getSession().setAttribute(key, serializedString(new CacheElement(value, expiration)));
+      }
+      catch (ProcessingException e) {
+        LOG.error("Error during serialization", e);
+      }
     }
   }
 
   @Override
   public Object getClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    String hex = (String) req.getSession().getAttribute(key);
-    if (hex != null) {
-      ICacheElement e = (ICacheElement) deserialize(StringUtility.hexToBytes(hex));
-      if (e != null && e.isActive()) {
-        return e.getValue();
-      }
-      else if (e != null) {
-        removeClientAttribute(req, res, key);
-      }
+    ICacheElement e = deserializeCacheElement((String) req.getSession().getAttribute(key));
+    if (e != null && e.isActive()) {
+      return e.getValue();
+    }
+    else if (e != null) {
+      removeClientAttribute(req, res, key);
     }
     return null;
   }
@@ -57,17 +62,14 @@ public class SerializedCacheService extends AbstractCacheStoreService {
 
   @Override
   public void touchClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Integer expiration) {
-    String hex = (String) req.getSession().getAttribute(key);
-    if (hex != null) {
-      ICacheElement e = (ICacheElement) deserialize(StringUtility.hexToBytes(hex));
-      if (e != null) {
-        if (e.isActive()) {
-          e.setExpiration(expiration);
-          e.resetCreationTime();
-        }
-        else {
-          removeClientAttribute(req, res, key);
-        }
+    ICacheElement e = deserializeCacheElement((String) req.getSession().getAttribute(key));
+    if (e != null) {
+      if (e.isActive()) {
+        e.setExpiration(expiration);
+        e.resetCreationTime();
+      }
+      else {
+        removeClientAttribute(req, res, key);
       }
     }
   }

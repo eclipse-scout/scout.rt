@@ -2,5 +2,8 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="filters" name="filters" schema="schema/filters.exsd"/>
-
+   <extension point="org.eclipse.scout.service.services">
+      <service class="org.eclipse.scout.rt.server.commons.cache.ClientIdentificationService" createImmediately="false"/>
+      <service class="org.eclipse.scout.rt.server.commons.cache.StickySessionCacheStoreService" createImmediately="false" ranking="-1"/>
+   </extension>
 </plugin>
