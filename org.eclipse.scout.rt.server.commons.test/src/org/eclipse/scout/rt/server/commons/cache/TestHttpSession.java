@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSessionContext;
  * Test session recording attributes
  */
 @SuppressWarnings("deprecation")
-class TestHttpSession implements HttpSession {
+public class TestHttpSession implements HttpSession {
 
   private final HashMap<String, Object> m_sessionAttributes = new HashMap<String, Object>();
 

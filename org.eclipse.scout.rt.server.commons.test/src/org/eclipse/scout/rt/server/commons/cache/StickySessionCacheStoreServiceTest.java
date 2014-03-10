@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * Test for {@link StickySessionCacheStoreService}
  */
-public class SingleNodeCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
+public class StickySessionCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
 
   @Test
   public void testTouchAttribute() {

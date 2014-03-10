@@ -23,7 +23,7 @@ public class StickySessionCacheStoreService extends AbstractCacheStoreService {
 
   @Override
   public void setClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Object value, Integer expiration) {
-    req.getSession().setAttribute(key, new CacheElement(value, expiration));
+    req.getSession(true).setAttribute(key, new CacheElement(value, expiration));
   }
 
   @Override
@@ -42,12 +42,12 @@ public class StickySessionCacheStoreService extends AbstractCacheStoreService {
   }
 
   private ICacheElement getCacheElement(HttpServletRequest req, String key) {
-    return (ICacheElement) req.getSession().getAttribute(key);
+    return (ICacheElement) req.getSession(true).getAttribute(key);
   }
 
   @Override
   public void removeClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    req.getSession().removeAttribute(key);
+    req.getSession(true).removeAttribute(key);
   }
 
   @Override

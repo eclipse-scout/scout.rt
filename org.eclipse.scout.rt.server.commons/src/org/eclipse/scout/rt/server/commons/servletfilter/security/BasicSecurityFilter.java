@@ -19,10 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.server.commons.cache.ICacheStoreService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * <h4>BasicSecurityFilter</h4> A simple security filter using username,password
@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
  * @since 1.0.3 06.02.2009
  */
 public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicSecurityFilter.class);
   public static final String PROP_BASIC_ATTEMPT = "BasicSecurityFilter.basicAttempt";
 
   private HashMap<String, String> m_userDatabase;
@@ -81,28 +80,28 @@ public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
         }
       }
     }
-    int attempts = getBasicAttempt(req);
+    int attempts = getBasicAttempt(req, resp);
     if (attempts > 2) {
       return STATUS_CONTINUE_CHAIN;
     }
     else {
-      setBasicAttept(req, attempts + 1);
+      setBasicAttept(req, resp, attempts + 1);
       resp.setHeader("WWW-Authenticate", "Basic realm=\"" + getRealm() + "\"");
       return STATUS_CONTINUE_CHAIN;
     }
   }
 
-  private int getBasicAttempt(HttpServletRequest req) {
+  private int getBasicAttempt(HttpServletRequest req, HttpServletResponse res) {
     int basicAtttempt = 0;
-    Object attribute = req.getSession().getAttribute(PROP_BASIC_ATTEMPT);
+    Object attribute = SERVICES.getService(ICacheStoreService.class).getClientAttributeAndTouch(req, res, PROP_BASIC_ATTEMPT);
     if (attribute instanceof Integer) {
       basicAtttempt = ((Integer) attribute).intValue();
     }
     return basicAtttempt;
   }
 
-  private void setBasicAttept(HttpServletRequest req, int attempts) {
-    req.getSession().setAttribute(PROP_BASIC_ATTEMPT, attempts);
+  private void setBasicAttept(HttpServletRequest req, HttpServletResponse res, int attempts) {
+    SERVICES.getService(ICacheStoreService.class).setClientAttribute(req, res, PROP_BASIC_ATTEMPT, attempts);
   }
 
 }

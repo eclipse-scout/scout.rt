@@ -40,7 +40,7 @@ public abstract class AbstractCacheStoreServiceTest {
     m_requestMock = mock(HttpServletRequest.class);
     m_responseMock = mock(HttpServletResponse.class);
     m_testSession = new TestHttpSession();
-    when(m_requestMock.getSession()).thenReturn(m_testSession);
+    when(m_requestMock.getSession(true)).thenReturn(m_testSession);
     m_cacheService = createCacheService();
   }
 
