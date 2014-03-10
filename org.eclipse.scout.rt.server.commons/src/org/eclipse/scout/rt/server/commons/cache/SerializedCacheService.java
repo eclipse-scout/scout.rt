@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.StringUtility;
  * </p>
  * 
  * @author tsw
+ * @since 4.0.0
  */
 public class SerializedCacheService extends AbstractCacheStoreService {
 

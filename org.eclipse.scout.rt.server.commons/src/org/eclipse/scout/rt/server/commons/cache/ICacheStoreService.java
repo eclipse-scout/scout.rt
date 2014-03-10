@@ -17,6 +17,8 @@ import org.eclipse.scout.service.IService;
 
 /**
  * Service for caching server side data.
+ * 
+ * @since 4.0.0
  */
 public interface ICacheStoreService extends IService {
 

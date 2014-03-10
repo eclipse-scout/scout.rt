@@ -24,7 +24,7 @@ import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- *
+ * @since 4.0.0
  */
 public abstract class AbstractCacheStoreService extends AbstractService implements ICacheStoreService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCacheStoreService.class);

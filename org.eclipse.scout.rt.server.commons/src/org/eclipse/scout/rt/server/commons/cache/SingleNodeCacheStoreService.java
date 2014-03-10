@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This is the cache store service is for Scout Applications running on a single server instance. The data stored does
  * not to be serializable.
+ * 
+ * @since 4.0.0
  */
 public class SingleNodeCacheStoreService extends AbstractCacheStoreService {
 
@@ -35,7 +37,7 @@ public class SingleNodeCacheStoreService extends AbstractCacheStoreService {
   }
 
   private Object getClientAttribute(HttpServletRequest req, String key) {
-    CacheElement e = (CacheElement) req.getSession().getAttribute(key);
+    ICacheElement e = (ICacheElement) req.getSession().getAttribute(key);
     if (e != null && e.isActive()) {
       return e.getValue();
     }

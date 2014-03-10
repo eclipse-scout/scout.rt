@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This service identifies the requesting client
+ * 
+ * @since 4.0.0
  */
 public interface IClientIdentificationService {
 

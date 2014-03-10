@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.server.commons.cache;
 
 /**
  * A cached value that may expire
+ * 
+ * @since 4.0.0
  */
 public interface ICacheElement {
 

@@ -18,10 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Uses a cookie to identify clients.
+ * 
+ * @since 4.0.0
  */
 public class ClientIdentificationService implements IClientIdentificationService {
 
-  private static final String SCOUT_CLIENT_ID = "scid";
+  protected static final String SCOUT_CLIENT_ID_KEY = "scid";
 
   /**
    * returns the session id of the HTTP-Request. If no session id is set a new id will be generated and set.
@@ -34,36 +36,50 @@ public class ClientIdentificationService implements IClientIdentificationService
    */
   @Override
   public String getClientId(HttpServletRequest req, HttpServletResponse res) {
+    String existingId = findExistingId(req);
+    if (existingId != null) {
+      return existingId;
+    }
+
+    String newClientId = createNewId();
+    setClientId(req, res, newClientId);
+    return newClientId;
+  }
+
+  /**
+   * Try to find existing id as a cookie or request attribute (on first request)
+   */
+  private String findExistingId(HttpServletRequest req) {
     Cookie[] cookies = req.getCookies();
     if (cookies != null) {
-      for (int i = 0; i < cookies.length; i++) {
-        Cookie cookie = cookies[i];
-        if (cookie.getName().equals(SCOUT_CLIENT_ID)) {
+      for (Cookie cookie : cookies) {
+        if (SCOUT_CLIENT_ID_KEY.equals(cookie.getName())) {
           return cookie.getValue();
         }
       }
     }
-    if (req.getAttribute(SCOUT_CLIENT_ID) != null) {
-      return (String) req.getAttribute(SCOUT_CLIENT_ID);
+    Object clientIdRequestAttribute = req.getAttribute(SCOUT_CLIENT_ID_KEY);
+    if (clientIdRequestAttribute instanceof String) {
+      return (String) clientIdRequestAttribute;
     }
-    return createAndSetId(req, res);
+    return null;
   }
 
   /**
-   * generates a new id, set it as cookie and returns it
+   * sets id as cookie to response and as attribute to the request for the first request
    * 
    * @param req
    *          HttpServletRequest
    * @param res
    *          HttpServletResponse
-   * @return the new session id
    */
-  private String createAndSetId(HttpServletRequest req, HttpServletResponse res) {
-    String newClientId = UUID.randomUUID().toString();
-    Cookie cookie = new Cookie(SCOUT_CLIENT_ID, newClientId);
-    req.setAttribute(SCOUT_CLIENT_ID, newClientId);
-    res.addCookie(cookie);
-    return newClientId;
+  private void setClientId(HttpServletRequest req, HttpServletResponse res, String newClientId) {
+    req.setAttribute(SCOUT_CLIENT_ID_KEY, newClientId);
+    res.addCookie(new Cookie(SCOUT_CLIENT_ID_KEY, newClientId));
+  }
+
+  protected String createNewId() {
+    return UUID.randomUUID().toString();
   }
 
 }
