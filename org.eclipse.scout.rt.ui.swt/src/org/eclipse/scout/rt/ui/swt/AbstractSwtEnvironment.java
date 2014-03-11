@@ -1005,6 +1005,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             viewPart.showForm(form);
             part = viewPart;
             m_openForms.put(form, viewPart);
+            // activate first view
+            IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            if (page != null && page.getActivePart() == null) {
+              page.activate(viewPart);
+            }
           }
           catch (ProcessingException e) {
             LOG.error(e.getMessage(), e);
