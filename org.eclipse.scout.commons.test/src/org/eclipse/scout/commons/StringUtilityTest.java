@@ -17,6 +17,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
 
@@ -125,6 +127,15 @@ public class StringUtilityTest {
     assertEquals("12", StringUtility.join(null, new Long[]{Long.valueOf(1), Long.valueOf(2)}));
     assertEquals("1, 2", StringUtility.join(", ", new Long[]{Long.valueOf(1), Long.valueOf(2)}));
     assertEquals("1, 2", StringUtility.join(", ", new Long[]{Long.valueOf(1), null, Long.valueOf(2)}));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testJoinCollection() {
+    assertEquals("", StringUtility.join(null, (Collection<?>) null));
+    assertEquals("abc", StringUtility.join(null, Arrays.asList("a", "b", "c")));
+    assertEquals("123", StringUtility.join(null, Arrays.asList(1, 2, 3)));
+    assertEquals("11", StringUtility.join(null, Arrays.asList(1, null, BigDecimal.ONE)));
   }
 
   @Test

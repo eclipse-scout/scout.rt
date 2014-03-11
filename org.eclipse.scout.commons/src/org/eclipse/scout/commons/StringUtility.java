@@ -38,6 +38,8 @@ public final class StringUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StringUtility.class);
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
 
+  private static final String[] EMPTY_ARRAY = new String[0];
+
   public static interface ITagProcessor {
     String/* tagReplacement */processTag(String tagName, String tagContent);
   }
@@ -1390,6 +1392,7 @@ public final class StringUtility {
 
   /**
    * @see #join(String, Object...)
+   * @since 4.0.0
    */
   public static String join(String delimiter, Long[] parts) {
     return join(delimiter, (Object[]) parts);
@@ -1401,6 +1404,14 @@ public final class StringUtility {
    */
   public static String join(String delimiter, String[] parts) {
     return join(delimiter, (Object[]) parts);
+  }
+
+  /**
+   * @see #join(String, Object...)
+   * @since 4.0.0
+   */
+  public static String join(String delimiter, Collection<?> parts) {
+    return join(delimiter, parts == null ? EMPTY_ARRAY : parts.toArray());
   }
 
   /**

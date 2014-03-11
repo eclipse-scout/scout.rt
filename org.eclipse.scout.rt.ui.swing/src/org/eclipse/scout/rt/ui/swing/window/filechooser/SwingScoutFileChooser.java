@@ -16,6 +16,8 @@ import java.awt.Frame;
 import java.awt.Window;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JFileChooser;
@@ -96,9 +98,11 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       for (int i = 0; filters != null && i < filters.length; i++) {
         dlg.removeChoosableFileFilter(filters[i]);
       }
+
+      dlg.addChoosableFileFilter(new ExtensionFileFilter(extensions));
       for (int i = 0; i < extensions.size(); i++) {
         String oneExt = extensions.get(i);
-        dlg.addChoosableFileFilter(new ExtensionFileFilter(oneExt));
+        dlg.addChoosableFileFilter(new ExtensionFileFilter(Collections.singletonList(oneExt)));
       }
     }
 
@@ -120,10 +124,10 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
         // add extension
         if (!folderMode) {
           if (f != null && (dlg.getFileFilter() instanceof ExtensionFileFilter)) {
-            String selectedExt = ((ExtensionFileFilter) dlg.getFileFilter()).getExt();
+            List<String> selectedExtensions = ((ExtensionFileFilter) dlg.getFileFilter()).getExtensions();
             String path = f.getAbsolutePath();
-            if (selectedExt.length() > 0 && !path.toLowerCase().endsWith(selectedExt)) {
-              f = new File(path + "." + selectedExt);
+            if (selectedExtensions.size() == 1 && !dlg.getFileFilter().accept(f)) {
+              f = new File(path + "." + selectedExtensions.get(0));
             }
           }
         }
@@ -203,7 +207,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       // not implemented in windows dialog
     }
 
-    if (extensions.size() > 0) {
+    if (extensions != null && extensions.isEmpty()) {
       final List<String> extListFinal = extensions;
       if (StringUtility.hasText(fileName)) {
         dlg.setFile(fileName);
@@ -272,32 +276,59 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     return new FileDialog(new Frame(), title, openMode ? FileDialog.LOAD : FileDialog.SAVE);
   }
 
-  private class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
-    private String m_ext = "";
+  public static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
+    private final List<String> m_extensions;
 
-    public ExtensionFileFilter(String ext) {
-      if (ext != null && !ext.equals("*")) {
-        m_ext = ext.toLowerCase();
+    public ExtensionFileFilter(List<String> extensions) {
+      if (extensions == null) {
+        m_extensions = Collections.emptyList();
+      }
+      else {
+        ArrayList<String> list = new ArrayList<String>();
+
+        for (String extension : extensions) {
+          if (extension != null && !extension.equals("*")) {
+            list.add(extension.toLowerCase());
+          }
+        }
+        m_extensions = list;
       }
     }
 
     @Override
     public String getDescription() {
-      if (m_ext.length() > 0) {
-        return "*." + m_ext;
+      if (m_extensions.isEmpty()) {
+        return "*.*";
       }
       else {
-        return "*.*";
+        StringBuilder s = new StringBuilder();
+        for (String extension : m_extensions) {
+          s.append("*.");
+          s.append(extension);
+          s.append(";");
+        }
+        s.deleteCharAt(s.length() - 1);
+        return s.toString();
       }
     }
 
-    public String getExt() {
-      return m_ext;
+    public List<String> getExtensions() {
+      return CollectionUtility.unmodifiableList(m_extensions);
     }
 
     @Override
     public boolean accept(File f) {
-      return f.isDirectory() || m_ext.length() == 0 || f.getName().toLowerCase().endsWith(m_ext);
+      return f.isDirectory() || m_extensions.isEmpty() || fileNameMatches(f);
+    }
+
+    private boolean fileNameMatches(File f) {
+      String name = f.getName().toLowerCase();
+      for (String extension : m_extensions) {
+        if (name.endsWith(extension)) {
+          return true;
+        }
+      }
+      return false;
     }
   }// end private class
 

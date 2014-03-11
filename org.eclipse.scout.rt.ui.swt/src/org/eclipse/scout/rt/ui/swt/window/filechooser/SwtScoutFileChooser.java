@@ -83,6 +83,11 @@ public class SwtScoutFileChooser {
       for (String ext : getScoutFileChooser().getFileExtensions()) {
         extensionList.add("*." + ext);
       }
+
+      // Put an extension filter matching all extensions
+      String allExtensions = StringUtility.join(";", extensionList);
+      extensionList.add(0, allExtensions);
+
       extensions = extensionList.toArray(new String[extensionList.size()]);
     }
     FileDialog dialog = new FileDialog(getParentShell(), style);
