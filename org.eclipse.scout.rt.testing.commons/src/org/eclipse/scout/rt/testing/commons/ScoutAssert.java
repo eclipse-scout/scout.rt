@@ -146,17 +146,19 @@ public final class ScoutAssert {
    * 
    * @param expectedFile
    * @param actualFile
+   * @param charsetName
+   *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
    * @throws ProcessingException
    */
-  public static void assertTextFileEquals(File expectedFile, File actualFile) throws ProcessingException {
+  public static void assertTextFileEquals(File expectedFile, File actualFile, String charsetName) throws ProcessingException {
     if (!expectedFile.exists()) {
       fail("File does not exists:" + expectedFile.getPath());
     }
     if (!actualFile.exists()) {
       fail("File does not exists:" + expectedFile.getPath());
     }
-    List<String> expectedLines = IOUtility.readLines(expectedFile);
-    List<String> actualLines = IOUtility.readLines(actualFile);
+    List<String> expectedLines = IOUtility.readLines(expectedFile, charsetName);
+    List<String> actualLines = IOUtility.readLines(actualFile, charsetName);
     assertListEquals(expectedLines, actualLines);
   }
 }

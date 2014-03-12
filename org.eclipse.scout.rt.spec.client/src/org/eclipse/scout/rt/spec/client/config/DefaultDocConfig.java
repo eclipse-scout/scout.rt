@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.spec.client.config.entity.DefaultCodeTypeTypesConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultColumnListConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultFormConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultFormFieldConfig;
@@ -70,8 +71,13 @@ public class DefaultDocConfig implements IDocConfig {
   }
 
   @Override
-  public IDocEntityListConfig<Class> getTypesConfig() {
+  public IDocEntityListConfig<Class> getGenericTypesConfig() {
     return new DefaultTypesConfig();
+  }
+
+  @Override
+  public IDocEntityListConfig<Class> getCodetypeTypesConfig() {
+    return new DefaultCodeTypeTypesConfig();
   }
 
 }

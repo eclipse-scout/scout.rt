@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * A visitor for {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}s that collects
@@ -47,12 +47,12 @@ public class SmartFieldVisitor implements IDocFormFieldVisitor {
    */
   private IDocSection createDocSection(ISmartField<?> field) {
     String title = m_config.getSmartFieldConfig().getTitleExtractor().getText(field);
-    IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig());
-    IDocSection menuSection = DocGenUtility.createDocSection(field.getMenus(), m_config.getMenuConfig());
+    IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig(), true);
+    IDocSection menuSection = DocGenUtility.createDocSection(field.getMenus(), m_config.getMenuConfig(), false);
     if (menuSection != null) {
-      return new SectionWithTable(title, docTable, menuSection);
+      return new Section(title, docTable, menuSection);
     }
-    return new SectionWithTable(title, docTable);
+    return new Section(title, docTable);
   }
 
   @Override

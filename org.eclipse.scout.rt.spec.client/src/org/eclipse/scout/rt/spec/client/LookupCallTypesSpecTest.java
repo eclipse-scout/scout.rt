@@ -18,6 +18,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 public class LookupCallTypesSpecTest extends AbstractTypeSpecTest {
 
   public LookupCallTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.lookupcalltypes", TEXTS.get("org.eclipse.scout.rt.spec.lookupcalltypes"), LookupCall.class);
+    super("org.eclipse.scout.rt.spec.lookupcalltypes", TEXTS.get("org.eclipse.scout.rt.spec.lookupcalltypes"), LookupCall.class, true);
   }
 }

@@ -69,8 +69,13 @@ public interface IDocConfig {
   IDocEntityConfig<IPageWithTable<? extends ITable>> getTablePageConfig();
 
   /**
-   * Configuration for types (eg. field types, column types, ...)
+   * Configuration suitable for different types (eg. field types, column types, ...)
    */
-  IDocEntityListConfig<Class> getTypesConfig();
+  IDocEntityListConfig<Class> getGenericTypesConfig();
+
+  /**
+   * Configuration for CodeTypes
+   */
+  IDocEntityListConfig<Class> getCodetypeTypesConfig();
 
 }

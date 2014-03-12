@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
@@ -17,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
@@ -25,23 +27,30 @@ import org.eclipse.scout.rt.spec.client.out.IDocSection;
  * Abstract spec test for creating a spec file with a table describing types (eg. form fields, columns, ...)
  * <p>
  * A type appears on the list if these criteria are met:<br>
- * - The type is a subtype or the same type as the supertype provided in the constructor.<br>
- * - A doc text with the key "[types classid]_name" is defined
+ * <li>The type is a subtype or the same type as the supertype provided in the constructor.<br>
+ * <li>Either a doc text with the key "[types classid]_name" is defined or the property {@link #m_listTypesWithoutDoc}
+ * is set to true and the type is neither an interface nore an abstract class.
  * <p>
  * The resulting table consists of the two columns:<br>
- * - Name: filled with doc text with the key "[types classid]_name"<br>
- * - Description: filled with doc text with the key "[types classid]_description"
+ * <li>Name: filled with doc text with the key "[types classid]_name"<br>
+ * <li>Description: filled with doc text with the key "[types classid]_description"
  */
 public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTypeSpecTest.class);
-  private Class<?> m_supertype;
-  private String m_id;
-  private String m_title;
+  protected Class<?> m_supertype;
+  protected String m_id;
+  protected String m_title;
+  protected boolean m_listTypesWithoutDoc;
 
-  public AbstractTypeSpecTest(String id, String title, Class<? extends ITypeWithClassId> supertype) {
+  public AbstractTypeSpecTest(String id, String title, Class<? extends ITypeWithClassId> supertype, boolean listTypesWithoutDoc) {
     m_id = id;
     m_title = title;
     m_supertype = supertype;
+    m_listTypesWithoutDoc = listTypesWithoutDoc;
+  }
+
+  public AbstractTypeSpecTest(String id, String title, Class<? extends ITypeWithClassId> supertype) {
+    this(id, title, supertype, false);
   }
 
   @Override
@@ -63,13 +72,20 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
     if (c == null || !m_supertype.isAssignableFrom(c)) {
       return false;
     }
+    if (m_listTypesWithoutDoc) {
+      return !c.isInterface() && !Modifier.isAbstract(c.getModifiers());
+    }
     String typeDescription = new SpecialDescriptionExtractor(null, "_name").getText(c);
     return typeDescription != null;
   }
 
   protected IDocSection generate(Set<Class> fieldTypes) {
-    TypeSpecGenerator g = new TypeSpecGenerator(getConfiguration(), m_id, m_title);
+    TypeSpecGenerator g = new TypeSpecGenerator(getEntityListConfig(), m_id, m_title);
     return g.getDocSection(fieldTypes);
+  }
+
+  protected IDocEntityListConfig<Class> getEntityListConfig() {
+    return getConfiguration().getGenericTypesConfig();
   }
 
 }

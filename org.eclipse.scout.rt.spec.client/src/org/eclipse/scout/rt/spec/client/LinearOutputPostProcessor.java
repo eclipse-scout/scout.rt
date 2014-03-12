@@ -118,7 +118,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
   protected File concatenateFiles() throws ProcessingException {
     File outputFile = null;
     String outputFileName = m_configFile.getName().replace(".config", "");
-    List<String> configEntries = IOUtility.readLines(m_configFile);
+    List<String> configEntries = IOUtility.readLines(m_configFile, "UTF-8");
     if (!StringUtility.isNullOrEmpty(outputFileName)) {
       PrintWriter writer = null;
       outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), outputFileName + ".mediawiki");

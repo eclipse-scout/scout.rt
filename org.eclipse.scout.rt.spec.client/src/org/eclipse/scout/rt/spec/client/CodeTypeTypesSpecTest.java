@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.spec.client;
 
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 
 /**
  * implementation of {@link AbstractTypeSpecTest} for lookup calls
@@ -18,6 +19,12 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 public class CodeTypeTypesSpecTest extends AbstractTypeSpecTest {
 
   public CodeTypeTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.codetypetypes", TEXTS.get("org.eclipse.scout.rt.spec.codetypetypes"), ICodeType.class);
+    super("org.eclipse.scout.rt.spec.codetypetypes", TEXTS.get("org.eclipse.scout.rt.spec.codetypetypes"), ICodeType.class, true);
   }
+
+  @Override
+  protected IDocEntityListConfig<Class> getEntityListConfig() {
+    return getConfiguration().getCodetypeTypesConfig();
+  }
+
 }

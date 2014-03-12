@@ -665,16 +665,18 @@ public final class IOUtility {
 
   /**
    * @param file
+   * @param charsetName
+   *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
    * @return List containing all lines of the file as Strings
    * @throws ProcessingException
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
-  public static List<String> readLines(File file) throws ProcessingException {
+  public static List<String> readLines(File file, String charsetName) throws ProcessingException {
     ArrayList<String> lines;
     lines = new ArrayList<String>();
     BufferedReader bufferedReader = null;
     try {
-      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charsetName));
       String line;
       while ((line = bufferedReader.readLine()) != null) {
         lines.add(line);
@@ -695,5 +697,4 @@ public final class IOUtility {
     }
     return lines;
   }
-
 }

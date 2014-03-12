@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
  * 
  * @param <T>
  */
-public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
+public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> {
   public static final String LINKS_TAG_NAME = "links";
 
   public LinkableTypeExtractor() {
@@ -33,17 +33,22 @@ public class LinkableTypeExtractor<T> extends AbstractNamedTextExtractor<T> impl
   @Override
   public String getText(T o) {
     Class type = o.getClass();
+    return getText(type);
+  }
+
+  public String getText(Class type) {
+    Class hierarchyType = type;
     StringBuilder specType = new StringBuilder();
-    while (type != null) {
-      String name = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(type) + "_name", null);
+    while (hierarchyType != null) {
+      String name = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(hierarchyType) + "_name", null);
       if (name != null) {
-        specType.append(MediawikiUtility.createLink("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(type), name));
+        specType.append(MediawikiUtility.createLink("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(hierarchyType), name));
         break;
       }
-      type = type.getSuperclass();
+      hierarchyType = hierarchyType.getSuperclass();
     }
     if (specType.length() == 0) {
-      specType.append(o.getClass().getSimpleName());
+      specType.append(type.getSimpleName());
     }
     return specType.toString();
   }

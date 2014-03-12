@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * Creates Specification data for a page
@@ -36,8 +36,8 @@ public class PageSpecGenerator {
     IColumn<?>[] columns = page.getTable().getColumns();
     IMenu[] menus = page.getTable().getMenus();
 
-    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig());
-    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig());
-    return new SectionWithTable(title, menuSection, columnSection);
+    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig(), false);
+    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig(), false);
+    return new Section(title, menuSection, columnSection);
   }
 }

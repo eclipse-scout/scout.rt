@@ -98,7 +98,7 @@ public class MediawikiWriter {
 
   private void appendTable(IDocSection section) throws IOException {
     if (section.hasTableCellTexts()) {
-      if (section.hasSubSections()) {
+      if (section.getTable().isTransposedLayout()) {
         m_tableWriter.appendTableTransposed(section.getTable());
       }
       else {

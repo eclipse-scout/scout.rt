@@ -19,10 +19,10 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
- * Creates Specification data from Form fields
+ * Creates specification data from forms
  */
 public class FormSpecGenerator {
   private final IDocConfig m_config;
@@ -34,7 +34,7 @@ public class FormSpecGenerator {
   public IDocSection getDocSection(IForm form) {
     //general form info
     IDocEntityConfig<IForm> formConfig = m_config.getFormConfig();
-    IDocTable formSpec = DocGenUtility.createDocTable(form, formConfig);
+    IDocTable formSpec = DocGenUtility.createDocTable(form, formConfig, true);
 
     //fields
     IDocFormFieldVisitor[] visitors = new IDocFormFieldVisitor[]{
@@ -44,7 +44,7 @@ public class FormSpecGenerator {
     };
     IDocSection[] subSections = getSubSections(form, visitors);
     String title = formConfig.getTitleExtractor().getText(form);
-    return new SectionWithTable(title, formSpec, subSections);
+    return new Section(title, formSpec, subSections);
   }
 
   private IDocSection[] getSubSections(IForm form, IDocFormFieldVisitor... visitors) {

@@ -12,17 +12,17 @@ package org.eclipse.scout.rt.spec.client.gen;
 
 import java.util.Set;
 
-import org.eclipse.scout.rt.spec.client.config.IDocConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 public class TypeSpecGenerator {
-  private final IDocConfig m_config;
+  private final IDocEntityListConfig<Class> m_config;
   private String m_anchorId;
   private String m_title;
 
-  public TypeSpecGenerator(IDocConfig config, String anchorId, String title) {
+  public TypeSpecGenerator(IDocEntityListConfig<Class> config, String anchorId, String title) {
     m_config = config;
     m_anchorId = anchorId;
     m_title = title;
@@ -31,7 +31,10 @@ public class TypeSpecGenerator {
   public IDocSection getDocSection(Set<Class> types) {
     String anchor = MediawikiUtility.createAnchor(m_anchorId);
     String titleWithAnchor = MediawikiUtility.transformToWiki(anchor + m_title);
-    IDocSection typeSection = DocGenUtility.createDocSection(types.toArray(new Class[types.size()]), m_config.getTypesConfig());
-    return new SectionWithTable(titleWithAnchor, typeSection);
+    if (types.isEmpty()) {
+      return new Section(titleWithAnchor);
+    }
+    IDocSection typeSection = DocGenUtility.createDocSection(types.toArray(new Class[types.size()]), m_config, false);
+    return new Section(titleWithAnchor, typeSection);
   }
 }

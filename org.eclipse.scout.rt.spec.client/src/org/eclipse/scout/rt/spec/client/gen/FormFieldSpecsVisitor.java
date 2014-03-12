@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * Extracts information from {@link IFormField}s by visiting all fields.
@@ -51,10 +51,10 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
   public List<IDocSection> getDocSections() {
     String[][] rowArray = CollectionUtility.toArray(m_rows, String[].class);
     String[] headers = DocGenUtility.getHeaders(m_config.getFieldListConfig().getTextExtractors());
-    IDocTable table = new DocTable(headers, rowArray);
+    IDocTable table = new DocTable(headers, rowArray, false);
     String title = TEXTS.get("org.eclipse.scout.rt.spec.fields");
     ArrayList<IDocSection> sections = new ArrayList<IDocSection>();
-    sections.add(new SectionWithTable(title, table));
+    sections.add(new Section(title, table));
     return sections;
   }
 

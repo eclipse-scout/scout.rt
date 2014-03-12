@@ -179,7 +179,7 @@ public class DocGenUtilityTest {
     ArrayList<IDocTextExtractor<IFormField>> ex = new ArrayList<IDocTextExtractor<IFormField>>();
     ex.add(new DescriptionExtractor<IFormField>());
     when(config.getTextExtractors()).thenReturn(ex);
-    IDocSection section = DocGenUtility.createDocSection(fields, config);
+    IDocSection section = DocGenUtility.createDocSection(fields, config, false);
     String[][] cellTexts = section.getTable().getCellTexts();
     String cellText = cellTexts[0][0];
     assertEquals(TEST_DOC, cellText);

@@ -20,8 +20,6 @@ public interface IDocSection {
    */
   String getTitle();
 
-  IDocSectionHeading getHeading();
-
   IDocTable getTable();
 
   IDocSection[] getSubSections();

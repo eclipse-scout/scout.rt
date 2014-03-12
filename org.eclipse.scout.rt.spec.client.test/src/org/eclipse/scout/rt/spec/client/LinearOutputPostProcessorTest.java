@@ -49,7 +49,7 @@ public class LinearOutputPostProcessorTest {
     File expectedFile = copyFile(TEST_DIR + File.separator + "expectedAfterLinearOutputPostProcessorLoremIpsum1.mediawiki");
 
     new LinearOutputPostProcessor(null).prefixAnchorsAndLinks(destFile);
-    ScoutAssert.assertTextFileEquals(expectedFile, destFile);
+    ScoutAssert.assertTextFileEquals(expectedFile, destFile, "UTF-8");
   }
 
   @Test

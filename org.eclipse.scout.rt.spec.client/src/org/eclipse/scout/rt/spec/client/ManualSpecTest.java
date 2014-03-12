@@ -16,7 +16,9 @@ import java.io.FilenameFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.osgi.framework.Bundle;
 
-// TODO ASA javadoc
+/**
+ * Copy manually written mediawiki and image files from source bundles to output directory
+ */
 public class ManualSpecTest extends AbstractSpecGenTest {
 
   @Override

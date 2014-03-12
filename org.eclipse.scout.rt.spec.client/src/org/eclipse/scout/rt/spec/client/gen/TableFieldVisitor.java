@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * A visitor for {@link ITableField}s that collects information according to configurations for {@link ITableField},
@@ -43,21 +43,21 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
 
   private IDocSection createDocSection(ITableField<?> field) {
     String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
-    IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuConfig());
-    IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnConfig());
+    IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuConfig(), false);
+    IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnConfig(), false);
     // TODO ASA refactor if/else cascade
     if (menuSection != null) {
       if (columnsSection != null) {
-        return new SectionWithTable(title, menuSection, columnsSection);
+        return new Section(title, menuSection, columnsSection);
       }
       else {
-        return new SectionWithTable(title, menuSection);
+        return new Section(title, menuSection);
       }
     }
     if (columnsSection != null) {
-      return new SectionWithTable(title, columnsSection);
+      return new Section(title, columnsSection);
     }
-    return new SectionWithTable(title);
+    return new Section(title);
   }
 
   @Override

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
  * d8b1f73a-4415-4477-8408-e6ada9e69551_name<br>
  * d8b1f73a-4415-4477-8408-e6ada9e69551_description
  */
-public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Class> implements IDocTextExtractor<Class> {
+public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Class> {
 
   protected String m_keySuffix;
   protected boolean m_createAnchor;
