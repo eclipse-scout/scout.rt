@@ -80,6 +80,17 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
     return m_trayItem == null || m_trayItem.isDisposed();
   }
 
+  @Override
+  public void disposeTray() {
+    dispose();
+    if (m_trayItem != null && !isDisposed()) {
+      m_trayItem.dispose();
+    }
+    if (m_popupMenu != null && !m_popupMenu.isDisposed()) {
+      m_popupMenu.dispose();
+    }
+  }
+
   protected void updatePopupMenus() {
     if (m_popupMenu == null) {
       return;

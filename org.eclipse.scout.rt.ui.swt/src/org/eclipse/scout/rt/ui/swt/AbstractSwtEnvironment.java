@@ -226,6 +226,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         m_formToolkit.dispose();
         m_formToolkit = null;
       }
+      if (m_trayComposite != null) {
+        m_trayComposite.disposeTray();
+        m_trayComposite = null;
+      }
       detachScoutListeners();
       detachSWTListeners();
       if (m_synchronizer != null) {
