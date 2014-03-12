@@ -20,9 +20,14 @@ public interface IDocSection {
    */
   String getTitle();
 
-  IDocSectionHeading getHeading();
-
   IDocTable getTable();
+
+  /**
+   * @return The introduction to this section which is printed directly after the heading.
+   *         <p>
+   *         May be null or empty.
+   */
+  String getIntroduction();
 
   IDocSection[] getSubSections();
 

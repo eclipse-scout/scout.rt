@@ -18,10 +18,12 @@ import org.eclipse.scout.rt.spec.client.out.IDocTable;
 public class DocTable implements IDocTable {
   private final String[] m_headerTexts;
   private final String[][] m_cellTexts;
+  private final boolean m_transposedLayout;
 
-  public DocTable(String[] headerTexts, String[][] cellTexts) {
+  public DocTable(String[] headerTexts, String[][] cellTexts, boolean transposedLayout) {
     m_headerTexts = headerTexts.clone();
     m_cellTexts = cellTexts.clone();
+    m_transposedLayout = transposedLayout;
   }
 
   @Override
@@ -32,6 +34,11 @@ public class DocTable implements IDocTable {
   @Override
   public String[] getHeaderTexts() {
     return m_headerTexts.clone();
+  }
+
+  @Override
+  public boolean isTransposedLayout() {
+    return m_transposedLayout;
   }
 
 }

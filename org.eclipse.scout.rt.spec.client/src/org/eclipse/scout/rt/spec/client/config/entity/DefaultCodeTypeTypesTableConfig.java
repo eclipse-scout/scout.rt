@@ -11,37 +11,22 @@
 package org.eclipse.scout.rt.spec.client.config.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.gen.extract.CodeTypeCodesExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  * Default configuration for {@link Class}
  */
-public class DefaultTypesConfig implements IDocEntityListConfig<Class<?>> {
+public class DefaultCodeTypeTypesTableConfig extends DefaultTypesTableConfig {
 
   @Override
   public List<IDocTextExtractor<Class<?>>> getTextExtractors() {
-    List<IDocTextExtractor<Class<?>>> extractors = new ArrayList<IDocTextExtractor<Class<?>>>();
-
-    extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name", true));
-    extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.doc"), "_description"));
+    ArrayList<IDocTextExtractor<Class<?>>> extractors = new ArrayList<IDocTextExtractor<Class<?>>>();
+    extractors.addAll(super.getTextExtractors());
+    extractors.add(new CodeTypeCodesExtractor());
     return extractors;
-  }
-
-  @Override
-  public List<IDocFilter<Class<?>>> getFilters() {
-    // TODO ASA filter for types?
-    return Collections.emptyList();
-  }
-
-  @Override
-  public String getTitle() {
-    return null;
   }
 
 }

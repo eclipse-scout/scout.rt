@@ -25,4 +25,9 @@ public interface IDocTable {
    */
   String[] getHeaderTexts();
 
+  /**
+   * @return whether headers and entries are filled into table as columns instead of rows
+   */
+  boolean isTransposedLayout();
+
 }

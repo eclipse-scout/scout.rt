@@ -377,7 +377,7 @@ public final class SpecIOUtility {
       }
     }
     else {
-      LOG.warn("Could not read directory: " + dir.getPath());
+      LOG.debug("Could not read directory: " + dir.getPath());
     }
     return fileNames;
   }
@@ -423,7 +423,7 @@ public final class SpecIOUtility {
   }
 
   /**
-   * @return
+   * @return the {@link SpecFileConfig} instance
    */
   public static SpecFileConfig getSpecFileConfigInstance() {
     if (s_specFileConfig == null) {
@@ -432,6 +432,9 @@ public final class SpecIOUtility {
     return s_specFileConfig;
   }
 
+  // TODO ASA The only property, that really can be customized in SpecFileConfig is the output dir. All source dirs need to be the in the same
+  // structure in all bundles (rt and project) because of hierarchic copying.
+  // --> Create a configuration possibility for the output dir and remove this setter.
   public static void setSpecFileConfig(SpecFileConfig specFileConfig) {
     SpecIOUtility.s_specFileConfig = specFileConfig;
   }
@@ -452,5 +455,25 @@ public final class SpecIOUtility {
       throw new ProcessingException("Error loading links file", e);
     }
     return p;
+  }
+
+  /**
+   * Copy files from all source bundles. If a file exists in multiple bundles, the version from the bundle with the
+   * highest priority overwrites the others.
+   * 
+   * @param destDir
+   * @param bundleRelativeSourceDirPath
+   * @param filenameFilter
+   *          ATTENTION: Must not depend on the <code>dir</code> parameter in
+   *          {@link FilenameFilter#accept(File dir, String name)} as this will be null in case of binary bundles.
+   * @throws ProcessingException
+   */
+  public static void copyFilesFromAllSourceBundles(File destDir, String bundleRelativeSourceDirPath, FilenameFilter filenameFilter) throws ProcessingException {
+    for (Bundle bundle : getSpecFileConfigInstance().getSourceBundles()) {
+      for (String file : listFiles(bundle, bundleRelativeSourceDirPath, filenameFilter)) {
+        File destFile = new File(destDir, file);
+        copyFile(bundle, bundleRelativeSourceDirPath + File.separator + file, destFile);
+      }
+    }
   }
 }

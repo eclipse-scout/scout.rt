@@ -390,4 +390,9 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   public ICodeRow<T> toCodeRow() {
     return new CodeRow<T>(m_row);
   }
+
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
 }

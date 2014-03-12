@@ -13,14 +13,12 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldBooleanPropertyExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldLabelExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldPropertyExtractor;
@@ -28,15 +26,15 @@ import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FormFieldProperty
 /**
  * The default configuration for {@link IFormField}
  */
-public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField> {
+public class DefaultFormFieldTableConfig extends AbstractEntityTableConfig<IFormField> {
 
   private boolean m_hierarchicLabels;
 
-  public DefaultFormFieldConfig() {
+  public DefaultFormFieldTableConfig() {
     this(true);
   }
 
-  public DefaultFormFieldConfig(boolean hierarchicLabels) {
+  public DefaultFormFieldTableConfig(boolean hierarchicLabels) {
     m_hierarchicLabels = hierarchicLabels;
   }
 
@@ -55,9 +53,6 @@ public class DefaultFormFieldConfig extends AbstractEntityListConfig<IFormField>
     extractors.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_MANDATORY, TEXTS.get("org.eclipse.scout.rt.spec.mandatory")));
     extractors.add(new FormFieldBooleanPropertyExtractor(IFormField.PROP_ENABLED, TEXTS.get("org.eclipse.scout.rt.spec.enabled")));
     extractors.add(new FormFieldPropertyExtractor(IStringField.PROP_MAX_LENGTH, TEXTS.get("org.eclipse.scout.rt.spec.length")));
-    if (Platform.inDevelopmentMode()) {
-      extractors.add(new SimpleTypeTextExtractor<IFormField>("#DEV# Classname"));
-    }
     extractors.add(new LinkableTypeExtractor<IFormField>());
     return extractors;
   }

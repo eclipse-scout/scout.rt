@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
@@ -25,13 +26,13 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
-import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * Some utility methods for {@link IDocTextExtractor}.
@@ -88,9 +89,11 @@ public final class DocGenUtility {
    * @param entities
    * @param config
    *          {@link IDocEntityConfig}
+   * @param transposedLayout
+   *          whether headers and entries are filled into table as columns instead of rows
    * @return {@link IDocTable}
    */
-  public static <T> IDocTable createDocTable(T entity, IDocEntityConfig<T> config) {
+  public static <T> IDocTable createDocTable(T entity, IDocEntityConfig<T> config, boolean transposedLayout) {
     List<IDocTextExtractor<T>> textExtractors = config.getPropertyTextExtractors();
     List<String[]> rows = new ArrayList<String[]>();
     String[] texts = DocGenUtility.getTexts(entity, textExtractors);
@@ -98,7 +101,7 @@ public final class DocGenUtility {
       rows.add(texts);
       String[][] rowArray = CollectionUtility.toArray(rows, String[].class);
       String[] headers = DocGenUtility.getHeaders(textExtractors);
-      return new DocTable(headers, rowArray);
+      return new DocTable(headers, rowArray, transposedLayout);
     }
     return null;
   }
@@ -112,9 +115,11 @@ public final class DocGenUtility {
    * @param entities
    * @param config
    *          {@link IDocEntityConfig}
+   * @param transposedLayout
+   *          whether headers and entries are filled into table as columns instead of rows
    * @return {@link IDocTable}
    */
-  public static <T> IDocSection createDocSection(Collection<T> entities, IDocEntityListConfig<T> config) {
+  public static <T> IDocSection createDocSection(Collection<T> entities, IDocEntityTableConfig<T> config, boolean transposedLayout) {
     List<IDocTextExtractor<T>> textExtractors = config.getTextExtractors();
     final List<String[]> rows = new ArrayList<String[]>();
     for (T e : entities) {
@@ -125,9 +130,10 @@ public final class DocGenUtility {
     }
     if (rows.size() > 0) {
       String[][] rowArray = CollectionUtility.toArray(rows, String[].class);
+      MatrixUtility.sortWithComparators(rowArray, config.getSortColumns());
       String[] headers = getHeaders(textExtractors);
-      IDocTable table = new DocTable(headers, rowArray);
-      return new SectionWithTable(config.getTitle(), table);
+      IDocTable table = new DocTable(headers, rowArray, transposedLayout);
+      return new Section(config.getTitle(), table);
     }
     return null;
   }

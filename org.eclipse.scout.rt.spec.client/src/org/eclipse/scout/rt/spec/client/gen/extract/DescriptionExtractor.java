@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.spec.client.gen.extract;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -47,7 +50,15 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
    * @return
    */
   private String getDocAssociatedWithClassId(T o) {
-    return TEXTS.getWithFallback(o.classId(), "");
+    ArrayList<String> classIdParts = new ArrayList<String>(Arrays.asList(o.classId().split(ITypeWithClassId.ID_CONCAT_SYMBOL)));
+    String text = null;
+    while (!classIdParts.isEmpty() && text == null) {
+      String classId = CollectionUtility.format(classIdParts, ITypeWithClassId.ID_CONCAT_SYMBOL);
+      text = TEXTS.getWithFallback(classId, null);
+      classIdParts.remove(classIdParts.size() - 1);
+    }
+
+    return text != null ? text : "";
   }
 
   /**

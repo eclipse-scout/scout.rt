@@ -11,35 +11,40 @@
 package org.eclipse.scout.rt.spec.client.out.internal;
 
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
-import org.eclipse.scout.rt.spec.client.out.IDocSectionHeading;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 
 /**
- * A basic documentation element containing a section with a table for descriptions.
+ * A basic documentation element containing a table for descriptions and/or subsections.
  */
-public class SectionWithTable implements IDocSection {
-  private final IDocTable m_table;
-  private final IDocSection[] m_subSections;
-  private final DocSectionHeading m_docSectionHeading;
+public class Section implements IDocSection {
+  protected final IDocTable m_table;
+  protected final IDocSection[] m_subSections;
+  protected String m_title;
+  protected String m_introduction;
 
-  public SectionWithTable(String title, IDocSection... subSections) {
-    this(title, null, subSections);
+  public Section(String title, IDocSection... subSections) {
+    this(title, null, null, subSections);
   }
 
-  public SectionWithTable(String title, IDocTable table, IDocSection... subSections) {
-    m_docSectionHeading = new DocSectionHeading(title);
+  public Section(String title, IDocTable table, IDocSection... subSections) {
+    this(title, null, table, subSections);
+  }
+
+  public Section(String title, String introduction, IDocTable table, IDocSection... subSections) {
+    m_title = title;
+    m_introduction = introduction;
     m_table = table;
     m_subSections = subSections;
   }
 
   @Override
   public String getTitle() {
-    return m_docSectionHeading.getName();
+    return m_title;
   }
 
   @Override
-  public IDocSectionHeading getHeading() {
-    return m_docSectionHeading;
+  public String getIntroduction() {
+    return m_introduction;
   }
 
   @Override

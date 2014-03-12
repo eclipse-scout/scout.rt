@@ -13,20 +13,21 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.page;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**
  *
  */
-public class TablePageExtractor<T extends IPageWithTable<? extends ITable>> extends AbstractNamedTextExtractor<T> {
+public class TablePageTitleExtractor<T extends IPageWithTable<? extends ITable>> extends AbstractNamedTextExtractor<T> {
 
-  public TablePageExtractor() {
+  public TablePageTitleExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.label"));
   }
 
   @Override
-  public String getText(T field) {
-    return MediawikiUtility.transformToWiki(field.getCell().getText());
+  public String getText(T page) {
+    return MediawikiUtility.createAnchor(SpecUtility.createAnchorId(page)) + MediawikiUtility.transformToWiki(page.getCell().getText());
   }
 }

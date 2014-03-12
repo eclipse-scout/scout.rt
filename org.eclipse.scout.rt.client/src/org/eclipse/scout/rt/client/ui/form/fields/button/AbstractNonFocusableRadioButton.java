@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
+
+@ClassId("292b7886-de8f-42ee-ab52-cd1b4bf3647e")
 public abstract class AbstractNonFocusableRadioButton<T> extends AbstractRadioButton<T> implements IRadioButton<T> {
 
   public AbstractNonFocusableRadioButton() {

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * Extracts information from {@link IFormField}s by visiting all fields.
@@ -40,8 +40,8 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
    */
   @Override
   public boolean visitField(IFormField field, int level, int fieldIndex) {
-    if (DocGenUtility.isAccepted(field, m_config.getFieldListConfig().getFilters())) {
-      String[] row = DocGenUtility.getTexts(field, m_config.getFieldListConfig().getTextExtractors());
+    if (DocGenUtility.isAccepted(field, m_config.getFormFieldTableConfig().getFilters())) {
+      String[] row = DocGenUtility.getTexts(field, m_config.getFormFieldTableConfig().getTextExtractors());
       m_rows.add(row);
     }
     return true;
@@ -50,11 +50,11 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
   @Override
   public List<IDocSection> getDocSections() {
     String[][] rowArray = CollectionUtility.toArray(m_rows, String[].class);
-    String[] headers = DocGenUtility.getHeaders(m_config.getFieldListConfig().getTextExtractors());
-    IDocTable table = new DocTable(headers, rowArray);
+    String[] headers = DocGenUtility.getHeaders(m_config.getFormFieldTableConfig().getTextExtractors());
+    IDocTable table = new DocTable(headers, rowArray, false);
     String title = TEXTS.get("org.eclipse.scout.rt.spec.fields");
     ArrayList<IDocSection> sections = new ArrayList<IDocSection>();
-    sections.add(new SectionWithTable(title, table));
+    sections.add(new Section(title, table));
     return sections;
   }
 

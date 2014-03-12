@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("a832c827-50ca-4a59-b8f3-31e620f329ec")
 public abstract class AbstractOkButton extends AbstractButton implements IButton {
 
   public AbstractOkButton() {

@@ -10,34 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
-/**
- * Extracts the value of a property
- */
-public class ActionPropertyExtractor<T extends IAction> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
-  private final String m_propertyName;
+public class HierarchicActionNodeLabelExtractor<T extends IActionNode<?>> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
 
-  /**
-   * @param propertyName
-   *          the name of the property (e.g. {@link IAction#PROP_TEXT}
-   * @param header
-   *          a header for the extractor
-   */
-  public ActionPropertyExtractor(String propertyName, String header) {
-    super(header);
-    m_propertyName = propertyName;
+  public HierarchicActionNodeLabelExtractor() {
+    super(TEXTS.get("org.eclipse.scout.rt.spec.label"));
   }
 
-  /**
-   * Reads the property of the action and returns its value converted to a String
-   */
   @Override
-  public String getText(T object) {
-    return MediawikiUtility.transformToWiki(object.getProperty(m_propertyName));
+  public String getText(T actionNode) {
+    return getIndent(actionNode) + MediawikiUtility.transformToWiki(actionNode.getText());
+  }
+
+  protected String getIndent(T actionNode) {
+    IActionNode<?> node = actionNode;
+    StringBuilder sb = new StringBuilder();
+    do {
+      node = node.getParent();
+      if (node != null) {
+        sb.append(SpecUtility.getDocConfigInstance().getIndent());
+      }
+    }
+    while (node != null);
+    return sb.toString();
   }
 
 }

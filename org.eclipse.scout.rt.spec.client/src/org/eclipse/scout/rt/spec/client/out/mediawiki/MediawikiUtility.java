@@ -14,13 +14,13 @@ package org.eclipse.scout.rt.spec.client.out.mediawiki;
  * Utilities for mediawiki
  */
 public final class MediawikiUtility {
-  private static final String[] ESCAPE_LIST = new String[]{"[", "]"};
+  private static final String[] ESCAPE_LIST = new String[]{"[", "]", "=", "*", "----", "#", "{", "--~"};
 
   private MediawikiUtility() {
   }
 
   /**
-   * Escape characters that are interpreted by mediawiki
+   * Escape character sequences that are interpreted by mediawiki
    * 
    * @param text
    * @return
@@ -59,8 +59,19 @@ public final class MediawikiUtility {
    * @param id
    * @return
    */
-  // TODO ASA unittest
   public static String createAnchor(String id) {
     return "{{a:" + id + "}}";
+  }
+
+  /**
+   * Creates a new String with all anchors removed and all links replaced by their display name.
+   * 
+   * @param input
+   * @return
+   */
+  public static String removeAnchorsAndLinks(String input) {
+    input = input.replaceAll("\\{\\{[^}]+}}", "");
+    input = input.replaceAll("\\[\\[([A-Za-z][A-Za-z0-9_\\$\\.-]+)\\|(.*?)]]", "$2");
+    return input;
   }
 }

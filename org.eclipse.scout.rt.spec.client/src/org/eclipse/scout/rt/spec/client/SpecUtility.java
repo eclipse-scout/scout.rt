@@ -20,6 +20,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
+import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 
 /**
  * General utilities for the spec plugin
@@ -27,6 +29,7 @@ import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
 public final class SpecUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecUtility.class);
   private static Set<Class<?>> s_allClasses;
+  private static IDocConfig s_docConfigInstance;
 
   private SpecUtility() {
   }
@@ -67,13 +70,49 @@ public final class SpecUtility {
         }
       });
     }
-    Set<Class<?>> filteredClasses = new HashSet<Class<?>>();
+    HashSet<Class<?>> filteredClasses = new HashSet<Class<?>>();
     for (Class c : s_allClasses) {
       if (filter.accept(c)) {
         filteredClasses.add(c);
       }
     }
     return filteredClasses;
+  }
+
+  /**
+   * @return the {@link IDocConfig} instance
+   */
+  public static IDocConfig getDocConfigInstance() {
+    if (s_docConfigInstance == null) {
+      s_docConfigInstance = new DefaultDocConfig();
+    }
+    return s_docConfigInstance;
+  }
+
+  public static void setDocConfig(IDocConfig specFileConfig) {
+    SpecUtility.s_docConfigInstance = specFileConfig;
+  }
+
+  /**
+   * Create an anchorId using the object's classId with {@link #createAnchorId(String)}
+   * 
+   * @param object
+   * @return
+   */
+  public static String createAnchorId(ITypeWithClassId object) {
+    String classId = object.classId();
+    return SpecUtility.createAnchorId(classId);
+  }
+
+  /**
+   * Prepends the classId with "c_" to make sure the anchor does not start with a digit, which is forbidden for IDs in
+   * HTML.
+   * 
+   * @param classId
+   * @return
+   */
+  public static String createAnchorId(String classId) {
+    return "c_" + classId;
   }
 
 }

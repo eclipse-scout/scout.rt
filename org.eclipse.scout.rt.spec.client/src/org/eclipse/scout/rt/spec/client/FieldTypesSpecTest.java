@@ -23,6 +23,6 @@ public class FieldTypesSpecTest extends AbstractTypeSpecTest {
   public static final String ID = "org.eclipse.scout.rt.spec.fieldtypes";
 
   public FieldTypesSpecTest() {
-    super(ID, TEXTS.get(ID), IFormField.class);
+    super(ID, TEXTS.get(ID), TEXTS.getWithFallback(ID + ".introduction", null), IFormField.class);
   }
 }

@@ -85,14 +85,14 @@ public class WikimediaWriterTest {
     String[] header = new String[]{"h1", "h2"};
     String[][] cells = new String[][]{{"a1", "a2"}, {"b1", "b2"}, {"c1", "c2"}};
     if (headers) {
-      return new DocTable(header, cells);
+      return new DocTable(header, cells, false);
     }
-    return new DocTable(null, cells);
+    return new DocTable(null, cells, false);
   }
 
   private IDocTable getTestTableNoHeaders() {
     String[][] cells = new String[][]{{"a1", "a2"}, {"b1", "b2"}, {"c1", "c2"}};
-    return new DocTable(null, cells);
+    return new DocTable(null, cells, false);
   }
 
   private String getTestTableWiki() {

@@ -14,9 +14,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.osgi.framework.Bundle;
 
-// TODO ASA javadoc
+/**
+ * Copy manually written mediawiki and image files from source bundles to output directory
+ */
 public class ManualSpecTest extends AbstractSpecGenTest {
 
   @Override
@@ -26,25 +27,19 @@ public class ManualSpecTest extends AbstractSpecGenTest {
   }
 
   protected void copyImages() throws ProcessingException {
-    File dest = getFileConfig().getImageDir();
+    File dest = SpecIOUtility.getSpecFileConfigInstance().getImageDir();
     dest.mkdirs();
-    for (Bundle bundle : getFileConfig().getSourceBundles()) {
-      for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeImagesSourceDirPath(), getFilter())) {
-        File destFile = new File(dest, file);
-        SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeImagesSourceDirPath() + File.separator + file, destFile);
-      }
-    }
+    String bundleRelativeSourceDirPath = SpecIOUtility.getSpecFileConfigInstance().getRelativeImagesSourceDirPath();
+    FilenameFilter filenameFilter = getFilter();
+    SpecIOUtility.copyFilesFromAllSourceBundles(dest, bundleRelativeSourceDirPath, filenameFilter);
   }
 
   protected void copyMediawikiFiles() throws ProcessingException {
-    File dest = getFileConfig().getMediawikiDir();
+    File dest = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir();
     dest.mkdirs();
-    for (Bundle bundle : getFileConfig().getSourceBundles()) {
-      for (String file : SpecIOUtility.listFiles(bundle, getFileConfig().getRelativeMediawikiSourceDirPath(), getFilter())) {
-        File destFile = new File(dest, file);
-        SpecIOUtility.copyFile(bundle, getFileConfig().getRelativeMediawikiSourceDirPath() + File.separator + file, destFile);
-      }
-    }
+    String bundleRelativeSourceDirPath = SpecIOUtility.getSpecFileConfigInstance().getRelativeMediawikiSourceDirPath();
+    FilenameFilter filenameFilter = getFilter();
+    SpecIOUtility.copyFilesFromAllSourceBundles(dest, bundleRelativeSourceDirPath, filenameFilter);
   }
 
   /**

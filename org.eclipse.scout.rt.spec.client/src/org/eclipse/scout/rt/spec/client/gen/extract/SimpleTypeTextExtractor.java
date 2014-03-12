@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.spec.client.gen.extract;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
- * An {@link IDocTextExtractor} with the simple class name as text.
+ * An {@link IDocTextExtractor} for the simple class name as text.
  */
 public class SimpleTypeTextExtractor<T> extends TypeExtractor<T> {
 
@@ -28,10 +28,14 @@ public class SimpleTypeTextExtractor<T> extends TypeExtractor<T> {
   /**
    * @param object
    *          the scout model entity
-   * @return the simple name of the objects type
+   * @return If the generic type is {@link Class} the name of the class is extracted else the name of the object^s
+   *         class.
    */
   @Override
   public String getText(T object) {
+    if (object instanceof Class) {
+      return ((Class) object).getSimpleName();
+    }
     return object.getClass().getSimpleName();
   }
 

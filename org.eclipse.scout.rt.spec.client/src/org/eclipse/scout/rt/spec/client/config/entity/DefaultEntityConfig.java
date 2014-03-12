@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
  */
 public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEntityConfig<T> {
 
+  private int m_topHeadingLevel = 2;
+
   /**
    * Default filters: Ignores Types annotated with {@link org.eclipse.scout.commons.annotations.Doc Doc#ignore()}==false
    */
@@ -47,6 +49,15 @@ public class DefaultEntityConfig<T extends ITypeWithClassId> implements IDocEnti
   @Override
   public IDocTextExtractor<T> getTitleExtractor() {
     return new SimpleTypeTextExtractor<T>();
+  }
+
+  @Override
+  public int getTopHeadingLevel() {
+    return m_topHeadingLevel;
+  }
+
+  public void setTopHeadingLevel(int topHeadingLevel) {
+    m_topHeadingLevel = topHeadingLevel;
   }
 
 }

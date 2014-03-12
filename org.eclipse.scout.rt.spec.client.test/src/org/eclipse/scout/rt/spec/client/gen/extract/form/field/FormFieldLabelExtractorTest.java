@@ -22,6 +22,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.junit.Test;
@@ -31,6 +32,8 @@ import org.junit.Test;
  */
 public class FormFieldLabelExtractorTest {
 
+  private String m_indent = SpecUtility.getDocConfigInstance().getIndent();
+
   @Test
   public void testGetTextFlat() {
     AbstractFormField testFormField = mock(AbstractFormField.class);
@@ -39,7 +42,7 @@ public class FormFieldLabelExtractorTest {
 
     FormFieldLabelExtractor ex = createExtractor(true);
     String text = ex.getText(testFormField);
-    assertFalse("Doc Text Invalid", text.startsWith(FormFieldLabelExtractor.INDENT));
+    assertFalse("Doc Text Invalid", text.startsWith(m_indent));
     assertTrue("Doc Text Invalid", text.contains(testLabel));
   }
 
@@ -73,7 +76,7 @@ public class FormFieldLabelExtractorTest {
 
     FormFieldLabelExtractor ex = createExtractor(true);
     String text = ex.getText(testFormField);
-    assertTrue("Doc Text Invalid", text.startsWith(FormFieldLabelExtractor.INDENT + FormFieldLabelExtractor.INDENT));
+    assertTrue("Doc Text Invalid", text.startsWith(m_indent + m_indent));
     assertTrue("Doc Text Invalid", text.contains(testLabel));
   }
 
@@ -81,9 +84,12 @@ public class FormFieldLabelExtractorTest {
   public void testGetLevel() {
     List<AbstractGroupBox> groupBoxTree = createGroupBoxTree();
     AbstractGroupBox superSuperBox = groupBoxTree.get(1);
+    when(superSuperBox.classId()).thenReturn("12345678");
     AbstractGroupBox superBox = groupBoxTree.get(2);
+    when(superBox.classId()).thenReturn("1234567");
 
     AbstractFormField testFormField = mock(AbstractFormField.class);
+    when(testFormField.classId()).thenReturn("123456");
 
     FormFieldLabelExtractor ex = createExtractor(true);
     assertEquals(0, ex.getLevel(testFormField));
@@ -109,8 +115,8 @@ public class FormFieldLabelExtractorTest {
     // hierarchic
     FormFieldLabelExtractor exHierarchic = createExtractor(true);
     assertEquals("Expected 0 indent levels", "", exHierarchic.getIndentation(superSuperBox));
-    assertEquals("Expected 1 indent levels", FormFieldLabelExtractor.INDENT, exHierarchic.getIndentation(superBox));
-    assertEquals("Expected 2 indent levels", FormFieldLabelExtractor.INDENT + FormFieldLabelExtractor.INDENT, exHierarchic.getIndentation(testFormField));
+    assertEquals("Expected 1 indent levels", m_indent, exHierarchic.getIndentation(superBox));
+    assertEquals("Expected 2 indent levels", m_indent + m_indent, exHierarchic.getIndentation(testFormField));
 
     //flat
     FormFieldLabelExtractor exFlat = createExtractor(false);

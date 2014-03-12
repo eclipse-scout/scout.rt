@@ -1020,21 +1020,20 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @Override
   public String classId() {
-    String computedClassId = computeClassId();
-    boolean prependFormId = !getClass().isAnnotationPresent(ClassId.class);
+    StringBuilder classId = new StringBuilder(computeClassId());
 
-    if (prependFormId) {
-      String formClassId = getForm() != null ? getForm().classId() + ID_CONCAT_SYMBOL : "";
-      computedClassId = formClassId + computedClassId;
+    boolean appendFormId = !getClass().isAnnotationPresent(ClassId.class);
+    if (appendFormId && getForm() != null) {
+      classId.append(ID_CONCAT_SYMBOL).append(getForm().classId());
     }
     boolean duplicate = existsDuplicateClassId();
     if (duplicate) {
-      LOG.warn("Found a duplicate classid for {}, adding field index. Override classId for dynamically injected fields.", computedClassId);
+      LOG.warn("Found a duplicate classid for {}, adding field index. Override classId for dynamically injected fields.", classId);
       int fieldIndex = getParentField().getFieldIndex(this);
-      computedClassId += ID_CONCAT_SYMBOL + fieldIndex;
+      classId.append(ID_CONCAT_SYMBOL).append(fieldIndex);
     }
 
-    return computedClassId;
+    return classId.toString();
   }
 
   /**
@@ -1049,8 +1048,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     fieldId.append(simpleClassId);
     List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
-    Collections.reverse(enclosingFieldList);
-    for (ICompositeField enclosingField : enclosingFieldList) {
+    for (int i = enclosingFieldList.size() - 1; i >= 0; --i) {
+      ICompositeField enclosingField = enclosingFieldList.get(i);
       String enclosingClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(enclosingField.getClass(), true);
       fieldId.append(ID_CONCAT_SYMBOL).append(enclosingClassId);
     }

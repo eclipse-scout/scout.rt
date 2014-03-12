@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.gen.extract.ColumnTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnHeaderTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnHeaderTooltipExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.column.ColumnSortIndexExtractor;
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilte
 /**
  * The default configuration for {@link IColumn}
  */
-public class DefaultColumnListConfig extends AbstractEntityListConfig<IColumn<?>> {
+public class DefaultColumnTableConfig extends AbstractEntityTableConfig<IColumn<?>> {
 
   /**
    * Default properties for {@link IColumn} with
@@ -45,7 +45,7 @@ public class DefaultColumnListConfig extends AbstractEntityListConfig<IColumn<?>
     propertyTemplate.add(new ColumnHeaderTooltipExtractor());
     propertyTemplate.add(new ColumnSortIndexExtractor());
     propertyTemplate.add(new ColumnWidthExtractor());
-    propertyTemplate.add(new LinkableTypeExtractor<IColumn<?>>());
+    propertyTemplate.add(new ColumnTypeExtractor());
     return propertyTemplate;
   }
 

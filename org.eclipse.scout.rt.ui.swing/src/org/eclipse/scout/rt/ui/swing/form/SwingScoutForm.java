@@ -330,7 +330,14 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
           }
         }
         if (wp == null) {
-          wp = new WidgetPrinter(SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane()));
+          Component printComponent;
+          if (getScoutForm().getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
+            printComponent = m_viewComposite.getSwingContentPane();
+          }
+          else {
+            printComponent = SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane());
+          }
+          wp = new WidgetPrinter(printComponent);
         }
       }
       if (wp != null) {

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -35,6 +36,7 @@ import org.osgi.framework.ServiceRegistration;
 public class LinkableTypeExtractorTest {
 
   private LinkableTypeExtractor<Object> m_extractor = new LinkableTypeExtractor<Object>();
+  private LinkableTypeExtractor<Object> m_assumeTypesWithClassIdDocumentedExtractor = new LinkableTypeExtractor<Object>(ITypeWithClassId.class, true);
 
   @Before
   public void before() {
@@ -48,14 +50,20 @@ public class LinkableTypeExtractorTest {
 
   @Test
   public void testGetTextDocsAvailable() {
-    List<ServiceRegistration> service = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 5, new SpecTestDocsTextProviderService());
+    List<ServiceRegistration> service = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 1000, new SpecTestDocsTextProviderService());
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
     try {
-      testGetTextInternal(new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName());
-      testGetTextInternal(new TestClassWithClassIdAndDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class));
-      testGetTextInternal(new TestSubClassWithFallbackClassId(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class));
-      testGetTextInternal(new TestSubClassWithOwnClassIdNoDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class));
-      testGetTextInternal(new TestSubClassWithOwnClassIdAndOwnDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestSubClassWithOwnClassIdAndOwnDoc.class));
+      testGetTextInternal(m_extractor, new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName(), false);
+      testGetTextInternal(m_extractor, new TestClassWithClassIdAndDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class), true);
+      testGetTextInternal(m_extractor, new TestSubClassWithFallbackClassId(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class), true);
+      testGetTextInternal(m_extractor, new TestSubClassWithOwnClassIdNoDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class), true);
+      testGetTextInternal(m_extractor, new TestSubClassWithOwnClassIdAndOwnDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestSubClassWithOwnClassIdAndOwnDoc.class), true);
+
+      testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName(), false);
+      testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestClassWithClassIdAndDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestClassWithClassIdAndDoc.class), true);
+      testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithFallbackClassId(), TestSubClassWithFallbackClassId.class.getSimpleName(), true);
+      testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithOwnClassIdNoDoc(), TestSubClassWithOwnClassIdNoDoc.class.getSimpleName(), true);
+      testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithOwnClassIdAndOwnDoc(), "Name for " + ConfigurationUtility.getAnnotatedClassIdWithFallback(TestSubClassWithOwnClassIdAndOwnDoc.class), true);
     }
     finally {
       TestingUtility.unregisterServices(service);
@@ -64,16 +72,29 @@ public class LinkableTypeExtractorTest {
 
   @Test
   public void testGetTextMissingDocs() {
-    testGetTextInternal(new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName());
-    testGetTextInternal(new TestClassWithClassIdAndDoc(), TestClassWithClassIdAndDoc.class.getSimpleName());
-    testGetTextInternal(new TestSubClassWithFallbackClassId(), TestSubClassWithFallbackClassId.class.getSimpleName());
-    testGetTextInternal(new TestSubClassWithOwnClassIdNoDoc(), TestSubClassWithOwnClassIdNoDoc.class.getSimpleName());
-    testGetTextInternal(new TestSubClassWithOwnClassIdAndOwnDoc(), TestSubClassWithOwnClassIdAndOwnDoc.class.getSimpleName());
+    testGetTextInternal(m_extractor, new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName(), false);
+    testGetTextInternal(m_extractor, new TestClassWithClassIdAndDoc(), TestClassWithClassIdAndDoc.class.getSimpleName(), false);
+    testGetTextInternal(m_extractor, new TestSubClassWithFallbackClassId(), TestSubClassWithFallbackClassId.class.getSimpleName(), false);
+    testGetTextInternal(m_extractor, new TestSubClassWithOwnClassIdNoDoc(), TestSubClassWithOwnClassIdNoDoc.class.getSimpleName(), false);
+    testGetTextInternal(m_extractor, new TestSubClassWithOwnClassIdAndOwnDoc(), TestSubClassWithOwnClassIdAndOwnDoc.class.getSimpleName(), false);
+
+    testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestClassWithoutClassId(), TestClassWithoutClassId.class.getSimpleName(), false);
+    testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestClassWithClassIdAndDoc(), TestClassWithClassIdAndDoc.class.getSimpleName(), true);
+    testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithFallbackClassId(), TestSubClassWithFallbackClassId.class.getSimpleName(), true);
+    testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithOwnClassIdNoDoc(), TestSubClassWithOwnClassIdNoDoc.class.getSimpleName(), true);
+    testGetTextInternal(m_assumeTypesWithClassIdDocumentedExtractor, new TestSubClassWithOwnClassIdAndOwnDoc(), TestSubClassWithOwnClassIdAndOwnDoc.class.getSimpleName(), true);
   }
 
-  private void testGetTextInternal(Object object, String expectedSubstring) {
-    String text = m_extractor.getText(object);
+  private void testGetTextInternal(LinkableTypeExtractor<Object> extractor, Object object, String expectedSubstring, boolean expectLink) {
+    String text = extractor.getText(object);
     assertTrue("Extracted text [" + text + "] does not contain expected substring [" + expectedSubstring + "].", text.contains(expectedSubstring));
+    if (expectLink) {
+      assertTrue("Extracted text [" + text + "] does not contain link syntax [\"[[...\"].", text.contains("[["));
+    }
+    else {
+      assertFalse("Extracted text [" + text + "] should not contain link syntax [\"[[...\"].", text.contains("[["));
+    }
+
   }
 
   private class TestClassWithoutClassId {

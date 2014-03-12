@@ -24,6 +24,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId1;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId2;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldWithoutClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox1;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -38,6 +41,7 @@ import org.junit.Test;
  * @since 3.10.0
  */
 public class AbstractFormFieldTest {
+  private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
 
   /**
@@ -68,6 +72,22 @@ public class AbstractFormFieldTest {
     SimpleTestFormField testField = new SimpleTestFormField();
     String classId = testField.classId();
     assertEquals("class id: no hierarchy", testField.getClass().getSimpleName(), classId);
+  }
+
+  @Test
+  public void testClassIdWithFormClassId() throws ProcessingException {
+    TestFormWithClassId testForm = new TestFormWithClassId();
+    TestFieldWithoutClassId field = testForm.getFieldByClass(TestFormWithClassId.MainBox.TestFieldWithoutClassId.class);
+    assertEquals("class id not as expected", field.getClass().getSimpleName() + ITypeWithClassId.ID_CONCAT_SYMBOL + TEST_CLASS_ID, field.classId());
+  }
+
+  @Test
+  public void testDuplicateClassId() throws ProcessingException {
+    TestFormWithClassId testForm = new TestFormWithClassId();
+    TestFieldDuplicateClassId1 field1 = testForm.getFieldByClass(TestFieldDuplicateClassId1.class);
+    TestFieldDuplicateClassId2 field2 = testForm.getFieldByClass(TestFieldDuplicateClassId2.class);
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "1", field1.classId());
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "2", field2.classId());
   }
 
   /**
@@ -109,6 +129,30 @@ public class AbstractFormFieldTest {
   //test classes
   @ClassId(TEST_CLASS_ID)
   class TestClassWithClassId extends AbstractFormField {
+  }
+
+  @ClassId(TEST_CLASS_ID)
+  class TestFormWithClassId extends AbstractForm {
+
+    public TestFormWithClassId() throws ProcessingException {
+      super();
+    }
+
+    public class MainBox extends AbstractGroupBox {
+      @Order(10.0)
+      public class TestFieldWithoutClassId extends AbstractFormField {
+      }
+
+      @Order(20.0)
+      @ClassId(DUPLICATE_CLASS_ID)
+      public class TestFieldDuplicateClassId1 extends AbstractFormField {
+      }
+
+      @Order(30.0)
+      @ClassId(DUPLICATE_CLASS_ID)
+      public class TestFieldDuplicateClassId2 extends AbstractFormField {
+      }
+    }
   }
 
   class SimpleTestFormField extends AbstractFormField {

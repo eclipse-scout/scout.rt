@@ -12,9 +12,10 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public interface ICode<T> {
+public interface ICode<T> extends ITypeWithClassId {
 
   /**
    * The id represented by this code, this is <b>not</b> the same as {@link #getValue()}

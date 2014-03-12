@@ -13,10 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
+import org.eclipse.scout.commons.annotations.ClassId;
 
 /**
  * Abstract class for a RadioButton.
  */
+@ClassId("1221cfac-4636-4d53-8485-07872f956fc1")
 public abstract class AbstractRadioButton<T> extends AbstractButton implements IRadioButton<T> {
 
   public AbstractRadioButton() {

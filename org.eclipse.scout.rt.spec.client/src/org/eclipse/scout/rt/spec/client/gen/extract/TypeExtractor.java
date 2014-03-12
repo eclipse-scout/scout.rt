@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 /**
  * An {@link IDocTextExtractor} with the fully qualified class name as text.
  */
-public class TypeExtractor<T> extends AbstractNamedTextExtractor<T> implements IDocTextExtractor<T> {
+public class TypeExtractor<T> extends AbstractNamedTextExtractor<T> {
 
   public TypeExtractor() {
     this(TEXTS.get("org.eclipse.scout.rt.spec.type"));

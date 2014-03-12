@@ -17,7 +17,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  */
 public class LookupCallTypesSpecTest extends AbstractTypeSpecTest {
 
+  public static final String ID = "org.eclipse.scout.rt.spec.lookupcalltypes";
+
   public LookupCallTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.lookupcalltypes", TEXTS.get("org.eclipse.scout.rt.spec.lookupcalltypes"), LookupCall.class);
+    super(ID, TEXTS.get(ID), TEXTS.getWithFallback(ID + ".introduction", null), LookupCall.class, true);
   }
 }

@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.SmartFieldTypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.field.FieldDetailTitleExtractor;
 
 /**
@@ -24,7 +26,10 @@ public class DefaultSmartFieldConfig extends DefaultEntityConfig<ISmartField<?>>
 
   @Override
   public List<IDocTextExtractor<ISmartField<?>>> getPropertyTextExtractors() {
-    return new ArrayList<IDocTextExtractor<ISmartField<?>>>();
+    ArrayList<IDocTextExtractor<ISmartField<?>>> extrators = new ArrayList<IDocTextExtractor<ISmartField<?>>>();
+    extrators.add(new DescriptionExtractor<ISmartField<?>>());
+    extrators.add(new SmartFieldTypeExtractor());
+    return extrators;
   }
 
   @Override

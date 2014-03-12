@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
-import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 
 /**
  * A template for describing the configuration of the generated documentation.
@@ -41,12 +41,12 @@ public interface IDocConfig {
   /**
    * Configuration for documenting {@link IColumn}.
    */
-  IDocEntityListConfig<IColumn<?>> getColumnConfig();
+  IDocEntityTableConfig<IColumn<?>> getColumnTableConfig();
 
   /**
    * Configuration for documenting {@link IMenu}.
    */
-  IDocEntityListConfig<IMenu> getMenuConfig();
+  IDocEntityTableConfig<IMenu> getMenuTableConfig();
 
   /**
    * Configuration for documenting {@link ITableField}.
@@ -61,7 +61,7 @@ public interface IDocConfig {
   /**
    * Configuration for documenting {@link Field}s.
    */
-  IDocEntityListConfig<IFormField> getFieldListConfig();
+  IDocEntityTableConfig<IFormField> getFormFieldTableConfig();
 
   /**
    * Configuration for table page {@link IPageWithTable}.
@@ -69,8 +69,98 @@ public interface IDocConfig {
   IDocEntityConfig<IPageWithTable<? extends ITable>> getTablePageConfig();
 
   /**
-   * Configuration for types (eg. field types, column types, ...)
+   * Configuration suitable for different types (eg. field types, column types, ...)
    */
-  IDocEntityListConfig<Class<?>> getTypesConfig();
+  IDocEntityTableConfig<Class<?>> getGenericTypesTableConfig();
+
+  /**
+   * Configuration for CodeTypes
+   */
+  IDocEntityTableConfig<Class<?>> getCodeTypeTypesTableConfig();
+
+  /**
+   * @return default top heading level for form spec
+   */
+  int getDefaultTopHeadingLevel();
+
+  /**
+   * setter for {@link #getDefaultTopHeadingLevel()}
+   * 
+   * @param topHeadingLevel
+   */
+  void setTopHeadingLevel(int topHeadingLevel);
+
+  /**
+   * setter for {@link #getCodeTypeTypesTableConfig()}
+   * 
+   * @param codeTypeTypesTableConfig
+   */
+  void setCodeTypeTypesTableConfig(IDocEntityTableConfig<Class<?>> codeTypeTypesTableConfig);
+
+  /**
+   * setter for {@link #getGenericTypesTableConfig()}
+   * 
+   * @param genericTypesTableConfig
+   */
+  void setGenericTypesTableConfig(IDocEntityTableConfig<Class<?>> genericTypesTableConfig);
+
+  /**
+   * setter for {@link #getTablePageConfig()}
+   * 
+   * @param tablePageConfig
+   */
+  void setTablePageConfig(IDocEntityConfig<IPageWithTable<? extends ITable>> tablePageConfig);
+
+  /**
+   * @param smartFieldConfig
+   */
+  void setSmartFieldConfig(IDocEntityConfig<ISmartField<?>> smartFieldConfig);
+
+  /**
+   * setter for {@link #getTableFieldConfig()}
+   * 
+   * @param tableFieldConfig
+   */
+  void setTableFieldConfig(IDocEntityConfig<ITableField<? extends ITable>> tableFieldConfig);
+
+  /**
+   * setter for {@link #getMenuTableConfig()}
+   * 
+   * @param menuTableConfig
+   */
+  void setMenuTableConfig(IDocEntityTableConfig<IMenu> menuTableConfig);
+
+  /**
+   * setter for {@link #getColumnTableConfig()}
+   * 
+   * @param columnTableConfig
+   */
+  void setColumnTableConfig(IDocEntityTableConfig<IColumn<?>> columnTableConfig);
+
+  /**
+   * setter for {@link #getFormFieldTableConfig()}
+   * 
+   * @param formFieldTableConfig
+   */
+  void setFormFieldTableConfig(IDocEntityTableConfig<IFormField> formFieldTableConfig);
+
+  /**
+   * setter for {@link #getFormConfig()}
+   * 
+   * @param formConfig
+   */
+  void setFormConfig(IDocEntityConfig<IForm> formConfig);
+
+  /**
+   * @return String for indentation inside table cell. This String needs to be repeated for each indent level.
+   */
+  String getIndent();
+
+  /**
+   * setter for {@link #getIndent()}
+   * 
+   * @param indent
+   */
+  void setIndent(String indent);
 
 }

@@ -13,12 +13,14 @@ package org.eclipse.scout.rt.spec.client.gen;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.extension.client.ui.action.menu.AbstractExtensibleMenu;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
-import org.eclipse.scout.rt.spec.client.out.internal.SectionWithTable;
+import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
  * A visitor for {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}s that collects
@@ -42,17 +44,27 @@ public class SmartFieldVisitor implements IDocFormFieldVisitor {
     return true;
   }
 
-  /**
-   *
-   */
-  private IDocSection createDocSection(ISmartField<?> field) {
+  protected IDocSection createDocSection(ISmartField<?> field) {
     String title = m_config.getSmartFieldConfig().getTitleExtractor().getText(field);
-    IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig());
-    IDocSection menuSection = DocGenUtility.createDocSection(field.getMenus(), m_config.getMenuConfig());
-    if (menuSection != null) {
-      return new SectionWithTable(title, docTable, menuSection);
+    IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig(), true);
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
+    for (IMenu menu : field.getMenus()) {
+      addMenuRecursive(menuList, menu);
     }
-    return new SectionWithTable(title, docTable);
+    IDocSection menuSection = DocGenUtility.createDocSection(menuList, m_config.getMenuTableConfig(), false);
+    if (menuSection != null) {
+      return new Section(title, docTable, menuSection);
+    }
+    return new Section(title, docTable);
+  }
+
+  protected void addMenuRecursive(ArrayList<IMenu> menuList, IMenu menu) {
+    menuList.add(menu);
+    if (menu instanceof AbstractExtensibleMenu) {
+      for (IMenu subMenu : ((AbstractExtensibleMenu) menu).getChildActions()) {
+        addMenuRecursive(menuList, subMenu);
+      }
+    }
   }
 
   @Override

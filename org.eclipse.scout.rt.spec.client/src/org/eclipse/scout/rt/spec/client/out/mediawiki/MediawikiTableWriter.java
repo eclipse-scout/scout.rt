@@ -71,6 +71,7 @@ public class MediawikiTableWriter {
    *          {@link IDocTable} containing row headers and cells.
    * @throws IOException
    */
+  // TODO ASA move switch whether to print transposed in this class
   public void appendTableTransposed(IDocTable table) throws IOException {
     m_writer.append(TABLE_START);
     m_writer.append(StringUtility.nvl(m_table_options, ""));
@@ -130,7 +131,7 @@ public class MediawikiTableWriter {
   }
 
   public void appendHeading(String name, int level) throws IOException {
-    String prefix = repeat(HEADING_CHAR, level);
+    String prefix = StringUtility.repeat(String.valueOf(HEADING_CHAR), level);
     m_writer.append(prefix);
     m_writer.append(" ");
     m_writer.append(name);
@@ -139,13 +140,13 @@ public class MediawikiTableWriter {
     m_writer.append(NEWLINE);
   }
 
-  // TODO ASA replace with StringUtility.repeat()
-  private String repeat(char c, int n) {
-    StringBuilder b = new StringBuilder();
-    for (int i = 0; i < n; i++) {
-      b.append(c);
-    }
-    return b.toString();
+  /**
+   * @param text
+   * @throws IOException
+   */
+  public void appendText(String text) throws IOException {
+    m_writer.append(text);
+    m_writer.append(NEWLINE);
   }
 
 }
