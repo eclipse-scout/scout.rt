@@ -138,13 +138,13 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
     getCellValue = Scout.DesktopMatrix.getCellValue;
 
   // collect data from table
-  for (r = 0; r < this._table.length; r++) {
+  for (r = 0; r < this._table.rows.length; r++) {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = getCellValue(this._table[r][this._allAxis[k].column]);
+      key = getCellValue(this._table.rows[r].cells[this._allAxis[k].column]);
       normKey = this._allAxis[k].norm(key);
-      if (normKey) {
+      if (normKey !== undefined) {
         this._allAxis[k].add(normKey);
         keys.push(normKey);
       }
@@ -154,9 +154,9 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = getCellValue(this._table[r][this._allData[v].column]);
+      data = getCellValue(this._table.rows[r].cells[this._allData[v].column]);
       normData = this._allData[v].norm(data);
-      if (normData) {
+      if (normData !== undefined) {
         values.push(normData);
       }
     }
@@ -232,8 +232,8 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
 
-    for (var r = 0; r < this._table.length; r++) {
-      var v = getCellValue(this._table[r][c]);
+    for (var r = 0; r < this._table.rows.length; r++) {
+      var v = getCellValue(this._table.rows[r].cells[c]);
       if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
 
@@ -243,17 +243,20 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
 };
 
 Scout.DesktopMatrix.getCellValue = function (cell) {
-  if (!cell) {
+  if (cell == null) { //cell may be a number so don't use !cell
     return null;
   }
   if (typeof cell !== 'object') {
     return cell;
   }
-  return cell.value || cell.text;
+  if (cell.value !== undefined) {
+    return cell.value;
+  }
+  return cell.text;
 };
 
 Scout.DesktopMatrix.getCellText = function (cell) {
-  if (!cell) {
+  if (cell == null) { //cell may be a number so don't use !cell
     return '';
   }
   if (typeof cell !== 'object') {

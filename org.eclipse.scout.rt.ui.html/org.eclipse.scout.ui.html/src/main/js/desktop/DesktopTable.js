@@ -3,29 +3,32 @@
 
 Scout.DesktopTable = function (scout, $parent, model) {
   this.model = model;
-  // data and a row-pointer is used by many functions, may be very large
-  this._table;
+  this.scout = scout;
+  this._$desktopTable;
   this._$tableData;
   this._$tableDataScroll;
   this._$infoSelect;
   this._$infoFilter;
   this._$infoLoad;
-  this.sumData = sumData;
+  this._tableHeader;
+  this.scout.widgetMap[model.table.id] = this;
+  this._$parent = $parent;
+};
+
+Scout.DesktopTable.prototype.render = function () {
+  //create container
+  this._$desktopTable = this._$parent.appendDiv('DesktopTable');
+
+  var $tableHeader = this._$desktopTable.appendDiv('TableHeader'),
+    $tableData = this._$desktopTable.appendDiv('TableData'),
+    $tableFooter = this._$desktopTable.appendDiv('TableFooter'),
+    $tableControl = this._$desktopTable.appendDiv('TableControl');
+
+  this._$tableDataScroll = $tableData.appendDiv('TableDataScroll');
+  this._$tableData = $tableData;
+  this._scrollbar = new Scout.Scrollbar(this._$tableDataScroll, 'y');
 
   var that = this;
-
-  //create container
-  var $desktopTable = $parent.appendDiv('DesktopTable'),
-    $tableHeader = $desktopTable.appendDiv('TableHeader'),
-    $tableData = $desktopTable.appendDiv('TableData'),
-    $tableFooter = $desktopTable.appendDiv('TableFooter'),
-    $tableControl = $desktopTable.appendDiv('TableControl');
-  this._$tableData = $tableData;
-
-  var $tableDataScroll = $tableData.appendDiv('TableDataScroll'),
-    scrollbar = new Scout.Scrollbar($tableDataScroll, 'y');
-  this._$tableDataScroll = $tableDataScroll;
-
   var $controlContainer = $tableControl.appendDiv('ControlContainer'),
     $controlResizeTop = $tableControl.appendDiv('ControlResizeTop'),
     $controlResizeBottom = $tableControl.appendDiv('ControlResizeBottom'),
@@ -37,7 +40,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
   this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
   this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', resetFilter);
-  this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', loadData);
+  this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
 
   // control buttons have mouse over effects
   $("body").on("mouseenter", "#control_graph, #control_chart, #control_map, #control_organise",
@@ -51,14 +54,14 @@ Scout.DesktopTable = function (scout, $parent, model) {
     });
 
   // create header
-  var tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, model.table.columns);
+  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, this.model.table.columns);
 
   // load data and create rows
-  loadData();
+  this._loadData();
 
   // update chart button
-  if(model.chart) {
-    $controlChart.data('label', model.chart.label)
+  if(this.model.chart) {
+    $controlChart.data('label', this.model.chart.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlChart);
@@ -67,8 +70,8 @@ Scout.DesktopTable = function (scout, $parent, model) {
   }
 
   // update or disable graph button
-  if (model.graph) {
-    $controlGraph.data('label', model.graph.label)
+  if (this.model.graph) {
+    $controlGraph.data('label', this.model.graph.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlGraph);
@@ -77,8 +80,8 @@ Scout.DesktopTable = function (scout, $parent, model) {
   }
 
   // update or disable map button
-  if (model.map) {
-    $controlMap.data('label', model.map.label)
+  if (this.model.map) {
+    $controlMap.data('label', this.model.map.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
       .click(controlMap);
@@ -117,10 +120,10 @@ Scout.DesktopTable = function (scout, $parent, model) {
       $clicked.parent().removeClass('resize-on');
 
       //adjust table
-      $tableData.animateAVCSD('height',
-        parseFloat($desktopTable.css('height')) - 93,
+      that._$tableData.animateAVCSD('height',
+        parseFloat(that._$desktopTable.css('height')) - 93,
         function () {$(this).css('height', 'calc(100% - 85px'); },
-        scrollbar.initThumb.bind(scrollbar),
+          that._scrollbar.initThumb.bind(that._scrollbar),
         500);
 
       // visual: reset label and close control
@@ -135,10 +138,10 @@ Scout.DesktopTable = function (scout, $parent, model) {
       $clicked.parent().addClass('resize-on');
 
       //adjust table
-      $tableData.animateAVCSD('height',
-        parseFloat($desktopTable.css('height')) - 444,
+      that._$tableData.animateAVCSD('height',
+        parseFloat(that._$desktopTable.css('height')) - 444,
         function () {$(this).css('height', 'calc(100% - 430px'); },
-        scrollbar.initThumb.bind(scrollbar),
+          that._scrollbar.initThumb.bind(that._scrollbar),
         500);
 
       // visual: update label, size container and control
@@ -153,19 +156,19 @@ Scout.DesktopTable = function (scout, $parent, model) {
   }
 
   function controlChart (event) {
-    new Scout.DesktopTableChart(scout, $controlContainer, model.table.columns, that._table, filterCallback);
+    new Scout.DesktopTableChart(that.scout, $controlContainer, that.model.table, filterCallback);
   }
 
   function controlGraph (event) {
-    new Scout.DesktopTableGraph(scout, $controlContainer, model);
+    new Scout.DesktopTableGraph(that.scout, $controlContainer, that.model);
   }
 
   function controlMap (event) {
-    new Scout.DesktopTableMap(scout, $controlContainer, model, that._table, filterCallback);
+    new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
   }
 
   function controlOrganize (event) {
-    new Scout.DesktopTableOrganize(scout, $controlContainer, model, model.table.columns, that);
+    new Scout.DesktopTableOrganize(that.scout, $controlContainer, that.model, that.model.table.columns, that);
   }
 
   function resizeControl (event) {
@@ -176,13 +179,13 @@ Scout.DesktopTable = function (scout, $parent, model) {
     var offset = (this.id == 'ControlResizeTop')  ? 58 : 108;
 
     function resizeMove(event){
-      var h = $parent.outerHeight() - event.pageY + offset;
-      if ($parent.height() < h + 50) return false;
+      var h = that._$parent.outerHeight() - event.pageY + offset;
+      if (that._$parent.height() < h + 50) return false;
 
       $tableControl.height(h);
-      $tableData.height('calc(100% - ' + (h + 30) + 'px)');
+      that._$tableData.height('calc(100% - ' + (h + 30) + 'px)');
       $controlContainer.height(h - 60);
-      scrollbar.initThumb();
+      that._scrollbar.initThumb();
     }
 
     function resizeEnd(event){
@@ -197,207 +200,11 @@ Scout.DesktopTable = function (scout, $parent, model) {
     return false;
   }
 
-  function loadData () {
-    var response = scout.sendSync('table', model.outlineId, {"nodeId":model.id});
-    that._table = response.events[0].rows;
-    $('.table-row').remove();
-    drawData(0);
-    that._setInfoSelect(0, false);
-  }
-
-  function drawData (startRow) {
-    // this function has to be fast
-    var rowString = '';
-
-    for (var r = startRow; r < Math.min(that._table.length, startRow + 100); r++) {
-      var row = that._table[r];
-
-      rowString += '<div class="table-row">';
-
-      for (var c = 0; c < row.length; c++) {
-        var column = model.table.columns[c],
-          width = column.width,
-          style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
-          allign = (column.type == 'number') ? 'text-align: right; ' : '';
-          value = Scout.DesktopMatrix.getCellText(row[c]);
-
-        rowString += '<div style = "' + style + allign + '">' + value + '</div>';
-      }
-
-      rowString += '</div>';
-    }
-
-    // append block of rows
-    $(rowString)
-      .appendTo($tableDataScroll)
-      .on('mousedown', '', clickData)
-      .width(tableHeader.totalWidth + 4);
-
-    // update info and scrollbar
-    that._setInfoLoad(r);
-    scrollbar.initThumb();
-
-    // repaint and append next block
-    if (r < that._table.length) {
-      setTimeout(function() { drawData(startRow + 100); }, 0);
-    }
-  }
-
-  function sumData (draw, groupColumn) {
-    $('.table-row-sum', $tableDataScroll).animateAVCSD('height', 0, $.removeThis);
-
-    if (draw) {
-      var groupValue,
-        $rows = $('.table-row', $tableDataScroll);
-        $sumRow = $.makeDiv('', 'table-row-sum'),
-        sum = [];
-
-      for (var r = 0; r < $rows.length; r++) {
-        var $cells = $rows.eq(r).children();
-
-        for (var c = 0; c < model.table.columns.length; c++) {
-          var value = $cells.eq(c).text();
-          if ( model.table.columns[c].type == 'number') {
-            sum[c] = (sum[c] || 0) + parseFloat(value);
-          }
-        }
-
-        if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
-            (r == $rows.length - 1)) && sum.length > 0) {
-          for (var c = 0; c < model.table.columns.length; c++) {
-            var $div;
-
-            if (typeof sum[c] == 'number')
-              $div = $.makeDiv('', '', sum[c])
-                .css('text-align', 'right');
-            else if (c == groupColumn) {
-              $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
-              .css('text-align', 'left');
-            } else {
-              $div = $.makeDiv('', '', '&nbsp')
-            }
-
-            $div.appendTo($sumRow).width(model.table.columns[c].width);
-          }
-
-          $sumRow.insertAfter($rows.eq(r))
-            .width(tableHeader.totalWidth + 4)
-            .css('height', 0)
-            .animateAVCSD('height', 34);
-
-          $sumRow = $.makeDiv('', 'table-row-sum');
-          sum = [];
-        }
-      }
-    }
-
-    // update scrollbar
-    scrollbar.initThumb();
-  }
-
-  function clickData (event) {
-    var $row = $(event.delegateTarget),
-      add = true,
-      first;
-
-    // click without ctrl always starts new selection, with ctrl toggle
-    if (event.shiftKey) {
-      first = $('.row-selected').first().index();
-    } else if (event.ctrlKey) {
-      add = !$row.hasClass('row-selected');
-    } else {
-      $('.row-selected').removeClass('row-selected');
-    }
-
-    // just a click...
-    selectData(event);
-
-    // ...or movement with held mouse button
-    $(".table-row").one("mousemove", function(event){
-      selectData(event);
-    });
-
-    // remove all events
-    $(".table-row").one("mouseup", function(event){
-      $(".table-row").unbind("mousemove");
-    });
-
-    // action for all affected rows
-    function selectData (event) {
-      // affected rows between $row and Target
-      var firstIndex = first || $row.index(),
-        lastIndex = $(event.delegateTarget).index();
-
-      var startIndex = Math.min(firstIndex, lastIndex),
-        endIndex = Math.max(firstIndex, lastIndex) + 1;
-
-      log(firstIndex, lastIndex);
-
-      var $actionRow = $('.table-row', $tableData).slice(startIndex, endIndex);
-
-      // set/remove selection
-      if (add) {
-        $actionRow.addClass('row-selected');
-      } else {
-        $actionRow.removeClass('row-selected');
-      }
-
-      // draw nice border
-      that._selectionBorder();
-
-      // open and animate menu
-      selectionMenu(event.pageX, event.pageY);
-    }
-  }
-
-  function selectionMenu (x, y) {
-    // selection
-    $rowSelected = $('.row-selected');
-
-    //FIXME added by cgu to make sure clickRowMenu is registered for every instance of DesktopTable
-    $('#MenuRow').remove();
-
-    // make menu - if not already there
-    var $menuRow = $('#MenuRow');
-    if ($menuRow.length === 0) {
-      $menuRow = $('body').appendDiv('MenuRow')
-        .on('click', '', clickRowMenu);
-    }
-    // place menu top-left
-    $menuRow.css('left', $rowSelected.first().offset().left - 13)
-      .css('top', $rowSelected.first().offset().top - 13);
-
-    // move to the mouse pointer
-    var moveMenu = function (event) {
-      var top = $rowSelected.first().offset().top,
-        bottom = $rowSelected.last().offset().top + 32;
-
-      var toTop = Math.abs(top - y) < Math.abs(bottom - y) ? top - 13: bottom - 13,
-        toLeft = x - 13;
-
-      $menuRow.stop().animate({'top': toTop},
-          {complete: function() {$menuRow.animate({'left': toLeft}, 500); }},
-          500);
-    };
-
-    // start movement
-    moveMenu(event);
-  }
-
-  function clickRowMenu (event) {
-    var $clicked = $(this),
-      nodeId = model.id,
-      x = $clicked.offset().left,
-      y = $clicked.offset().top;
-
-    new Scout.Menu(scout, model.outlineId, nodeId, x, y);
-  }
-
   function toggleSelect () {
-    var $rowSelected = $('.row-selected', $tableData);
+    var $selectedRows = $('.row-selected', $tableData);
 
-    if ($rowSelected.length == that._table.length) {
-      $rowSelected.removeClass('row-selected');
+    if ($selectedRows.length == that.model.table.rows.length) {
+      $selectedRows.removeClass('row-selected');
     } else {
       $('.table-row', $tableData).addClass('row-selected');
     }
@@ -407,7 +214,7 @@ Scout.DesktopTable = function (scout, $parent, model) {
 
   function filterCallback (testFunc) {
     var rowCount = 0,
-      $rowSelected = $('.row-selected', $tableData),
+      $selectedRows = $('.row-selected', $tableData),
       $allRows = $('.table-row', that._$tableDataScroll);
 
     that._resetSelection();
@@ -423,12 +230,12 @@ Scout.DesktopTable = function (scout, $parent, model) {
       } else {
         hideRow($row);
       }
-      scrollbar.initThumb();
+      that._scrollbar.initThumb();
     });
 
     that._setInfoFilter(rowCount);
     $allRows.appendTo(that._$tableDataScroll);
-    scrollbar.initThumb();
+    that._scrollbar.initThumb();
   }
 
   function resetFilter (event) {
@@ -487,8 +294,8 @@ Scout.DesktopTable.prototype._selectionBorder = function () {
       .removeClass('select-middle select-top select-bottom select-single');
 
   // draw nice border
-  $rowSelected = $('.row-selected');
-  $rowSelected.each(function (i) {
+  $selectedRows = $('.row-selected');
+  $selectedRows.each(function (i) {
     var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
       hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
 
@@ -499,7 +306,7 @@ Scout.DesktopTable.prototype._selectionBorder = function () {
   });
 
   // show count
-  this._setInfoSelect($rowSelected.length, $rowSelected.length == this._table.length);
+  this._setInfoSelect($selectedRows.length, $selectedRows.length == this.model.table.rows.length);
 };
 
 Scout.DesktopTable.prototype._resetSelection = function () {
@@ -559,7 +366,6 @@ Scout.DesktopTable.prototype._sort = function () {
     }
 };
 
-
 Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
   // find new sort direction
   var $header = $('.header-item').eq(index);
@@ -598,4 +404,267 @@ Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
 
   // sort and visualize
   this._sort();
+};
+
+Scout.DesktopTable.prototype._loadData = function () {
+  $('.table-row').remove();
+  this._drawData(0);
+  this._setInfoSelect(0, false);
+};
+
+Scout.DesktopTable.prototype._drawData = function (startRow) {
+  // this function has to be fast
+  var rowString = '';
+  var table = this.model.table;
+  for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
+    var row = table.rows[r];
+
+    rowString += '<div id="' + row.id + '" class="table-row">';
+
+    for (var c = 0; c < row.cells.length; c++) {
+      var column = table.columns[c],
+        width = column.width,
+        style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
+        allign = (column.type == 'number') ? 'text-align: right; ' : '';
+        value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+
+      rowString += '<div style="' + style + allign + '">' + value + '</div>';
+    }
+
+    rowString += '</div>';
+  }
+
+  // append block of rows
+  $(rowString)
+    .appendTo(this._$tableDataScroll)
+    .on('mousedown', '', onMouseDown)
+    .width(this._tableHeader.totalWidth + 4);
+
+  // update info and scrollbar
+  this._setInfoLoad(r);
+  this._scrollbar.initThumb();
+
+  // repaint and append next block
+  if (r < table.rows.length) {
+    var that = this;
+    setTimeout(function() { that._drawData(startRow + 100); }, 0);
+  }
+
+  var that = this;
+  function onMouseDown (event) {
+    var $row = $(event.delegateTarget),
+      add = true,
+      first,
+      $selectedRows = $('.row-selected'),
+      selectionChanged = false;
+
+    // click without ctrl always starts new selection, with ctrl toggle
+    if (event.shiftKey) {
+      first = $selectedRows.first().index();
+    } else if (event.ctrlKey) {
+      add = !$row.hasClass('row-selected');
+    } else {
+      $selectedRows.removeClass('row-selected');
+    }
+
+    // just a click...
+    selectData(event);
+
+    // ...or movement with held mouse button
+    $(".table-row").one("mousemove", function(event){
+      selectData(event);
+    });
+
+    $(".table-row").one("mouseup", function(event){
+      onMouseUp(event);
+    });
+
+    // action for all affected rows
+    function selectData (event) {
+      // affected rows between $row and Target
+      var firstIndex = first || $row.index(),
+        lastIndex = $(event.delegateTarget).index();
+
+      var startIndex = Math.min(firstIndex, lastIndex),
+        endIndex = Math.max(firstIndex, lastIndex) + 1;
+
+      log(firstIndex, lastIndex);
+
+      var $actionRow = $('.table-row', that._$tableData).slice(startIndex, endIndex);
+
+      // set/remove selection
+      if (add) {
+        $actionRow.addClass('row-selected');
+      } else {
+        $actionRow.removeClass('row-selected');
+      }
+
+      // draw nice border
+      that._selectionBorder();
+
+      // open and animate menu
+      selectionMenu(event.pageX, event.pageY);
+
+      //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
+      selectionChanged = true;
+    }
+
+    function onMouseUp (event) {
+      $(".table-row").unbind("mousemove");
+      $(".table-row").unbind("mouseup");
+
+      //Send click only if mouseDown and mouseUp happened on the same row
+      if ($row.get(0) == event.delegateTarget) {
+        that.scout.send('rowClicked', that.model.table.id, {"rowId" : $row.attr('id')});
+      }
+
+      if (selectionChanged) {
+        var rowIds = [],
+        $selectedRows = $('.row-selected');
+
+        $selectedRows.each(function(){
+          rowIds.push($(this).attr('id'));
+        });
+
+        that.scout.send('rowsSelected', that.model.table.id, {"rowIds" : rowIds});
+      }
+    }
+  }
+
+  function selectionMenu (x, y) {
+    // selection
+    $selectedRows = $('.row-selected');
+
+    //FIXME added by cgu to make sure clickRowMenu is registered for every instance of DesktopTable
+    $('#MenuRow').remove();
+
+    // make menu - if not already there
+    var $menuRow = $('#MenuRow');
+    if ($menuRow.length === 0) {
+      $menuRow = $('body').appendDiv('MenuRow')
+        .on('click', '', clickRowMenu);
+    }
+    // place menu top-left
+    $menuRow.css('left', $selectedRows.first().offset().left - 13)
+      .css('top', $selectedRows.first().offset().top - 13);
+
+    // move to the mouse pointer
+    var moveMenu = function (event) {
+      var top = $selectedRows.first().offset().top,
+        bottom = $selectedRows.last().offset().top + 32;
+
+      var toTop = Math.abs(top - y) < Math.abs(bottom - y) ? top - 13: bottom - 13,
+        toLeft = x - 13;
+
+      $menuRow.stop().animate({'top': toTop},
+          {complete: function() {$menuRow.animate({'left': toLeft}, 500); }},
+          500);
+    };
+
+    // start movement
+    moveMenu(event);
+  }
+
+  function clickRowMenu (event) {
+    var $clicked = $(this),
+      x = $clicked.offset().left,
+      y = $clicked.offset().top,
+      emptySpace = $selectedRows.length == 0;
+
+    new Scout.Menu(that.scout, that.model.table.id, emptySpace, x, y);
+  }
+
+};
+
+Scout.DesktopTable.prototype.sumData = function (draw, groupColumn) {
+  $('.table-row-sum', this._$tableDataScroll).animateAVCSD('height', 0, $.removeThis);
+
+  var table = this.model.table;
+  if (draw) {
+    var $rows = $('.table-row', this._$tableDataScroll);
+      $sumRow = $.makeDiv('', 'table-row-sum'),
+      sum = [];
+
+    for (var r = 0; r < $rows.length; r++) {
+      var $cells = $rows.eq(r).children();
+
+      for (var c = 0; c < table.columns.length; c++) {
+        var value = $cells.eq(c).text();
+        if ( table.columns[c].type == 'number') {
+          sum[c] = (sum[c] || 0) + parseFloat(value);
+        }
+      }
+
+      if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
+          (r == $rows.length - 1)) && sum.length > 0) {
+        for (var c = 0; c < table.columns.length; c++) {
+          var $div;
+
+          if (typeof sum[c] == 'number')
+            $div = $.makeDiv('', '', sum[c])
+              .css('text-align', 'right');
+          else if (c == groupColumn) {
+            $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
+            .css('text-align', 'left');
+          } else {
+            $div = $.makeDiv('', '', '&nbsp');
+          }
+
+          $div.appendTo($sumRow).width(table.columns[c].width);
+        }
+
+        $sumRow.insertAfter($rows.eq(r))
+          .width(this._tableHeader.totalWidth + 4)
+          .css('height', 0)
+          .animateAVCSD('height', 34);
+
+        $sumRow = $.makeDiv('', 'table-row-sum');
+        sum = [];
+      }
+    }
+  }
+
+  // update scrollbar
+  this._scrollbar.initThumb();
+};
+
+Scout.DesktopTable.prototype.detach = function () {
+  this._$desktopTable.detach();
+};
+
+Scout.DesktopTable.prototype.attach = function ($container) {
+  if (!this._$desktopTable) {
+    this.render();
+  }
+  else {
+    this._$desktopTable.appendTo($container);
+  }
+};
+
+Scout.DesktopTable.prototype._onRowsInserted = function (rows) {
+  //always insert new rows at the end
+  var table = this.model.table;
+  if (table.rows) {
+    table.rows.push.apply(table.rows, rows);
+  }
+  else {
+    table.rows = rows;
+  }
+  if (this._$desktopTable) {
+    this._loadData();
+  }
+};
+
+Scout.DesktopTable.prototype.onModelAction = function (event) {
+  if (event.type_ == 'rowsInserted') {
+    this._onRowsInserted(event.rows);
+  }
+  else if (event.type_ == 'rowsDeleted') {
+    //FIXME implement
+  }
+  else if (event.type_ == 'rowsSelected') {
+    //FIXME implement
+  }
+  else if (event.type_ == 'rowOrderChanged') {
+  }
 };

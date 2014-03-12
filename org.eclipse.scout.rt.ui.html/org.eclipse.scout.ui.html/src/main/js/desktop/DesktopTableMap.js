@@ -16,11 +16,11 @@ Scout.DesktopTableMap = function (scout, $parent, node, table, filterCallback) {
 
   // find all countries in table
   var tableCountries = [];
-  for (var i = 0; i < node.table.columns.length; i++) {
+  for (var i = 0; i < table.columns.length; i++) {
     for (var j = 0; j < node.map.columnIds.length; j++){
-      if (node.table.columns[i].id == node.map.columnIds[j]) {
-        for (var r = 0; r < table.length; r++) {
-          var value = table[r][i];
+      if (table.columns[i].id == node.map.columnIds[j]) {
+        for (var r = 0; r < table.rows.length; r++) {
+          var value = table.rows[r].cells[i];
           if ( tableCountries.indexOf(value) == -1) tableCountries.push(value);
         }
       }

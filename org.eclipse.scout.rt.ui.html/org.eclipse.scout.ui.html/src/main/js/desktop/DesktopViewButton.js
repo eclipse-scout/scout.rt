@@ -1,18 +1,21 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopViewButton = function (scout, $parent, viewButton) {
-  scout.widgetMap[viewButton.id] = this;
+Scout.DesktopViewButton = function (scout, $parent, model) {
+  this._$viewButton;
+
+  scout.widgetMap[model.id] = this;
 
   var state = '';
-  if(viewButton.selected) {
+  if(model.selected) {
     state='selected';
   }
-  var $viewButton = $parent.appendDiv(viewButton.id, 'view-item ' + state, viewButton.text);
-  $viewButton.on('click', '', onClick);
+  this._$viewButton = $parent.appendDiv(model.id, 'view-item ' + state, model.text);
+  this._$viewButton.on('click', '', onClick);
 
+  var that = this;
   function onClick (event) {
-    $viewButton.selectOne();
+    that._$viewButton.selectOne();
     scout.send('click', $(this).attr('id'));
   }
 
@@ -21,7 +24,7 @@ Scout.DesktopViewButton = function (scout, $parent, viewButton) {
 Scout.DesktopViewButton.prototype.onModelPropertyChange = function (event) {
   if(event.selected !== undefined) {
     if(event.selected){
-      $viewButton.selectOne();
+      this._$viewButton.selectOne();
     }
   }
 };

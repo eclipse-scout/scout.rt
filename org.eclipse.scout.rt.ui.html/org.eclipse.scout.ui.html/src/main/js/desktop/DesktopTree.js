@@ -4,6 +4,7 @@
 Scout.DesktopTree = function (scout, $parent, model) {
   this.model = model;
   this.scout = scout;
+  this._desktopTable;
 
   this.scout.widgetMap[model.id] = this;
   this._$desktopTreeScroll = $parent.appendDiv('DesktopTreeScroll');
@@ -13,15 +14,27 @@ Scout.DesktopTree = function (scout, $parent, model) {
 
 Scout.DesktopTree.prototype.detach = function () {
   this._$desktopTreeScroll.detach();
+  if (this._desktopTable) {
+    this._desktopTable.detach();
+  }
 };
 
 Scout.DesktopTree.prototype.attach = function ($container) {
   this._$desktopTreeScroll.appendTo($container);
+  if (this._desktopTable) {
+    this._desktopTable.attach($('#DesktopBench'));
+  }
 };
 
 Scout.DesktopTree.prototype.attachModel = function () {
-  if(this.model.selectedNodeIds) {
-    this.setNodeSelectedById(this.model.selectedNodeIds[0]);
+  if (this.model.selectedNodeIds) {
+    var node = this.model.selectedNodeIds[0];
+    this.setNodeSelectedById(node);
+
+//    if(this.model.detailTable) {
+//      node.outlineId = this.model.id;
+//      this._desktopTable = new Scout.DesktopTable(this.scout, $('#DesktopBench'), this.model.detailTable, node);
+//    }
   }
 };
 
@@ -95,19 +108,19 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
 
 Scout.DesktopTree.prototype.setNodeSelectedById = function (nodeId) {
   var $node = undefined;
-  if(nodeId) {
+  if (nodeId) {
     $node = this._$desktopTreeScroll.find('#' + nodeId);
-    if($node.data('node') === undefined) {
+    if ($node.data('node') === undefined) {
       //FIXME happens if tree with a selected node gets collapsed selected node should be showed again after outline switch.
       throw "No node found for id " + nodeId;
     }
   }
 
-  this._setNodesSelected($node);
+  this._setNodeSelected($node);
 };
 
-Scout.DesktopTree.prototype._setNodesSelected = function ($node) {
-  if(!$node) {
+Scout.DesktopTree.prototype._setNodeSelected = function ($node) {
+  if (!$node) {
     this._$desktopTreeScroll.children().select(false);
     return;
   }
@@ -119,10 +132,14 @@ Scout.DesktopTree.prototype._setNodesSelected = function ($node) {
   //update model
   this.model.selectedNodeIds = [node.id];
 
+  if (this._desktopTable) {
+    this._desktopTable.detach();
+  }
   $('#DesktopBench').html('');
-  if (node.type == 'table') {
-    node.outlineId = this.model.id;
-    new Scout.DesktopTable(this.scout, $('#DesktopBench'), node);
+  if (node.table) {
+    //FIXME really do this here? or better listen to detailTable property?
+    this._desktopTable = this.scout.widgetMap[node.table.id];
+    this._desktopTable.attach($('#DesktopBench'));
   }
   else{
     $('#DesktopBench').text(JSON.stringify(node));
@@ -139,7 +156,7 @@ Scout.DesktopTree.prototype._onNodesInserted = function (nodes, parentNodeId) {
   //update parent with new child nodes
   parentNode.childNodes.push.apply(parentNode.childNodes, nodes);
 
-  if(parentNode.expanded) {
+  if (parentNode.expanded) {
     this._setNodeExpanded($parent, true);
   }
 };
@@ -151,10 +168,10 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
     // create node
     var node = nodes[i];
     var state = '';
-    if(node.expanded && node.childNodes.length > 0) {
+    if (node.expanded && node.childNodes.length > 0) {
       state='expanded ';
     }
-    if(!node.leaf) {
+    if (!node.leaf) {
       state+='can-expand '; //TODO rename to leaf
     }
     level = $parent ? $parent.data('level') + 1 : 0;
@@ -199,6 +216,16 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
       $node.appendTo(this._$desktopTreeScroll);
     }
 
+    // Create tables for table pages
+    //FIXME really always create table (no gui is created)
+    if (node.table) {
+      var desktopTable = this.scout.widgetMap[node.table.id];
+      if (!desktopTable) {
+        node.outlineId = this.model.id;
+        new Scout.DesktopTable(this.scout, $('#DesktopBench'), node, this.model.id);
+      }
+    }
+
     // collect all nodes for later return
     $allNodes = $allNodes.add($node);
 
@@ -215,7 +242,8 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
 
 Scout.DesktopTree.prototype._onNodeClicked = function (event, $clicked) {
   var node = $clicked.data('node'),
-    nodeId = $clicked.attr('id');
+    nodeId = $clicked.attr('id'),
+    wasSelected = $clicked.isSelected();
 
   // pre select for immediate feedback
   $clicked.selectOne();
@@ -225,6 +253,11 @@ Scout.DesktopTree.prototype._onNodeClicked = function (event, $clicked) {
     events.push(new Scout.Event('nodeExpanded', this.model.id, {"nodeId":node.id, "expanded":true}));
   }
   events.push(new Scout.Event('nodeClicked', this.model.id, {"nodeId":nodeId}));
+
+  //don't send if already selected node gets clicked again
+  if (!wasSelected) {
+    events.push(new Scout.Event('nodeSelected', this.model.id, {"nodeId":nodeId}));
+  }
   this.scout.sendEvents(events);
 };
 
@@ -243,23 +276,50 @@ Scout.DesktopTree.prototype._onNodeControlClicked = function (event, $clicked) {
 };
 
 Scout.DesktopTree.prototype._onNodeMenuClicked = function (event, $clicked) {
-    var nodeId = $clicked.parent().attr('id'),
-      x = $clicked.offset().left,
-      y = $clicked.offset().top;
+  if (!$clicked.parent().isSelected()) {
+    //make sure node is selected when activating the menu, otherwise the wrong menus are returned
+    //FIXME section event for the server must be sent in setNodesSelected rather than nodeClick
+    this._setNodesSelected($clicked.parent());
+  }
 
-  new Scout.Menu(this.scout, this.model.id, nodeId, x, y);
+  var nodeId = $clicked.parent().attr('id'),
+    x = $clicked.offset().left,
+    y = $clicked.offset().top,
+    emptySpace = !nodeId;
+
+  new Scout.Menu(this.scout, this.model.id, emptySpace, x, y);
 
   return false;
 };
 
 Scout.DesktopTree.prototype.onModelPropertyChange = function (event) {
+//  if (event.detailTableId !== undefined) {
+//    if (this._desktopTable) {
+//      this._desktopTable.detach();
+//    }
+//
+//    this._desktopTable = this.scout.widgetMap[event.detailTableId];
+//    this._desktopTable.attach($('#DesktopBench'));
+//
+//    this.model.detailTable = this._desktopTable.model;
+//  }
+};
+
+Scout.DesktopTree.prototype.onModelCreate = function (event) {
+  if (event.objectType == "Table") {
+    if (this._desktopTable) {
+      this._desktopTable.detach();
+    }
+    var node = this.model.selectedNodeIds[0];
+    this._desktopTable = new Scout.DesktopTable(this.scout,$('#DesktopBench'), event, node);
+  }
 };
 
 Scout.DesktopTree.prototype.onModelAction = function (event) {
   if (event.type_ == 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
   }
-  if (event.type_ == 'nodesDeleted') {
+  else if (event.type_ == 'nodesDeleted') {
     //FIXME implement
 //    this.removeNodes(event.nodeIds);
   }

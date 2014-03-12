@@ -49,12 +49,12 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  protected void handleScoutPropertyChange(String name, Object newValue) {
+  protected void handleModelPropertyChange(String name, Object newValue) {
     if (IViewButton.PROP_SELECTED.equals(name)) {
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
     }
     else {
-      super.handleScoutPropertyChange(name, newValue);
+      super.handleModelPropertyChange(name, newValue);
     }
   }
 

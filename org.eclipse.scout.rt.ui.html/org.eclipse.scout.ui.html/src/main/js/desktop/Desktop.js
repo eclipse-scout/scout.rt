@@ -10,8 +10,8 @@ Scout.Desktop = function (scout, $parent, model) {
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(this.scout, $parent, model.viewButtons);
   var tool = new Scout.DesktopToolButton(this.scout, $parent, model.toolButtons);
-  var tree = new Scout.DesktopTreeContainer(this.scout, $parent, model.outline);
   var bench = new Scout.DesktopBench(this.scout, $parent);
+  var tree = new Scout.DesktopTreeContainer(this.scout, $parent, model.outline);
 
   this.tree = tree;
   this.tree.attachModel();

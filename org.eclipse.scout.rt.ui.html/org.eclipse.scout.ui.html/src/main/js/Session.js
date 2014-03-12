@@ -61,16 +61,16 @@ Scout.Session = function ($entryPoint, sessionPartId) {
           widget.onModelCreate(event);
         }
         else{
-          log("ERROR: No widget found for parentId " + event.parentId);
+          throw "No widget found for parentId " + event.parentId;
         }
       }
-      else if(event.type_ == "propertyChange") {
+      else if(event.type_ == "property") {
         var widget = scout.widgetMap[event.id];
         if(widget) {
             widget.onModelPropertyChange(event);
         }
         else{
-          log("ERROR: No widget found for id " + event.id);
+          throw "No widget found for id " + event.id;
         }
       }
       else {
@@ -79,7 +79,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
             widget.onModelAction(event);
         }
         else{
-          log("ERROR: No widget found for id " + event.id);
+          throw "No widget found for id " + event.id;
         }
       }
     }

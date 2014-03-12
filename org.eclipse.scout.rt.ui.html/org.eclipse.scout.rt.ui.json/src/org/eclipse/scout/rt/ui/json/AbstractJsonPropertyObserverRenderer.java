@@ -40,13 +40,13 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
     }
   }
 
-  protected void handleScoutPropertyChange(String name, Object newValue) {
+  protected void handleModelPropertyChange(String name, Object newValue) {
   }
 
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(final PropertyChangeEvent e) {
-      handleScoutPropertyChange(e.getPropertyName(), e.getNewValue());
+      handleModelPropertyChange(e.getPropertyName(), e.getNewValue());
     }
   }
 }

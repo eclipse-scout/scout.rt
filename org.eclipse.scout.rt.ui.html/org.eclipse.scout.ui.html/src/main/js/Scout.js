@@ -90,7 +90,7 @@ var log = console.log.bind(console);
   };
 
   $.fn.select = function (selected) {
-    if(selected) {
+    if (selected) {
       this.addClass('selected');
     }
     else {
@@ -98,6 +98,10 @@ var log = console.log.bind(console);
     }
 
     return this;
+  };
+
+  $.fn.isSelected = function () {
+    return this.hasClass('selected');
   };
 
   // most used animate

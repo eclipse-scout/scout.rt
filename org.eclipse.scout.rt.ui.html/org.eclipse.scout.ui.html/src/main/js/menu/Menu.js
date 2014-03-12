@@ -1,12 +1,19 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Menu = function (scout, id, nodeId, x, y) {
+/**
+ * @param data will be sent to server
+ */
+Scout.Menu = function (scout, id, emptySpace, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var response = scout.sendSync('menu', id, {"nodeId":nodeId});
+  var data = undefined;
+  if (emptySpace) {
+    data = {"emptySpace" : true};
+  }
+  var response = scout.sendSync('menuPopup', id, data);
   if(response.events.length === 0){
     return;
   }

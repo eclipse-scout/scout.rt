@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.ui.json;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,17 +11,11 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -38,6 +31,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
+  private Map<ITable, JsonDesktopTable> m_jsonTables;
 
   //FIXME remove after model is updated with new properties
   private String PROP_CUSTOM_JSON = "customJson";
@@ -74,6 +68,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     m_jsonDesktop = jsonDesktop;
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
+    m_jsonTables = new HashMap<>();
   }
 
   @Override
@@ -195,6 +190,10 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
         m_treeNodeIds.remove(node);
         m_treeNodes.remove(nodeId);
+        JsonDesktopTable table = m_jsonTables.remove(node);
+        if (table != null) {
+          table.dispose();
+        }
       }
 
       getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
@@ -261,10 +260,32 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       String pageType = "";
       if (page instanceof IPageWithTable) {
         pageType = "table";
-        json.put("table", tableToJson(((IPageWithTable) page).getTable()));
+        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+        ITable table = pageWithTable.getTable();
+        if (table != null) {
+          JsonDesktopTable jsonTable = m_jsonTables.get(table);
+          if (jsonTable == null) {
+            jsonTable = new JsonDesktopTable(table, getJsonSession());
+            jsonTable.init();
+            m_jsonTables.put(table, jsonTable);
+          }
+          json.put("table", m_jsonTables.get(table).toJson());
+        }
       }
       else {
         pageType = "node";
+        //FIXME send internal table and ignore on gui? or better modify model?
+//        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+//        ITable table = pageWithNodes.getInternalTable();
+//        if (table != null) {
+//          JsonDesktopTable jsonTable = m_jsonTables.get(table);
+//          if (jsonTable == null) {
+//            jsonTable = new JsonDesktopTable(table, getJsonSession());
+//            jsonTable.init();
+//            m_jsonTables.put(table, jsonTable);
+//          }
+//          json.put("table", m_jsonTables.get(table).toJson());
+//        }
       }
       json.put("type", pageType);
       json.put("graph", getCustomJson(page.getNodeId() + "_graph"));
@@ -276,113 +297,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-  }
-
-  protected JSONArray tableRowToJson(ITableRow row) throws JsonUIException {
-    JSONArray jsonCells = new JSONArray();
-    for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
-      IColumn column = row.getTable().getColumnSet().getColumn(colIndex);
-      if (column.isDisplayable()) {
-        jsonCells.put(tableCellToJson(row.getCell(colIndex), column));
-      }
-    }
-
-    return jsonCells;
-  }
-
-  protected Object tableCellToJson(ICell cell, IColumn column) throws JsonUIException {
-
-    JSONObject jsonCell = new JSONObject();
-    try {
-      jsonCell.put("value", getCellValue(cell, column));
-      jsonCell.put("foregroundColor", cell.getForegroundColor());
-      jsonCell.put("backgroundColor", cell.getBackgroundColor());
-      //FIXME implement missing
-
-      if (jsonCell.length() > 0) {
-        jsonCell.put("text", cell.getText());
-        return jsonCell;
-      }
-      else {
-        //Don't generate an object if only the text is returned to reduce the amount of data
-        return cell.getText();
-      }
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e);
-    }
-  }
-
-  protected Object getCellValue(ICell cell, IColumn column) {
-    Object retVal = null;
-    if (column instanceof IDateColumn) {
-      Date date = (Date) cell.getValue();
-      if (date != null) {
-        IDateColumn dateColumn = (IDateColumn) column;
-        if (dateColumn.isHasDate() && !dateColumn.isHasTime()) {
-          retVal = DateUtility.format(date, "yyyy-MM-dd");
-        }
-        else {
-          retVal = date.getTime();
-        }
-      }
-    }
-    else if (Number.class.isAssignableFrom(column.getDataType())) {
-      retVal = cell.getValue();
-    }
-    //not necessary to send duplicate values
-    if (retVal != null && !String.valueOf(retVal).equals(cell.getText())) {
-      return retVal;
-    }
-    return null;
-  }
-
-  protected JSONObject tableToJson(ITable table) throws JsonUIException {
-    try {
-      JSONObject json = new JSONObject();
-
-      JSONArray jsonColumns = new JSONArray();
-      for (IColumn<?> column : table.getColumns()) {
-        if (column.isDisplayable()) {
-          jsonColumns.put(columnToJson(column));
-        }
-      }
-      json.put("columns", jsonColumns);
-
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
-  }
-
-  protected JSONObject columnToJson(IColumn column) throws JsonUIException {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("id", column.getColumnId());
-      json.put("text", column.getHeaderCell().getText());
-      json.put("type", computeColumnType(column));
-      json.put(IColumn.PROP_WIDTH, column.getWidth());
-
-      if (column instanceof INumberColumn<?>) {
-        json.put("format", ((INumberColumn) column).getFormat().toLocalizedPattern());
-      }
-      //FIXME complete
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
-  }
-
-  protected String computeColumnType(IColumn column) {
-    if (Number.class.isAssignableFrom(column.getDataType())) {
-      return "number";
-    }
-    if (Date.class.isAssignableFrom(column.getDataType())) {
-      return "date";
-    }
-    return "text";
   }
 
   protected JSONObject getCustomJson(String propName) throws JSONException {
@@ -402,14 +316,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     if ("nodeClicked".equals(event.getEventType())) {
       handleUiNodeClickEvent(event, res);
     }
+    else if ("nodeSelected".equals(event.getEventType())) {
+      handleUiNodeSelectedEvent(event, res);
+    }
     else if ("nodeExpanded".equals(event.getEventType())) {
       handleUiNodeExpandedEvent(event, res);
     }
-    else if ("menu".equals(event.getEventType())) {
-      handleUiMenuEvent(event, res);
-    }
-    else if ("table".equals(event.getEventType())) {
-      handleUiTableEvent(event, res);
+    else if ("menuPopup".equals(event.getEventType())) {
+      handleUiMenuPopupEvent(event, res);
     }
     else if ("graph".equals(event.getEventType())) {
       handleUiGraphEvent(event, res);
@@ -427,16 +341,27 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
   protected void handleUiNodeClickEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
-      final String nodeId = event.getEventObject().getString("nodeId");
-      final ITreeNode node = m_treeNodes.get(nodeId);
-      if (node == null) {
-        throw new JsonUIException("No node found for id " + nodeId);
-      }
+      final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString("nodeId"));
 
       new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           getModelObject().getUIFacade().fireNodeClickFromUI(node);
+        }
+      }.runNow(new NullProgressMonitor());
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e.getMessage(), e);
+    }
+  }
+
+  protected void handleUiNodeSelectedEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+    try {
+      final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString("nodeId"));
+
+      new ClientSyncJob("Node selected", getJsonSession().getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
           getModelObject().getUIFacade().setNodesSelectedFromUI(CollectionUtility.arrayList(node));
         }
       }.runNow(new NullProgressMonitor());
@@ -448,12 +373,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
   protected void handleUiNodeExpandedEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
-      final String nodeId = event.getEventObject().getString("nodeId");
-      final ITreeNode node = m_treeNodes.get(nodeId);
+      final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString("nodeId"));
       final boolean expanded = event.getEventObject().getBoolean("expanded");
-      if (node == null) {
-        throw new JsonUIException("No node found for id " + nodeId);
-      }
 
       new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
         @Override
@@ -467,70 +388,21 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }
   }
 
-  protected void handleUiTableEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    String nodeId = extractNodeId(event);
+  protected ITreeNode getTreeNodeForNodeId(String nodeId) throws JsonUIException {
     ITreeNode node = m_treeNodes.get(nodeId);
-    if (!(node instanceof IPageWithTable)) {
-      throw new JsonUIException("Given nodeId is not a table page. NodeId: ");
+    if (node == null) {
+      throw new JsonUIException("No node found for id " + nodeId);
     }
-
-    final ITable table = ((IPageWithTable) node).getTable();
-    JSONArray tableRows = new JSONArray();
-    for (ITableRow row : table.getRows()) {
-      JSONArray jsonCells = tableRowToJson(row);
-      tableRows.put(jsonCells);
-    }
-
-    JSONObject responseEvent;
-    try {
-      responseEvent = new JSONObject();
-      responseEvent.put("rows", tableRows);
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
-    getJsonSession().currentJsonResponse().addActionEvent("showTable", getId(), responseEvent);
+    return node;
   }
 
-  //FIXME nodeId is not unique, currently its just the page name
-  private String extractNodeId(JsonEvent event) throws JsonUIException {
-    String nodeId;
+  protected void handleUiMenuPopupEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
-      nodeId = event.getEventObject().getString("nodeId");
-
-      final ITreeNode node = m_treeNodes.get(nodeId);
-      if (node == null) {
-        throw new JsonUIException("No node found for id " + nodeId);
+      boolean emptySpace = false;
+      if (event.getEventObject().has("emptySpace")) {
+        emptySpace = event.getEventObject().getBoolean("emptySpace");
       }
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e);
-    }
-    return nodeId;
-  }
-
-  protected void handleUiMenuEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    try {
-      String nodeId = extractNodeId(event);
-//      final String rowId = event.getEventObject().getString("rowId");
-      final ITreeNode node = m_treeNodes.get(nodeId);
-      List<IMenu> menus = null;
-      if (node instanceof IPageWithTable) {
-        final ITable table = ((IPageWithTable) node).getTable();
-
-//        new ClientSyncJob("Table row click", getJsonSession().getClientSession()) {
-//          @Override
-//          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-//            ITableRow row = table.getRow(Integer.parseInt(rowId));
-//            table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-//          }
-//        }.runNow(new NullProgressMonitor());
-
-        menus = collectRowMenus(table, true, false);
-      }
-      else {
-        menus = collectMenus(false, true);
-      }
+      List<IMenu> menus = fetchMenus(emptySpace, !emptySpace);
 
       JSONArray jsonMenus = new JSONArray();
       for (IMenu menu : menus) {
@@ -584,7 +456,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), responseEvent);
   }
 
-  protected List<IMenu> collectMenus(final boolean emptySpaceActions, final boolean nodeActions) {
+  protected List<IMenu> fetchMenus(final boolean emptySpaceActions, final boolean nodeActions) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
     new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
       @Override
@@ -601,25 +473,24 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     return Collections.unmodifiableList(menuList);
   }
 
-  protected List<IMenu> collectRowMenus(final ITable table, final boolean emptySpaceActions, final boolean nodeActions) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (emptySpaceActions) {
-          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (nodeActions) {
-          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
-        }
-      }
-    }.runNow(new NullProgressMonitor());
-
-    return Collections.unmodifiableList(menuList);
-  }
-
   @Override
-  protected void handleScoutPropertyChange(String name, Object newValue) {
+  protected void handleModelPropertyChange(String name, Object newValue) {
+    if (IOutline.PROP_DETAIL_TABLE.equals(name)) {
+      ITable table = (ITable) newValue;
+//      JsonDesktopTable jsonTable = m_jsonTables.get(table);
+//      if (jsonTable == null) {
+//        jsonTable = new JsonDesktopTable(table, getJsonSession());
+//        jsonTable.init();
+//        m_jsonTables.put(table, jsonTable);
+//        getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
+//      }
+//      else {
+//        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", jsonTable.getId());
+//      }
+    }
+    else {
+      super.handleModelPropertyChange(name, newValue);
+    }
   }
 
   private class P_ModelTreeListener implements TreeListener {

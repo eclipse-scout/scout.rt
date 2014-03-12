@@ -29,8 +29,11 @@ Scout.DesktopTreeContainer = function (scout, $parent, model) {
 };
 
 Scout.DesktopTreeContainer.prototype.onOutlineCreated = function (event) {
-  var desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, event);
-  desktopTree.attachModel();
+  if (this.desktopTree) {
+    this.desktopTree.detach();
+  }
+  this.desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, event);
+  this.desktopTree.attachModel();
 };
 
 Scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {

@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, filterCallback) {
+Scout.DesktopTableChart = function (scout, $controlContainer, table, filterCallback) {
   // group functions for dates
   // todo
   var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
@@ -9,8 +9,9 @@ Scout.DesktopTableChart = function (scout, $controlContainer, columns, table, fi
     countDesc = 'Anzahl';
 
   var removeChart = null,
+    columns = table.columns,
     xAxis,
-  yAxis;
+    yAxis;
 
   // create container
   var $chartSelect = $controlContainer.empty().appendDiv('ChartSelect');

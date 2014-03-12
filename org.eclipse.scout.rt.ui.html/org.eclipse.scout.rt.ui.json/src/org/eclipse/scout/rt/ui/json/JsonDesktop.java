@@ -176,10 +176,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
               m_jsonOutlines.put(e.getOutline(), jsonOutline);
               getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());
             }
-
-            JSONObject event = new JSONObject();
-            event.put("outlineId", jsonOutline.getId());
-            getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), event);
+            else {
+              JSONObject event = new JSONObject();
+              event.put("outlineId", jsonOutline.getId());
+              getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), event);
+            }
             break;
           case DesktopEvent.TYPE_FORM_ADDED: {
 

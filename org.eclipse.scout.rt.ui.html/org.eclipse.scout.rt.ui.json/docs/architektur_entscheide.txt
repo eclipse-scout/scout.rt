@@ -1,0 +1,15 @@
+Aufteilung zwischen GUI-Elementen und Server / Model-Interaktion?
+- z.B. Table schickt Server Event im Selektions-Code. Alternative wäre ein Listener, welcher auf Selektion hört und dort den Event schickt.
+- Vorteil des Listeners: Saubere Trennung, Komponenten könnten einfacher ersetzt werden?
+- Nachteil: Eventuell unnötiger Zusatzaufwand
+
+Session.js vs. ClientSession.js.
+- Dasselbe oder aufteilen? Auf dem Server gibt es heute JsonSession und JsonClientSession
+
+Attach / Detach vs. new Scout.DesktopTable()
+- Attach geht lange bei grossen Objekten (z.B. table mit 800 Rows)
+
+Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
+- Beispiel: Server schickt nodes und pro node table gleich mit, table darf aber noch nicht gerendert werden (wäre spezifisch für desktoptree)
+- Alternative: Client holt sich die table on demand bei selektion (falls noch nicht vorhanden) und stellt sie gleich dar (wäre spezifisch für desktoptree)
+- Alternative2: Server schickt nodes aber ohne Table. Table kommt mit pageDetailTableChanged Event. Selektierte node ist jedoch hier bei outline Wechsel noch nicht verfügbar
