@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -193,8 +194,26 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
   protected void attachScout() {
     super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
-    getUiBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
+    getUiBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     setProposalFormFromScout(getScoutObject().getProposalForm());
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override
@@ -206,8 +225,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    getUiBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (!CompareUtility.equals(s, getUiField().getText())) {
-      getUiBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
       if (s == null) {
         s = "";
       }

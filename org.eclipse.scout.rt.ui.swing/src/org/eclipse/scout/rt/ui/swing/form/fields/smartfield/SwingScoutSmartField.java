@@ -18,6 +18,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -175,7 +176,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     setIconIdFromScout(f.getIconId());
     setProposalFormFromScout(f.getProposalForm());
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(getScoutObject().hasMenus());
+      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(calculateDropDownButtonEnabled());
     }
   }
 
@@ -196,6 +197,9 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
   @Override
   protected void setDisplayTextFromScout(String s) {
     JTextComponent swingField = getSwingTextField();
+    if (swingField instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) swingField).setMenuEnabled(calculateDropDownButtonEnabled());
+    }
     if (!CompareUtility.equals(swingField.getText(), s)) {
       swingField.setText(s);
       // ticket 77424
@@ -207,6 +211,24 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
         swingField.setCaretPosition(0);
       }
     }
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override

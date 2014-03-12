@@ -14,6 +14,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -117,14 +118,35 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     IFileChooserField f = getScoutObject();
     setFileIconIdFromScout(f.getFileIconId());
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(getScoutObject().hasMenus());
+      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
     }
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
+    }
     JTextComponent swingField = getSwingTextField();
     swingField.setText(s);
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override

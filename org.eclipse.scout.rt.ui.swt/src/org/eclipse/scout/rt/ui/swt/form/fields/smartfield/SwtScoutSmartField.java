@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -168,8 +169,8 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    getSwtBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (!CompareUtility.equals(s, getSwtField().getText())) {
-      getSwtBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
       if (s == null) {
         s = "";
       }
@@ -177,6 +178,24 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       swtField.setText(s);
       swtField.setCaretOffset(0);
     }
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override

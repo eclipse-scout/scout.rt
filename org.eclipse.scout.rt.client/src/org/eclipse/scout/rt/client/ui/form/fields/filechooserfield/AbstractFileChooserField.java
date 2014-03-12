@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -483,16 +482,23 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
 
+    /**
+     * Uses {@link MenuUtility#filterValidMenus} to filter the given menus for valid menus.
+     * The method <code>prepareAction</code> on the menu objects are executed.
+     */
     @Override
     public List<IMenu> firePopupFromUI() {
-      List<IMenu> menus = new ArrayList<IMenu>();
-      for (IMenu menu : getMenus()) {
-        menu.prepareAction();
-        if (menu.isVisible()) {
-          menus.add(menu);
-        }
-      }
-      return Collections.unmodifiableList(menus);
+      return MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), true);
+    }
+
+    /**
+     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
+     * method <code>prepareAction</code> on the menu objects.
+     */
+    @Override
+    public boolean hasValidMenusFromUI() {
+      List<IMenu> validMenus = MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), false);
+      return validMenus.size() > 0;
     }
 
     @Override

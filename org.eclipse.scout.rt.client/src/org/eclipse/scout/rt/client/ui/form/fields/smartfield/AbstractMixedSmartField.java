@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -348,29 +348,17 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
 
     @Override
     public List<IMenu> firePopupFromUI() {
-      VALUE_TYPE smartValue = getValue();
-      List<IMenu> filteredMenus = new ArrayList<IMenu>();
-      for (IMenu m : getMenus()) {
-        IMenu validMenu = null;
-        if ((!m.isInheritAccessibility()) || isEnabled()) {
-          if (m.isEmptySpaceAction()) {
-            validMenu = m;
-          }
-          else if (m.isSingleSelectionAction()) {
-            if (smartValue != null) {
-              validMenu = m;
-            }
-          }
-        }
-        //
-        if (validMenu != null) {
-          validMenu.prepareAction();
-          if (validMenu.isVisible()) {
-            filteredMenus.add(validMenu);
-          }
-        }
-      }
-      return Collections.unmodifiableList(filteredMenus);
+      return MenuUtility.filterValidMenus(AbstractMixedSmartField.this, getMenus(), true);
+    }
+
+    /**
+     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
+     * method <code>prepareAction</code> on the menu objects.
+     */
+    @Override
+    public boolean hasValidMenusFromUI() {
+      List<IMenu> validMenus = MenuUtility.filterValidMenus(AbstractMixedSmartField.this, getMenus(), false);
+      return validMenus.size() > 0;
     }
 
     @Override

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -97,11 +98,30 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   protected void attachScout() {
     super.attachScout();
     setFileIconIdFromScout(getScoutObject().getFileIconId());
-    getSwtFileChooserButton().setDropdownEnabled(getScoutObject().hasMenus());
+    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (s == null) {
       s = "";
     }

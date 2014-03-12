@@ -29,4 +29,12 @@ public interface IContentAssistFieldUIFacade {
   boolean acceptProposalFromUI();
 
   void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form);
+
+  /**
+   * Called from the UI to check whether there are valid menus defined in the model.
+   * 
+   * @return <code>true</code> if there is at least one valid menu. Otherwise, <code>false</code>.
+   * @since 4.0.0-M6
+   */
+  boolean hasValidMenusFromUI();
 }

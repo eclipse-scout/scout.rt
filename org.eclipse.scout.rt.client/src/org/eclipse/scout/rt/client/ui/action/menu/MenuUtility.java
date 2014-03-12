@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  * Utility class for menus
@@ -56,5 +57,48 @@ public final class MenuUtility {
       }
     }
     return Collections.unmodifiableList(keyStrokes);
+  }
+
+  /**
+   * Filters a given list of menus belonging to a specific value field by returning a list containing only valid
+   * menus.
+   * A menu is considered to be valid if at least the value field is enabled or if the menu does not inherit its
+   * accessibility.
+   * Additionally, the menu has either to be
+   * <ul>
+   * an empty space action and visible menu or
+   * </ul>
+   * <ul>
+   * a single selection action and visible menu and the value field contains a non-null value
+   * </ul>
+   * The method prepareAction of a valid menu is executed if the parameter executePrepareAction is <code>true</code>
+   * 
+   * @since 4.0.0-M6
+   */
+  public static <T> List<IMenu> filterValidMenus(IValueField<T> valueField, List<IMenu> menusToFilter, boolean executePrepareAction) {
+    T value = valueField.getValue();
+    List<IMenu> filteredMenus = new ArrayList<IMenu>();
+    for (IMenu m : menusToFilter) {
+      IMenu validMenu = null;
+      if ((!m.isInheritAccessibility()) || valueField.isEnabled()) {
+        if (m.isEmptySpaceAction()) {
+          validMenu = m;
+        }
+        else if (m.isSingleSelectionAction()) {
+          if (value != null) {
+            validMenu = m;
+          }
+        }
+      }
+      if (validMenu != null) {
+        if (executePrepareAction) {
+          validMenu.prepareAction();
+        }
+        if (validMenu.isVisible()) {
+          filteredMenus.add(validMenu);
+        }
+      }
+    }
+    return Collections.unmodifiableList(filteredMenus);
   }
 }
