@@ -40,7 +40,7 @@ Scout.Desktop = function (scout, $parent, model) {
   var fKeys = {};
   if (tool) {
       $('.tool-item', tool.$div).each(function (i, e) {
-        var shortcut = parseInt($(e).attr('data-shortcut').replace('F', '')) + 111;
+        var shortcut = parseInt($(e).attr('data-shortcut').replace('F', ''), 10) + 111;
         fKeys[shortcut] = e;
       });
   }
@@ -115,9 +115,10 @@ Scout.Desktop = function (scout, $parent, model) {
       }
 
       // pgup: jump up
+      var $prev;
       if (event.which == 33){
         if ($rowsSelected.length > 0) {
-          var $prev = $rowsSelected.first().prevAll();
+          $prev = $rowsSelected.first().prevAll();
           if ($prev.length > 10) {
             $rowClick = $prev.eq(10);
           } else {
@@ -131,7 +132,7 @@ Scout.Desktop = function (scout, $parent, model) {
       // pgdn: jump down
       if (event.which == 34){
         if ($rowsSelected.length > 0) {
-          var $prev = $rowsSelected.last().nextAll();
+          $prev = $rowsSelected.last().nextAll();
           if ($prev.length > 10) {
             $rowClick = $prev.eq(10);
           } else {
@@ -189,7 +190,7 @@ Scout.Desktop = function (scout, $parent, model) {
     }
 
     // keys for table
-    var node = $('#TableData', bench.$div);
+    node = $('#TableData', bench.$div);
     if (node) {
       node.appendDiv('', 'key-box top3', 'Home');
       node.appendDiv('', 'key-box top2', 'PgUp');

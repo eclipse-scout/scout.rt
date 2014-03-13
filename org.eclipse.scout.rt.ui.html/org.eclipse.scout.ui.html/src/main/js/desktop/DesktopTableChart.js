@@ -427,26 +427,24 @@ Scout.DesktopTableChart = function (scout, $controlContainer, table, filterCallb
     var startAngle = 0,
       endAngle;
 
+    tweenIn = function (now, fx) {
+      var start = this.getAttribute('data-start'),
+        end = this.getAttribute('data-end');
+      this.setAttribute('d', pathSegment(450, 160, 105, start * fx.pos, end * fx.pos));
+    };
+
+    tweenOut = function (now, fx) {
+      var start = this.getAttribute('data-start'),
+        end = this.getAttribute('data-end');
+      this.setAttribute('d', pathSegment(450, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
+    };
+
     for (var a = 0; a < xAxis.length; a++) {
       var key = xAxis[a],
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
       endAngle = startAngle + value / dataAxis.total;
-
-      // segment
-
-      tweenIn = function (now, fx) {
-              var start = this.getAttribute('data-start'),
-                end = this.getAttribute('data-end');
-              this.setAttribute('d', pathSegment(450, 160, 105, start * fx.pos, end * fx.pos));
-            };
-
-      tweenOut = function (now, fx) {
-              var start = this.getAttribute('data-start'),
-                end = this.getAttribute('data-end');
-              this.setAttribute('d', pathSegment(450, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
-            };
 
       // arc segement
       $chartMain.appendSVG('path', '', 'main-chart')
@@ -456,7 +454,6 @@ Scout.DesktopTableChart = function (scout, $controlContainer, table, filterCallb
         .animate({tabIndex: 0}, {step: tweenIn, duration: 600})
         .attr('data-xAxis', key)
         .click(chartClick);
-
 
       // axis around the circle
       $chartMain.appendSVG('text', '', 'main-axis-x')
@@ -595,7 +592,7 @@ Scout.DesktopTableChart = function (scout, $controlContainer, table, filterCallb
     // change state
     if (event.ctrlKey) {
       if ($clicked.hasClassSVG('selected')) {
-        $clicked.removeClassSVG('selected');;
+        $clicked.removeClassSVG('selected');
       } else {
         $clicked.addClassSVG('selected');
       }

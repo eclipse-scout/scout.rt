@@ -234,7 +234,7 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
 
       if (column.$div.hasClass('sort-down')) {
         $column.appendDiv('', 'column-flag sort-down')
-          .attr('data-sort-order', column.$div.data('sort-order') + 1);;
+          .attr('data-sort-order', column.$div.data('sort-order') + 1);
       }
       if (column.$div.hasClass('filter')) {
         log(1);
@@ -269,8 +269,9 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
       // build html table
       var html = '<table><tr>';
 
-      for (var c = 0; c < columns.length; c++) {
-        var column = model.table.columns[c];
+      var c, column;
+      for (c = 0; c < columns.length; c++) {
+        column = model.table.columns[c];
 
         if (column.type == 'key') continue;
 
@@ -282,8 +283,8 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
       for (var r = 0; r < table.length; r++) {
         html += '<tr>';
 
-        for (var c = 0; c < columns.length; c++) {
-          var column = model.table.columns[c],
+        for (c = 0; c < columns.length; c++) {
+          column = model.table.columns[c],
             value = table[r][c];
 
           if (column.type == 'key') continue;
@@ -300,5 +301,5 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
       template = template.replace('{worksheet}', name).replace('{table}', html);
       template = window.btoa(unescape(encodeURIComponent(template)));
       window.location.href = uri + template;
-    };
+    }
 };

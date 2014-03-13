@@ -177,7 +177,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
     data.min = null;
     data.max = null;
 
-    for (var k in cube) {
+    for (k in cube) {
       if (cube.hasOwnProperty(k)) {
         var allCell = cube[k],
           subCell = [];
@@ -243,7 +243,7 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
 };
 
 Scout.DesktopMatrix.getCellValue = function (cell) {
-  if (cell == null) { //cell may be a number so don't use !cell
+  if (cell === null) { //cell may be a number so don't use !cell
     return null;
   }
   if (typeof cell !== 'object') {
@@ -256,7 +256,7 @@ Scout.DesktopMatrix.getCellValue = function (cell) {
 };
 
 Scout.DesktopMatrix.getCellText = function (cell) {
-  if (cell == null) { //cell may be a number so don't use !cell
+  if (cell === null) { //cell may be a number so don't use !cell
     return '';
   }
   if (typeof cell !== 'object') {

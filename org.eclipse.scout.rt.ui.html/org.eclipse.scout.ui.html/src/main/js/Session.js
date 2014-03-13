@@ -89,9 +89,10 @@ Scout.Session.prototype._sendNow = function (events, async) {
 Scout.Session.prototype.processEvents = function (events) {
   var scout=this;
   for(var i=0; i < events.length; i++) {
-    var event = events[i];
+    var event = events[i],
+      widget;
     if(event.type_ == "create") {
-      var widget = scout.widgetMap[event.parentId];
+      widget = scout.widgetMap[event.parentId];
       if(widget) {
         widget.onModelCreate(event);
       }
@@ -100,7 +101,7 @@ Scout.Session.prototype.processEvents = function (events) {
       }
     }
     else if(event.type_ == "property") {
-      var widget = scout.widgetMap[event.id];
+      widget = scout.widgetMap[event.id];
       if(widget) {
           widget.onModelPropertyChange(event);
       }
@@ -109,7 +110,7 @@ Scout.Session.prototype.processEvents = function (events) {
       }
     }
     else {
-      var widget = scout.widgetMap[event.id];
+      widget = scout.widgetMap[event.id];
       if(widget) {
           widget.onModelAction(event);
       }

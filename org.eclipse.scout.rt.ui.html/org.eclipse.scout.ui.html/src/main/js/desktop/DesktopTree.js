@@ -55,10 +55,11 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
   node.expanded = expanded;
 
   //Only expand / collapse if there are child nodes
-  if (node.childNodes.length == 0) {
+  if (node.childNodes.length === 0) {
     return true;
   }
-  var level = $node.attr('data-level');
+  var level = $node.attr('data-level'),
+    $control;
   if (expanded) {
     this._addNodes(node.childNodes,$node);
 
@@ -81,7 +82,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
 
         // animated control, at the end: parent is expanded
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
-        var $control = $node.children('.tree-item-control'),
+        $control = $node.children('.tree-item-control'),
           rotateControl = function (now, fx) {
             $control.css('transform', 'rotate(' + now + 'deg)');
           },
@@ -104,7 +105,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
     $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar));
 
     // animated control
-    var $control = $node.children('.tree-item-control'),
+    $control = $node.children('.tree-item-control'),
       rotateControl = function(now, fx){$control.css('transform', 'rotate(' + now + 'deg)');};
     $control.css('borderSpacing', 90)
       .animateAVCSD('borderSpacing', 0, null, rotateControl);
@@ -112,7 +113,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
 };
 
 Scout.DesktopTree.prototype.setNodeSelectedById = function (nodeId) {
-  var $node = undefined;
+  var $node;
   if (nodeId) {
     $node = this._$desktopTreeScroll.find('#' + nodeId);
     if ($node.data('node') === undefined) {
@@ -170,21 +171,12 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
     }
     level = $parent ? $parent.data('level') + 1 : 0;
 
-    var that = this;
-    var onNodeClicked = function() {
-      return that._onNodeClicked(event, $(this));
-    };
-
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
             .on('click', '', onNodeClicked)
             .data('node', node)
             .attr('data-level', level)
             .css('margin-left', level * 20)
             .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
-
-    var onNodeControlClicked = function() {
-      return that._onNodeControlClicked(event, $(this));
-    };
 
     // decorate with (close) control
     var $control = $node.appendDiv('', 'tree-item-control')
@@ -194,10 +186,6 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
     if ($node.hasClass('expanded')) {
       $control.css('transform', 'rotate(90deg)');
     }
-
-    var onNodeMenuClicked = function() {
-      return that._onNodeMenuClicked(event, $(this));
-    };
 
     // decorate with menu
     $node.appendDiv('', 'tree-item-menu')
@@ -228,6 +216,19 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
       var $n = this._addNodes(node.childNodes, $node);
       $allNodes = $allNodes.add($n);
     }
+  }
+
+  var that = this;
+  function onNodeClicked() {
+    return that._onNodeClicked(event, $(this));
+  }
+
+  function onNodeControlClicked() {
+    return that._onNodeControlClicked(event, $(this));
+  }
+
+  function onNodeMenuClicked() {
+    return that._onNodeMenuClicked(event, $(this));
   }
 
   // return all created nodes

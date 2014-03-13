@@ -1,6 +1,5 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
 /**
  * @param data will be sent to server
  */
@@ -9,7 +8,7 @@ Scout.Menu = function (scout, id, emptySpace, x, y) {
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
-  var data = undefined;
+  var data;
   if (emptySpace) {
     data = {"emptySpace" : true};
   }
@@ -25,14 +24,21 @@ Scout.Menu = function (scout, id, emptySpace, x, y) {
   var $menuControl = $('body').appendDiv('MenuControl')
           .css('left', x - 7).css('top', y - 3);
 
+  var onHoverIn = function() {
+    $('#MenuButtonsLabel').text($(this).data('label'));
+  };
+
+  var onHoverOut = function() {
+    $('#MenuButtonsLabel').text('');
+  };
+
   // create menu-item and menu-button
   for (var i = 0; i < menu.length; i++) {
     if (menu[i].icon) {
       $menuSelect.appendDiv('', 'menu-button')
         .attr('data-icon', menu[i].icon)
         .attr('data-label', menu[i].label)
-        .hover( function() {$('#MenuButtonsLabel').text($(this).data('label'));},
-            function() {$('#MenuButtonsLabel').text('');});
+        .hover(onHoverIn, onHoverOut);
     } else {
       $menuSelect.appendDiv('', 'menu-item', menu[i].label);
     }

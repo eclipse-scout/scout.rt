@@ -385,7 +385,7 @@ Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
       maxOrder = (value > maxOrder) ? value : maxOrder;
     });
 
-    if (clickOrder != undefined) {
+    if (clickOrder !== undefined) {
       newOrder = clickOrder;
     } else if (maxOrder > -1) {
       newOrder = maxOrder + 1;
@@ -415,7 +415,8 @@ Scout.DesktopTable.prototype._loadData = function () {
 Scout.DesktopTable.prototype._drawData = function (startRow) {
   // this function has to be fast
   var rowString = '';
-  var table = this.model.table;
+  var table = this.model.table,
+    that = this;
   for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
     var row = table.rows[r];
 
@@ -446,11 +447,9 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
 
   // repaint and append next block
   if (r < table.rows.length) {
-    var that = this;
     setTimeout(function() { that._drawData(startRow + 100); }, 0);
   }
 
-  var that = this;
   function onMouseDown (event) {
     var $row = $(event.delegateTarget),
       add = true,
@@ -569,7 +568,7 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
     var $clicked = $(this),
       x = $clicked.offset().left,
       y = $clicked.offset().top,
-      emptySpace = $selectedRows.length == 0;
+      emptySpace = $selectedRows.length === 0;
 
     new Scout.Menu(that.scout, that.model.table.id, emptySpace, x, y);
   }
@@ -597,12 +596,13 @@ Scout.DesktopTable.prototype.sumData = function (draw, groupColumn) {
 
       if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
           (r == $rows.length - 1)) && sum.length > 0) {
-        for (var c = 0; c < table.columns.length; c++) {
+        for (c = 0; c < table.columns.length; c++) {
           var $div;
 
-          if (typeof sum[c] == 'number')
+          if (typeof sum[c] == 'number') {
             $div = $.makeDiv('', '', sum[c])
               .css('text-align', 'right');
+          }
           else if (c == groupColumn) {
             $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
             .css('text-align', 'left');
