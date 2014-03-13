@@ -17,13 +17,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox1;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -81,7 +87,14 @@ public class AbstractFormFieldTest {
    */
   @Test
   public void testClassIdTemplateGroupBox() throws ProcessingException {
-    verifyNoDuplicateClassIds(new TestFormWithGroupBoxes().getAllFields());
+    TestFormWithGroupBoxes form = new TestFormWithGroupBoxes();
+    verifyNoDuplicateClassIds(form.getAllFields());
+    String completeClassId = form.getGroupBox1().getUsingOtherTemplateBox().getText1Field().classId();
+    String fieldClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(form.getGroupBox1().getUsingOtherTemplateBox().getText1Field().getClass());
+    String parentGroupboxClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(form.getGroupBox1().getUsingOtherTemplateBox().getClass(), true);
+    String parentParentGroupboxClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(form.getGroupBox1().getClass(), true);
+    String expectedClassId = fieldClassId + ITypeWithClassId.ID_CONCAT_SYMBOL + parentGroupboxClassId + ITypeWithClassId.ID_CONCAT_SYMBOL + parentParentGroupboxClassId;
+    Assert.assertEquals(expectedClassId, completeClassId);
   }
 
   private void verifyNoDuplicateClassIds(IFormField[] formFields) {
@@ -132,14 +145,22 @@ public class AbstractFormFieldTest {
       super();
     }
 
+    public GroupBox1 getGroupBox1() {
+      return getFieldByClass(GroupBox1.class);
+    }
+
+    public GroupBox2 getGroupBox2() {
+      return getFieldByClass(GroupBox2.class);
+    }
+
     public class MainBox extends AbstractGroupBox {
 
       @Order(10.0)
-      public class SimpleGroupBox extends AbstractTestGroupBox {
+      public class GroupBox1 extends AbstractTemplateUsingOtherTemplateGroupBox {
       }
 
       @Order(20.0)
-      public class SimpleGroupBox2 extends AbstractTestGroupBox {
+      public class GroupBox2 extends AbstractTemplateUsingOtherTemplateGroupBox {
       }
 
     }
