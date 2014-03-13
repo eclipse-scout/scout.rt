@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -140,6 +141,11 @@ public interface IDesktop extends IPropertyObserver {
    * DISPLAY_HINT_DIALOG
    */
   IForm[] getDialogStack();
+
+  /**
+   * Open dialogs or views that need to be saved
+   */
+  List<IForm> getUnsavedForms();
 
   /**
    * add form to desktop and notify attached listeners (incl. gui)

@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +70,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
@@ -1967,16 +1969,44 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Default behavior of the pre-hook is to delegate the before closing call to the each desktop extension.
-   * The method {@link IDesktopExtension#desktopBeforeClosingDelegate()} of each desktop extension will be called.
-   * If at least one of the desktop extension's delegate throws a {@link VetoException}, the closing process will be
-   * stopped unless the flag {@link AbstractDesktop#m_isForcedClosing} is not set to <code>true</code>.
-   * In this case the closing process will always be executed.
+   * <p>
+   * Default behavior of the pre-hook is to delegate the before closing call to the each desktop extension. The method
+   * {@link IDesktopExtension#desktopBeforeClosingDelegate()} of each desktop extension will be called. If at least one
+   * of the desktop extension's delegate throws a {@link VetoException}, the closing process will be stopped.
+   * </p>
+   * <p>
+   * Additionally, before closing, a dialog is shown to allow the user to save unsaved forms. At this point it is also
+   * possible to cancel closing.
+   * </p>
+   * If the flag {@link AbstractDesktop#m_isForcedClosing} is set to <code>true</code>, closing is always continued,
+   * without considering desktopExtensions or unsaved forms.
    */
   @Override
   public boolean doBeforeClosingInternal() {
-    IDesktopExtension[] extensions = getDesktopExtensions();
+    return isForcedClosing() || (continueClosingInDesktopExtensions() && continueClosingConsideringUnsavedForms());
+  }
+
+  protected boolean continueClosingConsideringUnsavedForms() {
+    List<IForm> forms = getUnsavedForms();
+    if (forms.size() > 0) {
+      try {
+        UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms);
+        f.startNew();
+        f.waitFor();
+        if (f.getCloseSystemType() == IButton.SYSTEM_TYPE_CANCEL) {
+          return false;
+        }
+      }
+      catch (ProcessingException e) {
+        LOG.error("Error closing forms", e);
+      }
+    }
+    return true;
+  }
+
+  private boolean continueClosingInDesktopExtensions() {
     boolean continueClosing = true;
+    IDesktopExtension[] extensions = getDesktopExtensions();
     if (extensions != null) {
       for (IDesktopExtension ext : extensions) {
         try {
@@ -1996,6 +2026,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    return isForcedClosing() || continueClosing;
+    return continueClosing;
+  }
+
+  @Override
+  public List<IForm> getUnsavedForms() {
+    List<IForm> saveNeededForms = new ArrayList<IForm>();
+
+    for (IForm f : getDialogStack()) {
+      if (f.isSaveNeeded()) {
+        saveNeededForms.add(f);
+      }
+    }
+    for (IForm f : getViewStack()) {
+      if (f.isSaveNeeded()) {
+        saveNeededForms.add(f);
+      }
+    }
+
+    return Collections.unmodifiableList(saveNeededForms);
   }
 }

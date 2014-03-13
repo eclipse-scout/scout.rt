@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.internal;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.EventListenerList;
@@ -545,6 +546,11 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public boolean doBeforeClosingInternal() {
     throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public List<IForm> getUnsavedForms() {
+    return null;
   }
 
 }
