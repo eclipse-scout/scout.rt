@@ -1048,7 +1048,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     StringBuilder fieldId = new StringBuilder();
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     fieldId.append(simpleClassId);
-    for (ICompositeField enclosingField : getEnclosingFieldList()) {
+    List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
+    Collections.reverse(enclosingFieldList);
+    for (ICompositeField enclosingField : enclosingFieldList) {
       String enclosingClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(enclosingField.getClass(), true);
       fieldId.append(ID_CONCAT_SYMBOL).append(enclosingClassId);
     }

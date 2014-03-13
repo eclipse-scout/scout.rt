@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fixture;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -41,6 +42,7 @@ public abstract class AbstractTestGroupBox extends AbstractGroupBox {
     return getFieldByClass(InnerTestGroupBox.class);
   }
 
+  @ClassId("1b67f4c4-1579-4875-a2c9-d62c7cd63508")
   @Order(10.0)
   public class Text1Field extends AbstractStringField {
   }
