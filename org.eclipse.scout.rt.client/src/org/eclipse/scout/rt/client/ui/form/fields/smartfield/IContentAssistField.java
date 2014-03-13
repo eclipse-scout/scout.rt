@@ -277,4 +277,9 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
    */
   int getProposalFormHeight();
 
+  /**
+   * @return
+   */
+  Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getContentAssistFieldTableClass();
+
 }

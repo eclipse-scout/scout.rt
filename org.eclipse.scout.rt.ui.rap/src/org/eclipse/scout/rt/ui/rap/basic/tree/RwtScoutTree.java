@@ -512,7 +512,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       case TreeEvent.TYPE_NODES_UPDATED: {
         //in case a virtual node was resolved, check if selection still valid
         ISelection oldSelection = getUiTreeViewer().getSelection();
-        ISelection newSelection = new StructuredSelection(getScoutObject().getSelectedNodes());
+        ISelection newSelection = new StructuredSelection(CollectionUtility.arrayList(getScoutObject().getSelectedNodes()));
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
         if (!newSelection.equals(oldSelection)) {
           getUiTreeViewer().setSelection(newSelection);

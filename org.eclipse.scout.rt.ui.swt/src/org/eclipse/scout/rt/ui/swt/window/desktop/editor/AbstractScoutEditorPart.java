@@ -139,7 +139,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
         toolBarManager = getEditorSite().getActionBars().getToolBarManager();
       }
       for (IToolButton b : toolbuttons) {
-        toolBarManager.add(new SwtScoutToolbarAction(b, toolBarManager, getSwtEnvironment()));
+        toolBarManager.add(new SwtScoutToolbarAction(b, getSwtEnvironment(), toolBarManager));
       }
       toolBarManager.update(true);
     }

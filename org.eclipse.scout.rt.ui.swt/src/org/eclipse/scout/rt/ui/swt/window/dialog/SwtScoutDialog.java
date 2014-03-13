@@ -171,7 +171,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     if (!toolbuttons.isEmpty()) {
       IToolBarManager toolBarManager = getRootForm().getToolBarManager();
       for (IToolButton b : toolbuttons) {
-        toolBarManager.add(new SwtScoutToolbarAction(b, toolBarManager, getEnvironment()));
+        toolBarManager.add(new SwtScoutToolbarAction(b, getEnvironment(), toolBarManager));
       }
       toolBarManager.update(true);
     }

@@ -95,6 +95,8 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
 
   private ILookupRow<KEY_TYPE> m_currentLookupRow;
 
+  private Class<? extends IContentAssistFieldTable<VALUE_TYPE>> m_contentAssistTableClazz;
+
   public AbstractContentAssistField() {
     this(true);
   }
@@ -216,6 +218,11 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   @Order(280)
   protected int getConfiguredProposalFormHeight() {
     return 280;
+  }
+
+  @Order(290)
+  protected Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getConfiguredContentAssistTable() {
+    return null;
   }
 
   /**
@@ -392,6 +399,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
     m_activeFilter = TriState.TRUE;
@@ -407,6 +415,19 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     setBrowseNewText(getConfiguredBrowseNewText());
     setProposalFormProvider(createProposalFormProvider());
     setProposalFormHeight(getConfiguredProposalFormHeight());
+    // content assist table
+    Class<? extends IContentAssistFieldTable<VALUE_TYPE>> contentAssistTableClazz = getConfiguredContentAssistTable();
+    // if no table is configured try to find a fitting inner class
+    if (contentAssistTableClazz == null) {
+      // try to find inner class
+      Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE_TYPE>>) ConfigurationUtility.filterClass(dca, IContentAssistFieldTable.class);
+    }
+    // if no inner class use default
+    if (contentAssistTableClazz == null) {
+      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE_TYPE>>) ContentAssistFieldTable.class;
+    }
+    setContentAssistTableClass(contentAssistTableClazz);
     IContentAssistFieldLookupRowFetcher<KEY_TYPE> lookupRowFetcher = createLookupRowFetcher();
     lookupRowFetcher.addPropertyChangeListener(new P_LookupRowFetcherPropertyListener());
     setLookupRowFetcher(lookupRowFetcher);
@@ -532,6 +553,18 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   @Override
   public int getProposalFormHeight() {
     return m_proposalFormHeight;
+  }
+
+  /**
+   * @param configuredContentAssistTableClass
+   */
+  private void setContentAssistTableClass(Class<? extends IContentAssistFieldTable<VALUE_TYPE>> configuredContentAssistTableClass) {
+    m_contentAssistTableClazz = configuredContentAssistTableClass;
+  }
+
+  @Override
+  public Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getContentAssistFieldTableClass() {
+    return m_contentAssistTableClazz;
   }
 
   /**

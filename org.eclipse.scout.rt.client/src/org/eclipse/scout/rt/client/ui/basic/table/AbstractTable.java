@@ -114,7 +114,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableRow> m_cachedRows;
   private final HashMap<CompositeObject, ITableRow> m_deletedRows;
   private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
-  private List<IMenu> m_menus;
   private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
   private final List<ITableRowFilter> m_rowFilters;
@@ -771,8 +770,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
     }
+    setMenus(menuList);
 
-    m_menus = menuList;
     // key strokes
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
     List<? extends Class<? extends IKeyStroke>> ksArray = getConfiguredKeyStrokes();
@@ -1501,14 +1500,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void importFromTableBeanData(AbstractTableFieldBeanData source) throws ProcessingException {
+    importFromTableRowBeanData(CollectionUtility.arrayList(source.getRows()), source.getRowType());
+  }
+
+  public void importFromTableRowBeanData(List<? extends AbstractTableRowData> rowDatas, Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
     discardAllDeletedRows();
     clearValidatedValuesOnAllColumns();
     clearAllRowsValidity();
     int deleteCount = 0;
     List<ITableRow> newRows = new ArrayList<ITableRow>();
-    ITableRowDataMapper mapper = createTableRowDataMapper(source.getRowType());
-    for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
-      AbstractTableRowData rowData = source.rowAt(i);
+    ITableRowDataMapper mapper = createTableRowDataMapper(rowType);
+    for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
+      AbstractTableRowData rowData = rowDatas.get(i);
       if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
         ITableRow newTableRow = new TableRow(getColumnSet());
         mapper.importTableRowData(newTableRow, rowData);
@@ -1523,8 +1526,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         setTableChanging(true);
         //
-        for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
-          AbstractTableRowData rowData = source.rowAt(i);
+        for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
+          AbstractTableRowData rowData = rowDatas.get(i);
           if (rowData.getRowState() == AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
             ITableRow newTableRow = new TableRow(getColumnSet());
             mapper.importTableRowData(newTableRow, rowData);
@@ -1619,8 +1622,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public void setMenus(List<? extends IMenu> menus) {
+    setProperty(PROP_MENUS, CollectionUtility.<IMenu> arrayListWithoutNullElements(menus));
+  }
+
+  @Override
+  public void addMenu(IMenu menu) {
+    List<IMenu> menus = new ArrayList<IMenu>(getMenus());
+    menus.add(menu);
+    setMenus(menus);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.unmodifiableListCopy((List<IMenu>) getProperty(PROP_MENUS));
   }
 
   @Override

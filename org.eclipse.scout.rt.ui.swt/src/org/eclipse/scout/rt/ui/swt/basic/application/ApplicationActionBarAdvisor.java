@@ -63,14 +63,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     if (d != null) {
       for (IViewButton scoutViewButton : d.getViewButtons()) {
         if (scoutViewButton.isVisible() && scoutViewButton.isVisibleGranted()) {
-          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutViewButton, m_toolbar, getEnvironment());
+          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutViewButton, getEnvironment(), m_toolbar);
           contributeToCoolBar(swtAction);
         }
       }
 
       for (IToolButton scoutToolButton : d.getToolButtons()) {
         if (scoutToolButton.isVisible() && scoutToolButton.isVisibleGranted()) {
-          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutToolButton, m_toolbar, getEnvironment());
+          SwtScoutToolbarAction swtAction = new SwtScoutToolbarAction(scoutToolButton, getEnvironment(), m_toolbar);
           contributeToCoolBar(swtAction);
         }
       }

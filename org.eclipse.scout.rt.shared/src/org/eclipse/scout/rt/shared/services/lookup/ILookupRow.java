@@ -13,11 +13,17 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 /**
  *
  */
 public interface ILookupRow<KEY_TYPE> extends Serializable {
+
+  AbstractTableRowData getAdditionalTableRowData();
+
+  void setAdditionalTableRowData(AbstractTableRowData bean);
+
   /**
    * @return
    */

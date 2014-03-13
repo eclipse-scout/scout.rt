@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformat
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartTableForm.MainBox.GroupBox.FilterField;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -35,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldTable;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -116,14 +116,6 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
   }
 
   @Override
-  protected void injectResultTableMenus(List<IMenu> menuList) {
-    super.injectResultTableMenus(menuList);
-
-    List<IMenu> smartFieldMenus = getContentAssistField().getMenus();
-    menuList.addAll(smartFieldMenus);
-  }
-
-  @Override
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
     // nop. Clicking a row must NOT close the form.
   }
@@ -160,6 +152,11 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
 
   public FilterField getFilterField() {
     return getFieldByClass(FilterField.class);
+  }
+
+  @Override
+  protected void execDecorateTable(IContentAssistFieldTable<LOOKUP_TYPE> table) {
+    table.setMenus(getContentAssistField().getMenus());
   }
 
   public class MainBox extends ContentAssistTableForm.MainBox {

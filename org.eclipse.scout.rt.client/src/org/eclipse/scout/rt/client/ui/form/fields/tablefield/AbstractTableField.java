@@ -225,7 +225,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     return false;
   }
 
-  private Class<? extends ITable> getConfiguredTable() {
+  protected Class<? extends ITable> getConfiguredTable() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ITable>> f = ConfigurationUtility.filterClasses(dca, ITable.class);
     if (f.size() == 1) {
@@ -247,18 +247,10 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   protected void initConfig() {
     super.initConfig();
     setTableStatusVisible(getConfiguredTableStatusVisible());
-    if (getConfiguredTable() != null) {
-      try {
-        setTableInternal((T) ConfigurationUtility.newInnerInstance(this, getConfiguredTable()));
-      }
-      catch (Exception e) {
-        LOG.warn(null, e);
-      }
-    }
+    setTableInternal(createTable());
     // local enabled listener
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
       @Override
@@ -268,6 +260,19 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
     });
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T createTable() {
+    if (getConfiguredTable() != null) {
+      try {
+        return (T) ConfigurationUtility.newInnerInstance(this, getConfiguredTable());
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
+      }
+    }
+    return null;
   }
 
   /*

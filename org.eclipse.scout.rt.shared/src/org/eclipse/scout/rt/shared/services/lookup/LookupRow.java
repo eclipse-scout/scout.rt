@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
@@ -30,6 +31,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public static final int ENABLED_BIT = 8;
   public static final int PARENT_KEY_BIT = 9;
   public static final int ACTIVE_BIT = 10;
+  public static final int ADDITIONAL_TABLE_ROW_DATA = 11;
 
   public LookupRow(ID_TYPE key, String text) {
     this(key, text, null);
@@ -280,6 +282,16 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   @Override
   public void setActive(boolean active) {
     setValueInternal(ACTIVE_BIT, active ? null : Boolean.FALSE);
+  }
+
+  @Override
+  public AbstractTableRowData getAdditionalTableRowData() {
+    return (AbstractTableRowData) getValueInternal(ADDITIONAL_TABLE_ROW_DATA);
+  }
+
+  @Override
+  public void setAdditionalTableRowData(AbstractTableRowData bean) {
+    setValueInternal(ADDITIONAL_TABLE_ROW_DATA, bean);
   }
 
   /**

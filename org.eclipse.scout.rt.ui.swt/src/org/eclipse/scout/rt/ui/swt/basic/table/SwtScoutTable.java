@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldTable;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
@@ -235,7 +235,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       return;
     }
     // Ensure multiline tooltip is not used for smartfield tables or list boxes
-    if (getScoutObject() instanceof ContentAssistTableForm.MainBox.ResultTableField.Table || getScoutObject() instanceof DefaultListBoxTable) {
+    if (getScoutObject() instanceof IContentAssistFieldTable || getScoutObject() instanceof DefaultListBoxTable) {
       return;
     }
     getSwtTableViewer().getTable().setToolTipText("");

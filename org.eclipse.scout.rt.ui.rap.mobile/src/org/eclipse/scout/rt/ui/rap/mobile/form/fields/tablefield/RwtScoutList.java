@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.table.AbstractAvoidWrongDoubleClickListener;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
@@ -50,7 +51,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
@@ -631,49 +631,33 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     }
   }
 
-  private class P_RwtTableListener implements Listener {
+  private class P_RwtTableListener extends AbstractAvoidWrongDoubleClickListener {
     private static final long serialVersionUID = 1L;
 
-    private Boolean m_doubleClicked = Boolean.FALSE;
-
     @Override
-    public void handleEvent(Event event) {
+    public void handleEventInternal(Event event) {
       //Doit can be used by other listeners to prevent the execution of this one
       if (!event.doit) {
         return;
       }
-
       switch (event.type) {
         case SWT.MouseUp: {
           setContextColumnFromUi();
-
-          synchronized (m_doubleClicked) {
-            if (m_doubleClicked == Boolean.TRUE) {
-              m_doubleClicked = Boolean.FALSE;
-              break;
-            }
-          }
           Point eventPosition = new Point(event.x, event.y);
+          ITableRow element = (ITableRow) getUiTableViewer().getElementAt(getUiField().getItemIndex(eventPosition));
           if (getUiField().getItem(eventPosition) == null) {
             getUiTableViewer().setSelection(null);
             setSelectionFromUi(new StructuredSelection());
           }
           else {
-            StructuredSelection selection = (StructuredSelection) getUiTableViewer().getSelection();
-            if (selection != null && selection.size() == 1) {
-              handleUiRowClick((ITableRow) selection.getFirstElement());
-            }
+            handleUiRowClick((ITableRow) element);
           }
           break;
         }
         case SWT.MouseDoubleClick: {
-          synchronized (m_doubleClicked) {
-            m_doubleClicked = Boolean.TRUE;
-          }
-          StructuredSelection selection = (StructuredSelection) getUiTableViewer().getSelection();
-          if (selection != null && selection.size() == 1) {
-            handleUiRowAction((ITableRow) selection.getFirstElement());
-          }
+          Point eventPosition = new Point(event.x, event.y);
+          ITableRow element = (ITableRow) getUiTableViewer().getElementAt(getUiField().getItemIndex(eventPosition));
+          handleUiRowAction((ITableRow) element);
           break;
         }
       }

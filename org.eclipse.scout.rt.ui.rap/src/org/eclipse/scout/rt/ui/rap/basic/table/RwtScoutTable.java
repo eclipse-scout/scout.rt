@@ -1102,13 +1102,11 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     menu.setVisible(true);
   }
 
-  private class P_RwtTableListener implements Listener {
+  private class P_RwtTableListener extends AbstractAvoidWrongDoubleClickListener {
     private static final long serialVersionUID = 1L;
 
-    private Boolean m_doubleClicked = Boolean.FALSE;
-
     @Override
-    public void handleEvent(Event event) {
+    public void handleEventInternal(Event event) {
       Point eventPosition = new Point(event.x, event.y);
       TableViewer uiTableViewer = getUiTableViewer();
       switch (event.type) {
@@ -1126,12 +1124,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           break;
         }
         case SWT.MouseUp: {
-          synchronized (m_doubleClicked) {
-            if (m_doubleClicked == Boolean.TRUE) {
-              m_doubleClicked = Boolean.FALSE;
-              break;
-            }
-          }
           StructuredSelection selection = (StructuredSelection) uiTableViewer.getSelection();
           if (selection != null && selection.size() == 1) {
             handleUiRowClick((ITableRow) selection.getFirstElement());
@@ -1139,9 +1131,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           break;
         }
         case SWT.MouseDoubleClick: {
-          synchronized (m_doubleClicked) {
-            m_doubleClicked = Boolean.TRUE;
-          }
           StructuredSelection selection = (StructuredSelection) uiTableViewer.getSelection();
           if (selection != null && selection.size() == 1) {
             handleUiRowAction((ITableRow) selection.getFirstElement());

@@ -115,7 +115,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return m_serviceCached;
   }
 
-  private ILookupService<KEY_TYPE> createLookupService() {
+  protected ILookupService<KEY_TYPE> createLookupService() {
     ILookupService<KEY_TYPE> s = null;
     if (getConfiguredService() != null) {
       s = SERVICES.getService(getConfiguredService());

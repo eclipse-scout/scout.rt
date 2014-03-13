@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
@@ -29,6 +30,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private String m_extKey;
   private Number m_value;
   private long m_partitionId;
+  private AbstractTableRowData m_additionalTableRowData;
 
   public CodeRow(Object[] cells) {
     this(cells, cells.length - 1);
@@ -296,5 +298,15 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
 
   public void setPartitionId(long partitionId) {
     m_partitionId = partitionId;
+  }
+
+  @Override
+  public AbstractTableRowData getAdditionalTableRowData() {
+    return m_additionalTableRowData;
+  }
+
+  @Override
+  public void setAdditionalTableRowData(AbstractTableRowData bean) {
+    m_additionalTableRowData = bean;
   }
 }

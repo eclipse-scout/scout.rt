@@ -205,7 +205,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
         toolBarManager = getViewSite().getActionBars().getToolBarManager();
       }
       for (IToolButton b : toolbuttons) {
-        toolBarManager.add(new SwtScoutToolbarAction(b, toolBarManager, getSwtEnvironment()));
+        toolBarManager.add(new SwtScoutToolbarAction(b, getSwtEnvironment(), toolBarManager));
       }
       toolBarManager.update(true);
     }

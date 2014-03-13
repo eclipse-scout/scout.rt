@@ -36,24 +36,23 @@ public class SwtScoutKeyStroke extends SwtKeyStroke {
   @Override
   public void handleSwtAction(Event e) {
     if (getScoutKeyStroke().isEnabled() && getScoutKeyStroke().isVisible()) {
-      if (SwtUtility.runSwtInputVerifier()) {
-        if (!m_handleActionPending) {
-          m_handleActionPending = true;
-          Runnable job = new Runnable() {
-            @Override
-            public void run() {
-              try {
-                getScoutKeyStroke().getUIFacade().fireActionFromUI();
-              }
-              finally {
-                m_handleActionPending = false;
-              }
+      SwtUtility.runSwtInputVerifier();
+      if (!m_handleActionPending) {
+        m_handleActionPending = true;
+        Runnable job = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              getScoutKeyStroke().getUIFacade().fireActionFromUI();
             }
-          };
-          getEnvironment().invokeScoutLater(job, 0);
-        }
-        e.doit = false;
-      } //
+            finally {
+              m_handleActionPending = false;
+            }
+          }
+        };
+        getEnvironment().invokeScoutLater(job, 0);
+      }
+      e.doit = false;
     }
   }
 

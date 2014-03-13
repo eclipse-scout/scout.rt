@@ -114,6 +114,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
+
+  /**
+   * @since 4.0.0
+   */
+  String PROP_MENUS = "menus";
   /**
    * Host for local urls that call back to the table itself and can be handled by overriding
    * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
@@ -888,4 +893,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 3.10.0-M5
    */
   ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException;
+
+  /**
+   * @param menus
+   */
+  void setMenus(List<? extends IMenu> menus);
+
+  /**
+   * @param menu
+   */
+  void addMenu(IMenu menu);
 }

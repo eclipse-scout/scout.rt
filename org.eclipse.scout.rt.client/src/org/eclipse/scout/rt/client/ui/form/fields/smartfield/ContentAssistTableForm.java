@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
@@ -25,12 +25,10 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -38,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ActiveStateRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.NewButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ResultTableField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ResultTableField.Table;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -57,7 +54,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   public void forceProposalSelection() throws ProcessingException {
     @SuppressWarnings("unchecked")
     ContentAssistTableForm<KEY_TYPE>.MainBox.ResultTableField tableField = getResultTableField();
-    ContentAssistTableForm.MainBox.ResultTableField.Table table = tableField.getTable();
+    IContentAssistFieldTable<KEY_TYPE> table = tableField.getTable();
     table.selectNextRow();
   }
 
@@ -75,46 +72,27 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
       searchText = result.getSearchText();
     }
     if (rows == null) {
-      rows = new ArrayList<ILookupRow<KEY_TYPE>>();
+      rows = Collections.emptyList();
     }
+
     try {
       // populate table
-      ResultTableField.Table table = (Table) getResultTableField().getTable();
-
-      int n = rows.size();
-      if (maxCount > 0) {
-        n = Math.min(n, maxCount);
-      }
-      List<ITableRow> tableRows = new ArrayList<ITableRow>();
-      for (int i = 0; i < n; i++) {
-        ITableRow row = table.createRow(new Object[]{rows.get(i), null});
-        tableRows.add(row);
-        row.setEnabled(rows.get(i).isEnabled());
-      }
+      IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
+      table.setTableChanging(true);
+      table.setLookupRows(CollectionUtility.truncateList(rows, maxCount));
       try {
-        table.setTableChanging(true);
-        table.discardAllRows();
-        table.addRows(tableRows);
         //restore selection
         KEY_TYPE keyToSelect = null;
         if (selectCurrentValue) {
           m_lastSelectedKey = getContentAssistField().getValueAsLookupKey();
           keyToSelect = m_lastSelectedKey;
         }
-        else if (table.getRowCount() == 1 && !isAllowCustomText()) {
+        else if (rows.size() == 1 && !isAllowCustomText()) {
           // select first
-          keyToSelect = (KEY_TYPE) table.getKeyColumn().getValue(0).getKey();
+          keyToSelect = (KEY_TYPE) CollectionUtility.firstElement(rows).getKey();
         }
         if (keyToSelect != null) {
-          for (ITableRow row : table.getRows()) {
-            if (CompareUtility.equals(keyToSelect, table.getKeyColumn().getValue(row).getKey())) {
-              table.selectRow(row);
-              if (table.isCheckable()) {
-                table.checkRow(row, true);
-              }
-              break;
-            }
-          }
+          table.select(keyToSelect);
         }
       }
       finally {
@@ -167,9 +145,9 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   protected ILookupRow<KEY_TYPE> execGetSingleMatch() {
     int matchCount = 0;
     ILookupRow<KEY_TYPE> foundRow = null;
-    Table table = (Table) getResultTableField().getTable();
     @SuppressWarnings("unchecked")
-    List<ILookupRow<KEY_TYPE>> values = table.getKeyColumn().getValues();
+    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
+    List<ILookupRow<KEY_TYPE>> values = table.getLookupRows();
     for (ILookupRow<KEY_TYPE> row : values) {
       if (row.isEnabled()) {
         foundRow = row;
@@ -197,16 +175,11 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   @Order(130)
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
     @SuppressWarnings("unchecked")
-    ILookupRow<KEY_TYPE> lrow = (ILookupRow<KEY_TYPE>) ((Table) getResultTableField().getTable()).getKeyColumn().getSelectedValue();
+    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
+    ILookupRow<KEY_TYPE> lrow = table.getSelectedLookupRow();
     if (lrow != null && lrow.isEnabled()) {
       doOk();
     }
-  }
-
-  /**
-   * Override this method to adapt the menu list of the result {@link Table}
-   */
-  protected void injectResultTableMenus(List<IMenu> menuList) {
   }
 
   @Override
@@ -225,16 +198,16 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
 
   @SuppressWarnings("unchecked")
   public ILookupRow<KEY_TYPE> getSelectedLookupRow() {
-    Table table = (Table) getResultTableField().getTable();
+    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
     ILookupRow<KEY_TYPE> row = null;
     if (table.isCheckable()) {
       Collection<ITableRow> checkedRows = table.getCheckedRows();
       if (CollectionUtility.hasElements(checkedRows)) {
-        row = (ILookupRow<KEY_TYPE>) table.getKeyColumn().getValue(CollectionUtility.firstElement(checkedRows));
+        row = (ILookupRow<KEY_TYPE>) table.getCheckedLookupRow();
       }
     }
     else {
-      row = (ILookupRow<KEY_TYPE>) table.getKeyColumn().getSelectedValue();
+      row = (ILookupRow<KEY_TYPE>) table.getSelectedLookupRow();
     }
 
     return row;
@@ -268,6 +241,14 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
     return getFieldByClass(NewButton.class);
   }
 
+  /**
+   * might be used to add special listeners to the smart table.
+   */
+  protected void execDecorateTable(IContentAssistFieldTable<KEY_TYPE> table) {
+
+  }
+
+  @Order(10)
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -291,10 +272,48 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
     }
 
     @Order(10)
-    public class ResultTableField extends AbstractTableField<ContentAssistTableForm.MainBox.ResultTableField.Table> {
+    public class ResultTableField extends AbstractTableField<IContentAssistFieldTable<KEY_TYPE>> {
 
       public ResultTableField() {
         super();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      protected IContentAssistFieldTable<KEY_TYPE> createTable() {
+        Class<?> contentAssistFieldTableClazz = getContentAssistField().getContentAssistFieldTableClass();
+        if (contentAssistFieldTableClazz != null) {
+          try {
+            return (IContentAssistFieldTable<KEY_TYPE>) ConfigurationUtility.newInnerInstance(getContentAssistField(), contentAssistFieldTableClazz);
+          }
+          catch (Exception e) {
+            LOG.warn(null, e);
+          }
+        }
+        return null;
+      }
+
+      @Override
+      protected void execInitField() throws ProcessingException {
+        getTable().addTableListener(new TableListener() {
+
+          @Override
+          public void tableChangedBatch(List<? extends TableEvent> batch) {
+          }
+
+          @Override
+          public void tableChanged(TableEvent e) {
+            if (e.getType() == TableEvent.TYPE_ROW_CLICK) {
+              try {
+                execResultTableRowClicked(CollectionUtility.firstElement(e.getRows()));
+              }
+              catch (ProcessingException e1) {
+                LOG.warn("could not handle smart table selection.", e);
+              }
+            }
+          }
+        });
+        execDecorateTable(getTable());
       }
 
       @Override
@@ -325,89 +344,6 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
       @Override
       protected void execUpdateTableStatus() {
         //nop
-      }
-
-      /*
-       * inner table
-       */
-      @Order(4)
-      public class Table extends AbstractTable {
-
-        @Override
-        protected void injectMenusInternal(List<IMenu> menuList) {
-          injectResultTableMenus(menuList);
-        }
-
-        @Override
-        protected boolean getConfiguredAutoResizeColumns() {
-          return true;
-        }
-
-        @Override
-        protected boolean getConfiguredHeaderVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredMultiSelect() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredMultiCheck() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredScrollToSelection() {
-          return true;
-        }
-
-        @Override
-        protected void execRowClick(ITableRow row) throws ProcessingException {
-          execResultTableRowClicked(row);
-        }
-
-        @SuppressWarnings("unchecked")
-        public KeyColumn getKeyColumn() {
-          return getColumnSet().getColumnByClass(KeyColumn.class);
-        }
-
-        @SuppressWarnings("unchecked")
-        public TextColumn getTextColumn() {
-          return getColumnSet().getColumnByClass(TextColumn.class);
-        }
-
-        @Order(1)
-        public class KeyColumn extends AbstractColumn<ILookupRow<KEY_TYPE>> {
-          @Override
-          protected boolean getConfiguredPrimaryKey() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredDisplayable() {
-            return false;
-          }
-        }
-
-        @Order(2)
-        public class TextColumn extends AbstractStringColumn {
-          @Override
-          protected void execDecorateCell(Cell cell, ITableRow row) {
-            ILookupRow<KEY_TYPE> lookupRow = getKeyColumn().getValue(row);
-            cell.setText(lookupRow.getText());
-            cell.setTooltipText(lookupRow.getTooltipText());
-            cell.setBackgroundColor(lookupRow.getBackgroundColor());
-            cell.setForegroundColor(lookupRow.getForegroundColor());
-            cell.setFont(lookupRow.getFont());
-            if (getResultTableField().getTable().getDefaultIconId() == null) {
-              if (lookupRow.getIconId() != null) {
-                cell.setIconId(lookupRow.getIconId());
-              }
-            }
-          }
-        }
       }
     }
 
@@ -533,7 +469,11 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
     @SuppressWarnings("unchecked")
     @Override
     protected void execLoad() throws ProcessingException {
-      getResultTableField().getTable().setDefaultIconId(getContentAssistField().getBrowseIconId());
+
+      ITable table = getResultTableField().getTable();
+      if (table.getDefaultIconId() == null) {
+        table.setDefaultIconId(getContentAssistField().getBrowseIconId());
+      }
       getActiveStateRadioButtonGroup().setVisible(getContentAssistField().isActiveFilterEnabled());
       getActiveStateRadioButtonGroup().setValue((TriState) getContentAssistField().getActiveFilter());
       getNewButton().setEnabled(getContentAssistField().getBrowseNewText() != null);

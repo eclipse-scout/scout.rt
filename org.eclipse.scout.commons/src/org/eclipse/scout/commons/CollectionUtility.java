@@ -169,6 +169,18 @@ public final class CollectionUtility {
     return list;
   }
 
+  public static <T> ArrayList<T> truncateList(List<? extends T> input, int maxSize) {
+    if (input == null) {
+      input = new ArrayList<T>();
+    }
+    ArrayList<T> result = new ArrayList<T>();
+    int endIndex = Math.min(input.size(), maxSize);
+    for (int i = 0; i < endIndex; i++) {
+      result.add(input.get(i));
+    }
+    return result;
+  }
+
   /**
    * Null safe creation of a {@link ArrayList} out of a given collection. The returned {@link ArrayList} is modifiable
    * and not null.
