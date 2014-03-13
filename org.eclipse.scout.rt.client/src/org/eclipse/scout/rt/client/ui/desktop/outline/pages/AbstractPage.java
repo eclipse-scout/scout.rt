@@ -561,12 +561,17 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         // do NOT unload page, because this will clear the selection
         // //getOutline().unloadNode(this);
         loadChildren();
-        execPageDataLoaded();
       }
       finally {
         tree.setTreeChanging(false);
       }
     }
+  }
+
+  @Override
+  public void loadChildren() throws ProcessingException {
+    super.loadChildren();
+    execPageDataLoaded();
   }
 
   @Override
