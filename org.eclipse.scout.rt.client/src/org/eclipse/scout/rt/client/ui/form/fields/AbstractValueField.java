@@ -201,14 +201,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   protected boolean execIsSaveNeeded() throws ProcessingException {
-    T value = getValue();
-    T initValue = getInitValue();
-    if (CompareUtility.equals(value, initValue)) {
-      return false;
-    }
-    else {
-      return true;
-    }
+    return !CompareUtility.equals(getValue(), getInitValue());
   }
 
   @Override

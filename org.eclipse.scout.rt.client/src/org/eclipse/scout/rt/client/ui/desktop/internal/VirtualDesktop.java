@@ -563,4 +563,9 @@ public class VirtualDesktop implements IDesktop {
   public void traverseFocusPrevious() {
   }
 
+  @Override
+  public List<IForm> getUnsavedForms() {
+    return null;
+  }
+
 }

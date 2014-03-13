@@ -145,6 +145,11 @@ public interface IDesktop extends IPropertyObserver {
   List<IForm> getDialogStack();
 
   /**
+   * Open dialogs or views that need to be saved
+   */
+  List<IForm> getUnsavedForms();
+
+  /**
    * add form to desktop and notify attached listeners (incl. gui)
    */
   void addForm(IForm form);
