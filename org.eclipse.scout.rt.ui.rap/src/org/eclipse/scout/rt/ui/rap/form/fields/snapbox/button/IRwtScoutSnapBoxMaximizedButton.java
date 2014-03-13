@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.snapbox.button;
 
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.form.fields.button.IRwtScoutButton;
 
-public interface IRwtScoutSnapBoxMaximizedButton extends IRwtScoutButton {
+public interface IRwtScoutSnapBoxMaximizedButton extends IRwtScoutButton<IButton> {
 
 }

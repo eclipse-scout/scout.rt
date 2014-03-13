@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,7 @@ import javax.swing.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
-public interface ISwingScoutButton extends ISwingScoutFormField<IButton> {
+public interface ISwingScoutButton<T extends IButton> extends ISwingScoutFormField<T> {
 
   AbstractButton getSwingButton();
 

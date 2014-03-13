@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -144,23 +143,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures the value represented by this radio button. This is the value that is
-   * returned if you query a radio button group for the current value and this button is the
-   * currently selected radio button.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   * 
-   * @return an {@code Object} representing the value of this radio button
-   * @see AbstractRadioButton
-   * @see AbstractRadioButtonGroup
-   */
-  @ConfigProperty(ConfigProperty.OBJECT)
-  @Order(230)
-  protected Object getConfiguredRadioValue() {
-    return null;
-  }
-
-  /**
    * Configures the icon for this button. The icon is displayed on the button itself. Depending on UI and look and feel,
    * this button might support icon groups to represent different states of this button, such as enabled, disabled,
    * mouse-over etc.
@@ -224,7 +206,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setDisplayStyleInternal(getConfiguredDisplayStyle());
     setProcessButton(getConfiguredProcessButton());
     setIconId(getConfiguredIconId());
-    setRadioValue(getConfiguredRadioValue());
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
@@ -329,19 +310,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         setEnabledProcessingButton(true);
       }
     }
-  }
-
-  /*
-   * Radio Buttons
-   */
-  @Override
-  public Object getRadioValue() {
-    return m_radioValue;
-  }
-
-  @Override
-  public void setRadioValue(Object o) {
-    m_radioValue = o;
   }
 
   /**

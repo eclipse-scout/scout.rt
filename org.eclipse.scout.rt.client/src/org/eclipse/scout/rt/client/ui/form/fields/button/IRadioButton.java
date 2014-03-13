@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.form.fields.button;
-
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.swt.widgets.Control;
+package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 /**
- * <h3>ISwtScoutButton</h3> ...
- * 
- * @since 1.0.0 10.03.2008
+ * Interface for a RadioButton
+ *
+ * @since 4.0.0-M7
  */
-public interface ISwtScoutButton<T extends IButton> extends ISwtScoutFormField<T> {
+public interface IRadioButton<T> extends IButton {
+  String PROP_RADIOVALUE = "radioValue";
 
-  @Override
-  Control getSwtField();
+  /**
+   * @return radio button value
+   * @since moved to {@link IRadioButton} in 4.0.0-M7
+   */
+  T getRadioValue();
+
+  /**
+   * @param o
+   *          radio button value
+   * @since moved to {@link IRadioButton} in 4.0.0-M7
+   */
+  void setRadioValue(T o);
 }

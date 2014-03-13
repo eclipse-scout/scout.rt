@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
@@ -671,12 +672,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       }
 
       @Order(1)
-      public class ActiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class ActiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -684,18 +680,13 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.TRUE;
         }
       }
 
       @Order(2)
-      public class InactiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class InactiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -703,18 +694,13 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.FALSE;
         }
       }
 
       @Order(3)
-      public class ActiveAndInactiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class ActiveAndInactiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -722,7 +708,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.UNDEFINED;
         }
       }

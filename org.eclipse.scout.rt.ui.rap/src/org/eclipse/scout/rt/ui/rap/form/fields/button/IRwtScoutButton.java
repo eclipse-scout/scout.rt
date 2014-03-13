@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
  * 
  * @since 3.7.0 June 2011
  */
-public interface IRwtScoutButton extends IRwtScoutFormField<IButton> {
+public interface IRwtScoutButton<T extends IButton> extends IRwtScoutFormField<T> {
 
   @Override
   Control getUiField();

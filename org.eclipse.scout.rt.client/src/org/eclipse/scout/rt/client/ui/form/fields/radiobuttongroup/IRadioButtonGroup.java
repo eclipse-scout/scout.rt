@@ -14,29 +14,29 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 
 public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
 
   /**
    * @return the buttons controlled by this radio button group
    */
-  List<IButton> getButtons();
+  List<IRadioButton<T>> getButtons();
 
   /**
    * @return the button representing this value
    */
-  IButton getButtonFor(T radioValue);
+  IRadioButton<T> getButtonFor(T radioValue);
 
   /**
    * @return the selected radio button controlled by this radio button group
    */
-  IButton getSelectedButton();
+  IRadioButton<T> getSelectedButton();
 
   /**
    * select a button controlled by this radio button group
    */
-  void selectButton(IButton button);
+  void selectButton(IRadioButton<T> button);
 
   /**
    * @return the radio value of the selected button controlled by this radio button group

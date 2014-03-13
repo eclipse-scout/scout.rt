@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -36,8 +35,9 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -51,14 +51,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * The listbox value is a Object[] where the Object[] is the set of selected
- * keys of the listbox<br>
- * the inner table shows those rows as selected which have the key value as a
- * part of the listbox value (Object[])
- * <p>
- * Note, that the listbox might not necessarily show all selected rows since the value of the listbox might contain
- * inactive keys that are not reflected in the listbox<br>
- * Therefore an empty listbox table is not the same as a listbox with an empty value (null)
+ * AbstractRadioButtonGroup contains a set of {@link IRadioButton} and can also contain other {@link IFormField}s at the
+ * same time. In an AbstractRadioButtonGroup only 1 RadioButton
+ * can be selected at a time.
  */
 @ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
 public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
@@ -69,7 +64,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private RadioButtonGroupGrid m_grid;
   private List<IFormField> m_fields;
-  private List<IButton> m_radioButtons;
+  private List<IRadioButton<T>> m_radioButtons;
 
   public AbstractRadioButtonGroup() {
     this(true);
@@ -166,29 +161,29 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       f.addPropertyChangeListener(new P_FieldPropertyChangeListenerEx());
     }
     //extract buttons from field subtree
-    ArrayList<IButton> buttonList = new ArrayList<IButton>();
+    List<IRadioButton<T>> buttonList = new ArrayList<IRadioButton<T>>();
     for (IFormField f : m_fields) {
-      IButton b = findFirstButtonInFieldTree(f);
+      IRadioButton<T> b = findFirstButtonInFieldTree(f);
       if (b != null) {
         buttonList.add(b);
       }
     }
     m_radioButtons = buttonList;
     //decorate radiobuttons
-    for (IButton b : m_radioButtons) {
-      b.setDisplayStyleInternal(IButton.DISPLAY_STYLE_RADIO);
+    for (IRadioButton b : m_radioButtons) {
       b.addPropertyChangeListener(new P_ButtonPropertyChangeListener());
     }
     handleFieldVisibilityChanged();
   }
 
-  private IButton findFirstButtonInFieldTree(IFormField f) {
-    if (f instanceof IButton) {
-      return (IButton) f;
+  @SuppressWarnings("unchecked")
+  private IRadioButton<T> findFirstButtonInFieldTree(IFormField f) {
+    if (f instanceof IRadioButton) {
+      return (IRadioButton) f;
     }
     else if (f instanceof ICompositeField) {
       for (IFormField sub : ((ICompositeField) f).getFields()) {
-        IButton b = findFirstButtonInFieldTree(sub);
+        IRadioButton<T> b = findFirstButtonInFieldTree(sub);
         if (b != null) {
           return b;
         }
@@ -266,7 +261,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   protected void initFieldInternal() throws ProcessingException {
     // special case: a button represents null
-    IButton b = getButtonFor(null);
+    IRadioButton b = getButtonFor(null);
     if (b != null) {
       syncValueToButtons();
     }
@@ -375,10 +370,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       validValue = null;
     }
     else {
-      T t = TypeCastUtility.castValue(rawValue, getHolderType());
-      IButton b = getButtonFor(t);
+      IRadioButton b = getButtonFor(rawValue);
       if (b != null) {
-        validValue = t;
+        validValue = rawValue;
       }
       else {
         throw new ProcessingException("Illegal radio value: " + rawValue);
@@ -398,9 +392,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public IButton getButtonFor(T value) {
-    for (IButton b : getButtons()) {
-      T radioValue = TypeCastUtility.castValue(b.getRadioValue(), getHolderType());
+  public IRadioButton<T> getButtonFor(T value) {
+    for (IRadioButton<T> b : getButtons()) {
+      T radioValue = b.getRadioValue();
       if (CompareUtility.equals(radioValue, value)) {
         return b;
       }
@@ -409,7 +403,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public IButton getSelectedButton() {
+  public IRadioButton<T> getSelectedButton() {
     return getButtonFor(getSelectedKey());
   }
 
@@ -419,8 +413,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public void selectButton(IButton button) {
-    for (IButton b : getButtons()) {
+  public void selectButton(IRadioButton button) {
+    for (IRadioButton b : getButtons()) {
       if (b == button) {
         button.setSelected(true);
         break;
@@ -524,7 +518,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public List<IButton> getButtons() {
+  public List<IRadioButton<T>> getButtons() {
     if (m_radioButtons == null) {
       return Collections.emptyList();
     }
@@ -563,8 +557,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       m_valueAndSelectionMediatorActive = true;
       //
       T selectedKey = getSelectedKey();
-      IButton selectedButton = getButtonFor(selectedKey);
-      for (IButton b : getButtons()) {
+      IRadioButton selectedButton = getButtonFor(selectedKey);
+      for (IRadioButton b : getButtons()) {
         b.setSelected(b == selectedButton);
       }
     }
@@ -573,18 +567,17 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  private void syncButtonsToValue(IButton selectedButton) {
+  private void syncButtonsToValue(IRadioButton<T> selectedButton) {
     if (m_valueAndSelectionMediatorActive) {
       return;
     }
     try {
       m_valueAndSelectionMediatorActive = true;
       //
-      for (IButton b : getButtons()) {
+      for (IRadioButton<T> b : getButtons()) {
         b.setSelected(b == selectedButton);
       }
-      T radioValue = TypeCastUtility.castValue(selectedButton.getRadioValue(), getHolderType());
-      selectKey(radioValue);
+      selectKey(selectedButton.getRadioValue());
     }
     finally {
       m_valueAndSelectionMediatorActive = false;
@@ -614,11 +607,12 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)
    */
   private class P_ButtonPropertyChangeListener implements PropertyChangeListener {
+    @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IButton.PROP_SELECTED)) {
-        if (((IButton) e.getSource()).isSelected()) {
-          syncButtonsToValue((IButton) e.getSource());
+        if (((IRadioButton) e.getSource()).isSelected()) {
+          syncButtonsToValue((IRadioButton<T>) e.getSource());
         }
       }
     }
@@ -627,7 +621,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   /**
    * A dynamic unconfigured radio button
    */
-  private final class RadioButton extends AbstractButton {
+  private final class RadioButton extends AbstractRadioButton<T> {
     @Override
     protected void initConfig() {
       super.initConfig();

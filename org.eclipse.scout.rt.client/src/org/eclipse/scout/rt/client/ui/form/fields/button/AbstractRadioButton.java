@@ -10,8 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 
-public abstract class AbstractRadioButton extends AbstractButton implements IButton {
+/**
+ * Abstract class for a RadioButton.
+ */
+public abstract class AbstractRadioButton<T> extends AbstractButton implements IRadioButton<T> {
 
   public AbstractRadioButton() {
     this(true);
@@ -21,11 +27,43 @@ public abstract class AbstractRadioButton extends AbstractButton implements IBut
     super(callInitializer);
   }
 
-  /*
-   * Configuration
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setRadioValue(getConfiguredRadioValue());
+  }
+
+  /**
+   * Configures the value represented by this radio button. This is the value that is
+   * returned if you query a radio button group for the current value and this button is the
+   * currently selected radio button.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return an {@code Object} representing the value of this radio button
+   * @see AbstractRadioButton
+   * @see AbstractRadioButtonGroup
+   * @since moved to {@link AbstractRadioButton} in 4.0.0-M6
    */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(230)
+  protected T getConfiguredRadioValue() {
+    return null;
+  }
+
   @Override
   protected int getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_RADIO;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public T getRadioValue() {
+    return (T) propertySupport.getProperty(PROP_RADIOVALUE);
+  }
+
+  @Override
+  public void setRadioValue(T o) {
+    propertySupport.setProperty(PROP_RADIOVALUE, o);
   }
 }

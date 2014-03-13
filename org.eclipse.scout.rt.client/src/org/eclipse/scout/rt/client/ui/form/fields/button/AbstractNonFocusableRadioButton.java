@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-
-public abstract class AbstractNonFocusableRadioButton extends AbstractButton implements IButton {
+public abstract class AbstractNonFocusableRadioButton<T> extends AbstractRadioButton<T> implements IRadioButton<T> {
 
   public AbstractNonFocusableRadioButton() {
     this(true);
@@ -21,16 +20,8 @@ public abstract class AbstractNonFocusableRadioButton extends AbstractButton imp
     super(callInitializer);
   }
 
-  /*
-   * Configuration
-   */
   @Override
   protected boolean getConfiguredFocusable() {
     return false;
-  }
-
-  @Override
-  protected int getConfiguredDisplayStyle() {
-    return DISPLAY_STYLE_RADIO;
   }
 }

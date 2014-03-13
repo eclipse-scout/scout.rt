@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ActiveStateRadioButtonGroup;
@@ -364,12 +365,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
       }
 
       @Order(10)
-      public class ActiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class ActiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -377,18 +373,13 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.TRUE;
         }
       }
 
       @Order(20)
-      public class InactiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class InactiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -396,18 +387,13 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.FALSE;
         }
       }
 
       @Order(30)
-      public class ActiveAndInactiveButton extends AbstractButton {
-
-        @Override
-        protected int getConfiguredDisplayStyle() {
-          return DISPLAY_STYLE_RADIO;
-        }
+      public class ActiveAndInactiveButton extends AbstractRadioButton<TriState> {
 
         @Override
         protected String getConfiguredLabel() {
@@ -415,7 +401,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
         }
 
         @Override
-        protected Object getConfiguredRadioValue() {
+        protected TriState getConfiguredRadioValue() {
           return TriState.UNDEFINED;
         }
       }
@@ -475,7 +461,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
         table.setDefaultIconId(getContentAssistField().getBrowseIconId());
       }
       getActiveStateRadioButtonGroup().setVisible(getContentAssistField().isActiveFilterEnabled());
-      getActiveStateRadioButtonGroup().setValue((TriState) getContentAssistField().getActiveFilter());
+      getActiveStateRadioButtonGroup().setValue(getContentAssistField().getActiveFilter());
       getNewButton().setEnabled(getContentAssistField().getBrowseNewText() != null);
       getNewButton().setLabel(getContentAssistField().getBrowseNewText());
     }

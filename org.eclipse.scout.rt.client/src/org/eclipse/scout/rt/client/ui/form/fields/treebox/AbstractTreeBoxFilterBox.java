@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -180,16 +180,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(10)
-    public class CheckedButton extends AbstractButton {
+    public class CheckedButton extends AbstractRadioButton<Boolean> {
 
       @Override
       protected void execAddSearchTerms(SearchFilter search) {
         //nop
-      }
-
-      @Override
-      protected int getConfiguredDisplayStyle() {
-        return DISPLAY_STYLE_RADIO;
       }
 
       @Override
@@ -198,7 +193,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
       }
 
       @Override
-      protected Object getConfiguredRadioValue() {
+      protected Boolean getConfiguredRadioValue() {
         return true;
       }
 
@@ -209,16 +204,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(20)
-    public class AllButton extends AbstractButton {
+    public class AllButton extends AbstractRadioButton<Boolean> {
 
       @Override
       protected void execAddSearchTerms(SearchFilter search) {
         //nop
-      }
-
-      @Override
-      protected int getConfiguredDisplayStyle() {
-        return DISPLAY_STYLE_RADIO;
       }
 
       @Override
@@ -227,7 +217,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
       }
 
       @Override
-      protected Object getConfiguredRadioValue() {
+      protected Boolean getConfiguredRadioValue() {
         return false;
       }
 
@@ -290,16 +280,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(10)
-    public class ActiveButton extends AbstractButton {
+    public class ActiveButton extends AbstractRadioButton<TriState> {
 
       @Override
       protected void execAddSearchTerms(SearchFilter search) {
         //nop
-      }
-
-      @Override
-      protected int getConfiguredDisplayStyle() {
-        return DISPLAY_STYLE_RADIO;
       }
 
       @Override
@@ -308,7 +293,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
       }
 
       @Override
-      protected Object getConfiguredRadioValue() {
+      protected TriState getConfiguredRadioValue() {
         return TriState.TRUE;
       }
 
@@ -319,16 +304,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(20)
-    public class InactiveButton extends AbstractButton {
+    public class InactiveButton extends AbstractRadioButton<TriState> {
 
       @Override
       protected void execAddSearchTerms(SearchFilter search) {
         //nop
-      }
-
-      @Override
-      protected int getConfiguredDisplayStyle() {
-        return DISPLAY_STYLE_RADIO;
       }
 
       @Override
@@ -337,7 +317,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
       }
 
       @Override
-      protected Object getConfiguredRadioValue() {
+      protected TriState getConfiguredRadioValue() {
         return TriState.FALSE;
       }
 
@@ -348,16 +328,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(30)
-    public class ActiveAndInactiveButton extends AbstractButton {
+    public class ActiveAndInactiveButton extends AbstractRadioButton<TriState> {
 
       @Override
       protected void execAddSearchTerms(SearchFilter search) {
         //nop
-      }
-
-      @Override
-      protected int getConfiguredDisplayStyle() {
-        return DISPLAY_STYLE_RADIO;
       }
 
       @Override
@@ -366,7 +341,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
       }
 
       @Override
-      protected Object getConfiguredRadioValue() {
+      protected TriState getConfiguredRadioValue() {
         return TriState.UNDEFINED;
       }
 

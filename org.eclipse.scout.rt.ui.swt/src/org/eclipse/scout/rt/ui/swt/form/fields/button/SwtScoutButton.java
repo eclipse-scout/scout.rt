@@ -50,10 +50,10 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * <h3>SwtScoutButton</h3> ...
- * 
+ *
  * @since 1.0.0 07.04.2008
  */
-public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements ISwtScoutButton {
+public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T> implements ISwtScoutButton<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutButton.class);
 
   private ButtonListener m_scoutButtonListener;
@@ -75,30 +75,21 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     Hyperlink swtFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        MultilineRadioButton btn = getEnvironment().getFormToolkit().createMultilineRadioButton(container);
-        swtFieldAsButton = btn;
+        swtFieldAsButton = createSwtRadioButton(container, SWT.NONE);
         break;
       }
       case IButton.DISPLAY_STYLE_TOGGLE: {
-        ButtonEx swtButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.CENTER | SWT.TOGGLE);
+        ButtonEx swtButton = createSwtToggleButton(container, SWT.CENTER | SWT.TOGGLE);
         swtFieldAsButton = swtButton;
         break;
       }
       case IButton.DISPLAY_STYLE_LINK: {
-        int style = SWT.CENTER;
-        Hyperlink swtLink = getEnvironment().getFormToolkit().createHyperlink(container, "", style);
-        swtLink.setUnderlined(true);
+        Hyperlink swtLink = createSwtHyperlink(container, "", SWT.CENTER);
         swtFieldAsLink = swtLink;
         break;
       }
       default: {
-        int style = SWT.CENTER | SWT.PUSH;
-        if (getScoutObject().hasMenus()) {
-          style |= SWT.DROP_DOWN;
-        }
-        ButtonEx swtButton = getEnvironment().getFormToolkit().createButtonEx(container, style);
-        swtButton.setDropDownEnabled(true);
-        swtFieldAsButton = swtButton;
+        swtFieldAsButton = createSwtPushButton(container, SWT.CENTER | SWT.PUSH);
       }
     }
     //
@@ -113,12 +104,8 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
       setSwtField(swtFieldAsButton);
       //auto process button height
       LogicalGridData gd = (LogicalGridData) swtFieldAsButton.getLayoutData();
-      //set default button height
-      if (getScoutObject().isProcessButton() && !gd.useUiHeight) {
-        gd.useUiHeight = true;
-        IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
-        gd.heightHint = deco.getProcessButtonHeight();
-      }
+      adaptButtonLayoutData(gd);
+
     }
     else if (swtFieldAsLink != null) {
       swtFieldAsLink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -133,6 +120,54 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     }
     // layout
     getSwtContainer().setLayout(new LogicalGridLayout(0, 0));
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected void adaptButtonLayoutData(LogicalGridData gd) {
+
+    //set default button height
+    if (getScoutObject().isProcessButton() && !gd.useUiHeight) {
+      gd.useUiHeight = true;
+      IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
+      gd.heightHint = deco.getProcessButtonHeight();
+    }
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected Hyperlink createSwtHyperlink(Composite container, String text, int style) {
+    Hyperlink link = getEnvironment().getFormToolkit().createHyperlink(container, text, style);
+    link.setUnderlined(true);
+    return link;
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected Control createSwtRadioButton(Composite container, int style) {
+    return getEnvironment().getFormToolkit().createMultilineRadioButton(container);
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected ButtonEx createSwtToggleButton(Composite container, int style) {
+    return getEnvironment().getFormToolkit().createButtonEx(container, style);
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected ButtonEx createSwtPushButton(Composite container, int style) {
+    if (getScoutObject().hasMenus()) {
+      style |= SWT.DROP_DOWN;
+    }
+    ButtonEx swtButton = getEnvironment().getFormToolkit().createButtonEx(container, style);
+    swtButton.setDropDownEnabled(true);
+    return swtButton;
   }
 
   @Override

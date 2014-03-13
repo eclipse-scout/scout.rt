@@ -52,7 +52,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
  * Composition between a scout IButton and a swing
  * JButton/JToggleButton/JRadioButton
  */
-public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implements ISwingScoutButton {
+public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposite<T> implements ISwingScoutButton<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutButton.class);
 
   private ButtonListener m_scoutButtonListener;
@@ -68,26 +68,15 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     AbstractButton swingFieldAsButton = null;
     switch (getScoutButton().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        JRadioButton swingButton = new JRadioButtonEx();
-        swingButton.setOpaque(false);
-        swingButton.setRolloverEnabled(false);
-        swingButton.addItemListener(new P_SwingSelectionListener());
-        swingButton.setAlignmentX(0);
-        swingButton.setVerticalAlignment(SwingConstants.TOP);
-        swingFieldAsButton = swingButton;
+        swingFieldAsButton = createSwingRadioButton();
         break;
       }
       case IButton.DISPLAY_STYLE_TOGGLE: {
-        JToggleButtonEx swingButton = new JToggleButtonEx();
-        swingButton.addItemListener(new P_SwingSelectionListener());
-        swingButton.setAlignmentX(0.5f);
-        swingFieldAsButton = swingButton;
+        swingFieldAsButton = createSwingToggleButton();
         break;
       }
       default: {
-        JButtonEx swingButton = new JButtonEx();
-        swingButton.setAlignmentX(0.5f);
-        swingFieldAsButton = swingButton;
+        swingFieldAsButton = createSwingPushButton();
       }
     }
     //
@@ -118,24 +107,58 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     container.setName(getScoutButton().getClass().getSimpleName() + ".container");
     setSwingLabel(null);
     setSwingField(swingFieldAsButton);
+
+    //in case the button is inside a dropdowncomposite, copy the griddata to the drop down composite
     LogicalGridData gd = (LogicalGridData) swingFieldAsButton.getClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME);
+    adaptButtonLayoutData(gd);
+    ((JComponent) container.getComponent(0)).putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, gd);
+    setSwingContainer(container);
+    container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
+  }
+
+  /**
+   * Create the gridData for the Button
+   *
+   * @since 4.0.0-M7
+   */
+  protected void adaptButtonLayoutData(LogicalGridData gd) {
     if (getScoutObject().isProcessButton() && !gd.useUiHeight) {
       //set default button height
       gd.useUiHeight = true;
       gd.heightHint = getSwingEnvironment().getProcessButtonHeight();
     }
-    //bsi ticket 101344: modify the layout constraint for the checkbox, so it is only as wide as its label.
-    //this avoids that clicking in white space area toggles the value
-    switch (getScoutButton().getDisplayStyle()) {
-      case IButton.DISPLAY_STYLE_RADIO: {
-        gd.fillHorizontal = false;
-        break;
-      }
-    }
-    //in case the button is inside a dropdowncomposite, copy the griddata to the drop down composite
-    ((JComponent) container.getComponent(0)).putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, gd);
-    setSwingContainer(container);
-    container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected JRadioButton createSwingRadioButton() {
+    JRadioButton swingButton = new JRadioButtonEx();
+    swingButton.setOpaque(false);
+    swingButton.setRolloverEnabled(false);
+    swingButton.addItemListener(new P_SwingSelectionListener());
+    swingButton.setAlignmentX(0);
+    swingButton.setVerticalAlignment(SwingConstants.TOP);
+    return swingButton;
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected JToggleButtonEx createSwingToggleButton() {
+    JToggleButtonEx swingButton = new JToggleButtonEx();
+    swingButton.addItemListener(new P_SwingSelectionListener());
+    swingButton.setAlignmentX(0.5f);
+    return swingButton;
+  }
+
+  /**
+   * @since 4.0.0-M7
+   */
+  protected JButtonEx createSwingPushButton() {
+    JButtonEx swingButton = new JButtonEx();
+    swingButton.setAlignmentX(0.5f);
+    return swingButton;
   }
 
   @Override
@@ -147,7 +170,7 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     }
   }
 
-  public IButton getScoutButton() {
+  public T getScoutButton() {
     return getScoutObject();
   }
 
@@ -163,7 +186,7 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
       m_scoutButtonListener = new P_ScoutButtonListener();
       getScoutButton().addButtonListener(m_scoutButtonListener);
     }
-    IButton b = getScoutButton();
+    T b = getScoutButton();
     setIconIdFromScout(b.getIconId());
     setImageFromScout(b.getImage());
     setSelectionFromScout(b.isSelected());

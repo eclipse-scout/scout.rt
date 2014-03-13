@@ -111,16 +111,5 @@ public interface IButton extends IFormField {
    */
   void requestPopup();
 
-  /**
-   * @return radio button value
-   */
-  Object getRadioValue();
-
-  /**
-   * @param o
-   *          radio button value
-   */
-  void setRadioValue(Object o);
-
   IButtonUIFacade getUIFacade();
 }
