@@ -978,7 +978,7 @@ public class SwtMock implements IGuiMock {
         if (f.getItemCount() > 0) {
           for (CTabItem item : f.getItems()) {
             if (item.isShowing()) {
-              if (title.equals(cleanButtonLabel(item.getText()))) {
+              if (title.equals(cleanCTabItemTitle(item.getText()))) {
                 return item;
               }
             }
@@ -987,6 +987,14 @@ public class SwtMock implements IGuiMock {
       }
     }
     return null;
+  }
+
+  /**
+   * Removes mnemonics and the '*' character that indicates dirty state
+   */
+  protected String cleanCTabItemTitle(String title) {
+    String result = StringUtility.removeMnemonic(title);
+    return StringUtility.removePrefixes(result, "*").trim();
   }
 
   protected Control waitForPushButtonWithLabel(final String label) {
