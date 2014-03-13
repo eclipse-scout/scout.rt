@@ -115,6 +115,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }
       json.put("nodes", jsonPages);
       json.put("selectedNodeIds", nodeIdsToJson(getModelObject().getSelectedNodes()));
+
+      JsonDesktopTable jsonTable = m_jsonTables.get(getModelObject().getDetailTable());
+      if (jsonTable != null) {
+        json.put("detailTableId", jsonTable.getId());
+      }
       return json;
     }
     catch (JSONException e) {
@@ -375,6 +380,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     try {
       final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString("nodeId"));
       final boolean expanded = event.getEventObject().getBoolean("expanded");
+      if (node.isExpanded() == expanded) {
+        return;
+      }
 
       new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
         @Override
@@ -477,16 +485,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   protected void handleModelPropertyChange(String name, Object newValue) {
     if (IOutline.PROP_DETAIL_TABLE.equals(name)) {
       ITable table = (ITable) newValue;
-//      JsonDesktopTable jsonTable = m_jsonTables.get(table);
-//      if (jsonTable == null) {
-//        jsonTable = new JsonDesktopTable(table, getJsonSession());
-//        jsonTable.init();
-//        m_jsonTables.put(table, jsonTable);
-//        getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
-//      }
-//      else {
-//        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", jsonTable.getId());
-//      }
+
+      JsonDesktopTable jsonTable = m_jsonTables.get(table);
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", jsonTable.getId());
     }
     else {
       super.handleModelPropertyChange(name, newValue);

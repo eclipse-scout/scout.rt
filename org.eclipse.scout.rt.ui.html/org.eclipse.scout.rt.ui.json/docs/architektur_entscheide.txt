@@ -11,5 +11,6 @@ Attach / Detach vs. new Scout.DesktopTable()
 
 Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
 - Beispiel: Server schickt nodes und pro node table gleich mit, table darf aber noch nicht gerendert werden (wäre spezifisch für desktoptree)
-- Alternative: Client holt sich die table on demand bei selektion (falls noch nicht vorhanden) und stellt sie gleich dar (wäre spezifisch für desktoptree)
-- Alternative2: Server schickt nodes aber ohne Table. Table kommt mit pageDetailTableChanged Event. Selektierte node ist jedoch hier bei outline Wechsel noch nicht verfügbar
+  Aktuell wird einfach ein JsonDesktopTable erzeugt ohne gui, damit table events behandelt werden können.
+- Soll die Erzeugung vom Server getriggert werden mittels create events? Aktuell wird die table einfach mit den nodes mitgeschickt
+
