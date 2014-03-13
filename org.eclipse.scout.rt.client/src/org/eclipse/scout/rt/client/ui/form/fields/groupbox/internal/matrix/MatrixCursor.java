@@ -53,7 +53,7 @@ public class MatrixCursor {
     else if (getOrientation() == Orientation.Horizontal) {
       m_currentIndex.x++;
       if (m_currentIndex.x >= startX + columnCount) {
-        m_currentIndex.x = 0;
+        m_currentIndex.x = startX;
         m_currentIndex.y++;
       }
     }
@@ -61,7 +61,7 @@ public class MatrixCursor {
       // vertical
       m_currentIndex.y++;
       if (m_currentIndex.y >= startY + rowCount) {
-        m_currentIndex.y = 0;
+        m_currentIndex.y = startY;
         m_currentIndex.x++;
       }
     }
