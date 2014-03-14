@@ -20,13 +20,19 @@ public class Section implements IDocSection {
   protected final IDocTable m_table;
   protected final IDocSection[] m_subSections;
   protected String m_title;
+  protected String m_introduction;
 
   public Section(String title, IDocSection... subSections) {
-    this(title, null, subSections);
+    this(title, null, null, subSections);
   }
 
   public Section(String title, IDocTable table, IDocSection... subSections) {
+    this(title, null, table, subSections);
+  }
+
+  public Section(String title, String introduction, IDocTable table, IDocSection... subSections) {
     m_title = title;
+    m_introduction = introduction;
     m_table = table;
     m_subSections = subSections;
   }
@@ -34,6 +40,11 @@ public class Section implements IDocSection {
   @Override
   public String getTitle() {
     return m_title;
+  }
+
+  @Override
+  public String getIntroduction() {
+    return m_introduction;
   }
 
   @Override

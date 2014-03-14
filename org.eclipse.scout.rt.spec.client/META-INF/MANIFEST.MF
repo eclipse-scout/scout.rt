@@ -7,7 +7,9 @@ Bundle-Activator: org.eclipse.scout.rt.spec.client.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.rt.spec.client,
  org.eclipse.scout.rt.spec.client.config,
+ org.eclipse.scout.rt.spec.client.config.entity,
  org.eclipse.scout.rt.spec.client.gen,
+ org.eclipse.scout.rt.spec.client.gen.extract,
  org.eclipse.scout.rt.spec.client.out,
  org.eclipse.scout.rt.spec.client.out.html,
  org.eclipse.scout.rt.spec.client.out.mediawiki,

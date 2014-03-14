@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.annotations.Doc.Filtering;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
@@ -175,7 +175,7 @@ public class DocGenUtilityTest {
     IFormField[] fields = new IFormField[1];
     fields[0] = testField;
     @SuppressWarnings("unchecked")
-    IDocEntityListConfig<IFormField> config = mock(IDocEntityListConfig.class);
+    IDocEntityTableConfig<IFormField> config = mock(IDocEntityTableConfig.class);
     ArrayList<IDocTextExtractor<IFormField>> ex = new ArrayList<IDocTextExtractor<IFormField>>();
     ex.add(new DescriptionExtractor<IFormField>());
     when(config.getTextExtractors()).thenReturn(ex);

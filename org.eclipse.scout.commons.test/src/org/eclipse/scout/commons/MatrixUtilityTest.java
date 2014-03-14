@@ -13,6 +13,7 @@ package org.eclipse.scout.commons;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -126,4 +127,25 @@ public class MatrixUtilityTest {
 
     assertArrayEquals(expected, data);
   }
+
+  @Test
+  public void testSortComparator() {
+    MatrixUtility.sortWithComparators(m_array,
+        new ArrayComparator.ColumnComparator(2, new ArrayComparator.DefaultObjectComparator(new Locale("de", "CH"))),
+        new ArrayComparator.ColumnComparator(1, Collections.reverseOrder(new ArrayComparator.DefaultObjectComparator(new Locale("de", "CH")))));
+    assertArrayEquals(new Object[][]{E3, E4, E5, E2, E1}, m_array);
+  }
+
+  @Test
+  public void testSortComparatorNoVararg() {
+    MatrixUtility.sortWithComparators(m_array);
+    assertArrayEquals(m_array, m_array);
+  }
+
+  @Test
+  public void testSortNoVararg() {
+    MatrixUtility.sort(m_array);
+    assertArrayEquals(m_array, m_array);
+  }
+
 }

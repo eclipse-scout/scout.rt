@@ -214,18 +214,36 @@ public final class MatrixUtility {
   }
 
   /**
-   * Convenience function to sort data for later call to {@link #createCodeRowArray(Object[][])} The sort indices are
-   * 0-based.
+   * Sorting a 2d Object array providing {@link ArrayComparator.ColumnComparator ArrayComparator.ColumnComparators}
+   * 
+   * @param data
+   * @param columnComparators
+   */
+  public static void sortWithComparators(Object[][] data, ArrayComparator.ColumnComparator... columnComparators) {
+    if (data != null && data.length >= 2 && columnComparators != null && columnComparators.length > 0) {
+      Arrays.sort(data, new ArrayComparator(columnComparators));
+    }
+  }
+
+  /**
+   * Delegates to {@link #sort(Locale, Object[][], int...)} using {@link NlsUtility#getDefaultLocale()}
    * <p>
    * <b>It is recommended to use {@link #sort(Locale, Object[][], int...)} with the specific {@link Locale}</b>
+   * 
+   * @param data
+   * @param sortColumns
    */
   public static void sort(Object[][] data, int... sortColumns) {
     sort(NlsUtility.getDefaultLocale(), data, sortColumns);
   }
 
   /**
-   * Convenience function to sort data for later call to {@link #createCodeRowArray(Object[][])} The sort indices are
-   * 0-based.
+   * Sorting a 2d Object array using {@link ArrayComparator}
+   * 
+   * @param locale
+   * @param data
+   * @param sortColumns
+   *          0-bases column indices
    */
   public static void sort(Locale locale, Object[][] data, int... sortColumns) {
     if (data != null && data.length >= 2 && sortColumns != null && sortColumns.length > 0) {

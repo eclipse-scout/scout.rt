@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("60f8536e-c0db-44c5-88ae-83289620f790")
 public abstract class AbstractFormStateButton extends AbstractButton implements IButton {
 
   public AbstractFormStateButton() {

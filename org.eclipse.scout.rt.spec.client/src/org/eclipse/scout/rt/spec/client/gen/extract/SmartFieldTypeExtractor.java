@@ -21,6 +21,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  */
 public class SmartFieldTypeExtractor extends AbstractNamedTextExtractor<ISmartField<?>> {
 
+  protected LinkableTypeExtractor<ICodeType> m_codeTypeExtroactor = new LinkableTypeExtractor<ICodeType>(ICodeType.class, true);
+  protected LinkableTypeExtractor<LookupCall> m_linkableTypeExtractor = new LinkableTypeExtractor<LookupCall>(LookupCall.class, true);
+
   public SmartFieldTypeExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.type"));
   }
@@ -31,11 +34,14 @@ public class SmartFieldTypeExtractor extends AbstractNamedTextExtractor<ISmartFi
     Class codeTypeClass = getCodeTypeClass(smartfield);
     if (codeTypeClass != null) {
       text.append(TEXTS.get("org.eclipse.scout.rt.spec.codetype")).append(": ");
-      text.append(new LinkableTypeExtractor<ICodeType>().getText(getCodeTypeClass(smartfield)));
+      text.append(m_codeTypeExtroactor.getText(getCodeTypeClass(smartfield)));
+    }
+    else if (smartfield.getLookupCall() != null) {
+      text.append(TEXTS.get("org.eclipse.scout.rt.spec.lookupcall")).append(": ");
+      text.append(m_linkableTypeExtractor.getText(smartfield.getLookupCall()));
     }
     else {
-      text.append(TEXTS.get("org.eclipse.scout.rt.spec.lookupcall")).append(": ");
-      text.append(new LinkableTypeExtractor<LookupCall>().getText(smartfield.getLookupCall()));
+      text.append(TEXTS.get("org.eclipse.scout.rt.spec.na"));
     }
     return text.toString();
   }

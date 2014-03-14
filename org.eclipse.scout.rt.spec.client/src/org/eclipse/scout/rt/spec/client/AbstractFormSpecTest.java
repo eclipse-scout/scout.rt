@@ -35,6 +35,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
   public void generateSpec() throws ProcessingException {
     List<File> screenshots = printScreenshots();
     IForm form = createAndStartForm(Collections.<FormListener> emptyList());
+    form.activate();
     IDocSection doc = generateDocSection(form);
     writeMediawikiFile(doc, SpecUtility.getSpecFileBaseName(form), getImagePaths(screenshots));
     form.doClose();
@@ -42,9 +43,10 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
 
   protected List<File> printScreenshots() throws ProcessingException {
     ArrayList<FormListener> formListeners = new ArrayList<FormListener>();
-    PrintScreenshotsFormListener listener = new PrintScreenshotsFormListener(new FormScreenshotPrinter(getFileConfig().getImageDir()));
+    PrintScreenshotsFormListener listener = new PrintScreenshotsFormListener(new FormScreenshotPrinter(SpecIOUtility.getSpecFileConfigInstance().getImageDir()));
     formListeners.add(listener);
     IForm form = createAndStartForm(formListeners);
+    form.activate();
     form.waitFor();
     return listener.getPrintedFiles();
   }
@@ -73,7 +75,12 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
    */
   protected String[] getImagePaths(List<File> screenshots) throws ProcessingException {
     File[] files = CollectionUtility.toArray(screenshots, File.class);
-    return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(files, getFileConfig().getSpecDir()), "../");
+    return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(files, SpecIOUtility.getSpecFileConfigInstance().getSpecDir()), "../");
+  }
+
+  @Override
+  protected int getTopHeadingLevel() {
+    return getConfiguration().getFormConfig().getTopHeadingLevel();
   }
 
 }

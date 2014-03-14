@@ -15,8 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.junit.Test;
@@ -97,17 +99,35 @@ public class ActionExtractorTest {
   }
 
   /**
-   * Tests that {@link EmptySpaceSelectionExtractor#getText(AbstractAction)} return the true text
-   * {@link AbstractBooleanTextExtractor.DOC_ID_TRUE}, if single selection is enabled.
+   * Test for {@link HierarchicActionNodeLabelExtractor}
    */
   @Test
-  public void testActionPropertyExtractor() {
-    final String testText = "TEST_TEXT";
-    ActionPropertyExtractor<AbstractAction> ex = new ActionPropertyExtractor<AbstractAction>(IAction.PROP_TEXT, "TEST_HEADER");
-    AbstractAction testAction = mock(AbstractAction.class);
-    when(testAction.getProperty(IAction.PROP_TEXT)).thenReturn(testText);
-    String text = ex.getText(testAction);
-    assertEquals(testText, text);
+  public void testHierarchicActionNodeLabelExtractor() {
+    String indent = SpecUtility.getDocConfigInstance().getIndent();
+    HierarchicActionNodeLabelExtractor<IMenu> ex = new HierarchicActionNodeLabelExtractor<IMenu>();
+    AbstractMenu hierarchicMenu = new AbstractMenu() {
+      @Override
+      protected String getConfiguredText() {
+        return "hierarchicMenu";
+      }
+    };
+    AbstractMenu subMenu = new AbstractMenu() {
+      @Override
+      protected String getConfiguredText() {
+        return "subMenu";
+      }
+    };
+    subMenu.setParent(hierarchicMenu);
+    AbstractMenu subSubMenu = new AbstractMenu() {
+      @Override
+      protected String getConfiguredText() {
+        return "subSubMenu";
+      }
+    };
+    subSubMenu.setParent(subMenu);
+    assertEquals(hierarchicMenu.getText(), ex.getText(hierarchicMenu));
+    assertEquals(indent + subMenu.getText(), ex.getText(subMenu));
+    assertEquals(indent + indent + subSubMenu.getText(), ex.getText(subSubMenu));
   }
 
   /**

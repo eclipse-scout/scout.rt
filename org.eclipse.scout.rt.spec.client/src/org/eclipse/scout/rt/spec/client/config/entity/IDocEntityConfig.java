@@ -45,4 +45,9 @@ public interface IDocEntityConfig<T> {
    */
   IDocTextExtractor<T> getTitleExtractor();
 
+  /**
+   * @return default top heading level for form spec
+   */
+  int getTopHeadingLevel();
+
 }

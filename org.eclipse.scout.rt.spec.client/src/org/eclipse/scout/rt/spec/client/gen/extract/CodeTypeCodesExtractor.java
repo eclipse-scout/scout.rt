@@ -31,6 +31,7 @@ public class CodeTypeCodesExtractor extends AbstractNamedTextExtractor<Class> {
    */
   @Override
   public String getText(Class c) {
+    FallbackTextExtractor<Class> codeNameExtractor = new FallbackTextExtractor<Class>(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name", true), new SimpleTypeTextExtractor<Class>());
     if (!ICodeType.class.isAssignableFrom(c)) {
       // TODO ASA scout 4.0: can generic param be further typed Class<? extends ICodeType>?
       return null;
@@ -38,7 +39,7 @@ public class CodeTypeCodesExtractor extends AbstractNamedTextExtractor<Class> {
     ArrayList<String> codes = new ArrayList<String>();
     for (Class innerClass : c.getDeclaredClasses()) {
       if (AbstractCode.class.isAssignableFrom(innerClass)) {
-        codes.add(innerClass.getSimpleName());
+        codes.add(codeNameExtractor.getText(innerClass));
       }
     }
     return ListUtility.format(codes);

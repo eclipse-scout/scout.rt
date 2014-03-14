@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
@@ -36,19 +37,10 @@ public class FormTitleExtractor extends AbstractNamedTextExtractor<IForm> {
   public String getText(IForm form) {
     StringBuilder sb = new StringBuilder();
     if (m_anchor) {
-      sb.append(MediawikiUtility.createAnchor(getAnchorId(form)));
+      sb.append(MediawikiUtility.createAnchor(SpecUtility.createAnchorId(form)));
     }
     sb.append(MediawikiUtility.transformToWiki(form.getTitle()));
     return sb.toString();
-  }
-
-  public static String getAnchorId(IForm form) {
-    String classId = form.classId();
-    return getAnchorId(classId);
-  }
-
-  public static String getAnchorId(String classId) {
-    return "c_" + classId;
   }
 
 }

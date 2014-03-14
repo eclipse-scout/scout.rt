@@ -12,17 +12,17 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.ArrayComparator;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
- * A template for describing the configuration of the generated documentation for a list of scout entities. (e.g. a list
- * all smartfields in a form).
+ * Configuration for the documentation of scout entities in a table (e.g. a table containing all fields in a form)
  * 
  * @param <T>
  *          the type of the configuration (e.g. {@link org.eclipse.scout.rt.client.ui.form.fields.IFormField IFormField}
  */
-public interface IDocEntityListConfig<T> {
+public interface IDocEntityTableConfig<T> {
 
   /**
    * Configuration for documenting type <code>T</code>.
@@ -39,8 +39,15 @@ public interface IDocEntityListConfig<T> {
   List<IDocFilter<T>> getFilters();
 
   /**
-   * Configuration describing an extractor for the title of the entities
+   * Title of the section
    */
   String getTitle();
+
+  /**
+   * {@link ArrayComparator.ColumnComparator ArrayComparator.ColumnComparators} for sorting the table
+   * <p>
+   * If null or empty, no sorting takes place.
+   */
+  ArrayComparator.ColumnComparator[] getSortColumns();
 
 }

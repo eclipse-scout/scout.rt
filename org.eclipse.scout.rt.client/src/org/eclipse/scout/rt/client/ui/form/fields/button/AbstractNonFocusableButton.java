@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 
+@ClassId("36dc920b-26df-4d40-bf38-0c83361fd4c8")
 public abstract class AbstractNonFocusableButton extends AbstractButton implements IButton {
 
   public AbstractNonFocusableButton() {

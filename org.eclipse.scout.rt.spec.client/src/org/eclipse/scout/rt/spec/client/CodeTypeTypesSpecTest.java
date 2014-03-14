@@ -11,20 +11,22 @@ package org.eclipse.scout.rt.spec.client;
 
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityListConfig;
+import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 
 /**
  * implementation of {@link AbstractTypeSpecTest} for lookup calls
  */
 public class CodeTypeTypesSpecTest extends AbstractTypeSpecTest {
 
+  public static final String ID = "org.eclipse.scout.rt.spec.codetypetypes";
+
   public CodeTypeTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.codetypetypes", TEXTS.get("org.eclipse.scout.rt.spec.codetypetypes"), ICodeType.class, true);
+    super(ID, TEXTS.get(ID), TEXTS.getWithFallback(ID + ".introduction", null), ICodeType.class, true);
   }
 
   @Override
-  protected IDocEntityListConfig<Class> getEntityListConfig() {
-    return getConfiguration().getCodetypeTypesConfig();
+  protected IDocEntityTableConfig<Class> getEntityListConfig() {
+    return getConfiguration().getCodeTypeTypesTableConfig();
   }
 
 }

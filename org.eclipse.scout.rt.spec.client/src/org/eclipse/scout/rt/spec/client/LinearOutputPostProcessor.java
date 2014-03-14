@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,6 +39,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(LinearOutputPostProcessor.class);
   public static final String ANCHOR_PREFIX = "lo_";
   private File m_configFile;
+  private String m_outputFileName;
 
   /**
    * @param configFile
@@ -61,6 +62,9 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     }
     if (m_configFile == null || !m_configFile.exists()) {
       LOG.error("Configfile " + configFile + " could not be copied!");
+    }
+    else {
+      m_outputFileName = m_configFile.getName().replace(".config", ".mediawiki");
     }
   }
 
@@ -117,18 +121,19 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
 
   protected File concatenateFiles() throws ProcessingException {
     File outputFile = null;
-    String outputFileName = m_configFile.getName().replace(".config", "");
     List<String> configEntries = IOUtility.readLines(m_configFile, "UTF-8");
-    if (!StringUtility.isNullOrEmpty(outputFileName)) {
-      PrintWriter writer = null;
-      outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), outputFileName + ".mediawiki");
-      outputFile.delete();
-      try {
-        outputFile.createNewFile();
-        writer = new PrintWriter(outputFile);
-        for (String configEntry : configEntries) {
+    List<String> referencedFileNames = new ArrayList<String>();
+    PrintWriter writer = null;
+    outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), m_outputFileName);
+    outputFile.delete();
+    try {
+      outputFile.createNewFile();
+      writer = new PrintWriter(outputFile);
+      for (String configEntry : configEntries) {
+        if (!isComment(configEntry)) {
           File file = findFileForConfigEntry(configEntry);
           if (file != null) {
+            referencedFileNames.add(file.getName());
             IOUtility.appendFile(writer, file);
             writer.flush();
           }
@@ -137,16 +142,45 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
           }
         }
       }
-      catch (IOException e) {
-        throw new ProcessingException("Error creating output file.", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error creating output file.", e);
+    }
+    finally {
+      if (writer != null) {
+        writer.close();
       }
-      finally {
-        if (writer != null) {
-          writer.close();
+    }
+    logMissingEntries(referencedFileNames);
+    return outputFile;
+  }
+
+  /**
+   * log all mediawiki files that are not referenced in config
+   * 
+   * @param referencedFilenames
+   * @throws ProcessingException
+   */
+  protected void logMissingEntries(List<String> referencedFilenames) throws ProcessingException {
+    final String suffix = ".mediawiki";
+    String[] fileList = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().list(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.endsWith(suffix);
+      }
+    });
+    if (fileList != null) {
+      for (String file : fileList) {
+        if (!referencedFilenames.contains(file) && !m_outputFileName.equals(file)) {
+          LOG.warn("There is no entry for the existing file " + file + " in " + m_configFile.getName() + ".");
         }
       }
     }
-    return outputFile;
+
+  }
+
+  protected boolean isComment(String configEntry) {
+    return configEntry.startsWith("#");
   }
 
   protected File findFileForConfigEntry(String configEntry) throws ProcessingException {

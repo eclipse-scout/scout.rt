@@ -29,39 +29,60 @@ public class SpecialDescriptionExtractor extends AbstractNamedTextExtractor<Clas
 
   protected String m_keySuffix;
   protected boolean m_createAnchor;
+  protected IDocTextExtractor<Class> m_fallback;
 
   /**
    * @param name
    * @param keySuffix
    * @param createAnchor
-   *          if true the extracted text starts with an anchor with ["c_" + classId] as id
+   *          If true the extracted text starts with an anchor with ["c_" + classId] as id.
+   * @param fallback
+   *          Used by {@link #getText(Class)} when no special description is available.
    */
-  public SpecialDescriptionExtractor(String name, String keySuffix, boolean createAnchor) {
+  public SpecialDescriptionExtractor(String name, String keySuffix, boolean createAnchor, IDocTextExtractor<Class> fallback) {
     super(name);
     m_keySuffix = keySuffix;
     m_createAnchor = createAnchor;
+    m_fallback = fallback;
   }
 
   /**
-   * convenience for {@link #SpecialDescriptionExtractor(name, keySuffix, false)}
+   * convenience for {@link #SpecialDescriptionExtractor(String, String, boolean, IDocTextExtractor)} with parameters
+   * <code>(name, keySuffix, createAnchor, null)</code>
+   * 
+   * @param name
+   * @param keySuffix
+   * @param createAnchor
+   */
+  public SpecialDescriptionExtractor(String name, String keySuffix, boolean createAnchor) {
+    this(name, keySuffix, createAnchor, null);
+  }
+
+  /**
+   * convenience for {@link #SpecialDescriptionExtractor(String, String, boolean, IDocTextExtractor)} with parameters
+   * <code>(name, keySuffix, false, null)</code>
    * 
    * @param name
    * @param keySuffix
    */
   public SpecialDescriptionExtractor(String name, String keySuffix) {
-    this(name, keySuffix, false);
+    this(name, keySuffix, false, null);
   }
 
   /**
-   * @return fully qualified class name.
+   * @return special description or fallback.
+   *         <p>
+   *         Optionally the returned text contains an anchor.
+   *         <p>
+   *         Null is returned if no special description is available and fallback is either not set or extracts null.
    */
   @Override
   public String getText(Class clazz) {
     String text = TEXTS.getWithFallback(ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz) + m_keySuffix, null);
-    if (text == null) {
-      return null;
+    if (text == null && m_fallback != null) {
+      text = m_fallback.getText(clazz);
     }
-    return m_createAnchor ? MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz)) + text : text;
+    return text != null && m_createAnchor ? MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(clazz)) + text : text;
   }
 
 }

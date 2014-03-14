@@ -17,7 +17,9 @@ import org.eclipse.scout.rt.shared.TEXTS;
  */
 public class ColumnTypesSpecTest extends AbstractTypeSpecTest {
 
+  public static final String ID = "org.eclipse.scout.rt.spec.columntypes";
+
   public ColumnTypesSpecTest() {
-    super("org.eclipse.scout.rt.spec.columntypes", TEXTS.get("org.eclipse.scout.rt.spec.columntypes"), IColumn.class);
+    super(ID, TEXTS.get(ID), TEXTS.getWithFallback(ID + ".introduction", null), IColumn.class);
   }
 }

@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 
+@ClassId("1221cfac-4636-4d53-8485-07872f956fc1")
 public abstract class AbstractRadioButton extends AbstractButton implements IButton {
 
   public AbstractRadioButton() {

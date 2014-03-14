@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.extension.client.ui.form.fields.button;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
+@ClassId("80fd5704-5db4-4d3c-a93c-d94bf74b76fd")
 public abstract class AbstractExtensibleButton extends AbstractButton implements IExtensibleScoutObject {
 
   public AbstractExtensibleButton() {

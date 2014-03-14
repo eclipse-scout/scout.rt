@@ -31,4 +31,14 @@ public class MediawikiUtilityTest {
   public void createLinkTest() {
     assertEquals("[[ID0815|display name]]", MediawikiUtility.createLink("ID0815", "display name"));
   }
+
+  @Test
+  public void createAnchorTest() {
+    assertEquals("{{a:id123456}}", MediawikiUtility.createAnchor("id123456"));
+  }
+
+  @Test
+  public void removeAnchorsAndLinksTest() {
+    assertEquals("some text, some more text linkDisplayName link2DisplayName", MediawikiUtility.removeAnchorsAndLinks("some text, {{a:id}}some more text {{a:id2}}[[link|linkDisplayName]] [[link2|link2DisplayName]]"));
+  }
 }

@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -27,7 +28,6 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
  * Extracts the label of a field
  */
 public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormField> implements IDocTextExtractor<IFormField> {
-  protected static final String INDENT = "&nbsp;&nbsp;&nbsp;";
   private boolean m_hierarchicLabels;
   private List<IDocFilter<IFormField>> m_docFilters;
 
@@ -46,14 +46,33 @@ public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormFie
 
   @Override
   public String getText(IFormField field) {
-    String label;
+    StringBuilder label = new StringBuilder();
+    label.append(MediawikiUtility.createAnchor(createAnchorId(field)));
     if (isFieldWithDetailSection(field)) {
-      label = MediawikiUtility.createLink(FieldDetailTitleExtractor.createAnchorId(field), getLabelOrSubstituteWhenEmpty(field));
+      label.append(MediawikiUtility.createLink(FieldDetailTitleExtractor.createAnchorId(field), getLabelOrSubstituteWhenEmpty(field)));
     }
     else {
-      label = getLabelOrSubstituteWhenEmpty(field);
+      label.append(getLabelOrSubstituteWhenEmpty(field));
     }
-    return decorateText(field, label);
+    return decorateText(field, label.toString());
+  }
+
+  /**
+   * create the anchor id for a field with the following syntax<br>
+   * [anchorId of the containing form spec]_field_[classId of the field]<br>
+   * --> e.g. c_721c3f5f-bd28-41e4-a5f0-d78891034485_field_9876545f-bd28-41e4-a5f0-a879987df485
+   * 
+   * @param field
+   * @return
+   */
+  public static String createAnchorId(IFormField field) {
+    StringBuilder sb = new StringBuilder();
+    if (field.getForm() != null) {
+      sb.append(SpecUtility.createAnchorId(field.getForm()));
+    }
+    sb.append("_field_");
+    sb.append(field.classId());
+    return sb.toString();
   }
 
   /**
@@ -113,7 +132,7 @@ public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormFie
     StringBuilder sb = new StringBuilder();
     if (m_hierarchicLabels) {
       int level = getLevel(field);
-      sb.append(StringUtility.repeat(INDENT, level));
+      sb.append(StringUtility.repeat(SpecUtility.getDocConfigInstance().getIndent(), level));
     }
     return sb.toString();
   }

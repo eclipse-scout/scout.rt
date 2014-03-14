@@ -36,7 +36,7 @@ public class MediawikiPostProcessorTest {
     s_links.setProperty("target2", "targetFile.mediawiki#target2");
     s_links.setProperty("c_776bff1c-6cfa-41d8-b01d-c2240103180c", "testFormTargetFile.mediawiki#c_776bff1c-6cfa-41d8-b01d-c2240103180c");
     s_links.setProperty("lo_c_776bff1c-6cfa-41d8-b01d-c2240103180c", "testFormTargetFile.mediawiki#lo_c_776bff1c-6cfa-41d8-b01d-c2240103180c");
-    s_linkProcessor = new MediawikiPostProcessor.P_LinkProcessor(s_links, new MediawikiPostProcessor().m_classIdTargets);
+    s_linkProcessor = new MediawikiPostProcessor.P_LinkProcessor(s_links, new MediawikiPostProcessor().m_classIdTargets, null);
   }
 
   /**

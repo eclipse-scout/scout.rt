@@ -36,8 +36,8 @@ public class PageSpecGenerator {
     IColumn<?>[] columns = page.getTable().getColumns();
     IMenu[] menus = page.getTable().getMenus();
 
-    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnConfig(), false);
-    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuConfig(), false);
+    IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnTableConfig(), false);
+    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuTableConfig(), false);
     return new Section(title, menuSection, columnSection);
   }
 }

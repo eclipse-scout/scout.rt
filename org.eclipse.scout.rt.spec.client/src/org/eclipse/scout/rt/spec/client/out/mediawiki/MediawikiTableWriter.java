@@ -140,4 +140,13 @@ public class MediawikiTableWriter {
     m_writer.append(NEWLINE);
   }
 
+  /**
+   * @param text
+   * @throws IOException
+   */
+  public void appendText(String text) throws IOException {
+    m_writer.append(text);
+    m_writer.append(NEWLINE);
+  }
+
 }

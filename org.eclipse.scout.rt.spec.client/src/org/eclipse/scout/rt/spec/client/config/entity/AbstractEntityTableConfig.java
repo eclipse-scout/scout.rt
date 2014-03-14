@@ -13,17 +13,18 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.ArrayComparator.ColumnComparator;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  *
  */
-public abstract class AbstractEntityListConfig<T extends ITypeWithClassId> implements IDocEntityListConfig<T> {
+public abstract class AbstractEntityTableConfig<T extends ITypeWithClassId> implements IDocEntityTableConfig<T> {
 
   /**
    * Default filters for {@link org.eclipse.scout.rt.client.ui.form.fields.IFormField IFormField}: Ignores Types
@@ -42,6 +43,11 @@ public abstract class AbstractEntityListConfig<T extends ITypeWithClassId> imple
     p.add(new TypeExtractor<T>());
     p.add(new DescriptionExtractor<T>());
     return p;
+  }
+
+  @Override
+  public ColumnComparator[] getSortColumns() {
+    return null;
   }
 
 }

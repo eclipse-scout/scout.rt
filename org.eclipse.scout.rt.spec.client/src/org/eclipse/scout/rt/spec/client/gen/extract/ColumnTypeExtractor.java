@@ -44,11 +44,14 @@ public class ColumnTypeExtractor extends LinkableTypeExtractor<IColumn<?>> {
     Class codeTypeClass = getCodeTypeClass(smartcolumn);
     if (codeTypeClass != null) {
       text.append(TEXTS.get("org.eclipse.scout.rt.spec.codetype")).append(": ");
-      text.append(new LinkableTypeExtractor<ICodeType>().getText(getCodeTypeClass(smartcolumn)));
+      text.append(new LinkableTypeExtractor<ICodeType>(ICodeType.class, true).getText(getCodeTypeClass(smartcolumn)));
+    }
+    else if (smartcolumn.getLookupCall() != null) {
+      text.append(TEXTS.get("org.eclipse.scout.rt.spec.lookupcall")).append(": ");
+      text.append(new LinkableTypeExtractor<LookupCall>(LookupCall.class, true).getText(smartcolumn.getLookupCall()));
     }
     else {
-      text.append(TEXTS.get("org.eclipse.scout.rt.spec.lookupcall")).append(": ");
-      text.append(new LinkableTypeExtractor<LookupCall>().getText(smartcolumn.getLookupCall()));
+      text.append(TEXTS.get("org.eclipse.scout.rt.spec.na"));
     }
     return text.toString();
   }

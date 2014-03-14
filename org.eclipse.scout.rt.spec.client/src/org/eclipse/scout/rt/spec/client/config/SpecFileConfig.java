@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.spec.client.internal.Activator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -46,8 +47,11 @@ public class SpecFileConfig {
    */
   // TODO ASA So far, there is no support for subdirectories. Would we need it?
   private static final String ADDITIONAL_SOURCE_PLUGINS = "additionalSourcePlugins";
-  private static final String SPEC_OUT_DIR_NAME = "target" + File.separator + "spec";
-  private static final String SPEC_IN_DIR_NAME = "resources" + File.separator + "spec";
+  private static final String SPEC_OUT_DIR_PATH = "target" + File.separator + "spec";
+  private static final String SPEC_IN_DIR_PATH = "resources" + File.separator + "spec";
+
+  private static final String CSS_PATH = "resources" + File.separator + "style";
+  private static final String DEFAULT_CSS_FILE_NAME = "spec.css";
 
   private static final String IMAGES_DIR_NAME = "images";
   private static final String MEDIAWIKI_DIR_NAME = "mediawiki";
@@ -132,6 +136,11 @@ public class SpecFileConfig {
    */
   public List<Bundle> getSourceBundles() {
     ArrayList<Bundle> arrayList = new ArrayList<Bundle>();
+
+    // org.eclipse.scout.rt.spec
+    arrayList.add(Activator.getDefault().getBundle());
+
+    // additional bundles
     for (String bundleName : m_additionalSourcePlugins) {
       Bundle bundle = Platform.getBundle(bundleName);
       if (bundle != null) {
@@ -141,6 +150,8 @@ public class SpecFileConfig {
         LOG.warn("no bundle available with symbolic name: " + bundleName);
       }
     }
+
+    // product's bundle
     arrayList.add(getBundle());
     return arrayList;
   }
@@ -150,7 +161,7 @@ public class SpecFileConfig {
    * @throws ProcessingException
    */
   public File getSpecDir() throws ProcessingException {
-    return new File(getBundleRoot(), SPEC_OUT_DIR_NAME);
+    return new File(getBundleRoot(), SPEC_OUT_DIR_PATH);
   }
 
   /**
@@ -180,23 +191,23 @@ public class SpecFileConfig {
   }
 
   public String getRelativeMediawikiSourceDirPath() {
-    return SPEC_IN_DIR_NAME + File.separator + MEDIAWIKI_DIR_NAME;
+    return SPEC_IN_DIR_PATH + File.separator + MEDIAWIKI_DIR_NAME;
   }
 
   public String getRelativeSourceDirPath() {
-    return SPEC_IN_DIR_NAME;
+    return SPEC_IN_DIR_PATH;
   }
 
   public String getRelativeImagesSourceDirPath() {
-    return SPEC_IN_DIR_NAME + File.separator + IMAGES_DIR_NAME;
+    return SPEC_IN_DIR_PATH + File.separator + IMAGES_DIR_NAME;
   }
 
-  /**
-   * @return mediawiki raw output (without postprocessing)
-   * @throws ProcessingException
-   */
-  public File getMediawikiRawDir() throws ProcessingException {
-    return new File(getSpecDir(), "mediawiki_raw");
+  public String getRelativeCssDirPath() {
+    return CSS_PATH;
+  }
+
+  public String getDefaultCssFileName() {
+    return DEFAULT_CSS_FILE_NAME;
   }
 
   public File getLinksFile() throws ProcessingException {

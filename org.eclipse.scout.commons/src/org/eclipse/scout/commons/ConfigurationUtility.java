@@ -474,7 +474,7 @@ public final class ConfigurationUtility {
     if (annotatedClassId != null) {
       return annotatedClassId;
     }
-    else if (simpleName) {
+    else if (simpleName && !StringUtility.isNullOrEmpty(replaced.getSimpleName())) {
       return replaced.getSimpleName();
     }
     return replaced.getName();

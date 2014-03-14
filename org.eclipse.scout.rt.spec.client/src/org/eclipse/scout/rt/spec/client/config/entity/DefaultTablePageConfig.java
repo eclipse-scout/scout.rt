@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.page.TablePageExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.form.page.TablePageTitleExtractor;
 
 /**
  *
@@ -22,7 +22,7 @@ public class DefaultTablePageConfig extends DefaultEntityConfig<IPageWithTable<?
 
   @Override
   public IDocTextExtractor<IPageWithTable<? extends ITable>> getTitleExtractor() {
-    return new TablePageExtractor<IPageWithTable<? extends ITable>>();
+    return new TablePageTitleExtractor<IPageWithTable<? extends ITable>>();
   }
 
 }

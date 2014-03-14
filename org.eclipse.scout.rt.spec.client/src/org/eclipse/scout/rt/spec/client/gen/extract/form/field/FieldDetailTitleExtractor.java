@@ -12,12 +12,16 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.field;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.form.FormTitleExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
-// TODO ASA javadoc FieldDetailTitleExtractor
+/**
+ * Extracts the title with anchor (using {@link #createAnchorId(IFormField)}) for the field's detail section
+ * 
+ * @param <T>
+ */
 public class FieldDetailTitleExtractor<T extends IFormField> extends AbstractNamedTextExtractor<T> {
 
   public FieldDetailTitleExtractor() {
@@ -44,7 +48,7 @@ public class FieldDetailTitleExtractor<T extends IFormField> extends AbstractNam
   public static String createAnchorId(IFormField field) {
     StringBuilder sb = new StringBuilder();
     if (field.getForm() != null) {
-      sb.append(FormTitleExtractor.getAnchorId(field.getForm()));
+      sb.append(SpecUtility.createAnchorId(field.getForm()));
     }
     sb.append("_fielddetail_");
     sb.append(field.classId());

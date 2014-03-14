@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 /**
  * Default configuration for {@link Class}
  */
-public class DefaultCodeTypeTypesConfig extends DefaultTypesConfig {
+public class DefaultCodeTypeTypesTableConfig extends DefaultTypesTableConfig {
 
   @Override
   public List<IDocTextExtractor<Class>> getTextExtractors() {

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.spec.client.out.mediawiki;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,10 +46,10 @@ public class MediawikiWriter {
    * 
    * @throws ProcessingException
    */
-  public void write() throws ProcessingException {
+  public void write(int headingLevel) throws ProcessingException {
     try {
       LOG.info("writing section " + m_section.getTitle());
-      appendSection(m_section, 2, true);
+      appendSection(m_section, headingLevel, true);
       m_wikiWriter.flush();
     }
     catch (IOException e) {
@@ -70,6 +71,7 @@ public class MediawikiWriter {
     if (section.isDisplayed()) {
       LOG.info("writing section " + section.getTitle());
       appendHeading(section, headingLevel);
+      appendIntroduction(section);
       appendTable(section);
       if (appendImages) {
         appendImages();
@@ -93,6 +95,13 @@ public class MediawikiWriter {
   private void appendHeading(IDocSection section, int headingLevel) throws IOException {
     if (section.getTitle() != null) {
       m_tableWriter.appendHeading(section.getTitle(), headingLevel);
+    }
+  }
+
+  private void appendIntroduction(IDocSection section) throws IOException {
+    String introduction = section.getIntroduction();
+    if (!StringUtility.isNullOrEmpty(introduction)) {
+      m_tableWriter.appendText(introduction);
     }
   }
 

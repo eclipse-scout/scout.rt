@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("5ca31667-6bdf-4e06-8d51-5e283aa16c52")
 public abstract class AbstractSearchButton extends AbstractButton implements IButton {
 
   public AbstractSearchButton() {

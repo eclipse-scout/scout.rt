@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
  * An outline button is associated with an {@link IOutline} instance, a click on the
  * button activates the outline on the desktop.
  */
+@ClassId("b235fb65-6b50-4870-895a-f8a26ee41c96")
 public abstract class AbstractOutlineButton extends AbstractButton {
   private IOutline m_outline;
 

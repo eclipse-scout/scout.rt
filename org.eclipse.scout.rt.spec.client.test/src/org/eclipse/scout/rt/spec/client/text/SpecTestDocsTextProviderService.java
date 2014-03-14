@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.text;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService;
 
 /**
  * Text provider service for texts used by org.eclipse.scout.rt.spec.client.test plugin.
  */
-@Priority(1000)
 public class SpecTestDocsTextProviderService extends AbstractDynamicNlsTextProviderService implements IDocumentationTextProviderService {
   @Override
   protected String getDynamicNlsBaseName() {
