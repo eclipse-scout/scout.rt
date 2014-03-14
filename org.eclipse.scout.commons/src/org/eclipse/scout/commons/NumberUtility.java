@@ -142,11 +142,19 @@ public final class NumberUtility {
     return sum;
   }
 
-  public static double sum(List<? extends Number> a) {
+  /**
+   * null lenient
+   * 
+   * @param numbers
+   * @return the sum of all numbers passt in the given list. Null elements are not considered.
+   */
+  public static double sum(List<? extends Number> numbers) {
     double sum = 0;
-    if (CollectionUtility.hasElements(a)) {
-      for (Number number : a) {
-        sum += number.doubleValue();
+    if (CollectionUtility.hasElements(numbers)) {
+      for (Number number : numbers) {
+        if (number != null) {
+          sum += number.doubleValue();
+        }
       }
     }
     return sum;
