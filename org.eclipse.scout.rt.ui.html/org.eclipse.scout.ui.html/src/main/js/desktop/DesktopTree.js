@@ -55,7 +55,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
   node.expanded = expanded;
 
   //Only expand / collapse if there are child nodes
-  if (node.childNodes.length === 0) {
+  if (!node.childNodes || node.childNodes.length === 0) {
     return true;
   }
   var level = $node.attr('data-level'),
