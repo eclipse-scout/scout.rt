@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.button;
 
+import java.beans.PropertyChangeEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.OptimisticLock;
@@ -18,6 +20,7 @@ import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
@@ -25,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.AbstractSwtScoutActionPropertyChangeListener;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineButton;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
@@ -61,6 +65,8 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
   private boolean m_handleActionPending;
 
   private Menu m_contextMenu;
+  private boolean m_hasDropDown = false;
+  private P_ScoutActionPropertyListener m_scoutActionPropertyListener;
 
   public SwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -94,9 +100,10 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
         int style = SWT.CENTER | SWT.PUSH;
         if (getScoutObject().hasMenus()) {
           style |= SWT.DROP_DOWN;
+          m_hasDropDown = true;
         }
         ButtonEx swtButton = getEnvironment().getFormToolkit().createButtonEx(container, style);
-        swtButton.setDropDownEnabled(true);
+        swtButton.setDropDownEnabled(calculateDropDownButtonEnabled());
         swtFieldAsButton = swtButton;
       }
     }
@@ -134,6 +141,24 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     getSwtContainer().setLayout(new LogicalGridLayout(0, 0));
   }
 
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
@@ -141,7 +166,12 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
       m_scoutButtonListener = new P_ScoutButtonListener();
       getScoutObject().addButtonListener(m_scoutButtonListener);
     }
-
+    if (m_hasDropDown) {
+      if (m_scoutActionPropertyListener == null) {
+        m_scoutActionPropertyListener = new P_ScoutActionPropertyListener();
+      }
+      m_scoutActionPropertyListener.attachToScoutMenus(getScoutObject().getMenus());
+    }
   }
 
   @Override
@@ -150,6 +180,10 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     if (m_scoutButtonListener != null) {
       getScoutObject().removeButtonListener(m_scoutButtonListener);
       m_scoutButtonListener = null;
+    }
+    if (m_scoutActionPropertyListener != null) {
+      m_scoutActionPropertyListener.detachFromScoutMenus(getScoutObject().getMenus());
+      m_scoutActionPropertyListener = null;
     }
   }
 
@@ -322,6 +356,18 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     }
   }
 
+  protected void handleScoutActionPropertyChange(String name, Object newValue) {
+    if (IAction.PROP_VISIBLE.equals(name)) {
+      handleDropDownButtonEnabled();
+    }
+  }
+
+  protected void handleDropDownButtonEnabled() {
+    if (m_hasDropDown) {
+      ((ButtonEx) getSwtField()).setDropDownEnabled(calculateDropDownButtonEnabled());
+    }
+  }
+
   private class P_SwtSelectionListener implements Listener {
     @Override
     public void handleEvent(Event event) {
@@ -417,4 +463,26 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     }
 
   } // end class P_ContextMenuListener
+
+  private class P_ScoutActionPropertyListener extends AbstractSwtScoutActionPropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent e) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          if (isHandleScoutPropertyChangeSwtThread()) {
+            try {
+              getUpdateSwtFromScoutLock().acquire();
+              //
+              handleScoutActionPropertyChange(e.getPropertyName(), e.getNewValue());
+            }
+            finally {
+              getUpdateSwtFromScoutLock().release();
+            }
+          }
+        }
+      };
+      getEnvironment().invokeSwtLater(t);
+    }
+  } // end private class P_ScoutActionPropertyListener
 }

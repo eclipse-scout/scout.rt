@@ -41,6 +41,9 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
    * property-type: String
    */
   String PROP_SEPARATOR = "separator";
+  String PROP_INHERIT_ACCESSIBILITY = "inheritAccessibility";
+  String PROP_EMPTY_SPACE = "emptySpace";
+  String PROP_SINGLE_SELECTION = "singleSelection";
 
   /**
    * called to perform action

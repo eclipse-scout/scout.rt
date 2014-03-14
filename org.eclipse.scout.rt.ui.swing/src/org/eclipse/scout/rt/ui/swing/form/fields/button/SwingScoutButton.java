@@ -17,6 +17,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
@@ -27,8 +29,10 @@ import javax.swing.SwingConstants;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
@@ -38,6 +42,7 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.AbstractSwingScoutActionPropertyChangeListener;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 import org.eclipse.scout.rt.ui.swing.ext.JButtonEx;
@@ -57,6 +62,8 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   private ButtonListener m_scoutButtonListener;
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
+  private JDropDownButton m_dropDownButton;
+  private P_ScoutActionPropertyChangeListener m_scoutActionPropertyListener;
 
   public SwingScoutButton() {
   }
@@ -99,15 +106,16 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     swingFieldAsButton.addActionListener(new P_SwingActionListener());
     // check if button has menus
     if (getScoutObject().hasMenus()) {
-      JDropDownButton dropDownButton = new JDropDownButton(swingFieldAsButton);
-      dropDownButton.getMenuButton().addActionListener(new ActionListener() {
+      m_dropDownButton = new JDropDownButton(swingFieldAsButton);
+      m_dropDownButton.getMenuButton().setEnabled(calculateDropDownButtonEnabled());
+      m_dropDownButton.getMenuButton().addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
           handleSwingPopup((Component) e.getSource());
         }
       });
       container = new JPanelEx();
-      container.add(dropDownButton);
+      container.add(m_dropDownButton);
     }
     else {
       container = new JPanelEx();
@@ -137,12 +145,34 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
   }
 
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
+  }
+
   @Override
   protected void detachScout() {
     super.detachScout();
     if (m_scoutButtonListener != null) {
       getScoutButton().removeButtonListener(m_scoutButtonListener);
       m_scoutButtonListener = null;
+    }
+    if (m_scoutActionPropertyListener != null) {
+      m_scoutActionPropertyListener.detachFromScoutMenus(getScoutObject().getMenus());
+      m_scoutActionPropertyListener = null;
     }
   }
 
@@ -153,6 +183,10 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   @Override
   public AbstractButton getSwingButton() {
     return (AbstractButton) getSwingField();
+  }
+
+  protected JDropDownButton getDropDownButton() {
+    return m_dropDownButton;
   }
 
   @Override
@@ -166,6 +200,12 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     setIconIdFromScout(b.getIconId());
     setImageFromScout(b.getImage());
     setSelectionFromScout(b.isSelected());
+    if (getDropDownButton() != null) {
+      if (m_scoutActionPropertyListener == null) {
+        m_scoutActionPropertyListener = new P_ScoutActionPropertyChangeListener();
+      }
+      m_scoutActionPropertyListener.attachToScoutMenus(getScoutObject().getMenus());
+    }
   }
 
   @Override
@@ -346,6 +386,18 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     // end notify
   }
 
+  protected void handleScoutActionPropertyChange(String name, Object newValue) {
+    if (IAction.PROP_VISIBLE.equals(name)) {
+      handleDropDownButtonEnabled();
+    }
+  }
+
+  protected void handleDropDownButtonEnabled() {
+    if (getDropDownButton() != null) {
+      getDropDownButton().getMenuButton().setEnabled(calculateDropDownButtonEnabled());
+    }
+  }
+
   /*
    * Listeners
    */
@@ -408,6 +460,25 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
         }
       }
     }
-  }
+  } // end private class P_ScoutButtonListener
 
+  private class P_ScoutActionPropertyChangeListener extends AbstractSwingScoutActionPropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent e) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getUpdateSwingFromScoutLock().acquire();
+            //
+            handleScoutActionPropertyChange(e.getPropertyName(), e.getNewValue());
+          }
+          finally {
+            getUpdateSwingFromScoutLock().release();
+          }
+        }
+      };
+      getSwingEnvironment().invokeSwingLater(t);
+    }
+  } // end private class P_ScoutActionPropertyChangeListener
 }

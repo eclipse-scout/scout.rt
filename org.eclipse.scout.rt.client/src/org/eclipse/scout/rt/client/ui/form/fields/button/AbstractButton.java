@@ -413,14 +413,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private IMenu[] fireButtonPopup() {
     ButtonEvent e = new ButtonEvent(this, ButtonEvent.TYPE_POPUP);
     // single observer add our menus
-    IMenu[] a = getMenus();
-    for (int i = 0; i < a.length; i++) {
-      IMenu m = a[i];
-      m.prepareAction();
-      if (m.isVisible()) {
-        e.addPopupMenu(m);
-      }
-    }
+    IMenu[] menus = MenuUtility.filterValidMenusOnButton(this, getMenus(), true);
+    e.addPopupMenus(menus);
     fireButtonEvent(e);
     return e.getPopupMenus();
   }
@@ -454,6 +448,16 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     @Override
     public IMenu[] fireButtonPopupFromUI() {
       return fireButtonPopup();
+    }
+
+    /**
+     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
+     * method <code>prepareAction</code> on the menu objects.
+     */
+    @Override
+    public boolean hasValidMenusFromUI() {
+      IMenu[] menus = MenuUtility.filterValidMenusOnButton(AbstractButton.this, getMenus(), false);
+      return menus.length > 0;
     }
 
     /**

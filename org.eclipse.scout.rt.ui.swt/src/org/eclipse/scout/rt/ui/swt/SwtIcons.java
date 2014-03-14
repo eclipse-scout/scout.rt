@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.ui.swt;
  */
 public interface SwtIcons {
   String DropDownFieldArrowDown = "dropdownfield_arrowdown";
+  String DropDownFieldArrowDownDisabled = "dropdownfield_arrowdown_disabled";
   String Window = "window";
   String CheckboxYes = "checkbox_yes";
   String CheckboxNo = "checkbox_no";

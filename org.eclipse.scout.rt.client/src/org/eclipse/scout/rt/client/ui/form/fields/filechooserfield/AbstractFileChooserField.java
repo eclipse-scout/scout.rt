@@ -476,16 +476,23 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
 
+    /**
+     * Uses {@link MenuUtility#filterValidMenus} to filter the given menus for valid menus.
+     * The method <code>prepareAction</code> on the menu objects are executed.
+     */
     @Override
     public IMenu[] firePopupFromUI() {
-      ArrayList<IMenu> menus = new ArrayList<IMenu>();
-      for (IMenu menu : getMenus()) {
-        menu.prepareAction();
-        if (menu.isVisible()) {
-          menus.add(menu);
-        }
-      }
-      return menus.toArray(new IMenu[0]);
+      return MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), true);
+    }
+
+    /**
+     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
+     * method <code>prepareAction</code> on the menu objects.
+     */
+    @Override
+    public boolean hasValidMenusFromUI() {
+      IMenu[] validMenus = MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), false);
+      return validMenus.length > 0;
     }
 
     @Override
@@ -496,5 +503,4 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       return parseValue(newText);
     }
   }
-
 }

@@ -1489,31 +1489,23 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private class P_UIFacade implements ISmartFieldUIFacade {
     private Map<ICell, LookupRow> m_validProposals;
 
+    /**
+     * Uses {@link MenuUtility#filterValidMenus} to filter the given menus for valid menus.
+     * The method <code>prepareAction</code> on the menu objects are executed.
+     */
     @Override
     public IMenu[] firePopupFromUI() {
-      T smartValue = getValue();
-      ArrayList<IMenu> filteredMenus = new ArrayList<IMenu>();
-      for (IMenu m : getMenus()) {
-        IMenu validMenu = null;
-        if ((!m.isInheritAccessibility()) || isEnabled()) {
-          if (m.isEmptySpaceAction()) {
-            validMenu = m;
-          }
-          else if (m.isSingleSelectionAction()) {
-            if (smartValue != null) {
-              validMenu = m;
-            }
-          }
-        }
-        //
-        if (validMenu != null) {
-          validMenu.prepareAction();
-          if (validMenu.isVisible()) {
-            filteredMenus.add(validMenu);
-          }
-        }
-      }
-      return filteredMenus.toArray(new IMenu[0]);
+      return MenuUtility.filterValidMenus(AbstractSmartField.this, getMenus(), true);
+    }
+
+    /**
+     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
+     * method <code>prepareAction</code> on the menu objects.
+     */
+    @Override
+    public boolean hasValidMenusFromUI() {
+      IMenu[] validMenus = MenuUtility.filterValidMenus(AbstractSmartField.this, getMenus(), false);
+      return validMenus.length > 0;
     }
 
     @Override

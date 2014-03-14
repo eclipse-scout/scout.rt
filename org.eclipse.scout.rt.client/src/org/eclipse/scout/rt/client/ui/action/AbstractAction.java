@@ -35,16 +35,13 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private boolean m_initialized;
   private final EventListenerList m_listenerList = new EventListenerList();
   private final IActionUIFacade m_uiFacade;
-  private boolean m_inheritAccessibility;
   // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledProcessingAction;
   private boolean m_visibleProperty;
   private boolean m_visibleGranted;
-  private boolean m_singleSelectionAction;
   private boolean m_multiSelectionAction;
-  private boolean m_emptySpaceAction;
   private boolean m_toggleAction;
 
   public AbstractAction() {
@@ -459,12 +456,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public boolean isInheritAccessibility() {
-    return m_inheritAccessibility;
+    return propertySupport.getPropertyBool(PROP_INHERIT_ACCESSIBILITY);
   }
 
   @Override
   public void setInheritAccessibility(boolean b) {
-    m_inheritAccessibility = b;
+    propertySupport.setPropertyBool(PROP_INHERIT_ACCESSIBILITY, b);
   }
 
   /**
@@ -552,12 +549,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public boolean isSingleSelectionAction() {
-    return m_singleSelectionAction;
+    return propertySupport.getPropertyBool(PROP_SINGLE_SELECTION);
   }
 
   @Override
   public void setSingleSelectionAction(boolean b) {
-    m_singleSelectionAction = b;
+    propertySupport.setProperty(PROP_SINGLE_SELECTION, b);
   }
 
   @Override
@@ -572,12 +569,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public boolean isEmptySpaceAction() {
-    return m_emptySpaceAction;
+    return propertySupport.getPropertyBool(PROP_EMPTY_SPACE);
   }
 
   @Override
   public void setEmptySpaceAction(boolean b) {
-    m_emptySpaceAction = b;
+    propertySupport.setProperty(PROP_EMPTY_SPACE, b);
   }
 
   @Override

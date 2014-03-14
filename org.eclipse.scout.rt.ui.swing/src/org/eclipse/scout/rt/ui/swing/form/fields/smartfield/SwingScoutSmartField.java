@@ -17,6 +17,8 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -46,6 +48,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -54,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposal
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.AbstractSwingScoutActionPropertyChangeListener;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
@@ -78,6 +82,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   private SwingScoutDropDownPopup m_proposalPopup;
   private P_PendingProposalJob m_pendingProposalJob;
   private Object m_pendingProposalJobLock;
+  private P_ScoutActionPropertyChangeListener m_scoutActionPropertyListener;
 
   @Override
   @SuppressWarnings("serial")
@@ -172,14 +177,22 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     ISmartField f = getScoutObject();
     setIconIdFromScout(f.getIconId());
     setProposalFormFromScout(f.getProposalForm());
+    if (m_scoutActionPropertyListener == null) {
+      m_scoutActionPropertyListener = new P_ScoutActionPropertyChangeListener();
+    }
+    m_scoutActionPropertyListener.attachToScoutMenus(f.getMenus());
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(getScoutObject().hasMenus());
+      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(calculateDropDownButtonEnabled());
     }
   }
 
   @Override
   protected void detachScout() {
     hideProposalPopup();
+    if (m_scoutActionPropertyListener != null) {
+      m_scoutActionPropertyListener.detachFromScoutMenus(getScoutObject().getMenus());
+      m_scoutActionPropertyListener = null;
+    }
     super.detachScout();
   }
 
@@ -194,6 +207,9 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected void setDisplayTextFromScout(String s) {
     JTextComponent swingField = getSwingTextField();
+    if (swingField instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) swingField).setMenuEnabled(calculateDropDownButtonEnabled());
+    }
     if (!CompareUtility.equals(swingField.getText(), s)) {
       swingField.setText(s);
       // ticket 77424
@@ -207,12 +223,31 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
   }
 
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
+  }
+
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
       ((JTextFieldWithDropDownButton) getSwingField()).setDropDownButtonEnabled(b);
     }
+    handleDropDownButtonEnabled();
   }
 
   protected void setIconIdFromScout(String iconId) {
@@ -600,6 +635,13 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
   }
 
+  protected void handleDropDownButtonEnabled() {
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(calculateDropDownButtonEnabled());
+      getSwingField().repaint();
+    }
+  }
+
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
@@ -608,6 +650,13 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
     else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
       setProposalFormFromScout((ISmartFieldProposalForm) newValue);
+    }
+  }
+
+  protected void handleScoutActionPropertyChange(String name, Object newValue) {
+    if (IAction.PROP_INHERIT_ACCESSIBILITY.equals(name) || IAction.PROP_EMPTY_SPACE.equals(name) ||
+        IAction.PROP_SINGLE_SELECTION.equals(name) || IAction.PROP_VISIBLE.equals(name)) {
+      handleDropDownButtonEnabled();
     }
   }
 
@@ -669,4 +718,23 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     return b.toString();
   }
 
+  private class P_ScoutActionPropertyChangeListener extends AbstractSwingScoutActionPropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent e) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getUpdateSwingFromScoutLock().acquire();
+            //
+            handleScoutActionPropertyChange(e.getPropertyName(), e.getNewValue());
+          }
+          finally {
+            getUpdateSwingFromScoutLock().release();
+          }
+        }
+      };
+      getSwingEnvironment().invokeSwingLater(t);
+    }
+  } // end private class P_ScoutActionPropertyChangeListener
 }

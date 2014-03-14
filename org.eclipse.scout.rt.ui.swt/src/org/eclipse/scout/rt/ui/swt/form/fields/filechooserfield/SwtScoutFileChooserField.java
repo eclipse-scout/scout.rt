@@ -10,17 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield;
 
+import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.AbstractSwtScoutActionPropertyChangeListener;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
@@ -44,6 +48,7 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   private DropDownButton m_fileChooserButton;
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
+  private P_ScoutActionPropertyChangeListener m_scoutActionPropertyListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -95,11 +100,43 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   protected void attachScout() {
     super.attachScout();
     setFileIconIdFromScout(getScoutObject().getFileIconId());
-    getSwtFileChooserButton().setDropdownEnabled(getScoutObject().hasMenus());
+    if (m_scoutActionPropertyListener == null) {
+      m_scoutActionPropertyListener = new P_ScoutActionPropertyChangeListener();
+    }
+    m_scoutActionPropertyListener.attachToScoutMenus(getScoutObject().getMenus());
+    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
+  }
+
+  @Override
+  protected void detachScout() {
+    if (m_scoutActionPropertyListener != null) {
+      m_scoutActionPropertyListener.detachFromScoutMenus(getScoutObject().getMenus());
+      m_scoutActionPropertyListener = null;
+    }
+    super.detachScout();
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (s == null) {
       s = "";
     }
@@ -112,6 +149,7 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     m_fileChooserButton.setEnabled(b);
+    m_fileChooserButton.setDropdownEnabled(calculateDropDownButtonEnabled());
   }
 
   @Override
@@ -216,6 +254,17 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
     }
   }
 
+  protected void handleScoutActionPropertyChange(String name, Object newValue) {
+    if (IAction.PROP_INHERIT_ACCESSIBILITY.equals(name) || IAction.PROP_EMPTY_SPACE.equals(name) ||
+        IAction.PROP_SINGLE_SELECTION.equals(name) || IAction.PROP_VISIBLE.equals(name)) {
+      handleDropDownButtonEnabled();
+    }
+  }
+
+  protected void handleDropDownButtonEnabled() {
+    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
+  }
+
   private class P_SwtFileChooserButtonListener extends SelectionAdapter {
     @Override
     public void widgetSelected(SelectionEvent e) {
@@ -263,4 +312,26 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
     }
 
   } // end class P_ContextMenuListener
+
+  private class P_ScoutActionPropertyChangeListener extends AbstractSwtScoutActionPropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent e) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          if (isHandleScoutPropertyChangeSwtThread()) {
+            try {
+              getUpdateSwtFromScoutLock().acquire();
+              //
+              handleScoutActionPropertyChange(e.getPropertyName(), e.getNewValue());
+            }
+            finally {
+              getUpdateSwtFromScoutLock().release();
+            }
+          }
+        }
+      };
+      getEnvironment().invokeSwtLater(t);
+    }
+  } // end class P_ScoutActionPropertyChangeListener
 }

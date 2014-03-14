@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.ui.swing.form.fields.filechooserfield;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -27,12 +29,14 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.AbstractSwingScoutActionPropertyChangeListener;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -42,6 +46,8 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 
 public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IFileChooserField> implements ISwingScoutFileChooserField {
   private static final long serialVersionUID = 1L;
+
+  private P_ScoutActionPropertyChangeListener m_scoutActionPropertyListener;
 
   @Override
   protected void initializeSwing() {
@@ -114,15 +120,49 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     super.attachScout();
     IFileChooserField f = getScoutObject();
     setFileIconIdFromScout(f.getFileIconId());
+    if (m_scoutActionPropertyListener == null) {
+      m_scoutActionPropertyListener = new P_ScoutActionPropertyChangeListener();
+    }
+    m_scoutActionPropertyListener.attachToScoutMenus(f.getMenus());
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(getScoutObject().hasMenus());
+      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
     }
   }
 
   @Override
+  protected void detachScout() {
+    if (m_scoutActionPropertyListener != null) {
+      m_scoutActionPropertyListener.detachFromScoutMenus(getScoutObject().getMenus());
+      m_scoutActionPropertyListener = null;
+    }
+    super.detachScout();
+  }
+
+  @Override
   protected void setDisplayTextFromScout(String s) {
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
+    }
     JTextComponent swingField = getSwingTextField();
     swingField.setText(s);
+  }
+
+  private boolean calculateDropDownButtonEnabled() {
+    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+    return hasValidMenus.get();
   }
 
   @Override
@@ -139,6 +179,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     if (getSwingField() instanceof JTextFieldWithDropDownButton) {
       ((JTextFieldWithDropDownButton) getSwingTextField()).setDropDownButtonEnabled(b);
     }
+    handleDropDownButtonEnabled();
   }
 
   protected void setFileIconIdFromScout(String s) {
@@ -253,6 +294,20 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     }
   }
 
+  protected void handleScoutActionPropertyChange(String name, Object newValue) {
+    if (IAction.PROP_INHERIT_ACCESSIBILITY.equals(name) || IAction.PROP_EMPTY_SPACE.equals(name) ||
+        IAction.PROP_SINGLE_SELECTION.equals(name) || IAction.PROP_VISIBLE.equals(name)) {
+      handleDropDownButtonEnabled();
+    }
+  }
+
+  protected void handleDropDownButtonEnabled() {
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(calculateDropDownButtonEnabled());
+      getSwingField().repaint();
+    }
+  }
+
   /**
    * Swing action
    */
@@ -264,5 +319,25 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
       handleSwingFileChooserAction();
     }
   }// end private class
+
+  private class P_ScoutActionPropertyChangeListener extends AbstractSwingScoutActionPropertyChangeListener {
+    @Override
+    public void propertyChange(final PropertyChangeEvent e) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getUpdateSwingFromScoutLock().acquire();
+            //
+            handleScoutActionPropertyChange(e.getPropertyName(), e.getNewValue());
+          }
+          finally {
+            getUpdateSwingFromScoutLock().release();
+          }
+        }
+      };
+      getSwingEnvironment().invokeSwingLater(t);
+    }
+  } // end private class P_ScoutActionPropertyChangeListener
 
 }

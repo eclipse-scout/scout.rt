@@ -46,6 +46,7 @@ public class ButtonEx extends Button {
   private Listener[] m_actionSelectionListener;
   private Listener[] m_menuSelectionListener;
   private Image m_dropDownIcon;
+  private Image m_dropDownDisabledIcon;
 
   private P_DropDownPaintListener m_dropDownPaintListener;
   private Listener m_paintListener = new Listener() {
@@ -58,7 +59,8 @@ public class ButtonEx extends Button {
   public ButtonEx(Composite parent, int style) {
     super(parent, style);
     m_dropDownIcon = Activator.getIcon(SwtIcons.DropDownFieldArrowDown);
-    // dopdown
+    m_dropDownDisabledIcon = Activator.getIcon(SwtIcons.DropDownFieldArrowDownDisabled);
+    // dropdown
     P_DelegateSelectionListener delegateListener = new P_DelegateSelectionListener();
     if ((style & SWT.DROP_DOWN) != 0) {
       m_hasDropDown = true;
@@ -185,6 +187,7 @@ public class ButtonEx extends Button {
 
   public void setDropDownEnabled(boolean enabled) {
     m_dropDownEnabled = enabled;
+    redraw();
   }
 
   public boolean isDropDownEnabled() {
@@ -288,11 +291,15 @@ public class ButtonEx extends Button {
 
       Rectangle bounds = getBounds();
       gc.drawLine(bounds.width - 12, 3, bounds.width - 12, bounds.height - 4);
-      gc.drawImage(m_dropDownIcon, bounds.width - 11, (bounds.height - m_dropDownIcon.getBounds().height) / 2);
-      // gc.fillPolygon(new int[] { bounds.width - 10, bounds.height / 2,
-      // bounds.width - 6, bounds.height - 7, bounds.width - 3, bounds.height /
-      // 2 });
 
+      if (m_dropDownEnabled) {
+        gc.drawImage(m_dropDownIcon, bounds.width - 11, (bounds.height - m_dropDownIcon.getBounds().height) / 2);
+      }
+      else {
+        gc.drawImage(m_dropDownDisabledIcon, bounds.width - 11, (bounds.height - m_dropDownDisabledIcon.getBounds().height) / 2);
+      }
+//      gc.fillPolygon(new int[]{bounds.width - 10, bounds.height / 2,
+//          bounds.width - 6, bounds.height - 7, bounds.width - 3, bounds.height / 2});
     }
   } // end class P_DropDownPaintListener
 
