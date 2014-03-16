@@ -136,9 +136,17 @@ public class UnsavedFormChangesForm extends AbstractForm {
   public class NewHandler extends AbstractFormHandler {
 
     @Override
+    protected void execPostLoad() throws ProcessingException {
+      touch();
+    }
+
+    @Override
     protected void execStore() throws ProcessingException {
-      for (IForm f : getOpenFormsField().getValue()) {
-        f.doOk();
+      IForm[] forms = getOpenFormsField().getValue();
+      if (forms != null) {
+        for (IForm f : forms) {
+          f.doOk();
+        }
       }
     }
 
