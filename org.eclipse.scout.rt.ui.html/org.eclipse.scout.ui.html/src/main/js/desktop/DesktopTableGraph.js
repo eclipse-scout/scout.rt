@@ -42,6 +42,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
   }
 
   // start optimization
+  disolveLinks();
   doPhysics();
 
   // moving nodes and links by dx and dy
@@ -88,6 +89,46 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
                   ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
   }
 
+  // dissolv corssing links
+  function disolveLinks () {
+    for (var l1 = 0; l1 < graph.links.length; l1++) {
+      var link1 = graph.links[l1],
+        E = {}, F = {};
+
+      E.x = getPos(link1, 'x1'),
+      E.y = getPos(link1, 'y1'),
+      F.x = getPos(link1, 'x2'),
+      F.y = getPos(link1, 'y2');
+
+      for (var l2 = 0; l2 < graph.links.length; l2++) {
+        if (l1 == l2) continue;
+
+        var link2 = graph.links[l2],
+          P = {}, Q = {};
+
+        P.x = getPos(link2, 'x1'),
+        P.y = getPos(link2, 'y1'),
+        Q.x = getPos(link2, 'x2'),
+        Q.y = getPos(link2, 'y2');
+
+        // ckeck if crossing exists, if yes: change position
+        if ((_test(E, P, Q) != _test(F, P, Q)) && (_test(E, F, P) != _test(E, F, Q))) {
+          var n1 = graph.nodes[link1.target],
+            n2 = graph.nodes[link2.target],
+            dx = getPos(n1, 'x') - getPos(n2, 'x');
+            dy = getPos(n1, 'y') - getPos(n2, 'y');
+
+          setNode(n1, -dx, -dy);
+          setNode(n2, dx, dy);
+        }
+      }
+    }
+
+    function _test (p1, p2, p3) {
+      return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+    }
+  }
+
   // force the nodes to their place
   function doPhysics () {
     var totalDiff = 0;
@@ -103,6 +144,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
         dx += ((wContainer - wBox) / 2 - x) / 40;
         dy += ((hContainer - hBox) / 2 - y) / 40;
       }
+
       // move from outside
       dx -= (Math.min(x, 5) - 5) / 2;
       dy -= (Math.min(y, 5) - 5) / 2;
@@ -123,7 +165,6 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
 
           dx += (x - oX) * repForce;
           dy += (y - oY) * repForce;
-
         }
       }
 
