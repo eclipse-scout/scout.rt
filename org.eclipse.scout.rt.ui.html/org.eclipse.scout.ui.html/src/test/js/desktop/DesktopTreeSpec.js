@@ -12,6 +12,7 @@ describe("DesktopTree", function() {
   afterEach(function(){
     scout = null;
     jasmine.Ajax.uninstallMock();
+    clearAjaxRequests();
     jasmine.clock().uninstall();
   });
 
@@ -67,10 +68,8 @@ describe("DesktopTree", function() {
 
       expect(ajaxRequests.length).toBe(1);
 
-      var requestData = $.parseJSON(ajaxRequests[0].params);
-      expect(requestData.events[0].type_).toBe('nodeClicked');
-      expect(requestData.events[1].type_).toBe('nodeSelected');
-      expect(requestData.events[2].type_).toBe('nodeExpanded');
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
   });
 
