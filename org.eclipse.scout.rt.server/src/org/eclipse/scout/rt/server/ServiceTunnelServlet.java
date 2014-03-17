@@ -24,7 +24,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -43,6 +42,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
+import org.eclipse.scout.rt.server.commons.cache.ICacheStoreService;
+import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.internal.Activator;
@@ -82,11 +83,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private transient IServiceTunnelContentHandler m_contentHandler;
   private transient Bundle[] m_orderedBundleList;
   private Object m_orderedBundleListLock = new Boolean(true);
-  private VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
   private Object m_msgEncoderLock = new Boolean(true);
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private boolean m_debug;
+  private final Object m_cacheServiceLock = new Object();
 
   public ServiceTunnelServlet() {
     String text = Activator.getDefault().getBundle().getBundleContext().getProperty(HTTP_DEBUG_PARAM);
@@ -205,31 +206,25 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   protected IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
-    synchronized (req.getSession()) {
-      IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
+    synchronized (m_cacheServiceLock) {
+      IServerSession serverSession = (IServerSession) SERVICES.getService(ICacheStoreService.class).getClientAttributeAndTouch(req, res, IServerSession.class.getName());
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-        req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
+        serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
+        SERVICES.getService(ICacheStoreService.class).setClientAttribute(req, res, IServerSession.class.getName(), serverSession);
       }
       return serverSession;
     }
   }
 
   private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
-    synchronized (m_ajaxSessionCache) {
-      //update session timeout
-      int maxInactive = req.getSession().getMaxInactiveInterval();
-      if (maxInactive < 0) {
-        maxInactive = 3600;
-      }
-      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * maxInactive));
-      IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+    synchronized (m_cacheServiceLock) {
+      // Use GlobalAttribute to be independent of the requesting RAP node
+      IServerSession serverSession = (IServerSession) SERVICES.getService(ICacheStoreService.class).getGlobalAttributeAndTouch(ajaxSessionId, 3600);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-        m_ajaxSessionCache.put(ajaxSessionId, serverSession);
-      }
-      else {
-        m_ajaxSessionCache.touch(ajaxSessionId);
+        serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
+        SERVICES.getService(ICacheStoreService.class).setGlobalAttribute(ajaxSessionId, serverSession);
       }
       return serverSession;
     }
@@ -323,7 +318,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
         // next
         cause = cause.getCause();
       }
-      LOG.error("Session=" + req.getSession().getId() + ", Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), t);
+      LOG.error("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), t);
       res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -435,13 +430,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      // get session
-      HttpSession session = m_request.getSession();
       String key = AdminSession.class.getName();
-      AdminSession as = (AdminSession) session.getAttribute(key);
+      AdminSession as = (AdminSession) SERVICES.getService(ICacheStoreService.class).getClientAttributeAndTouch(m_request, m_response, key);
       if (as == null) {
         as = new AdminSession();
-        session.setAttribute(key, as);
+        SERVICES.getService(ICacheStoreService.class).setClientAttribute(m_request, m_response, key, as);
       }
       as.serviceRequest(m_request, m_response);
       return Status.OK_STATUS;

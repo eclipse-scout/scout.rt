@@ -10,14 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
-import javax.servlet.http.HttpSession;
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.commons.cache.ICacheStoreService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
 public class LogoutService extends AbstractService implements ILogoutService {
@@ -28,15 +31,7 @@ public class LogoutService extends AbstractService implements ILogoutService {
 
   @Override
   public void logout() {
-    try {
-      HttpSession session = ThreadContext.getHttpServletRequest().getSession();
-      session.invalidate();
-    }
-    catch (IllegalStateException e) {
-      //already invalid
-    }
-    catch (Throwable t) {
-      LOG.warn("Session logout failed");
-    }
+    SERVICES.getService(ICacheStoreService.class).removeClientAttribute(ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse(), IServerSession.class.getName());
+    SERVICES.getService(ICacheStoreService.class).removeClientAttribute(ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse(), Subject.class.getName());
   }
 }

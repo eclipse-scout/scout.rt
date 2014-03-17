@@ -21,10 +21,16 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationNotification;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
+import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent.EventType;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueListener;
+import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
+import org.eclipse.scout.rt.server.services.common.node.NodeSynchronizationProcessService;
+import org.eclipse.scout.rt.server.services.common.notification.INotificationService;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * element type used in CTIStateCache
@@ -33,40 +39,90 @@ public class ClientNotificationQueue {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationQueue.class);
   private EventListenerList m_listenerList = new EventListenerList();
 
-  private LinkedList<QueueElement> m_queue;
+  private LinkedList<ClientNotificationNotification> m_queue;
   private Object m_queueLock = new Object();
 
   public ClientNotificationQueue() {
-    m_queue = new LinkedList<QueueElement>();
+    m_queue = new LinkedList<ClientNotificationNotification>();
+  }
+
+  public void putDistributedNotification(IClientNotification notification, IClientNotificationFilter filter) {
+    notification.setReceiveingServerNodeId(SERVICES.getService(NodeSynchronizationProcessService.class).getClusterNodeId());
+
+    ClientNotificationNotification clientNotificationNotification = new ClientNotificationNotification(notification, filter);
+    putNotification(clientNotificationNotification);
+
+    INotificationService messageService = SERVICES.getService(INotificationService.class);
+    if (messageService != null && !(filter instanceof SessionFilter)) {
+      messageService.publishNotification(clientNotificationNotification);
+    }
   }
 
   public void putNotification(IClientNotification notification, IClientNotificationFilter filter) {
-    if (notification == null) {
+    notification.setReceiveingServerNodeId(SERVICES.getService(NodeSynchronizationProcessService.class).getClusterNodeId());
+
+    ClientNotificationNotification clientNotificationNotification = new ClientNotificationNotification(notification, filter);
+    putNotification(clientNotificationNotification);
+  }
+
+  public void putNotification(ClientNotificationNotification notifiationNotification) {
+    if (notifiationNotification == null) {
       throw new IllegalArgumentException("notification must not be null");
     }
-    if (filter == null) {
+    if (notifiationNotification.getClientNotification() == null) {
+      throw new IllegalArgumentException("client notification must not be null");
+    }
+    if (notifiationNotification.getFilter() == null) {
       throw new IllegalArgumentException("filter must not be null");
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("put " + notification + " for " + filter);
+      LOG.debug("put " + notifiationNotification.getClientNotification() + " for " + notifiationNotification.getFilter());
     }
     synchronized (m_queueLock) {
-      for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
-        QueueElement e = it.next();
+      for (Iterator<ClientNotificationNotification> it = m_queue.iterator(); it.hasNext();) {
+        ClientNotificationNotification e = it.next();
         if (!e.getFilter().isActive()) {
           it.remove();
         }
-        else if (e.getClientNotification() == notification) {
+        else if (e.getClientNotification() == notifiationNotification.getClientNotification()) {
           it.remove();
         }
-        else if (e.getClientNotification().getClass() == notification.getClass() && filter.equals(e.getFilter()) && notification.coalesce(e.getClientNotification())) {
+        else if (e.getClientNotification().getClass() == notifiationNotification.getClientNotification().getClass() && notifiationNotification.getFilter().equals(e.getFilter()) && notifiationNotification.getClientNotification().coalesce(e.getClientNotification())) {
           it.remove();
         }
       }
-      m_queue.add(new QueueElement(notification, filter));
+      m_queue.add(notifiationNotification);
       m_queueLock.notifyAll();
     }
-    fireEvent(notification, filter);
+    fireEvent(notifiationNotification, EventType.NEW);
+  }
+
+  public void updateNotification(ClientNotificationNotification notification) {
+    synchronized (m_queueLock) {
+      for (Iterator<ClientNotificationNotification> it = m_queue.iterator(); it.hasNext();) {
+        ClientNotificationNotification e = it.next();
+        if (!e.getFilter().isActive()) {
+          it.remove();
+        }
+        else if (e.getClientNotification().getId().equals(notification.getClientNotification().getId())) {
+          e.addConsumedBy(notification.getConsumedBy());
+        }
+      }
+    }
+  }
+
+  public void removeNotification(ClientNotificationNotification notifiationNotification) {
+    synchronized (m_queueLock) {
+      for (Iterator<ClientNotificationNotification> it = m_queue.iterator(); it.hasNext();) {
+        ClientNotificationNotification e = it.next();
+        if (!e.getFilter().isActive()) {
+          it.remove();
+        }
+        else if (!e.getClientNotification().getId().equals(notifiationNotification.getClientNotification().getId())) {
+          m_queue.remove(e);
+        }
+      }
+    }
   }
 
   public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
@@ -75,24 +131,32 @@ public class ClientNotificationQueue {
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
-          for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
-            QueueElement e = it.next();
+          for (Iterator<ClientNotificationNotification> it = m_queue.iterator(); it.hasNext();) {
+            ClientNotificationNotification e = it.next();
             if (e.getFilter().isActive()) {
               IServerSession serverSession = ThreadContext.getServerSession();
-              if (!e.isConsumedBy(serverSession)) {
+              if (!e.isConsumedBy(serverSession.getId())) {
                 if (e.getFilter().accept()) {
+                  String id = SERVICES.getService(NodeSynchronizationProcessService.class).getClusterNodeId();
+                  e.getClientNotification().setProvidingServerNodeId(id);
+
                   list.add(e.getClientNotification());
                   if (e.getFilter().isMulticast()) {
-                    e.setConsumedBy(serverSession);
+                    e.setConsumedBy(serverSession.getId());
+                    fireEvent(e, EventType.UPDATE);
+                    SERVICES.getService(INotificationService.class).updateNotification(e);
                   }
                   else {
                     it.remove();
+                    fireEvent(e, EventType.REMOVE);
+                    SERVICES.getService(INotificationService.class).removeNotification(e);
                   }
                 }
               }
             }
             else {
               it.remove();
+              fireEvent(e, EventType.REMOVE);
             }
           }
         }
@@ -181,11 +245,11 @@ public class ClientNotificationQueue {
     m_listenerList.remove(IClientNotificationQueueListener.class, listener);
   }
 
-  private void fireEvent(IClientNotification notification, IClientNotificationFilter filter) {
+  private void fireEvent(ClientNotificationNotification notificationNotification, EventType eventType) {
     IClientNotificationQueueListener[] listeners = m_listenerList.getListeners(IClientNotificationQueueListener.class);
     if (listeners != null && listeners.length > 0) {
       for (int i = 0; i < listeners.length; i++) {
-        (listeners[i]).queueChanged(new ClientNotificationQueueEvent(notification, filter, ClientNotificationQueueEvent.TYPE_NOTIFICATION_ADDED));
+        (listeners[i]).queueChanged(new ClientNotificationQueueEvent(notificationNotification, eventType));
       }
     }
   }

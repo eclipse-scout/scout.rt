@@ -17,6 +17,7 @@ package org.eclipse.scout.rt.server.services.common.code;
  */
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,10 +27,16 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.server.services.common.node.NodeSynchronizationStatusInfo;
+import org.eclipse.scout.rt.server.services.common.notification.INotificationService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.common.node.INodeSynchronizationProcessService;
+import org.eclipse.scout.rt.shared.services.common.node.NodeServiceStatus;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -41,10 +48,15 @@ public class CodeTypeStore {
 
   private Object m_storeLock;
   private HashMap<PartitionLanguageComposite, CodeTypeCache> m_store;
+  private final Object m_statusInfoLock;
+  private final NodeSynchronizationStatusInfo m_statusInfo;
 
   public CodeTypeStore() {
     m_storeLock = new Object();
     m_store = new HashMap<PartitionLanguageComposite, CodeTypeCache>();
+    m_statusInfoLock = new Object();
+    m_statusInfo = new NodeSynchronizationStatusInfo();
+    SERVICES.getService(INotificationService.class).addDistributedNotificationListener(new UnloadCodeTypeCacheNodeNotificationListener());
   }
 
   public CodeTypeCache getCodeTypeCache(Locale locale) {
@@ -77,6 +89,21 @@ public class CodeTypeStore {
   }
 
   public void unloadCodeTypeCache(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    SERVICES.getService(INotificationService.class).publishNotification(new UnloadCodeTypeCacheNodeNotification(types));
+
+    String changedUserId = ThreadContext.getServerSession().getUserId();
+    String changedClusterNodeId = SERVICES.getService(INodeSynchronizationProcessService.class).getClusterNodeId();
+
+    if (Activator.getDefault().getNodeSynchronizationInfo().isEnabled()) {
+      m_statusInfo.setLastChangedDate(new Date());
+      m_statusInfo.setLastChangedClusterNodeId(changedClusterNodeId);
+      m_statusInfo.setLastChangedUserId(changedUserId);
+    }
+
+    unloadCodeTypeCacheInternal(types);
+  }
+
+  public void unloadCodeTypeCacheInternal(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);
     }
@@ -139,6 +166,14 @@ public class CodeTypeStore {
         return false;
       }
       return true;
+    }
+  }
+
+  public void fillClusterServiceStatus(NodeServiceStatus serviceStatus) {
+    synchronized (m_statusInfoLock) {
+      serviceStatus.setLastChangedDate(m_statusInfo.getLastChangedDate());
+      serviceStatus.setLastChangedUserId(m_statusInfo.getLastChangedUserId());
+      serviceStatus.setLastChangedClusterNodeId(m_statusInfo.getLastChangedClusterNodeId());
     }
   }
 }

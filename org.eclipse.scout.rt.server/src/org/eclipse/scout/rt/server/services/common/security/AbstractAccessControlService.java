@@ -27,8 +27,10 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.security.internal.AccessControlStore;
+import org.eclipse.scout.rt.server.services.common.security.internal.INodeSynchronizationAccessControlService;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
+import org.eclipse.scout.rt.shared.services.common.node.NodeServiceStatus;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.AbstractService;
@@ -39,7 +41,7 @@ import org.osgi.framework.ServiceRegistration;
  * Implementations should override {@link #execLoadPermissions()}
  */
 @Priority(-1)
-public class AbstractAccessControlService extends AbstractService implements IAccessControlService {
+public class AbstractAccessControlService extends AbstractService implements IAccessControlService, INodeSynchronizationAccessControlService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;
@@ -233,5 +235,19 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   @Override
   public void clearCacheOfUserIds(Collection<String> userIds) {
     m_accessControlStore.clearCacheOfUserIds(userIds);
+  }
+
+  @Override
+  public void clearCacheInternal(String changedUserId, String changedClusterNodeId) {
+    m_accessControlStore.clearCacheInternal(changedUserId, changedClusterNodeId);
+  }
+
+  @Override
+  public void clearCacheOfUserIdsInternal(String changedUserId, String changedClusterNodeId, String... userIds) {
+  }
+
+  @Override
+  public void fillClusterServiceStatus(NodeServiceStatus serviceStatus) {
+    m_accessControlStore.fillClusterServiceStatus(serviceStatus);
   }
 }

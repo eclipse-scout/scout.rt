@@ -14,6 +14,13 @@
      <service class="org.eclipse.scout.rt.server.services.common.processing.ServerProcessingCancelService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
      <service class="org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession" ranking="-50"/>
      <service class="org.eclipse.scout.rt.server.services.common.session.DefaultServerSessionService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" />
+     <service class="org.eclipse.scout.rt.server.services.common.session.ClientIdentificationService" />
+     <service class="org.eclipse.scout.rt.server.services.common.notification.NotificationService" />
+     <service class="org.eclipse.scout.rt.server.services.common.node.NodeSynchronizationProcessService" />
+     <service class="org.eclipse.scout.rt.server.services.common.security.AccessControlClusterStatusProviderService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.code.CodeTypeClusterStatusProviderService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.node.GeneralNodeStatusProviderService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.node.BackendService"/>
      <service
            class="org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService"
            createImmediately="false"

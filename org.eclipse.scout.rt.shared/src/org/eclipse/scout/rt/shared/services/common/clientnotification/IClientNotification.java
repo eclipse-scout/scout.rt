@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -56,4 +56,26 @@ public interface IClientNotification extends Serializable {
    *          com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
    */
   void setOriginNode(int node);
+
+  String getId();
+
+  /**
+   * @return
+   */
+  String getReceiveingServerNodeId();
+
+  /**
+   * @param receiveingServerNodeId
+   */
+  void setReceiveingServerNodeId(String receiveingServerNodeId);
+
+  /**
+   * @return
+   */
+  String getProvidingServerNodeId();
+
+  /**
+   * @param providungServerNodeId
+   */
+  void setProvidingServerNodeId(String providungServerNodeId);
 }

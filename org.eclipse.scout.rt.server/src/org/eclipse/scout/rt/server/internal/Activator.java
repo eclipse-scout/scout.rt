@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
+import org.eclipse.scout.rt.server.services.common.node.NodeSynchronizationInfo;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -36,6 +37,7 @@ public class Activator extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.server";
   private static Activator plugin;
+  private NodeSynchronizationInfo m_nodeSynchronizationInfo;
 
   public static Activator getDefault() {
     return plugin;
@@ -53,6 +55,7 @@ public class Activator extends Plugin {
     super.start(context);
     plugin = this;
     m_processInspector = new ProcessInspector();
+    m_nodeSynchronizationInfo = new NodeSynchronizationInfo();
     // workaround for bug in serverside equinox implementation with servletbridge
     // wait until done and launch product if one exists
     if (Platform.getBundle("org.eclipse.scout.sdk") == null) {
@@ -134,5 +137,9 @@ public class Activator extends Plugin {
       }
     }
     return null;
+  }
+
+  public NodeSynchronizationInfo getNodeSynchronizationInfo() {
+    return m_nodeSynchronizationInfo;
   }
 }

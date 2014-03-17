@@ -224,4 +224,9 @@ public class TestingCodeService extends AbstractService implements ICodeService 
       return getAllCodeTypes(classPrefix);
     }
   }
+
+  @Override
+  public List<ICodeType<?, ?>> reloadCodeTypesInternal(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    return reloadCodeTypes(types);
+  }
 }

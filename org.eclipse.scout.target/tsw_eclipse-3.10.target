@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<?pde version="3.6"?>
+<target name="scout-3.10I.target" sequenceNumber="9">
+  <locations>
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
+
+      <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.pde.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.jdt.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
+    </location>
+
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20131024145017/repository/"/>
+
+      <unit id="javax.servlet" version="3.0.0.v201112011016"/>
+      <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
+      <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
+      <unit id="javax.wsdl.source" version="1.6.2.v201012040545"/>
+      <unit id="javax.xml" version="1.3.4.v201005080400"/>
+      <unit id="org.apache.batik.css" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.css.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.util" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.util.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.util.gui" version="1.7.0.v200903091627"/>
+      <unit id="org.apache.batik.util.gui.source" version="1.7.0.v200903091627"/>
+      <unit id="org.apache.batik.bridge" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.bridge.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.dom" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.dom.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.dom.svg" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.dom.svg.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.ext.awt" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.ext.awt.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.parser" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.parser.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.svggen" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.svggen.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.swing" version="1.7.0.v201302011158"/>
+      <unit id="org.apache.batik.swing.source" version="1.7.0.v201302011158"/>
+      <unit id="org.apache.batik.transcoder" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.transcoder.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.xml" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.xml.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.commons.codec" version="1.6.0.v201305230611"/>
+      <unit id="org.apache.commons.codec.source" version="1.6.0.v201305230611"/>
+      <unit id="org.apache.commons.exec" version="1.1.0.v201301240602"/>
+      <unit id="org.apache.commons.exec.source" version="1.1.0.v201301240602"/>
+      <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
+      <unit id="org.apache.commons.logging.source" version="1.1.1.v201101211721"/>
+      <unit id="org.apache.httpcomponents.httpclient" version="4.2.5.v201305222326"/>
+      <unit id="org.apache.httpcomponents.httpclient.source" version="4.2.5.v201305222326"/>
+      <unit id="org.apache.httpcomponents.httpcore" version="4.2.4.v201310231540"/>
+      <unit id="org.apache.httpcomponents.httpcore.source" version="4.2.4.v201310231540"/>
+      <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
+      <unit id="org.apache.xml.resolver" version="1.2.0.v201005080400"/>
+      <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
+      <unit id="org.junit" version="4.11.0.v201303080030"/>
+      <unit id="org.junit.source" version="4.11.0.v201303080030"/>
+      <unit id="org.hamcrest.core" version="1.3.0.v201303031735"/>
+      <unit id="org.hamcrest.core.source" version="1.3.0.v201303031735"/>
+      <unit id="org.easymock" version="2.4.0.v20090202-0900"/>
+      <unit id="org.easymock.source" version="2.4.0.v20090202-0900"/>
+      <unit id="org.json" version="1.0.0.v201011060100"/>
+      <unit id="org.w3c.css.sac" version="1.3.1.v200903091627"/>
+      <unit id="org.w3c.css.sac.source" version="1.3.1.v200903091627"/>
+      <unit id="org.w3c.dom.smil" version="1.0.1.v200903091627"/>
+      <unit id="org.w3c.dom.smil.source" version="1.0.1.v200903091627"/>
+      <unit id="org.w3c.dom.svg" version="1.1.0.v201011041433"/>
+      <unit id="org.w3c.dom.svg.source" version="1.1.0.v201011041433"/>
+      <unit id="org.w3c.dom.events" version="3.0.0.draft20060413_v201105210656"/>
+      <unit id="org.w3c.dom.events.source" version="3.0.0.draft20060413_v201105210656"/>
+      <unit id="com.thoughtworks.selenium" version="2.25.0.v201212071504"/>
+      <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
+      <unit id="com.google.guava" version="12.0.0.v201212092141"/>
+      <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
+    </location>
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="rap_2.2" location="http://download.eclipse.org/rt/rap/2.2/M2-20130930-1404.luna/"/>
+
+      <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
+    </location>
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="rap_incubator_file_2.0" location="http://download.eclipse.org/rt/rap/incubator/2.0/fileupload/"/>
+
+      <unit id="org.eclipse.rap.fileupload.feature.feature.group" version="0.0.0"/>
+    </location>
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+
+      <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.rap.testing.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group" version="0.0.0"/>
+
+      <unit id="org.eclipse.scout.sdk.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.sdk.rap.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.sdk.testing.source.feature.group" version="0.0.0"/>
+    </location>
+    <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <unit id="com.bsiag.scout.rt.server.jdbc.mysql5117.source.feature.group" version="5.1.17.20130515-1301"/>
+    <repository location="http://tools.bsiag.com/marketplace/jdbc/3.9"/>
+  </location>
+  </locations>
+</target>

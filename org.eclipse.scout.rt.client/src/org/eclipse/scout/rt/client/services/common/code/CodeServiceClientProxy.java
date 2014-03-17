@@ -323,6 +323,11 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   @Override
+  public List<ICodeType<?, ?>> reloadCodeTypesInternal(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    return reloadCodeTypes(types);
+  }
+
+  @Override
   public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
     if (classPrefix == null) {
       return Collections.emptySet();

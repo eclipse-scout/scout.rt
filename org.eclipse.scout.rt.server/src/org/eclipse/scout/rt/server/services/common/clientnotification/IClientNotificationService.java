@@ -36,7 +36,15 @@ public interface IClientNotificationService extends IService {
    */
   void putNotification(IClientNotification notification, IClientNotificationFilter filter);
 
+  void putDistributedNotification(IClientNotification notification, IClientNotificationFilter filter);
+
   void addClientNotificationQueueListener(IClientNotificationQueueListener listener);
 
   void removeClientNotificationQueueListener(IClientNotificationQueueListener listener);
+
+  void putNotification(ClientNotificationNotification notification);
+
+  void updateNotification(ClientNotificationNotification notification);
+
+  void removeNotification(ClientNotificationNotification notification);
 }

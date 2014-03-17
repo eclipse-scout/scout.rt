@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.services.common.clientnotification.internal;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,6 +36,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
   private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";
 
   private final EventListenerList m_globalListenerList = new EventListenerList();
+  private Map<String, Long> m_consumedNotificationIds = new HashMap<String, Long>();
 
   public ClientNotificationConsumerService() {
   }
@@ -96,6 +99,12 @@ public class ClientNotificationConsumerService extends AbstractService implement
   }
 
   private void fireEvent(IClientSession session, IClientNotification notification, boolean sync) {
+    if (checkNotificationIsNew(notification)) {
+      return;
+    }
+
+    m_consumedNotificationIds.put(notification.getId(), System.currentTimeMillis());
+
     ClientNotificationConsumerEvent e = new ClientNotificationConsumerEvent(this, notification);
     IClientNotificationConsumerListener[] globalListeners = m_globalListenerList.getListeners(IClientNotificationConsumerListener.class);
     IClientNotificationConsumerListener[] listeners = getServiceState(session).m_listenerList.getListeners(IClientNotificationConsumerListener.class);
@@ -119,6 +128,16 @@ public class ClientNotificationConsumerService extends AbstractService implement
         }
       }
     }
+  }
+
+  private boolean checkNotificationIsNew(IClientNotification notification) {
+    for (Map.Entry<String, Long> entry : m_consumedNotificationIds.entrySet()) {
+      if (entry.getValue() > System.currentTimeMillis() + (1000 * 60 * 10)) {
+        m_consumedNotificationIds.remove(entry.getKey());
+      }
+    }
+
+    return m_consumedNotificationIds.containsKey(notification.getId());
   }
 
   private static class ServiceState {
