@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.ui.json.servlet;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,44 +24,55 @@ import org.eclipse.scout.ui.html.TextFileUtil;
  * <p>
  * The interception can be turned on and off using the url param ?debug=true
  */
-public class JavascriptDebugResourceInterceptor {
+public class JavascriptDebugRequestInterceptor implements IHttpRequestInterceptor {
   private static final long serialVersionUID = 1L;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JavascriptDebugRequestInterceptor.class);
+  private static final String SESSION_ATTR_ENABLED = JavascriptDebugRequestInterceptor.class.getSimpleName() + ".enabled";
+  private static final String DEBUG_PARAM = "debug";
   //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4="-min", $5=".js" or ".css"
-  private static final Pattern SCRIPT_FILE_PAT = Pattern.compile("(/(\\w+/)*)([^/]+)([-.]min)(\\.(js|css))");
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JavascriptDebugResourceInterceptor.class);
+  private static final Pattern SCRIPT_FILE_PATTERN = Pattern.compile("(/(\\w+/)*)([^/]+)([-.]min)(\\.(js|css))");
 
-  private final List<ResourceHandler> m_resourceHandlers;
+  private IResourceProvider m_resourceProvider;
 
-  public JavascriptDebugResourceInterceptor(List<ResourceHandler> resourceHandlers) {
-    m_resourceHandlers = resourceHandlers;
+  public JavascriptDebugRequestInterceptor(IResourceProvider resourceProvider) {
+    m_resourceProvider = resourceProvider;
   }
 
-  public boolean handle(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws IOException, ServletException {
+  @Override
+  public boolean beforePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    return false;
+  }
+
+  @Override
+  public boolean beforeGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String pathInfo = req.getPathInfo();
     boolean debugEnabled = checkDebugEnabled(req, resp);
-    if (debugEnabled) {
-      if (pathInfo != null) {
-        Matcher mat = SCRIPT_FILE_PAT.matcher(pathInfo);
-        if (mat.matches()) {
-          //is there a template for this script?
-          String bundlePath = "src/main/js/" + mat.group(3) + "-template" + mat.group(5);
-          ResourceHandler h = findHandlerFor(bundlePath);
-          if (h != null) {
-            LOG.info("replacing " + pathInfo + " by live processing /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
-            handleScriptTemplate(req, resp, h, bundlePath);
-            return true;
-          }
-          //is there a uncompressed library version of this script?
-          bundlePath = "libjs/" + mat.group(3) + mat.group(5);
-          h = findHandlerFor(bundlePath);
-          if (h != null) {
-            LOG.info("replacing " + pathInfo + " by the uncompressed /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
-            handleScriptLibrary(req, resp, h, bundlePath);
-            return true;
-          }
-        }
+    if (!debugEnabled || pathInfo == null) {
+      return false;
+    }
+
+    Matcher mat = SCRIPT_FILE_PATTERN.matcher(pathInfo);
+    if (mat.matches()) {
+      //is there a template for this script?
+      String bundlePath = "src/main/js/" + mat.group(3) + "-template" + mat.group(5);
+      ResourceHandler h = findHandlerFor(bundlePath);
+      if (h != null) {
+        LOG.info("replacing " + pathInfo + " by live processing /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
+        handleScriptTemplate(req, resp, h, bundlePath);
+        return true;
+      }
+
+      //is there a uncompressed library version of this script?
+      bundlePath = "libjs/" + mat.group(3) + mat.group(5);
+      h = findHandlerFor(bundlePath);
+      if (h != null) {
+        LOG.info("replacing " + pathInfo + " by the uncompressed /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
+        handleScriptLibrary(req, resp, h, bundlePath);
+        return true;
       }
     }
-    return handleDefault(req, resp, pathInfo);
+
+    return false;
   }
 
   protected boolean checkDebugEnabled(HttpServletRequest req, HttpServletResponse resp) {
@@ -70,11 +80,11 @@ public class JavascriptDebugResourceInterceptor {
     if (session == null) {
       return false;
     }
-    String flag = req.getParameter("debug");
+    String flag = req.getParameter(DEBUG_PARAM);
     if (flag != null) {
-      session.setAttribute("JavascriptDebugResourceInterceptor.enabled", "true".equals(flag));
+      session.setAttribute(SESSION_ATTR_ENABLED, "true".equals(flag));
     }
-    Boolean active = (Boolean) session.getAttribute("JavascriptDebugResourceInterceptor.enabled");
+    Boolean active = (Boolean) session.getAttribute(SESSION_ATTR_ENABLED);
     if (active != null) {
       return active.booleanValue();
     }
@@ -85,21 +95,12 @@ public class JavascriptDebugResourceInterceptor {
   }
 
   protected ResourceHandler findHandlerFor(String bundlePath) throws IOException, ServletException {
-    for (ResourceHandler h : m_resourceHandlers) {
+    for (ResourceHandler h : m_resourceProvider.getResourceHandlers()) {
       if (h.getBundle().getEntry(bundlePath) != null) {
         return h;
       }
     }
     return null;
-  }
-
-  protected boolean handleDefault(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws IOException, ServletException {
-    for (ResourceHandler h : m_resourceHandlers) {
-      if (h.handle(req, resp, pathInfo)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final ResourceHandler handler, String bundlePath) throws IOException, ServletException {

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//FIXME seams to be very similar to IOUtility. Either use IOUtility or enhance IOUtility with missing functionality. Or maybe use FileUtility?
 public final class TextFileUtil {
 
   private TextFileUtil() {

@@ -27,7 +27,6 @@ public class ResourceHandler {
   private final String m_bundleWebContentFolder;
 
   /**
-   * @param bundle
    * @param webContentFolder
    *          by default "WebContent"
    */
@@ -36,7 +35,8 @@ public class ResourceHandler {
     m_bundleWebContentFolder = webContentFolder;
   }
 
-  public boolean handle(HttpServletRequest req, HttpServletResponse resp, String pathInfo) throws ServletException, IOException {
+  public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String pathInfo = req.getPathInfo();
     URL url = resolveBundleResource(pathInfo);
     if (url == null) {
       return false;
