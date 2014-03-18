@@ -115,7 +115,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       labelPanel.setOpaque(true);
       JLabelEx label = new JLabelEx();
       label.setText(s);
-      ensureProperDimension(label);
+      ensureProperDimension(label, s);
       labelPanel.add(label);
       contentPane.add(BorderLayout.NORTH, labelPanel);
     }
@@ -126,7 +126,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       labelPanel.setOpaque(false);
       JLabelEx label = new JLabelEx();
       label.setText(s);
-      ensureProperDimension(label);
+      ensureProperDimension(label, s);
       labelPanel.add(label);
       contentPane.add(BorderLayout.CENTER, labelPanel);
     }
@@ -422,18 +422,20 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
 
   /**
    * Ensures proper text wrapping
-   * 
+   *
    * @param label
    *          the label component with its initial text set
+   * @param text
+   *          the text that should be displayed
    */
-  private void ensureProperDimension(final JLabel label) {
+  private void ensureProperDimension(final JLabel label, String text) {
     final int maxLabelWidth = MAX_WIDTH - 2 * HORIZONTAL_PADDING;
     if (label.getPreferredSize().width <= maxLabelWidth) {
       return;
     }
 
     // convert text to HTML to enable text wrapping
-    label.setText(SwingUtility.createHtmlLabelText(label.getText(), true));
+    label.setText(SwingUtility.createHtmlLabelText(text, true));
     // register listener to correct dimension
     label.addPropertyChangeListener("ancestor", new PropertyChangeListener() {
 
