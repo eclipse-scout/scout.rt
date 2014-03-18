@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.basic;
 
 import java.awt.Color;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -99,9 +100,10 @@ public final class ColorUtility {
    * Create the color from the given string
    */
   public static Color createColor(String c) {
-    if (c == null) {
+    if (StringUtility.isNullOrEmpty(c)) {
       return null;
     }
+    c = c.replaceAll("^(0x|0X|#)", "");
     try {
       return new Color(Integer.parseInt(c, 16));
     }

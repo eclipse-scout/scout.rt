@@ -39,22 +39,15 @@ Display {
   rwt-selectionmarker-color: #fec83c;
   rwt-infobackground-color: #ffffff;
   /* Rayo no icons in messageboxes */
-
   /*   rwt-error-image: url( theme/img/dialog/error.png ); */
-
   /*   rwt-information-image: url( theme/img/dialog/information.png ); */
-
   /*   rwt-question-image: url( theme/img/dialog/question.png ); */
-
   /*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
-
   /*   rwt-working-image: url( theme/img/dialog/information.png ); */
-
   rwt-fontlist: 12px Arial, Helvetica, sans-serif;
   /*
  background-image: url( theme/img/display/browser_bg.png );
  */
-
 }
 /* Control - Default for all controls */
 * {
@@ -97,34 +90,32 @@ Button[RADIO][BORDER] {
   background-image: none;
 }
 Button-CheckIcon {
-  background-image: url(theme/img/button/check_box.png);
+  background-image: url(theme/img/button/check_box.png );
 }
 Button-CheckIcon:disabled {
-  background-image: url(theme/img/button/check_box_disabled.png);
+  background-image: url(theme/img/button/check_box_disabled.png );
 }
 Button-CheckIcon:selected {
-  background-image: url(theme/img/button/check_box_selected.png);
+  background-image: url(theme/img/button/check_box_selected.png );
 }
 Button-CheckIcon:selected:disabled {
-  background-image: url(theme/img/button/check_box_disabled_selected.png);
+  background-image: url(theme/img/button/check_box_disabled_selected.png );
 }
 Button-RadioIcon {
-  background-image: url(theme/img/button/radio_button.png);
+  background-image: url(theme/img/button/radio_button.png );
 }
 Button-RadioIcon:disabled {
-  background-image: url(theme/img/button/radio_button_disabled.png);
+  background-image: url(theme/img/button/radio_button_disabled.png );
 }
 Button-RadioIcon:selected {
-  background-image: url(theme/img/button/radio_button_selected.png);
+  background-image: url(theme/img/button/radio_button_selected.png );
 }
 Button-FocusIndicator[CHECK] {
   /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
    we need to fix this when bug 346501 is fixed.
   background-image: url( theme/img/button/check_box_focused.png );
  */
-
   /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
-
   background-color: transparent;
   border: 1px dotted #b0cce3;
   margin: 1px 0px 1px 0px;
@@ -136,9 +127,7 @@ Button-FocusIndicator[RADIO] {
    we need to fix this when bug 346501 is fixed.
   background-image: url( theme/img/button/check_box_focused.png );
  */
-
   /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
-
   background-color: transparent;
   border: 1px dotted #b0cce3;
   margin: 1px 0px 1px 0px;
@@ -168,10 +157,10 @@ CCombo-Button:pressed {
   background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
 }
 CCombo-Button-Icon {
-  background-image: url(theme/img/ccombo/down.png);
+  background-image: url(theme/img/ccombo/down.png );
 }
 CCombo-Button-Icon:hover {
-  background-image: url(theme/img/ccombo/down-hover.png);
+  background-image: url(theme/img/ccombo/down-hover.png );
 }
 CCombo-Button[FLAT] {
   border: none;
@@ -215,10 +204,10 @@ Combo-Button:pressed {
   background-image: gradient(linear, left top, left bottom, from(#e0e0e0), color-stop(52%, #e0e0e0), to(#b0b0b0));
 }
 Combo-Button-Icon {
-  background-image: url(theme/img/ccombo/down.png);
+  background-image: url(theme/img/ccombo/down.png );
 }
 Combo-Button-Icon:hover {
-  background-image: url(theme/img/ccombo/down-hover.png);
+  background-image: url(theme/img/ccombo/down-hover.png );
 }
 Combo-List {
   border: 1px solid #c1c1c1;
@@ -262,10 +251,10 @@ CTabItem:disabled {
   color: black;
 }
 CTabFolder-DropDownButton-Icon {
-  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown.png);
+  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown.png );
 }
 CTabFolder-DropDownButton-Icon:hover {
-  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown-hover.png);
+  background-image: url(theme/img/ctabfolder/ctabfolder-dropdown-hover.png );
 }
 /* DateTime */
 DateTime {
@@ -306,32 +295,32 @@ DateTime-Calendar-Navbar {
   color: #ffffff;
 }
 DateTime-Calendar-PreviousMonthButton {
-  background-image: url(theme/img/datetime/left-month.png);
+  background-image: url(theme/img/datetime/left-month.png );
   cursor: default;
 }
 DateTime-Calendar-PreviousMonthButton:hover {
-  background-image: url(theme/img/datetime/left-month-hover.png);
+  background-image: url(theme/img/datetime/left-month-hover.png );
 }
 DateTime-Calendar-NextMonthButton {
-  background-image: url(theme/img/calendar/nextMonth.png);
+  background-image: url(theme/img/calendar/nextMonth.png );
   cursor: default;
 }
 DateTime-Calendar-NextMonthButton:hover {
-  background-image: url(theme/img/calendar/nextMonth-hover.png);
+  background-image: url(theme/img/calendar/nextMonth-hover.png );
 }
 DateTime-Calendar-PreviousYearButton {
-  background-image: url(theme/img/calendar/lastYear.png);
+  background-image: url(theme/img/calendar/lastYear.png );
   cursor: default;
 }
 DateTime-Calendar-PreviousYearButton:hover {
-  background-image: url(theme/img/calendar/lastYear-hover.png);
+  background-image: url(theme/img/calendar/lastYear-hover.png );
 }
 DateTime-Calendar-NextYearButton {
-  background-image: url(theme/img/calendar/nextYear.png);
+  background-image: url(theme/img/calendar/nextYear.png );
   cursor: default;
 }
 DateTime-Calendar-NextYearButton:hover {
-  background-image: url(theme/img/calendar/nextYear-hover.png);
+  background-image: url(theme/img/calendar/nextYear-hover.png );
 }
 DateTime-UpButton {
   background-color: transparent;
@@ -345,10 +334,10 @@ DateTime-UpButton:pressed {
   background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(52%, #e0e0e0), to(#b0b0b0));
 }
 DateTime-UpButton-Icon {
-  background-image: url(theme/img/spinner/up.png);
+  background-image: url(theme/img/spinner/up.png );
 }
 DateTime-UpButton-Icon:hover {
-  background-image: url(theme/img/spinner/up-hover.png);
+  background-image: url(theme/img/spinner/up-hover.png );
 }
 DateTime-DownButton {
   background-color: transparent;
@@ -370,16 +359,16 @@ DateTime-DropDownButton {
   width: 18px;
 }
 DateTime-DropDownButton-Icon {
-  background-image: url(theme/img/spinner/down.png);
+  background-image: url(theme/img/spinner/down.png );
 }
 DateTime-DropDownButton-Icon:hover {
-  background-image: url(theme/img/spinner/down-hover.png);
+  background-image: url(theme/img/spinner/down-hover.png );
 }
 DateTime-DownButton-Icon {
-  background-image: url(theme/img/spinner/down.png);
+  background-image: url(theme/img/spinner/down.png );
 }
 DateTime-DownButton-Icon:hover {
-  background-image: url(theme/img/spinner/down-hover.png);
+  background-image: url(theme/img/spinner/down-hover.png );
 }
 DateTime-DropDownCalendar {
   border: 1px #a7a6aa;
@@ -404,16 +393,16 @@ ExpandItem-Header:disabled {
   cursor: default;
 }
 ExpandItem-Button {
-  background-image: url(theme/img/expanditem/expanditem-expand.png);
+  background-image: url(theme/img/expanditem/expanditem-expand.png );
 }
 ExpandItem-Button:hover {
-  background-image: url(theme/img/expanditem/expanditem-expand-hover.png);
+  background-image: url(theme/img/expanditem/expanditem-expand-hover.png );
 }
 ExpandItem-Button:expanded {
-  background-image: url(theme/img/expanditem/expanditem-collapse.png);
+  background-image: url(theme/img/expanditem/expanditem-collapse.png );
 }
 ExpandItem-Button:expanded:hover {
-  background-image: url(theme/img/expanditem/expanditem-collapse-hover.png);
+  background-image: url(theme/img/expanditem/expanditem-collapse-hover.png );
 }
 /* List */
 List {
@@ -471,13 +460,13 @@ MenuItem:hover:disabled {
   color: #cfcfcf;
 }
 MenuItem-CheckIcon {
-  background-image: url(theme/img/menu/checkbox.gif);
+  background-image: url(theme/img/menu/checkbox.gif );
 }
 MenuItem-RadioIcon {
-  background-image: url(theme/img/menu/radiobutton.gif);
+  background-image: url(theme/img/menu/radiobutton.gif );
 }
 MenuItem-CascadeIcon {
-  background-image: url(theme/img/menu/arrow.gif);
+  background-image: url(theme/img/menu/arrow.gif );
 }
 /* ProgressBar */
 ProgressBar {
@@ -513,7 +502,6 @@ Sash {
 }
 Sash[BORDER] {
   /* XXX hstaudacher we need to set the border-radius when bug 346620 is fixed */
-
   border: 1px solid #bbcddb;
 }
 Sash-Handle {
@@ -588,28 +576,28 @@ Slider-DownButton[VERTICAL] {
 }
 /* Button Icons */
 Slider-UpButton-Icon[HORIZONTAL] {
-  background-image: url(theme/img/slider/right.png);
+  background-image: url(theme/img/slider/right.png );
 }
 Slider-UpButton-Icon[HORIZONTAL]:hover {
-  background-image: url(theme/img/slider/right-hover.png);
+  background-image: url(theme/img/slider/right-hover.png );
 }
 Slider-UpButton-Icon[VERTICAL] {
-  background-image: url(theme/img/spinner/down.png);
+  background-image: url(theme/img/spinner/down.png );
 }
 Slider-UpButton-Icon[VERTICAL]:hover {
-  background-image: url(theme/img/spinner/down-hover.png);
+  background-image: url(theme/img/spinner/down-hover.png );
 }
 Slider-DownButton-Icon[HORIZONTAL] {
-  background-image: url(theme/img/slider/left.png);
+  background-image: url(theme/img/slider/left.png );
 }
 Slider-DownButton-Icon[HORIZONTAL]:hover {
-  background-image: url(theme/img/slider/left-hover.png);
+  background-image: url(theme/img/slider/left-hover.png );
 }
 Slider-DownButton-Icon[VERTICAL] {
-  background-image: url(theme/img/spinner/up.png);
+  background-image: url(theme/img/spinner/up.png );
 }
 Slider-DownButton-Icon[VERTICAL]:hover {
-  background-image: url(theme/img/spinner/up-hover.png);
+  background-image: url(theme/img/spinner/up-hover.png );
 }
 /* Spinner */
 Spinner {
@@ -637,10 +625,10 @@ Spinner-UpButton:pressed {
   background-image: gradient(linear, left top, left bottom, from(#ffffff), color-stop(52%, #e0e0e0), to(#b0b0b0));
 }
 Spinner-UpButton-Icon {
-  background-image: url(theme/img/spinner/up.png);
+  background-image: url(theme/img/spinner/up.png );
 }
 Spinner-UpButton-Icon:hover {
-  background-image: url(theme/img/spinner/up-hover.png);
+  background-image: url(theme/img/spinner/up-hover.png );
 }
 Spinner-DownButton {
   background-color: transparent;
@@ -654,10 +642,10 @@ Spinner-DownButton:pressed {
   background-image: gradient(linear, left top, left bottom, from(#b0b0b0), color-stop(52%, #e0e0e0), to(#ffffff));
 }
 Spinner-DownButton-Icon {
-  background-image: url(theme/img/spinner/down.png);
+  background-image: url(theme/img/spinner/down.png );
 }
 Spinner-DownButton-Icon:hover {
-  background-image: url(theme/img/spinner/down-hover.png);
+  background-image: url(theme/img/spinner/down-hover.png );
 }
 /* TabFolder */
 TabItem {
@@ -716,10 +704,10 @@ ToolItem:selected {
   border: 1px solid #a4a4a4;
   border-radius: 2px;
   padding: 3px 2px 1px 4px;
-  background-image: url(theme/img/dotted_white.gif);
+  background-image: url(theme/img/dotted_white.gif );
 }
 ToolItem-DropDownIcon {
-  background-image: url(theme/img/arrows/down.gif);
+  background-image: url(theme/img/arrows/down.gif );
   border: none;
 }
 ToolItem-DropDownIcon:hover {
@@ -762,12 +750,10 @@ Composite.formbarContainer {
 }
 Composite.labelfield {
   /* a little padding to make sure the label is on the same line as the field's label */
-
   padding: 4px 0px 0px 0px;
 }
 Composite.htmlfield {
   /* a little padding to make sure the content is on the same line as the field's label */
-
   padding: 4px 0px 0px 0px;
 }
 Button.formButton {
@@ -797,110 +783,10 @@ Button.formButton-active:selected:hover,
 Button.formButton-active:hover {
   background-image: none;
 }
-/* Shell */
-Shell {
-  border: none;
-  padding: 0px;
-  background-image: none;
-  opacity: 1;
-}
-Shell[TITLE],
-Shell[BORDER] {
-  background-color: #ffffff;
-  border: 2px solid #67a8ce;
-  border-radius: 0px 0px 0px 0px;
-  padding: 0px 0px 0px 0px;
-}
-Shell[BORDER]:inactive,
-Shell[TITLE]:inactive {
-  border: 2px solid #91b8cf;
-}
-Shell:maximized,
-Shell:maximized:inactive {
-  border: none;
-  border-radius: 0px 0px 0px 0px;
-}
-Shell-DisplayOverlay {
-  animation: none;
-  background-image: none;
-  background-color: transparent;
-}
-/* Shell titlebar */
-Shell-Titlebar {
-  font: bold 12px Arial, Helvetica, sans-serif;
-  background-color: #67a8ce;
-  color: #ffffff;
-  padding: 2px 0px 2px 13px;
-  margin: 0px;
-  height: 18px;
-  border: none;
-  border-radius: 0px 0px 0px 0px;
-}
-Shell-Titlebar:inactive {
-  background-color: #91b8cf;
-}
-Shell-MinButton,
-Shell-MaxButton,
-Shell-CloseButton {
-  margin: 0px;
-}
-/* Shell buttons */
-/* Minimize button */
-Shell-MinButton {
-  background-image: url(theme/img/window/shell-min.png);
-}
-Shell-MinButton:hover {
-  background-image: url(theme/img/window/shell-min-hover.png);
-}
-Shell-MinButton:inactive {
-  background-image: url(theme/img/window/shell-min.png);
-}
-Shell-MinButton:inactive:hover {
-  background-image: url(theme/img/window/shell-min-hover.png);
-}
-/* Maximize button */
-Shell-MaxButton {
-  background-image: url(theme/img/window/shell-max.png);
-}
-Shell-MaxButton:hover {
-  background-image: url(theme/img/window/shell-max-hover.png);
-}
-Shell-MaxButton:inactive {
-  background-image: url(theme/img/window/shell-max.png);
-}
-Shell-MaxButton:inactive:hover {
-  background-image: url(theme/img/window/shell-max-hover.png);
-}
-/* Restore button */
-Shell-MaxButton:maximized {
-  background-image: url(theme/img/window/shell-restore.png);
-}
-Shell-MaxButton:maximized:hover {
-  background-image: url(theme/img/window/shell-restore-hover.png);
-}
-Shell-MaxButton:maximized:inactive {
-  background-image: url(theme/img/window/shell-restore.png);
-}
-Shell-MaxButton:maximized:inactive:hover {
-  background-image: url(theme/img/window/shell-restore-hover.png);
-}
-/* Close button */
-Shell-CloseButton {
-  background-image: url(theme/img/window/shell-close.png);
-}
-Shell-CloseButton:hover {
-  background-image: url(theme/img/window/shell-close-hover.png);
-}
-Shell-CloseButton:inactive {
-  background-image: url(theme/img/window/shell-close.png);
-}
-Shell-CloseButton:inactive:hover {
-  background-image: url(theme/img/window/shell-close-hover.png);
-}
 /* generated at http://www.ajaxload.info */
 Composite.busyIndicator {
   padding: 8px;
-  background-image: url(theme/img/busy/busy.gif);
+  background-image: url(theme/img/busy/busy.gif );
 }
 /* Button */
 Button {
@@ -937,7 +823,6 @@ Button[TOGGLE]:pressed {
 Button-FocusIndicator[PUSH],
 Button-FocusIndicator[TOGGLE] {
   /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
-
   background-color: transparent;
   border: 1px solid #b0cce3;
   margin: 1px;
@@ -959,11 +844,84 @@ Button[TOGGLE]:selected:hover {
 /* Link */
 Link-Hyperlink {
   /* XXX hstaudacher Theme text decorator when bug 346438 is fixed */
-
   color: red;
 }
 Link-Hyperlink:disabled {
   color: #2a5a76;
+}
+Composite.colorpickerfield {
+  /* 2px on the right side to move the button a little bit away from the border */
+  padding: 0px 2px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  background-image: none;
+}
+Composite.colorpickerfield-disabled {
+  /* 2px on the right side to move the button a little bit away from the border */
+  padding: 0px 2px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+Label.colorpickerfield {
+  /* 2px on the right side to move the button a little bit away from the border */
+  padding: 0px 2px 0px 0px;
+  background-image: none;
+}
+Label.colorpickerfield_splitLabel {
+  background-color: #95b7c1;
+}
+Text.colorpickerfield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Text.colorpickerfield:disabled {
+  background-color: #f4f8fc;
+}
+Button.colorpicker_browse {
+  background-image: url(theme/img/button/smartfield_browse.png );
+  border-radius: 5px;
+  cursor: pointer;
+}
+Button.colorpicker_browse:hover {
+  background-image: url(theme/img/button/smartfield_browse_mouse_over.png );
+}
+Button-FocusIndicator.colorpicker_browse {
+  background-color: transparent;
+  border: none;
+}
+Button.colorpicker_browse_disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png );
+  cursor: default;
+}
+Button.colorpicker_browse_disabled:hover {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png );
+}
+Button-FocusIndicator.colorpicker_browse_disabled {
+  background-color: transparent;
+  border: none;
+}
+Button.colorpicker_browse_menu {
+  background-image: url(theme/img/button/smartfield_browse_menu.png );
+  cursor: pointer;
+}
+Button.colorpicker_browse_menu:hover {
+  background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png );
+}
+Button-FocusIndicator.colorpicker_browse_menu {
+  background-color: transparent;
+  border: none;
+}
+Button.colorpicker_browse_disabled_menu {
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu.png );
+  cursor: default;
+}
+Button.colorpicker_browse_disabled_menu:hover {
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu_mouse_over.png );
+}
+Button-FocusIndicator.colorpicker_browse_disabled_menu {
+  background-color: transparent;
+  border: none;
 }
 /*Datefield*/
 Composite.datefield {
@@ -988,20 +946,20 @@ Text.datefield[BORDER]:disabled {
   background-color: #f4f8fc;
 }
 Button.datefield {
-  background-image: url(theme/img/button/datefield_date.png);
+  background-image: url(theme/img/button/datefield_date.png );
   border-radius: 5px;
   border: none;
 }
 Button.datefield:selected {
-  background-image: url(theme/img/button/datefield_date_selected.png);
+  background-image: url(theme/img/button/datefield_date_selected.png );
   border: none;
 }
 Button.datefield:disabled {
-  background-image: url(theme/img/button/datefield_date_disabled.png);
+  background-image: url(theme/img/button/datefield_date_disabled.png );
   border: none;
 }
 Button.datefield:hover {
-  background-image: url(theme/img/button/datefield_date_mouse_over.png);
+  background-image: url(theme/img/button/datefield_date_mouse_over.png );
   border: none;
 }
 Button-FocusIndicator.datefield {
@@ -1029,7 +987,6 @@ Table-GridLine.datechooser-dialog:vertical {
    At the moment the Gridline styling does not work and the datechooser has
    white vertical gridlines instead of none
  */
-
   color: #f4f8fc;
 }
 TableColumn.datechooser-dialog {
@@ -1040,25 +997,25 @@ TableColumn.datechooser-dialog {
 }
 Button.datechooser-dialog-last-year,
 Button.datechooser-dialog-last-year:hover {
-  background-image: url(theme/img/datetime/last-year.png);
+  background-image: url(theme/img/datetime/last-year.png );
   border-radius: 5px;
   border: none;
 }
 Button.datechooser-dialog-last-month,
 Button.datechooser-dialog-last-month:hover {
-  background-image: url(theme/img/datetime/last-month.png);
+  background-image: url(theme/img/datetime/last-month.png );
   border-radius: 5px;
   border: none;
 }
 Button.datechooser-dialog-next-year,
 Button.datechooser-dialog-next-year:hover {
-  background-image: url(theme/img/datetime/next-year.png);
+  background-image: url(theme/img/datetime/next-year.png );
   border-radius: 5px;
   border: none;
 }
 Button.datechooser-dialog-next-month,
 Button.datechooser-dialog-next-month:hover {
-  background-image: url(theme/img/datetime/next-month.png);
+  background-image: url(theme/img/datetime/next-month.png );
   border-radius: 5px;
   border: none;
 }
@@ -1100,18 +1057,17 @@ Text.filechooserfield_file[BORDER]:disabled {
   background-color: #f4f8fc;
 }
 FileUpload.filechooserfield_file {
-  background-image: url(theme/img/button/filechooserfield_file.png);
+  background-image: url(theme/img/button/filechooserfield_file.png );
   border-radius: 5px;
   padding: 20px 10px;
   /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
-
   cursor: pointer;
 }
 FileUpload.filechooserfield_file:hover {
-  background-image: url(theme/img/button/filechooserfield_file.png);
+  background-image: url(theme/img/button/filechooserfield_file.png );
 }
 FileUpload.filechooserfield_file:disabled {
-  background-image: url(theme/img/button/filechooserfield_file_disabled.png);
+  background-image: url(theme/img/button/filechooserfield_file_disabled.png );
   cursor: default;
 }
 FileUpload-FocusIndicator.filechooserfield_file {
@@ -1119,18 +1075,17 @@ FileUpload-FocusIndicator.filechooserfield_file {
   border: none;
 }
 FileUpload.filechooserfield_file_menu {
-  background-image: url(theme/img/button/filechooserfield_file_menu.png);
+  background-image: url(theme/img/button/filechooserfield_file_menu.png );
   border-radius: 5px;
   padding: 20px 10px;
   /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
-
   cursor: pointer;
 }
 FileUpload.filechooserfield_file_menu:hover {
-  background-image: url(theme/img/button/filechooserfield_file_menu.png);
+  background-image: url(theme/img/button/filechooserfield_file_menu.png );
 }
 FileUpload.filechooserfield_file_menu:disabled {
-  background-image: url(theme/img/button/filechooserfield_file_menu_disabled.png);
+  background-image: url(theme/img/button/filechooserfield_file_menu_disabled.png );
   cursor: default;
 }
 FileUpload-FocusIndicator.filechooserfield_file_menu {
@@ -1142,7 +1097,6 @@ Group {
   color: #4a4a4a;
   background-color: transparent;
   /* XXX hstaudacher we need to fix the border and set the border top when bug 346630 is fixed */
-
   border: none;
   border-radius: 2px 2px 2px 2px;
   font: bold 12px Arial, Helvetica, sans-serif;
@@ -1173,7 +1127,6 @@ Composite.groupBoxWithLineFrame {
 }
 Composite.groupBoxWithLineFrameContainer {
   /* Little padding above the label */
-
   padding: 6px 0px 0px 0px;
 }
 Label.GroupBoxLine {
@@ -1242,7 +1195,7 @@ Label-SeparatorLine[SHADOW_OUT] {
 }
 /* Label end */
 Button.menuButton {
-  background-image: url(theme/img/button/icon_menu.png);
+  background-image: url(theme/img/button/icon_menu.png );
   background-color: #ffffff;
   border-radius: 5px 5px 0px 0px;
   color: #fe9a23;
@@ -1253,7 +1206,7 @@ Button.menuButton:selected,
 Button.menuButton:selected:hover,
 Button.menuButton:pressed,
 Button.menuButton:hover {
-  background-image: url(theme/img/button/icon_menu_mouse_over.png);
+  background-image: url(theme/img/button/icon_menu_mouse_over.png );
 }
 /* ScrollBar */
 ScrollBar {
@@ -1297,39 +1250,134 @@ ScrollBar-Thumb-Icon[HORIZONTAL] {
 }
 ScrollBar-UpButton-Icon[VERTICAL] {
   /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
-
-  background-image: url(theme/img/scrollbar/scrollbar-down-button.png);
+  background-image: url(theme/img/scrollbar/scrollbar-down-button.png );
 }
 ScrollBar-UpButton-Icon[VERTICAL]:hover {
   /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
-
-  background-image: url(theme/img/scrollbar/scrollbar-down-button.png);
+  background-image: url(theme/img/scrollbar/scrollbar-down-button.png );
 }
 ScrollBar-UpButton-Icon[HORIZONTAL] {
-  background-image: url(theme/img/scrollbar/scrollbar-right.png);
+  background-image: url(theme/img/scrollbar/scrollbar-right.png );
 }
 ScrollBar-UpButton-Icon[HORIZONTAL]:hover {
-  background-image: url(theme/img/scrollbar/scrollbar-right.png);
+  background-image: url(theme/img/scrollbar/scrollbar-right.png );
 }
 ScrollBar-DownButton-Icon[VERTICAL] {
   /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
-
-  background-image: url(theme/img/scrollbar/scrollbar-up-button.png);
+  background-image: url(theme/img/scrollbar/scrollbar-up-button.png );
 }
 ScrollBar-DownButton-Icon[VERTICAL]:hover {
   /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
-
-  background-image: url(theme/img/scrollbar/scrollbar-up-button.png);
+  background-image: url(theme/img/scrollbar/scrollbar-up-button.png );
 }
 ScrollBar-DownButton-Icon[HORIZONTAL] {
-  background-image: url(theme/img/scrollbar/scrollbar-left.png);
+  background-image: url(theme/img/scrollbar/scrollbar-left.png );
 }
 ScrollBar-DownButton-Icon[HORIZONTAL]:hover {
-  background-image: url(theme/img/scrollbar/scrollbar-left.png);
+  background-image: url(theme/img/scrollbar/scrollbar-left.png );
+}
+/* Shell */
+Shell {
+  border: none;
+  padding: 0px;
+  background-image: none;
+  opacity: 1;
+}
+Shell[TITLE],
+Shell[BORDER] {
+  background-color: #ffffff;
+  border: 2px solid #67a8ce;
+  border-radius: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+Shell[BORDER]:inactive,
+Shell[TITLE]:inactive {
+  border: 2px solid #91b8cf;
+}
+Shell:maximized,
+Shell:maximized:inactive {
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: transparent;
+}
+/* Shell titlebar */
+Shell-Titlebar {
+  font: bold 12px Arial, Helvetica, sans-serif;
+  background-color: #67a8ce;
+  color: #ffffff;
+  padding: 2px 0px 2px 13px;
+  margin: 0px;
+  height: 18px;
+  border: none;
+  border-radius: 0px 0px 0px 0px;
+}
+Shell-Titlebar:inactive {
+  background-color: #91b8cf;
+}
+Shell-MinButton,
+Shell-MaxButton,
+Shell-CloseButton {
+  margin: 0px;
+}
+/* Shell buttons */
+/* Minimize button */
+Shell-MinButton {
+  background-image: url(theme/img/window/shell-min.png );
+}
+Shell-MinButton:hover {
+  background-image: url(theme/img/window/shell-min-hover.png );
+}
+Shell-MinButton:inactive {
+  background-image: url(theme/img/window/shell-min.png );
+}
+Shell-MinButton:inactive:hover {
+  background-image: url(theme/img/window/shell-min-hover.png );
+}
+/* Maximize button */
+Shell-MaxButton {
+  background-image: url(theme/img/window/shell-max.png );
+}
+Shell-MaxButton:hover {
+  background-image: url(theme/img/window/shell-max-hover.png );
+}
+Shell-MaxButton:inactive {
+  background-image: url(theme/img/window/shell-max.png );
+}
+Shell-MaxButton:inactive:hover {
+  background-image: url(theme/img/window/shell-max-hover.png );
+}
+/* Restore button */
+Shell-MaxButton:maximized {
+  background-image: url(theme/img/window/shell-restore.png );
+}
+Shell-MaxButton:maximized:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png );
+}
+Shell-MaxButton:maximized:inactive {
+  background-image: url(theme/img/window/shell-restore.png );
+}
+Shell-MaxButton:maximized:inactive:hover {
+  background-image: url(theme/img/window/shell-restore-hover.png );
+}
+/* Close button */
+Shell-CloseButton {
+  background-image: url(theme/img/window/shell-close.png );
+}
+Shell-CloseButton:hover {
+  background-image: url(theme/img/window/shell-close-hover.png );
+}
+Shell-CloseButton:inactive {
+  background-image: url(theme/img/window/shell-close.png );
+}
+Shell-CloseButton:inactive:hover {
+  background-image: url(theme/img/window/shell-close-hover.png );
 }
 Composite.smartfield {
   /* 2px on the right side to move the button a little bit away from the border */
-
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
@@ -1337,7 +1385,6 @@ Composite.smartfield {
 }
 Composite.smartfield-disabled {
   /* 2px on the right side to move the button a little bit away from the border */
-
   padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
   border-radius: 4px;
@@ -1351,45 +1398,45 @@ Text.smartfield:disabled {
   background-color: #f4f8fc;
 }
 Button.smartfield_browse {
-  background-image: url(theme/img/button/smartfield_browse.png);
+  background-image: url(theme/img/button/smartfield_browse.png );
   border-radius: 5px;
   cursor: pointer;
 }
 Button.smartfield_browse:hover {
-  background-image: url(theme/img/button/smartfield_browse_mouse_over.png);
+  background-image: url(theme/img/button/smartfield_browse_mouse_over.png );
 }
 Button-FocusIndicator.smartfield_browse {
   background-color: transparent;
   border: none;
 }
 Button.smartfield_browse_disabled {
-  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+  background-image: url(theme/img/button/smartfield_browse_disabled.png );
   cursor: default;
 }
 Button.smartfield_browse_disabled:hover {
-  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+  background-image: url(theme/img/button/smartfield_browse_disabled.png );
 }
 Button-FocusIndicator.smartfield_browse_disabled {
   background-color: transparent;
   border: none;
 }
 Button.smartfield_browse_menu {
-  background-image: url(theme/img/button/smartfield_browse_menu.png);
+  background-image: url(theme/img/button/smartfield_browse_menu.png );
   cursor: pointer;
 }
 Button.smartfield_browse_menu:hover {
-  background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png);
+  background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png );
 }
 Button-FocusIndicator.smartfield_browse_menu {
   background-color: transparent;
   border: none;
 }
 Button.smartfield_browse_disabled_menu {
-  background-image: url(theme/img/button/smartfield_browse_disabled_menu.png);
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu.png );
   cursor: default;
 }
 Button.smartfield_browse_disabled_menu:hover {
-  background-image: url(theme/img/button/smartfield_browse_disabled_menu_mouse_over.png);
+  background-image: url(theme/img/button/smartfield_browse_disabled_menu_mouse_over.png );
 }
 Button-FocusIndicator.smartfield_browse_disabled_menu {
   background-color: transparent;
@@ -1449,9 +1496,7 @@ Button.tabboxButton-marked:pressed,
 Button.tabboxButton-marked:hover {
   background-image: url(theme/img/button/icon_changed.png);
   /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
-
   /* background-position: bottom right; /* XXX Currently not supported by RAP */
-
   border: none;
   text-shadow: none;
   color: #295973;
@@ -1480,11 +1525,8 @@ Button.tabboxButton-active-marked:selected:hover,
 Button.tabboxButton-active-marked:hover {
   background-image: url(theme/img/button/icon_changed-marked.png);
   /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
-
   /* background-position: bottom right; /* XXX Currently not supported by RAP */
-
   /* background-color: @light-tabbox-background-blue; /* XXX Would work in FF and Webkit, but not in IE. A svg element is generated which does not include bg color. Workaround: bg is set in image */
-
   border-radius: 5px 5px 0px 0px;
   border: none;
   text-shadow: none;
@@ -1581,7 +1623,6 @@ TableColumn {
   color: #000000;
   border-bottom: 1px solid #e1efec;
   /* XXX hstaudacher we need to theme the column separator when bug 347771 is fixed */
-
 }
 /* Workaround for malfunctioning ":disabled" behaviour, see comment in org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable.setEnabledFromScout(boolean) */
 TableColumn.customDisabled {
@@ -1608,10 +1649,10 @@ TableColumn-SortIndicator {
   background-image: none;
 }
 TableColumn-SortIndicator:up {
-  background-image: url(theme/img/column/table_sort_asc.png);
+  background-image: url(theme/img/column/table_sort_asc.png );
 }
 TableColumn-SortIndicator:down {
-  background-image: url(theme/img/column/table_sort_desc.png);
+  background-image: url(theme/img/column/table_sort_desc.png );
 }
 Table-Cell {
   spacing: 3px;
@@ -1631,19 +1672,18 @@ Table-Checkbox {
  * For backward compatibility we have to keep the width property.
  * Deprecated, use "margin" instead.
  **/
-
   width: 21px;
   margin: 0px;
-  background-image: url(theme/img/button/check_box.png);
+  background-image: url(theme/img/button/check_box.png );
 }
 Table-Checkbox:disabled {
-  background-image: url(theme/img/button/check_box_disabled.png);
+  background-image: url(theme/img/button/check_box_disabled.png );
 }
 Table-Checkbox:selected {
-  background-image: url(theme/img/button/check_box_selected.png);
+  background-image: url(theme/img/button/check_box_selected.png );
 }
 Table-Checkbox:selected:disabled {
-  background-image: url(theme/img/button/check_box_disabled_selected.png);
+  background-image: url(theme/img/button/check_box_disabled_selected.png );
 }
 /* Text */
 Text {
@@ -1678,7 +1718,6 @@ Text[MULTI][BORDER] {
  * padding currently has no effect because of bug 253644
  * [TODO] remove comment if bug fixed
  */
-
   padding: 0px 0px 0px 4px;
 }
 Text[MULTI][BORDER]:disabled {
@@ -1714,20 +1753,20 @@ Text.timefield[BORDER]:disabled {
   background-color: #f4f8fc;
 }
 Button.timefield {
-  background-image: url(theme/img/button/datefield_time.png);
+  background-image: url(theme/img/button/datefield_time.png );
   border-radius: 5px;
   border: none;
 }
 Button.timefield:selected {
-  background-image: url(theme/img/button/datefield_time_selected.png);
+  background-image: url(theme/img/button/datefield_time_selected.png );
   border: none;
 }
 Button.timefield:disabled {
-  background-image: url(theme/img/button/datefield_time_disabled.png);
+  background-image: url(theme/img/button/datefield_time_disabled.png );
   border: none;
 }
 Button.timefield:hover {
-  background-image: url(theme/img/button/datefield_time_mouse_over.png);
+  background-image: url(theme/img/button/datefield_time_mouse_over.png );
   border: none;
 }
 Button-FocusIndicator.timefield {
@@ -1752,23 +1791,20 @@ Composite.toolButtonBar-active {
   background-image: none;
   background-color: #67a8ce;
   /* XXX hstaudacher new radius is not applied on the client. Should be fixed automatically with bug 346683 */
-
   border-radius: 5px 0px 0px 0px;
 }
 Button.toolButtonBarCollapseButton {
-  background-image: url(theme/img/button/icon_slider.png);
+  background-image: url(theme/img/button/icon_slider.png );
   background-color: #67a8ce;
   border: none;
   /*   padding: 8px 15px; */
-
   /*   border-radius: 0px 0px 0px 0px; */
-
 }
 Button.toolButtonBarCollapseButton:pressed,
 Button.toolButtonBarCollapseButton:selected,
 Button.toolButtonBarCollapseButton:selected:hover,
 Button.toolButtonBarCollapseButton:hover {
-  background-image: url(theme/img/button/icon_slider_mouse_over.png);
+  background-image: url(theme/img/button/icon_slider_mouse_over.png );
   border: none;
 }
 Button.toolButton {
@@ -1824,15 +1860,12 @@ ToolTip {
 }
 ToolTip-Image[ICON_ERROR] {
   /*   background-image: url( theme/img/tooltip/error.png ); */
-
 }
 ToolTip-Image[ICON_INFORMATION] {
   /*   background-image: url( theme/img/tooltip/information.png ); */
-
 }
 ToolTip-Image[ICON_WARNING] {
   /*   background-image: url( theme/img/tooltip/warning.png ); */
-
 }
 ToolTip-Text {
   color: #003399;
@@ -1886,7 +1919,6 @@ TreeItem {
 }
 TreeItem:disabled {
   /* XXX hstaudacher does not work atm. Should be fixed with bug 347934 */
-
   background-color: transparent;
   color: #2a5a76;
   text-decoration: none;
@@ -1934,10 +1966,10 @@ TreeColumn-SortIndicator {
   background-image: none;
 }
 TreeColumn-SortIndicator:up {
-  background-image: url(theme/img/column/table_sort_asc.png);
+  background-image: url(theme/img/column/table_sort_asc.png );
 }
 TreeColumn-SortIndicator:down {
-  background-image: url(theme/img/column/table_sort_desc.png);
+  background-image: url(theme/img/column/table_sort_desc.png );
 }
 Tree-Cell {
   spacing: 3px;
@@ -1951,80 +1983,80 @@ Tree-GridLine:horizontal {
 }
 Tree-Checkbox {
   margin: 0px 2px 0px 0px;
-  background-image: url(theme/img/button/check_box.png);
+  background-image: url(theme/img/button/check_box.png );
 }
 Tree-Checkbox:disabled {
-  background-image: url(theme/img/button/check_box_disabled.png);
+  background-image: url(theme/img/button/check_box_disabled.png );
 }
 Tree-Checkbox:selected {
-  background-image: url(theme/img/button/check_box_selected.png);
+  background-image: url(theme/img/button/check_box_selected.png );
 }
 Tree-Checkbox:selected:disabled {
-  background-image: url(theme/img/button/check_box_disabled_selected.png);
+  background-image: url(theme/img/button/check_box_disabled_selected.png );
 }
 Tree-Indent {
   width: 20px;
-  background-image: url(theme/img/tree/tree-indent.png);
+  background-image: url(theme/img/tree/tree-indent.png );
 }
 Tree-Indent:collapsed {
-  background-image: url(theme/img/tree/tree-indent-collapsed.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed.png );
 }
 Tree-Indent:collapsed:hover {
-  background-image: url(theme/img/tree/tree-indent-collapsed.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed.png );
 }
 Tree-Indent:expanded {
-  background-image: url(theme/img/tree/tree-indent-expanded.png);
+  background-image: url(theme/img/tree/tree-indent-expanded.png );
 }
 Tree-Indent:expanded:hover {
-  background-image: url(theme/img/tree/tree-indent-expanded.png);
+  background-image: url(theme/img/tree/tree-indent-expanded.png );
 }
 Tree-Indent:line {
-  background-image: url(theme/img/tree/tree-indent-line.png);
+  background-image: url(theme/img/tree/tree-indent-line.png );
 }
 Tree-Indent:first {
-  background-image: url(theme/img/tree/tree-indent-first.png);
+  background-image: url(theme/img/tree/tree-indent-first.png );
 }
 Tree-Indent:first:collapsed {
-  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png );
 }
 Tree-Indent:first:collapsed:hover {
-  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png );
 }
 Tree-Indent:first:expanded {
-  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png );
 }
 Tree-Indent:first:expanded:hover {
-  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png );
 }
 Tree-Indent:last {
-  background-image: url(theme/img/tree/tree-indent-last.png);
+  background-image: url(theme/img/tree/tree-indent-last.png );
 }
 Tree-Indent:last:collapsed {
-  background-image: url(theme/img/tree/tree-indent-collapsed-last.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-last.png );
 }
 Tree-Indent:last:collapsed:hover {
-  background-image: url(theme/img/tree/tree-indent-collapsed-last.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-last.png );
 }
 Tree-Indent:last:expanded {
-  background-image: url(theme/img/tree/tree-indent-expanded.png);
+  background-image: url(theme/img/tree/tree-indent-expanded.png );
 }
 Tree-Indent:last:expanded:hover {
-  background-image: url(theme/img/tree/tree-indent-expanded.png);
+  background-image: url(theme/img/tree/tree-indent-expanded.png );
 }
 Tree-Indent:first:last {
   background-image: none;
 }
 Tree-Indent:first:last:collapsed {
-  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png );
 }
 Tree-Indent:first:last:collapsed:hover {
-  background-image: url(theme/img/tree/tree-indent-collapsed-first.png);
+  background-image: url(theme/img/tree/tree-indent-collapsed-first.png );
 }
 Tree-Indent:first:last:expanded {
-  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png );
 }
 Tree-Indent:first:last:expanded:hover {
-  background-image: url(theme/img/tree/tree-indent-expanded-first.png);
+  background-image: url(theme/img/tree/tree-indent-expanded-first.png );
 }
 Composite.toolbarContainer {
   background-color: #ddebf4;
@@ -2065,24 +2097,22 @@ Composite.formTab {
   background-color: transparent;
   border-radius: 8px 8px 0px 0px;
   /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
-
   padding: 2px 5px 0px 5px;
 }
 Composite.formTab-active {
   background-color: #ffffff;
   border-radius: 8px 8px 0px 0px;
   /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
-
   padding: 2px 5px 0px 5px;
 }
 Button.formTabClose {
   background-color: transparent;
-  background-image: url(theme/img/form/form-close.png);
+  background-image: url(theme/img/form/form-close.png );
   padding: 2px 5px 0px 6px;
 }
 Button.formTabClose:hover {
   background-color: transparent;
-  background-image: url(theme/img/form/form-close-hover.png);
+  background-image: url(theme/img/form/form-close-hover.png );
 }
 Button.formTabActivate {
   background-image: none;

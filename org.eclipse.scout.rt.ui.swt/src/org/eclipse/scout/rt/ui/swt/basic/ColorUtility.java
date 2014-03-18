@@ -10,7 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic;
 
+import java.util.regex.Matcher;
+
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Utility class for Colors in SWT
@@ -32,5 +37,31 @@ public class ColorUtility {
       return null;
     }
     return org.eclipse.scout.commons.ColorUtility.rgbToText(c.getRed(), c.getGreen(), c.getBlue());
+  }
+
+  public static Color createColor(Display display, String hex) {
+    RGB rgb = toRGB(hex);
+    if (rgb != null) {
+      return new Color(display, rgb);
+    }
+    return null;
+  }
+
+  public static RGB toRGB(String hex) {
+    if (StringUtility.isNullOrEmpty(hex)) {
+      return null;
+    }
+    Matcher matcher = org.eclipse.scout.commons.ColorUtility.HEX_COLOR_PATTERN.matcher(hex);
+    if (matcher.matches()) {
+      hex = matcher.group(2);
+      int red = Integer.parseInt(hex.substring(0, 2), 16);
+      int green = Integer.parseInt(hex.substring(2, 4), 16);
+      int blue = Integer.parseInt(hex.substring(4, 6), 16);
+      return new RGB(red, green, blue);
+
+    }
+    else {
+      throw new IllegalArgumentException("Input '" + hex + "' must be a hex number with 6 digits. ");
+    }
   }
 }

@@ -438,6 +438,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     // super.setEnabledFromScout(b);
     m_htmlView.setEditable(getScoutObject().isMailEditor());
     m_htmlView.setEnabled(b);
+    m_htmlView.updateUI();
   }
 
   protected void setAddressesFromScout(Address[] addresses, String addressKey, boolean invisibleWhenEmpty) {

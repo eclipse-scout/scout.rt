@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.swt.basic.ColorUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -52,12 +53,7 @@ public class ColorFactory {
     if (scoutColor == null) {
       return null;
     }
-    if (!scoutColor.matches("(|[A-Fa-f0-9]{6})")) {
-      LOG.warn("undefined color string '" + scoutColor + "'");
-      return null;
-    }
-    int i = Integer.parseInt(scoutColor, 16);
-    RGB rgb = new RGB((i >> 16) & 0xff, (i >> 8) & 0xff, (i) & 0xff);
+    RGB rgb = ColorUtility.toRGB(scoutColor);
     return new Color(m_display, rgb);
   }
 

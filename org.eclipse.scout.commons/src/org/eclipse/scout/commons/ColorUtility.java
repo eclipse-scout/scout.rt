@@ -11,8 +11,11 @@
 package org.eclipse.scout.commons;
 
 import java.awt.Color;
+import java.util.regex.Pattern;
 
 public final class ColorUtility {
+
+  public static final Pattern HEX_COLOR_PATTERN = Pattern.compile("^(\\#|0X|0x)?([0-9A-Fa-f]{6})$");
 
   // public constants
   public static final String RED = "ff0000";

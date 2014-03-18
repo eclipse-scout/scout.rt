@@ -75,7 +75,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (fix.mouseClicked()) {
+        if (fix != null && fix.mouseClicked()) {
           return;
         }
         Region r = getRegionTouchedByCursor(e.getPoint());

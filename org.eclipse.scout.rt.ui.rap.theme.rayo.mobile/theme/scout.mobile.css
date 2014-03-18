@@ -758,104 +758,6 @@ Button.formButton-active:selected:hover { background-image:none; }
 
 Button.formButton-active:hover { background-image:none; }
 
-Shell {
-  border:none;
-  padding:0px;
-  background-image:none;
-  opacity:1;
-}
-
-Shell[TITLE] {
-  background-color:#ffffff;
-  border:2px solid #67a8ce;
-  border-radius:0px 0px 0px 0px;
-  padding:0px 0px 0px 0px;
-}
-
-Shell[BORDER] {
-  background-color:#ffffff;
-  border:2px solid #67a8ce;
-  border-radius:0px 0px 0px 0px;
-  padding:0px 0px 0px 0px;
-  box-shadow:5px 5px 4px 0px #3f3f3f;
-  animation:none;
-}
-
-Shell[BORDER]:inactive { border:2px solid #91b8cf; }
-
-Shell[TITLE]:inactive { border:2px solid #91b8cf; }
-
-Shell:maximized {
-  border:none;
-  border-radius:0px 0px 0px 0px;
-}
-
-Shell:maximized:inactive {
-  border:none;
-  border-radius:0px 0px 0px 0px;
-}
-
-Shell-DisplayOverlay {
-  animation:none;
-  background-image:none;
-  background-color:#565656;
-  opacity:0.5;
-}
-
-Shell-Titlebar {
-  font:bold 14px Arial,Helvetica,sans-serif;
-  background-color:#67a8ce;
-  color:#ffffff;
-  padding:2px 0px 2px 13px;
-  margin:0px;
-  height:18px;
-  border:none;
-  border-radius:0px 0px 0px 0px;
-}
-
-Shell-Titlebar:inactive { background-color:#91b8cf; }
-
-Shell-MinButton {
-  margin:0px;
-  background-image:url(theme/img/window/shell-min.png);
-}
-
-Shell-MaxButton {
-  margin:0px;
-  background-image:url(theme/img/window/shell-max.png);
-}
-
-Shell-CloseButton {
-  margin:0px;
-  background-image:url(theme/img/window/shell-close.png);
-}
-
-Shell-MinButton:hover { background-image:url(theme/img/window/shell-min-hover.png); }
-
-Shell-MinButton:inactive { background-image:url(theme/img/window/shell-min.png); }
-
-Shell-MinButton:inactive:hover { background-image:url(theme/img/window/shell-min-hover.png); }
-
-Shell-MaxButton:hover { background-image:url(theme/img/window/shell-max-hover.png); }
-
-Shell-MaxButton:inactive { background-image:url(theme/img/window/shell-max.png); }
-
-Shell-MaxButton:inactive:hover { background-image:url(theme/img/window/shell-max-hover.png); }
-
-Shell-MaxButton:maximized { background-image:url(theme/img/window/shell-restore.png); }
-
-Shell-MaxButton:maximized:hover { background-image:url(theme/img/window/shell-restore-hover.png); }
-
-Shell-MaxButton:maximized:inactive { background-image:url(theme/img/window/shell-restore.png); }
-
-Shell-MaxButton:maximized:inactive:hover { background-image:url(theme/img/window/shell-restore-hover.png); }
-
-Shell-CloseButton:hover { background-image:url(theme/img/window/shell-close-hover.png); }
-
-Shell-CloseButton:inactive { background-image:url(theme/img/window/shell-close.png); }
-
-Shell-CloseButton:inactive:hover { background-image:url(theme/img/window/shell-close-hover.png); }
-
 Composite.busyIndicator {
   padding:8px;
   background-image:url(theme/img/busy/busy.gif);
@@ -960,6 +862,83 @@ Button[TOGGLE]:selected:hover { background-image:gradient(linear,left top,left b
 Link-Hyperlink { color:red; }
 
 Link-Hyperlink:disabled { color:#2a5a76; }
+
+Composite.colorpickerfield {
+  padding:0px 2px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+  background-image:none;
+}
+
+Composite.colorpickerfield-disabled {
+  padding:0px 2px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
+}
+
+Label.colorpickerfield {
+  padding:0px 2px 0px 0px;
+  background-image:none;
+}
+
+Label.colorpickerfield_splitLabel { background-color:#95b7c1; }
+
+Text.colorpickerfield {
+  border-radius:4px;
+  background-image:none;
+  background-color:transparent;
+}
+
+Text.colorpickerfield:disabled { background-color:#f4f8fc; }
+
+Button.colorpicker_browse {
+  background-image:url(theme/img/button/smartfield_browse.png);
+  border-radius:5px;
+  cursor:pointer;
+}
+
+Button.colorpicker_browse:hover { background-image:url(theme/img/button/smartfield_browse_mouse_over.png); }
+
+Button-FocusIndicator.colorpicker_browse {
+  background-color:transparent;
+  border:none;
+}
+
+Button.colorpicker_browse_disabled {
+  background-image:url(theme/img/button/smartfield_browse_disabled.png);
+  cursor:default;
+}
+
+Button.colorpicker_browse_disabled:hover { background-image:url(theme/img/button/smartfield_browse_disabled.png); }
+
+Button-FocusIndicator.colorpicker_browse_disabled {
+  background-color:transparent;
+  border:none;
+}
+
+Button.colorpicker_browse_menu {
+  background-image:url(theme/img/button/smartfield_browse_menu.png);
+  cursor:pointer;
+}
+
+Button.colorpicker_browse_menu:hover { background-image:url(theme/img/button/smartfield_browse_menu_mouse_over.png); }
+
+Button-FocusIndicator.colorpicker_browse_menu {
+  background-color:transparent;
+  border:none;
+}
+
+Button.colorpicker_browse_disabled_menu {
+  background-image:url(theme/img/button/smartfield_browse_disabled_menu.png);
+  cursor:default;
+}
+
+Button.colorpicker_browse_disabled_menu:hover { background-image:url(theme/img/button/smartfield_browse_disabled_menu_mouse_over.png); }
+
+Button-FocusIndicator.colorpicker_browse_disabled_menu {
+  background-color:transparent;
+  border:none;
+}
 
 Composite.datefield {
   padding:0px 0px 0px 0px;
@@ -1323,6 +1302,104 @@ ScrollBar-DownButton-Icon[VERTICAL]:hover { background-image:url(theme/img/scrol
 ScrollBar-DownButton-Icon[HORIZONTAL] { background-image:url(theme/img/scrollbar/scrollbar-left.png); }
 
 ScrollBar-DownButton-Icon[HORIZONTAL]:hover { background-image:url(theme/img/scrollbar/scrollbar-left.png); }
+
+Shell {
+  border:none;
+  padding:0px;
+  background-image:none;
+  opacity:1;
+}
+
+Shell[TITLE] {
+  background-color:#ffffff;
+  border:2px solid #67a8ce;
+  border-radius:0px 0px 0px 0px;
+  padding:0px 0px 0px 0px;
+}
+
+Shell[BORDER] {
+  background-color:#ffffff;
+  border:2px solid #67a8ce;
+  border-radius:0px 0px 0px 0px;
+  padding:0px 0px 0px 0px;
+  box-shadow:5px 5px 4px 0px #3f3f3f;
+  animation:none;
+}
+
+Shell[BORDER]:inactive { border:2px solid #91b8cf; }
+
+Shell[TITLE]:inactive { border:2px solid #91b8cf; }
+
+Shell:maximized {
+  border:none;
+  border-radius:0px 0px 0px 0px;
+}
+
+Shell:maximized:inactive {
+  border:none;
+  border-radius:0px 0px 0px 0px;
+}
+
+Shell-DisplayOverlay {
+  animation:none;
+  background-image:none;
+  background-color:#565656;
+  opacity:0.5;
+}
+
+Shell-Titlebar {
+  font:bold 14px Arial,Helvetica,sans-serif;
+  background-color:#67a8ce;
+  color:#ffffff;
+  padding:2px 0px 2px 13px;
+  margin:0px;
+  height:18px;
+  border:none;
+  border-radius:0px 0px 0px 0px;
+}
+
+Shell-Titlebar:inactive { background-color:#91b8cf; }
+
+Shell-MinButton {
+  margin:0px;
+  background-image:url(theme/img/window/shell-min.png);
+}
+
+Shell-MaxButton {
+  margin:0px;
+  background-image:url(theme/img/window/shell-max.png);
+}
+
+Shell-CloseButton {
+  margin:0px;
+  background-image:url(theme/img/window/shell-close.png);
+}
+
+Shell-MinButton:hover { background-image:url(theme/img/window/shell-min-hover.png); }
+
+Shell-MinButton:inactive { background-image:url(theme/img/window/shell-min.png); }
+
+Shell-MinButton:inactive:hover { background-image:url(theme/img/window/shell-min-hover.png); }
+
+Shell-MaxButton:hover { background-image:url(theme/img/window/shell-max-hover.png); }
+
+Shell-MaxButton:inactive { background-image:url(theme/img/window/shell-max.png); }
+
+Shell-MaxButton:inactive:hover { background-image:url(theme/img/window/shell-max-hover.png); }
+
+Shell-MaxButton:maximized { background-image:url(theme/img/window/shell-restore.png); }
+
+Shell-MaxButton:maximized:hover { background-image:url(theme/img/window/shell-restore-hover.png); }
+
+Shell-MaxButton:maximized:inactive { background-image:url(theme/img/window/shell-restore.png); }
+
+Shell-MaxButton:maximized:inactive:hover { background-image:url(theme/img/window/shell-restore-hover.png); }
+
+Shell-CloseButton:hover { background-image:url(theme/img/window/shell-close-hover.png); }
+
+Shell-CloseButton:inactive { background-image:url(theme/img/window/shell-close.png); }
+
+Shell-CloseButton:inactive:hover { background-image:url(theme/img/window/shell-close-hover.png); }
 
 Composite.smartfield {
   padding:0px;

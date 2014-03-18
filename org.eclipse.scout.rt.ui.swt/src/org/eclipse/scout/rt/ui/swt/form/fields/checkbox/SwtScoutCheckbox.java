@@ -150,7 +150,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
   }
 
   @Override
-  protected void setValueFromScout() {
+  protected void updateValueFromScout() {
     getSwtField().setSelection(BooleanUtility.nvl(getScoutObject() == null ? null : getScoutObject().getValue()));
   }
 

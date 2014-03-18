@@ -127,8 +127,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
       s = "";
     }
     getSwtField().setText(s);
-    super.handleSwtFocusGained();
-    getSwtField().setCaretOffset(0);
   }
 
   @Override

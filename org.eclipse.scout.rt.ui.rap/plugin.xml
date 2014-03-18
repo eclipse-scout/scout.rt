@@ -9,6 +9,7 @@
 
     Contributors:
         BSI Business Systems Integration AG - initial API and implementation
+        2014, Schweizerische Bundesbahnen SBB - ColorPicker, TristateField
  -->
 
 <plugin>
@@ -261,6 +262,15 @@
         <uiClass
               class="org.eclipse.scout.rt.ui.rap.form.fields.composer.RwtScoutComposerField">
         </uiClass>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField"
+            name="Color picker field"
+            scope="default">
+            <uiClass
+              class="org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield.RwtScoutColorPickerField">
+            </uiClass>
       </formField>
   </extension>
   <extension

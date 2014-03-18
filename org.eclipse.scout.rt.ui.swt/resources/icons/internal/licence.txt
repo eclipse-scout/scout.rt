@@ -2,6 +2,7 @@ The following icons are provided by http://www.famfamfam.com
 - network_latency_green.png (original name= bullet_green.png)
 - network_latency_yellow.png (original name= bullet_yellow.png)
 - network_latency_red.png (original name= bullet_red.png)
+- colorpicker_browse.png (original name= palette.png)
 - tooltip.png (original name= comment.png)
 
 And are published under Creative Commons Attribution 3.0 License:

@@ -23,11 +23,11 @@ public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> exte
   @Override
   protected void attachScout() {
     super.attachScout();
-    setValueFromScout();
+    updateValueFromScout();
     setDisplayTextFromScout(getScoutObject().getDisplayText());
   }
 
-  protected void setValueFromScout() {
+  protected void updateValueFromScout() {
   }
 
   protected void setDisplayTextFromScout(String s) {
@@ -40,7 +40,7 @@ public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> exte
       setDisplayTextFromScout((String) newValue);
     }
     else if (name.equals(IValueField.PROP_VALUE)) {
-      setValueFromScout();
+      updateValueFromScout();
     }
   }
 

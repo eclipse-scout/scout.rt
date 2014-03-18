@@ -115,7 +115,7 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
   }
 
   @Override
-  protected void setValueFromScout() {
+  protected void updateValueFromScout() {
     RemoteFile remoteFile = getScoutObject().getValue();
     String location = null;
     if (remoteFile != null && remoteFile.exists()) {
