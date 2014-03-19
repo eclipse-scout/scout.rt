@@ -47,7 +47,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
   @Override
   public void init(HttpServletRequest request, String sessionId) throws JsonUIException {
     UserAgent userAgent = createUserAgent();
-    Subject subject = Subject.getSubject(AccessController.getContext());
+    Subject subject = initSubject();
     if (subject == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
@@ -64,6 +64,10 @@ public abstract class AbstractJsonSession implements IJsonSession {
   protected UserAgent createUserAgent() {
     //FIXME create UiLayer.Json, or better let deliver from real gui -> html?
     return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
+  }
+
+  protected Subject initSubject() {
+    return Subject.getSubject(AccessController.getContext());
   }
 
   protected abstract Class<? extends IClientSession> clientSessionClass();
@@ -129,15 +133,17 @@ public abstract class AbstractJsonSession implements IJsonSession {
     m_jsonClientSession.processRequestLocale(httpReq.getLocale());
 
     final JsonResponse res = currentJsonResponse();
-    for (JsonEvent action : jsonReq.getEvents()) {
-      processAction(action, res);
+    //FIXME maybe rename event to action? request=actions, response=events?
+    for (JsonEvent event : jsonReq.getEvents()) {
+      processEvent(event, res);
     }
+
     //Clear event map when sent to client
     m_currentJsonResponse = new JsonResponse();
     return res;
   }
 
-  protected void processAction(JsonEvent event, JsonResponse res) {
+  protected void processEvent(JsonEvent event, JsonResponse res) {
     final String id = event.getEventId();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {

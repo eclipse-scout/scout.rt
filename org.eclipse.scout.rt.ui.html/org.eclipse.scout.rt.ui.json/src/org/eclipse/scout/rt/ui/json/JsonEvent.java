@@ -14,6 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonEvent {
+  public static final String TYPE = "type_";
+  public static final String ID = "id";
+
   private final JSONObject m_event;
 
   public JsonEvent(JSONObject event) {
@@ -22,7 +25,7 @@ public class JsonEvent {
 
   public String getEventType() {
     try {
-      return m_event.getString("type_");
+      return m_event.getString(TYPE);
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -31,7 +34,7 @@ public class JsonEvent {
 
   public String getEventId() {
     try {
-      return m_event.getString("id");
+      return m_event.getString(ID);
     }
     catch (JSONException e) {
       throw new JsonUIException(e);

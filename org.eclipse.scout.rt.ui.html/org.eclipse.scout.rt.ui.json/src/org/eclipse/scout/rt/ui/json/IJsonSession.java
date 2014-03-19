@@ -29,13 +29,12 @@ public interface IJsonSession {
   IJsonRenderer getJsonRenderer(String id);
 
   /**
-   * @return the current ui response that is collecting changes for the next {@link #processRequest(Jsoneventuest)}
-   *         cycle
+   * @return the current ui response that is collecting changes for the next
+   *         {@link #processRequest(HttpServletRequest, JsonRequest)} cycle
    */
   JsonResponse currentJsonResponse();
 
   HttpServletRequest currentHttpRequest();
 
   JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonUIException;
-
 }

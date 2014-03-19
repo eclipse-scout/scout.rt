@@ -51,7 +51,7 @@ describe("DesktopTree", function() {
 
       spyOn(desktopTree, '_onNodeClicked');
       var $node = desktopTree._$desktopTreeScroll.children().first();
-      $($node).click()
+      $node.click();
 
       expect(desktopTree._onNodeClicked).toHaveBeenCalled();
     });
@@ -62,14 +62,14 @@ describe("DesktopTree", function() {
       var desktopTree = createDesktopTree(model);
 
       var $node = desktopTree._$desktopTreeScroll.children().first();
-      $($node).click()
+      $node.click();
 
       jasmine.clock().tick(0);
 
       expect(ajaxRequests.length).toBe(1);
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeExpanded']);
     });
   });
 

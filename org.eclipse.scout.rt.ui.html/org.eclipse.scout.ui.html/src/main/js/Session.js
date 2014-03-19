@@ -49,7 +49,7 @@ Scout.Session.prototype.send = function (type, id, data, async) {
     //Before sending a sync request make sure the queued async request is executed before
     if (this._asyncRequestQueued) {
       var message = this._sendNow(this._asyncEvents, false);
-      this.processEvents(message.events);
+      this._processEvents(message.events);
       this._asyncEvents = [];
     }
 
@@ -76,7 +76,7 @@ Scout.Session.prototype._sendNow = function (events, async) {
     data : JSON.stringify(request),
     success : function (message) {
       if (async) {
-        that.processEvents(message.events);
+        that._processEvents(message.events);
       }
       else {
         ret = message;
@@ -86,37 +86,34 @@ Scout.Session.prototype._sendNow = function (events, async) {
   return ret;
 };
 
-Scout.Session.prototype.processEvents = function (events) {
+Scout.Session.prototype._processEvents = function (events) {
   var scout=this;
   for(var i=0; i < events.length; i++) {
     var event = events[i],
-      widget;
-    if(event.type_ == "create") {
-      widget = scout.widgetMap[event.parentId];
-      if(widget) {
+      widgetId;
+
+    if (event.type_ == "create") {
+      widgetId = event.parentId;
+    } else {
+      widgetId = event.id;
+    }
+
+    var widget = scout.widgetMap[widgetId];
+    if (!widget) {
+      throw "No widget found for id " + widgetId;
+    }
+
+    widget.updateFromModelInProgress = true;
+    try {
+      if (event.type_ == "create") {
         widget.onModelCreate(event);
+      } else if (event.type_ == "property") {
+        widget.onModelPropertyChange(event);
+      } else {
+        widget.onModelAction(event);
       }
-      else{
-        throw "No widget found for parentId " + event.parentId;
-      }
-    }
-    else if(event.type_ == "property") {
-      widget = scout.widgetMap[event.id];
-      if(widget) {
-          widget.onModelPropertyChange(event);
-      }
-      else{
-        throw "No widget found for id " + event.id;
-      }
-    }
-    else {
-      widget = scout.widgetMap[event.id];
-      if(widget) {
-          widget.onModelAction(event);
-      }
-      else{
-        throw "No widget found for id " + event.id;
-      }
+    } finally {
+      widget.updateFromModelInProgress = null;
     }
   }
 };

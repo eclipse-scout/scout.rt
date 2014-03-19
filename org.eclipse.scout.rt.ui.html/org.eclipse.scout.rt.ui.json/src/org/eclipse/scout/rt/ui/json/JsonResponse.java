@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,10 @@ public class JsonResponse {
       LOG.error("", ex);
     }
     return response;
+  }
+
+  public List<JSONObject> getEventList() {
+    return Collections.unmodifiableList(m_eventList);
   }
 
 }

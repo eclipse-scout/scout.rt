@@ -50,7 +50,9 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
 
   var node = $node.data('node');
   if (node.expanded != expanded) {
-    this.scout.send('nodeExpanded', this.model.id, {"nodeId" : node.id, "expanded" : expanded});
+    if (!this.updateFromModelInProgress) {
+      this.scout.send('nodeExpanded', this.model.id, {"nodeId" : node.id, "expanded" : expanded});
+    }
   }
   node.expanded = expanded;
 
@@ -138,7 +140,10 @@ Scout.DesktopTree.prototype._setNodeSelected = function ($node) {
 
   $node.selectOne();
 
-  this.scout.send('nodeSelected', this.model.id, {"nodeId":node.id});
+  //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
+  if (!this.updateFromModelInProgress) {
+    this.scout.send('nodesSelected', this.model.id, {"nodeIds":[node.id]});
+  }
 };
 
 Scout.DesktopTree.prototype._onNodesInserted = function (nodes, parentNodeId) {

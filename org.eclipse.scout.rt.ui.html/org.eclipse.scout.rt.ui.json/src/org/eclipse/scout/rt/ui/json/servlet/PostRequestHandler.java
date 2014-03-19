@@ -41,21 +41,31 @@ public class PostRequestHandler {
     JsonRequest uiReq = new JsonRequest(toJSON(req));
     String sessionAttributeName = "JsonUi#" + uiReq.getSessionPartId();
     HttpSession httpSession = req.getSession();
-    //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
-    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
-    if (jsonSession == null) {
-      jsonSession = m_jsonSessionProvider.createJsonSession();
-      jsonSession.init(req, uiReq.getSessionPartId());
-      httpSession.setAttribute(sessionAttributeName, jsonSession);
-    }
-    JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
-    String jsonText = uiRes.toJson().toString();
-    byte[] data = jsonText.getBytes("UTF-8");
-    resp.setContentLength(data.length);
-    resp.setContentType("application/json; charset=utf-8");
-    resp.getOutputStream().write(data);
 
-    LOG.debug("Returning: " + jsonText);
+    //FIXME really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession?
+    IJsonSession jsonSession = null;
+    synchronized (this) {
+      jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
+      if (jsonSession == null) {
+        //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
+        jsonSession = m_jsonSessionProvider.createJsonSession();
+        jsonSession.init(req, uiReq.getSessionPartId());
+        httpSession.setAttribute(sessionAttributeName, jsonSession);
+      }
+    }
+
+    //GUI requests for the same session must be processed consecutively
+    synchronized (jsonSession) {
+      JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
+      String jsonText = uiRes.toJson().toString();
+      byte[] data = jsonText.getBytes("UTF-8");
+      resp.setContentLength(data.length);
+      resp.setContentType("application/json");
+      resp.setCharacterEncoding("UTF-8");
+      resp.getOutputStream().write(data);
+
+      LOG.debug("Returned: " + jsonText);
+    }
   }
 
   protected JSONObject toJSON(HttpServletRequest req) throws JsonUIException {
