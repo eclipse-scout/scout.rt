@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -64,6 +65,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
   private JComponent m_swingField;
   private final OptimisticLock m_updateSwingFromScoutLock;
   private final Set<String> m_ignoredScoutEvents;
+  private volatile EventListenerList m_inputVerifyListeners; // initialized lazily on first use.
   private boolean m_inputDirty;
   private T m_scoutObject;
   private P_ScoutPropertyChangeListener m_scoutPropertyListener;
@@ -101,6 +103,26 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
    */
   public void removeIgnoredScoutEvent(Class eventType, String name) {
     m_ignoredScoutEvents.remove(eventType.getSimpleName() + ":" + name);
+  }
+
+  @Override
+  public void addInputVerifyListener(ISwingInputVerifyListener listener) {
+    if (m_inputVerifyListeners == null) {
+      synchronized (this) {
+        if (m_inputVerifyListeners == null) {
+          m_inputVerifyListeners = new EventListenerList();
+        }
+      }
+    }
+    m_inputVerifyListeners.add(ISwingInputVerifyListener.class, listener);
+  }
+
+  @Override
+  public void removeInputVerifyListener(ISwingInputVerifyListener listener) {
+    if (m_inputVerifyListeners == null) {
+      return;
+    }
+    m_inputVerifyListeners.remove(ISwingInputVerifyListener.class, listener);
   }
 
   /**
@@ -463,9 +485,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       handleSwingFocusLost();
     }
 
-  }// end private class
+  }// end private class P_SwingDefaultFocusListener
 
-  private class P_SwingInputVerifier extends InputVerifier {
+  private final class P_SwingInputVerifier extends InputVerifier {
     private boolean m_lastResult = true;
 
     @Override
@@ -473,6 +495,18 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       if (isInputDirty()) {
         if (getUpdateSwingFromScoutLock().isReleased()) {
           m_lastResult = handleSwingInputVerifier();
+
+          // notify follow-up listeners
+          if (m_inputVerifyListeners != null) {
+            for (ISwingInputVerifyListener listener : m_inputVerifyListeners.getListeners(ISwingInputVerifyListener.class)) {
+              try {
+                listener.verify(input);
+              }
+              catch (Exception t) {
+                LOG.error("Error notifying verify listener '" + listener.getClass().getName() + "'.", t);
+              }
+            }
+          }
         }
       }
       if (m_lastResult) {
@@ -480,7 +514,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       }
       return m_lastResult;
     }
-  }// end private class
+  }// end private class P_SwingInputVerifier
 
   private class P_SwingAddRemoveListener implements HierarchyListener {
 
@@ -497,7 +531,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
         }
       }
     }
-  }// end private class
+  }// end private class P_SwingAddRemoveListener
 
   private class P_SwingShowingListener implements HierarchyListener {
     @Override
@@ -518,7 +552,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
         }
       }
     }
-  }// end private class
+  }// end private class P_SwingShowingListener
 
   /**
    * This listener must be a {@link WeakEventListener}. Even though all scout
@@ -550,6 +584,6 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
         getSwingEnvironment().invokeSwingLater(t);
       }
     }
-  }// end private class
+  }// end private class P_ScoutPropertyChangeListener
 
 }

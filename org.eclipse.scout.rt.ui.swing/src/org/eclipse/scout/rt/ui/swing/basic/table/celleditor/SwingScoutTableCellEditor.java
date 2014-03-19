@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ISwingInputVerifyListener;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
@@ -70,8 +71,9 @@ public class SwingScoutTableCellEditor {
   private TableCellEditor m_cellEditor;
 
   private boolean m_tableIsEditingAndContainsFocus;
-  private JComponent m_cachedSwingEditorComponent;
+  private ISwingScoutComposite<? extends IFormField> m_cachedSwingEditor;
   private CellEditorListener m_cellEditorListener;
+  private P_SwingInputVerifyListener m_verifyListener;
 
   public SwingScoutTableCellEditor(ISwingScoutTable tableComposite) {
     m_tableComposite = tableComposite;
@@ -86,18 +88,40 @@ public class SwingScoutTableCellEditor {
     m_tableComposite.getSwingTable().setDefaultEditor(Object.class, m_cellEditor);
   }
 
-  protected JComponent getCachedEditorComposite(int row, int col) {
-    if (m_cachedSwingEditorComponent == null) {
+  public synchronized void dispose() {
+    clearCachedSwingEditor();
+  }
+
+  protected synchronized JComponent getCachedEditorComposite(int row, int col) {
+    if (m_cachedSwingEditor == null) {
       ISwingScoutComposite<? extends IFormField> editorComposite = createEditorComposite(row, col);
       if (editorComposite != null) {
         decorateEditorComposite(editorComposite, row, col);
-        m_cachedSwingEditorComponent = editorComposite.getSwingContainer();
+
+        m_verifyListener = new P_SwingInputVerifyListener();
+        editorComposite.addInputVerifyListener(m_verifyListener);
+        m_cachedSwingEditor = editorComposite;
       }
       else {
-        m_cachedSwingEditorComponent = null;
+        m_cachedSwingEditor = null;
       }
     }
-    return m_cachedSwingEditorComponent;
+
+    if (m_cachedSwingEditor == null) {
+      return null;
+    }
+    return m_cachedSwingEditor.getSwingContainer();
+  }
+
+  // no need to synchronize because it is only called within already synchronized blocks
+  private void clearCachedSwingEditor() {
+    if (m_cachedSwingEditor != null) {
+      if (m_verifyListener != null) {
+        m_cachedSwingEditor.removeInputVerifyListener(m_verifyListener);
+        m_verifyListener = null;
+      }
+      m_cachedSwingEditor = null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -312,10 +336,10 @@ public class SwingScoutTableCellEditor {
     }
   }
 
-  protected void saveEditorFromSwing() {
+  protected synchronized void saveEditorFromSwing() {
     m_tableIsEditingAndContainsFocus = false;
-    if (m_cachedSwingEditorComponent != null) {
-      m_cachedSwingEditorComponent = null;
+    if (m_cachedSwingEditor != null) {
+      clearCachedSwingEditor();
       Runnable t = new Runnable() {
         @Override
         public void run() {
@@ -339,10 +363,10 @@ public class SwingScoutTableCellEditor {
     return false;
   }
 
-  protected void cancelEditorFromSwing() {
+  protected synchronized void cancelEditorFromSwing() {
     m_tableIsEditingAndContainsFocus = false;
-    if (m_cachedSwingEditorComponent != null) {
-      m_cachedSwingEditorComponent = null;
+    if (m_cachedSwingEditor != null) {
+      clearCachedSwingEditor();
       Runnable t = new Runnable() {
         @Override
         public void run() {
@@ -391,6 +415,13 @@ public class SwingScoutTableCellEditor {
       if (m_cellEditor != null) {
         m_cellEditor.stopCellEditing();
       }
+    }
+  }
+
+  private final class P_SwingInputVerifyListener implements ISwingInputVerifyListener {
+    @Override
+    public void verify(JComponent input) {
+      saveEditorFromSwing();
     }
   }
 
@@ -496,5 +527,4 @@ public class SwingScoutTableCellEditor {
       cancelEditorFromSwing();
     }
   }
-
 }
