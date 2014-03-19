@@ -135,6 +135,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   // keyboard navigation
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
 
+  private SwingScoutTableCellEditor m_editor;
+
   public SwingScoutTable() {
     super();
   }
@@ -160,9 +162,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     table.setAutoCreateColumnsFromModel(false);
     table.setColumnModel(new SwingTableColumnModel(getSwingEnvironment(), this));
     table.setModel(new SwingTableModel(getSwingEnvironment(), this));
-    //editors
-    SwingScoutTableCellEditor editor = new SwingScoutTableCellEditor(this);
-    editor.initialize();
+    m_editor = new SwingScoutTableCellEditor(this);
+    m_editor.initialize();
     //disable auto-start editing
     table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
     table.setSelectionModel(new DefaultListSelectionModel());
@@ -355,6 +356,11 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (getScoutObject() == null) {
       return;
     }
+
+    if (m_editor != null) {
+      m_editor.dispose();
+    }
+
     if (m_scoutTableListener != null) {
       getScoutObject().removeTableListener(m_scoutTableListener);
       m_scoutTableListener = null;
