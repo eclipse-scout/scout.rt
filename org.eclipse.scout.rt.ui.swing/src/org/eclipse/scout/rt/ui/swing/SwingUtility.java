@@ -341,7 +341,7 @@ public final class SwingUtility {
   }
 
   /**
-   * @deprecated Use {@link ColorUtility#createColor(String)} instead. Will be removed in the M-Release
+   * @deprecated Use {@link ColorUtility#createColor(String)} instead. Will be removed in the 5.0.0-Release
    */
   @Deprecated
   public static Color createColor(String c) {

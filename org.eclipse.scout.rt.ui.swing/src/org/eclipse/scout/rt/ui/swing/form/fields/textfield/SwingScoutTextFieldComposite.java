@@ -44,6 +44,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
@@ -201,7 +202,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     super.setForegroundFromScout(scoutColor);
     JTextComponent fld = getSwingTextComponent();
     if (fld != null) {
-      Color c = SwingUtility.createColor(scoutColor);
+      Color c = ColorUtility.createColor(scoutColor);
       if (c == null) {
         c = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_DISABLED_TEXT_COLOR);
       }

@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
@@ -102,7 +103,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     label.setToolTipText(s);
     // background
     if (cell.getBackgroundColor() != null) {
-      Color color = SwingUtility.createColor(cell.getBackgroundColor());
+      Color color = ColorUtility.createColor(cell.getBackgroundColor());
       if (selected) {
         color = color.darker();
       }
@@ -110,7 +111,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     }
     // foreground
     if (cell.getForegroundColor() != null) {
-      Color color = SwingUtility.createColor(cell.getForegroundColor());
+      Color color = ColorUtility.createColor(cell.getForegroundColor());
       if (selected) {
         color = color.brighter();
       }

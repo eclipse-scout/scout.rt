@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTableHeaderCellRenderer implements TableCellRenderer {
@@ -115,7 +116,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
       }
       // background
       if (cell.getBackgroundColor() != null) {
-        Color color = SwingUtility.createColor(cell.getBackgroundColor());
+        Color color = ColorUtility.createColor(cell.getBackgroundColor());
         if (selected) {
           color = color.darker();
         }
@@ -123,7 +124,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
       }
       // foreground
       if (cell.getForegroundColor() != null) {
-        Color color = SwingUtility.createColor(cell.getForegroundColor());
+        Color color = ColorUtility.createColor(cell.getForegroundColor());
         if (selected) {
           color = color.brighter();
         }

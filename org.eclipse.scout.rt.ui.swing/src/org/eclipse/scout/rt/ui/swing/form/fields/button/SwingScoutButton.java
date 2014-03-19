@@ -359,13 +359,6 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
           }
         }
       };
-      switch (getScoutButton().getDisplayStyle()) {
-        case IButton.DISPLAY_STYLE_RADIO:
-        case IButton.DISPLAY_STYLE_TOGGLE: {
-
-          break;
-        }
-      }
       getSwingEnvironment().invokeScoutLater(t, 0);
       //end notify
     }

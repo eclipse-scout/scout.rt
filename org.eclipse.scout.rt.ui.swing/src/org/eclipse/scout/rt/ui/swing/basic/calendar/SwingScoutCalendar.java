@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.CalendarModel;
@@ -250,7 +251,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     @Override
     public Color getColor(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
-      return SwingUtility.createColor(comp.getCell().getBackgroundColor());
+      return ColorUtility.createColor(comp.getCell().getBackgroundColor());
     }
 
     @Override

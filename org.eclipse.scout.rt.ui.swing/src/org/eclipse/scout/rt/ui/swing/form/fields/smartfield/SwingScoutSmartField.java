@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.AbstractSwingScoutActionPropertyChangeListener;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
@@ -276,7 +277,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   protected void setForegroundFromScout(String scoutColor) {
     JComponent fld = getSwingField();
     if (fld != null && scoutColor != null && fld instanceof JTextComponent) {
-      setDisabledTextColor(SwingUtility.createColor(scoutColor), (JTextComponent) fld);
+      setDisabledTextColor(ColorUtility.createColor(scoutColor), (JTextComponent) fld);
     }
     super.setForegroundFromScout(scoutColor);
   }
