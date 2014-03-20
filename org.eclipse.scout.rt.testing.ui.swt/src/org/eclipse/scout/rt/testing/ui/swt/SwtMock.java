@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.testing.commons.OsUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
+import org.eclipse.scout.rt.ui.swt.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
@@ -828,6 +829,9 @@ public class SwtMock implements IGuiMock {
     state.y = p.y;
     state.width = c.getBounds().width;
     state.height = c.getBounds().height;
+
+    state.foregroundColor = ColorUtility.createStringFromColor(c.getForeground());
+    state.backgroundColor = ColorUtility.createStringFromColor(c.getBackground());
     //text
     if (c instanceof Label) {
       state.text = ((Label) c).getText();

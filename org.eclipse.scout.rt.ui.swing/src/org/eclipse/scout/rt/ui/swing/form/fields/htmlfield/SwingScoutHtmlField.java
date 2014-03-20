@@ -292,6 +292,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     m_htmlView.setEditable(getScoutObject().isHtmlEditor());
+    m_htmlView.setEnabled(b);
     if (m_htmlView.getCaret() instanceof DefaultCaret) {
       // enable / disable caret update according to editability.
       ((DefaultCaret) m_htmlView.getCaret()).setUpdatePolicy(getScoutObject().isHtmlEditor() ? DefaultCaret.UPDATE_WHEN_ON_EDT : DefaultCaret.NEVER_UPDATE);

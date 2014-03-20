@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.dnd.TextTransferable;
@@ -752,6 +753,8 @@ public class SwingMock implements IGuiMock {
       state.width = c.getWidth();
       state.height = c.getHeight();
     }
+    state.foregroundColor = ColorUtility.createStringFromColor(c.getForeground());
+    state.backgroundColor = ColorUtility.createStringFromColor(c.getBackground());
     //text
     if (c instanceof JLabel) {
       state.text = ((JLabel) c).getText();

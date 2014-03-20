@@ -126,7 +126,7 @@ public final class ColorUtility {
     if (c == null) {
       return null;
     }
-    return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+    return org.eclipse.scout.commons.ColorUtility.rgbToText(c.getRed(), c.getGreen(), c.getBlue());
   }
 
 }

@@ -38,4 +38,18 @@ public final class ColorUtility {
     return Color.HSBtoRGB(hue, saturation, brightness);
   }
 
+  /**
+   * Converts a color's RGB presentation to a textual hexadecimal representation.
+   * <p>
+   * Example: r = 255, g = 0, b = 0 --> "#ff0000"
+   * <p>
+   * Note: the hexadecimal representation is lowercase
+   * 
+   * @return hexadecimal representation of RGB in lowercase.
+   * @since 4.0-M7
+   */
+  public static String rgbToText(int red, int green, int blue) {
+    return String.format("#%02x%02x%02x", red, green, blue);
+  }
+
 }

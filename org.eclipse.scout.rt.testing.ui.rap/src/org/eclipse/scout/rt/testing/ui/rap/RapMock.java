@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
@@ -904,6 +905,10 @@ public class RapMock implements IGuiMock {
     state.y = p.y;
     state.width = c.getBounds().width;
     state.height = c.getBounds().height;
+
+    state.foregroundColor = ColorUtility.createStringFromColor(c.getForeground());
+    state.backgroundColor = ColorUtility.createStringFromColor(c.getBackground());
+
     //text
     if (c instanceof Label) {
       state.text = ((Label) c).getText();

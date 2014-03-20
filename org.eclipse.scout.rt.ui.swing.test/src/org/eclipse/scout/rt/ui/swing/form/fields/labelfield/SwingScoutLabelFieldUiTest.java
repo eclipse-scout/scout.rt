@@ -1,14 +1,23 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.labelfield;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.awt.Color;
 
 import javax.swing.JComponent;
 import javax.swing.JTextPane;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
-import org.eclipse.scout.rt.ui.swing.ext.JTextPaneEx;
+import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.text.HTMLStyledTextCreator;
 import org.eclipse.scout.rt.ui.swing.text.IStyledTextCreator;
 import org.junit.Before;
@@ -19,7 +28,7 @@ import org.junit.Test;
  * 
  * @since 3.10.0-M5
  */
-public class SwingScoutLabelFieldTest {
+public class SwingScoutLabelFieldUiTest {
 
   private TestSwingScoutLabelField m_label;
 
@@ -27,6 +36,7 @@ public class SwingScoutLabelFieldTest {
   public void setup() {
     m_label = new TestSwingScoutLabelField();
     m_label.setSwingField(m_label.createLabelField());
+    m_label.initializeSwing();
   }
 
   @Test
@@ -70,6 +80,38 @@ public class SwingScoutLabelFieldTest {
     assertTrue(text.contains("align=\"right\""));
   }
 
+  @Test
+  public void testForgroundColor() {
+    m_label.setEnabledFromScout(true);
+    Color enabledForegroundColor = m_label.getSwingLabelField().getForeground();
+    assertNotNull(enabledForegroundColor);
+    m_label.setEnabledFromScout(false);
+    Color disabledForegroundColor = m_label.getSwingLabelField().getForeground();
+    assertNotNull(disabledForegroundColor);
+
+    assertNotEquals("enabled foregroundColor should be different from disabled foregroundColor", enabledForegroundColor, disabledForegroundColor);
+  }
+
+  @Test
+  public void testSelectable() {
+    m_label.setEnabledFromScout(true);
+    assertTrue("JTextPaneEx should be enabled, otherwise text selecion is not possible", m_label.getSwingLabelField().isEnabled());
+    m_label.setEnabledFromScout(false);
+    assertTrue("JTextPaneEx should be enabled, otherwise text selecion is not possible", m_label.getSwingLabelField().isEnabled());
+
+    m_label.setSelectableFromScout(true);
+    assertNotNull(m_label.getSwingLabelField().getHighlighter());
+    assertNotNull(m_label.getSwingLabelField().getTransferHandler());
+
+    m_label.setSelectableFromScout(false);
+    assertNull(m_label.getSwingLabelField().getHighlighter());
+    assertNull(m_label.getSwingLabelField().getTransferHandler());
+
+    m_label.setSelectableFromScout(true);
+    assertNotNull(m_label.getSwingLabelField().getHighlighter());
+    assertNotNull(m_label.getSwingLabelField().getTransferHandler());
+  }
+
   private static class TestSwingScoutLabelField extends SwingScoutLabelField {
 
     private IStyledTextCreator m_styledTextCreator = new HTMLStyledTextCreator();
@@ -80,21 +122,17 @@ public class SwingScoutLabelFieldTest {
     }
 
     @Override
-    public JTextPaneEx createLabelField() {
-      return super.createLabelField();
-    }
-
-    @Override
-    protected void setTextWrapFromScout(boolean b) {
-      super.setTextWrapFromScout(b);
-    }
-
-    @Override
     public ILabelField getScoutObject() {
-      ILabelField scoutObject = EasyMock.createNiceMock(ILabelField.class);
-      EasyMock.expect(scoutObject.getGridData()).andReturn(new GridData(0, 0, 0, 0, 0, 0));
-      EasyMock.replay(scoutObject);
+      ILabelField scoutObject = mock(ILabelField.class);
+      when(scoutObject.getGridData()).thenReturn(new GridData(0, 0, 0, 0, 0, 0));
       return scoutObject;
+    }
+
+    @Override
+    public ISwingEnvironment getSwingEnvironment() {
+      ISwingEnvironment environment = mock(ISwingEnvironment.class);
+      when(environment.createStatusLabel(any(IFormField.class))).thenReturn(new JStatusLabelEx());
+      return environment;
     }
 
     @Override
