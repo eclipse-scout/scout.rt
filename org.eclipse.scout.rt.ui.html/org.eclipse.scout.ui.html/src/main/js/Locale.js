@@ -58,7 +58,7 @@ locale.Number = function (pattern) {
   pattern = pattern.replace(locale._numberG, '');
 
   // split on decimal point
-  var split = pattern.split(locale._numberP);
+  split = pattern.split(locale._numberP);
 
   // find digits before and after decimal point
   this.zeroBefore = _count(split[0], locale._numberD);
@@ -73,8 +73,8 @@ locale.Number = function (pattern) {
     return null;
   }
 
-  function _count(string, char) {
-    return string.split(char).length - 1;
+  function _count(str, separator) {
+    return string.split(separator).length - 1;
   }
 };
 
@@ -110,6 +110,7 @@ locale.Number.prototype.format = function format (number) {
 // convert milliseconds to string using java format
 // without timezone
 
+/*jshint sub:true*/
 locale.Date = function (pattern) {
   this.formatFunc = [];
   this.pattern = pattern;
@@ -237,12 +238,12 @@ locale.Date = function (pattern) {
   function _weekInYear(date) {
     var onejan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
-  };
+  }
 
   function _weekInMonth(date) {
       var onemon = new Date(date.getFullYear(), date.getMonth(), 1);
       return Math.ceil((((date - onemon) / 86400000) + onemon.getDay() + 1) / 7);
-  };
+  }
 };
 
 locale.Date.prototype.format = function format (time) {
