@@ -89,7 +89,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
                   ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
   }
 
-  // dissolv corssing links
+  // disolve crossing links
   function disolveLinks () {
     for (var l1 = 0; l1 < graph.links.length; l1++) {
       var link1 = graph.links[l1],
