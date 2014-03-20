@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTable = function (scout, $parent, model) {
+Scout.DesktopTable = function (scout, model) {
   this.model = model;
   this.scout = scout;
   this._$desktopTable;
@@ -12,10 +12,11 @@ Scout.DesktopTable = function (scout, $parent, model) {
   this._$infoLoad;
   this._tableHeader;
   this.scout.widgetMap[model.table.id] = this;
-  this._$parent = $parent;
 };
 
-Scout.DesktopTable.prototype.render = function () {
+Scout.DesktopTable.prototype.render = function ($parent) {
+  this._$parent = $parent;
+
   //create container
   this._$desktopTable = this._$parent.appendDiv('DesktopTable');
 
@@ -634,7 +635,7 @@ Scout.DesktopTable.prototype.detach = function () {
 
 Scout.DesktopTable.prototype.attach = function ($container) {
   if (!this._$desktopTable) {
-    this.render();
+    this.render($container);
   }
   else {
     this._$desktopTable.appendTo($container);

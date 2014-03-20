@@ -209,7 +209,7 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
       var desktopTable = this.scout.widgetMap[node.table.id];
       if (!desktopTable) {
         node.outlineId = this.model.id;
-        new Scout.DesktopTable(this.scout, $('#DesktopBench'), node, this.model.id);
+        new Scout.DesktopTable(this.scout, node, this.model.id);
       }
     }
 
