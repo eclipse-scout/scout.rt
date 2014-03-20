@@ -1,7 +1,8 @@
 //define local als singleton
-locale = new function Locale (model) {
-  this.localeString = model.localeString;
-  this.decimalFormatSymbols = model.decimalFormatSymbols;
+locale = new function Locale () {
+  //FIXME CGU check with chris
+//  this.localeString = model.localeString;
+//  this.decimalFormatSymbols = model.decimalFormatSymbols;
 
   log(this.decimalFormatSymbols);
 

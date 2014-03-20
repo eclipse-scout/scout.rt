@@ -125,11 +125,13 @@ Scout.Session.prototype.init = function () {
 
 Scout.Session.prototype.onModelAction = function (event) {
   if (event.type_ == 'initialized') {
-    this.locale = new Scout.Locale(event.locale);
+     //FIXME cgu check with chris
+    // this.locale = new Scout.Locale(event.locale);
     new Scout.Desktop(this, this.$entryPoint, event.desktop);
   }
   else if (event.type_ == 'localeChanged') {
-    this.locale = new Scout.Locale(event);
+    //FIXME cgu check with chris
+//    this.locale = new Scout.Locale(event);
     //FIXME inform components to reformat display text?
   }
 };
