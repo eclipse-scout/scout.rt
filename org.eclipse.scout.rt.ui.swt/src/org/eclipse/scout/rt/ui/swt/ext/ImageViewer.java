@@ -20,6 +20,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -164,7 +165,18 @@ public class ImageViewer extends Canvas {
 
       if (isFocusable() && isFocusControl()) {
         // draw focus border
-        gc.drawFocus(imageLocation.x - focusBorderOffset.x, imageLocation.y - focusBorderOffset.y, imgBounds.width - focusBorderOffset.width, imgBounds.height - focusBorderOffset.height);
+        int lineStyleBackup = gc.getLineStyle();
+        Color foregroundBackup = gc.getForeground();
+        try {
+          // do not use gc.drawFocus() because this does not draw properly in some cases.
+          gc.setLineStyle(SWT.LINE_DOT);
+          gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_DARK_BLUE));
+          gc.drawRectangle(imageLocation.x - focusBorderOffset.x, imageLocation.y - focusBorderOffset.y, imgBounds.width - focusBorderOffset.width, imgBounds.height - focusBorderOffset.height);
+        }
+        finally {
+          gc.setLineStyle(lineStyleBackup);
+          gc.setForeground(foregroundBackup);
+        }
       }
     }
   }
@@ -242,5 +254,4 @@ public class ImageViewer extends Canvas {
   public Image getImage() {
     return m_image;
   }
-
 }
