@@ -54,6 +54,8 @@
    <feature url="features/org.eclipse.scout.rt.swt.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.swt.source" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
+   <bundle id="org.eclipse.scout.rt.client.testenvironment" version="0.0.0"/>
+   <bundle id="org.eclipse.scout.rt.server.testenvironment" version="0.0.0"/>
    <category-def name="Eclipse Scout RT" label="Scout Application Development RT">
       <description>
          Scout Application Development RT
