@@ -1,11 +1,11 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Desktop = function (scout, $parent, model) {
+Scout.Desktop = function(scout, $parent, model) {
   this.scout = scout;
   this.tree;
   this.scout.widgetMap[model.id] = this;
-//  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple scout divs with multiple desktops
+  //  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple scout divs with multiple desktops
 
   // create all 4 containers
   var view = new Scout.DesktopViewButtonBar(this.scout, $parent, model.viewButtons);
@@ -17,62 +17,61 @@ Scout.Desktop = function (scout, $parent, model) {
   this.tree.attachModel();
 
   // alt and f1-help
-  $(window).keydown(function (event)  {
+  $(window).keydown(function(event) {
     if (event.which == 18) {
       removeKeyBox();
       drawKeyBox();
     }
   });
 
-  $(window).keyup(function (event)  {
+  $(window).keyup(function(event) {
     if (event.which == 18) {
       removeKeyBox();
       return false;
     }
   });
 
-  $(window).blur(function (event)  {
+  $(window).blur(function(event) {
     removeKeyBox();
   });
-
 
   // key handling
   var fKeys = {};
   if (tool) {
-      $('.tool-item', tool.$div).each(function (i, e) {
-        var shortcut = parseInt($(e).attr('data-shortcut').replace('F', ''), 10) + 111;
-        fKeys[shortcut] = e;
-      });
+    $('.tool-item', tool.$div).each(function(i, e) {
+      var shortcut = parseInt($(e).attr('data-shortcut').replace('F', ''), 10) + 111;
+      fKeys[shortcut] = e;
+    });
   }
 
-  $(window).keydown(function (event)  {
+  $(window).keydown(function(event) {
     // numbers: views
-    if (event.which >= 49 && event.which <= 57){
+    if (event.which >= 49 && event.which <= 57) {
       $('.view-item', view.$div).eq(event.which - 49).click();
     }
 
     // function keys: tools
-    if (fKeys[event.which]){
+    if (fKeys[event.which]) {
       $(fKeys[event.which]).click();
       return false;
     }
 
     // left: up in tree
-    if (event.which == 37){
+    if (event.which == 37) {
       $('.selected', tree.$div).prev().click();
       removeKeyBox();
       return false;
     }
 
     // right: down in tree
-    if (event.which == 39){
+    if (event.which == 39) {
       $('.selected', tree.$div).next().click();
       removeKeyBox();
       return false;
     }
 
     // +/-: open and close tree
-    if (event.which == 109 || event.which == 107){
+    if (event.which == 109 || event.which == 107) {
       $('.selected', tree.$div).children('.tree-item-control').click();
       removeKeyBox();
       return false;
@@ -80,13 +79,13 @@ Scout.Desktop = function (scout, $parent, model) {
 
     // table handling
     // todo: make clicked row visible
-    if ([38, 40, 36, 35, 33, 34].indexOf(event.which) > -1){
+    if ([38, 40, 36, 35, 33, 34].indexOf(event.which) > -1) {
       var $rowsAll = $('.table-row', bench.$div),
         $rowsSelected = $('.row-selected', bench.$div),
         $rowClick;
 
       // up: move up
-      if (event.which == 38){
+      if (event.which == 38) {
         if ($rowsSelected.length > 0) {
           $rowClick = $rowsSelected.first().prev();
         } else {
@@ -95,7 +94,7 @@ Scout.Desktop = function (scout, $parent, model) {
       }
 
       // down: move down
-      if (event.which == 40){
+      if (event.which == 40) {
         var $row = $('.row-selected', bench.$div);
         if ($rowsSelected.length > 0) {
           $rowClick = $rowsSelected.last().next();
@@ -105,18 +104,18 @@ Scout.Desktop = function (scout, $parent, model) {
       }
 
       // home: top of table
-      if (event.which == 36){
+      if (event.which == 36) {
         $rowClick = $rowsAll.first();
       }
 
       // end: bottom of table
-      if (event.which == 35){
+      if (event.which == 35) {
         $rowClick = $rowsAll.last();
       }
 
       // pgup: jump up
       var $prev;
-      if (event.which == 33){
+      if (event.which == 33) {
         if ($rowsSelected.length > 0) {
           $prev = $rowsSelected.first().prevAll();
           if ($prev.length > 10) {
@@ -130,7 +129,7 @@ Scout.Desktop = function (scout, $parent, model) {
       }
 
       // pgdn: jump down
-      if (event.which == 34){
+      if (event.which == 34) {
         if ($rowsSelected.length > 0) {
           $prev = $rowsSelected.last().nextAll();
           if ($prev.length > 10) {
@@ -147,20 +146,20 @@ Scout.Desktop = function (scout, $parent, model) {
     }
   });
 
-  function removeKeyBox () {
+  function removeKeyBox() {
     $('.key-box').remove();
     $('.tree-item-control').show();
   }
 
-  function drawKeyBox () {
+  function drawKeyBox() {
     // keys for views
-    $('.view-item', view.$div).each(function (i, e) {
-        if (i < 9)  $(e).appendDiv('', 'key-box', i + 1);
-      });
+    $('.view-item', view.$div).each(function(i, e) {
+      if (i < 9) $(e).appendDiv('', 'key-box', i + 1);
+    });
 
     // keys for tools
     if (tool) {
-      $('.tool-item', tool.$div).each(function (i, e) {
+      $('.tool-item', tool.$div).each(function(i, e) {
         $(e).appendDiv('', 'key-box', $(e).attr('data-shortcut'));
       });
     }
@@ -180,7 +179,7 @@ Scout.Desktop = function (scout, $parent, model) {
     }
 
     if (prev) {
-      prev.appendDiv('', 'key-box', '←');
+      prev.appendDiv('', 'key-box', '�?');
       prev.children('.tree-item-control').hide();
     }
 
@@ -202,14 +201,13 @@ Scout.Desktop = function (scout, $parent, model) {
   }
 };
 
-Scout.Desktop.prototype.onModelPropertyChange = function () {
-};
+Scout.Desktop.prototype.onModelPropertyChange = function() {};
 
-Scout.Desktop.prototype.onModelCreate = function (event) {
+Scout.Desktop.prototype.onModelCreate = function(event) {
   this.tree.onOutlineCreated(event);
 };
 
-Scout.Desktop.prototype.onModelAction = function (event) {
+Scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
     this.tree.onOutlineChanged(event.outlineId);
   }

@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Session = function ($entryPoint, sessionPartId) {
+Scout.Session = function($entryPoint, sessionPartId) {
   this.widgetMap = {};
   this.locale;
   this.$entryPoint = $entryPoint;
@@ -13,7 +13,7 @@ Scout.Session = function ($entryPoint, sessionPartId) {
   this.widgetMap[sessionPartId] = this;
 };
 
-Scout.Session.prototype.sendSync = function (type, id, data) {
+Scout.Session.prototype.sendSync = function(type, id, data) {
   return this.send(type, id, data, false);
 };
 
@@ -26,7 +26,7 @@ Scout.Session.prototype.sendSync = function (type, id, data) {
  * If async is set to false, the request will be sent immediately and the response returned.<br>
  * If there are queued async events then these events are sent right before sending the sync request
  */
-Scout.Session.prototype.send = function (type, id, data, async) {
+Scout.Session.prototype.send = function(type, id, data, async) {
   if (async === undefined) {
     async = true;
   }
@@ -44,8 +44,7 @@ Scout.Session.prototype.send = function (type, id, data, async) {
 
       this._asyncRequestQueued = true;
     }
-  }
-  else {
+  } else {
     //Before sending a sync request make sure the queued async request is executed before
     if (this._asyncRequestQueued) {
       var message = this._sendNow(this._asyncEvents, false);
@@ -58,27 +57,26 @@ Scout.Session.prototype.send = function (type, id, data, async) {
   }
 };
 
-Scout.Session.prototype._sendNow = function (events, async) {
+Scout.Session.prototype._sendNow = function(events, async) {
   var request = {
-    events : events,
-    sessionPartId : this._sessionPartId
+    events: events,
+    sessionPartId: this._sessionPartId
   };
 
   var url = 'json';
   var ret;
   var that = this;
   $.ajax({
-    async : async,
-    type : "POST",
-    dataType : "json",
-    cache : false,
-    url : url,
-    data : JSON.stringify(request),
-    success : function (message) {
+    async: async,
+    type: "POST",
+    dataType: "json",
+    cache: false,
+    url: url,
+    data: JSON.stringify(request),
+    success: function(message) {
       if (async) {
         that._processEvents(message.events);
-      }
-      else {
+      } else {
         ret = message;
       }
     }
@@ -86,9 +84,9 @@ Scout.Session.prototype._sendNow = function (events, async) {
   return ret;
 };
 
-Scout.Session.prototype._processEvents = function (events) {
-  var scout=this;
-  for(var i=0; i < events.length; i++) {
+Scout.Session.prototype._processEvents = function(events) {
+  var scout = this;
+  for (var i = 0; i < events.length; i++) {
     var event = events[i],
       widgetId;
 
@@ -118,20 +116,19 @@ Scout.Session.prototype._processEvents = function (events) {
   }
 };
 
-Scout.Session.prototype.init = function () {
+Scout.Session.prototype.init = function() {
   // create all widgets for entry point
   this.send('startup', this._sessionPartId);
 };
 
-Scout.Session.prototype.onModelAction = function (event) {
+Scout.Session.prototype.onModelAction = function(event) {
   if (event.type_ == 'initialized') {
-     //FIXME cgu check with chris
+    //FIXME cgu check with chris
     // this.locale = new Scout.Locale(event.locale);
     new Scout.Desktop(this, this.$entryPoint, event.desktop);
-  }
-  else if (event.type_ == 'localeChanged') {
+  } else if (event.type_ == 'localeChanged') {
     //FIXME cgu check with chris
-//    this.locale = new Scout.Locale(event);
+    //    this.locale = new Scout.Locale(event);
     //FIXME inform components to reformat display text?
   }
 };

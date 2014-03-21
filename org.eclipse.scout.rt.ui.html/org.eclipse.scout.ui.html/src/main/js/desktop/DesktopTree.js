@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTree = function (scout, $parent, model) {
+Scout.DesktopTree = function(scout, $parent, model) {
   this.model = model;
   this.scout = scout;
   this._desktopTable;
@@ -12,21 +12,21 @@ Scout.DesktopTree = function (scout, $parent, model) {
   this._addNodes(this.model.nodes);
 };
 
-Scout.DesktopTree.prototype.detach = function () {
+Scout.DesktopTree.prototype.detach = function() {
   this._$desktopTreeScroll.detach();
   if (this._desktopTable) {
     this._desktopTable.detach();
   }
 };
 
-Scout.DesktopTree.prototype.attach = function ($container) {
+Scout.DesktopTree.prototype.attach = function($container) {
   this._$desktopTreeScroll.appendTo($container);
   if (this._desktopTable) {
     this._desktopTable.attach($('#DesktopBench'));
   }
 };
 
-Scout.DesktopTree.prototype.attachModel = function () {
+Scout.DesktopTree.prototype.attachModel = function() {
   if (this.model.selectedNodeIds) {
     var nodeId = this.model.selectedNodeIds[0];
     this.setNodeSelectedById(nodeId);
@@ -38,12 +38,12 @@ Scout.DesktopTree.prototype.attachModel = function () {
   }
 };
 
-Scout.DesktopTree.prototype.setNodeExpandedById = function (nodeId, expanded) {
-  var $node = this._$desktopTreeScroll.find('#'+nodeId);
+Scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
+  var $node = this._$desktopTreeScroll.find('#' + nodeId);
   this._setNodeExpanded($node, expanded);
 };
 
-Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
+Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   if (!$node.hasClass('can-expand') || $node.data('expanding') || expanded == $node.hasClass('expanded')) {
     return true;
   }
@@ -51,7 +51,10 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
   var node = $node.data('node');
   if (node.expanded != expanded) {
     if (!this.updateFromModelInProgress) {
-      this.scout.send('nodeExpanded', this.model.id, {"nodeId" : node.id, "expanded" : expanded});
+      this.scout.send('nodeExpanded', this.model.id, {
+        "nodeId": node.id,
+        "expanded": expanded
+      });
     }
   }
   node.expanded = expanded;
@@ -63,7 +66,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
   var level = $node.attr('data-level'),
     $control;
   if (expanded) {
-    this._addNodes(node.childNodes,$node);
+    this._addNodes(node.childNodes, $node);
 
     // open node
     if ($node.hasClass('can-expand') && !$node.hasClass('expanded')) {
@@ -77,7 +80,10 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
         $newNodes.wrapAll('<div id="TreeItemAnimate"></div>)');
         var that = this;
         var h = $newNodes.height() * $newNodes.length,
-          removeContainer = function () {$(this).replaceWith($(this).contents()); that.scrollbar.initThumb();};
+          removeContainer = function() {
+            $(this).replaceWith($(this).contents());
+            that.scrollbar.initThumb();
+          };
 
         $('#TreeItemAnimate').css('height', 0)
           .animateAVCSD('height', h, removeContainer, this.scrollbar.initThumb.bind(this.scrollbar));
@@ -85,36 +91,39 @@ Scout.DesktopTree.prototype._setNodeExpanded = function ($node, expanded) {
         // animated control, at the end: parent is expanded
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
         $control = $node.children('.tree-item-control'),
-          rotateControl = function (now, fx) {
-            $control.css('transform', 'rotate(' + now + 'deg)');
-          },
-          addExpanded = function () {
-            $node.addClass('expanded');
-            $node.removeData('expanding');
-          };
+        rotateControl = function(now, fx) {
+          $control.css('transform', 'rotate(' + now + 'deg)');
+        },
+        addExpanded = function() {
+          $node.addClass('expanded');
+          $node.removeData('expanding');
+        };
 
         $control.css('borderSpacing', 0)
           .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl);
       }
     }
-  }
-  else {
+  } else {
     $node.removeClass('expanded');
 
     // animated closing ;)
-    $node.nextUntil(function() {return $(this).attr("data-level") <= level;})
+    $node.nextUntil(function() {
+      return $(this).attr("data-level") <= level;
+    })
       .wrapAll('<div id="TreeItemAnimate"></div>)');
     $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar));
 
     // animated control
     $control = $node.children('.tree-item-control'),
-      rotateControl = function(now, fx){$control.css('transform', 'rotate(' + now + 'deg)');};
+    rotateControl = function(now, fx) {
+      $control.css('transform', 'rotate(' + now + 'deg)');
+    };
     $control.css('borderSpacing', 90)
       .animateAVCSD('borderSpacing', 0, null, rotateControl);
-   }
+  }
 };
 
-Scout.DesktopTree.prototype.setNodeSelectedById = function (nodeId) {
+Scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
   var $node;
   if (nodeId) {
     $node = this._$desktopTreeScroll.find('#' + nodeId);
@@ -127,7 +136,7 @@ Scout.DesktopTree.prototype.setNodeSelectedById = function (nodeId) {
   this._setNodeSelected($node);
 };
 
-Scout.DesktopTree.prototype._setNodeSelected = function ($node) {
+Scout.DesktopTree.prototype._setNodeSelected = function($node) {
   if (!$node) {
     this._$desktopTreeScroll.children().select(false);
     return;
@@ -142,12 +151,14 @@ Scout.DesktopTree.prototype._setNodeSelected = function ($node) {
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
-    this.scout.send('nodesSelected', this.model.id, {"nodeIds":[node.id]});
+    this.scout.send('nodesSelected', this.model.id, {
+      "nodeIds": [node.id]
+    });
   }
 };
 
-Scout.DesktopTree.prototype._onNodesInserted = function (nodes, parentNodeId) {
-  var $parent = this._$desktopTreeScroll.find('#'+parentNodeId);
+Scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
+  var $parent = this._$desktopTreeScroll.find('#' + parentNodeId);
   var parentNode = $parent.data('node');
   if (parentNode === undefined) {
     throw "No parentNode found for id " + parentNodeId;
@@ -161,27 +172,27 @@ Scout.DesktopTree.prototype._onNodesInserted = function (nodes, parentNodeId) {
   }
 };
 
-Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
+Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
   var $allNodes = $('');
 
-  for (var i =  nodes.length - 1; i >= 0; i--) {
+  for (var i = nodes.length - 1; i >= 0; i--) {
     // create node
     var node = nodes[i];
     var state = '';
     if (node.expanded && node.childNodes.length > 0) {
-      state='expanded ';
+      state = 'expanded ';
     }
     if (!node.leaf) {
-      state+='can-expand '; //TODO rename to leaf
+      state += 'can-expand '; //TODO rename to leaf
     }
     level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
-            .on('click', '', onNodeClicked)
-            .data('node', node)
-            .attr('data-level', level)
-            .css('margin-left', level * 20)
-            .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
+      .on('click', '', onNodeClicked)
+      .data('node', node)
+      .attr('data-level', level)
+      .css('margin-left', level * 20)
+      .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
 
     // decorate with (close) control
     var $control = $node.appendDiv('', 'tree-item-control')
@@ -224,6 +235,7 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
   }
 
   var that = this;
+
   function onNodeClicked() {
     return that._onNodeClicked(event, $(this));
   }
@@ -240,22 +252,23 @@ Scout.DesktopTree.prototype._addNodes = function (nodes, $parent) {
   return $allNodes;
 };
 
-Scout.DesktopTree.prototype._onNodeClicked = function (event, $clicked) {
+Scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
   var nodeId = $clicked.attr('id');
-  this.scout.send('nodeClicked', this.model.id, {"nodeId" : nodeId});
+  this.scout.send('nodeClicked', this.model.id, {
+    "nodeId": nodeId
+  });
 
   this._setNodeSelected($clicked);
   this._setNodeExpanded($clicked, true);
 };
 
-Scout.DesktopTree.prototype._onNodeControlClicked = function (event, $clicked) {
+Scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
   var $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded');
 
   if ($node.hasClass('can-expand')) {
     this._setNodeExpanded($node, expanded);
-  }
-  else {
+  } else {
     this._onNodeClicked(event, $node);
   }
 
@@ -263,7 +276,7 @@ Scout.DesktopTree.prototype._onNodeControlClicked = function (event, $clicked) {
   return false;
 };
 
-Scout.DesktopTree.prototype._onNodeMenuClicked = function (event, $clicked) {
+Scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
   if (!$clicked.parent().isSelected()) {
     //make sure node is selected when activating the menu, otherwise the wrong menus are returned
     this._setNodeSelected($clicked.parent());
@@ -279,7 +292,7 @@ Scout.DesktopTree.prototype._onNodeMenuClicked = function (event, $clicked) {
   return false;
 };
 
-Scout.DesktopTree.prototype.onModelPropertyChange = function (event) {
+Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
   if (event.detailTableId === undefined) {
     return;
   }
@@ -294,21 +307,17 @@ Scout.DesktopTree.prototype.onModelPropertyChange = function (event) {
   this.model.detailTable = this._desktopTable.model;
 };
 
-Scout.DesktopTree.prototype.onModelCreate = function (event) {
-};
+Scout.DesktopTree.prototype.onModelCreate = function(event) {};
 
-Scout.DesktopTree.prototype.onModelAction = function (event) {
+Scout.DesktopTree.prototype.onModelAction = function(event) {
   if (event.type_ == 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
-  }
-  else if (event.type_ == 'nodesDeleted') {
+  } else if (event.type_ == 'nodesDeleted') {
     //FIXME implement
-//    this.removeNodes(event.nodeIds);
-  }
-  else if (event.type_ == 'nodesSelected') {
+    //    this.removeNodes(event.nodeIds);
+  } else if (event.type_ == 'nodesSelected') {
     this.setNodeSelectedById(event.nodeIds[0]);
-  }
-  else if (event.type_ == 'nodeExpanded') {
+  } else if (event.type_ == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
   }
 };

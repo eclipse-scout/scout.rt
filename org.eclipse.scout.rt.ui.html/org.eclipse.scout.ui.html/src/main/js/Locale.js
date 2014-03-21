@@ -1,12 +1,12 @@
 //define local als singleton
-locale = new function Locale () {
+locale = new function Locale() {
   //FIXME CGU check with chris
-//  this.localeString = model.localeString;
-//  this.decimalFormatSymbols = model.decimalFormatSymbols;
+  //  this.localeString = model.localeString;
+  //  this.decimalFormatSymbols = model.decimalFormatSymbols;
 
   log(this.decimalFormatSymbols);
 
-// TODO cru:init with server
+  // TODO cru:init with server
 
   //  init localized number pattern chars
   this._numberD = '0';
@@ -25,14 +25,13 @@ locale = new function Locale () {
   this.dateAM = 'AM';
   this.datePM = 'PM';
 
-  function getText() {
-  }
+  function getText() {}
 }();
 
 // convert number to sting using java format
 // without prefix and suffix and without E and without %
 
-locale.Number = function (pattern) {
+locale.Number = function(pattern) {
   // format function will use these (defaults)
   this.negPrefix = locale._numberM;
   this.negSuffix = '';
@@ -54,7 +53,7 @@ locale.Number = function (pattern) {
   // find group length
   var start = _find(pattern, locale._numberG, -1),
     end = _find(pattern, locale._numberP, 1) || pattern.length;
-  if (start && end)  this.groupLength = end - start - 1;
+  if (start && end) this.groupLength = end - start - 1;
   pattern = pattern.replace(locale._numberG, '');
 
   // split on decimal point
@@ -79,7 +78,7 @@ locale.Number = function (pattern) {
 };
 
 // in public use for formatting
-locale.Number.prototype.format = function format (number) {
+locale.Number.prototype.format = function format(number) {
   if (number < 0) return this.negPrefix + this.format(-number) + this.negSuffix;
 
   // before decimal point
@@ -106,123 +105,172 @@ locale.Number.prototype.format = function format (number) {
   return before + (after ? this.pointChar + after : '');
 };
 
-
 // convert milliseconds to string using java format
 // without timezone
 
 /*jshint sub:true*/
-locale.Date = function (pattern) {
+locale.Date = function(pattern) {
   this.formatFunc = [];
   this.pattern = pattern;
 
   patterLibrary = {};
 
-  patterLibrary['year'] =
-    [
-    {term : 'yyyy',
-     func: function (date) { return String(date.getFullYear()); }},
-    {term : 'yy',
-     func: function (date) { return String(date.getFullYear()).slice(2); }}
-     ];
+  patterLibrary['year'] = [{
+    term: 'yyyy',
+    func: function(date) {
+      return String(date.getFullYear());
+    }
+  }, {
+    term: 'yy',
+    func: function(date) {
+      return String(date.getFullYear()).slice(2);
+    }
+  }];
 
-  patterLibrary['month'] =
-    [
-    {term : 'MMMM',
-     func: function (date) { return locale.dateMonthLong[date.getMonth()]; }},
-    {term : 'MMM',
-     func: function (date) { return locale.dateMonth[date.getMonth()]; }},
-    {term : 'MM',
-     func: function (date) {  return _padding(date.getMonth() + 1); }},
-    {term : 'M',
-     func: function (date) {  return date.getMonth() + 1; }}
-     ];
+  patterLibrary['month'] = [{
+    term: 'MMMM',
+    func: function(date) {
+      return locale.dateMonthLong[date.getMonth()];
+    }
+  }, {
+    term: 'MMM',
+    func: function(date) {
+      return locale.dateMonth[date.getMonth()];
+    }
+  }, {
+    term: 'MM',
+    func: function(date) {
+      return _padding(date.getMonth() + 1);
+    }
+  }, {
+    term: 'M',
+    func: function(date) {
+      return date.getMonth() + 1;
+    }
+  }];
 
-  patterLibrary['week in year'] =
-    [
-    {term : 'ww',
-     func: function (date) { return _padding(_weekInYear(date)); }},
-    {term : 'w',
-     func: function (date) { return _weekInYear(date); }}
-     ];
+  patterLibrary['week in year'] = [{
+    term: 'ww',
+    func: function(date) {
+      return _padding(_weekInYear(date));
+    }
+  }, {
+    term: 'w',
+    func: function(date) {
+      return _weekInYear(date);
+    }
+  }];
 
-  patterLibrary['week in month'] =
-    [
-    {term : 'WW',
-     func: function (date) { return _padding(_weekInMonth(date)); }},
-    {term : 'W',
-     func: function (date) { return _weekInMonth(date); }}
-     ];
+  patterLibrary['week in month'] = [{
+    term: 'WW',
+    func: function(date) {
+      return _padding(_weekInMonth(date));
+    }
+  }, {
+    term: 'W',
+    func: function(date) {
+      return _weekInMonth(date);
+    }
+  }];
 
-  patterLibrary['day in month'] =
-    [
-    {term : 'dd',
-     func: function (date) { return _padding(date.getDate()); }},
-    {term : 'd',
-     func: function (date) { return date.getDate(); }}
-     ];
+  patterLibrary['day in month'] = [{
+    term: 'dd',
+    func: function(date) {
+      return _padding(date.getDate());
+    }
+  }, {
+    term: 'd',
+    func: function(date) {
+      return date.getDate();
+    }
+  }];
 
-  patterLibrary['weekday'] =
-    [
-    {term : 'EE',
-     func: function (date) { return locale.dateWeekdayLong[date.getDay()]; }},
-    {term : 'E',
-     func: function (date) { return locale.dateWeekday[date.getDay()]; }}
-     ];
+  patterLibrary['weekday'] = [{
+    term: 'EE',
+    func: function(date) {
+      return locale.dateWeekdayLong[date.getDay()];
+    }
+  }, {
+    term: 'E',
+    func: function(date) {
+      return locale.dateWeekday[date.getDay()];
+    }
+  }];
 
-  patterLibrary['hour: 0 - 23'] =
-    [
-    {term : 'HH',
-     func: function (date) { return _padding(date.getHours()); }},
-    {term : 'H',
-     func: function (date) { return date.getHours(); }}
-     ];
+  patterLibrary['hour: 0 - 23'] = [{
+    term: 'HH',
+    func: function(date) {
+      return _padding(date.getHours());
+    }
+  }, {
+    term: 'H',
+    func: function(date) {
+      return date.getHours();
+    }
+  }];
 
-  patterLibrary['hour: 1 - 12'] =
-    [
-    {term : 'KK',
-     func: function (date) { return _padding((date.getHours() + 11) % 12 + 1); }},
-    {term : 'K',
-     func: function (date) { return (date.getHours() + 11) % 12 + 1; }}
-     ];
+  patterLibrary['hour: 1 - 12'] = [{
+    term: 'KK',
+    func: function(date) {
+      return _padding((date.getHours() + 11) % 12 + 1);
+    }
+  }, {
+    term: 'K',
+    func: function(date) {
+      return (date.getHours() + 11) % 12 + 1;
+    }
+  }];
 
-  patterLibrary['am/pm marker'] =
-    [
-    {term : 'a',
-     func: function (date) { return (date.getHours() < 12) ? locale.dateAM : locale.datePM; }}
-     ];
+  patterLibrary['am/pm marker'] = [{
+    term: 'a',
+    func: function(date) {
+      return (date.getHours() < 12) ? locale.dateAM : locale.datePM;
+    }
+  }];
 
-  patterLibrary['minutes'] =
-    [
-    {term : 'mm',
-     func: function (date) { return _padding(date.getMinutes()); }},
-    {term : 'm',
-     func: function (date) { return date.getMinutes(); }}
-     ];
+  patterLibrary['minutes'] = [{
+    term: 'mm',
+    func: function(date) {
+      return _padding(date.getMinutes());
+    }
+  }, {
+    term: 'm',
+    func: function(date) {
+      return date.getMinutes();
+    }
+  }];
 
-  patterLibrary['seconds'] =
-    [
-    {term : 'ss',
-     func: function (date) { return _padding(date.getSeconds()); }},
-    {term : 's',
-     func: function (date) { return date.getSeconds(); }}
-     ];
+  patterLibrary['seconds'] = [{
+    term: 'ss',
+    func: function(date) {
+      return _padding(date.getSeconds());
+    }
+  }, {
+    term: 's',
+    func: function(date) {
+      return date.getSeconds();
+    }
+  }];
 
-  patterLibrary['milliseconds'] =
-    [
-    {term : 'SSS',
-     func: function (date) { return ('000' + date.getMilliseconds()).slice(-3); }},
-     {term : 'S',
-       func: function (date) { return date.getMilliseconds(); }}
-     ];
-
+  patterLibrary['milliseconds'] = [{
+    term: 'SSS',
+    func: function(date) {
+      return ('000' + date.getMilliseconds()).slice(-3);
+    }
+  }, {
+    term: 'S',
+    func: function(date) {
+      return date.getMilliseconds();
+    }
+  }];
 
   for (var l in patterLibrary) {
     for (var p = 0; p < patterLibrary[l].length; p += 1) {
       var test = patterLibrary[l][p];
       if (pattern.indexOf(test.term) > -1) {
-        var closure = function (term, func) {
-          return function (string, date) {
-            return string.replace(term, func(date)) ;
+        var closure = function(term, func) {
+          return function(string, date) {
+            return string.replace(term, func(date));
           };
         }(test.term, test.func);
         this.formatFunc.push(closure);
@@ -231,7 +279,7 @@ locale.Date = function (pattern) {
     }
   }
 
-  function _padding (number)  {
+  function _padding(number) {
     return (number <= 9 ? '0' + number : number);
   }
 
@@ -241,16 +289,16 @@ locale.Date = function (pattern) {
   }
 
   function _weekInMonth(date) {
-      var onemon = new Date(date.getFullYear(), date.getMonth(), 1);
-      return Math.ceil((((date - onemon) / 86400000) + onemon.getDay() + 1) / 7);
+    var onemon = new Date(date.getFullYear(), date.getMonth(), 1);
+    return Math.ceil((((date - onemon) / 86400000) + onemon.getDay() + 1) / 7);
   }
 };
 
-locale.Date.prototype.format = function format (time) {
+locale.Date.prototype.format = function format(time) {
   var ret = this.pattern,
     date = new Date(time);
 
-  for (f = this.formatFunc.length - 1; f >= 0; f-- ) {
+  for (f = this.formatFunc.length - 1; f >= 0; f--) {
     ret = this.formatFunc[f](ret, date);
   }
 

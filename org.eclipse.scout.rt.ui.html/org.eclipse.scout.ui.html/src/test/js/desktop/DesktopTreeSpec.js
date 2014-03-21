@@ -9,7 +9,7 @@ describe("DesktopTree", function() {
     jasmine.clock().install();
   });
 
-  afterEach(function(){
+  afterEach(function() {
     scout = null;
     jasmine.Ajax.uninstallMock();
     clearAjaxRequests();
@@ -17,13 +17,15 @@ describe("DesktopTree", function() {
   });
 
   function createModel(id) {
-    return {"id" : id};
+    return {
+      "id": id
+    };
   }
 
   function createModelNode(id, text) {
     return {
-      "id" : id,
-      "text" : text
+      "id": id,
+      "text": text
     };
   }
 

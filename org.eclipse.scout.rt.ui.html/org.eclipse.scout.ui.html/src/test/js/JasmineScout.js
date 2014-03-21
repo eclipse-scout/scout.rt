@@ -3,16 +3,16 @@ function mostRecentJsonRequest() {
 }
 
 var jasmineScoutMatchers = {
-  toContainEventTypesExactly : function(util, customEqualityTesters) {
+  toContainEventTypesExactly: function(util, customEqualityTesters) {
     return {
-      compare : function(actual, expected) {
+      compare: function(actual, expected) {
         if (expected === undefined) {
           expected = [];
         }
         var result = {};
 
         var actualEventTypes = [];
-        for(i =0; i< actual.events.length; i++) {
+        for (i = 0; i < actual.events.length; i++) {
           actualEventTypes.push(actual.events[i].type_);
         }
 

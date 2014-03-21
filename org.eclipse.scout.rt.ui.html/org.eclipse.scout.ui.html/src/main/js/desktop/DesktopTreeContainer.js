@@ -1,4 +1,4 @@
-Scout.DesktopTreeContainer = function (scout, $parent, model) {
+Scout.DesktopTreeContainer = function(scout, $parent, model) {
   this.scout = scout;
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
@@ -8,19 +8,20 @@ Scout.DesktopTreeContainer = function (scout, $parent, model) {
     .on('mousedown', '', resizeTree);
 
   var that = this;
-  function resizeTree (event) {
+
+  function resizeTree(event) {
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
 
-    function resizeMove(event){
+    function resizeMove(event) {
       var w = event.pageX + 11;
       that._$desktopTree.width(w);
       that._$desktopTree.next().width('calc(100% - ' + (w + 80) + 'px)')
         .css('left', w);
     }
 
-    function resizeEnd(event){
+    function resizeEnd(event) {
       $('body').off('mousemove')
         .removeClass('col-resize');
     }
@@ -28,7 +29,7 @@ Scout.DesktopTreeContainer = function (scout, $parent, model) {
   }
 };
 
-Scout.DesktopTreeContainer.prototype.onOutlineCreated = function (event) {
+Scout.DesktopTreeContainer.prototype.onOutlineCreated = function(event) {
   if (this.desktopTree) {
     this.desktopTree.detach();
   }
@@ -43,7 +44,7 @@ Scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
   this.desktopTree.attachModel();
 };
 
-Scout.DesktopTreeContainer.prototype.attachModel = function () {
+Scout.DesktopTreeContainer.prototype.attachModel = function() {
   //TODO attachModel only necessary because setNodeSelection relies on desktop bench which is created later, is there a better way?
   this.desktopTree.attachModel();
 };

@@ -2,16 +2,15 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 // scout namespace
-Scout = {
-};
+Scout = {};
 
 //local log function
 var log = console.log.bind(console);
 
 //extend jQuery, with all helpers
-(function ($) {
+(function($) {
   // scout uses only divs...
-  $.makeDiv = function (i, c, h) {
+  $.makeDiv = function(i, c, h) {
     i = i ? ' id="' + i + '"' : '';
     c = c ? ' class="' + c + '"' : '';
     h = h || '';
@@ -19,27 +18,27 @@ var log = console.log.bind(console);
   };
 
   // prepend - and return new div for chaining
-  $.fn.prependDiv = function (i, c, h) {
+  $.fn.prependDiv = function(i, c, h) {
     return $.makeDiv(i, c, h).prependTo(this);
   };
 
   // append - and return new div for chaining
-  $.fn.appendDiv = function (i, c, h) {
+  $.fn.appendDiv = function(i, c, h) {
     return $.makeDiv(i, c, h).appendTo(this);
   };
 
   // insert after - and return new div for chaining
-  $.fn.afterDiv = function (i, c, h) {
+  $.fn.afterDiv = function(i, c, h) {
     return $.makeDiv(i, c, h).insertAfter(this);
   };
 
   // insert before - and return new div for chaining
-  $.fn.beforeDiv = function (i, c, h) {
+  $.fn.beforeDiv = function(i, c, h) {
     return $.makeDiv(i, c, h).insertBefore(this);
   };
 
   // append svg
-  $.fn.appendSVG = function (t, i, c, h) {
+  $.fn.appendSVG = function(t, i, c, h) {
     var $svgElement = $(document.createElementNS("http://www.w3.org/2000/svg", t));
     if (i) $svgElement.attr('id', i);
     if (c) $svgElement.attr('class', c);
@@ -48,20 +47,20 @@ var log = console.log.bind(console);
   };
 
   // attr and class handling for svg
-  $.fn.attrSVG = function (a, v) {
-    return this.each(function () {
+  $.fn.attrSVG = function(a, v) {
+    return this.each(function() {
       this.setAttribute(a, v);
     });
   };
 
-  $.fn.attrXLINK = function (a, v) {
-    return this.each(function () {
+  $.fn.attrXLINK = function(a, v) {
+    return this.each(function() {
       this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + a, v);
     });
   };
 
-  $.fn.addClassSVG = function (c) {
-    return this.each(function () {
+  $.fn.addClassSVG = function(c) {
+    return this.each(function() {
       if (!$(this).hasClassSVG(c)) {
         var old = this.getAttribute('class');
         this.setAttribute('class', old + ' ' + c);
@@ -69,43 +68,41 @@ var log = console.log.bind(console);
     });
   };
 
-  $.fn.removeClassSVG = function (c) {
-    return this.each(function () {
+  $.fn.removeClassSVG = function(c) {
+    return this.each(function() {
       var old = ' ' + this.getAttribute('class') + ' ';
-      this.setAttribute('class',  old.replace(' ' + c + ' ', ' '));
+      this.setAttribute('class', old.replace(' ' + c + ' ', ' '));
     });
   };
 
-  $.fn.hasClassSVG = function (c) {
+  $.fn.hasClassSVG = function(c) {
     var old = ' ' + this.attr('class') + ' ';
     return old.indexOf(' ' + c + ' ') > -1;
   };
 
-
   // select one and deselect siblings
-  $.fn.selectOne = function () {
+  $.fn.selectOne = function() {
     this.siblings().removeClass('selected');
     this.addClass('selected');
     return this;
   };
 
-  $.fn.select = function (selected) {
+  $.fn.select = function(selected) {
     if (selected) {
       this.addClass('selected');
-    }
-    else {
+    } else {
       this.removeClass('selected');
     }
 
     return this;
   };
 
-  $.fn.isSelected = function () {
+  $.fn.isSelected = function() {
     return this.hasClass('selected');
   };
 
   // most used animate
-  $.fn.animateAVCSD = function (attr, value, complete, step, duration) {
+  $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
     var properties = {},
       options = {};
 
@@ -120,21 +117,25 @@ var log = console.log.bind(console);
   };
 
   // SVG animate, array contains attr, endValue + startValue
-  $.fn.animateSVG = function (attr, endValue, duration, complete) {
-    return this.each(function () {
+  $.fn.animateSVG = function(attr, endValue, duration, complete) {
+    return this.each(function() {
       var startValue = parseFloat($(this).attr(attr));
 
-      $(this).animate({tabIndex: 0},
-        {step: function (now, fx) {this.setAttribute(attr, startValue + (endValue - startValue) * fx.pos); },
+      $(this).animate({
+        tabIndex: 0
+      }, {
+        step: function(now, fx) {
+          this.setAttribute(attr, startValue + (endValue - startValue) * fx.pos);
+        },
         duration: duration,
         complete: complete,
-        queue: false});
+        queue: false
+      });
     });
   };
 
-
   // over engineered animate
-  $.fn.widthToContent = function () {
+  $.fn.widthToContent = function() {
     var oldW = this.outerWidth(),
       newW = this.css('width', 'auto').outerWidth(),
       finalWidth = this.data('finalWidth');
@@ -144,7 +145,9 @@ var log = console.log.bind(console);
     }
 
     if (newW != finalWidth) {
-      this.stop().animateAVCSD('width', newW, null, function () { $(this).data('finalWidth', null); });
+      this.stop().animateAVCSD('width', newW, null, function() {
+        $(this).data('finalWidth', null);
+      });
       this.data('finalWidth', newW);
     }
 
@@ -152,7 +155,9 @@ var log = console.log.bind(console);
   };
 
   // used by some animate functions
-  $.removeThis = function () { $(this).remove(); };
+  $.removeThis = function() {
+    $(this).remove();
+  };
 
   // converter functions constants
   // todo: holen aus kleinem Array
@@ -168,7 +173,7 @@ var log = console.log.bind(console);
   $.MONTH_LONG = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
   // converter functions
-  $.numberToString = function (number, round) {
+  $.numberToString = function(number, round) {
     var string = String(number.toFixed(round));
 
     // replace decimal point
@@ -189,7 +194,7 @@ var log = console.log.bind(console);
     return string;
   };
 
-  $.stringToDate = function (string) {
+  $.stringToDate = function(string) {
     var splitter = string.split($.DATE_SEP);
 
     var d = parseInt(splitter[$.DATE.indexOf('dd')], 10);
@@ -199,7 +204,7 @@ var log = console.log.bind(console);
     return new Date((y < 100 ? y + 2000 : y), m - 1, d);
   };
 
-  $.dateToString = function (date) {
+  $.dateToString = function(date) {
     var d = date.getDate(),
       m = date.getMonth() + 1,
       y = date.getFullYear();

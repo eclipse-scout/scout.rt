@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTable = function (scout, model) {
+Scout.DesktopTable = function(scout, model) {
   this.model = model;
   this.scout = scout;
   this._$desktopTable;
@@ -14,7 +14,7 @@ Scout.DesktopTable = function (scout, model) {
   this.scout.widgetMap[model.table.id] = this;
 };
 
-Scout.DesktopTable.prototype.render = function ($parent) {
+Scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
 
   //create container
@@ -61,7 +61,7 @@ Scout.DesktopTable.prototype.render = function ($parent) {
   this._loadData();
 
   // update chart button
-  if(this.model.chart) {
+  if (this.model.chart) {
     $controlChart.data('label', this.model.chart.label)
       .hover(controlIn, controlOut)
       .click(controlClick)
@@ -92,23 +92,23 @@ Scout.DesktopTable.prototype.render = function ($parent) {
 
   // organize button
   var textOrganize = 'Spaltenverwaltung',
-  textClose = 'schliessen';
+    textClose = 'schliessen';
   $controlOrganize.data('label', textOrganize)
     .hover(controlIn, controlOut)
     .click(controlClick)
     .click(controlOrganize);
 
   // named functions
-  function controlIn (event) {
+  function controlIn(event) {
     var close = $(event.target).hasClass('selected') ? ' ' + textClose : '';
     $controlLabel.text($(event.target).data('label') + close);
   }
 
-  function controlOut (event) {
+  function controlOut(event) {
     $controlLabel.text('');
   }
 
-  function controlClick (event) {
+  function controlClick(event) {
     var $clicked = $(this);
 
     // reset handling resize
@@ -123,8 +123,10 @@ Scout.DesktopTable.prototype.render = function ($parent) {
       //adjust table
       that._$tableData.animateAVCSD('height',
         parseFloat(that._$desktopTable.css('height')) - 93,
-        function () {$(this).css('height', 'calc(100% - 85px'); },
-          that._scrollbar.initThumb.bind(that._scrollbar),
+        function() {
+          $(this).css('height', 'calc(100% - 85px');
+        },
+        that._scrollbar.initThumb.bind(that._scrollbar),
         500);
 
       // visual: reset label and close control
@@ -141,8 +143,10 @@ Scout.DesktopTable.prototype.render = function ($parent) {
       //adjust table
       that._$tableData.animateAVCSD('height',
         parseFloat(that._$desktopTable.css('height')) - 444,
-        function () {$(this).css('height', 'calc(100% - 430px'); },
-          that._scrollbar.initThumb.bind(that._scrollbar),
+        function() {
+          $(this).css('height', 'calc(100% - 430px');
+        },
+        that._scrollbar.initThumb.bind(that._scrollbar),
         500);
 
       // visual: update label, size container and control
@@ -156,30 +160,30 @@ Scout.DesktopTable.prototype.render = function ($parent) {
     }
   }
 
-  function controlChart (event) {
+  function controlChart(event) {
     new Scout.DesktopTableChart(that.scout, $controlContainer, that.model.table, filterCallback);
   }
 
-  function controlGraph (event) {
+  function controlGraph(event) {
     new Scout.DesktopTableGraph(that.scout, $controlContainer, that.model);
   }
 
-  function controlMap (event) {
+  function controlMap(event) {
     new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
   }
 
-  function controlOrganize (event) {
+  function controlOrganize(event) {
     new Scout.DesktopTableOrganize(that.scout, $controlContainer, that.model, that.model.table.columns, that);
   }
 
-  function resizeControl (event) {
+  function resizeControl(event) {
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
 
-    var offset = (this.id == 'ControlResizeTop')  ? 58 : 108;
+    var offset = (this.id == 'ControlResizeTop') ? 58 : 108;
 
-    function resizeMove(event){
+    function resizeMove(event) {
       var h = that._$parent.outerHeight() - event.pageY + offset;
       if (that._$parent.height() < h + 50) return false;
 
@@ -189,7 +193,7 @@ Scout.DesktopTable.prototype.render = function ($parent) {
       that._scrollbar.initThumb();
     }
 
-    function resizeEnd(event){
+    function resizeEnd(event) {
       if ($controlContainer.height() < 75) {
         $('.selected', $tableControl).click();
       }
@@ -201,7 +205,7 @@ Scout.DesktopTable.prototype.render = function ($parent) {
     return false;
   }
 
-  function toggleSelect () {
+  function toggleSelect() {
     var $selectedRows = $('.row-selected', $tableData);
 
     if ($selectedRows.length == that.model.table.rows.length) {
@@ -213,7 +217,7 @@ Scout.DesktopTable.prototype.render = function ($parent) {
     that._selectionBorder();
   }
 
-  function filterCallback (testFunc) {
+  function filterCallback(testFunc) {
     var rowCount = 0,
       $selectedRows = $('.row-selected', $tableData),
       $allRows = $('.table-row', that._$tableDataScroll);
@@ -221,11 +225,11 @@ Scout.DesktopTable.prototype.render = function ($parent) {
     that._resetSelection();
 
     $allRows.detach();
-    $allRows.each(function (i) {
+    $allRows.each(function(i) {
       var $row = $(this),
         show = testFunc($row);
 
-      if (show){
+      if (show) {
         showRow($row);
         rowCount++;
       } else {
@@ -239,48 +243,62 @@ Scout.DesktopTable.prototype.render = function ($parent) {
     that._scrollbar.initThumb();
   }
 
-  function resetFilter (event) {
-    $('.table-row', $tableData).each(function (i) { showRow($(this)); });
-    that._$infoFilter.animateAVCSD('width', 0, function () {$(this).hide(); });
+  function resetFilter(event) {
+    $('.table-row', $tableData).each(function(i) {
+      showRow($(this));
+    });
+    that._$infoFilter.animateAVCSD('width', 0, function() {
+      $(this).hide();
+    });
     $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
     log($('.main-chart.selected'));
     that._resetSelection();
   }
 
-  function showRow ($row) {
-      $row.show()
-        .animate({'height': '34', 'padding-top': '2', 'padding-bottom': '2'});
+  function showRow($row) {
+    $row.show()
+      .animate({
+        'height': '34',
+        'padding-top': '2',
+        'padding-bottom': '2'
+      });
   }
 
-  function hideRow ($row) {
-      $row.hide()
-        .animate({'height': '0', 'padding-top': '0', 'padding-bottom': '0'},
-          {complete: function() {$(this).hide();}});
+  function hideRow($row) {
+    $row.hide()
+      .animate({
+        'height': '0',
+        'padding-top': '0',
+        'padding-bottom': '0'
+      }, {
+        complete: function() {
+          $(this).hide();
+        }
+      });
   }
 
 };
 
-Scout.DesktopTable.prototype._setInfoLoad = function (count) {
+Scout.DesktopTable.prototype._setInfoLoad = function(count) {
   this._$infoLoad.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
   this._$infoLoad.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._setInfoMore = function (count) {
-};
+Scout.DesktopTable.prototype._setInfoMore = function(count) {};
 
-Scout.DesktopTable.prototype._setInfoFilter = function (count) {
+Scout.DesktopTable.prototype._setInfoFilter = function(count) {
   this._$infoFilter.html(this._findInfo(count) + ' gefiltert</br>Filter entfernen');
   this._$infoFilter.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._setInfoSelect = function (count, all) {
+Scout.DesktopTable.prototype._setInfoSelect = function(count, all) {
   var allText = all ? 'Keine' : 'Alle';
   this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren');
   this._$infoSelect.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._findInfo = function (n) {
-  if (n === 0 ) {
+Scout.DesktopTable.prototype._findInfo = function(n) {
+  if (n === 0) {
     return 'Keine Zeile';
   } else if (n == 1) {
     return 'Eine Zeile';
@@ -289,14 +307,14 @@ Scout.DesktopTable.prototype._findInfo = function (n) {
   }
 };
 
-Scout.DesktopTable.prototype._selectionBorder = function () {
+Scout.DesktopTable.prototype._selectionBorder = function() {
   // remove nice border
-    $('.select-middle, .select-top, .select-bottom, .select-single')
-      .removeClass('select-middle select-top select-bottom select-single');
+  $('.select-middle, .select-top, .select-bottom, .select-single')
+    .removeClass('select-middle select-top select-bottom select-single');
 
   // draw nice border
   $selectedRows = $('.row-selected');
-  $selectedRows.each(function (i) {
+  $selectedRows.each(function(i) {
     var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
       hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
 
@@ -310,13 +328,13 @@ Scout.DesktopTable.prototype._selectionBorder = function () {
   this._setInfoSelect($selectedRows.length, $selectedRows.length == this.model.table.rows.length);
 };
 
-Scout.DesktopTable.prototype._resetSelection = function () {
+Scout.DesktopTable.prototype._resetSelection = function() {
   $('.row-selected', this._$tableData).removeClass('row-selected');
   this._selectionBorder();
   $('#MenuRow').remove();
 };
 
-Scout.DesktopTable.prototype._sort = function () {
+Scout.DesktopTable.prototype._sort = function() {
   var sortColumns = [];
 
   // remove selection
@@ -326,12 +344,15 @@ Scout.DesktopTable.prototype._sort = function () {
   for (var c = 0; c < this.model.table.columns.length; c++) {
     var column = this.model.table.columns[c],
       order = column.$div.data('sort-order'),
-      dir =  column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
-      sortColumns[order] = {index : c, dir : dir};
+      dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
+    sortColumns[order] = {
+      index: c,
+      dir: dir
+    };
   }
 
   // compare rows
-  function compare (a, b) {
+  function compare(a, b) {
     for (var s = 0; s < sortColumns.length; s++) {
       var index = sortColumns[s].index,
         dir = sortColumns[s].dir == 'up' ? -1 : 1;
@@ -350,7 +371,7 @@ Scout.DesktopTable.prototype._sort = function () {
   var $rows = $('.table-row');
 
   // store old position
-  $rows.each(function () {
+  $rows.each(function() {
     $(this).data('old-top', $(this).offset().top);
   });
 
@@ -360,14 +381,14 @@ Scout.DesktopTable.prototype._sort = function () {
 
   // for less than 100 rows: move to old position and then animate
   if ($rows.length < 100) {
-    $rows.each(function (i) {
+    $rows.each(function(i) {
       $(this).css('top', $(this).data('old-top') - $(this).offset().top)
         .animateAVCSD('top', 0);
-      });
-    }
+    });
+  }
 };
 
-Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
+Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
   // find new sort direction
   var $header = $('.header-item').eq(index);
 
@@ -407,13 +428,13 @@ Scout.DesktopTable.prototype.sortChange = function  (index, dir, additional) {
   this._sort();
 };
 
-Scout.DesktopTable.prototype._loadData = function () {
+Scout.DesktopTable.prototype._loadData = function() {
   $('.table-row').remove();
   this._drawData(0);
   this._setInfoSelect(0, false);
 };
 
-Scout.DesktopTable.prototype._drawData = function (startRow) {
+Scout.DesktopTable.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '';
   var table = this.model.table,
@@ -428,7 +449,7 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
         width = column.width,
         style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
         allign = (column.type == 'number') ? 'text-align: right; ' : '';
-        value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+      value = Scout.DesktopMatrix.getCellText(row.cells[c]);
 
       rowString += '<div style="' + style + allign + '">' + value + '</div>';
     }
@@ -448,10 +469,12 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
 
   // repaint and append next block
   if (r < table.rows.length) {
-    setTimeout(function() { that._drawData(startRow + 100); }, 0);
+    setTimeout(function() {
+      that._drawData(startRow + 100);
+    }, 0);
   }
 
-  function onMouseDown (event) {
+  function onMouseDown(event) {
     var $row = $(event.delegateTarget),
       add = true,
       first,
@@ -471,16 +494,16 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
     selectData(event);
 
     // ...or movement with held mouse button
-    $(".table-row").one("mousemove", function(event){
+    $(".table-row").one("mousemove", function(event) {
       selectData(event);
     });
 
-    $(".table-row").one("mouseup", function(event){
+    $(".table-row").one("mouseup", function(event) {
       onMouseUp(event);
     });
 
     // action for all affected rows
-    function selectData (event) {
+    function selectData(event) {
       // affected rows between $row and Target
       var firstIndex = first || $row.index(),
         lastIndex = $(event.delegateTarget).index();
@@ -509,29 +532,33 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
       selectionChanged = true;
     }
 
-    function onMouseUp (event) {
+    function onMouseUp(event) {
       $(".table-row").unbind("mousemove");
       $(".table-row").unbind("mouseup");
 
       //Send click only if mouseDown and mouseUp happened on the same row
       if ($row.get(0) == event.delegateTarget) {
-        that.scout.send('rowClicked', that.model.table.id, {"rowId" : $row.attr('id')});
+        that.scout.send('rowClicked', that.model.table.id, {
+          "rowId": $row.attr('id')
+        });
       }
 
       if (selectionChanged) {
         var rowIds = [],
-        $selectedRows = $('.row-selected');
+          $selectedRows = $('.row-selected');
 
-        $selectedRows.each(function(){
+        $selectedRows.each(function() {
           rowIds.push($(this).attr('id'));
         });
 
-        that.scout.send('rowsSelected', that.model.table.id, {"rowIds" : rowIds});
+        that.scout.send('rowsSelected', that.model.table.id, {
+          "rowIds": rowIds
+        });
       }
     }
   }
 
-  function selectionMenu (x, y) {
+  function selectionMenu(x, y) {
     // selection
     $selectedRows = $('.row-selected');
 
@@ -549,23 +576,30 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
       .css('top', $selectedRows.first().offset().top - 13);
 
     // move to the mouse pointer
-    var moveMenu = function (event) {
+    var moveMenu = function(event) {
       var top = $selectedRows.first().offset().top,
         bottom = $selectedRows.last().offset().top + 32;
 
-      var toTop = Math.abs(top - y) < Math.abs(bottom - y) ? top - 13: bottom - 13,
+      var toTop = Math.abs(top - y) < Math.abs(bottom - y) ? top - 13 : bottom - 13,
         toLeft = x - 13;
 
-      $menuRow.stop().animate({'top': toTop},
-          {complete: function() {$menuRow.animate({'left': toLeft}, 500); }},
-          500);
+      $menuRow.stop().animate({
+          'top': toTop
+        }, {
+          complete: function() {
+            $menuRow.animate({
+              'left': toLeft
+            }, 500);
+          }
+        },
+        500);
     };
 
     // start movement
     moveMenu(event);
   }
 
-  function clickRowMenu (event) {
+  function clickRowMenu(event) {
     var $clicked = $(this),
       x = $clicked.offset().left,
       y = $clicked.offset().top,
@@ -576,37 +610,36 @@ Scout.DesktopTable.prototype._drawData = function (startRow) {
 
 };
 
-Scout.DesktopTable.prototype.sumData = function (draw, groupColumn) {
+Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
   $('.table-row-sum', this._$tableDataScroll).animateAVCSD('height', 0, $.removeThis);
 
   var table = this.model.table;
   if (draw) {
     var $rows = $('.table-row', this._$tableDataScroll);
-      $sumRow = $.makeDiv('', 'table-row-sum'),
-      sum = [];
+    $sumRow = $.makeDiv('', 'table-row-sum'),
+    sum = [];
 
     for (var r = 0; r < $rows.length; r++) {
       var $cells = $rows.eq(r).children();
 
       for (var c = 0; c < table.columns.length; c++) {
         var value = $cells.eq(c).text();
-        if ( table.columns[c].type == 'number') {
+        if (table.columns[c].type == 'number') {
           sum[c] = (sum[c] || 0) + parseFloat(value);
         }
       }
 
       if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
-          (r == $rows.length - 1)) && sum.length > 0) {
+        (r == $rows.length - 1)) && sum.length > 0) {
         for (c = 0; c < table.columns.length; c++) {
           var $div;
 
           if (typeof sum[c] == 'number') {
             $div = $.makeDiv('', '', sum[c])
               .css('text-align', 'right');
-          }
-          else if (c == groupColumn) {
+          } else if (c == groupColumn) {
             $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
-            .css('text-align', 'left');
+              .css('text-align', 'left');
           } else {
             $div = $.makeDiv('', '', '&nbsp');
           }
@@ -629,26 +662,24 @@ Scout.DesktopTable.prototype.sumData = function (draw, groupColumn) {
   this._scrollbar.initThumb();
 };
 
-Scout.DesktopTable.prototype.detach = function () {
+Scout.DesktopTable.prototype.detach = function() {
   this._$desktopTable.detach();
 };
 
-Scout.DesktopTable.prototype.attach = function ($container) {
+Scout.DesktopTable.prototype.attach = function($container) {
   if (!this._$desktopTable) {
     this.render($container);
-  }
-  else {
+  } else {
     this._$desktopTable.appendTo($container);
   }
 };
 
-Scout.DesktopTable.prototype._onRowsInserted = function (rows) {
+Scout.DesktopTable.prototype._onRowsInserted = function(rows) {
   //always insert new rows at the end
   var table = this.model.table;
   if (table.rows) {
     table.rows.push.apply(table.rows, rows);
-  }
-  else {
+  } else {
     table.rows = rows;
   }
   if (this._$desktopTable) {
@@ -656,16 +687,12 @@ Scout.DesktopTable.prototype._onRowsInserted = function (rows) {
   }
 };
 
-Scout.DesktopTable.prototype.onModelAction = function (event) {
+Scout.DesktopTable.prototype.onModelAction = function(event) {
   if (event.type_ == 'rowsInserted') {
     this._onRowsInserted(event.rows);
-  }
-  else if (event.type_ == 'rowsDeleted') {
+  } else if (event.type_ == 'rowsDeleted') {
     //FIXME implement
-  }
-  else if (event.type_ == 'rowsSelected') {
+  } else if (event.type_ == 'rowsSelected') {
     //FIXME implement
-  }
-  else if (event.type_ == 'rowOrderChanged') {
-  }
+  } else if (event.type_ == 'rowOrderChanged') {}
 };

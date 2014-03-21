@@ -3,26 +3,28 @@
 /**
  * @param data will be sent to server
  */
-Scout.Menu = function (scout, id, emptySpace, x, y) {
+Scout.Menu = function(scout, id, emptySpace, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
   // load model
   var data;
   if (emptySpace) {
-    data = {"emptySpace" : true};
+    data = {
+      "emptySpace": true
+    };
   }
   var response = scout.sendSync('menuPopup', id, data);
-  if(response.events.length === 0){
+  if (response.events.length === 0) {
     return;
   }
   var menu = response.events[0].menus;
 
   // create 2 container, animate do not allow overflow
   var $menuSelect = $('body').appendDiv('MenuSelect')
-          .css('left', x + 28).css('top', y - 3);
+    .css('left', x + 28).css('top', y - 3);
   var $menuControl = $('body').appendDiv('MenuControl')
-          .css('left', x - 7).css('top', y - 3);
+    .css('left', x - 7).css('top', y - 3);
 
   var onHoverIn = function() {
     $('#MenuButtonsLabel').text($(this).data('label'));
@@ -50,8 +52,8 @@ Scout.Menu = function (scout, id, emptySpace, x, y) {
 
   // show menu on top
   var menuTop = $menuSelect.offset().top;
-    menuHeight = $menuSelect.height(),
-    windowHeight = $(window).height();
+  menuHeight = $menuSelect.height(),
+  windowHeight = $(window).height();
 
   if (menuTop + menuHeight > windowHeight) {
     $menuSelect.css('top', menuTop - menuHeight + 27);
@@ -63,9 +65,13 @@ Scout.Menu = function (scout, id, emptySpace, x, y) {
 
   // every user action will close menu
   $('*').one('mousedown keydown mousewheel', removeMenu);
-  function removeMenu (event) {
+
+  function removeMenu(event) {
     $menuSelect.animateAVCSD('width', 0,
-        function() {$menuControl.remove(); $menuSelect.remove(); });
+      function() {
+        $menuControl.remove();
+        $menuSelect.remove();
+      });
     return true;
   }
 };

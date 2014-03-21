@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopMatrix = function (columns, table) {
+Scout.DesktopMatrix = function(columns, table) {
   this._allData = [];
   this._allAxis = [];
   this._columns = columns;
@@ -11,7 +11,7 @@ Scout.DesktopMatrix = function (columns, table) {
 /**
  * add data axis
  */
-Scout.DesktopMatrix.prototype.addData = function (data, dataGroup) {
+Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
   var dataAxis = [];
 
   // collect all axis
@@ -21,30 +21,32 @@ Scout.DesktopMatrix.prototype.addData = function (data, dataGroup) {
   dataAxis.column = data;
 
   // data always is number
-  dataAxis.format = function (n) {return $.numberToString(n, 0); };
+  dataAxis.format = function(n) {
+    return $.numberToString(n, 0);
+  };
 
   // count, sum, avg
   if (dataGroup == -1) {
-    dataAxis.norm = function (f) {
+    dataAxis.norm = function(f) {
       return 1;
     };
-    dataAxis.group = function (array) {
+    dataAxis.group = function(array) {
       return array.length;
     };
   } else if (dataGroup == 1) {
-    dataAxis.norm = function (f) {
+    dataAxis.norm = function(f) {
       return parseFloat(f);
     };
-    dataAxis.group = function (array) {
+    dataAxis.group = function(array) {
       return array.reduce(function(a, b) {
         return a + b;
       });
     };
   } else if (dataGroup == 2) {
-    dataAxis.norm = function (f) {
+    dataAxis.norm = function(f) {
       return parseFloat(f);
     };
-    dataAxis.group = function (array) {
+    dataAxis.group = function(array) {
       return array.reduce(function(a, b) {
         return a + b;
       }) / array.length;
@@ -54,8 +56,8 @@ Scout.DesktopMatrix.prototype.addData = function (data, dataGroup) {
   return dataAxis;
 };
 
-  //add x or y Axis
-Scout.DesktopMatrix.prototype.addAxis = function (axis, axisGroup) {
+//add x or y Axis
+Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [];
 
   // collect all axis
@@ -66,73 +68,83 @@ Scout.DesktopMatrix.prototype.addAxis = function (axis, axisGroup) {
   keyAxis.normTable = [];
 
   // add a key to the axis
-  keyAxis.add = function (k) { if (keyAxis.indexOf(k) == -1) keyAxis.push(k); };
+  keyAxis.add = function(k) {
+    if (keyAxis.indexOf(k) == -1) keyAxis.push(k);
+  };
 
   // default sorts function
-  keyAxis.reorder = function () { keyAxis.sort(); };
+  keyAxis.reorder = function() {
+    keyAxis.sort();
+  };
 
   // norm and format depends of datatype and group functionality
   if (this._columns[axis].type == 'date') {
     if (axisGroup === 0) {
-      keyAxis.norm = function (f) {
+      keyAxis.norm = function(f) {
         if (f) {
           return new Date(f).getTime();
         }
       };
-      keyAxis.format = function (n) {
+      keyAxis.format = function(n) {
         return $.dateToString(new Date(n));
       };
     } else if (axisGroup === 1) {
-      keyAxis.norm = function (f) {
+      keyAxis.norm = function(f) {
         if (f) {
           return (new Date(f).getDay() + 6) % 7;
         }
       };
-      keyAxis.format = function (n) {
+      keyAxis.format = function(n) {
         return $.WEEKDAY_LONG[n];
       };
     } else if (axisGroup === 2) {
-      keyAxis.norm = function (f) {
+      keyAxis.norm = function(f) {
         if (f) {
           return new Date(f).getMonth();
         }
       };
-      keyAxis.format = function (n) {
+      keyAxis.format = function(n) {
         return $.MONTH_LONG[n];
       };
     } else if (axisGroup === 3) {
-      keyAxis.norm = function (f) {
+      keyAxis.norm = function(f) {
         if (f) {
           return new Date(f).getFullYear();
         }
       };
-      keyAxis.format = function (n) {
+      keyAxis.format = function(n) {
         return String(n);
       };
     }
-  } else if (this._columns[axis].type == 'number'){
-    keyAxis.norm = function (f) {
+  } else if (this._columns[axis].type == 'number') {
+    keyAxis.norm = function(f) {
       return parseFloat(f);
     };
-    keyAxis.format = function (n) {
+    keyAxis.format = function(n) {
       return $.numberToString(n, 0);
     };
   } else {
-    keyAxis.norm = function (f) {var index =  keyAxis.normTable.indexOf(f);
-                  if (index == -1) {
-                    return  keyAxis.normTable.push(f) - 1;
-                  } else {
-                    return index;
-                  } };
-    keyAxis.format = function (n) { return keyAxis.normTable[n]; };
-    keyAxis.reorder = function () { log('TODO');};
+    keyAxis.norm = function(f) {
+      var index = keyAxis.normTable.indexOf(f);
+      if (index == -1) {
+        return keyAxis.normTable.push(f) - 1;
+      } else {
+        return index;
+      }
+    };
+    keyAxis.format = function(n) {
+      return keyAxis.normTable[n];
+    };
+    keyAxis.reorder = function() {
+      log('TODO');
+    };
 
   }
 
   return keyAxis;
 };
 
-Scout.DesktopMatrix.prototype.calculateCube = function () {
+Scout.DesktopMatrix.prototype.calculateCube = function() {
   var cube = {},
     r, v, k, data,
     getCellValue = Scout.DesktopMatrix.getCellValue;
@@ -212,7 +224,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
   }
 
   // acces function used by chart
-  cube.getValue = function (keys) {
+  cube.getValue = function(keys) {
     keys = JSON.stringify(keys);
 
     if (cube.hasOwnProperty(keys)) {
@@ -225,7 +237,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function () {
   return cube;
 };
 
-Scout.DesktopMatrix.prototype.columnCount = function () {
+Scout.DesktopMatrix.prototype.columnCount = function() {
   var colCount = [],
     getCellValue = Scout.DesktopMatrix.getCellValue;
 
@@ -242,7 +254,7 @@ Scout.DesktopMatrix.prototype.columnCount = function () {
   return colCount;
 };
 
-Scout.DesktopMatrix.getCellValue = function (cell) {
+Scout.DesktopMatrix.getCellValue = function(cell) {
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
   }
@@ -255,7 +267,7 @@ Scout.DesktopMatrix.getCellValue = function (cell) {
   return cell.text;
 };
 
-Scout.DesktopMatrix.getCellText = function (cell) {
+Scout.DesktopMatrix.getCellText = function(cell) {
   if (cell === null) { //cell may be a number so don't use !cell
     return '';
   }

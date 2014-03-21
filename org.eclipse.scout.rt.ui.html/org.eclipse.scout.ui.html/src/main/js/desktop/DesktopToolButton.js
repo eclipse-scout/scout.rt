@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopToolButton = function (scout, $desktop, toolButtons) {
+Scout.DesktopToolButton = function(scout, $desktop, toolButtons) {
   this.$div;
 
   // create container
@@ -27,7 +27,7 @@ Scout.DesktopToolButton = function (scout, $desktop, toolButtons) {
   $desktopTools.appendDiv('DesktopDialogs');
 
   // named event funktions
-  function clickTool (event) {
+  function clickTool(event) {
     var $clicked = $(this);
 
     $('.tool-open').animateAVCSD('width', 0, $.removeThis, null, 500);

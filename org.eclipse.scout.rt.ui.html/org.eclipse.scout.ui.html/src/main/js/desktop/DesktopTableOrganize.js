@@ -1,9 +1,9 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns, desktopTable) {
-//  var response = scout.sendSync('dataModel', model.outlineId, {"nodeId": model.nodeId}),
-//    dataModel = response.events[0].dataModel;
+Scout.DesktopTableOrganize = function(scout, $controlContainer, model, columns, desktopTable) {
+  //  var response = scout.sendSync('dataModel', model.outlineId, {"nodeId": model.nodeId}),
+  //    dataModel = response.events[0].dataModel;
 
   $controlContainer.empty();
   var $organizeColumn = $controlContainer.appendDiv('OrganizeColumn'),
@@ -20,16 +20,24 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     .data('label', 'Sortierung');
   $commandSort.appendDiv('', 'command-item sort-up')
     .data('label', 'aufsteigend')
-    .click(function () {sort('up', false); });
+    .click(function() {
+      sort('up', false);
+    });
   $commandSort.appendDiv('', 'command-item sort-down')
     .data('label', 'absteigend')
-    .click(function () {sort('down', false); });
+    .click(function() {
+      sort('down', false);
+    });
   $commandSort.appendDiv('', 'command-item sort-up-add')
     .data('label', 'zusätzlich aufsteigend')
-    .click(function () {sort('up', true); });
+    .click(function() {
+      sort('up', true);
+    });
   $commandSort.appendDiv('', 'command-item sort-down-add')
     .data('label', 'zusätzlich absteigend')
-    .click(function () {sort('down', true); });
+    .click(function() {
+      sort('down', true);
+    });
 
   var $commandFilter = $organizeCommand.appendDiv('', 'command-group');
   $commandFilter.appendDiv('', 'command-text')
@@ -84,7 +92,7 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     .click(moveBottom);
 
   // name all label elements
-  $('.command-text').each( function () {
+  $('.command-text').each(function() {
     $(this).text($(this).data('label'));
   });
 
@@ -96,46 +104,45 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
 
   // prepare command section
 
-
   // event handling
-  function selectColumn () {
+  function selectColumn() {
     var $clicked = $(this);
     $clicked.selectOne('selected');
   }
 
-  function enterCommand () {
+  function enterCommand() {
     var $command = $(this),
       $text = $command.siblings('.command-text');
 
-    $text.text( $text.data('label') + ' ' + $command.data('label'));
+    $text.text($text.data('label') + ' ' + $command.data('label'));
   }
 
-  function leaveCommand () {
+  function leaveCommand() {
     var $command = $(this),
       $text = $command.siblings('.command-text');
 
     $text.text($text.data('label'));
   }
 
-  function sort (dir, additional) {
+  function sort(dir, additional) {
     var id = $('.selected', $organizeColumn).index();
     desktopTable.sortChange(id, dir, additional);
     drawColumns();
   }
 
-  function filterAdd () {
+  function filterAdd() {
     var id = $('.selected', $organizeColumn).index();
     columns[id].$div.addClass('filter');
     drawColumns();
   }
 
-  function filterRemove () {
+  function filterRemove() {
     var id = $('.selected', $organizeColumn).index();
     columns[id].$div.removeClass('filter');
     drawColumns();
   }
 
-  function groupAll () {
+  function groupAll() {
     if (!$(this).hasClass('selected')) {
       $(this).selectOne('selected');
       desktopTable.sumData(true);
@@ -143,7 +150,7 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     }
   }
 
-  function groupSort () {
+  function groupSort() {
     $(this).selectOne('selected');
 
     var id = $('.selected', $organizeColumn).index();
@@ -153,21 +160,18 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     drawColumns();
   }
 
-  function groupRemove () {
+  function groupRemove() {
     $(this).siblings().removeClass('selected');
     desktopTable.sumData(false);
   }
 
-  function columnAdd () {
-  }
+  function columnAdd() {}
 
-  function columnChange () {
-  }
+  function columnChange() {}
 
-  function columnRemove () {
-  }
+  function columnRemove() {}
 
-  function moveTop () {
+  function moveTop() {
     var id = $('.selected', $organizeColumn).index();
     moveTo(id, -1);
   }
@@ -177,22 +181,22 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     moveTo(id, Math.max(id - 2, -1));
   }
 
-  function moveDown () {
+  function moveDown() {
     var id = $('.selected', $organizeColumn).index();
     moveTo(id, Math.min(id + 1, columns.length - 1));
   }
 
-  function moveBottom () {
+  function moveBottom() {
     var id = $('.selected', $organizeColumn).index();
     moveTo(id, columns.length - 1);
   }
 
-  function moveTo (oldPos, newPos) {
+  function moveTo(oldPos, newPos) {
     var $columns = $('.column-item'),
       $move = $columns.eq(oldPos);
 
     // store old position
-    $columns.each(function () {
+    $columns.each(function() {
       $(this).data('old-top', $(this).offset().top);
     });
 
@@ -204,7 +208,7 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     }
 
     // move to old position and then animate
-    $columns.each(function (i) {
+    $columns.each(function(i) {
       $(this).css('top', $(this).data('old-top') - $(this).offset().top)
         .animateAVCSD('top', 0);
     });
@@ -213,7 +217,7 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     // columns.splice(newPos + 1, 0, columns.splice(oldPos, 1)[0]);
   }
 
-  function drawColumns () {
+  function drawColumns() {
     var selected = $('.selected', $organizeColumn).index();
 
     $organizeColumn.empty();
@@ -252,54 +256,53 @@ Scout.DesktopTableOrganize = function (scout, $controlContainer, model, columns,
     if ($sorted.length === 1) $sorted.attr('data-sort-order', '');
   }
 
-
   // test
   // exportExcel('Datenblatt', table);
 
-  function exportExcel (name, table) {
-      // http://jsfiddle.net/cmewv/537/
-      var uri = 'data:application/vnd.ms-excel;base64,',
-        template = '<html xmlns:o="urn:schemas-microsoft-com:office:office"' +
-          'xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>' +
-          '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}' +
-          '</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>' +
-          '</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" ' +
-          'content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>';
+  function exportExcel(name, table) {
+    // http://jsfiddle.net/cmewv/537/
+    var uri = 'data:application/vnd.ms-excel;base64,',
+      template = '<html xmlns:o="urn:schemas-microsoft-com:office:office"' +
+        'xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head>' +
+        '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}' +
+        '</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>' +
+        '</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" ' +
+        'content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>';
 
-      // build html table
-      var html = '<table><tr>';
+    // build html table
+    var html = '<table><tr>';
 
-      var c, column;
+    var c, column;
+    for (c = 0; c < columns.length; c++) {
+      column = model.table.columns[c];
+
+      if (column.type == 'key') continue;
+
+      html += '<td style="font-weight: bold;">' + column.text + '</td>';
+    }
+
+    html += '</tr>';
+
+    for (var r = 0; r < table.length; r++) {
+      html += '<tr>';
+
       for (c = 0; c < columns.length; c++) {
-        column = model.table.columns[c];
+        column = model.table.columns[c],
+        value = table[r][c];
 
         if (column.type == 'key') continue;
 
-        html += '<td style="font-weight: bold;">' + column.text + '</td>';
+        html += '<td>' + value + '</td>';
       }
 
       html += '</tr>';
-
-      for (var r = 0; r < table.length; r++) {
-        html += '<tr>';
-
-        for (c = 0; c < columns.length; c++) {
-          column = model.table.columns[c],
-            value = table[r][c];
-
-          if (column.type == 'key') continue;
-
-          html += '<td>' + value + '</td>';
-        }
-
-        html += '</tr>';
-      }
-
-      html += '</table>';
-
-      // open excel
-      template = template.replace('{worksheet}', name).replace('{table}', html);
-      template = window.btoa(unescape(encodeURIComponent(template)));
-      window.location.href = uri + template;
     }
+
+    html += '</table>';
+
+    // open excel
+    template = template.replace('{worksheet}', name).replace('{table}', html);
+    template = window.btoa(unescape(encodeURIComponent(template)));
+    window.location.href = uri + template;
+  }
 };

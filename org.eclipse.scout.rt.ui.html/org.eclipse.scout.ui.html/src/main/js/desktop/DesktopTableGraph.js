@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
+Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
   // create container
   $graphContainer = $controlContainer.empty()
     .appendSVG('svg', 'GraphContainer');
@@ -14,7 +14,9 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
     hContainer = $graphContainer.height();
 
   // create container
-  var response = scout.sendSync('graph', node.outlineId, {"nodeId":node.id});
+  var response = scout.sendSync('graph', node.outlineId, {
+    "nodeId": node.id
+  });
   graph = response.events[0].graph;
 
   // create all links with label
@@ -38,7 +40,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
     node.$divText = $graphContainer.appendSVG('text', null, 'graph-node-text', node.name)
       .on('mousedown', moveNode);
 
-    setNode(node,  Math.random() * (wContainer - wBox),  Math.random() * (hContainer - hBox));
+    setNode(node, Math.random() * (wContainer - wBox), Math.random() * (hContainer - hBox));
   }
 
   // start optimization
@@ -46,7 +48,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
   doPhysics();
 
   // moving nodes and links by dx and dy
-  function setNode (node, dx, dy) {
+  function setNode(node, dx, dy) {
     var x = getPos(node, 'x'),
       y = getPos(node, 'y');
 
@@ -76,7 +78,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
   }
 
   // set label of a link
-  function setLabel (link) {
+  function setLabel(link) {
     var x1 = getPos(link, 'x1'),
       y1 = getPos(link, 'y1'),
       x2 = getPos(link, 'x2'),
@@ -86,11 +88,11 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
       .attr('x', (x1 + x2) / 2)
       .attr('y', (y1 + y2) / 2)
       .attr('transform', 'rotate( ' + (Math.atan((y2 - y1) / (x2 - x1)) / Math.PI * 180) +
-                  ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
+        ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
   }
 
   // disolve crossing links
-  function disolveLinks () {
+  function disolveLinks() {
     for (var l1 = 0; l1 < graph.links.length; l1++) {
       var link1 = graph.links[l1],
         E = {}, F = {};
@@ -116,7 +118,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
           var n1 = graph.nodes[link1.target],
             n2 = graph.nodes[link2.target],
             dx = getPos(n1, 'x') - getPos(n2, 'x');
-            dy = getPos(n1, 'y') - getPos(n2, 'y');
+          dy = getPos(n1, 'y') - getPos(n2, 'y');
 
           setNode(n1, -dx, -dy);
           setNode(n2, dx, dy);
@@ -124,20 +126,20 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
       }
     }
 
-    function _test (p1, p2, p3) {
+    function _test(p1, p2, p3) {
       return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
     }
   }
 
   // force the nodes to their place
-  function doPhysics () {
+  function doPhysics() {
     var totalDiff = 0;
 
     for (var n = 0; n < graph.nodes.length; n++) {
       var node = graph.nodes[n],
         x = getPos(node, 'x'),
         y = getPos(node, 'y');
-        dx = 0, dy = 0;
+      dx = 0, dy = 0;
 
       // move center to the middle
       if (node.type == 'center') {
@@ -159,7 +161,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
       for (var o = 0; o < graph.nodes.length; o++) {
         var otherNode = graph.nodes[o];
         if (o != n) {
-          var  oX = getPos(otherNode, 'x'),
+          var oX = getPos(otherNode, 'x'),
             oY = getPos(otherNode, 'y'),
             repForce = 100 / (Math.pow(x - oX, 2) + Math.pow(y - oY, 2));
 
@@ -173,9 +175,9 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
         var link = graph.links[l],
           oppositeNode = null;
 
-        if (link.source === node.id){
+        if (link.source === node.id) {
           oppositeNode = graph.nodes[link.target];
-        } else if (link.target === node.id){
+        } else if (link.target === node.id) {
           oppositeNode = graph.nodes[link.source];
         }
 
@@ -183,7 +185,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
           otherX = getPos(oppositeNode, 'x');
           otherY = getPos(oppositeNode, 'y');
 
-          var dist =  Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2)),
+          var dist = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2)),
             springForce = Math.log(dist / 260) / 10;
 
           dx -= (x - otherX) * springForce;
@@ -193,7 +195,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
 
       // adjust position
       setNode(node, dx, dy);
-      totalDiff += Math.abs(dx)  + Math.abs(dy);
+      totalDiff += Math.abs(dx) + Math.abs(dy);
     }
 
     // cool down, heat up
@@ -201,7 +203,7 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
   }
 
   // move node by mouse
-  function moveNode (event) {
+  function moveNode(event) {
     var startX = event.pageX,
       startY = event.pageY,
       clickedNode;
@@ -215,20 +217,22 @@ Scout.DesktopTableGraph = function (scout, $controlContainer, node) {
       .one('mouseup', '', nodeEnd);
     return false;
 
-    function nodeMove (event) {
+    function nodeMove(event) {
       setNode(clickedNode, event.pageX - startX, event.pageY - startY);
       startX = event.pageX;
       startY = event.pageY;
       kelvin = 0;
     }
 
-    function nodeEnd (event){
+    function nodeEnd(event) {
       $('body').off('mousemove');
       kelvin = 200;
       doPhysics();
     }
   }
 
-  function getPos(e, d) { return parseFloat(e.$div.attr(d)); }
+  function getPos(e, d) {
+    return parseFloat(e.$div.attr(d));
+  }
 
 };

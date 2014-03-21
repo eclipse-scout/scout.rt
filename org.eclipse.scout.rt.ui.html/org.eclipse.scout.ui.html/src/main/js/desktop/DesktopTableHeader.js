@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
+Scout.DesktopTableHeader = function(desktopTable, $tableHeader, columns) {
   this.totalWidth = 0;
 
   // create header based on model
@@ -24,15 +24,15 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
     columns[i].$div = $header;
   }
 
-  function sortToggle (event) {
+  function sortToggle(event) {
     // find new sort direction
-   var $clicked = $(this),
-     dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+    var $clicked = $(this),
+      dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
 
-   desktopTable.sortChange($clicked.index(), dir, event.shiftKey || event.ctrlKey);
+    desktopTable.sortChange($clicked.index(), dir, event.shiftKey || event.ctrlKey);
   }
 
-  function resizeHeader (event) {
+  function resizeHeader(event) {
     var startX = event.pageX - 8,
       $header = $(this).parent(),
       colNum = $header.index() + 1,
@@ -41,20 +41,21 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);   return false;
+      .one('mouseup', '', resizeEnd);
+    return false;
 
-    function resizeMove (event) {
+    function resizeMove(event) {
       var diff = event.pageX - startX;
 
       if (headerWidth + diff > 80) {
         $header.css('width', headerWidth + diff);
         $('.table-row > div:nth-of-type(' + colNum + ' )').css('width', headerWidth + diff);
         $('.table-row').width(totalWidth + diff);
-   
-   }
+
+      }
     }
 
-    function resizeEnd (event){
+    function resizeEnd(event) {
       $('body').off('mousemove')
         .removeClass('col-resize');
 
@@ -62,12 +63,12 @@ Scout.DesktopTableHeader = function (desktopTable, $tableHeader, columns) {
     }
   }
 
-  function clickHeaderMenu (event) {
+  function clickHeaderMenu(event) {
     var $clicked = $(this),
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.MenuHeader($clicked.parent(), desktopTable,  x, y);
+    new Scout.MenuHeader($clicked.parent(), desktopTable, x, y);
 
     return false;
   }

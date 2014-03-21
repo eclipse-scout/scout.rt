@@ -5,7 +5,7 @@ describe("Session", function() {
     jasmine.clock().install();
   });
 
-  afterEach(function(){
+  afterEach(function() {
     jasmine.Ajax.uninstallMock();
     clearAjaxRequests();
     jasmine.clock().uninstall();
