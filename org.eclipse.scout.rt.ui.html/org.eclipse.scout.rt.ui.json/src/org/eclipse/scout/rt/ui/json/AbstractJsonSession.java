@@ -23,11 +23,9 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractJsonSession implements IJsonSession {
 
@@ -46,18 +44,20 @@ public abstract class AbstractJsonSession implements IJsonSession {
 
   @Override
   public void init(HttpServletRequest request, String sessionId) throws JsonUIException {
+    m_currentHttpRequest = request;
     UserAgent userAgent = createUserAgent();
     Subject subject = initSubject();
     if (subject == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
-    if (!clientSession.isActive()) {
-      throw new JsonUIException("ClientSession is not active, there must be a problem with loading or starting");
-    }
 
     m_jsonClientSession = new JsonClientSession(clientSession, this, sessionId); //FIXME use sessionId use createUniqueIdFor? duplicates possible?
     m_jsonClientSession.init();
+
+    if (!clientSession.isActive()) {
+      throw new JsonUIException("ClientSession is not active, there must be a problem with loading or starting");
+    }
     LOG.info("JsonSession initialized.");
   }
 
@@ -75,10 +75,29 @@ public abstract class AbstractJsonSession implements IJsonSession {
   protected IClientSession createClientSession(UserAgent userAgent, Subject subject, Locale locale) {
     LocaleThreadLocal.set(locale);
     try {
-      return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+      return createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
+      //FIXME session must be started later, see JsonClientSession
+      //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
     }
     finally {
       LocaleThreadLocal.set(null);
+    }
+  }
+
+  private IClientSession createClientSessionInternal(Class<? extends IClientSession> clazz, UserAgent userAgent, Subject subject, Locale locale, String virtualSessionId) {
+    try {
+      IClientSession clientSession = clazz.newInstance();
+      clientSession.setSubject(subject);
+      if (virtualSessionId != null) {
+        clientSession.setVirtualSessionId(virtualSessionId);
+      }
+      clientSession.setUserAgent(userAgent);
+
+      return clientSession;
+    }
+    catch (Throwable t) {
+      LOG.error("could not load session", t);
+      return null;
     }
   }
 

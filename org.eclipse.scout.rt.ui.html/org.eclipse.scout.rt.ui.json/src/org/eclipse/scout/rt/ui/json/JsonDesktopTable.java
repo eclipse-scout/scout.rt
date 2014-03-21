@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +25,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -29,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
@@ -255,12 +260,28 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
       json.put(IColumn.PROP_WIDTH, column.getWidth());
 
       if (column instanceof INumberColumn<?>) {
+        //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
         json.put("format", ((INumberColumn) column).getFormat().toLocalizedPattern());
+      }
+      else if (column instanceof IDateColumn) {
+        //FIXME CGU update IDateColumnInterface
+        //getDateFormat uses LocaleThreadLocal. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
+        //Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
+        LocaleThreadLocal.set(getJsonSession().getClientSession().getLocale());
+        try {
+          Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
+          method.setAccessible(true);
+          SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(column);
+          json.put("format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
+        }
+        finally {
+          LocaleThreadLocal.set(null);
+        }
       }
       //FIXME complete
       return json;
     }
-    catch (JSONException e) {
+    catch (JSONException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
   }

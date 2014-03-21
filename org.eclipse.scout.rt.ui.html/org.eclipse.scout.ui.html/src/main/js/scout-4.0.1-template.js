@@ -25,7 +25,7 @@
 //@include("src/main/js/menu/MenuHeader.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
-//@include("src/main/js/text/DecimalFormatSymbols.js");
+//@include("src/main/js/text/DateFormat.js");
 
 $(document).ready(function() {
   var tabId = '' + new Date().getTime();

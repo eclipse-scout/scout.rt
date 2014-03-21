@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.ui.json.servlet;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -112,7 +113,11 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     processor.setIncludeFileLoader(new ITextFileLoader() {
       @Override
       public String read(String path) throws IOException {
-        return TextFileUtil.readUTF8(handler.getBundle().getEntry(path));
+        URL includeUrl = handler.getBundle().getEntry(path);
+        if (includeUrl == null) {
+          throw new FileNotFoundException(path);
+        }
+        return TextFileUtil.readUTF8(includeUrl);
       }
     });
     processor.setShowLineNumbers(true);

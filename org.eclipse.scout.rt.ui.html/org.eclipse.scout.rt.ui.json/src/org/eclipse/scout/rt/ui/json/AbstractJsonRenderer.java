@@ -14,6 +14,7 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
   private final String m_id;
+  private boolean m_initialized;
 
   public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession) {
     this(modelObject, jsonSession, null);
@@ -45,9 +46,10 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
   }
 
   @Override
-  public void init() throws JsonUIException {
+  public final void init() throws JsonUIException {
     getJsonSession().registerJsonRenderer(getId(), this);
     attachModel();
+    m_initialized = true;
   }
 
   protected void attachModel() throws JsonUIException {
@@ -55,11 +57,18 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
 
   @Override
   public void dispose() throws JsonUIException {
+    if (!m_initialized) {
+      return;
+    }
     detachModel();
     getJsonSession().unregisterJsonRenderer(getId());
   }
 
   protected void detachModel() throws JsonUIException {
+  }
+
+  public boolean isInitialized() {
+    return m_initialized;
   }
 
 }

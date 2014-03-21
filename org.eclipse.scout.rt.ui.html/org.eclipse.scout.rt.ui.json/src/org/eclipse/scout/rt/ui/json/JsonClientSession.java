@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.text.DateFormatSymbols;
 import java.text.DecimalFormatSymbols;
+import java.util.Calendar;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,6 +42,22 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       m_localeListener = new P_LocaleListener();
       getModelObject().addLocaleListener(m_localeListener);
     }
+
+    if (!getModelObject().isActive()) {
+      //FIXME copied from session service. Moved here to be able to attach locale listener first
+      ClientSyncJob job = new ClientSyncJob("Session startup", getModelObject()) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getCurrentSession().startSession(Activator.getDefault().getBundle());
+        }
+      };
+      //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
+      job.runNow(new NullProgressMonitor());
+    }
+
+    //FIXME where to put the initialization stuff?
+    m_jsonDesktop = new JsonDesktop(getModelObject().getDesktop(), getJsonSession());
+    m_jsonDesktop.init();
   }
 
   @Override
@@ -47,14 +66,6 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       getModelObject().removeLocaleListener(m_localeListener);
       m_localeListener = null;
     }
-  }
-
-  @Override
-  public void init() throws JsonUIException {
-    super.init();
-
-    m_jsonDesktop = new JsonDesktop(getModelObject().getDesktop(), getJsonSession());
-    m_jsonDesktop.init();
   }
 
   @Override
@@ -99,8 +110,28 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) throws JsonUIException {
     JSONObject jsonObject = new JSONObject();
     try {
-      jsonObject.put("groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
+      jsonObject.put("digit", String.valueOf(symbols.getDigit()));
+      jsonObject.put("zeroDigit", String.valueOf(symbols.getZeroDigit()));
       jsonObject.put("decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
+      jsonObject.put("groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
+      jsonObject.put("minusSign", String.valueOf(symbols.getMinusSign()));
+      jsonObject.put("patternSeparator", String.valueOf(symbols.getPatternSeparator()));
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+    return jsonObject;
+  }
+
+  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) throws JsonUIException {
+    JSONObject jsonObject = new JSONObject();
+    try {
+      jsonObject.put("months", new JSONArray(symbols.getMonths()));
+      jsonObject.put("monthsShort", new JSONArray(symbols.getShortMonths()));
+      jsonObject.put("weekdays", new JSONArray(symbols.getWeekdays()));
+      jsonObject.put("weekdaysShort", new JSONArray(symbols.getShortWeekdays()));
+      jsonObject.put("am", symbols.getAmPmStrings()[Calendar.AM]);
+      jsonObject.put("pm", symbols.getAmPmStrings()[Calendar.PM]);
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -112,6 +143,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("decimalFormatSymbols", decimalFormatSymbolsToJson(new DecimalFormatSymbols(locale)));
+      jsonObject.put("dateFormatSymbols", dateFormatSymbolsToJson(new DateFormatSymbols(locale)));
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -125,7 +157,9 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       final Locale locale = event.getLocale();
       if (!CompareUtility.equals(getJsonSession().currentHttpRequest().getLocale(), locale)) {
         m_localeManagedByModel = true;
-        getJsonSession().currentJsonResponse().addActionEvent("localeChanged", getId(), localeToJson(locale));
+        if (isInitialized()) {//If Locale changes during session startup (execLoadSession) it is not necessary to notify the gui
+          getJsonSession().currentJsonResponse().addActionEvent("localeChanged", getId(), localeToJson(locale));
+        }
       }
     }
   }
