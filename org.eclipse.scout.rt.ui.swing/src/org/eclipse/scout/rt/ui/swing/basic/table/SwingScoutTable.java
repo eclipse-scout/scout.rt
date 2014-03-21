@@ -461,8 +461,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     int[] newSwingRows = scoutToSwingRows(scoutRows);
     Arrays.sort(oldSwingRows);
     Arrays.sort(newSwingRows);
-    // restore selection
-    if (!CompareUtility.equals(oldSwingRows, newSwingRows)) {
+    // restore selection only, if list selection model has received its final value.
+    if (!CompareUtility.equals(oldSwingRows, newSwingRows) && !lsm.getValueIsAdjusting()) {
       HashSet<Integer> addSet = new HashSet<Integer>();
       HashSet<Integer> removeSet = new HashSet<Integer>();
       for (int index : newSwingRows) {
