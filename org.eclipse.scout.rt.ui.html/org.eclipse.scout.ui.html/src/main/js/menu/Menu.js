@@ -52,8 +52,8 @@ Scout.Menu = function(scout, id, emptySpace, x, y) {
 
   // show menu on top
   var menuTop = $menuSelect.offset().top;
-  menuHeight = $menuSelect.height(),
-  windowHeight = $(window).height();
+  var menuHeight = $menuSelect.height(),
+    windowHeight = $(window).height();
 
   if (menuTop + menuHeight > windowHeight) {
     $menuSelect.css('top', menuTop - menuHeight + 27);
@@ -66,7 +66,7 @@ Scout.Menu = function(scout, id, emptySpace, x, y) {
   // every user action will close menu
   $('*').one('mousedown keydown mousewheel', removeMenu);
 
-  function removeMenu(event) {
+  function removeMenu() {
     $menuSelect.animateAVCSD('width', 0,
       function() {
         $menuControl.remove();

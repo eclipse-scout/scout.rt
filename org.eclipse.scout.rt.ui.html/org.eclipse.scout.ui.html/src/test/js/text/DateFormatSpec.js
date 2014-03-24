@@ -1,7 +1,6 @@
 describe("DateFormat", function() {
-
   var scout;
-  var symbols;
+  var symbolsByLocale;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -15,14 +14,14 @@ describe("DateFormat", function() {
   });
 
   function createLocale(locale) {
-    var symobls = {};
-    symbols.dateFormatSymbols = symbols[locale];
+    var symbols = {};
+    symbols.dateFormatSymbols = symbolsByLocale[locale];
     return new Scout.Locale(symbols);
   }
 
   function initSymbols() {
-    symbols = {};
-    symbols.de = createSymbolsForDe();
+    symbolsByLocale = {};
+    symbolsByLocale.de = createSymbolsForDe();
   }
 
   function createSymbolsForDe() {

@@ -64,7 +64,9 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
     return true;
   }
   var level = $node.attr('data-level'),
-    $control;
+    $control,
+    rotateControl;
+
   if (expanded) {
     this._addNodes(node.childNodes, $node);
 
@@ -90,11 +92,13 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
 
         // animated control, at the end: parent is expanded
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
-        $control = $node.children('.tree-item-control'),
-        rotateControl = function(now, fx) {
+        $control = $node.children('.tree-item-control');
+
+        rotateControl = function(now /*, fx*/) {
           $control.css('transform', 'rotate(' + now + 'deg)');
-        },
-        addExpanded = function() {
+        };
+
+        var addExpanded = function() {
           $node.addClass('expanded');
           $node.removeData('expanding');
         };
@@ -114,8 +118,8 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
     $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar));
 
     // animated control
-    $control = $node.children('.tree-item-control'),
-    rotateControl = function(now, fx) {
+    $control = $node.children('.tree-item-control');
+    rotateControl = function(now /*, fx*/) {
       $control.css('transform', 'rotate(' + now + 'deg)');
     };
     $control.css('borderSpacing', 90)
@@ -185,7 +189,7 @@ Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     if (!node.leaf) {
       state += 'can-expand '; //TODO rename to leaf
     }
-    level = $parent ? $parent.data('level') + 1 : 0;
+    var level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
       .on('click', '', onNodeClicked)
@@ -307,7 +311,7 @@ Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
   this.model.detailTable = this._desktopTable.model;
 };
 
-Scout.DesktopTree.prototype.onModelCreate = function(event) {};
+Scout.DesktopTree.prototype.onModelCreate = function() {};
 
 Scout.DesktopTree.prototype.onModelAction = function(event) {
   if (event.type_ == 'nodesInserted') {

@@ -27,7 +27,7 @@ Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
 
   // count, sum, avg
   if (dataGroup == -1) {
-    dataAxis.norm = function(f) {
+    dataAxis.norm = function(/*f*/) {
       return 1;
     };
     dataAxis.group = function(array) {
@@ -136,7 +136,7 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
       return keyAxis.normTable[n];
     };
     keyAxis.reorder = function() {
-      log('TODO');
+      //FIXME implement
     };
 
   }
@@ -146,7 +146,7 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
 
 Scout.DesktopMatrix.prototype.calculateCube = function() {
   var cube = {},
-    r, v, k, data,
+    r, v, k, data, key,
     getCellValue = Scout.DesktopMatrix.getCellValue;
 
   // collect data from table
@@ -155,7 +155,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
       key = getCellValue(this._table.rows[r].cells[this._allAxis[k].column]);
-      normKey = this._allAxis[k].norm(key);
+      var normKey = this._allAxis[k].norm(key);
       if (normKey !== undefined) {
         this._allAxis[k].add(normKey);
         keys.push(normKey);
@@ -167,7 +167,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
       data = getCellValue(this._table.rows[r].cells[this._allData[v].column]);
-      normData = this._allData[v].norm(data);
+      var normData = this._allData[v].norm(data);
       if (normData !== undefined) {
         values.push(normData);
       }

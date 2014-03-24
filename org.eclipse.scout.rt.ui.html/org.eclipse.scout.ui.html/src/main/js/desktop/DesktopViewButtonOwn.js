@@ -5,24 +5,24 @@ Scout.DesktopViewButtonOwn = function(scout, $parent, viewButton) {
 
   scout.widgetMap[viewButton.id] = this;
 
-  var $viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
-  $viewButton.on('click', '', onClick)
+  this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
+  this._$viewButton.on('click', '', onClick)
     .appendDiv('', 'view-remove')
     .on('click', '', removeOwnView)
     .selectOne();
 
-  var w = $viewButton.width();
-  $viewButton.css('width', 0).animateAVCSD('width', w);
+  var w = this._$viewButton.width();
+  this._$viewButton.css('width', 0).animateAVCSD('width', w);
 
-  function onClick(event) {
-    $viewButton.selectOne();
-    //TODO what to do on scout?
+  function onClick() {
+    this._$viewButton.selectOne();
+    //FIXME what to do on scout?
     /*
       scout.send('click', viewButton.id);
        */
   }
 
-  function removeOwnView(event) {
+  function removeOwnView() {
     $(this).parent()
       .animateAVCSD('width', 0, $.removeThis)
       .prev().click();
@@ -34,9 +34,9 @@ Scout.DesktopViewButtonOwn = function(scout, $parent, viewButton) {
 Scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
   if (event.selected !== undefined) {
     if (event.selected) {
-      $viewButton.selectOne();
+      this._$viewButton.selectOne();
     }
   }
 };
 
-Scout.DesktopViewButtonOwn.prototype.onModelAction = function(event) {};
+Scout.DesktopViewButtonOwn.prototype.onModelAction = function() {};

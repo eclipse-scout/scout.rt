@@ -1,3 +1,4 @@
+/* exported mostRecentJsonRequest */
 function mostRecentJsonRequest() {
   return $.parseJSON(mostRecentAjaxRequest().params);
 }
@@ -12,7 +13,7 @@ var jasmineScoutMatchers = {
         var result = {};
 
         var actualEventTypes = [];
-        for (i = 0; i < actual.events.length; i++) {
+        for (var i = 0; i < actual.events.length; i++) {
           actualEventTypes.push(actual.events[i].type_);
         }
 

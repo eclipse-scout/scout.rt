@@ -33,7 +33,7 @@ Scout.MenuHeader = function($header, desktopTable, x, y) {
   // every user action will close menu
   $('*').one('mousedown keydown mousewheel', removeMenu);
 
-  function removeMenu(event) {
+  function removeMenu() {
     $menuHeader.animateAVCSD('height', 32, $.removeThis);
     return true;
   }

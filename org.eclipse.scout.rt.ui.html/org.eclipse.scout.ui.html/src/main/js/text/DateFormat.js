@@ -5,13 +5,14 @@
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-/*jshint sub:true*/
 Scout.DateFormat = function(scout, pattern) {
+  /*jshint sub:true*/
+
   this._symbols = scout.locale.dateFormatSymbols;
   this.formatFunc = [];
   this.pattern = pattern;
 
-  patterLibrary = {};
+  var patterLibrary = {};
 
   var that = this;
   patterLibrary['year'] = [{
@@ -163,16 +164,18 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
+
+  var createHandler = function(term, func) {
+    return function(string, date) {
+      return string.replace(term, func(date));
+    };
+  };
+
   for (var l in patterLibrary) {
     for (var p = 0; p < patterLibrary[l].length; p += 1) {
       var test = patterLibrary[l][p];
       if (pattern.indexOf(test.term) > -1) {
-        var closure = function(term, func) {
-          return function(string, date) {
-            return string.replace(term, func(date));
-          };
-        }(test.term, test.func);
-        this.formatFunc.push(closure);
+        this.formatFunc.push(createHandler(test.term, test.func));
         break;
       }
     }
@@ -197,7 +200,7 @@ Scout.DateFormat.prototype.format = function format(time) {
   var ret = this.pattern,
     date = new Date(time);
 
-  for (f = this.formatFunc.length - 1; f >= 0; f--) {
+  for (var f = this.formatFunc.length - 1; f >= 0; f--) {
     ret = this.formatFunc[f](ret, date);
   }
 

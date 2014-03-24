@@ -21,9 +21,9 @@ Scout.DesktopTable.prototype.render = function($parent) {
   this._$desktopTable = this._$parent.appendDiv('DesktopTable');
 
   var $tableHeader = this._$desktopTable.appendDiv('TableHeader'),
-    $tableData = this._$desktopTable.appendDiv('TableData'),
-    $tableFooter = this._$desktopTable.appendDiv('TableFooter'),
-    $tableControl = this._$desktopTable.appendDiv('TableControl');
+    $tableData = this._$desktopTable.appendDiv('TableData');
+  this._$desktopTable.appendDiv('TableFooter');
+  var $tableControl = this._$desktopTable.appendDiv('TableControl');
 
   this._$tableDataScroll = $tableData.appendDiv('TableDataScroll');
   this._$tableData = $tableData;
@@ -104,7 +104,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlLabel.text($(event.target).data('label') + close);
   }
 
-  function controlOut(event) {
+  function controlOut() {
     $controlLabel.text('');
   }
 
@@ -160,23 +160,23 @@ Scout.DesktopTable.prototype.render = function($parent) {
     }
   }
 
-  function controlChart(event) {
+  function controlChart() {
     new Scout.DesktopTableChart(that.scout, $controlContainer, that.model.table, filterCallback);
   }
 
-  function controlGraph(event) {
+  function controlGraph() {
     new Scout.DesktopTableGraph(that.scout, $controlContainer, that.model);
   }
 
-  function controlMap(event) {
+  function controlMap() {
     new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
   }
 
-  function controlOrganize(event) {
+  function controlOrganize() {
     new Scout.DesktopTableOrganize(that.scout, $controlContainer, that.model, that.model.table.columns, that);
   }
 
-  function resizeControl(event) {
+  function resizeControl() {
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
@@ -193,7 +193,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
       that._scrollbar.initThumb();
     }
 
-    function resizeEnd(event) {
+    function resizeEnd() {
       if ($controlContainer.height() < 75) {
         $('.selected', $tableControl).click();
       }
@@ -219,13 +219,12 @@ Scout.DesktopTable.prototype.render = function($parent) {
 
   function filterCallback(testFunc) {
     var rowCount = 0,
-      $selectedRows = $('.row-selected', $tableData),
       $allRows = $('.table-row', that._$tableDataScroll);
 
     that._resetSelection();
 
     $allRows.detach();
-    $allRows.each(function(i) {
+    $allRows.each(function() {
       var $row = $(this),
         show = testFunc($row);
 
@@ -243,15 +242,14 @@ Scout.DesktopTable.prototype.render = function($parent) {
     that._scrollbar.initThumb();
   }
 
-  function resetFilter(event) {
-    $('.table-row', $tableData).each(function(i) {
+  function resetFilter() {
+    $('.table-row', $tableData).each(function() {
       showRow($(this));
     });
     that._$infoFilter.animateAVCSD('width', 0, function() {
       $(this).hide();
     });
     $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    log($('.main-chart.selected'));
     that._resetSelection();
   }
 
@@ -284,7 +282,7 @@ Scout.DesktopTable.prototype._setInfoLoad = function(count) {
   this._$infoLoad.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._setInfoMore = function(count) {};
+Scout.DesktopTable.prototype._setInfoMore = function( /*count*/ ) {};
 
 Scout.DesktopTable.prototype._setInfoFilter = function(count) {
   this._$infoFilter.html(this._findInfo(count) + ' gefiltert</br>Filter entfernen');
@@ -313,8 +311,8 @@ Scout.DesktopTable.prototype._selectionBorder = function() {
     .removeClass('select-middle select-top select-bottom select-single');
 
   // draw nice border
-  $selectedRows = $('.row-selected');
-  $selectedRows.each(function(i) {
+  var $selectedRows = $('.row-selected');
+  $selectedRows.each(function() {
     var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
       hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
 
@@ -381,7 +379,7 @@ Scout.DesktopTable.prototype._sort = function() {
 
   // for less than 100 rows: move to old position and then animate
   if ($rows.length < 100) {
-    $rows.each(function(i) {
+    $rows.each(function() {
       $(this).css('top', $(this).data('old-top') - $(this).offset().top)
         .animateAVCSD('top', 0);
     });
@@ -448,8 +446,8 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       var column = table.columns[c],
         width = column.width,
         style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
-        allign = (column.type == 'number') ? 'text-align: right; ' : '';
-      value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+        allign = (column.type == 'number') ? 'text-align: right; ' : '',
+        value = Scout.DesktopMatrix.getCellText(row.cells[c]);
 
       rowString += '<div style="' + style + allign + '">' + value + '</div>';
     }
@@ -511,8 +509,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       var startIndex = Math.min(firstIndex, lastIndex),
         endIndex = Math.max(firstIndex, lastIndex) + 1;
 
-      log(firstIndex, lastIndex);
-
       var $actionRow = $('.table-row', that._$tableData).slice(startIndex, endIndex);
 
       // set/remove selection
@@ -560,7 +556,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
   function selectionMenu(x, y) {
     // selection
-    $selectedRows = $('.row-selected');
+    var $selectedRows = $('.row-selected');
 
     //FIXME added by cgu to make sure clickRowMenu is registered for every instance of DesktopTable
     $('#MenuRow').remove();
@@ -576,7 +572,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       .css('top', $selectedRows.first().offset().top - 13);
 
     // move to the mouse pointer
-    var moveMenu = function(event) {
+    var moveMenu = function() {
       var top = $selectedRows.first().offset().top,
         bottom = $selectedRows.last().offset().top + 32;
 
@@ -599,8 +595,9 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     moveMenu(event);
   }
 
-  function clickRowMenu(event) {
+  function clickRowMenu() {
     var $clicked = $(this),
+      $selectedRows = $('.row-selected'),
       x = $clicked.offset().left,
       y = $clicked.offset().top,
       emptySpace = $selectedRows.length === 0;
@@ -616,7 +613,7 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
   var table = this.model.table;
   if (draw) {
     var $rows = $('.table-row', this._$tableDataScroll);
-    $sumRow = $.makeDiv('', 'table-row-sum'),
+    var $sumRow = $.makeDiv('', 'table-row-sum'),
     sum = [];
 
     for (var r = 0; r < $rows.length; r++) {

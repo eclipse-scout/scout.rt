@@ -60,6 +60,8 @@ Scout.DecimalFormat = function(scout, pattern) {
 };
 
 Scout.DecimalFormat.prototype.format = function format(number) {
+  /*jshint newcap: false */
+
   if (number < 0) return this.negPrefix + this.format(-number) + this.negSuffix;
 
   // before decimal point

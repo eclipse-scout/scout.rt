@@ -31,7 +31,7 @@ Scout.Desktop = function(scout, $parent, model) {
     }
   });
 
-  $(window).blur(function(event) {
+  $(window).blur(function() {
     removeKeyBox();
   });
 
@@ -95,7 +95,6 @@ Scout.Desktop = function(scout, $parent, model) {
 
       // down: move down
       if (event.which == 40) {
-        var $row = $('.row-selected', bench.$div);
         if ($rowsSelected.length > 0) {
           $rowClick = $rowsSelected.last().next();
         } else {
@@ -179,7 +178,7 @@ Scout.Desktop = function(scout, $parent, model) {
     }
 
     if (prev) {
-      prev.appendDiv('', 'key-box', '�?');
+      prev.appendDiv('', 'key-box', '←');
       prev.children('.tree-item-control').hide();
     }
 
