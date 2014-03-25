@@ -16,25 +16,20 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.ui.swt.ext.table.internal.EditableTableMarkerSupport;
 import org.eclipse.scout.rt.ui.swt.ext.table.internal.TableMultilineListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 
 public class TableEx extends Table {
 
   private static final int TEXT_MARGIN_Y = 1;
   private static final int TEXT_MARGIN_X = 6;
 
-  private P_MouseHoverListener m_mouseHoverListener = new P_MouseHoverListener();
   private boolean m_readOnly;
 
   public TableEx(Composite parent, int style, ITable table) {
@@ -49,6 +44,7 @@ public class TableEx extends Table {
         addListener(SWT.EraseItem, multilineListener);
         addListener(SWT.PaintItem, multilineListener);
       }
+      new EditableTableMarkerSupport(this);
     }
   }
 
@@ -140,52 +136,5 @@ public class TableEx extends Table {
       setForeground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
     }
   }
-
-  private class P_MouseHoverListener extends MouseTrackAdapter implements MouseMoveListener {
-    private TableItem m_mouseHoverItem;
-
-    // case 1: mouse hover an item
-    @Override
-    public void mouseMove(MouseEvent e) {
-      TableItem item = getItem(new Point(e.x, e.y));
-      // another item under the mouse?
-      if (item != m_mouseHoverItem && item != null) {
-        // old mouse over item valid?
-        if (m_mouseHoverItem != null && !m_mouseHoverItem.isDisposed()) {
-          // change color and redraw old item
-          m_mouseHoverItem.setBackground(null);
-          final Rectangle b = m_mouseHoverItem.getBounds();
-          redrawInternal(b);
-        }
-        // store, change color and redraw new item
-        m_mouseHoverItem = item;
-        m_mouseHoverItem.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
-        Rectangle b = m_mouseHoverItem.getBounds();
-        redrawInternal(b);
-      }
-    }
-
-    // case 2: exit from the table
-    @Override
-    public void mouseExit(MouseEvent e) {
-      if (m_mouseHoverItem != null && !m_mouseHoverItem.isDisposed()) {
-        m_mouseHoverItem.setBackground(null);
-        Rectangle b = m_mouseHoverItem.getBounds();
-        redrawInternal(b);
-      }
-    }
-
-    // asynchronous redraw
-    private void redrawInternal(final Rectangle b) {
-      getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (!isDisposed()) {
-            redraw(b.x, b.y, b.width, b.height, false);
-          }
-        }
-      });
-    }
-  } // end class P_MouseHoverListener
 
 }
