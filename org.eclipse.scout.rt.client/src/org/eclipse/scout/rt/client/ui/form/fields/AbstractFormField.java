@@ -203,8 +203,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * affects only the filed itself. in case of a composite field initially the property
-   * does not gets broadcasted.
+   * Specifies if the form field is enabled initially.<br>
+   * Affects only the field itself. In case of a composite field the property does not get broadcasted initially.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
@@ -213,8 +213,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * affects only the filed itself. in case of a composite field initially the property
-   * does not gets broadcasted.
+   * Specifies if the form field is visible initially.<br>
+   * Affects only the field itself. In case of a composite field the property does not get broadcasted initially.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
@@ -223,8 +223,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * affects only the filed itself. in case of a composite field initially the property
-   * does not gets broadcasted.
+   * Specifies if the form field is mandatory (required) initially.<br>
+   * Affects only the field itself. In case of a composite field the property does not get broadcasted initially.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
