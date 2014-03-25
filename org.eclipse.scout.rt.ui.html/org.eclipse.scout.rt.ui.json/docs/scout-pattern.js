@@ -1,8 +1,6 @@
 //local log function
 var log = console.log.bind(console);
 
-Function.prototype.that = function (context) {that = context; return this.bind(context);}
-
 // extend jquery
 (function ($) {
 
@@ -29,6 +27,8 @@ Scout = function (sessionPartId) {
       log(server, this.id)
     };
   }();
+  
+  locale = new Locale ();
 
   // interface to outside
   this.add = function add ($div) {
@@ -43,6 +43,8 @@ Scout = function (sessionPartId) {
     // }
 
   };
+  
+  fetch
 
 
   // each 'class' in one file
