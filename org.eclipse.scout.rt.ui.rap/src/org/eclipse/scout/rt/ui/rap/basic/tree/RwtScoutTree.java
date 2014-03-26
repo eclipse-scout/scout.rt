@@ -54,6 +54,8 @@ import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -154,6 +156,10 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     else {
       return false;
     }
+  }
+
+  protected boolean isDragEnabled() {
+    return getScoutObject().isDragEnabled();
   }
 
   protected void setUiTreeViewer(TreeViewer viewer) {
@@ -860,6 +866,14 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
 
     @Override
+    protected DragSource createDragSource(Control control) {
+      if (isDragEnabled()) {
+        return new DragSource(control, DND.DROP_COPY | DND.DROP_MOVE);
+      }
+      return null;
+    }
+
+    @Override
     protected TransferObject handleUiDragRequest() {
       final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
       Runnable t = new Runnable() {
@@ -879,6 +893,22 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
 
     @Override
+    protected void handleUiDragFinished() {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireDragFinishedFromUI();
+        }
+      };
+      try {
+        getUiEnvironment().invokeScoutLater(t, 20000).join(20000);
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
+
+    @Override
     protected void handleUiDropAction(DropTargetEvent event, final TransferObject scoutTransferObject) {
       Object dropTarget = event.item != null ? event.item.getData() : null;
       final ITreeNode node = dropTarget instanceof ITreeNode ? (ITreeNode) dropTarget : null;
@@ -886,6 +916,19 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         @Override
         public void run() {
           getScoutObject().getUIFacade().fireNodeDropActionFromUI(node, scoutTransferObject);
+        }
+      };
+      getUiEnvironment().invokeScoutLater(job, 200);
+    }
+
+    @Override
+    protected void handleUiDropTargetChanged(DropTargetEvent event) {
+      Object dropTarget = event.item != null ? event.item.getData() : null;
+      final ITreeNode node = dropTarget instanceof ITreeNode ? (ITreeNode) dropTarget : null;
+      Runnable job = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireNodeDropTargetChangedFromUI(node);
         }
       };
       getUiEnvironment().invokeScoutLater(job, 200);

@@ -13,7 +13,11 @@ package org.eclipse.scout.rt.ui.swing.basic.tree;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -25,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TooManyListenersException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractAction;
@@ -36,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -69,8 +75,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JTreeEx;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
 /**
- * The prefix SwingScout... denotes a model COMPOSITION between a swing and a
- * scout component
+ * Implementation of the Scout tree in Swing.
  */
 public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwingScoutTree {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTree.class);
@@ -103,6 +108,12 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     // attach drag and remove default transfer handler
     P_SwingDragAndDropTransferHandler th = new P_SwingDragAndDropTransferHandler();
     tree.setTransferHandler(th);
+    try {
+      tree.getDropTarget().addDropTargetListener(new P_DropTargetListener());
+    }
+    catch (TooManyListenersException e1) {
+      LOG.error(e1.getMessage());
+    }
     //ticket 87030, bug 365161
     //attach delayed resize: make selection visible
     m_swingScrollPane.addComponentListener(new ComponentAdapter() {
@@ -728,32 +739,6 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
   }
 
-  protected boolean handleSwingDragEnabled() {
-    if (getUpdateSwingFromScoutLock().isAcquired()) {
-      return false;
-    }
-    //
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
-    if (getScoutObject() != null) {
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          boolean enabled = getScoutObject().getUIFacade().getNodesDragEnabledFromUI();
-          result.setValue(enabled);
-        }
-      };
-      try {
-        getSwingEnvironment().invokeScoutLater(t, 2345).join(2345);
-      }
-      catch (InterruptedException e) {
-        //nop
-      }
-      // end notify
-    }
-    return result.getValue();
-  }
-
   protected Transferable handleSwingDragRequest() {
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return null;
@@ -804,6 +789,39 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
       }
     }
+  }
+
+  protected void handleSwingDropTargetChanged(TreePath path, Transferable swingTransferable) {
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
+    //
+    if (swingTransferable != null && getScoutObject() != null) {
+      final ITreeNode scoutNode = treePathToScoutNode(path);
+      // notify Scout (asynchronous !)
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireNodeDropTargetChangedFromUI(scoutNode);
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(t, 0);
+      // end notify
+    }
+  }
+
+  protected void handleSwingDragFinished() {
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().fireDragFinishedFromUI();
+      }
+    };
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 
   protected void handleSwingNodePopup(final MouseEvent e) {
@@ -1050,6 +1068,32 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }// end private class
 
   /**
+   * @since 4.0-M7
+   */
+  private class P_DropTargetListener extends DropTargetAdapter {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void dragOver(DropTargetDragEvent dtde) {
+      DataFlavor[] currentFlavors = dtde.getCurrentDataFlavors();
+      JComponent jcomponent = (JComponent) dtde.getDropTargetContext().getComponent();
+      TransferHandler transferHandler = jcomponent.getTransferHandler();
+      if (transferHandler != null && transferHandler.canImport(jcomponent, currentFlavors)) {
+
+        Point location = dtde.getLocation();
+        TreePath path = getSwingTree().getPathForLocation(location.x, location.y);
+        Transferable t = dtde.getTransferable();
+        handleSwingDropTargetChanged(path, t);
+      }
+    }
+
+    @Override
+    public void drop(DropTargetDropEvent dtde) {
+    }
+
+  } // end class P_DropTargetListener
+
+  /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
    *
    * @since Build 202
@@ -1059,7 +1103,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
     @Override
     public boolean canDrag() {
-      return handleSwingDragEnabled();
+      return getScoutObject().isDragEnabled();
     }
 
     @Override
@@ -1074,6 +1118,17 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
 
     @Override
+    public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+      return SwingUtility.isSupportedTransfer(getScoutObject().getDropType(), transferFlavors);
+    }
+
+    @Override
+    protected void exportDone(JComponent source, Transferable data, int action) {
+      super.exportDone(source, data, action);
+      handleSwingDragFinished();
+    }
+
+    @Override
     public boolean importDataEx(JComponent comp, Transferable t, Point location) {
       if (location != null) {
         TreePath dropPath = getSwingTree().getPathForLocation(location.x, location.y);
@@ -1082,6 +1137,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
       return false;
     }
+
   }// end private class
 
   private class P_SwingSelectionListener implements TreeSelectionListener {
@@ -1204,4 +1260,5 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       this.vertical = vertical;
     }
   }
+
 }

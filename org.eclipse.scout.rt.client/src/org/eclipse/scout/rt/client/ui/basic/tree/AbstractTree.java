@@ -78,6 +78,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   // only do one action at a time
   private boolean m_actionRunning;
   private boolean m_saveAndRestoreScrollbars;
+  private ITreeNode m_lastSeenDropNode;
 
   public AbstractTree() {
     this(true);
@@ -192,7 +193,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   * 
+   *
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -211,7 +212,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -245,7 +246,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -261,7 +262,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   * 
+   *
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -273,7 +274,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   * 
+   *
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -288,6 +289,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(40)
   protected void execDrop(ITreeNode node, TransferObject t) throws ProcessingException {
+  }
+
+  /**
+   * This method gets called when the drop node is changed, e.g. the dragged object
+   * is moved over a new drop target.
+   *
+   * @since 4.0-M7
+   */
+  @ConfigOperation
+  @Order(45)
+  protected void execDropTargetChanged(ITreeNode node) throws ProcessingException {
   }
 
   /**
@@ -346,6 +358,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     });
     // add Convenience observer for drag & drop callbacks and event history
     addTreeListener(new TreeAdapter() {
+
       @Override
       public void treeChanged(TreeEvent e) {
         //event history
@@ -356,6 +369,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         //dnd
         switch (e.getType()) {
           case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
+            m_lastSeenDropNode = null;
             if (e.getDragObject() == null) {
               try {
                 TransferObject transferObject = execDrag(e.getNode());
@@ -371,6 +385,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             break;
           }
           case TreeEvent.TYPE_NODE_DROP_ACTION: {
+            m_lastSeenDropNode = null;
             if (e.getDropObject() != null) {
               try {
                 execDrop(e.getNode(), e.getDropObject());
@@ -384,6 +399,21 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           case TreeEvent.TYPE_NODES_SELECTED: {
             rebuildKeyStrokesInternal();
             break;
+          }
+          case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
+            try {
+              if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
+                m_lastSeenDropNode = e.getNode();
+                execDropTargetChanged(e.getNode());
+              }
+            }
+            catch (Throwable t) {
+              LOG.error("DropTargetChanged", t);
+            }
+            break;
+          }
+          case TreeEvent.TYPE_DRAG_FINISHED: {
+            m_lastSeenDropNode = null;
           }
         }
       }
@@ -459,7 +489,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -1878,7 +1908,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   * 
+   *
    * @param nodes
    * @return
    */
@@ -2129,6 +2159,27 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fireNodeDropAction(ITreeNode node, TransferObject dropData) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_DROP_ACTION, node);
     e.setDropObject(dropData);
+    fireTreeEventInternal(e);
+  }
+
+  /**
+   * This method gets called when the drop node is changed, e.g. the dragged object
+   * is moved over a new drop target.
+   *
+   * @since 4.0-M7
+   */
+  public void fireNodeDropTargetChanged(ITreeNode node) {
+    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED, node);
+    fireTreeEventInternal(e);
+  }
+
+  /**
+   * This method gets called after the drag action has been finished.
+   *
+   * @since 4.0-M7
+   */
+  public void fireDragFinished() {
+    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_DRAG_FINISHED);
     fireTreeEventInternal(e);
   }
 
@@ -2630,6 +2681,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean getNodesDragEnabledFromUI() {
       return isDragEnabled();
@@ -2646,6 +2698,36 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
         return null;
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireDragFinishedFromUI() {
+      try {
+        pushUIProcessor();
+        fireDragFinished();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireNodeDropTargetChangedFromUI(ITreeNode node) {
+      try {
+        pushUIProcessor();
+        //
+        node = resolveNode(node);
+        node = resolveVirtualNode(node);
+        if (node != null) {
+          fireNodeDropTargetChanged(node);
+        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
       finally {
         popUIProcessor();
@@ -2691,4 +2773,5 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
   }// end private class
+
 }

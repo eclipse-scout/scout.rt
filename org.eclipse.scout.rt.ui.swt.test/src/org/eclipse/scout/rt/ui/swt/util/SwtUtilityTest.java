@@ -1,13 +1,16 @@
 package org.eclipse.scout.rt.ui.swt.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.commons.dnd.TextTransferObject;
+import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.junit.Test;
 
 /**
  * JUnit tests for {@link SwtUtility}
- * 
+ *
  * @since 3.10.0-M4
  */
 public class SwtUtilityTest {
@@ -34,4 +37,17 @@ public class SwtUtilityTest {
     assertEquals("KeyStroke should be empty", "", ks.getKeyStroke());
     assertEquals("KeyStroke pretty printed should be empty", "", SwtUtility.getKeyStrokePrettyPrinted(ks));
   }
+
+  @Test
+  public void testSwtTransferables() {
+    TransferObject o = new TextTransferObject("hello world");
+    SwtTransferObject[] swtTransferables = SwtUtility.createSwtTransferables(o);
+    assertTrue(swtTransferables.length == 1);
+    assertEquals(swtTransferables[0].getData(), "hello world");
+
+    swtTransferables = SwtUtility.createSwtTransferables(null);
+    assertTrue(swtTransferables.length == 0);
+
+  }
+
 }

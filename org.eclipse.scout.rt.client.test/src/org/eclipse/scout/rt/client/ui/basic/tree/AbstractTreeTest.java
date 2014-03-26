@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,15 +29,16 @@ public class AbstractTreeTest {
 
   private AbstractTreeNode m_node;
   private P_TreeListener m_treeListener;
+  private P_Tree m_tree;
 
   @Before
   public void setup() {
-    P_Tree tree = new P_Tree();
+    m_tree = new P_Tree();
     m_node = new AbstractTreeNode() {
     };
-    tree.addChildNode(tree.getRootNode(), m_node);
+    m_tree.addChildNode(m_tree.getRootNode(), m_node);
     m_treeListener = new P_TreeListener();
-    tree.addTreeListener(m_treeListener);
+    m_tree.addTreeListener(m_treeListener);
   }
 
   @Test
@@ -55,6 +58,34 @@ public class AbstractTreeTest {
     m_node.getCellForUpdate().setForegroundColor("00FF00");
     m_node.getCellForUpdate().setFont(new FontSpec("Arial", FontSpec.STYLE_BOLD, 7));
     assertNotifications(5, 5);
+  }
+
+  @Test
+  public void testNodeDropTargetChanged() throws ProcessingException {
+    ITreeNode a = mock(ITreeNode.class);
+    ITreeNode b = mock(ITreeNode.class);
+    ITreeNode c = mock(ITreeNode.class);
+
+    assertEquals(0, m_tree.m_execDropTargetChangedTimesCalled);
+
+    m_tree.fireNodeDropTargetChanged(a);
+    Assert.assertEquals(a, m_tree.m_currentDropNode);
+    assertEquals(1, m_tree.m_execDropTargetChangedTimesCalled);
+
+    m_tree.fireNodeDropTargetChanged(b);
+    assertEquals(b, m_tree.m_currentDropNode);
+    assertEquals(2, m_tree.m_execDropTargetChangedTimesCalled);
+
+    m_tree.fireNodeDropTargetChanged(c);
+    assertEquals(c, m_tree.m_currentDropNode);
+    assertEquals(3, m_tree.m_execDropTargetChangedTimesCalled);
+    m_tree.fireNodeDropTargetChanged(c);
+    m_tree.fireNodeDropTargetChanged(c);
+    m_tree.fireNodeDropTargetChanged(c);
+    m_tree.fireNodeDropTargetChanged(c);
+    m_tree.fireNodeDropTargetChanged(c);
+    assertEquals(c, m_tree.m_currentDropNode);
+    assertEquals(3, m_tree.m_execDropTargetChangedTimesCalled);
   }
 
   @Test
@@ -86,6 +117,15 @@ public class AbstractTreeTest {
   }
 
   public static class P_Tree extends AbstractTree {
+    ITreeNode m_currentDropNode;
+    int m_execDropTargetChangedTimesCalled;
+
+    @Override
+    protected void execDropTargetChanged(ITreeNode node) throws ProcessingException {
+      super.execDropTargetChanged(node);
+      m_currentDropNode = node;
+      m_execDropTargetChangedTimesCalled++;
+    }
   }
 
   public static class P_TreeListener implements TreeListener {
@@ -99,9 +139,7 @@ public class AbstractTreeTest {
     }
 
     private void handleTreeEvent(TreeEvent e) {
-      if (e.getType() == TreeEvent.TYPE_NODE_CHANGED) {
-        m_treeEvents.add(e);
-      }
+      m_treeEvents.add(e);
     }
 
     @Override

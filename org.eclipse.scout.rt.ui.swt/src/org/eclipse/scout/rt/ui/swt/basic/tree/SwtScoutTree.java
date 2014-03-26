@@ -50,6 +50,8 @@ import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -66,7 +68,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * <h3>SwtScoutTree</h3> ...
- * 
+ *
  * @since 1.0.0 23.07.2008
  * @author Andreas Hoegger
  */
@@ -144,6 +146,10 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     else {
       return false;
     }
+  }
+
+  protected boolean isDragEnabled() {
+    return getScoutObject().isDragEnabled();
   }
 
   protected void setSwtTreeViewer(TreeViewer viewer) {
@@ -781,6 +787,14 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     }
 
     @Override
+    protected DragSource createDragSource(Control control) {
+      if (isDragEnabled()) {
+        return new DragSource(control, DND.DROP_COPY | DND.DROP_MOVE);
+      }
+      return null;
+    }
+
+    @Override
     protected TransferObject handleSwtDragRequest() {
       final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
       Runnable t = new Runnable() {
@@ -794,9 +808,25 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         getEnvironment().invokeScoutLater(t, 20000).join(20000);
       }
       catch (InterruptedException e) {
-        //nop
+        LOG.warn("Exception occurred while drag request: ", e);
       }
       return result.getValue();
+    }
+
+    @Override
+    protected void handleSwtDragFinished() {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireDragFinishedFromUI();
+        }
+      };
+      try {
+        getEnvironment().invokeScoutLater(t, 20000).join(20000);
+      }
+      catch (InterruptedException e) {
+        LOG.warn("Exception occurred while drag finished: ", e);
+      }
     }
 
     @Override
@@ -810,6 +840,20 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         }
       };
       getEnvironment().invokeScoutLater(job, 200);
+    }
+
+    @Override
+    protected void handleSwtDropTargetChanged(DropTargetEvent event) {
+      Object dropTarget = event.item != null ? event.item.getData() : null;
+      final ITreeNode node = dropTarget instanceof ITreeNode ? (ITreeNode) dropTarget : null;
+      Runnable job = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireNodeDropTargetChangedFromUI(node);
+        }
+      };
+      getEnvironment().invokeScoutLater(job, 200);
+
     }
   }// end class P_DndSupport
 

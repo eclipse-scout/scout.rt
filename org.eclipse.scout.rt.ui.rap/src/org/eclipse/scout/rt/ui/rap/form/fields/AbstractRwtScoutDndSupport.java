@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>AbstractRwtScoutDndSupport</h3> ...
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public abstract class AbstractRwtScoutDndSupport implements IRwtScoutDndSupport {
@@ -119,7 +119,13 @@ public abstract class AbstractRwtScoutDndSupport implements IRwtScoutDndSupport 
 
   protected abstract void handleUiDropAction(DropTargetEvent event, TransferObject scoutTransferObject);
 
+  protected void handleUiDropTargetChanged(DropTargetEvent event) {
+  }
+
   protected abstract TransferObject handleUiDragRequest();
+
+  protected void handleUiDragFinished() {
+  }
 
   protected void updateDragSupportFromScout() {
     if (m_scoutObject == null || m_control == null || m_control.isDisposed()) {
@@ -131,7 +137,7 @@ public abstract class AbstractRwtScoutDndSupport implements IRwtScoutDndSupport 
     if (dragSource == null) {
       if (transferTypes.length > 0) {
         // create new
-        dragSource = new DragSource(m_control, DND.DROP_COPY);
+        dragSource = createDragSource(m_control);
       }
     }
     if (dragSource != null) {
@@ -163,6 +169,10 @@ public abstract class AbstractRwtScoutDndSupport implements IRwtScoutDndSupport 
         dragSource.dispose();
       }
     }
+  }
+
+  protected DragSource createDragSource(Control control) {
+    return new DragSource(control, DND.DROP_COPY);
   }
 
   protected void updateDropSupportFromScout() {
@@ -233,20 +243,38 @@ public abstract class AbstractRwtScoutDndSupport implements IRwtScoutDndSupport 
         handleUiDropAction(event, scoutTransferable);
       }
     }
+
+    @Override
+    public void dragOver(DropTargetEvent event) {
+      handleUiDropTargetChanged(event);
+    }
   } // end class P_RwtDropTargetListener
 
   private class P_RwtDragSourceListener extends DragSourceAdapter {
     private static final long serialVersionUID = 1L;
+    private Object m_data;
+
+    @Override
+    public void dragStart(DragSourceEvent event) {
+      super.dragStart(event);
+      TransferObject scoutTransfer = handleUiDragRequest();
+      if (scoutTransfer != null) {
+        m_data = RwtUtility.createUiTransferable(scoutTransfer);
+      }
+    }
 
     @Override
     public void dragSetData(DragSourceEvent event) {
-      TransferObject scoutTransfer = handleUiDragRequest();
-      if (scoutTransfer != null) {
-        Object data = RwtUtility.createUiTransferable(scoutTransfer);
-        if (data != null) {
-          event.data = data;
-        }
+      if (m_data != null) {
+        event.data = m_data;
       }
+    }
+
+    @Override
+    public void dragFinished(DragSourceEvent event) {
+      super.dragFinished(event);
+      handleUiDragFinished();
+      m_data = null;
     }
   } // end class P_RwtDragSourceListener
 

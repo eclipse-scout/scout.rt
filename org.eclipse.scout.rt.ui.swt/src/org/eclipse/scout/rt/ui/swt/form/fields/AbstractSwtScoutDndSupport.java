@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>AbstractSwtScoutDndSupport</h3> ...
- * 
+ *
  * @since 1.0.9 24.07.2008
  */
 public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport {
@@ -117,6 +117,23 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
 
   protected abstract TransferObject handleSwtDragRequest();
 
+  /**
+   * This method gets called when the drag action has finished
+   *
+   * @since 4.0-M7
+   */
+  protected void handleSwtDragFinished() {
+  }
+
+  /**
+   * This method gets called when the drop node is changed, e.g. the dragged object
+   * is moved over a new drop target.
+   *
+   * @since 4.0-M7
+   */
+  protected void handleSwtDropTargetChanged(DropTargetEvent event) {
+  }
+
   protected boolean acceptDrag() {
     return true;
   }
@@ -136,7 +153,7 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
     if (dragSource == null) {
       if (swtTransferTypes.length > 0) {
         // create new
-        dragSource = new DragSource(m_control, DND.DROP_COPY);
+        dragSource = createDragSource(m_control);
       }
     }
     if (dragSource != null) {
@@ -169,6 +186,10 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
       }
     }
 
+  }
+
+  protected DragSource createDragSource(Control control) {
+    return new DragSource(control, DND.DROP_COPY);
   }
 
   protected void updateDropSupportFromScout() {
@@ -239,31 +260,45 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
       }
     }
 
+    @Override
+    public void dragOver(DropTargetEvent event) {
+      handleSwtDropTargetChanged(event);
+    }
   } // end class P_SwtDropTargetListener
 
   private class P_SwtDragSourceListener extends DragSourceAdapter {
+    private SwtTransferObject[] m_swtTransferables;
+
     @Override
     public void dragStart(DragSourceEvent event) {
       if (!acceptDrag()) {
         event.doit = false;
       }
+      else {
+        TransferObject scoutTransferObject = handleSwtDragRequest();
+        if (scoutTransferObject == null) {
+          return;
+        }
+        m_swtTransferables = SwtUtility.createSwtTransferables(scoutTransferObject);
+      }
     }
 
     @Override
     public void dragSetData(DragSourceEvent event) {
-      TransferObject scoutTransferObject = handleSwtDragRequest();
-      if (scoutTransferObject == null) {
-        return;
+      if (m_swtTransferables.length > 0) {
+        Object data = m_swtTransferables[0].getData();
+        if (data == null) {
+          return;
+        }
+        event.data = data;
       }
-      SwtTransferObject[] swtTransferables = SwtUtility.createSwtTransferables(scoutTransferObject);
-      if (swtTransferables.length == 0) {
-        return;
-      }
-      Object data = swtTransferables[0].getData();
-      if (data == null) {
-        return;
-      }
-      event.data = data;
+    }
+
+    @Override
+    public void dragFinished(DragSourceEvent event) {
+      super.dragFinished(event);
+      handleSwtDragFinished();
+      m_swtTransferables = null;
     }
 
   } // end class P_SwtDragSourceListener

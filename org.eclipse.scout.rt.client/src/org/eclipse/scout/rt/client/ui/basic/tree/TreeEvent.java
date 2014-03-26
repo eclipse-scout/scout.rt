@@ -77,6 +77,12 @@ public class TreeEvent extends EventObject {
    * register the drag object using the setDragObject method
    */
   public static final int TYPE_NODES_DRAG_REQUEST = 730;
+
+  /**
+   * Drag operation is finished
+   */
+  public static final int TYPE_DRAG_FINISHED = 735;
+
   /**
    * valid attributes are node get the drop object using the getDropObject
    * method
@@ -106,12 +112,19 @@ public class TreeEvent extends EventObject {
   /**
    * Node has changed in a way that may affect its presentation (e.g. text, font, color...) but no structural changes
    * occurred
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static final int TYPE_NODE_CHANGED = 850;
 
-  // next 860
+  /**
+   * A node has changed during a drag and drop operation
+   *
+   * @since 4.0-M7
+   */
+  public static final int TYPE_NODE_DROP_TARGET_CHANGED = 860;
+
+  // next 870
 
   private final int m_type;
   private ITreeNode m_commonParentNode;
