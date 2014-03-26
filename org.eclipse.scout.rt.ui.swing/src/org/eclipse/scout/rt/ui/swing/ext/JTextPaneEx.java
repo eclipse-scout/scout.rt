@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,18 +23,21 @@ public class JTextPaneEx extends JTextPane {
 
   private static final long serialVersionUID = 1L;
 
+  /**
+   * This property is set from the Scout Model. It will determine the foreground color of the JTextPane. If
+   * <code>true</code> the default text color will be shown, if <code>false</code> the disabled text color will be
+   * shown.
+   */
+  private boolean m_enabledFromScout;
+
   public JTextPaneEx() {
     super();
+    setEnabled(true);
   }
 
-  /**
-   * Deep inside swing the text field editor View.class is only checking for
-   * isEnable() This is not changeable by a LookAndFeel. This is handled in the
-   * corresponding ...Ex sub classes of JTextComponent
-   */
   @Override
   public Color getForeground() {
-    if (isEditable()) {
+    if (m_enabledFromScout) {
       return super.getForeground();
     }
     else {
@@ -52,6 +55,20 @@ public class JTextPaneEx extends JTextPane {
       cursor = null;
     }
     super.setCursor(cursor);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    m_enabledFromScout = enabled;
+  }
+
+  /**
+   * Always return <code>true</code> so that the JTextPane stays selectable. If we would return <code>false</code> the
+   * JTextPane's content would not be selectable anymore
+   */
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 
   @Override

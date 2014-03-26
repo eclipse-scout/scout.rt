@@ -97,6 +97,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     getSwingLabelField().setEditable(false); //JTextPane is never editable!
+    getSwingLabelField().setEnabled(b);
     updateTextInGUI();
   }
 
