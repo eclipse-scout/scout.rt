@@ -46,6 +46,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -240,7 +241,7 @@ public class SwtScoutTableCellEditor {
       public void doSetFocus() {
         ISwtScoutForm swtScoutForm = formFieldDialog.getInnerSwtScoutForm();
         if (swtScoutForm != null) {
-            requestFocus(swtScoutForm.getSwtContainer());
+          requestFocus(swtScoutForm.getSwtContainer());
         }
       }
     });
@@ -366,7 +367,7 @@ public class SwtScoutTableCellEditor {
         TableUtility.editNextTableCell(table, row, col, forward, new TableUtility.ITableCellEditorFilter() {
           @Override
           public boolean accept(ITableRow rowx, IColumn<?> colx) {
-            return !(colx instanceof IBooleanColumn);
+            return true;
           }
         });
       }
@@ -392,7 +393,7 @@ public class SwtScoutTableCellEditor {
     if (control.setFocus()) {
       return true;
     }
-  
+
     if (control instanceof Composite) {
       for (Control child : ((Composite) control).getChildren()) {
         if (requestFocus(child)) {
@@ -431,12 +432,7 @@ public class SwtScoutTableCellEditor {
             synchronized (b) {
               try {
                 if (table != null && row != null && column != null) {
-                  if (column instanceof IBooleanColumn) {
-                    b.set(false);
-                  }
-                  else {
-                    b.set(table.isCellEditable(row, column));
-                  }
+                  b.set(table.isCellEditable(row, column));
                 }
               }
               catch (Throwable ex) {
@@ -481,6 +477,16 @@ public class SwtScoutTableCellEditor {
         @Override
         public Point computeSize(int wHint, int hHint, boolean changed) {
           return new Point(wHint, hHint);
+        }
+
+        @Override
+        public void setBounds(Rectangle rect) {
+          // ensure the check image is not visible in editor case
+          if (m_editScoutCol instanceof IBooleanColumn) {
+            rect.x = Math.max(0, rect.x - 16);
+            rect.width = Math.max(0, rect.width + 16);
+          }
+          super.setBounds(rect);
         }
       };
       m_container.setLayout(new FillLayout());
@@ -613,29 +619,29 @@ public class SwtScoutTableCellEditor {
               switch (e.detail) {
                 case SWT.TRAVERSE_ESCAPE:
                 case SWT.TRAVERSE_RETURN: {
-                e.doit = false;
-                break;
-              }
-              case SWT.TRAVERSE_TAB_NEXT: {
-                e.doit = false;
-                ITableRow scoutRow = m_editScoutRow;
-                IColumn<?> scoutCol = m_editScoutCol;
-                fireApplyEditorValue();
-                deactivate();
-                enqueueEditNextTableCell(scoutRow, scoutCol, true);
-                break;
-              }
-              case SWT.TRAVERSE_TAB_PREVIOUS: {
-                e.doit = false;
-                ITableRow scoutRow = m_editScoutRow;
-                IColumn<?> scoutCol = m_editScoutCol;
-                fireApplyEditorValue();
-                deactivate();
-                enqueueEditNextTableCell(scoutRow, scoutCol, false);
-                break;
+                  e.doit = false;
+                  break;
+                }
+                case SWT.TRAVERSE_TAB_NEXT: {
+                  e.doit = false;
+                  ITableRow scoutRow = m_editScoutRow;
+                  IColumn<?> scoutCol = m_editScoutCol;
+                  fireApplyEditorValue();
+                  deactivate();
+                  enqueueEditNextTableCell(scoutRow, scoutCol, true);
+                  break;
+                }
+                case SWT.TRAVERSE_TAB_PREVIOUS: {
+                  e.doit = false;
+                  ITableRow scoutRow = m_editScoutRow;
+                  IColumn<?> scoutCol = m_editScoutCol;
+                  fireApplyEditorValue();
+                  deactivate();
+                  enqueueEditNextTableCell(scoutRow, scoutCol, false);
+                  break;
+                }
               }
             }
-          }
           });
         }
         getFocusLostListener().resume(); // because listener was suspended after activation
