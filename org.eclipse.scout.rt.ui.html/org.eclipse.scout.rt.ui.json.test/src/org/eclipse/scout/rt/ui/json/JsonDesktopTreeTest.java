@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import static org.eclipse.scout.rt.ui.json.JsonDesktopTreeTestUtil.createJsonDesktopTreeWithMocks;
-import static org.eclipse.scout.rt.ui.json.JsonDesktopTreeTestUtil.createJsonSelectedEvent;
 import static org.eclipse.scout.rt.ui.json.testing.JsonTestUtility.extractEventsFromResponse;
 
 import java.util.LinkedList;
@@ -24,12 +22,16 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.OutlineWithOneNode;
+import org.eclipse.scout.rt.ui.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonDesktopTreeTest {
@@ -102,5 +104,26 @@ public class JsonDesktopTreeTest {
 
     List<ITreeNode> treeNodes = jsonDesktopTree.extractTreeNodes(responseEvents.get(0));
     Assert.assertEquals(firstNode, treeNodes.get(0));
+  }
+
+  public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
+    JsonSessionMock jsonSession = new JsonSessionMock();
+    JsonDesktop jsonDesktop = Mockito.mock(JsonDesktop.class);
+
+    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(jsonDesktop, outline, jsonSession);
+    jsonDesktopTree.init();
+
+    //init treeNode map
+    jsonDesktopTree.toJson();
+
+    return jsonDesktopTree;
+  }
+
+  public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
+    JsonEvent event = JsonTestUtility.createJsonEvent(JsonDesktopTree.EVENT_NODES_SELECTED);
+    JSONArray nodeIds = new JSONArray();
+    nodeIds.put(nodeId);
+    event.getEventObject().put(JsonDesktopTree.PROP_NODE_IDS, nodeIds);
+    return event;
   }
 }

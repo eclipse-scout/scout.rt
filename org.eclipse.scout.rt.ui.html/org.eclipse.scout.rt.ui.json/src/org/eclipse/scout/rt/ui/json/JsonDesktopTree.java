@@ -37,7 +37,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
   private Map<ITable, JsonDesktopTable> m_jsonTables;
-  private List<TreeEvent> m_ignorableModelEvents;
+  private TreeEventFilter m_treeEventFilter;
 
   //FIXME remove after model is updated with new properties
   private String PROP_CUSTOM_JSON = "customJson";
@@ -75,7 +75,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_jsonTables = new HashMap<>();
-    m_ignorableModelEvents = new LinkedList<>();
+    m_treeEventFilter = new TreeEventFilter(getModelObject());
   }
 
   @Override
@@ -101,6 +101,10 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     super.dispose();
     m_treeNodeIds.clear();
     m_treeNodes.clear();
+  }
+
+  public TreeEventFilter getTreeEventFilter() {
+    return m_treeEventFilter;
   }
 
   @Override
@@ -135,7 +139,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleModelTreeEvent(TreeEvent event) throws JsonUIException {
-    event = filterIgnorableModelEvent(event);
+    event = getTreeEventFilter().filterIgnorableModelEvent(event);
     if (event == null) {
       return;
     }
@@ -352,43 +356,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }
   }
 
-  protected void addIgnorableModelEvent(TreeEvent event) {
-    m_ignorableModelEvents.add(event);
-  }
-
-  protected void removeIgnorableModelEvent(TreeEvent event) {
-    m_ignorableModelEvents.remove(event);
-  }
-
-  /**
-   * Computes whether the event should be returned to the GUI. There are three cases:
-   * <ul>
-   * <li>No filtering happens: The original event is returned. <br>
-   * This is the case if {@link #m_ignorableModelEvents} does not contain an event with the same type as the original
-   * event.</li>
-   * <li>Partial filtering happens: A new event with a subset of tree nodes is returned.<br>
-   * This is the case if the {@link #m_ignorableModelEvents} contains a relevant event but has different nodes than the
-   * original event.
-   * <li>Complete filtering happens: Null is returned.<br>
-   * This is the case if the event should be filtered for every node in the original event
-   */
-  protected TreeEvent filterIgnorableModelEvent(TreeEvent event) {
-    for (TreeEvent eventToIgnore : m_ignorableModelEvents) {
-      if (eventToIgnore.getType() == event.getType()) {
-        Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
-        nodes.removeAll(eventToIgnore.getNodes());
-        if (nodes.size() == 0) {
-          //Event should be ignored if no nodes remain or if the event contained no nodes at all
-          return null;
-        }
-
-        TreeEvent newEvent = new TreeEvent(getModelObject(), event.getType(), event.getCommonParentNode(), nodes);
-        return newEvent;
-      }
-    }
-    return event;
-  }
-
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     if ("nodeClicked".equals(event.getEventType())) {
@@ -441,13 +408,13 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
-          addIgnorableModelEvent(treeEvent);
+          getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
           try {
             getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
           }
           finally {
-            removeIgnorableModelEvent(treeEvent);
+            getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
           }
         }
       }.runNow(new NullProgressMonitor());
@@ -469,13 +436,13 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
-          addIgnorableModelEvent(treeEvent);
+          getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
           try {
             getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
           }
           finally {
-            removeIgnorableModelEvent(treeEvent);
+            getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
           }
         }
       }.runNow(new NullProgressMonitor());

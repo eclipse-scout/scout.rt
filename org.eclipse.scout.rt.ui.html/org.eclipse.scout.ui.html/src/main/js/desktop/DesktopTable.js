@@ -14,6 +14,10 @@ Scout.DesktopTable = function(scout, model) {
   this.scout.widgetMap[model.table.id] = this;
 };
 
+Scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
+Scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
+Scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
+
 Scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
 
@@ -214,7 +218,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
       $('.table-row', $tableData).addClass('row-selected');
     }
 
-    that._selectionBorder();
+    that._drawSelectionBorder();
   }
 
   function filterCallback(testFunc) {
@@ -305,7 +309,7 @@ Scout.DesktopTable.prototype._findInfo = function(n) {
   }
 };
 
-Scout.DesktopTable.prototype._selectionBorder = function() {
+Scout.DesktopTable.prototype._drawSelectionBorder = function() {
   // remove nice border
   $('.select-middle, .select-top, .select-bottom, .select-single')
     .removeClass('select-middle select-top select-bottom select-single');
@@ -323,12 +327,16 @@ Scout.DesktopTable.prototype._selectionBorder = function() {
   });
 
   // show count
-  this._setInfoSelect($selectedRows.length, $selectedRows.length == this.model.table.rows.length);
+  var rowCount = 0;
+  if (this.model.table.rows) {
+    rowCount = this.model.table.rows.length;
+  }
+  this._setInfoSelect($selectedRows.length, $selectedRows.length == rowCount);
 };
 
 Scout.DesktopTable.prototype._resetSelection = function() {
   $('.row-selected', this._$tableData).removeClass('row-selected');
-  this._selectionBorder();
+  this._drawSelectionBorder();
   $('#MenuRow').remove();
 };
 
@@ -405,7 +413,8 @@ Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
       maxOrder = (value > maxOrder) ? value : maxOrder;
     });
 
-    if (clickOrder !== undefined) {
+    /*jshint -W041:false*/
+    if (clickOrder != undefined) {
       newOrder = clickOrder;
     } else if (maxOrder > -1) {
       newOrder = maxOrder + 1;
@@ -429,7 +438,7 @@ Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
 Scout.DesktopTable.prototype._loadData = function() {
   $('.table-row').remove();
   this._drawData(0);
-  this._setInfoSelect(0, false);
+  this._drawSelectionBorder();
 };
 
 Scout.DesktopTable.prototype._drawData = function(startRow) {
@@ -437,40 +446,53 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   var rowString = '';
   var table = this.model.table,
     that = this;
-  for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
-    var row = table.rows[r];
 
-    rowString += '<div id="' + row.id + '" class="table-row">';
+  var numRowsLoaded = startRow;
+  if (table.rows && table.rows.length > 0) {
+    for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
+      var row = table.rows[r];
 
-    for (var c = 0; c < row.cells.length; c++) {
-      var column = table.columns[c],
-        width = column.width,
-        style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
-        allign = (column.type == 'number') ? 'text-align: right; ' : '',
-        value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+      var rowClass = 'table-row ';
+      if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
+        rowClass += 'row-selected ';
+      }
 
-      rowString += '<div style="' + style + allign + '">' + value + '</div>';
+      rowString += '<div id="' + row.id + '" class="' + rowClass + '">';
+
+      for (var c = 0; c < row.cells.length; c++) {
+        var column = table.columns[c],
+          width = column.width,
+          style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
+          allign = (column.type == 'number') ? 'text-align: right; ' : '',
+          value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+
+        rowString += '<div style="' + style + allign + '">' + value + '</div>';
+      }
+
+      rowString += '</div>';
     }
+    numRowsLoaded = r;
 
-    rowString += '</div>';
+    // append block of rows
+    $(rowString)
+      .appendTo(this._$tableDataScroll)
+      .on('mousedown', '', onMouseDown)
+      .width(this._tableHeader.totalWidth + 4);
   }
 
-  // append block of rows
-  $(rowString)
-    .appendTo(this._$tableDataScroll)
-    .on('mousedown', '', onMouseDown)
-    .width(this._tableHeader.totalWidth + 4);
-
   // update info and scrollbar
-  this._setInfoLoad(r);
+  this._setInfoLoad(numRowsLoaded);
   this._scrollbar.initThumb();
 
   // repaint and append next block
-  if (r < table.rows.length) {
-    setTimeout(function() {
-      that._drawData(startRow + 100);
-    }, 0);
+  if (table.rows && table.rows.length > 0) {
+    if (numRowsLoaded < table.rows.length) {
+      setTimeout(function() {
+        that._drawData(startRow + 100);
+      }, 0);
+    }
   }
+
 
   function onMouseDown(event) {
     var $row = $(event.delegateTarget),
@@ -483,7 +505,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     if (event.shiftKey) {
       first = $selectedRows.first().index();
     } else if (event.ctrlKey) {
-      add = !$row.hasClass('row-selected');
+      add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
     } else {
       $selectedRows.removeClass('row-selected');
     }
@@ -519,7 +541,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       }
 
       // draw nice border
-      that._selectionBorder();
+      that._drawSelectionBorder();
 
       // open and animate menu
       selectionMenu(event.pageX, event.pageY);
@@ -534,7 +556,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
       //Send click only if mouseDown and mouseUp happened on the same row
       if ($row.get(0) == event.delegateTarget) {
-        that.scout.send('rowClicked', that.model.table.id, {
+        that.scout.send(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
           "rowId": $row.attr('id')
         });
       }
@@ -547,7 +569,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
           rowIds.push($(this).attr('id'));
         });
 
-        that.scout.send('rowsSelected', that.model.table.id, {
+        that.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, that.model.table.id, {
           "rowIds": rowIds
         });
       }
@@ -614,7 +636,7 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
   if (draw) {
     var $rows = $('.table-row', this._$tableDataScroll);
     var $sumRow = $.makeDiv('', 'table-row-sum'),
-    sum = [];
+      sum = [];
 
     for (var r = 0; r < $rows.length; r++) {
       var $cells = $rows.eq(r).children();
@@ -671,7 +693,7 @@ Scout.DesktopTable.prototype.attach = function($container) {
   }
 };
 
-Scout.DesktopTable.prototype._onRowsInserted = function(rows) {
+Scout.DesktopTable.prototype.insertRows = function(rows) {
   //always insert new rows at the end
   var table = this.model.table;
   if (table.rows) {
@@ -684,12 +706,37 @@ Scout.DesktopTable.prototype._onRowsInserted = function(rows) {
   }
 };
 
+Scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
+  var table = this.model.table;
+  table.selectedRowIds = rowIds;
+
+  if (this._$tableDataScroll) {
+    this._resetSelection();
+
+    //select rows
+    for (var i = 0; i < rowIds.length; i++) {
+      var rowId = rowIds[i];
+      var $row = $('#' + rowId);
+      $row.addClass('row-selected');
+    }
+
+    this._drawSelectionBorder();
+  }
+
+  if (!this.updateFromModelInProgress) {
+    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
+    this.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, this.model.table.id, {
+      "rowIds": rowIds
+    });
+  }
+};
+
 Scout.DesktopTable.prototype.onModelAction = function(event) {
-  if (event.type_ == 'rowsInserted') {
-    this._onRowsInserted(event.rows);
+  if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
+    this.insertRows(event.rows);
   } else if (event.type_ == 'rowsDeleted') {
     //FIXME implement
-  } else if (event.type_ == 'rowsSelected') {
-    //FIXME implement
+  } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
+    this.selectRowsByIds(event.rowIds);
   } else if (event.type_ == 'rowOrderChanged') {}
 };

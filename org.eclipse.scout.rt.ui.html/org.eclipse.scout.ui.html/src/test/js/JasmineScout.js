@@ -4,11 +4,55 @@ function mostRecentJsonRequest() {
 }
 
 var jasmineScoutMatchers = {
+  /**
+   * Checks if given request contains expected events, order does not matter.
+   * @actual json request, may be obtained by mostRecentJsonRequest
+   */
+  toContainEvents: function(util, customEqualityTesters) {
+    return {
+      compare: function(actual, expected) {
+        if (expected === undefined) {
+          expected = [];
+        }
+        if (!Array.isArray(expected)) {
+          expected = [expected];
+        }
+        var result = {};
+
+        var actualEvents = [];
+        for (var i = 0; i < actual.events.length; i++) {
+          actualEvents.push(actual.events[i]);
+        }
+
+        result.pass = true;
+        for (i = 0; i < expected.length; i++) {
+          //Prototype may be Scout.Event. If that's the case we need to convert, otherwise equals will fail
+          if (Object.getPrototypeOf(expected[i]) !== Object.prototype) {
+            expected[i] = $.parseJSON(JSON.stringify(expected[i]));
+          }
+
+          result.pass &= util.contains(actualEvents, expected[i], customEqualityTesters);
+        }
+
+        if (!result.pass) {
+          result.message = "Expected actual events " + actualEvents + " to be equal to " + expected;
+        }
+        return result;
+      }
+    };
+  },
+  /**
+   * Checks if given request contains events with the expected event types in the given order
+   * @actual json request, may be obtained by mostRecentJsonRequest
+   */
   toContainEventTypesExactly: function(util, customEqualityTesters) {
     return {
       compare: function(actual, expected) {
         if (expected === undefined) {
           expected = [];
+        }
+        if (!Array.isArray(expected)) {
+          expected = [expected];
         }
         var result = {};
 
