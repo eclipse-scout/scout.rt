@@ -278,6 +278,9 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
           acceptProposal(row);
         }
       }
+      else {
+        revertValue();
+      }
       registerProposalFormInternal(null);
     }
   }
