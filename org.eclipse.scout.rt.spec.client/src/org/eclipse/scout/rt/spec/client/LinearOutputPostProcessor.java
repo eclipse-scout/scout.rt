@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -176,7 +178,6 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
         }
       }
     }
-
   }
 
   protected boolean isComment(String configEntry) {
@@ -191,13 +192,69 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     }
     // priority 2: try doc entity class name
     Set<Class<?>> allClasses = DocGenUtility.getAllDocEntityClasses();
-    for (Class c : allClasses) {
+    for (Class<?> c : allClasses) {
       if (configEntry.equals(c.getSimpleName()) || configEntry.equals(c.getName())) {
-        file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), SpecUtility.getSpecFileBaseName(c) + ".mediawiki");
-        if (file.exists()) {
-          return file;
+        File fileForClass = findFileForClass(c);
+        if (fileForClass == null) {
+          Set<Class> subclasses = getSubClassesOrderdByDistance(c, allClasses);
+          for (Class subclass : subclasses) {
+            fileForClass = findFileForClass(subclass);
+            if (fileForClass != null) {
+              break;
+            }
+          }
         }
-        break;
+        return fileForClass;
+      }
+    }
+    return null;
+  }
+
+  protected Set<Class> getSubClassesOrderdByDistance(final Class<?> c, Set<Class<?>> allClasses) {
+    TreeSet<Class> subclasses = new TreeSet<Class>(new Comparator<Class>() {
+      @Override
+      public int compare(Class o1, Class o2) {
+        Integer distanceO1 = getDistance(o1, c);
+        Integer distanceO2 = getDistance(o2, c);
+        return distanceO1.compareTo(distanceO2);
+      }
+    });
+    for (Class candidate : allClasses) {
+      if (c.isAssignableFrom(candidate) && c != candidate) {
+        subclasses.add(candidate);
+      }
+    }
+    return subclasses;
+  }
+
+  /**
+   * evaluates the distance in the class hierarchy between a sub class and a super class
+   * 
+   * @param subClass
+   * @param superClass
+   * @return
+   * @throws IllegalArgumentException
+   *           if <code>subClass</code> is not a real sub class of <code>superClass</code> (In particular this is the
+   *           case if one of them is an interface type or they are equal.)
+   */
+  protected static int getDistance(Class subClass, Class<?> superClass) {
+    if (!superClass.isAssignableFrom(subClass) || subClass == superClass || subClass.isInterface() || superClass.isInterface()) {
+      throw new IllegalArgumentException();
+    }
+    int distance = 0;
+    Class c = subClass;
+    while (c != superClass) {
+      c = c.getSuperclass();
+      ++distance;
+    }
+    return distance;
+  }
+
+  protected File findFileForClass(Class c) throws ProcessingException {
+    File[] mediawikiFiles = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles();
+    for (File file : mediawikiFiles) {
+      if (file.getName().startsWith(c.getSimpleName() + "_")) {
+        return file;
       }
     }
     return null;

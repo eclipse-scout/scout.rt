@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -61,8 +62,8 @@ public class FormScreenshotPrinter {
    * 
    * @param form
    */
-  public List<Object> getPrintObjects(IForm form) {
-    ArrayList<Object> printMap = new ArrayList<Object>();
+  public List<ITypeWithClassId> getPrintObjects(IForm form) {
+    ArrayList<ITypeWithClassId> printMap = new ArrayList<ITypeWithClassId>();
     printMap.add(form);
     for (IFormField field : form.getAllFields()) {
       if (field instanceof ITabBox && field.isVisible()) {
@@ -84,14 +85,8 @@ public class FormScreenshotPrinter {
     return printMap;
   }
 
-  protected File getPrintFile(Object o) {
-    // TODO ASA refactor in scout 4.0: when createAndStartForm(...) in AbstractFormSpecTest is split,
-    //          form can be provided in constructor and this check will be obsolet
-    if (m_form == null) {
-      String name = o.getClass().getName();
-      return getPrintFile(name);
-    }
-    return getPrintFile(m_form.classId() + "_" + o.getClass().getName());
+  protected File getPrintFile(ITypeWithClassId o) {
+    return getPrintFile(o.classId());
   }
 
   protected File getPrintFile(String baseName) {
@@ -118,7 +113,7 @@ public class FormScreenshotPrinter {
     form.printForm(PrintDevice.File, parameters);
   }
 
-  protected void print(Object o) {
+  protected void print(ITypeWithClassId o) {
     File file = getPrintFile(o);
     getDestinationFolder().mkdirs();
     if (o instanceof IForm) {

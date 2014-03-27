@@ -17,6 +17,7 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -36,7 +37,7 @@ public class PrintScreenshotsFormListener implements FormListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintScreenshotsFormListener.class);
 
   /** All scout objects that need to be printed */
-  private final Queue<Object> m_printQueue = new LinkedBlockingDeque<Object>();
+  private final Queue<ITypeWithClassId> m_printQueue = new LinkedBlockingDeque<ITypeWithClassId>();
 
   private final FormScreenshotPrinter m_formPrinter;
 
@@ -75,7 +76,7 @@ public class PrintScreenshotsFormListener implements FormListener {
 
       @Override
       protected void runVoid(IProgressMonitor monitor) {
-        Object next = m_printQueue.remove();
+        ITypeWithClassId next = m_printQueue.remove();
         m_formPrinter.print(next);
       }
     }.schedule();
@@ -92,8 +93,8 @@ public class PrintScreenshotsFormListener implements FormListener {
    *          form containing tab boxes
    */
   private void enqueuePrintObjects(IForm form) {
-    List<Object> printObjects = m_formPrinter.getPrintObjects(form);
-    for (Object o : printObjects) {
+    List<ITypeWithClassId> printObjects = m_formPrinter.getPrintObjects(form);
+    for (ITypeWithClassId o : printObjects) {
       m_printQueue.add(o);
       LOG.info("Adding object to print: {}", o);
     }

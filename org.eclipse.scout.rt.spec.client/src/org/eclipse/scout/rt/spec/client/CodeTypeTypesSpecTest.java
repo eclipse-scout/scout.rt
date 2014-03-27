@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 
 /**
- * implementation of {@link AbstractTypeSpecTest} for lookup calls
+ * implementation of {@link AbstractTypeSpecTest} for CodeTypes
  */
 public class CodeTypeTypesSpecTest extends AbstractTypeSpecTest {
 

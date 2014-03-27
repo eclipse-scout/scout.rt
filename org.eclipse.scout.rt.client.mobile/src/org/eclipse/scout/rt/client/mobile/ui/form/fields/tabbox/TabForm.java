@@ -65,6 +65,11 @@ public class TabForm extends AbstractForm {
       public String getFieldId() {
         return m_tabGroupBox.getFieldId();
       }
+
+      @Override
+      public String classId() {
+        return m_tabGroupBox.classId();
+      }
     }
 
     @Order(10)

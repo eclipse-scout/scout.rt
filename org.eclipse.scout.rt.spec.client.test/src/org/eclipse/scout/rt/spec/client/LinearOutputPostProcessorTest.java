@@ -55,6 +55,7 @@ public class LinearOutputPostProcessorTest {
   @Test
   public void testFindFileForConfigEntry() throws ProcessingException {
     copyFile(TEST_DIR + File.separator + "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
+    copyFile(TEST_DIR + File.separator + "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
     copyFile(TEST_DIR + File.separator + "LoremIpsum1.mediawiki");
     LinearOutputPostProcessor lopp = new LinearOutputPostProcessor(null);
 
@@ -63,13 +64,15 @@ public class LinearOutputPostProcessorTest {
     testFindFileForConfigEntry(lopp, "LoremIpsum1", "LoremIpsum1.mediawiki");
     testFindFileForConfigEntry(lopp, "LoppTestForm", "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
     testFindFileForConfigEntry(lopp, "org.eclipse.scout.rt.spec.client.LinearOutputPostProcessorTest$LoppTestForm", "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
+    testFindFileForConfigEntry(lopp, "LoppTestFormToExtend", "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
+    testFindFileForConfigEntry(lopp, "org.eclipse.scout.rt.spec.client.LinearOutputPostProcessorTest$LoppTestFormToExtend", "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
 
   }
 
   private void testFindFileForConfigEntry(LinearOutputPostProcessor lopp, String configEntry, String expectedFileName) throws ProcessingException {
-    File loremIpsumFile = lopp.findFileForConfigEntry(configEntry);
-    Assert.assertEquals("config entry was not resolved as expected", expectedFileName, loremIpsumFile.getName());
-    Assert.assertTrue("resolved does not exist", loremIpsumFile.exists());
+    File file = lopp.findFileForConfigEntry(configEntry);
+    Assert.assertEquals("config entry was not resolved as expected", expectedFileName, file.getName());
+    Assert.assertTrue("resolved does not exist", file.exists());
   }
 
   private File copyFile(String relativeSourcePath) throws ProcessingException {
@@ -81,6 +84,20 @@ public class LinearOutputPostProcessorTest {
   @ClassId("1c1ce9e7-7216-4f01-9881-4786fa87e06c")
   class LoppTestForm extends AbstractForm {
     public LoppTestForm() throws ProcessingException {
+      super();
+    }
+  }
+
+  @ClassId("a24a5c92-c10a-4a26-a3ce-45257f9c295f")
+  class LoppTestFormToExtend extends AbstractForm {
+    public LoppTestFormToExtend() throws ProcessingException {
+      super();
+    }
+  }
+
+  @ClassId("71f9de60-604d-440e-8b91-2ad6a8c6f12d")
+  class LoppTestFormExtended extends LoppTestFormToExtend {
+    public LoppTestFormExtended() throws ProcessingException {
       super();
     }
   }

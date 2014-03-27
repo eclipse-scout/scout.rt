@@ -5,7 +5,7 @@
       <service
             class="org.eclipse.scout.rt.spec.client.text.SpecDocsTextProviderService"
             createImmediately="false"
-            ranking="10">
+            ranking="-50">
       </service>
    </extension>
 

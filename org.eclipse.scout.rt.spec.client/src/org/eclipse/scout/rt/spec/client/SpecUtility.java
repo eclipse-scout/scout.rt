@@ -10,16 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 
@@ -44,15 +46,6 @@ public final class SpecUtility {
     return object.getClass().getSimpleName() + "_" + object.classId();
   }
 
-  /**
-   * creates a base file name (without file extension) for a class using it's annotated classId or the classId fallback
-   * 
-   * @param c
-   * @return
-   */
-  public static String getSpecFileBaseName(Class c) {
-    return c.getSimpleName() + "_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(c);
-  }
 
   /**
    * wrapper around {@link BundleInspector#getAllClasses(IClassFilter)} which caches all classes on first invocation
@@ -113,6 +106,28 @@ public final class SpecUtility {
    */
   public static String createAnchorId(String classId) {
     return "c_" + classId;
+  }
+
+  /**
+   * Creates a flat array with all menus by traversing the menu hierarchy by depth-first search.
+   * 
+   * @param menus
+   *          the list of top level menus
+   * @return
+   */
+  public static List<IMenu> expandMenuHierarchy(List<IMenu> menus) {
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
+    for (IMenu menu : menus) {
+      addMenuRecursive(menuList, menu);
+    }
+    return menuList;
+  }
+
+  private static void addMenuRecursive(ArrayList<IMenu> menuList, IMenu menu) {
+    menuList.add(menu);
+    for (IMenu subMenu : menu.getChildActions()) {
+      addMenuRecursive(menuList, subMenu);
+    }
   }
 
 }
