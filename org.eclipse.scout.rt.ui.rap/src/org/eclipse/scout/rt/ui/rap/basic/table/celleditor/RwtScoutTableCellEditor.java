@@ -37,6 +37,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +47,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * This class is responsible for creating cell editors on the {@link RwtScoutTable}.
- * 
+ *
  * @since 3.8.0, refactored 3.10.0-M5
  */
 public class RwtScoutTableCellEditor {
@@ -177,7 +178,7 @@ public class RwtScoutTableCellEditor {
         TableUtility.editNextTableCell(table, row, col, forward, new TableUtility.ITableCellEditorFilter() {
           @Override
           public boolean accept(ITableRow rowx, IColumn<?> colx) {
-            return !(colx instanceof IBooleanColumn);
+            return true;
           }
         });
       }
@@ -246,12 +247,7 @@ public class RwtScoutTableCellEditor {
             synchronized (b) {
               try {
                 if (table != null && row != null && column != null) {
-                  if (column instanceof IBooleanColumn) {
-                    b.set(false);
-                  }
-                  else {
-                    b.set(table.isCellEditable(row, column));
-                  }
+                  b.set(table.isCellEditable(row, column));
                 }
               }
               catch (Throwable ex) {
@@ -300,6 +296,16 @@ public class RwtScoutTableCellEditor {
         @Override
         public Point computeSize(int wHint, int hHint, boolean changed) {
           return new Point(wHint, hHint);
+        }
+
+        @Override
+        public void setBounds(Rectangle rect) {
+          // ensure the check image is not visible in editor case
+          if (m_editScoutCol instanceof IBooleanColumn) {
+            rect.x = Math.max(0, rect.x - 16);
+            rect.width = Math.max(0, rect.width + 16);
+          }
+          super.setBounds(rect);
         }
       };
 
