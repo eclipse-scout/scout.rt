@@ -304,7 +304,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures whether the columns are auto resized. If true, all columns are resized so that the table never needs
    * horizontal scrolling. This is especially useful for tables inside a form.
    * <p>
-   * Subclasses can override this method. Default is {@code true}.
+   * Subclasses can override this method. Default is {@code false}.
    * 
    * @return {@code true} if the columns are auto resized, {@code false} otherwise.
    * @see {@link AbstractColumn#getConfiguredWidth()}
