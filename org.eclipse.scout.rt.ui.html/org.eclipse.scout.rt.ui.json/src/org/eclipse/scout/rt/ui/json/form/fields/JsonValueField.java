@@ -8,43 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.menu;
+package org.eclipse.scout.rt.ui.json.form.fields;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonEvent;
-import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
+public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
+  public static final String PROP_VALUE = IValueField.PROP_VALUE;
+  public static final String PROP_DISPLAY_TEXT = IValueField.PROP_DISPLAY_TEXT;
 
-  public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public JsonValueField(T model, IJsonSession session) {
+    super(model, session);
   }
 
   @Override
   public String getObjectType() {
-    return "Menu";
+    return "ValueField";
   }
 
   @Override
   public JSONObject toJson() throws JsonUIException {
     JSONObject json = super.toJson();
     try {
-      json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
-      json.put("icon", getModelObject().getIconId());//FIXME how to handle resources?
+//      json.put(PROP_VALUE, valueToJson()); //FIXME
+      json.put(PROP_DISPLAY_TEXT, getModelObject().getDisplayText());
       return json;
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
   }
 
 }

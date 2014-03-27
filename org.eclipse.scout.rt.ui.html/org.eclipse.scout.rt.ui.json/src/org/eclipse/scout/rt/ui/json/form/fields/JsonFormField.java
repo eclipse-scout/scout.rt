@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.menu;
+package org.eclipse.scout.rt.ui.json.form.fields;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
@@ -19,23 +19,23 @@ import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
+public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField {
 
-  public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public JsonFormField(T model, IJsonSession session) {
+    super(model, session);
   }
 
   @Override
   public String getObjectType() {
-    return "Menu";
+    return "FormField";
   }
 
   @Override
   public JSONObject toJson() throws JsonUIException {
     JSONObject json = super.toJson();
     try {
-      json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
-      json.put("icon", getModelObject().getIconId());//FIXME how to handle resources?
+      json.put("label", getModelObject().getLabel());
+
       return json;
     }
     catch (JSONException e) {

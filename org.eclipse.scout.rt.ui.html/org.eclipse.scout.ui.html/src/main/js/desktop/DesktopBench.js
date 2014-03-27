@@ -3,5 +3,5 @@
 
 Scout.DesktopBench = function(scout, $parent) {
   //create container
-  $parent.appendDiv('DesktopBench');
+  this.$container = $parent.appendDiv('DesktopBench');
 };

@@ -94,7 +94,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
         $control = $node.children('.tree-item-control');
 
-        rotateControl = function(now /*, fx*/) {
+        rotateControl = function(now /*, fx*/ ) {
           $control.css('transform', 'rotate(' + now + 'deg)');
         };
 
@@ -119,7 +119,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
 
     // animated control
     $control = $node.children('.tree-item-control');
-    rotateControl = function(now /*, fx*/) {
+    rotateControl = function(now /*, fx*/ ) {
       $control.css('transform', 'rotate(' + now + 'deg)');
     };
     $control.css('borderSpacing', 90)
@@ -323,5 +323,7 @@ Scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type_ == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
+  } else {
+    log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
   }
 };

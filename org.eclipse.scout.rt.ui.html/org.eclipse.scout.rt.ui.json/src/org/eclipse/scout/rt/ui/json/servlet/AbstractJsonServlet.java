@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
-import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.eclipse.scout.ui.html.Activator;
 
@@ -49,6 +49,8 @@ public abstract class AbstractJsonServlet extends HttpServletEx implements IJson
     m_postRequestHandler = createPostRequestHandler();
     initResourceHandlers();
     initRequestInterceptors();
+
+    JsonRendererFactory.init(createJsonRendererFactory());
   }
 
   protected void initRequestInterceptors() {
@@ -104,8 +106,9 @@ public abstract class AbstractJsonServlet extends HttpServletEx implements IJson
     }
   }
 
-  @Override
-  public abstract IJsonSession createJsonSession() throws JsonUIException;
+  public JsonRendererFactory createJsonRendererFactory() throws JsonUIException {
+    return new JsonRendererFactory();
+  }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

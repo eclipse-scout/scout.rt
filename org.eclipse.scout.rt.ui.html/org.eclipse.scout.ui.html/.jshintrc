@@ -11,6 +11,8 @@
     "jQuery": false,
     "$": false,
 
+    "log": false,
+
     "jasmine": false,
 	"describe": false,
     "beforeEach": false,

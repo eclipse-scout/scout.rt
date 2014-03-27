@@ -65,6 +65,11 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
   }
 
   @Override
+  public String getObjectType() {
+    return "Table";
+  }
+
+  @Override
   protected void attachModel() throws JsonUIException {
     super.attachModel();
     if (m_modelTableListener == null) {
@@ -88,11 +93,8 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
 
   @Override
   public JSONObject toJson() throws JsonUIException {
+    JSONObject json = super.toJson();
     try {
-      JSONObject json = new JSONObject();
-      json.put("id", getId());
-      json.put("objectType", "Table");
-
       JSONArray jsonColumns = new JSONArray();
       for (IColumn<?> column : getModelObject().getColumns()) {
         if (column.isDisplayable()) {
@@ -118,17 +120,17 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     if ("rowClicked".equals(event.getEventType())) {
-      handleUiRowClickedEvent(event, res);
+      handleUiRowClicked(event, res);
     }
     else if (EVENT_ROWS_SELECTED.equals(event.getEventType())) {
-      handleUiRowsSelectedEvent(event, res);
+      handleUiRowsSelected(event, res);
     }
     else if ("menuPopup".equals(event.getEventType())) {
-      handleUiMenuPopupEvent(event, res);
+      handleUiMenuPopup(event, res);
     }
   }
 
-  protected void handleUiRowClickedEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiRowClicked(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
       final ITableRow tableRow = getTableRowForRowId(event.getEventObject().getString("rowId"));
 
@@ -144,7 +146,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void handleUiRowsSelectedEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
       final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
 
@@ -168,7 +170,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void handleUiMenuPopupEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiMenuPopup(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
       boolean emptySpace = false;
       if (event.getEventObject().has("emptySpace")) {
@@ -365,7 +367,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
 
   protected void handleModelTableEventBatch(List<? extends TableEvent> events) throws JsonUIException {
     for (TableEvent event : events) {
-      handleModelTableEvent(event);
+      handleModelTableEvent(event); //FIXME sufficient?
     }
   }
 
@@ -376,25 +378,25 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED: {
-        setRowsInsertedFromModel(event);
+        handleModelRowsInserted(event);
         break;
       }
       case TableEvent.TYPE_ROWS_DELETED: {
-        setRowsDeletedFromModel(event.getRows());
+        handleModelRowsDeleted(event.getRows());
         break;
       }
       case TableEvent.TYPE_ROWS_SELECTED: {
-        setRowsSelectedFromModel(event.getRows());
+        handleModelRowsSelected(event.getRows());
         break;
       }
       case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-        setRowOrderChangedFromModel(event.getRows());
+        handleModelRowOrderChanged(event.getRows());
         break;
       }
     }
   }
 
-  protected void setRowsInsertedFromModel(TableEvent event) throws JsonUIException {
+  protected void handleModelRowsInserted(TableEvent event) throws JsonUIException {
     try {
       JSONObject jsonEvent = new JSONObject();
 
@@ -412,7 +414,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void setRowsDeletedFromModel(Collection<ITableRow> modelRows) throws JsonUIException {
+  protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) throws JsonUIException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
@@ -433,7 +435,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void setRowsSelectedFromModel(Collection<ITableRow> modelRows) throws JsonUIException {
+  protected void handleModelRowsSelected(Collection<ITableRow> modelRows) throws JsonUIException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
@@ -444,7 +446,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void setRowOrderChangedFromModel(Collection<ITableRow> modelRows) throws JsonUIException {
+  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) throws JsonUIException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));

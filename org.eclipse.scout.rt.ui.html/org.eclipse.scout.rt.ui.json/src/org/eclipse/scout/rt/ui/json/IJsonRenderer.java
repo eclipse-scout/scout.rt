@@ -6,6 +6,8 @@ public interface IJsonRenderer {
 
   String getId();
 
+  String getObjectType();
+
   void init() throws JsonUIException;
 
   void dispose() throws JsonUIException;

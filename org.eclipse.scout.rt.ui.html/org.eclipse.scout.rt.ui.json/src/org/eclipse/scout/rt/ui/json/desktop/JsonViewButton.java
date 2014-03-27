@@ -19,11 +19,14 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
+  public String getObjectType() {
+    return "ViewButton";
+  }
+
+  @Override
   public JSONObject toJson() throws JsonUIException {
+    JSONObject json = super.toJson();
     try {
-      JSONObject json = new JSONObject();
-      json.put("objectType", "ViewButton");
-      json.put("id", getId());
       json.put(IViewButton.PROP_TEXT, getModelObject().getText());
       json.put("selected", getModelObject().isSelected());
       return json;
@@ -34,26 +37,6 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    if ("click".equals(event.getEventType())) {
-      handleUiClickEvent(event, res);
-    }
-    else {
-      throw new IllegalArgumentException("unsupported event type");
-    }
-  }
-
-  protected void handleUiClickEvent(JsonEvent event, JsonResponse res) {
-    ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireActionFromUI();
-      }
-    };
-    syncJob.runNow(new NullProgressMonitor());
-  }
-
-  @Override
   protected void handleModelPropertyChange(String name, Object newValue) {
     if (IViewButton.PROP_SELECTED.equals(name)) {
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
@@ -61,6 +44,26 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
     else {
       super.handleModelPropertyChange(name, newValue);
     }
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+    if ("click".equals(event.getEventType())) {
+      handleUiClick(event, res);
+    }
+    else {
+      throw new IllegalArgumentException("unsupported event type");
+    }
+  }
+
+  protected void handleUiClick(JsonEvent event, JsonResponse res) {
+    ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        getModelObject().getUIFacade().fireActionFromUI();
+      }
+    };
+    syncJob.runNow(new NullProgressMonitor());
   }
 
 }

@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
-import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.OutlineWithOneNode;
@@ -35,7 +33,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonDesktopTreeTest {
@@ -112,9 +109,8 @@ public class JsonDesktopTreeTest {
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonDesktop jsonDesktop = Mockito.mock(JsonDesktop.class);
 
-    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(jsonDesktop, outline, jsonSession);
+    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession);
     jsonDesktopTree.init();
 
     //init treeNode map

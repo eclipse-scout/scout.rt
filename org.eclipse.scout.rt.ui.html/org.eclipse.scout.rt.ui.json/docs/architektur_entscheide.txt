@@ -14,3 +14,5 @@ Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
   Aktuell wird einfach ein JsonDesktopTable erzeugt ohne gui, damit table events behandelt werden können.
 - Soll die Erzeugung vom Server getriggert werden mittels create events? Aktuell wird die table einfach mit den nodes mitgeschickt
 
+Datenübertragung
+- Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung

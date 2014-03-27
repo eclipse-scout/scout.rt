@@ -493,7 +493,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     }
   }
 
-
   function onMouseDown(event) {
     var $row = $(event.delegateTarget),
       add = true,
@@ -734,9 +733,9 @@ Scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
 Scout.DesktopTable.prototype.onModelAction = function(event) {
   if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
     this.insertRows(event.rows);
-  } else if (event.type_ == 'rowsDeleted') {
-    //FIXME implement
   } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
-  } else if (event.type_ == 'rowOrderChanged') {}
+  } else {
+    log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
+  }
 };
