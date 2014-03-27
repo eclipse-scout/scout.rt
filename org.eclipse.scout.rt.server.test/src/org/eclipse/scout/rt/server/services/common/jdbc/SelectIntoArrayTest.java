@@ -13,15 +13,21 @@ package org.eclipse.scout.rt.server.services.common.jdbc;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.holders.BeanArrayHolder;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.ITableBeanHolder;
 import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.ContainerBean;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithArray;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithSet;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
@@ -46,10 +52,15 @@ public class SelectIntoArrayTest {
       new Object[]{true, null, "abc"},
       new Object[]{true, 1, null},
   };
+  private static final Object[][] ROLES_DATA = new Object[][]{
+      new Object[]{3L},
+      new Object[]{5L},
+      new Object[]{7L}
+  };
 
   @Test
   public void testSelect() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     Object[][] data = sql.select("SELECT A,B,C FROM T WHERE D=0");
     Object[][] expectedData = DATA;
@@ -62,7 +73,7 @@ public class SelectIntoArrayTest {
 
   @Test
   public void testSelectIntoBeanArray() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     BeanArrayHolder<MyBean> h = new BeanArrayHolder<SelectIntoArrayTest.MyBean>(MyBean.class);
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{h.active},:{h.state},:{h.name}", new NVPair("h", h));
@@ -102,7 +113,7 @@ public class SelectIntoArrayTest {
 
   @Test
   public void testSelectIntoFormDataArray() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     Object[][] expectedData = DATA;
     BeanArrayHolder<MyFormData> h = new BeanArrayHolder<SelectIntoArrayTest.MyFormData>(MyFormData.class);
@@ -121,7 +132,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldData() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldData tableData = new TableFieldData();
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :active,:state,:name", tableData);
@@ -134,7 +145,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldDataInNVPair() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldData tableData = new TableFieldData();
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{table.active},:{table.state},:{table.name}", new NVPair("table", tableData));
@@ -147,7 +158,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldDataInMap() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldData tableData = new TableFieldData();
     Map<String, ?> map = Collections.singletonMap("table", tableData);
@@ -161,7 +172,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldDataInBean() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     ContainerBean bean = new ContainerBean();
     bean.setTableFieldData(new TableFieldData());
@@ -185,7 +196,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldBeanData() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :active,:state,:name", tableData);
@@ -198,7 +209,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInNVPair() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{table.active},:{table.state},:{table.name}", new NVPair("table", tableData));
@@ -211,7 +222,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInMap() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
     Map<String, ?> map = Collections.singletonMap("table", tableData);
@@ -225,7 +236,7 @@ public class SelectIntoArrayTest {
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInBean() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
+    SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     ContainerBean bean = new ContainerBean();
     bean.setTableFieldBeanData(new TableFieldBeanData());
@@ -245,10 +256,74 @@ public class SelectIntoArrayTest {
     }
   }
 
-  private SqlServiceMock createSqlServiceMock() {
+  @Test
+  public void testSelectIntoFormDataWithArray() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
+    //
+
+    FormDataWithArray formData = new FormDataWithArray();
+    formData.getPersonNr().setValue(42L);
+
+    sql.selectInto("SELECT ROLE_NR FROM USER_ROLE WHERE USER_NR = :personNr INTO :{roles}", formData);
+    Long[] r = formData.getRoles().getValue();
+    assertNotNull(r);
+    assertEquals(3, r.length);
+    assertEquals("first role", 3L, r[0].longValue());
+    assertEquals("second role", 5L, r[1].longValue());
+    assertEquals("third role", 7L, r[2].longValue());
+  }
+
+  @Test
+  public void testSelectIntoFormDataWithSet() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
+    //
+
+    FormDataWithSet formData = new FormDataWithSet();
+    formData.getPersonNr().setValue(42L);
+
+    sql.selectInto("SELECT ROLE_NR FROM USER_ROLE WHERE USER_NR = :personNr INTO :{roles}", formData);
+    Set<Long> r = formData.getRoles().getValue();
+    assertNotNull(r);
+    assertEquals(3, r.size());
+    assertTrue("role contains 3", r.contains(3L));
+    assertTrue("role contains 5", r.contains(5L));
+    assertTrue("role contains 7", r.contains(7L));
+  }
+
+  @Test
+  public void testSelectIntoListInHolder() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
+    //
+
+    Holder<List> rolesHolder = new Holder<List>(List.class);
+
+    sql.selectInto("SELECT ROLE_NR FROM USER_ROLE WHERE USER_NR = :personNr INTO :{roles}", new NVPair("personNr", 63L), new NVPair("roles", rolesHolder));
+    List r = rolesHolder.getValue();
+    assertNotNull(r);
+    assertEquals(3, r.size());
+    assertEquals("first role", 3L, r.get(0));
+    assertEquals("second role", 5L, r.get(1));
+    assertEquals("third role", 7L, r.get(2));
+  }
+
+  @Test
+  public void testEmptySelectIntoFormDataWithSet() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock(new Object[][]{});
+    //
+
+    FormDataWithSet formData = new FormDataWithSet();
+    formData.getPersonNr().setValue(42L);
+
+    sql.selectInto("SELECT ROLE_NR FROM USER_ROLE WHERE USER_NR = :personNr INTO :{roles}", formData);
+    Set<Long> r = formData.getRoles().getValue();
+    assertNotNull(r);
+    assertEquals(0, r.size());
+  }
+
+  private SqlServiceMock createSqlServiceMock(Object[][] resultData) {
     SqlServiceMock sql = new SqlServiceMock();
     sql.setSqlStyle(new OracleSqlStyle());
-    sql.setResultData(DATA);
+    sql.setResultData(resultData);
     return sql;
   }
 

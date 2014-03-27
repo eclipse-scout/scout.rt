@@ -12,20 +12,28 @@ package org.eclipse.scout.rt.server.services.common.jdbc;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.ITableBeanHolder;
 import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
 import org.eclipse.scout.commons.holders.TableHolderFilter;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.ContainerBean;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithArray;
+import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithSet;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.junit.Test;
 
 /**
@@ -313,4 +321,144 @@ public class SelectInputBindTest {
     assertEquals(EXPECTED_PROTOCOL, sql.getProtocol().toString());
   }
 
+  /**
+   * Batch update from an array.
+   */
+  @Test
+  public void testBatchUpdateFromArray() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Long person = 9L;
+    Long[] roles = new Long[]{5L, 6L};
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", roles), new NVPair("value", "lorem"));
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * This test is similar to {@link #testBatchUpdateFromArray()}. It ensure that
+   * {@link #assertExpectedProtocol2(SqlServiceMock)} does not care about the order of the elements in the roles array
+   * (because in a set you can not ensure the order of the entries in the set)
+   */
+  @Test
+  public void testBatchUpdateFromArray2() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Long person = 9L;
+    Long[] roles = new Long[]{6L, 5L};
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", roles), new NVPair("value", "lorem"));
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Batch update from a list.
+   */
+  @Test
+  public void testBatchUpdateFromList() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Long person = 9L;
+    List<Long> roles = Arrays.asList(5L, 6L);
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", roles), new NVPair("value", "lorem"));
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Direct batch update from a set.
+   */
+  @Test
+  public void testBatchUpdateFromSet() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Long person = 9L;
+    Set<Long> roles = new HashSet<Long>();
+    roles.add(5L);
+    roles.add(6L);
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", roles), new NVPair("value", "lorem"));
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Batch update from a list in an holder.
+   */
+  @Test
+  public void testBatchUpdateFromListInHolder() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Long person = 9L;
+    List<Long> roles = Arrays.asList(5L, 6L);
+    Holder<List> holder = new Holder<List>(List.class, roles);
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", holder), new NVPair("value", "lorem"));
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Direct batch update from a array in {@link AbstractValueFieldData}.
+   */
+  @Test
+  public void testBatchUpdateFromArrayInValueField() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    FormDataWithArray formData = new FormDataWithArray();
+    formData.getPersonNr().setValue(9L);
+    formData.getValue().setValue("lorem");
+    formData.getRoles().setValue(new Long[]{5L, 6L});
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", formData);
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Direct batch update from a array in {@link AbstractValueFieldData}.
+   */
+  @Test
+  public void testBatchUpdateFromSetInValueField() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    Set<Long> roles = new HashSet<Long>();
+    roles.add(5L);
+    roles.add(6L);
+
+    FormDataWithSet formData = new FormDataWithSet();
+    formData.getPersonNr().setValue(9L);
+    formData.getValue().setValue("lorem");
+    formData.getRoles().setValue(roles);
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", formData);
+    assertExpectedProtocol2(sql);
+  }
+
+  /**
+   * Direct batch update from a array in {@link AbstractValueFieldData}.
+   */
+  @Test
+  public void testEmptyBatchUpdateFromSetInValueField() throws Exception {
+    SqlServiceMock sql = createSqlServiceMock();
+
+    FormDataWithSet formData = new FormDataWithSet();
+    formData.getPersonNr().setValue(9L);
+    formData.getValue().setValue("lorem");
+    formData.getRoles().setValue(Collections.<Long> emptySet());
+    sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", formData);
+    assertEquals("", sql.getProtocol().toString());
+
+  }
+
+  private static final String PREPARE_STATEMENT = "Connection.prepareStatement(UDPATE this_table SET v = ? where r = ? and p = ?)\n";
+  private static final String OBJECTS_RECORD_1 = "PreparedStatement.setObject(1, lorem, 12)\n" +
+      "PreparedStatement.setObject(2, 5, -5)\n" +
+      "PreparedStatement.setObject(3, 9, -5)\n";
+  private static final String OBJECTS_RECORD_2 = "PreparedStatement.setObject(1, lorem, 12)\n" +
+      "PreparedStatement.setObject(2, 6, -5)\n" +
+      "PreparedStatement.setObject(3, 9, -5)\n";
+
+  private static final String EXPECTED_PROTOCOL_2_V1 = PREPARE_STATEMENT + OBJECTS_RECORD_1 + PREPARE_STATEMENT + OBJECTS_RECORD_2;
+  private static final String EXPECTED_PROTOCOL_2_V2 = PREPARE_STATEMENT + OBJECTS_RECORD_2 + PREPARE_STATEMENT + OBJECTS_RECORD_1;
+
+  private static void assertExpectedProtocol2(SqlServiceMock sql) {
+    String actual = sql.getProtocol().toString();
+    if (actual.startsWith(PREPARE_STATEMENT + OBJECTS_RECORD_1)) {
+      assertEquals(EXPECTED_PROTOCOL_2_V1, actual);
+    }
+    else {
+      assertEquals(EXPECTED_PROTOCOL_2_V2, actual);
+    }
+  }
 }

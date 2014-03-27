@@ -1390,7 +1390,10 @@ public class StatementProcessor implements IStatementProcessor {
 
   private IBindOutput createOutputTerminal(IHolder h, ValueOutputToken bindToken) {
     Class cls = h.getHolderType();
-    if (cls.isArray()) {
+    if (Collection.class.isAssignableFrom(cls)) {
+      return new CollectionHolderOutput(h, bindToken);
+    }
+    else if (cls.isArray()) {
       // byte[] and char[] are no "arrays"
       if (cls == byte[].class || cls == char[].class) {
         return new SingleHolderOutput(h, bindToken);
@@ -1413,7 +1416,16 @@ public class StatementProcessor implements IStatementProcessor {
       if (nullType == null) {
         nullType = cls;
       }
-      if (cls.isArray()) {
+      if (Collection.class.isAssignableFrom(cls)) {
+        Collection value = (Collection) ((IHolder) o).getValue();
+        if (value == null) {
+          return new ArrayInput(null, bindToken);
+        }
+        else {
+          return new ArrayInput(value.toArray(), bindToken);
+        }
+      }
+      else if (cls.isArray()) {
         // byte[] and char[] are no "arrays"
         if (cls == byte[].class || cls == char[].class) {
           return new SingleInput(((IHolder) o).getValue(), nullType, bindToken);
