@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

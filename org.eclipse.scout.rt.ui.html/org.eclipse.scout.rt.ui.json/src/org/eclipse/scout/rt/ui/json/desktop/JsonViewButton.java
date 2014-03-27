@@ -1,9 +1,14 @@
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.desktop;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
+import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

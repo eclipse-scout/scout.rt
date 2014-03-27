@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.desktop;
 
 import static org.eclipse.scout.rt.ui.json.testing.JsonTestUtility.extractEventsFromResponse;
 
@@ -17,6 +17,9 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTable;
 import org.eclipse.scout.rt.ui.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.json.testing.JsonTestUtility;

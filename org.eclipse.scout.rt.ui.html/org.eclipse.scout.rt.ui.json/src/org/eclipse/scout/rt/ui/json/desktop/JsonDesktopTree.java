@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.desktop;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +22,14 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.json.Activator;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
+import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

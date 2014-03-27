@@ -1,13 +1,15 @@
 /**
  *
  */
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.desktop;
 
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;

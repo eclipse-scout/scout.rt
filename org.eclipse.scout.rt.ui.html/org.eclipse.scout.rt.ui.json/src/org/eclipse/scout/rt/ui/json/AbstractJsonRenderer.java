@@ -37,7 +37,7 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
     return m_id;
   }
 
-  protected IJsonSession getJsonSession() {
+  public IJsonSession getJsonSession() {
     return m_jsonSession;
   }
 
