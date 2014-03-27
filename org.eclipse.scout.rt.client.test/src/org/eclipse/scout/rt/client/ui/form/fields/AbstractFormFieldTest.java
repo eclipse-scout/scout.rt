@@ -86,8 +86,8 @@ public class AbstractFormFieldTest {
     TestFormWithClassId testForm = new TestFormWithClassId();
     TestFieldDuplicateClassId1 field1 = testForm.getFieldByClass(TestFieldDuplicateClassId1.class);
     TestFieldDuplicateClassId2 field2 = testForm.getFieldByClass(TestFieldDuplicateClassId2.class);
-    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "0", field1.classId());
-    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "1", field2.classId());
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "1", field1.classId());
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "2", field2.classId());
   }
 
   /**
@@ -139,13 +139,16 @@ public class AbstractFormFieldTest {
     }
 
     public class MainBox extends AbstractGroupBox {
+      @Order(10.0)
       public class TestFieldWithoutClassId extends AbstractFormField {
       }
 
+      @Order(20.0)
       @ClassId(DUPLICATE_CLASS_ID)
       public class TestFieldDuplicateClassId1 extends AbstractFormField {
       }
 
+      @Order(30.0)
       @ClassId(DUPLICATE_CLASS_ID)
       public class TestFieldDuplicateClassId2 extends AbstractFormField {
       }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 
@@ -113,6 +115,28 @@ public final class SpecUtility {
    */
   public static String createAnchorId(String classId) {
     return "c_" + classId;
+  }
+
+  /**
+   * Creates a flat array with all menus by traversing the menu hierarchy by depth-first search.
+   * 
+   * @param menus
+   *          the list of top level menus
+   * @return
+   */
+  public static IMenu[] expandMenuHierarchy(IMenu[] menus) {
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
+    for (IMenu menu : menus) {
+      addMenuRecursive(menuList, menu);
+    }
+    return menuList.toArray(new IMenu[menuList.size()]);
+  }
+
+  private static void addMenuRecursive(ArrayList<IMenu> menuList, IMenu menu) {
+    menuList.add(menu);
+    for (IMenu subMenu : menu.getChildActions()) {
+      addMenuRecursive(menuList, subMenu);
+    }
   }
 
 }

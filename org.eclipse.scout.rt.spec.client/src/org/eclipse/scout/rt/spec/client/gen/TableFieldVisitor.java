@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.internal.Section;
@@ -43,7 +44,7 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
 
   private IDocSection createDocSection(ITableField<?> field) {
     String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
-    IDocSection menuSection = DocGenUtility.createDocSection(field.getTable().getMenus(), m_config.getMenuTableConfig(), false);
+    IDocSection menuSection = DocGenUtility.createDocSection(SpecUtility.expandMenuHierarchy(field.getTable().getMenus()), m_config.getMenuTableConfig(), false);
     IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnTableConfig(), false);
     // TODO ASA refactor if/else cascade
     if (menuSection != null) {

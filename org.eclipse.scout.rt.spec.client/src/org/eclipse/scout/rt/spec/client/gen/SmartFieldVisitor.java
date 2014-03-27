@@ -13,10 +13,9 @@ package org.eclipse.scout.rt.spec.client.gen;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.extension.client.ui.action.menu.AbstractExtensibleMenu;
+import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
@@ -47,24 +46,11 @@ public class SmartFieldVisitor implements IDocFormFieldVisitor {
   protected IDocSection createDocSection(ISmartField<?> field) {
     String title = m_config.getSmartFieldConfig().getTitleExtractor().getText(field);
     IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig(), true);
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    for (IMenu menu : field.getMenus()) {
-      addMenuRecursive(menuList, menu);
-    }
-    IDocSection menuSection = DocGenUtility.createDocSection(menuList.toArray(new IMenu[menuList.size()]), m_config.getMenuTableConfig(), false);
+    IDocSection menuSection = DocGenUtility.createDocSection(SpecUtility.expandMenuHierarchy(field.getMenus()), m_config.getMenuTableConfig(), false);
     if (menuSection != null) {
       return new Section(title, docTable, menuSection);
     }
     return new Section(title, docTable);
-  }
-
-  protected void addMenuRecursive(ArrayList<IMenu> menuList, IMenu menu) {
-    menuList.add(menu);
-    if (menu instanceof AbstractExtensibleMenu) {
-      for (IMenu subMenu : ((AbstractExtensibleMenu) menu).getChildActions()) {
-        addMenuRecursive(menuList, subMenu);
-      }
-    }
   }
 
   @Override
