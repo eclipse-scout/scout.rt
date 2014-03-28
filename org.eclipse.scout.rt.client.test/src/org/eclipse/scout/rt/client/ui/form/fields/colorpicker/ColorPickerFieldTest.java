@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.colorpicker;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -39,13 +41,13 @@ public class ColorPickerFieldTest {
   private List<ServiceRegistration> reg;
 
   @Before
-  public void setUp() throws Throwable {
+  public void setUp() throws ProcessingException {
     form = new TestForm();
     form.startForm();
   }
 
   @Test
-  public void testParseValue() throws Throwable {
+  public void testParseValue() {
     ColorPickerField01 field = form.getColorPickerField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
@@ -64,7 +66,45 @@ public class ColorPickerFieldTest {
   }
 
   @Test
-  public void testMenusWithoutDefault() {
+  public void testParseInvalidValues() {
+    // valid
+    ColorPickerField01 field = form.getColorPickerField01();
+    field.getUIFacade().setTextFromUI("120 135 160", false);
+    assertEquals("#7887A0", field.getValue());
+    assertNull(field.getErrorStatus());
+
+    // invalid hex
+    field.getUIFacade().setTextFromUI("#5989A4E", false);
+    assertEquals("#7887A0", field.getValue());
+    assertNotNull(field.getErrorStatus());
+
+  }
+
+  @Test
+  public void testInvalidRgbValues() {
+    ColorPickerField01 field = form.getColorPickerField01();
+    field.getUIFacade().setTextFromUI("120 135 160", false);
+    assertEquals("#7887A0", field.getValue());
+    assertNull(field.getErrorStatus());
+
+    // invalid rgb
+    field.getUIFacade().setTextFromUI("256-200-200", false);
+    assertEquals("#7887A0", field.getValue());
+    assertNotNull(field.getErrorStatus());
+
+    // reset to valid
+    field.getUIFacade().setTextFromUI("#1010A0", false);
+    assertEquals("#1010A0", field.getValue());
+    assertNull(field.getErrorStatus());
+
+    // invalid rgb
+    field.getUIFacade().setTextFromUI("-100-200-200", false);
+    assertEquals("#1010A0", field.getValue());
+    assertNotNull(field.getErrorStatus());
+  }
+
+  @Test
+  public void testMenus() {
     ColorPickerField01 field = form.getColorPickerField01();
     assertEquals(1, field.getMenus().size());
     assertEquals(TestMenu1.class, field.getMenus().get(0).getClass());
