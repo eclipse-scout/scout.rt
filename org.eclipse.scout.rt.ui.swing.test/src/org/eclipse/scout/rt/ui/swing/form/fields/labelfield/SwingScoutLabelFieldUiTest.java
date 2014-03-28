@@ -25,10 +25,17 @@ import org.junit.Test;
 
 /**
  * Tests for {@link SwingScoutLabelField}
- * 
+ *
  * @since 3.10.0-M5
  */
 public class SwingScoutLabelFieldUiTest {
+
+  private static final int LABEL_HORIZONTAL_ALIGNMENT_LEFT = -1;
+  private static final int LABEL_HORIZONTAL_ALIGNMENT_CENTER = 0;
+  private static final int LABEL_HORIZONTAL_ALIGNMENT_RIGHT = 1;
+  private static final int LABEL_VERTICAL_ALIGNMENT_TOP = -1;
+  private static final int LABEL_VERTICAL_ALIGNMENT_MIDDLE = 0;
+  private static final int LABEL_VERTICAL_ALIGNMENT_BOTTOM = 1;
 
   private TestSwingScoutLabelField m_label;
 
@@ -52,39 +59,40 @@ public class SwingScoutLabelFieldUiTest {
 
   @Test
   public void testVerticalAlignment() {
-    m_label.setVerticalAlignmentFromScout(0);
+    m_label.setVerticalAlignmentFromScout(LABEL_VERTICAL_ALIGNMENT_MIDDLE);
     String text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("valign=\"middle\""));
 
-    m_label.setVerticalAlignmentFromScout(-1);
+    m_label.setVerticalAlignmentFromScout(LABEL_VERTICAL_ALIGNMENT_TOP);
     text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("valign=\"top\""));
 
-    m_label.setVerticalAlignmentFromScout(1);
+    m_label.setVerticalAlignmentFromScout(LABEL_VERTICAL_ALIGNMENT_BOTTOM);
     text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("valign=\"bottom\""));
   }
 
   @Test
   public void testHorizontalAlignment() {
-    m_label.setHorizontalAlignmentFromScout(-1);
+    m_label.setHorizontalAlignmentFromScout(LABEL_HORIZONTAL_ALIGNMENT_LEFT);
     String text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("align=\"left\""));
 
-    m_label.setHorizontalAlignmentFromScout(0);
+    m_label.setHorizontalAlignmentFromScout(LABEL_HORIZONTAL_ALIGNMENT_CENTER);
     text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("align=\"center\""));
 
-    m_label.setHorizontalAlignmentFromScout(1);
+    m_label.setHorizontalAlignmentFromScout(LABEL_HORIZONTAL_ALIGNMENT_RIGHT);
     text = ((JTextPane) m_label.getSwingField()).getText();
     assertTrue(text.contains("align=\"right\""));
   }
 
   @Test
-  public void testForgroundColor() {
+  public void testForegroundColor() {
     m_label.setEnabledFromScout(true);
     Color enabledForegroundColor = m_label.getSwingLabelField().getForeground();
     assertNotNull(enabledForegroundColor);
+
     m_label.setEnabledFromScout(false);
     Color disabledForegroundColor = m_label.getSwingLabelField().getForeground();
     assertNotNull(disabledForegroundColor);
