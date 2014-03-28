@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -465,8 +464,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected List<Class<? extends IToolButton>> getConfiguredToolButtons() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(Arrays.asList(dca), IToolButton.class);
+    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IToolButton>> filtered = ConfigurationUtility.filterClasses(dca, IToolButton.class);
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IToolButton.class);
   }
 
   protected void initConfig() throws ProcessingException {
@@ -636,8 +636,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public List<IToolButton> getToolbuttons() {
+  public List<IToolButton> getToolButtons() {
     return CollectionUtility.unmodifiableListCopy(m_toolbuttons);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public List<IToolButton> getToolbuttons() {
+    return getToolButtons();
   }
 
   /**
@@ -653,13 +659,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz) {
+  public IToolButton getToolButtonByClass(Class<? extends IToolButton> clazz) {
     for (IToolButton b : m_toolbuttons) {
       if (b.getClass() == clazz) {
         return b;
       }
     }
     return null;
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz) {
+    return getToolButtonByClass(clazz);
   }
 
   /**
@@ -1252,7 +1264,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     initFormInternal();
     // fields
     FormUtility.initFormFields(this);
-    ActionUtility.initActions(getToolbuttons());
+    ActionUtility.initActions(getToolButtons());
     // custom
     execInitForm();
   }

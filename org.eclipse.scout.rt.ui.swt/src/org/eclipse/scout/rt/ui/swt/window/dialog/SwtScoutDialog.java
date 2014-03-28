@@ -167,7 +167,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   *
   */
   protected void updateToolbarActionsFromScout() {
-    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolbuttons());
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolButtons());
     if (!toolbuttons.isEmpty()) {
       IToolBarManager toolBarManager = getRootForm().getToolBarManager();
       for (IToolButton b : toolbuttons) {

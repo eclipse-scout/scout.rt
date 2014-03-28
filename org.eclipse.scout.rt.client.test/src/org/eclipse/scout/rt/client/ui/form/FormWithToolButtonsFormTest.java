@@ -15,13 +15,11 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
-import org.eclipse.scout.rt.client.ui.form.FormWithToolbuttonsFormTest.FormWithToolbuttonsForm.MainBox.CloseButton;
-import org.eclipse.scout.rt.client.ui.form.FormWithToolbuttonsFormTest.FormWithToolbuttonsForm.MainBox.GroupBox;
-import org.eclipse.scout.rt.client.ui.form.FormWithToolbuttonsFormTest.FormWithToolbuttonsForm.MainBox.GroupBox.DefaultField;
-import org.eclipse.scout.rt.client.ui.form.FormWithToolbuttonsFormTest.FormWithToolbuttonsForm.Toolbutton01;
+import org.eclipse.scout.rt.client.ui.form.FormWithToolButtonsFormTest.FormWithToolButtonsForm.MainBox.CloseButton;
+import org.eclipse.scout.rt.client.ui.form.FormWithToolButtonsFormTest.FormWithToolButtonsForm.ToolButton01;
+import org.eclipse.scout.rt.client.ui.form.FormWithToolButtonsFormTest.FormWithToolButtonsForm.ToolButton02;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -29,18 +27,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
-public class FormWithToolbuttonsFormTest {
+public class FormWithToolButtonsFormTest {
 
   @Test
   public void testForm() throws ProcessingException {
-    FormWithToolbuttonsForm form = new FormWithToolbuttonsForm();
-    assertEquals(1, form.getToolbuttons().size());
-    assertEquals(Toolbutton01.class.getSimpleName(), form.getToolbuttons().get(0).getClass().getSimpleName());
+    FormWithToolButtonsForm form = new FormWithToolButtonsForm();
+    assertEquals(2, form.getToolButtons().size());
+    assertEquals(ToolButton01.class.getSimpleName(), form.getToolButtons().get(0).getClass().getSimpleName());
+    assertEquals(ToolButton02.class.getSimpleName(), form.getToolButtons().get(1).getClass().getSimpleName());
   }
 
-  public class FormWithToolbuttonsForm extends AbstractForm {
+  public class FormWithToolButtonsForm extends AbstractForm {
 
-    public FormWithToolbuttonsForm() throws ProcessingException {
+    public FormWithToolButtonsForm() throws ProcessingException {
       super();
     }
 
@@ -54,20 +53,12 @@ public class FormWithToolbuttonsFormTest {
       return TEXTS.get("StringField");
     }
 
-    public void startPageForm() throws ProcessingException {
-      startInternal(new PageFormHandler());
+    public void startView() throws ProcessingException {
+      startInternal(new ViewHandler());
     }
 
     public CloseButton getCloseButton() {
       return getFieldByClass(CloseButton.class);
-    }
-
-    public DefaultField getDefaultField() {
-      return getFieldByClass(DefaultField.class);
-    }
-
-    public GroupBox getGroupBox() {
-      return getFieldByClass(GroupBox.class);
     }
 
     public MainBox getMainBox() {
@@ -77,31 +68,16 @@ public class FormWithToolbuttonsFormTest {
     @Order(10.0)
     public class MainBox extends AbstractGroupBox {
 
-      @Order(10.0)
-      public class GroupBox extends AbstractGroupBox {
-
-        @Order(10.0)
-        public class DefaultField extends AbstractStringField {
-
-          @Override
-          protected int getConfiguredGridW() {
-            return 2;
-          }
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Default");
-          }
-        }
-      }
-
       @Order(30.0)
       public class CloseButton extends AbstractCloseButton {
       }
     }
 
+    public abstract class AbstractButtonTemplate extends AbstractToolButton {
+    }
+
     @Order(200)
-    public class Toolbutton01 extends AbstractToolButton {
+    public class ToolButton01 extends AbstractToolButton {
       @Override
       protected String getConfiguredText() {
         return "Toolbutton";
@@ -113,12 +89,16 @@ public class FormWithToolbuttonsFormTest {
       }
     }
 
-    public class PageFormHandler extends AbstractFormHandler {
+    @Order(210)
+    public class ToolButton02 extends AbstractButtonTemplate {
 
       @Override
-      protected void execLoad() throws ProcessingException {
-        getDefaultField().setValue(TEXTS.get("Lorem"));
+      protected String getConfiguredIconId() {
+        return AbstractIcons.Gears;
       }
+    }
+
+    public class ViewHandler extends AbstractFormHandler {
     }
   }
 }

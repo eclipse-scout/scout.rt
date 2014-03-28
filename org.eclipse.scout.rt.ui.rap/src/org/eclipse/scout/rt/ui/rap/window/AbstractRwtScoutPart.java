@@ -143,7 +143,7 @@ public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
     if (uiForm == null) {
       return;
     }
-    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getScoutObject().getToolbuttons());
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getScoutObject().getToolButtons());
     if (!toolbuttons.isEmpty()) {
       IToolBarManager toolBarManager = uiForm.getToolBarManager();
       for (IToolButton b : toolbuttons) {

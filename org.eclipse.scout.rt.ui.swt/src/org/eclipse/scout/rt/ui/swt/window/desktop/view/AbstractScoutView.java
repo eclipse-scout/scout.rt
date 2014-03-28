@@ -198,7 +198,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
    *
    */
   protected void updateToolbarActionsFromScout() {
-    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolbuttons());
+    List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolButtons());
     if (!toolbuttons.isEmpty()) {
       IToolBarManager toolBarManager = getRootForm().getToolBarManager();
       if (getForm().getToolbarLocation() == IForm.TOOLBAR_VIEW_PART) {

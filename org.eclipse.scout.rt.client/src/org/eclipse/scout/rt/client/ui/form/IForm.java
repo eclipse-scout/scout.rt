@@ -531,8 +531,34 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    */
   void setFormStored(boolean b);
 
+  /**
+   * Returns a read only list of all tool buttons
+   * 
+   * @return list of all tool buttons
+   * @since Scout 4.0.0-M7
+   */
+  List<IToolButton> getToolButtons();
+
+  /**
+   * @deprecated use {@link #getToolButtons()} instead. will be removed with Scout 4.0.0-RC1
+   */
+  @Deprecated
   List<IToolButton> getToolbuttons();
 
+  /**
+   * Returns the tool button identified with the {@link IToolButton} class
+   * 
+   * @param clazz
+   *          the class of the tool button
+   * @return toolbutton
+   * @since Scout 4.0.0-M7
+   */
+  IToolButton getToolButtonByClass(Class<? extends IToolButton> clazz);
+
+  /**
+   * @deprecated use {@link #getToolButtonByClass()} instead. will be removed with Scout 4.0.0-RC1
+   */
+  @Deprecated
   IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz);
 
   Object getProperty(String name);
