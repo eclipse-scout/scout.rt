@@ -67,7 +67,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
     .click(drawChart);
 
   // find best x and y axis: best is 9 different entries
-  var matrix = new Scout.DesktopMatrix(columns, table),
+  var matrix = new Scout.DesktopMatrix(table),
     columnCount = matrix.columnCount(),
     comp = function(a, b) {
       return Math.abs(a[1] - 9) - Math.abs(b[1] - 9);
@@ -249,7 +249,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
       dataSum = $('.selected', $dataSelect).hasClass('data-sum');
 
     // build matrix
-    var matrix = new Scout.DesktopMatrix(columns, table),
+    var matrix = new Scout.DesktopMatrix(table),
       dataAxis = matrix.addData(data, dataCount ? -1 : (dataSum ? 1 : 2));
 
     xAxis = matrix.addAxis(axis, axisGroup);

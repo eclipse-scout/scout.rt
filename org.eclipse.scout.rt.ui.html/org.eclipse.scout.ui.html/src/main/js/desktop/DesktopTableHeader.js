@@ -1,41 +1,60 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableHeader = function(desktopTable, $tableHeader, columns) {
+Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) {
   this.totalWidth = 0;
 
-  // create header based on model
+  var columns = desktopTable.model.table.columns;
+
   for (var i = 0; i < columns.length; i++) {
     var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('type', columns[i].type)
-      .css('width', columns[i].width)
-      .on('mousedown', '', sortToggle);
-
-    if (columns[i].width === 0) $header.hide();
+      .data('index', i)
+      .css('width', columns[i].width - 17)
+      .on('click', '', clickHeader);
 
     this.totalWidth += columns[i].width;
 
-    $header.appendDiv('', 'header-control', '')
-      .on('mousedown', '', clickHeaderMenu);
-
-    $header.appendDiv('', 'header-resize', '')
+    $tableHeader.appendDiv('', 'header-resize', '')
       .on('mousedown', '', resizeHeader);
 
     columns[i].$div = $header;
   }
 
-  function sortToggle(event) {
-    // find new sort direction
-    var $clicked = $(this),
-      dir = $clicked.hasClass('sort-up') ? 'down' : 'up';
+  $tableHeader.appendDiv('HeaderOrganize')
+    .on('click', '', clickOrganize);
 
-    desktopTable.sortChange($clicked.index(), dir, event.shiftKey || event.ctrlKey);
+  function clickHeader(event) {
+    var $header = $(this);
+
+    if (event.shiftKey || event.ctrlKey) {
+      var index = $header.data('index'),
+        dir = $header.hasClass('sort-up') ? 'down' : 'up';
+
+      desktopTable.sortChange(index, dir, event.shiftKey);
+    } else {
+      var x = $header.offset().left,
+        y = $header.offset().top;
+      new Scout.MenuHeader(desktopTable, $header, filterCallback, x, y);
+    }
+
+    return false;
+  }
+
+  function clickOrganize(event) {
+    var $clicked = $(this),
+      x = $clicked.offset().left,
+      y = $clicked.offset().top;
+
+    new Scout.MenuTable(desktopTable, x, y);
+
+    return false;
   }
 
   function resizeHeader(event) {
-    var startX = event.pageX - 8,
-      $header = $(this).parent(),
-      colNum = $header.index() + 1,
+    var startX = event.pageX - 1,
+      $header = $(this).prev(),
+      colNum = $header.data('index') + 1,
       headerWidth = $header.width(),
       totalWidth = $('.table-row').first().width();
 
@@ -49,7 +68,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, columns) {
 
       if (headerWidth + diff > 80) {
         $header.css('width', headerWidth + diff);
-        $('.table-row > div:nth-of-type(' + colNum + ' )').css('width', headerWidth + diff);
+        $('.table-row > div:nth-of-type(' + colNum + ' )').css('width', headerWidth  + 17 + diff);
         $('.table-row').width(totalWidth + diff);
 
       }
@@ -61,15 +80,5 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, columns) {
 
       return false;
     }
-  }
-
-  function clickHeaderMenu(event) {
-    var $clicked = $(this),
-      x = $clicked.offset().left,
-      y = $clicked.offset().top;
-
-    new Scout.MenuHeader($clicked.parent(), desktopTable, x, y);
-
-    return false;
   }
 };

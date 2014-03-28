@@ -14,7 +14,6 @@
 //@include("src/main/js/desktop/DesktopTableGraph.js");
 //@include("src/main/js/desktop/DesktopTableHeader.js");
 //@include("src/main/js/desktop/DesktopTableMap.js");
-//@include("src/main/js/desktop/DesktopTableOrganize.js");
 //@include("src/main/js/desktop/DesktopToolButton.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");
 //@include("src/main/js/desktop/DesktopTree.js");
@@ -23,6 +22,7 @@
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/menu/MenuHeader.js");
+//@include("src/main/js/menu/MenuTable.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");

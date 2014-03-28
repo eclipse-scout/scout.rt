@@ -1,11 +1,11 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopMatrix = function(columns, table) {
+Scout.DesktopMatrix = function(table) {
   this._allData = [];
   this._allAxis = [];
-  this._columns = columns;
-  this._table = table;
+  this._columns = table.columns;
+  this._rows = table.rows;
 };
 
 /**
@@ -150,11 +150,11 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
     getCellValue = Scout.DesktopMatrix.getCellValue;
 
   // collect data from table
-  for (r = 0; r < this._table.rows.length; r++) {
+  for (r = 0; r < this._rows.length; r++) {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = getCellValue(this._table.rows[r].cells[this._allAxis[k].column]);
+      key = getCellValue(this._rows[r].cells[this._allAxis[k].column]);
       normKey = this._allAxis[k].norm(key);
       if (normKey !== undefined) {
         this._allAxis[k].add(normKey);
@@ -166,7 +166,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = getCellValue(this._table.rows[r].cells[this._allData[v].column]);
+      data = getCellValue(this._rows[r].cells[this._allData[v].column]);
       normData = this._allData[v].norm(data);
       if (normData !== undefined) {
         values.push(normData);
@@ -244,8 +244,8 @@ Scout.DesktopMatrix.prototype.columnCount = function() {
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
 
-    for (var r = 0; r < this._table.rows.length; r++) {
-      var v = getCellValue(this._table.rows[r].cells[c]);
+    for (var r = 0; r < this._rows.length; r++) {
+      var v = getCellValue(this._rows[r].cells[c]);
       if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
 

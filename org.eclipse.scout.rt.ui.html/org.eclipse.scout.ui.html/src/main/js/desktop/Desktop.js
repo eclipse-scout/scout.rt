@@ -179,7 +179,7 @@ Scout.Desktop = function(scout, $parent, model) {
     }
 
     if (prev) {
-      prev.appendDiv('', 'key-box', '�?');
+      prev.appendDiv('', 'key-box', '←');
       prev.children('.tree-item-control').hide();
     }
 

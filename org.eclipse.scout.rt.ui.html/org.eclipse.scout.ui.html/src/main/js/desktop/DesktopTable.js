@@ -36,7 +36,6 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlChart = $tableControl.appendDiv('ControlChart'),
     $controlGraph = $tableControl.appendDiv('ControlGraph'),
     $controlMap = $tableControl.appendDiv('ControlMap'),
-    $controlOrganize = $tableControl.appendDiv('ControlOrganize'),
     $controlLabel = $tableControl.appendDiv('ControlLabel');
 
   this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
@@ -44,18 +43,18 @@ Scout.DesktopTable.prototype.render = function($parent) {
   this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
 
   // control buttons have mouse over effects
-  $("body").on("mouseenter", "#control_graph, #control_chart, #control_map, #control_organise",
+  $("body").on("mouseenter", "#control_graph, #control_chart, #control_map",
     function() {
       $('#control_label').text($(this).data('label'));
     });
 
-  $("body").on("mouseleave", "#control_graph, #control_chart, #control_map, #control_organise",
+  $("body").on("mouseleave", "#control_graph, #control_chart, #control_map",
     function() {
       $('#control_label').text('');
     });
 
   // create header
-  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, this.model.table.columns);
+  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, filterCallback);
 
   // load data and create rows
   this._loadData();
@@ -90,17 +89,9 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlMap.addClass('disabled');
   }
 
-  // organize button
-  var textOrganize = 'Spaltenverwaltung',
-    textClose = 'schliessen';
-  $controlOrganize.data('label', textOrganize)
-    .hover(controlIn, controlOut)
-    .click(controlClick)
-    .click(controlOrganize);
-
   // named functions
   function controlIn(event) {
-    var close = $(event.target).hasClass('selected') ? ' ' + textClose : '';
+    var close = $(event.target).hasClass('selected') ? ' schliessen' : '';
     $controlLabel.text($(event.target).data('label') + close);
   }
 
@@ -172,10 +163,6 @@ Scout.DesktopTable.prototype.render = function($parent) {
     new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
   }
 
-  function controlOrganize(event) {
-    new Scout.DesktopTableOrganize(that.scout, $controlContainer, that.model, that.model.table.columns, that);
-  }
-
   function resizeControl(event) {
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
@@ -235,12 +222,10 @@ Scout.DesktopTable.prototype.render = function($parent) {
       } else {
         hideRow($row);
       }
-      that._scrollbar.initThumb();
     });
 
     that._setInfoFilter(rowCount);
     $allRows.appendTo(that._$tableDataScroll);
-    that._scrollbar.initThumb();
   }
 
   function resetFilter(event) {
@@ -251,7 +236,6 @@ Scout.DesktopTable.prototype.render = function($parent) {
       $(this).hide();
     });
     $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    log($('.main-chart.selected'));
     that._resetSelection();
   }
 
@@ -261,6 +245,10 @@ Scout.DesktopTable.prototype.render = function($parent) {
         'height': '34',
         'padding-top': '2',
         'padding-bottom': '2'
+      }, {
+        complete: function() {
+          that._scrollbar.initThumb();
+        }
       });
   }
 
@@ -273,6 +261,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
       }, {
         complete: function() {
           $(this).hide();
+          that._scrollbar.initThumb();
         }
       });
   }
@@ -345,10 +334,13 @@ Scout.DesktopTable.prototype._sort = function() {
     var column = this.model.table.columns[c],
       order = column.$div.data('sort-order'),
       dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
-    sortColumns[order] = {
-      index: c,
-      dir: dir
-    };
+
+    if (order >= 0) {
+      sortColumns[order] = {
+        index: c,
+        dir: dir
+      };
+    }
   }
 
   // compare rows
@@ -389,7 +381,7 @@ Scout.DesktopTable.prototype._sort = function() {
 };
 
 Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
-  // find new sort direction
+  // find header div
   var $header = $('.header-item').eq(index);
 
   // change sort order of clicked header
@@ -399,23 +391,18 @@ Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
   // when shift pressed: add, otherwise reset
   if (additional) {
     var clickOrder = $header.data('sort-order'),
-      maxOrder = -1,
-      newOrder;
+      maxOrder = -1;
 
     $('.header-item').each(function() {
       var value = $(this).data('sort-order');
-      maxOrder = (value > maxOrder) ? value : maxOrder;
+      maxOrder = (typeof value == 'number' && value > maxOrder) ? value : maxOrder;
     });
 
-    if (clickOrder !== undefined) {
-      newOrder = clickOrder;
-    } else if (maxOrder > -1) {
-      newOrder = maxOrder + 1;
+    if (clickOrder !== undefined && clickOrder !== null) {
+      $header.data('sort-order', clickOrder);
     } else {
-      newOrder = 0;
+      $header.data('sort-order', maxOrder + 1);
     }
-
-    $header.data('sort-order', newOrder);
 
   } else {
     $header.data('sort-order', 0)
@@ -510,8 +497,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
       var startIndex = Math.min(firstIndex, lastIndex),
         endIndex = Math.max(firstIndex, lastIndex) + 1;
-
-      log(firstIndex, lastIndex);
 
       var $actionRow = $('.table-row', that._$tableData).slice(startIndex, endIndex);
 
@@ -611,9 +596,12 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 };
 
 Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
-  $('.table-row-sum', this._$tableDataScroll).animateAVCSD('height', 0, $.removeThis);
+  var that = this,
+    table = this.model.table;
 
-  var table = this.model.table;
+  $('.table-row-sum', this._$tableDataScroll).animateAVCSD('height', 0, $.removeThis, that._scrollbar.initThumb.bind(that._scrollbar));
+  this.sortChange(groupColumn, 'up', false);
+
   if (draw) {
     var $rows = $('.table-row', this._$tableDataScroll);
     $sumRow = $.makeDiv('', 'table-row-sum'),
@@ -650,16 +638,13 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
         $sumRow.insertAfter($rows.eq(r))
           .width(this._tableHeader.totalWidth + 4)
           .css('height', 0)
-          .animateAVCSD('height', 34);
+          .animateAVCSD('height', 34, null, that._scrollbar.initThumb.bind(that._scrollbar));
 
         $sumRow = $.makeDiv('', 'table-row-sum');
         sum = [];
       }
     }
   }
-
-  // update scrollbar
-  this._scrollbar.initThumb();
 };
 
 Scout.DesktopTable.prototype.detach = function() {
