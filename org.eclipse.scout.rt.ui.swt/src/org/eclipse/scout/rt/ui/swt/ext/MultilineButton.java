@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Menu;
  * SWT's RadioButton and Checkbox don't support multiline in their labels.
  * A pure SWT Label however supports multiline.
  * Therefore this class was created, it is a composite of a button and a label.
- * 
+ *
  * @since 3.10.0-M4
  */
 public abstract class MultilineButton extends Composite {
@@ -109,6 +109,18 @@ public abstract class MultilineButton extends Composite {
     super.setToolTipText(string);
     m_btn.setToolTipText(string);
     m_label.setToolTipText(string);
+  }
+
+  @Override
+  public void setData(Object data) {
+    super.setData(data);
+    m_btn.setData(data);
+  }
+
+  @Override
+  public void setData(String key, Object value) {
+    super.setData(key, value);
+    m_btn.setData(key, value);
   }
 
   public void setImage(Image icon) {
