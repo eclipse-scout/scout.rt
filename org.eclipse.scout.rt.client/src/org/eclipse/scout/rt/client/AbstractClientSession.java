@@ -64,6 +64,7 @@ public abstract class AbstractClientSession implements IClientSession {
   // state
   private final Object m_stateLock;
   private volatile boolean m_active;
+  private volatile boolean m_isStopping;
   private Throwable m_loadError;
   private int m_exitCode = IApplication.EXIT_OK;
   // model
@@ -86,6 +87,7 @@ public abstract class AbstractClientSession implements IClientSession {
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
+    m_isStopping = false;
     m_sharedVariableMap = new SharedVariableMap();
     m_locale = LocaleThreadLocal.get();
     if (autoInitConfig) {
@@ -337,7 +339,15 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public void stopSession(int exitCode) {
+    synchronized (m_stateLock) {
+      if (isStopping()) {
+        // we are already stopping. ignore event
+        return;
+      }
+      m_isStopping = true;
+    }
     if (!m_desktop.doBeforeClosingInternal()) {
+      m_isStopping = false;
       return;
     }
     m_exitCode = exitCode;
@@ -371,6 +381,10 @@ public abstract class AbstractClientSession implements IClientSession {
     if (LOG.isInfoEnabled()) {
       LOG.info("end session event loop");
     }
+  }
+
+  protected boolean isStopping() {
+    return m_isStopping;
   }
 
   @Override

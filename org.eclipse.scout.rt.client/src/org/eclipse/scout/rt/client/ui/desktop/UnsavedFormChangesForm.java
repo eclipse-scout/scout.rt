@@ -11,24 +11,27 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.OpenFormsField;
+import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.UnsavedChangesBox;
+import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.UnsavedChangesBox.OpenFormsField;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -48,6 +51,11 @@ public class UnsavedFormChangesForm extends AbstractForm {
     return TEXTS.get("UnsavedChangesTitle");
   }
 
+  @Override
+  protected boolean getConfiguredAskIfNeedSave() {
+    return false;
+  }
+
   public void startNew() throws ProcessingException {
     startInternal(new NewHandler());
   }
@@ -60,12 +68,20 @@ public class UnsavedFormChangesForm extends AbstractForm {
     return getFieldByClass(MainBox.class);
   }
 
+  public UnsavedChangesBox getUnsavedChangesBox() {
+    return getFieldByClass(UnsavedChangesBox.class);
+  }
+
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
 
   public OpenFormsField getOpenFormsField() {
     return getFieldByClass(OpenFormsField.class);
+  }
+
+  public List<IForm> getUnsavedForms() {
+    return CollectionUtility.unmodifiableList(m_forms);
   }
 
   @Order(10.0)
@@ -78,63 +94,136 @@ public class UnsavedFormChangesForm extends AbstractForm {
     }
 
     @Order(10.0)
-    public class LabelField extends AbstractLabelField {
+    @ClassId("51908aa1-6409-44fd-9aeb-a92cec73baaa")
+    public class UnsavedChangesBox extends AbstractGroupBox {
 
       @Override
-      protected void execInitField() throws ProcessingException {
-        setValue(TEXTS.get("SaveChangesOfSelectedItems"));
+      protected String getConfiguredLabel() {
+        return TEXTS.get("SaveChangesOfSelectedItems");
       }
 
       @Override
-      protected int getConfiguredGridH() {
+      protected String getConfiguredBorderDecoration() {
+        return BORDER_DECORATION_LINE;
+      }
+
+      @Override
+      protected int getConfiguredGridColumnCount() {
         return 1;
       }
 
-      @Override
-      protected boolean getConfiguredLabelVisible() {
-        return false;
+      @Order(20.0)
+      @ClassId("84f2a9cf-bce5-4379-aede-11d07b21d3fb")
+      public class OpenFormsField extends AbstractListBox<IForm> {
+
+        @Override
+        protected void execInitField() throws ProcessingException {
+          checkAllKeys();
+        }
+
+        public List<IForm> getInvalidForms() {
+          LinkedList<IForm> invalidForms = new LinkedList<IForm>();
+          for (IForm f : getValue()) {
+            try {
+              f.validateForm();
+            }
+            catch (ProcessingException e) {
+              invalidForms.add(f);
+            }
+          }
+          return invalidForms;
+        }
+
+        @Override
+        protected Class<? extends ILookupCall<IForm>> getConfiguredLookupCall() {
+          return UnsavedFormsLookupCall.class;
+        }
+
+        @Override
+        protected void execPrepareLookup(ILookupCall<IForm> call) throws ProcessingException {
+          UnsavedFormsLookupCall unsavedFormsLookupCall = (UnsavedFormsLookupCall) call;
+          unsavedFormsLookupCall.setUnsavedForms(getUnsavedForms());
+        }
+
+        @Override
+        protected int getConfiguredGridH() {
+          return 5;
+        }
+
+        @Override
+        protected boolean getConfiguredLabelVisible() {
+          return false;
+        }
       }
 
-    }
+      @Order(30.0)
+      @ClassId("923e159b-3e29-4604-9532-c1a274f89aa8")
+      public class CheckAllButton extends AbstractButton {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("CheckAllWithMnemonic");
+        }
 
-    @Order(20.0)
-    @ClassId("84f2a9cf-bce5-4379-aede-11d07b21d3fb")
-    public class OpenFormsField extends AbstractListBox<IForm> {
-
-      @Override
-      protected void execInitField() throws ProcessingException {
-        checkAllActiveKeys();
+        @Override
+        protected void execClickAction() throws ProcessingException {
+          getOpenFormsField().checkAllKeys();
+        }
       }
 
-      @Override
-      protected Class<? extends ILookupCall<IForm>> getConfiguredLookupCall() {
-        return UnsavedFormsLookupCall.class;
-      }
+      @Order(30.0)
+      @ClassId("923e159b-3e29-4604-9532-c1a274f89aa8")
+      public class UnCheckAllButton extends AbstractButton {
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("UncheckAllWithMnemonic");
+        }
 
-      @Override
-      protected int getConfiguredGridH() {
-        return 5;
+        @Override
+        protected void execClickAction() throws ProcessingException {
+          getOpenFormsField().uncheckAllKeys();
+        }
       }
-
-      @Override
-      protected boolean getConfiguredLabelVisible() {
-        return false;
-      }
-
     }
 
     @Order(20.0)
     @ClassId("caca3d68-b8cc-4cb0-a35c-5b8ccbcc3745")
     public class OkButton extends AbstractOkButton {
+      @Override
+      protected String getConfiguredTooltipText() {
+        return TEXTS.get("SaveCheckedFormsAndShutdown");
+      }
     }
 
     @Order(30.0)
     @ClassId("50c8526a-333f-4878-9876-b48f2b583d88")
     public class CancelButton extends AbstractCancelButton {
+      @Override
+      protected String getConfiguredTooltipText() {
+        return TEXTS.get("CancelShutdownAndReturnToTheApplication");
+      }
     }
   }
 
   public class NewHandler extends AbstractFormHandler {
+    @Override
+    protected void execPostLoad() throws ProcessingException {
+      touch();
+    }
+
+    @Override
+    protected boolean execValidate() throws ProcessingException {
+      List<IForm> invalidForms = getOpenFormsField().getInvalidForms();
+      if (invalidForms.size() > 0) {
+        StringBuilder msg = new StringBuilder(TEXTS.get("FormsCannotBeSaved"));
+        msg.append("\n\n");
+        for (IForm f : invalidForms) {
+          msg.append("- ").append(getFormDisplayName(f)).append("\n");
+        }
+        MessageBox.showOkMessage(TEXTS.get("NotAllCheckedFormsCanBeSaved"), TEXTS.get("NotAllCheckedFormsCanBeSaved"), msg.toString());
+        return false;
+      }
+      return true;
+    }
 
     @Override
     protected void execStore() throws ProcessingException {
@@ -142,25 +231,29 @@ public class UnsavedFormChangesForm extends AbstractForm {
         f.doOk();
       }
     }
+  }
 
+  private static String getFormDisplayName(IForm f) {
+    return StringUtility.nvl(f.getTitle(), f.getClass().getName());
   }
 
   @ClassId("70052229-e6e5-43f3-bac5-cabe6e4525d3")
   public static class UnsavedFormsLookupCall extends LocalLookupCall<IForm> {
     private static final long serialVersionUID = 1L;
+    private List<IForm> m_unsavedForms;
+
+    public void setUnsavedForms(List<IForm> unsavedForms) {
+      m_unsavedForms = unsavedForms;
+    }
 
     @Override
     protected List<? extends ILookupRow<IForm>> execCreateLookupRows() throws ProcessingException {
       List<ILookupRow<IForm>> formRows = new ArrayList<ILookupRow<IForm>>();
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-      if (desktop != null) {
-        for (IForm f : desktop.getUnsavedForms()) {
-          String text = StringUtility.nvl(f.getTitle(), f.getClass().getName());
-          formRows.add(new LookupRow<IForm>(f, text));
-        }
+      for (IForm f : m_unsavedForms) {
+        String text = getFormDisplayName(f);
+        formRows.add(new LookupRow<IForm>(f, text, null, text));
       }
       return formRows;
     }
   }
-
 }

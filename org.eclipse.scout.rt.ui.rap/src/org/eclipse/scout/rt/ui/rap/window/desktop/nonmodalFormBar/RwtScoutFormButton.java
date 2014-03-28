@@ -95,7 +95,11 @@ public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IR
 
   protected void updateTextFromScout() {
     if (m_textVisible) {
-      getUiField().setText(getScoutObject().getText());
+      String text = getScoutObject().getText();
+      if (text == null) {
+        text = "";
+      }
+      getUiField().setText(text);
     }
   }
 

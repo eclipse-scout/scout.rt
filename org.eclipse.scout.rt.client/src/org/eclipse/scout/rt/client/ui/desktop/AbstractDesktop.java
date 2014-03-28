@@ -2003,9 +2003,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public List<IForm> getUnsavedForms() {
     List<IForm> saveNeededForms = new ArrayList<IForm>();
     @SuppressWarnings("unchecked")
-    List<IForm> openForms = ListUtility.combine(getDialogStack(), getViewStack());
-    for (IForm f : openForms) {
-      if (f.isSaveNeeded()) {
+    List<IForm> openForms = ListUtility.combine(getViewStack(), getDialogStack());
+    // last element on the stack is the first that needs to be saved: iterate from end to start
+    for (int i = openForms.size() - 1; i >= 0; i--) {
+      IForm f = openForms.get(i);
+      if (f.isAskIfNeedSave() && f.isSaveNeeded()) {
         saveNeededForms.add(f);
       }
     }
