@@ -9,7 +9,7 @@ Scout.DesktopTreeContainer = function(scout, $parent, model) {
 
   var that = this;
 
-  function resizeTree(event) {
+  function resizeTree() {
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
@@ -21,7 +21,7 @@ Scout.DesktopTreeContainer = function(scout, $parent, model) {
         .css('left', w);
     }
 
-    function resizeEnd(event) {
+    function resizeEnd() {
       $('body').off('mousemove')
         .removeClass('col-resize');
     }

@@ -3,7 +3,7 @@
 
 Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
   // create container
-  $graphContainer = $controlContainer.empty()
+  var $graphContainer = $controlContainer.empty()
     .appendSVG('svg', 'GraphContainer');
 
   // some basics
@@ -17,7 +17,7 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
   var response = scout.sendSync('graph', node.outlineId, {
     "nodeId": node.id
   });
-  graph = response.events[0].graph;
+  var graph = response.events[0].graph;
 
   // create all links with label
   for (var l = 0; l < graph.links.length; l++) {
@@ -117,8 +117,8 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
         if ((_test(E, P, Q) != _test(F, P, Q)) && (_test(E, F, P) != _test(E, F, Q))) {
           var n1 = graph.nodes[link1.target],
             n2 = graph.nodes[link2.target],
-            dx = getPos(n1, 'x') - getPos(n2, 'x');
-          dy = getPos(n1, 'y') - getPos(n2, 'y');
+            dx = getPos(n1, 'x') - getPos(n2, 'x'),
+            dy = getPos(n1, 'y') - getPos(n2, 'y');
 
           setNode(n1, -dx, -dy);
           setNode(n2, dx, dy);
@@ -138,7 +138,8 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
     for (var n = 0; n < graph.nodes.length; n++) {
       var node = graph.nodes[n],
         x = getPos(node, 'x'),
-        y = getPos(node, 'y');
+        y = getPos(node, 'y'),
+        dx,dy;
       dx = 0, dy = 0;
 
       // move center to the middle
@@ -182,8 +183,8 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
         }
 
         if (oppositeNode) {
-          otherX = getPos(oppositeNode, 'x');
-          otherY = getPos(oppositeNode, 'y');
+          var otherX = getPos(oppositeNode, 'x');
+          var otherY = getPos(oppositeNode, 'y');
 
           var dist = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2)),
             springForce = Math.log(dist / 260) / 10;
@@ -224,7 +225,7 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
       kelvin = 0;
     }
 
-    function nodeEnd(event) {
+    function nodeEnd() {
       $('body').off('mousemove');
       kelvin = 200;
       doPhysics();

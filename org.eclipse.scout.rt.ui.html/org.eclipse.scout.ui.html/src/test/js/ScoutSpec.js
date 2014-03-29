@@ -1,5 +1,4 @@
 describe("Scout", function() {
-  var a;
 
   describe("$.numberToString", function() {
     it("formats 10 to '10'", function() {

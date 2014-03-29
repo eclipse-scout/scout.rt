@@ -3,7 +3,7 @@
 
 Scout.DesktopTableMap = function(scout, $parent, node, table, filterCallback) {
   // create container
-  $mapContainer = $parent.empty()
+  var $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG("preserveAspectRatio", "xMidYMid");

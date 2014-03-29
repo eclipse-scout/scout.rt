@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json;
+package org.eclipse.scout.rt.ui.json.menu;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,11 +26,14 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   }
 
   @Override
+  public String getObjectType() {
+    return "Menu";
+  }
+
+  @Override
   public JSONObject toJson() throws JsonUIException {
+    JSONObject json = super.toJson();
     try {
-      JSONObject json = new JSONObject();
-      json.put("objectType", "Menu");
-      json.put("id", getId());
       json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
       json.put("icon", getModelObject().getIconId());//FIXME how to handle resources?
       return json;
@@ -39,6 +47,4 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
   }
 
-  protected void handleUiDrillDownEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-  }
 }

@@ -27,7 +27,7 @@ Scout.DesktopToolButton = function(scout, $desktop, toolButtons) {
   $desktopTools.appendDiv('DesktopDialogs');
 
   // named event funktions
-  function clickTool(event) {
+  function clickTool() {
     var $clicked = $(this);
 
     $('.tool-open').animateAVCSD('width', 0, $.removeThis, null, 500);

@@ -1,3 +1,4 @@
+/*global jasmineScoutMatchers:false */
 describe("JasmineScout", function() {
 
   describe("toContainEventTypesExactly", function() {

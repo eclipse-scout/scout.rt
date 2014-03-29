@@ -17,7 +17,7 @@ Scout.DesktopViewButtonBar = function(scout, $parent, viewButtons) {
   $desktopView.appendDiv('ViewAdd').on('click', '', addOwnView);
   $desktopView.appendDiv('ViewLogo').delay(1000).animateAVCSD('width', 55, null, null, 1000);
 
-  function addOwnView(event) {
+  function addOwnView() {
     var name = $desktopView.children('.selected').text().split('(');
     var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
     //TODO widget id?

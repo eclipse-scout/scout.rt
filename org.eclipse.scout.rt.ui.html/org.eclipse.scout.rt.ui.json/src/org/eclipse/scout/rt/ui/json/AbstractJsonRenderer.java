@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRenderer {
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
@@ -37,7 +40,7 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
     return m_id;
   }
 
-  protected IJsonSession getJsonSession() {
+  public IJsonSession getJsonSession() {
     return m_jsonSession;
   }
 
@@ -69,6 +72,20 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
 
   public boolean isInitialized() {
     return m_initialized;
+  }
+
+  @Override
+  public JSONObject toJson() throws JsonUIException {
+    JSONObject json = new JSONObject();
+    try {
+      json.put("objectType", getObjectType());
+      json.put("id", getId());
+
+      return json;
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e.getMessage(), e);
+    }
   }
 
 }

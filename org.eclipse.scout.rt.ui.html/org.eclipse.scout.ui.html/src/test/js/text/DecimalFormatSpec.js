@@ -1,6 +1,6 @@
 describe("DecimalFormat", function() {
   var scout;
-  var symbols;
+  var symbolsByLocale;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -14,15 +14,15 @@ describe("DecimalFormat", function() {
   });
 
   function createLocale(locale) {
-    var symobls = {};
-    symbols.decimalFormatSymbols = symbols[locale];
+    var symbols = {};
+    symbols.decimalFormatSymbols = symbolsByLocale[locale];
     return new Scout.Locale(symbols);
   }
 
   function initSymbols() {
-    symbols = {};
-    symbols.de_CH = createSymbolsForDeCH();
-    symbols.de_DE = createSymbolsForDeDE();
+    symbolsByLocale = {};
+    symbolsByLocale.de_CH = createSymbolsForDeCH();
+    symbolsByLocale.de_DE = createSymbolsForDeDE();
   }
 
   function createSymbolsForDeCH() {

@@ -1,5 +1,30 @@
 {
   "expr": true,
   "newcap": true,
-  "evil":true
+  "evil":true,
+  "undef": true,
+  "unused": true,
+  "browser": true,
+  "globals": { 
+    "Scout": true,
+
+    "jQuery": false,
+    "$": false,
+
+    "log": false,
+
+    "jasmine": false,
+	"describe": false,
+    "beforeEach": false,
+    "afterEach": false,
+    "it": false,
+	"setFixtures": false,
+    "sandbox": false,
+    "expect": false,
+    "spyOn": false,
+    "ajaxRequests": false,
+    "mostRecentJsonRequest": false,
+    "mostRecentAjaxRequest": false,
+    "clearAjaxRequests": false
+  }
 }

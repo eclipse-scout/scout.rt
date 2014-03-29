@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,11 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   public JsonClientSession(IClientSession modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
     m_localeManagedByModel = false;
+  }
+
+  @Override
+  public String getObjectType() {
+    return null; //not used
   }
 
   @Override
@@ -56,8 +62,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     }
 
     //FIXME where to put the initialization stuff?
-    m_jsonDesktop = new JsonDesktop(getModelObject().getDesktop(), getJsonSession());
-    m_jsonDesktop.init();
+    m_jsonDesktop = JsonRendererFactory.get().createJsonDesktop(getModelObject().getDesktop(), getJsonSession());
   }
 
   @Override
@@ -70,7 +75,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
 
   @Override
   public JSONObject toJson() throws JsonUIException {
-    JSONObject jsonObject = new JSONObject();
+    JSONObject jsonObject = new JSONObject();//not necessary to call super
     try {
       jsonObject.put("desktop", m_jsonDesktop.toJson());
       jsonObject.put("locale", localeToJson(getModelObject().getLocale()));
@@ -85,11 +90,11 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
     //FIXME A little strange that startup doesn't actually trigger startup of the client session
     if ("startup".equals(event.getEventType())) {
-      handleUiStartupEvent(event, res);
+      handleUiStartup(event, res);
     }
   }
 
-  protected void handleUiStartupEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiStartup(JsonEvent event, JsonResponse res) throws JsonUIException {
     res.addActionEvent("initialized", getId(), toJson());
   }
 

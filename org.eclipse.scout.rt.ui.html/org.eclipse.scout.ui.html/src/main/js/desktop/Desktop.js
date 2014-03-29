@@ -4,7 +4,9 @@
 Scout.Desktop = function(scout, $parent, model) {
   this.scout = scout;
   this.tree;
+  this._$parent = $parent;
   this.scout.widgetMap[model.id] = this;
+
   //  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple scout divs with multiple desktops
 
   // create all 4 containers
@@ -15,6 +17,8 @@ Scout.Desktop = function(scout, $parent, model) {
 
   this.tree = tree;
   this.tree.attachModel();
+
+  this._bench = bench;
 
   // alt and f1-help
   $(window).keydown(function(event) {
@@ -31,7 +35,7 @@ Scout.Desktop = function(scout, $parent, model) {
     }
   });
 
-  $(window).blur(function(event) {
+  $(window).blur(function() {
     removeKeyBox();
   });
 
@@ -95,7 +99,6 @@ Scout.Desktop = function(scout, $parent, model) {
 
       // down: move down
       if (event.which == 40) {
-        var $row = $('.row-selected', bench.$div);
         if ($rowsSelected.length > 0) {
           $rowClick = $rowsSelected.last().next();
         } else {
@@ -204,11 +207,31 @@ Scout.Desktop = function(scout, $parent, model) {
 Scout.Desktop.prototype.onModelPropertyChange = function() {};
 
 Scout.Desktop.prototype.onModelCreate = function(event) {
-  this.tree.onOutlineCreated(event);
+  if (event.objectType == "Outline") {
+    this.tree.onOutlineCreated(event);
+  } else if (event.objectType == "Form") {
+    if (event.displayHint == "view") {
+      //FIXME separate into Scout.View and Scout.Dialog which use Scout.Form?
+      new Scout.Form(this.scout, this._bench.$container, event);
+    } else if (event.displayHint == "dialog") {
+      new Scout.Form(this.scout, this._$parent, event);
+    } else {
+      log("Form displayHint not handled: '" + event.displayHint + "'.");
+    }
+  } else {
+    log("Widget creation not handled for object type '" + event.objectType + "'.");
+  }
 };
 
 Scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
     this.tree.onOutlineChanged(event.outlineId);
+  } else if (event.type_ == 'formRemoved') {
+    var form = this.scout.widgetMap[event.formId];
+    if (form) {
+      form.hide();
+    }
+  } else {
+    log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");
   }
 };

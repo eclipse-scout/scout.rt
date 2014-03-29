@@ -15,7 +15,7 @@ Scout.DesktopViewButton = function(scout, $parent, model) {
 
   var that = this;
 
-  function onClick(event) {
+  function onClick() {
     that._$viewButton.selectOne();
     scout.send('click', $(this).attr('id'));
   }
@@ -30,4 +30,4 @@ Scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
   }
 };
 
-Scout.DesktopViewButton.prototype.onModelAction = function(event) {};
+Scout.DesktopViewButton.prototype.onModelAction = function() {};

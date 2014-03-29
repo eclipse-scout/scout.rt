@@ -31,7 +31,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
     .attr('height', 60)
     .attr('fill', 'none')
     .attr('pointer-events', 'all')
-    .click(function(event) {
+    .click(function() {
       chartSelect($(this).parent());
     })
     .click(drawChart);
@@ -114,7 +114,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
 
   function addSelectBar($Container) {
     var $svg = $Container.appendSVG('svg', 'ChartBar', 'select-chart');
-    show = [2, 4, 3, 3.5, 5];
+    var show = [2, 4, 3, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
       $svg.appendSVG('rect', '', 'select-fill')
@@ -198,7 +198,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
     }
   }
 
-  function axisSelect(event) {
+  function axisSelect() {
     var $axis = $(this),
       group = $axis.data('group');
 
@@ -218,7 +218,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
 
   }
 
-  function dataSelect(event) {
+  function dataSelect() {
     var $data = $(this);
 
     if ($data.hasClass('selected')) {
@@ -263,7 +263,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
     }
 
     // calculate matrix
-    cube = matrix.calculateCube();
+    var cube = matrix.calculateCube();
 
     // based on chart type: set class and draw chart
     if (chart == 'ChartBar') {
@@ -421,8 +421,8 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
 
       var key1 = xAxis[a - 1],
         key2 = xAxis[a],
-        value1 = cube.getValue([key1])[0];
-      value2 = cube.getValue([key2])[0];
+        value1 = cube.getValue([key1])[0],
+        value2 = cube.getValue([key2])[0];
 
       $chartMain.appendSVG('line', '', 'main-chart')
         .attr('x1', x(key1)).attr('y1', y(0))
@@ -449,13 +449,13 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
     var startAngle = 0,
       endAngle;
 
-    tweenIn = function(now, fx) {
+    var tweenIn = function(now, fx) {
       var start = this.getAttribute('data-start'),
         end = this.getAttribute('data-end');
       this.setAttribute('d', pathSegment(450, 160, 105, start * fx.pos, end * fx.pos));
     };
 
-    tweenOut = function(now, fx) {
+    var tweenOut = function(now, fx) {
       var start = this.getAttribute('data-start'),
         end = this.getAttribute('data-end');
       this.setAttribute('d', pathSegment(450, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
@@ -649,7 +649,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, table, filterCallba
       if (oneDim) {
         filters.push(dX);
       } else {
-        dY = parseFloat($(this).attr('data-yAxis'));
+        var dY = parseFloat($(this).attr('data-yAxis'));
         filters.push(JSON.stringify([dX, dY]));
       }
     });

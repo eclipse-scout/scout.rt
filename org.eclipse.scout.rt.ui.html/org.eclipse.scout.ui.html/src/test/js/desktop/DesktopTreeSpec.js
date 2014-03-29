@@ -1,5 +1,4 @@
 describe("DesktopTree", function() {
-  var $parent;
   var scout;
 
   beforeEach(function() {

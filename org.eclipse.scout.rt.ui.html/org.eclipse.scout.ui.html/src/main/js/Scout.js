@@ -1,6 +1,9 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
+/*global console: false */
+/*exported log*/
+
 // scout namespace
 Scout = {};
 
@@ -175,9 +178,6 @@ var log = console.log.bind(console);
   // converter functions
   $.numberToString = function(number, round) {
     var string = String(number.toFixed(round));
-
-    // replace decimal point
-    split = string.split('.').join($.DEC);
 
     // find start and end position of main number
     var start = string.indexOf($.DEC);
