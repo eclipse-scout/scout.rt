@@ -167,15 +167,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
   }
 
-<<<<<<< HEAD
   function resizeControl(event) {
-=======
-  function controlOrganize() {
-    new Scout.DesktopTableOrganize(that.scout, $controlContainer, that.model, that.model.table.columns, that);
-  }
-
-  function resizeControl() {
->>>>>>> refs/remotes/origin/develop
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
@@ -413,16 +405,8 @@ Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
       maxOrder = (typeof value == 'number' && value > maxOrder) ? value : maxOrder;
     });
 
-<<<<<<< HEAD
     if (clickOrder !== undefined && clickOrder !== null) {
       $header.data('sort-order', clickOrder);
-=======
-    /*jshint -W041:false*/
-    if (clickOrder != undefined) {
-      newOrder = clickOrder;
-    } else if (maxOrder > -1) {
-      newOrder = maxOrder + 1;
->>>>>>> refs/remotes/origin/develop
     } else {
       $header.data('sort-order', maxOrder + 1);
     }
