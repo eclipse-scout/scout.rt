@@ -72,7 +72,7 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   // create buttons in command for grouping
   log(column.type);
 
-  if (column.type === '') {
+  if (column.type === 'text' || column.type === 'date') {
     var $commandGroup = $headerCommand.appendDiv('', 'header-group');
     $commandGroup.appendDiv('', 'header-text')
       .data('label', 'Summe');
@@ -89,7 +89,7 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   }
 
   // create buttons in command for coloring
-  if (column.type === '') {
+  if (column.type === 'number') {
     var $commandColor = $headerCommand.appendDiv('', 'header-group');
     $commandColor.appendDiv('', 'header-text')
       .data('label', 'Einfärben');

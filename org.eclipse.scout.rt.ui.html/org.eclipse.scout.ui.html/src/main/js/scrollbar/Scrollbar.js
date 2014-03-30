@@ -7,6 +7,7 @@ Scout.Scrollbar = function($parent, axis) {
   this._thumbRange;
   this._scroll;
   this._offset;
+
   // create scrollbar
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');

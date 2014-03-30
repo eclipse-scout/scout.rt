@@ -4,8 +4,9 @@ Scout.Form = function(scout, $parent, model) {
 
   this.scout.widgetMap[model.id] = this;
 
-  this._$container = $parent.appendDiv();
-  this._$container.html(JSON.stringify(model));
+  // cru > cgu: sorry
+  //this._$container = $parent.appendDiv();
+  //this._$container.html(JSON.stringify(model));
 };
 
 Scout.Form.prototype.hide = function() {

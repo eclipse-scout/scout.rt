@@ -270,10 +270,11 @@ Scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
   var $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded');
 
+  //TODO cru/cgu: talk about click on not seleced nodes
+  this._onNodeClicked(event, $node);
+
   if ($node.hasClass('can-expand')) {
     this._setNodeExpanded($node, expanded);
-  } else {
-    this._onNodeClicked(event, $node);
   }
 
   // prevent immediately reopening
