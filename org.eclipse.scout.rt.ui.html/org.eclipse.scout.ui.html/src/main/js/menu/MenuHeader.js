@@ -70,8 +70,6 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
     });
 
   // create buttons in command for grouping
-  log(column.type);
-
   if (column.type === 'text' || column.type === 'date') {
     var $commandGroup = $headerCommand.appendDiv('', 'header-group');
     $commandGroup.appendDiv('', 'header-text')
@@ -96,16 +94,16 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
 
     $commandColor.appendDiv('HeaderCommandColorRed', 'header-command')
       .data('label', 'von Rot nach Grün')
-      .click(groupAll);
+      .click(colorRed);
     $commandColor.appendDiv('HeaderCommandColorGreen', 'header-command')
       .data('label', 'von Grün nach Rot')
-      .click(groupSort);
+      .click(colorGreen);
     $commandColor.appendDiv('HeaderCommandColorBar', 'header-command')
       .data('label', 'mit Balkendiagramm')
-      .click(groupRemove);
+      .click(colorBar);
     $commandColor.appendDiv('HeaderCommandColorRemove', 'header-command')
       .data('label', 'entfernen')
-      .click(groupRemove);
+      .click(colorRemove);
   }
 
   // create buttons in command for new columns
@@ -126,7 +124,7 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   $headerFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
-  var matrix = new Scout.DesktopMatrix(desktopTable.model.table),
+  var matrix = new Scout.DesktopMatrix(desktopTable),
     xAxis = matrix.addAxis(id, -1),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
@@ -209,6 +207,22 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   function groupRemove() {
     $(this).siblings().removeClass('selected');
     desktopTable.sumData(false);
+  }
+
+  function colorRed() {
+    desktopTable.colorData('red', id);
+  }
+
+  function colorGreen() {
+    desktopTable.colorData('green', id);
+  }
+
+  function colorBar() {
+    desktopTable.colorData('bar', id);
+  }
+
+  function colorRemove() {
+    desktopTable.colorData('remove', id);
   }
 
   function columnAdd() {}

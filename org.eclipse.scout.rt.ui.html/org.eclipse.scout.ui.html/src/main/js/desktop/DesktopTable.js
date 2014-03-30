@@ -156,7 +156,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
   }
 
   function controlChart() {
-    new Scout.DesktopTableChart(that.scout, $controlContainer, that.model.table, filterCallback);
+    new Scout.DesktopTableChart(that.scout, $controlContainer, that, filterCallback);
   }
 
   function controlGraph() {
@@ -351,14 +351,18 @@ Scout.DesktopTable.prototype._sort = function() {
   }
 
   // compare rows
+  var that = this;
   function compare(a, b) {
     for (var s = 0; s < sortColumns.length; s++) {
       var index = sortColumns[s].index,
+        valueA = that.getValue(index, $(a).data('row')),
+        valueB = that.getValue(index, $(b).data('row'))
         dir = sortColumns[s].dir == 'up' ? -1 : 1;
 
-      if (a.children[index].innerHTML < b.children[index].innerHTML) {
+
+      if (valueA < valueB) {
         return dir;
-      } else if (a.children[index].innerHTML > b.children[index].innerHTML) {
+      } else if (valueA > valueB) {
         return -1 * dir;
       }
     }
@@ -428,6 +432,7 @@ Scout.DesktopTable.prototype._loadData = function() {
   this._drawSelectionBorder();
 };
 
+
 Scout.DesktopTable.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '';
@@ -444,14 +449,14 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
         rowClass += 'row-selected ';
       }
 
-      rowString += '<div id="' + row.id + '" class="' + rowClass + '">';
+      rowString += '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + r + '>';
 
       for (var c = 0; c < row.cells.length; c++) {
         var column = table.columns[c],
           width = column.width,
           style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
           allign = (column.type == 'number') ? 'text-align: right; ' : '',
-          value = Scout.DesktopMatrix.getCellText(row.cells[c]);
+          value = this.getText(c, r);
 
         rowString += '<div style="' + style + allign + '">' + value + '</div>';
       }
@@ -615,6 +620,34 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
 };
 
+
+Scout.DesktopTable.prototype.getValue = function(col, row) {
+  var cell = this.model.table.rows[row].cells[col];
+
+  if (cell === null) { //cell may be a number so don't use !cell
+    return null;
+  }
+  if (typeof cell !== 'object') {
+    return cell;
+  }
+  if (cell.value !== undefined) {
+    return cell.value;
+  }
+  return cell.text;
+};
+
+Scout.DesktopTable.prototype.getText = function(col, row) {
+  var cell = this.model.table.rows[row].cells[col];
+
+  if (cell === null) { //cell may be a number so don't use !cell
+    return '';
+  }
+  if (typeof cell !== 'object') {
+    return cell;
+  }
+  return cell.text;
+};
+
 Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
   var that = this,
     table = this.model.table;
@@ -623,36 +656,40 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
   this.sortChange(groupColumn, 'up', false);
 
   if (draw) {
-    var $rows = $('.table-row', this._$tableDataScroll);
+    var $rows = $('.table-row:visible', this._$tableDataScroll);
+    var $cols = $('.header-item', this._$desktopTable);
     var $sumRow = $.makeDiv('', 'table-row-sum'),
       sum = [];
 
     for (var r = 0; r < $rows.length; r++) {
-      var $cells = $rows.eq(r).children();
+      var row = $rows.eq(r).data('row');
 
-      for (var c = 0; c < table.columns.length; c++) {
-        var value = $cells.eq(c).text();
-        if (table.columns[c].type == 'number') {
-          sum[c] = (sum[c] || 0) + parseFloat(value);
+      for (var c = 0; c < $cols.length; c++) {
+        var index = $cols.eq(c).data('index'),
+          value = this.getValue(index, row);
+
+        if (table.columns[index].type == 'number') {
+          sum[c] = (sum[c] || 0) + value;
         }
       }
 
-      if (($cells.eq(groupColumn).text() != $rows.eq(r + 1).children().eq(groupColumn).text() ||
-        (r == $rows.length - 1)) && sum.length > 0) {
-        for (c = 0; c < table.columns.length; c++) {
+      var nextRow = $rows.eq(r + 1).data('row');
+      if ((r == $rows.length - 1) || (this.getText(groupColumn, row) != this.getText(groupColumn, nextRow))
+          && sum.length > 0) {
+        for (c = 0; c < $cols.length; c++) {
           var $div;
 
           if (typeof sum[c] == 'number') {
             $div = $.makeDiv('', '', sum[c])
               .css('text-align', 'right');
-          } else if (c == groupColumn) {
-            $div = $.makeDiv('', '', $cells.eq(groupColumn).text())
+          } else if (c == $cols.eq(c).data('index') == groupColumn) {
+            $div = $.makeDiv('', '', this.getText(groupColumn, row))
               .css('text-align', 'left');
           } else {
             $div = $.makeDiv('', '', '&nbsp');
           }
 
-          $div.appendTo($sumRow).width(table.columns[c].width);
+          $div.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
         }
 
         $sumRow.insertAfter($rows.eq(r))
@@ -664,6 +701,73 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
         sum = [];
       }
     }
+  }
+};
+
+Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
+
+  var minValue,
+    maxValue,
+    colorFunc;
+
+  for (var r = 0; r < this.model.table.rows.length; r++) {
+    var v = this.getValue(colorColumn, r);
+
+    if (v < minValue || minValue === undefined) minValue = v;
+    if (v > maxValue || maxValue === undefined) maxValue = v;
+  }
+
+  log (minValue, maxValue);
+
+  if (mode === 'red') {
+    colorFunc = function(cell, value) {
+      var level = (value - minValue) / (maxValue - minValue ) ;
+
+      var r = Math.ceil(255 - level * (255 - 171)) ,
+        g = Math.ceil(175 - level * (175 - 214)),
+        b = Math.ceil(175 - level * (175 - 147));
+
+      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b +')');
+      cell.css('background-image', '');
+    };
+  } else if (mode === 'green') {
+    colorFunc = function(cell, value) {
+      var level = (value - minValue) / (maxValue - minValue ) ;
+
+      var r = Math.ceil(171 - level * (171 - 255)) ,
+        g = Math.ceil(214 - level * (214 - 175)),
+        b = Math.ceil(147 - level * (147 - 175));
+
+      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b +')');
+      cell.css('background-image', '');
+    };
+  } else if (mode === 'bar') {
+    colorFunc = function(cell, value) {
+      var level = Math.ceil((value - minValue) / (maxValue - minValue ) * 100) + '';
+
+      cell.css('background-color', '#fff');
+      cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, white ' + level + '%, white 100% )');
+    };
+  } else if (mode === 'remove')
+    colorFunc = function(cell, value) {
+      cell.css('background-image', '');
+      cell.css('background-color', '#fff');
+    };
+
+  var $rows = $('.table-row:visible', this._$tableDataScroll),
+    c;
+
+
+  $('.header-item', this._$desktopTable).each(function(i) {
+    if ($(this).data('index') == colorColumn) c = i;
+  });
+
+  for (var r = 0; r < $rows.length; r++) {
+    var row = $rows.eq(r).data('row'),
+      value = this.getValue(colorColumn, row);
+
+    colorFunc($rows.eq(r).children().eq(c), value);
+
   }
 };
 

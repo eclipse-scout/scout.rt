@@ -1,11 +1,12 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopMatrix = function(table) {
+Scout.DesktopMatrix = function(desktopTable) {
   this._allData = [];
   this._allAxis = [];
-  this._columns = table.columns;
-  this._rows = table.rows;
+  this._columns = desktopTable.model.table.columns;
+  this._rows = desktopTable.model.table.rows;
+  this._desktopTable = desktopTable;
 };
 
 /**
@@ -146,15 +147,14 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
 
 Scout.DesktopMatrix.prototype.calculateCube = function() {
   var cube = {},
-    r, v, k, data, key,
-    getCellValue = Scout.DesktopMatrix.getCellValue;
+    r, v, k, data, key;
 
   // collect data from table
   for (r = 0; r < this._rows.length; r++) {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = getCellValue(this._rows[r].cells[this._allAxis[k].column]);
+      key = this._desktopTable.getValue(this._allAxis[k].column, r);
       var normKey = this._allAxis[k].norm(key);
 
       if (normKey !== undefined) {
@@ -167,7 +167,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = getCellValue(this._rows[r].cells[this._allData[v].column]);
+      data = this._desktopTable.getValue(this._allData[v].column, r);
       normData = this._allData[v].norm(data);
       var normData = this._allData[v].norm(data);
       if (normData !== undefined) {
@@ -240,41 +240,17 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
 };
 
 Scout.DesktopMatrix.prototype.columnCount = function() {
-  var colCount = [],
-    getCellValue = Scout.DesktopMatrix.getCellValue;
+  var colCount = [];
 
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
 
     for (var r = 0; r < this._rows.length; r++) {
-      var v = getCellValue(this._rows[r].cells[c]);
+      var v = this._desktopTable.getValue(c, r);
       if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
 
     colCount[c][1] = colCount[c][1].length;
   }
   return colCount;
-};
-
-Scout.DesktopMatrix.getCellValue = function(cell) {
-  if (cell === null) { //cell may be a number so don't use !cell
-    return null;
-  }
-  if (typeof cell !== 'object') {
-    return cell;
-  }
-  if (cell.value !== undefined) {
-    return cell.value;
-  }
-  return cell.text;
-};
-
-Scout.DesktopMatrix.getCellText = function(cell) {
-  if (cell === null) { //cell may be a number so don't use !cell
-    return '';
-  }
-  if (typeof cell !== 'object') {
-    return cell;
-  }
-  return cell.text;
 };

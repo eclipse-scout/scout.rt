@@ -68,8 +68,8 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
 
       if (headerWidth + diff > 80) {
         $header.css('width', headerWidth + diff);
-        $('.table-row > div:nth-of-type(' + colNum + ' )').css('width', headerWidth  + 17 + diff);
-        $('.table-row').width(totalWidth + diff);
+        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('width', headerWidth  + 17 + diff);
+        $('.table-row, .table-row-sum').width(totalWidth + diff);
 
       }
     }
