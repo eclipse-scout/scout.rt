@@ -16,3 +16,20 @@ Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
 
 Datenübertragung
 - Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung
+
+
+Scout/Model-Anpassungen
+- Feld-Validierungen
+  Ziel: Validierungen und Formatierungen möglichst mittels Javascript machen
+  - Pro Feld Pattern/Regex und Error-Meldung?
+  - Möglichkeit für custom Javascript Validator/Formatter?
+- Tabellen-Sortierung / Filterung soll ins JS
+  Paging-Unterstützung andenken
+- Unterstützung für Graph / Map / Chart auf Pages
+  Was soll alles im Modell konfiguriert werden können?
+- ViewButtons eigentlich nicht nötig, Modell ist auf dem Desktop vorhanden
+- Editierbare-Tabellen
+  Felder wären im JS bekannt, Tabelle hat aber execPrepare, execCompleteEdit etc.
+- Filter bei Tree / Table (ITreeNodeFilter, ITableRowFilter) könnten auch vom JS übernommen werden
+- Tabellen-Organisation soll neu ein eigenes GUI-Element sein (kein Standard-Form)
+- Dynamische Outlines (Add/Remove)
