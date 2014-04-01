@@ -640,12 +640,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return CollectionUtility.unmodifiableListCopy(m_toolbuttons);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public List<IToolButton> getToolbuttons() {
-    return getToolButtons();
-  }
-
   /**
    * @param configuredToolbuttonLocation
    */
@@ -666,12 +660,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     }
     return null;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public IToolButton getToolbuttonByClass(Class<? extends IToolButton> clazz) {
-    return getToolButtonByClass(clazz);
   }
 
   /**
