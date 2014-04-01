@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json.menu;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
@@ -20,6 +23,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
+  public static final String EVENT_MENU_ACTION = "menuAction";
+  public static final String PROP_TEXT = "label";//FIXME renameIMenu.PROP_TEXT
+  public static final String PROP_ICON = "icon";
 
   public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
@@ -34,8 +40,8 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   public JSONObject toJson() throws JsonUIException {
     JSONObject json = super.toJson();
     try {
-      json.put("label", getModelObject().getText());//FIXME renameIMenu.PROP_TEXT
-      json.put("icon", getModelObject().getIconId());//FIXME how to handle resources?
+      json.put(PROP_TEXT, getModelObject().getText());
+      json.put(PROP_ICON, getModelObject().getIconId());//FIXME how to handle resources?
       return json;
     }
     catch (JSONException e) {
@@ -45,6 +51,18 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+    if (EVENT_MENU_ACTION.equals(event.getEventType())) {
+      handleUiMenuAction(event, res);
+    }
+  }
+
+  public void handleUiMenuAction(JsonEvent event, JsonResponse res) throws JsonUIException {
+    new ClientSyncJob("Menu action", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        getModelObject().getUIFacade().fireActionFromUI();
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
 }
