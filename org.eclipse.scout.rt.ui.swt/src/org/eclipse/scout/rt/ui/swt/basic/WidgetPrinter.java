@@ -27,6 +27,7 @@ import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.Printer;
 import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class WidgetPrinter {
@@ -41,11 +42,17 @@ public class WidgetPrinter {
   }
 
   public void print(PrintDevice device, Map<String, Object> parameters) throws Throwable {
-    if (device == PrintDevice.File) {
-      printToFile(createImage(), parameters);
+    Image image = createImage();
+    try {
+      if (device == PrintDevice.File) {
+        printToFile(image, parameters);
+      }
+      else if (device == PrintDevice.Printer) {
+        printToPrinter(image, parameters);
+      }
     }
-    else if (device == PrintDevice.Printer) {
-      printToPrinter(createImage(), parameters);
+    finally {
+      image.dispose();
     }
   }
 
@@ -53,7 +60,7 @@ public class WidgetPrinter {
     return m_printedFile;
   }
 
-  private void printToFile(Image image, Map<String, Object> parameters) throws Throwable {
+  protected void printToFile(Image image, Map<String, Object> parameters) throws Throwable {
     m_printedFile = (File) parameters.remove("file");
     if (m_printedFile == null) {
       throw new IllegalArgumentException("parameter \"file\" must not be null");
@@ -80,7 +87,7 @@ public class WidgetPrinter {
     tmpFile.renameTo(m_printedFile);
   }
 
-  private void printToPrinter(Image image, Map<String, Object> parameters) throws Throwable {
+  protected void printToPrinter(Image image, Map<String, Object> parameters) throws Throwable {
     @SuppressWarnings("unused")
     String printerName = (String) parameters.remove("printerName");
     String jobName = (String) parameters.remove("jobName");
@@ -108,23 +115,49 @@ public class WidgetPrinter {
     }
   }
 
-  private Image createImage() {
+  protected Image createImage() {
     Rectangle bounds = m_widget.getBounds();
-    int x = 0;
-    int y = 0;
+    int width = bounds.width;
+    int height = bounds.height;
     if (m_widget instanceof Shell) {
       Rectangle ca = ((Shell) m_widget).getClientArea();
-      x = (bounds.width - ca.width) / 2;
-      y = (bounds.height - ca.height) - x;
+      width = ca.width;
+      height = ca.height;
     }
-    GC gc = new GC(m_widget);
-    Image image = new Image(m_widget.getDisplay(), bounds.width, bounds.height);
-    gc.copyArea(image, -x, -y);
-    gc.dispose();
-    return image;
+
+    GC gcWidget = new GC(m_widget);
+    Image image = new Image(m_widget.getDisplay(), width, height);
+    Image imageWithFrame;
+    try {
+      gcWidget.copyArea(image, 0, 0);
+      int frameWidth = 2;
+      imageWithFrame = createImageWithFrame(image, frameWidth);
+    }
+    finally {
+      gcWidget.dispose();
+      image.dispose();
+    }
+
+    return imageWithFrame;
   }
 
-  private class DefaultPrintable {
+  protected Image createImageWithFrame(Image image, int frameWidth) {
+    Image imageWithFrame = new Image(m_widget.getDisplay(), image.getBounds().width + (2 * frameWidth), image.getBounds().height + (2 * frameWidth));
+    GC gcResult = new GC(imageWithFrame);
+    try {
+      gcResult.setAdvanced(true);
+      gcResult.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+      gcResult.setLineWidth(frameWidth);
+      gcResult.drawRectangle(imageWithFrame.getBounds());
+      gcResult.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, frameWidth, frameWidth, image.getBounds().width, image.getBounds().height);
+    }
+    finally {
+      gcResult.dispose();
+    }
+    return imageWithFrame;
+  }
+
+  protected class DefaultPrintable {
     public void print(Printer printer, Image image) {
       if (printer.startPage()) {
         GC gc = new GC(printer);

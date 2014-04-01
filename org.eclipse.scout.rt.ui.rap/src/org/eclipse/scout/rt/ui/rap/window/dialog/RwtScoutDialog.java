@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormFooter;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
@@ -217,6 +218,20 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   }
 
   protected Control createContentsDelegate(Composite parent) {
+    m_uiDialog.getShell().addShellListener(new ShellAdapter() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void shellActivated(ShellEvent e) {
+        Runnable job = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().fireFormActivatedFromUI();
+          }
+        };
+        getUiEnvironment().invokeScoutLater(job, 0);
+      }
+    });
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_container.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
