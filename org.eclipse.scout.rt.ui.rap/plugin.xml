@@ -265,11 +265,11 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField"
-            name="Color picker field"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField"
+            name="Color field"
             scope="default">
             <uiClass
-              class="org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield.RwtScoutColorPickerField">
+              class="org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield.RwtScoutColorField">
             </uiClass>
       </formField>
   </extension>

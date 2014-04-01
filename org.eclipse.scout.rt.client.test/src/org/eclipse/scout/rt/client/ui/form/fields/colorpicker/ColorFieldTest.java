@@ -21,9 +21,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorPickerFieldTest.TestForm.MainBox.ColorPickerField01;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorPickerFieldTest.TestForm.MainBox.ColorPickerField01.TestMenu1;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorPickerField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.form.FormHandler;
@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.ServiceRegistration;
 
 @RunWith(ScoutClientTestRunner.class)
-public class ColorPickerFieldTest {
+public class ColorFieldTest {
 
   protected TestForm form;
   private List<ServiceRegistration> reg;
@@ -48,7 +48,7 @@ public class ColorPickerFieldTest {
 
   @Test
   public void testParseValue() {
-    ColorPickerField01 field = form.getColorPickerField01();
+    ColorField01 field = form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
 
@@ -68,7 +68,7 @@ public class ColorPickerFieldTest {
   @Test
   public void testParseInvalidValues() {
     // valid
-    ColorPickerField01 field = form.getColorPickerField01();
+    ColorField01 field = form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
@@ -82,7 +82,7 @@ public class ColorPickerFieldTest {
 
   @Test
   public void testInvalidRgbValues() {
-    ColorPickerField01 field = form.getColorPickerField01();
+    ColorField01 field = form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
@@ -105,7 +105,7 @@ public class ColorPickerFieldTest {
 
   @Test
   public void testMenus() {
-    ColorPickerField01 field = form.getColorPickerField01();
+    ColorField01 field = form.getColorField01();
     assertEquals(1, field.getMenus().size());
     assertEquals(TestMenu1.class, field.getMenus().get(0).getClass());
   }
@@ -131,8 +131,8 @@ public class ColorPickerFieldTest {
       startInternal(new FormHandler());
     }
 
-    public ColorPickerField01 getColorPickerField01() {
-      return getFieldByClass(ColorPickerField01.class);
+    public ColorField01 getColorField01() {
+      return getFieldByClass(ColorField01.class);
     }
 
     public MainBox getMainBox() {
@@ -143,7 +143,7 @@ public class ColorPickerFieldTest {
     public class MainBox extends AbstractGroupBox {
 
       @Order(10)
-      public class ColorPickerField01 extends AbstractColorPickerField {
+      public class ColorField01 extends AbstractColorField {
         @Override
         protected String getConfiguredLabel() {
           return "Field 01";

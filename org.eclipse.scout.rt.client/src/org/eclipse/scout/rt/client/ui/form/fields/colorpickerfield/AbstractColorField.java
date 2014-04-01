@@ -33,19 +33,19 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractColorPickerField extends AbstractBasicField<String> implements IColorPickerField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractColorPickerField.class);
+public abstract class AbstractColorField extends AbstractBasicField<String> implements IColorField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractColorField.class);
 
-  private IColorPickerUiFacade m_uiFacade;
+  private IColorFieldUiFacade m_uiFacade;
   private List<IMenu> m_menus;
 
   protected static final Pattern RGB_COLOR_PATTERN = Pattern.compile("^([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})$");
 
-  public AbstractColorPickerField() {
+  public AbstractColorField() {
     this(true);
   }
 
-  public AbstractColorPickerField(boolean callInitializer) {
+  public AbstractColorField(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -91,7 +91,7 @@ public abstract class AbstractColorPickerField extends AbstractBasicField<String
   }
 
   @Override
-  public IColorPickerUiFacade getUIFacade() {
+  public IColorFieldUiFacade getUIFacade() {
     return m_uiFacade;
   }
 
@@ -159,7 +159,7 @@ public abstract class AbstractColorPickerField extends AbstractBasicField<String
   }
 
   // ---------------------------------------------------------------------------------
-  private class P_UiFacade implements IColorPickerUiFacade {
+  private class P_UiFacade implements IColorFieldUiFacade {
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {

@@ -8,15 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield;
+package org.eclipse.scout.rt.ui.swt.form.fields.colorpickerfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField;
-import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
+import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
+import org.eclipse.swt.widgets.Button;
 
 /**
  *
  */
-public interface IRwtScoutColorPickerField extends IRwtScoutFormField<IColorPickerField> {
-  String VARIANT_COLORPICKERFIELD = "colorpickerfield";
-  String VARIANT_COLORPICKERFIELD_DISABLED = "colorpickerfield-disabled";
+public interface ISwtScoutColorField extends ISwtScoutFormField<IColorField> {
+
+  /**
+   * @return
+   */
+  ColorCanvas getColorCanvas();
+
+  /**
+   * @return
+   */
+  Button getColorPickButton();
+
 }

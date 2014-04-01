@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
 /**
  *
  */
-public interface ISwingScoutColorPickerField extends ISwingScoutFormField<IColorPickerField> {
+public interface ISwingScoutColorField extends ISwingScoutFormField<IColorField> {
 
 }

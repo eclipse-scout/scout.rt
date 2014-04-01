@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.ColorUtility;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class SwtScoutColorPickerField extends SwtScoutBasicFieldComposite<IColorPickerField> implements ISwtScoutColorPickerField {
+public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField> implements ISwtScoutColorField {
 
   private Menu m_contextMenu;
   private ColorCanvas m_colorCanvas;
@@ -204,7 +204,7 @@ public class SwtScoutColorPickerField extends SwtScoutBasicFieldComposite<IColor
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (name.equals(IColorPickerField.PROP_ICON_ID)) {
+    if (name.equals(IColorField.PROP_ICON_ID)) {
       updateIconIdFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);

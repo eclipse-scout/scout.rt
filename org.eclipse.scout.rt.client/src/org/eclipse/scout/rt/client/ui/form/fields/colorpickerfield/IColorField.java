@@ -15,13 +15,13 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
-public interface IColorPickerField extends IBasicField<String> {
+public interface IColorField extends IBasicField<String> {
   String PROP_ICON_ID = "iconId";
 
   List<IMenu> getMenus();
 
   @Override
-  IColorPickerUiFacade getUIFacade();
+  IColorFieldUiFacade getUIFacade();
 
   /**
    * @return

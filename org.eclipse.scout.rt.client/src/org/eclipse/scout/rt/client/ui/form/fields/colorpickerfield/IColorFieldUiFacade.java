@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
-public interface IColorPickerUiFacade extends IBasicFieldUIFacade {
+public interface IColorFieldUiFacade extends IBasicFieldUIFacade {
 
   List<IMenu> firePopupFromUI();
 

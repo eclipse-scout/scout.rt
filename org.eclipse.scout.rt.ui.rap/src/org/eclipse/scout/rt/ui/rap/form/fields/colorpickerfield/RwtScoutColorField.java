@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 
-public class RwtScoutColorPickerField extends RwtScoutBasicFieldComposite<IColorPickerField> implements IRwtScoutColorPickerField {
+public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField> implements IRwtScoutColorField {
   private Menu m_contextMenu;
   private Label m_colorPreviewLabel;
   private Button m_colorPickButton;
@@ -261,7 +261,7 @@ public class RwtScoutColorPickerField extends RwtScoutBasicFieldComposite<IColor
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (IColorPickerField.PROP_ICON_ID.equals(name)) {
+    if (IColorField.PROP_ICON_ID.equals(name)) {
       updateIconIdFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);

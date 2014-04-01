@@ -263,11 +263,11 @@
      </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField"
-            name="Color picker field"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField"
+            name="Color field"
             scope="default">
             <uiClass
-              class="org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield.SwingScoutColorPickerField">
+              class="org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield.SwingScoutColorField">
             </uiClass>
       </formField>
   </extension>

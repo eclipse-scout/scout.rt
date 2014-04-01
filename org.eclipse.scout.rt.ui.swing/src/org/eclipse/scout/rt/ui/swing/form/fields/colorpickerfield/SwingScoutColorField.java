@@ -25,7 +25,7 @@ import javax.swing.text.Document;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorPickerField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
 import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 
-public class SwingScoutColorPickerField extends SwingScoutBasicFieldComposite<IColorPickerField> implements ISwingScoutColorPickerField {
+public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorField> implements ISwingScoutColorField {
   private JTextField m_colorPreview;
 
   @Override
@@ -193,7 +193,7 @@ public class SwingScoutColorPickerField extends SwingScoutBasicFieldComposite<IC
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (name.equals(IColorPickerField.PROP_ICON_ID)) {
+    if (name.equals(IColorField.PROP_ICON_ID)) {
       updateIconIdFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);
