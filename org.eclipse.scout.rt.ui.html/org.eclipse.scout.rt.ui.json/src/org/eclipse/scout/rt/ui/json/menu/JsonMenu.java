@@ -24,8 +24,8 @@ import org.json.JSONObject;
 
 public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   public static final String EVENT_MENU_ACTION = "menuAction";
-  public static final String PROP_TEXT = "label";//FIXME renameIMenu.PROP_TEXT
-  public static final String PROP_ICON = "icon";
+  public static final String PROP_TEXT = IMenu.PROP_TEXT;
+  public static final String PROP_ICON = IMenu.PROP_ICON_ID;
 
   public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);

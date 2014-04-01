@@ -17,9 +17,16 @@ Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
 Datenübertragung
 - Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung
 
+Naming
+- Events und Properties sollten wie im Modell benannt werden. Z.B: beim Menu: "text" statt "label", weil es IMenu.getText(); heisst
+  Offen: Naming im CSS nachziehen?
 
 JsHint
 - Wir verwenden kein unused, weil sonst alle ungenützten Parameter auch angezeigt würden, was man leider nicht abstellen kann.
+
+Javascript-Event-Handling
+- Event-Listener müssen zwingend wieder entfernt werden (aktuell ein Problem im Menu.js)
+- Sollten wir für globale Events (z.B. ('*') bei Menu.js) Namespaces verwenden, damit wir anderen nicht reinfunken (Portlets)?
 
 Scout/Model-Anpassungen
 - Feld-Validierungen

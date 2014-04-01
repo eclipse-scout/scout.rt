@@ -1,8 +1,5 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-/**
- * @param data will be sent to server
- */
 Scout.Menu = function(scout, id, emptySpace, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
@@ -36,13 +33,17 @@ Scout.Menu = function(scout, id, emptySpace, x, y) {
 
   // create menu-item and menu-button
   for (var i = 0; i < menu.length; i++) {
-    if (menu[i].icon) {
+    if (menu[i].iconId) {
       $menuSelect.appendDiv('', 'menu-button')
-        .attr('data-icon', menu[i].icon)
-        .attr('data-label', menu[i].label)
+        .attr('id', menu[i].id)
+        .attr('data-icon', menu[i].iconId)
+        .attr('data-label', menu[i].text)
+        .on('click', '', onMenuItemClicked)
         .hover(onHoverIn, onHoverOut);
     } else {
-      $menuSelect.appendDiv('', 'menu-item', menu[i].label);
+      $menuSelect.appendDiv('', 'menu-item', menu[i].text)
+      .attr('id', menu[i].id)
+      .on('click', '', onMenuItemClicked);
     }
   }
 
@@ -65,6 +66,8 @@ Scout.Menu = function(scout, id, emptySpace, x, y) {
 
   // every user action will close menu
   $('*').one('mousedown keydown mousewheel', removeMenu);
+  //FIXME listeners are not removed afterwards, according to jquery manual one automatically removes but it does not seem to work
+  //FIXME do we need to add namespace to events in order to not accidentally remove listeners from other apps / portlets?
 
   function removeMenu() {
     $menuSelect.animateAVCSD('width', 0,
@@ -74,4 +77,11 @@ Scout.Menu = function(scout, id, emptySpace, x, y) {
       });
     return true;
   }
+
+  function onMenuItemClicked() {
+    scout.send(Scout.Menu.EVENT_MENU_ACTION, $(this).attr('id'));
+    return false;
+  }
 };
+
+Scout.Menu.EVENT_MENU_ACTION = "menuAction";
