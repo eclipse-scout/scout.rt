@@ -14,6 +14,8 @@ public interface IActionUIFacade {
 
   /**
    * use {@link #fireActionFromUI()} instead
+   * 
+   * @deprecated will be removed with V 5.0
    */
   @Deprecated
   void setSelectedFromUI(boolean b);
