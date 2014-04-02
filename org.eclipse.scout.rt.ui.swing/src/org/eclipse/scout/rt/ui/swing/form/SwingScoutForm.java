@@ -53,7 +53,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
   private ISwingScoutGroupBox m_mainBoxComposite;
   private FormListener m_scoutFormListener;
   private SwingScoutViewListener m_swingScoutViewListener;
-  private ISwingScoutView m_viewComposite;
+  private final ISwingScoutView m_viewComposite;
   private WeakHashMap<FormEvent, Object> m_consumedScoutFormEvents = new WeakHashMap<FormEvent, Object>();
 
   public SwingScoutForm(ISwingEnvironment env, IForm scoutForm) {
@@ -319,9 +319,25 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
   protected void handlePrintFromScout(final FormEvent e) {
     WidgetPrinter wp = null;
     try {
-      if (m_viewComposite != null) {
+      ISwingScoutView view = m_viewComposite;
+      if (view == null) {
+        // the current form has no view: it is a nested form (e.g. in a AbstractWrappedFormField)
+        // get the most outer form which must have a view and use this one (bugzilla 431791).
+        IForm tmp = getScoutForm();
+        IForm outerForm = getScoutForm();
+        while ((tmp = tmp.getOuterForm()) != null) {
+          outerForm = tmp;
+        }
+        if (outerForm != getScoutForm()) {
+          ISwingScoutForm topForm = getSwingEnvironment().getStandaloneFormComposite(outerForm);
+          if (topForm != null) {
+            view = topForm.getView();
+          }
+        }
+      }
+      if (view != null) {
         if (e.getFormField() != null) {
-          for (JComponent c : SwingUtility.findChildComponents(m_viewComposite.getSwingContentPane(), JComponent.class)) {
+          for (JComponent c : SwingUtility.findChildComponents(view.getSwingContentPane(), JComponent.class)) {
             IPropertyObserver scoutModel = SwingScoutComposite.getScoutModelOnWidget(c);
             if (scoutModel == e.getFormField()) {
               wp = new WidgetPrinter(c);
@@ -332,10 +348,10 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
         if (wp == null) {
           Component printComponent;
           if (getScoutForm().getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
-            printComponent = m_viewComposite.getSwingContentPane();
+            printComponent = view.getSwingContentPane();
           }
           else {
-            printComponent = SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane());
+            printComponent = SwingUtilities.getWindowAncestor(view.getSwingContentPane());
           }
           wp = new WidgetPrinter(printComponent);
         }

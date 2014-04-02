@@ -606,7 +606,8 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   /**
    * Prints the form<br>
    * <p>
-   * The method returns immediately, the print is done int the background.
+   * The method returns immediately, the print is done in the background.<br>
+   * As soon as the print has been finished the {@link FormEvent#TYPE_PRINTED} is fired.
    * <p>
    * For details and parameter details see {@link PrintDevice}
    */
@@ -615,7 +616,8 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   /**
    * Prints a form field<br>
    * <p>
-   * The method returns immediately, the print is done int the background.
+   * The method returns immediately, the print is done in the background.<br>
+   * As soon as the print has been finished the {@link FormEvent#TYPE_PRINTED} is fired.
    * <p>
    * For details and parameter details see {@link PrintDevice}
    */
