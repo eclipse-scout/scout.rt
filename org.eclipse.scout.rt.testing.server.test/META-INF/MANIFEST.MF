@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout RT Testing Server Test
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.server.test
-Bundle-Version: 3.10.0.qualifier
+Bundle-Version: 3.10.1.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Fragment-Host: org.eclipse.scout.rt.testing.server;bundle-version="3.10.0"
+Fragment-Host: org.eclipse.scout.rt.testing.server;bundle-version="3.10.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.hamcrest.core;version="[1.3.0,2.0.0)",
  org.junit;version="[4.9.0,5.0.0)",
  org.junit.runner;version="[4.9.0,5.0.0)",
  org.junit.runners.model;version="[4.9.0,5.0.0)"
-Require-Bundle: org.eclipse.scout.rt.server.testenvironment;bundle-version="[3.10.0,3.11.0)"
+Require-Bundle: org.eclipse.scout.rt.server.testenvironment;bundle-version="[3.10.1,3.11.0)"
