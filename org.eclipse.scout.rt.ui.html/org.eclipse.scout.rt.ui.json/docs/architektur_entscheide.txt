@@ -16,6 +16,8 @@ Clientseitige Model-Handler wann erstellen? Von Gui-Komponenten trennen?
 
 Datenübertragung
 - Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung
+- Dasselbe gilt für Properties, welche den "Default"-Wert haben. z.B: maximizedEnabled ist zu 99% auf false bei Dialogen, muss das übertragen werden?
+  Wir könnten initial auch eine Map mit Default-Props schicken und dann die einzelnen Props nur, falls sie nicht default sind. Ob man aber so viel spart dabei?
 
 Naming
 - Events und Properties sollten wie im Modell benannt werden. Z.B: beim Menu: "text" statt "label", weil es IMenu.getText(); heisst
