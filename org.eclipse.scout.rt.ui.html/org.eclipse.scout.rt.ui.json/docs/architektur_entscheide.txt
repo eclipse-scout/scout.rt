@@ -18,6 +18,9 @@ Datenübertragung
 - Wenn keine Elemente vorhanden, leere Liste oder das Element nicht schicken? Keine undef Prüfung mit JS vs. weniger Daten-Übertragung
 
 
+JsHint
+- Wir verwenden kein unused, weil sonst alle ungenützten Parameter auch angezeigt würden, was man leider nicht abstellen kann.
+
 Scout/Model-Anpassungen
 - Feld-Validierungen
   Ziel: Validierungen und Formatierungen möglichst mittels Javascript machen
@@ -33,3 +36,51 @@ Scout/Model-Anpassungen
 - Filter bei Tree / Table (ITreeNodeFilter, ITableRowFilter) könnten auch vom JS übernommen werden
 - Tabellen-Organisation soll neu ein eigenes GUI-Element sein (kein Standard-Form)
 - Dynamische Outlines (Add/Remove)
+
+Scout-Pattern / Namespacing
+- Scout verwendet genau einen Namespace namens scout
+- Es gibt keine weitere Gruppierung mittels JS-Objekten (scout.abc.xy). Jede weitere Verschachtelung ist ein Objekt-Zugriff -> Performance-Impact
+- Scout-Namespace wird mittels IIF (Immediate Invocation Function) erzeugt
+- Die internen Objekte/Komponenten (Session, Menu, etc) werden innerhalb dieser IIF definiert
+- Vorteil des IIF:
+  - Die Scout-Komponenten müssen nicht mittels Scout.Komponente referenziert werden
+  - API gegen aussen muss explizit definiert werden (die Komponenten müssen explizit freigegeben werden): scout.Menu = Menu;
+- Scout ist ein Singleton, es gibt einmal window.scout
+- Das Pattern könnte sich noch ändern, abhängig von Portlets und Erweiterbarkeit (siehe unten)
+
+Session-Handling
+- JsonSession beinhaltet zustand des Scout-Clients (welche Forms offen sind etc.)
+- JsonSession muss pro div sein -> sessionPartId
+- sessionPartId besteht aus tabId und divId
+- HttpSession enthält sessionPartIds
+- tabId darf nicht beim Neuladen der Seite bzw. beim Vor/Zurück neu erstellt werden, sonst wird jedesmal eine neue JsonSession erzeugt
+- tabId muss darum in die Url geschrieben werden (?t=123)
+- Tomcat unterstützt Cookie-Persistenz (mittels maxAge) -> Cookie wird nach dem Schliessen des Browsers NICHT gelöscht
+- Damit diese Persistenz genutzt werden kann, muss tabId dieselbe sein wie beim vorherigen Besuch
+- Benutzer kann entweder tabId selber eingeben (mühsam)
+- Oder Scout fügt automatisch die letzte tabId hinzu
+- Möglichkeiten:
+  - tabId ist eine Laufnummer, wenn die tabId fehlt wird automatisch tabId = 0 hinzugefügt. Laufnummer kann im html 5 cache oder in der http session gehalten werden
+  - tabId wird im html 5 cache gespeichert, wenn die tabId fehlt wird die (letzte) tabId aus dem html 5 cache geholt
+
+Portlets
+- Javascript und CSS müssen abgegrenzt werden
+- Die Elemente dürfen nicht über #Element im CSS referenziert werden, da es #Element pro scout-div geben kann
+  -> nur Klassen verwenden (.element)
+- Sobald es mehrere Divs auf der Seite gibt, darf das CSS die Objekte nur innerhalb eines divs selektieren, also anstatt .table muss es #divId.table heissen
+- Dieses Hinzufügen der divId kann vom Server übernommen werden. Client muss dem Server mitteilen, wieviele Divs es gibt.
+- Falls es nur ein Div hat, ist diese Prozessierung nicht nötig. Vorteil: Selektion ist schneller
+- Müssen / Wollen wir unterstützen, dass unterschiedliche Scout-Divs unterschiedliche Scout-Komponenten verwenden?
+  Falls ja, muss entweder JS bei der Erstellung der Komponenten divId berücksichtigen.
+  Oder pro (unterschiedlichem) scout div machen wir new Scout() anstatt ein Singleton (siehe scout-pattern.js)
+
+Erweiterbarkeit
+- Es muss möglich sein, Komponenten austauschen zu könnnen
+- Dafür braucht eine Komponenten-Factory (analog FormFieldFactory)
+- Pattern muss Registrierung von eigenen Komponenten ermöglichen -> scout.registerComponent();
+- Wie gehen wir mit custom CSS um? Css erweiterbar machen mittels z.B. @extends? Build-Umgebung für Css / JS sollte den Projekten zur Verfügung gestellt werden
+  Custom css nötig für eigene Komponenten + für eigenes Styling (Corporate Design)
+- Wenn Projekt eine eigene JS-Library verwenden möchte, kann es die im Script-Tag einfügen -> Durch Namespacing grenzt sich Scout ab -> keine Konflikte
+- Wie kann das Projekte eine bestehende Komponente erweitern / patchen?
+  Komponente registrieren -> ok
+  Komponente erweitern (extends) -> unklar. Nur via Build-Prozess? Oder genügt es, alle Scout-Komponenten öffentlich zu machen (scout.Table = Table)? Dann könnte man "JS-Vererbung" verwenden

@@ -1,7 +1,4 @@
-//local log function
-var log = console.log.bind(console);
-
-// extend jquery
+// extend jquery -> in eigenes File jquery-scout.js
 (function ($) {
 
   $.fn.doIt = function (a, v) {
@@ -11,106 +8,75 @@ var log = console.log.bind(console);
   };
 
   // ...
-
+  $.log = console.log.bind(console);
 }(jQuery));
 
-// scout namespace and object
+// scout namespace
+// protects $ and undefined from being redefined by another library
+(function(scout, $, undefined) {
 
-Scout = function (sessionPartId) {
+  //start file Session.js
+  function Session ($entryPoint, sessionPartId) {
 
-  // session handling, singleton
-  session = new function Session (sessionPartId) {
-    var server = 'localhost';
-    this.id = sessionPartId;
-
-    this.fetch () {
-      log(server, this.id)
-    };
-  }();
-  
-  locale = new Locale ();
-
-  // interface to outside
-  this.add = function add ($div) {
-    // create widget ...
-    // use session
-
-    // append classes dynamiacly
-    // if (typeof this.MySuperField === 'undefined') {
-    // $.getScript('XXX.js');
-    // DesktopTable.prototype.newFunc() {};
-    // this.MySuperField = function ()....
-    // }
-
+  }
+  Session.prototype.init = function () {
   };
-  
-  fetch
-
-
-  // each 'class' in one file
-  DesktopTable = function () {
-    // 1. instance variables
-    this.publicVar = publicVar;
-    this._privateVar = privateVar;
-
-     // 2. construction code
-    var $div =..;
-
-     // 3. named functions used for construction or event handling
-    var that = this;
-    function onClick () {
-      // direct access to 'variable'
-      log(variable);
-
-      that._privateFunc();
-
-      $div.xy;
-
-      // direct access to session
-      session.fetch(that._privateVar);
+  Session.prototype.createField = function () {
+    if(type == 'desktopTable') {
+      new DesktopTable
     }
+    else {
+      call({}, scout[type]);
 
+
+    }
+  };
+  //end file Session.js
+
+  //start file DesktopTable.js
+  function DesktopTable(session, model) {
+  }
+  DesktopTable.prototype.Func = function () {
+  };
+  //end file DesktopTable.js
+
+  //start file numbers.js
+  numbers = function () {
+    multiply : function sum(a,b) {},
+    div : function sum(a,b) {}
+  };
+  //end file numbers.js
+
+  // scout API
+  scout.init = function() {
+    var tabId = '' + new Date().getTime();
+    $('.scout').each(function() {
+      var portletPartId = $(this).data('partid') || '0',
+        sessionPartId = [portletPartId, tabId].join('.');
+      var session = new Session($(this), sessionPartId);
+      session.init();
+    });
   };
 
-  //instance functions
-  DesktopTable.prototype._privateFunc = function () {
+  scout.registerCustomComponent = function (name, component) {
+    scout[name] = component;
   };
 
-  DesktopTable.prototype.publicFunc = function () {
-      // access to 'this._privateVar'
-      log(this._privateVar);
-      // direct access to session
-      session.fetch(this._privateVar);
-      this._privateFunc();
-      this.publicVar ="abc";
-  };
+  scout.numbers = numbers;
 
-  // next class, next file
-  // ...
-}();
+}(window.scout = window.scout || {});
+
+Walbusch = {};
+Walbusch.MagicField = function (session) {
+
+};
 
 // scan index and start scout
 $(document).ready(function () {
-  var tabId = '' + new Date().getTime(),
-    scouts = {};
+  window.scout.init();
 
-  $('.scout').each(function () {
-    var portletPartId = $(this).data('partid') || '0',
-      sessionPartId = [portletPartId, tabId].join('.'),
-      scout;
-
-    if (scouts[sessionPartId]) {
-      scout = new Scout(sessionPartId);
-      scouts[sessionPartId] = scout;
-    } else {
-      scout = scouts[sessionPartId];
-    }
-
-    scout.add($(this));
-  });
+  window.scout.registerComponent('magicField', Walbusch.MagicField);
 });
 
-
-
-
-//----------------- new -----------------------
+//TODO discuss
+Function.prototype.that = function (context) {that = context; return this.bind(context);}
