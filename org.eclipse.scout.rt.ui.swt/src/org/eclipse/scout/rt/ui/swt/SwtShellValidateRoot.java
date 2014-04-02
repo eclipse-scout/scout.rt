@@ -59,7 +59,7 @@ public class SwtShellValidateRoot extends DefaultValidateRoot {
       }
       int dhPref = 0;
       dhPref = prefSize.y - curShellBounds.height;
-      if (dhPref != 0) {
+      if (dhPref > 0) {
         getShell().setBounds(new Rectangle(curShellBounds.x, curShellBounds.y, curShellBounds.width, prefSize.y));
       }
     }
