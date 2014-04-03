@@ -131,19 +131,20 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
           m_display.sleep();
         }
       }
-      catch (Throwable e) {
+      //Catch only exception instead of throwable to allow proper uithread shutdown (see UIThread.UIThreadTerminationError
+      catch (Exception e) {
         handleEventLoopException(e);
       }
     }
     return 0;
   }
 
-  protected void handleEventLoopException(final Throwable t) {
+  protected void handleEventLoopException(final Exception e) {
     invokeScoutLater(new Runnable() {
 
       @Override
       public void run() {
-        ProcessingException p = new ProcessingException("", t);
+        ProcessingException p = new ProcessingException("", e);
         SERVICES.getService(IExceptionHandlerService.class).handleException(p);
       }
 
