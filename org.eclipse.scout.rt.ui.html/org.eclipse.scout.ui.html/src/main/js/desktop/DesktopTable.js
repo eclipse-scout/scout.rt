@@ -17,6 +17,7 @@ Scout.DesktopTable = function(scout, model) {
 Scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
 Scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
 Scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
+Scout.DesktopTable.EVENT_ROW_ACTION = 'rowAction';
 
 Scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
@@ -352,13 +353,13 @@ Scout.DesktopTable.prototype._sort = function() {
 
   // compare rows
   var that = this;
+
   function compare(a, b) {
     for (var s = 0; s < sortColumns.length; s++) {
       var index = sortColumns[s].index,
         valueA = that.getValue(index, $(a).data('row')),
         valueB = that.getValue(index, $(b).data('row'))
         dir = sortColumns[s].dir == 'up' ? -1 : 1;
-
 
       if (valueA < valueB) {
         return dir;
@@ -432,7 +433,6 @@ Scout.DesktopTable.prototype._loadData = function() {
   this._drawSelectionBorder();
 };
 
-
 Scout.DesktopTable.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '';
@@ -469,6 +469,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     $(rowString)
       .appendTo(this._$tableDataScroll)
       .on('mousedown', '', onMouseDown)
+      .on('clicks', '', onClicks)
       .width(this._tableHeader.totalWidth + 4);
   }
 
@@ -486,6 +487,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 
   function onMouseDown(event) {
+    log('down');
     var $row = $(event.delegateTarget),
       add = true,
       first,
@@ -498,7 +500,12 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     } else if (event.ctrlKey) {
       add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
     } else {
-      $selectedRows.removeClass('row-selected');
+      //Click on the already selected row must not reselect it
+      if ($selectedRows.length == 1 && $row.hasClass('row-selected')) {
+        return;
+      } else {
+        $selectedRows.removeClass('row-selected');
+      }
     }
 
     // just a click...
@@ -545,26 +552,67 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       $(".table-row").unbind("mousemove");
       $(".table-row").unbind("mouseup");
 
-      //Send click only if mouseDown and mouseUp happened on the same row
-      if ($row.get(0) == event.delegateTarget) {
-        that.scout.send(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
-          "rowId": $row.attr('id')
-        });
+      //Handle mouse move selection. Single row selections are handled by onClicks
+      if ($row.get(0) != event.delegateTarget) {
+        sendRowsSelected();
       }
 
-      if (selectionChanged) {
-        var rowIds = [],
-          $selectedRows = $('.row-selected');
-
-        $selectedRows.each(function() {
-          rowIds.push($(this).attr('id'));
-        });
-
-        that.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, that.model.table.id, {
-          "rowIds": rowIds
-        });
-      }
     }
+  }
+
+  function sendRowsSelected() {
+    log('send selection');
+    var rowIds = [],
+      $selectedRows = $('.row-selected');
+
+    $selectedRows.each(function() {
+      rowIds.push($(this).attr('id'));
+    });
+
+    if (arrays.equalsIgnoreOrder(rowIds, that.model.table.selectedRowIds)) {
+      return;
+    }
+
+    that.model.table.selectedRowIds = rowIds;
+    if (that.model.table.selectedRowIds) {
+      that.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, that.model.table.id, {
+        "rowIds": rowIds
+      });
+    }
+  }
+
+  function onClicks(event) {
+    if (event.type == 'singleClick') {
+      onClick(event);
+    }
+
+    sendRowsSelected();
+
+    if (event.type == 'doubleClick') {
+      onDoubleClick(event);
+    }
+  }
+
+  function onClick(event) {
+    log('click');
+    var $row = $(event.delegateTarget);
+    //Send click only if mouseDown and mouseUp happened on the same row
+    log('send click');
+    that.scout.send(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
+      "rowId": $row.attr('id')
+    });
+  }
+
+  function onDoubleClick(event) {
+    log('dbl');
+    var $row = $(event.delegateTarget);
+
+    //Click events are always fired even if a double click event happened. That's why we need to 'manually' prevent the click event from beeing sent
+    that.scout.preventFromBeeingSent(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id);
+
+    that.scout.send(Scout.DesktopTable.EVENT_ROW_ACTION, that.model.table.id, {
+      "rowId": $row.attr('id')
+    });
   }
 
   function selectionMenu(x, y) {
@@ -620,7 +668,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
 };
 
-
 Scout.DesktopTable.prototype.getValue = function(col, row) {
   var cell = this.model.table.rows[row].cells[col];
 
@@ -674,8 +721,7 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
       }
 
       var nextRow = $rows.eq(r + 1).data('row');
-      if ((r == $rows.length - 1) || (this.getText(groupColumn, row) != this.getText(groupColumn, nextRow))
-          && sum.length > 0) {
+      if ((r == $rows.length - 1) || (this.getText(groupColumn, row) != this.getText(groupColumn, nextRow)) && sum.length > 0) {
         for (c = 0; c < $cols.length; c++) {
           var $div;
 
@@ -717,33 +763,33 @@ Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
     if (v > maxValue || maxValue === undefined) maxValue = v;
   }
 
-  log (minValue, maxValue);
+  log(minValue, maxValue);
 
   if (mode === 'red') {
     colorFunc = function(cell, value) {
-      var level = (value - minValue) / (maxValue - minValue ) ;
+      var level = (value - minValue) / (maxValue - minValue);
 
-      var r = Math.ceil(255 - level * (255 - 171)) ,
+      var r = Math.ceil(255 - level * (255 - 171)),
         g = Math.ceil(175 - level * (175 - 214)),
         b = Math.ceil(175 - level * (175 - 147));
 
-      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b +')');
+      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
       cell.css('background-image', '');
     };
   } else if (mode === 'green') {
     colorFunc = function(cell, value) {
-      var level = (value - minValue) / (maxValue - minValue ) ;
+      var level = (value - minValue) / (maxValue - minValue);
 
-      var r = Math.ceil(171 - level * (171 - 255)) ,
+      var r = Math.ceil(171 - level * (171 - 255)),
         g = Math.ceil(214 - level * (214 - 175)),
         b = Math.ceil(147 - level * (147 - 175));
 
-      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b +')');
+      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
       cell.css('background-image', '');
     };
   } else if (mode === 'bar') {
     colorFunc = function(cell, value) {
-      var level = Math.ceil((value - minValue) / (maxValue - minValue ) * 100) + '';
+      var level = Math.ceil((value - minValue) / (maxValue - minValue) * 100) + '';
 
       cell.css('background-color', '#fff');
       cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, white ' + level + '%, white 100% )');
@@ -756,7 +802,6 @@ Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
 
   var $rows = $('.table-row:visible', this._$tableDataScroll),
     c;
-
 
   $('.header-item', this._$desktopTable).each(function(i) {
     if ($(this).data('index') == colorColumn) c = i;

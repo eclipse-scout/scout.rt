@@ -298,18 +298,16 @@ Scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
 };
 
 Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
-  if (event.detailTableId === undefined) {
-    return;
-  }
-
   if (this._desktopTable) {
     this._desktopTable.detach();
+    this.model.detailTable = null;
   }
 
-  this._desktopTable = this.scout.widgetMap[event.detailTableId];
-  this._desktopTable.attach($('#DesktopBench'));
-
-  this.model.detailTable = this._desktopTable.model;
+  if(event.detailTableId) {
+    this._desktopTable = this.scout.widgetMap[event.detailTableId];
+    this._desktopTable.attach($('#DesktopBench'));
+    this.model.detailTable = this._desktopTable.model;
+  }
 };
 
 Scout.DesktopTree.prototype.onModelCreate = function() {};

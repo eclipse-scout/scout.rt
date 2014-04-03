@@ -49,8 +49,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITable> {
+  public static final String EVENT_ROW_CLICKED = "rowClicked";
+  public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
+  public static final String EVENT_MENU_POPUP = "menuPopup";
   public static final String PROP_ROW_IDS = "rowIds";
+  public static final String PROP_ROW_ID = "rowId";
 
   private P_ModelTableListener m_modelTableListener;
   private Map<String, ITableRow> m_tableRows;
@@ -119,20 +123,23 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    if ("rowClicked".equals(event.getEventType())) {
+    if (EVENT_ROW_CLICKED.equals(event.getEventType())) {
       handleUiRowClicked(event, res);
+    }
+    else if (EVENT_ROW_ACTION.equals(event.getEventType())) {
+      handleUiRowAction(event, res);
     }
     else if (EVENT_ROWS_SELECTED.equals(event.getEventType())) {
       handleUiRowsSelected(event, res);
     }
-    else if ("menuPopup".equals(event.getEventType())) {
+    else if (EVENT_MENU_POPUP.equals(event.getEventType())) {
       handleUiMenuPopup(event, res);
     }
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) throws JsonUIException {
     try {
-      final ITableRow tableRow = getTableRowForRowId(event.getEventObject().getString("rowId"));
+      final ITableRow tableRow = extractTableRow(event.getEventObject());
 
       new ClientSyncJob("Row clicked", getJsonSession().getClientSession()) {
         @Override
@@ -162,6 +169,22 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
           finally {
             getTableEventFilter().removeIgnorableModelEvent(tableEvent);
           }
+        }
+      }.runNow(new NullProgressMonitor());
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e.getMessage(), e);
+    }
+  }
+
+  protected void handleUiRowAction(JsonEvent event, JsonResponse res) throws JsonUIException {
+    try {
+      final ITableRow tableRow = extractTableRow(event.getEventObject());
+
+      new ClientSyncJob("Row action", getJsonSession().getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
         }
       }.runNow(new NullProgressMonitor());
     }
@@ -342,6 +365,10 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
 
   public List<ITableRow> extractTableRows(JSONObject jsonObject) throws JSONException {
     return jsonToTableRows(jsonObject.getJSONArray(PROP_ROW_IDS));
+  }
+
+  public ITableRow extractTableRow(JSONObject jsonObject) throws JSONException {
+    return getTableRowForRowId(jsonObject.getString(PROP_ROW_ID));
   }
 
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {

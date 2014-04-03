@@ -85,6 +85,20 @@ describe("DesktopTable", function() {
     return new Scout.DesktopTable(scout, model);
   }
 
+  function selectRowsAndAssert(desktopTable, rowIds) {
+    desktopTable.selectRowsByIds(rowIds);
+
+    var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+    expect($selectedRows.length).toBe(rowIds.length);
+
+    var selectedRowIds = [];
+    $selectedRows.each(function() {
+      selectedRowIds.push($(this).attr('id'));
+    });
+
+    expect(arrays.equalsIgnoreOrder(rowIds, selectedRowIds)).toBeTruthy();
+  }
+
   describe("render", function() {
 
     it("draws a table header", function() {
@@ -129,22 +143,8 @@ describe("DesktopTable", function() {
       var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
       expect($selectedRows.length).toBe(0);
 
-      var rowIds = ['0', '4'];
-      desktopTable.selectRowsByIds(rowIds);
-
-      $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
-      expect($selectedRows.length).toBe(2);
-
-      expect($selectedRows.first().attr('id')).toBe('0');
-      expect($selectedRows.last().attr('id')).toBe('4');
-
-      rowIds = ['2'];
-      desktopTable.selectRowsByIds(rowIds);
-
-      $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
-      expect($selectedRows.length).toBe(1);
-
-      expect($selectedRows.first().attr('id')).toBe('2');
+      selectRowsAndAssert(desktopTable, ['0', '4']);
+      selectRowsAndAssert(desktopTable, ['2']);
     });
 
     it("sends selection event containing rowIds", function() {
@@ -159,11 +159,10 @@ describe("DesktopTable", function() {
 
       expect(ajaxRequests.length).toBe(1);
 
-      var requestData = mostRecentJsonRequest();
       var event = new Scout.Event(Scout.DesktopTable.EVENT_ROWS_SELECTED, '1', {
         "rowIds": rowIds
       });
-      expect(requestData).toContainEvents(event);
+      expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
     it("updates cached model", function() {
@@ -181,23 +180,82 @@ describe("DesktopTable", function() {
 
   describe("row click", function() {
 
+    function clickRowAndAssertSelection(desktopTable, $row) {
+      $row.mousedown();
+      $row.mouseup();
+      $row.click();
+      jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME+1);
+
+      var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+      expect($selectedRows.length).toBe(1);
+
+      var $selectedRow = $selectedRows.first();
+      expect($selectedRow).toEqual($row);
+    }
+
+    it("selects row and unselects others", function() {
+      var model = createModelFixture(2, 5);
+      var desktopTable = createDesktopTable(model);
+      desktopTable.render(scout.$entryPoint);
+
+      var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+      expect($selectedRows.length).toBe(0);
+
+      var $rows = desktopTable._$tableDataScroll.children();
+      clickRowAndAssertSelection(desktopTable, $rows.eq(1));
+      clickRowAndAssertSelection(desktopTable, $rows.eq(2));
+
+      selectRowsAndAssert(desktopTable, ['0', '4']);
+      clickRowAndAssertSelection(desktopTable, $rows.eq(4));
+    });
+
     it("sends click and selection events", function() {
       var model = createModelFixture(2, 5);
       var desktopTable = createDesktopTable(model);
       desktopTable.render(scout.$entryPoint);
 
       var $row = desktopTable._$tableDataScroll.children().first();
-      $row.mousedown();
-      $row.mouseup();
+      $row.click();
+
+      jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME+1);
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([Scout.DesktopTable.EVENT_ROW_CLICKED, Scout.DesktopTable.EVENT_ROWS_SELECTED]);
+    });
+
+    it("sends only click if row already is selected", function() {
+      var model = createModelFixture(2, 5);
+      var desktopTable = createDesktopTable(model);
+      desktopTable.render(scout.$entryPoint);
+
+      var $row = desktopTable._$tableDataScroll.children().first();
+      clickRowAndAssertSelection(desktopTable, $row);
+      jasmine.clock().tick(0);
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([Scout.DesktopTable.EVENT_ROW_CLICKED, Scout.DesktopTable.EVENT_ROWS_SELECTED]);
+
+      clearAjaxRequests();
+      clickRowAndAssertSelection(desktopTable, $row);
+      jasmine.clock().tick(0);
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([Scout.DesktopTable.EVENT_ROW_CLICKED]);
+    });
+
+  });
+
+  describe("row double click", function() {
+    it("sends selection and row action events", function() {
+      var model = createModelFixture(2, 5);
+      var desktopTable = createDesktopTable(model);
+      desktopTable.render(scout.$entryPoint);
+
+      var $row = desktopTable._$tableDataScroll.children().first();
+      $row.click();
+      $row.click();
 
       jasmine.clock().tick(0);
 
-      expect(ajaxRequests.length).toBe(1);
-
-      var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly([Scout.DesktopTable.EVENT_ROW_CLICKED, Scout.DesktopTable.EVENT_ROWS_SELECTED]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([Scout.DesktopTable.EVENT_ROWS_SELECTED, Scout.DesktopTable.EVENT_ROW_ACTION]);
     });
-
   });
 
   describe("row mouse down / move / up", function() {
@@ -246,8 +304,6 @@ describe("DesktopTable", function() {
       $row2.mouseup();
 
       jasmine.clock().tick(0);
-
-      expect(ajaxRequests.length).toBe(1);
 
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(Scout.DesktopTable.EVENT_ROWS_SELECTED);

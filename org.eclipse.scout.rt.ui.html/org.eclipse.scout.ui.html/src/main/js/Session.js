@@ -84,6 +84,19 @@ Scout.Session.prototype._sendNow = function(events, async) {
   return ret;
 };
 
+/**
+ * Removes the events of the given type and id from the async event queue.
+ */
+Scout.Session.prototype.preventFromBeeingSent = function(type, id) {
+  var events = this._asyncEvents.slice();
+  for (var i = 0; i < events.length; i++) {
+    var event = events[i];
+    if (event.type_ === type && event.id === id) {
+      arrays.remove(this._asyncEvents, event);
+    }
+  }
+};
+
 Scout.Session.prototype._processEvents = function(events) {
   var scout = this;
   for (var i = 0; i < events.length; i++) {

@@ -2,6 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 //
 
+//@include("src/main/js/util/arrays.js");
 //@include("src/main/js/Scout.js");
 //@include("src/main/js/Session.js");
 //@include("src/main/js/Event.js");

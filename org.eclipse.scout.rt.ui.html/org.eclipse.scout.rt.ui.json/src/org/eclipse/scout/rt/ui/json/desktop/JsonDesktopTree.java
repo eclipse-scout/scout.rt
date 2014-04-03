@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -36,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutline> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String PROP_NODE_ID = "nodeId";
@@ -302,7 +305,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }
       else {
         pageType = "node";
-        //FIXME send internal table and ignore on gui? or better modify model?
+        //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
 //        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
 //        ITable table = pageWithNodes.getInternalTable();
 //        if (table != null) {
@@ -543,7 +546,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       ITable table = (ITable) newValue;
 
       JsonDesktopTable jsonTable = m_jsonTables.get(table);
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", jsonTable.getId());
+      String tableId = null;
+      if (jsonTable != null) {
+        tableId = jsonTable.getId();
+      }
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", tableId);
     }
     else {
       super.handleModelPropertyChange(name, newValue);

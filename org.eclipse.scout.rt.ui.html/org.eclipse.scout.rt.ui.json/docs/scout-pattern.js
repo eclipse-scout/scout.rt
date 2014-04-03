@@ -41,7 +41,7 @@
   //end file DesktopTable.js
 
   //start file numbers.js
-  numbers = function () {
+  var numbers = {
     multiply : function sum(a,b) {},
     div : function sum(a,b) {}
   };
