@@ -122,6 +122,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 

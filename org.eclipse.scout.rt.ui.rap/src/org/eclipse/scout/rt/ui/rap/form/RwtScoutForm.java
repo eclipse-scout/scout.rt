@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("deprecation")
 public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutForm.class);
   private static final String VARIANT_FORM = "form";
