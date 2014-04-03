@@ -284,7 +284,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
   @Order(170)
-  public int getConfiguredToobarLocation() {
+  protected int getConfiguredToobarLocation() {
     return TOOLBAR_FORM_HEADER;
   }
 
