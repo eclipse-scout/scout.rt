@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.out;
 
+import java.util.List;
+
 /**
  *
  */
@@ -29,7 +31,7 @@ public interface IDocSection {
    */
   String getIntroduction();
 
-  IDocSection[] getSubSections();
+  List<IDocSection> getSubSections();
 
   boolean hasSubSections();
 

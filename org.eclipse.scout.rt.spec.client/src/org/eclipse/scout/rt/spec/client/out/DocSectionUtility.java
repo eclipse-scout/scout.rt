@@ -30,10 +30,9 @@ public final class DocSectionUtility {
   }
 
   private static void addSectionsToListRec(List<IDocSection> list, IDocSection s) {
-    //TODO there should be no subsections that are null
     if (s != null) {
       list.add(s);
-      IDocSection[] subSections = s.getSubSections();
+      List<IDocSection> subSections = s.getSubSections();
       for (IDocSection sub : subSections) {
         addSectionsToListRec(list, sub);
       }

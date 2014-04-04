@@ -47,10 +47,7 @@ public class SmartFieldVisitor implements IDocFormFieldVisitor {
     String title = m_config.getSmartFieldConfig().getTitleExtractor().getText(field);
     IDocTable docTable = DocGenUtility.createDocTable(field, m_config.getSmartFieldConfig(), true);
     IDocSection menuSection = DocGenUtility.createDocSection(SpecUtility.expandMenuHierarchy(field.getMenus()), m_config.getMenuTableConfig(), false);
-    if (menuSection != null) {
-      return new Section(title, docTable, menuSection);
-    }
-    return new Section(title, docTable);
+    return new Section(title, docTable, menuSection);
   }
 
   @Override

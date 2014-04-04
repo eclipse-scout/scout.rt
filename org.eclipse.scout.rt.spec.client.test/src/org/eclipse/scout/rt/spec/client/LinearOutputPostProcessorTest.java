@@ -55,7 +55,7 @@ public class LinearOutputPostProcessorTest {
   @Test
   public void testFindFileForConfigEntry() throws ProcessingException {
     copyFile(TEST_DIR + File.separator + "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
-    copyFile(TEST_DIR + File.separator + "LoppTestFormExtended_71f9de60-604d-440e-8b91-2ad6a8c6f12d.mediawiki");
+    copyFile(TEST_DIR + File.separator + "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
     copyFile(TEST_DIR + File.separator + "LoremIpsum1.mediawiki");
     LinearOutputPostProcessor lopp = new LinearOutputPostProcessor(null);
 
@@ -64,8 +64,8 @@ public class LinearOutputPostProcessorTest {
     testFindFileForConfigEntry(lopp, "LoremIpsum1", "LoremIpsum1.mediawiki");
     testFindFileForConfigEntry(lopp, "LoppTestForm", "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
     testFindFileForConfigEntry(lopp, "org.eclipse.scout.rt.spec.client.LinearOutputPostProcessorTest$LoppTestForm", "LoppTestForm_1c1ce9e7-7216-4f01-9881-4786fa87e06c.mediawiki");
-    testFindFileForConfigEntry(lopp, "LoppTestFormToExtend", "LoppTestFormExtended_71f9de60-604d-440e-8b91-2ad6a8c6f12d.mediawiki");
-    testFindFileForConfigEntry(lopp, "org.eclipse.scout.rt.spec.client.LinearOutputPostProcessorTest$LoppTestFormToExtend", "LoppTestFormExtended_71f9de60-604d-440e-8b91-2ad6a8c6f12d.mediawiki");
+    testFindFileForConfigEntry(lopp, "LoppTestFormToExtend", "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
+    testFindFileForConfigEntry(lopp, "org.eclipse.scout.rt.spec.client.LinearOutputPostProcessorTest$LoppTestFormToExtend", "LoppTestFormExtended_123456idDoesNotMatter.mediawiki");
 
   }
 

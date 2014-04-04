@@ -251,12 +251,12 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
   }
 
   protected File findFileForClass(Class c) throws ProcessingException {
-    File file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), SpecUtility.getSpecFileBaseName(c) + ".mediawiki");
-    if (file.exists()) {
-      return file;
+    File[] mediawikiFiles = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles();
+    for (File file : mediawikiFiles) {
+      if (file.getName().startsWith(c.getSimpleName() + "_")) {
+        return file;
+      }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

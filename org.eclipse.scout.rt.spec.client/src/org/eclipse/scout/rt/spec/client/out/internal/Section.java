@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.out.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 
@@ -18,7 +22,7 @@ import org.eclipse.scout.rt.spec.client.out.IDocTable;
  */
 public class Section implements IDocSection {
   protected final IDocTable m_table;
-  protected final IDocSection[] m_subSections;
+  protected final ArrayList<IDocSection> m_subSections;
   protected String m_title;
   protected String m_introduction;
 
@@ -34,7 +38,12 @@ public class Section implements IDocSection {
     m_title = title;
     m_introduction = introduction;
     m_table = table;
-    m_subSections = subSections;
+    m_subSections = new ArrayList<IDocSection>();
+    for (IDocSection subSection : subSections) {
+      if (subSection != null) {
+        m_subSections.add(subSection);
+      }
+    }
   }
 
   @Override
@@ -48,11 +57,8 @@ public class Section implements IDocSection {
   }
 
   @Override
-  public IDocSection[] getSubSections() {
-    if (m_subSections == null) {
-      return new IDocSection[]{};
-    }
-    return m_subSections.clone();
+  public List<IDocSection> getSubSections() {
+    return Collections.unmodifiableList(m_subSections);
   }
 
   @Override
@@ -62,7 +68,7 @@ public class Section implements IDocSection {
 
   @Override
   public boolean hasSubSections() {
-    return getSubSections() != null && getSubSections().length > 0;
+    return m_subSections.size() > 0;
   }
 
   @Override

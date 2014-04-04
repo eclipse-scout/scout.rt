@@ -46,19 +46,7 @@ public class TableFieldVisitor implements IDocFormFieldVisitor {
     String title = m_config.getTableFieldConfig().getTitleExtractor().getText(field);
     IDocSection menuSection = DocGenUtility.createDocSection(SpecUtility.expandMenuHierarchy(field.getTable().getMenus()), m_config.getMenuTableConfig(), false);
     IDocSection columnsSection = DocGenUtility.createDocSection(field.getTable().getColumns(), m_config.getColumnTableConfig(), false);
-    // TODO ASA refactor if/else cascade
-    if (menuSection != null) {
-      if (columnsSection != null) {
-        return new Section(title, menuSection, columnsSection);
-      }
-      else {
-        return new Section(title, menuSection);
-      }
-    }
-    if (columnsSection != null) {
-      return new Section(title, columnsSection);
-    }
-    return new Section(title);
+    return new Section(title, menuSection, columnsSection);
   }
 
   @Override

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -46,15 +45,6 @@ public final class SpecUtility {
     return object.getClass().getSimpleName() + "_" + object.classId();
   }
 
-  /**
-   * creates a base file name (without file extension) for a class using it's annotated classId or the classId fallback
-   * 
-   * @param c
-   * @return
-   */
-  public static String getSpecFileBaseName(Class c) {
-    return c.getSimpleName() + "_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(c);
-  }
 
   /**
    * wrapper around {@link BundleInspector#getAllClasses(IClassFilter)} which caches all classes on first invocation
