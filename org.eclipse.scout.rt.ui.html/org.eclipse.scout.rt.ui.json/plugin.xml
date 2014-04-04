@@ -16,7 +16,7 @@
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.json.servlet.JsonServletMainRequestInterceptor"
+            class="org.eclipse.scout.rt.ui.json.servlet.MainRequestInterceptor"
             createImmediately="false">
       </service>
    </extension>

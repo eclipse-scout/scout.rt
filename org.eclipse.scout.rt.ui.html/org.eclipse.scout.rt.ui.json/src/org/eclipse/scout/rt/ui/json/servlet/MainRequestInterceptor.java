@@ -35,9 +35,9 @@ import org.json.JSONObject;
 /**
  * This interceptor contributes to the {@link AbstractJsonServlet} as the default interceptor with priority 0
  */
-@Priority(0)
-public class JsonServletMainRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonServletMainRequestInterceptor.class);
+@Priority(-1)
+public class MainRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MainRequestInterceptor.class);
 
   @Override
   public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
