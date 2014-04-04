@@ -13,11 +13,15 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.json.Activator;
+import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.ui.html.ITextFileLoader;
 import org.eclipse.scout.ui.html.ScriptProcessor;
 import org.eclipse.scout.ui.html.TextFileUtil;
+import org.osgi.framework.Bundle;
 
 /**
  * intercept scout-4.0.0.min.css and scout-4.0.0.min.js and replace by processing the source scout-4.0.0.css and
@@ -25,7 +29,8 @@ import org.eclipse.scout.ui.html.TextFileUtil;
  * <p>
  * The interception can be turned on and off using the url param ?debug=true
  */
-public class JavascriptDebugRequestInterceptor implements IHttpRequestInterceptor {
+@Priority(10)
+public class JavascriptDebugRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JavascriptDebugRequestInterceptor.class);
   private static final String SESSION_ATTR_ENABLED = JavascriptDebugRequestInterceptor.class.getSimpleName() + ".enabled";
@@ -33,19 +38,13 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
   //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4="-min", $5=".js" or ".css"
   private static final Pattern SCRIPT_FILE_PATTERN = Pattern.compile("(/(\\w+/)*)([^/]+)([-.]min)(\\.(js|css))");
 
-  private IResourceProvider m_resourceProvider;
-
-  public JavascriptDebugRequestInterceptor(IResourceProvider resourceProvider) {
-    m_resourceProvider = resourceProvider;
-  }
-
   @Override
-  public boolean beforePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
   @Override
-  public boolean beforeGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = req.getPathInfo();
     boolean debugEnabled = checkDebugEnabled(req, resp);
     if (!debugEnabled || pathInfo == null) {
@@ -56,19 +55,19 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     if (mat.matches()) {
       //is there a template for this script?
       String bundlePath = "src/main/js/" + mat.group(3) + "-template" + mat.group(5);
-      ResourceHandler h = findHandlerFor(bundlePath);
-      if (h != null) {
-        LOG.info("replacing " + pathInfo + " by live processing /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
-        handleScriptTemplate(req, resp, h, bundlePath);
+      Bundle handler = findBundleContaining(bundlePath);
+      if (handler != null) {
+        LOG.info("replacing " + pathInfo + " by live processing /" + bundlePath);
+        handleScriptTemplate(req, resp, handler, bundlePath);
         return true;
       }
 
       //is there a uncompressed library version of this script?
       bundlePath = "libjs/" + mat.group(3) + mat.group(5);
-      h = findHandlerFor(bundlePath);
-      if (h != null) {
-        LOG.info("replacing " + pathInfo + " by the uncompressed /" + h.getBundle().getSymbolicName() + "/" + bundlePath);
-        handleScriptLibrary(req, resp, h, bundlePath);
+      handler = findBundleContaining(bundlePath);
+      if (handler != null) {
+        LOG.info("replacing " + pathInfo + " by the uncompressed /" + bundlePath);
+        handleScriptLibrary(req, resp, handler, bundlePath);
         return true;
       }
     }
@@ -95,17 +94,18 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     return false;
   }
 
-  protected ResourceHandler findHandlerFor(String bundlePath) throws IOException, ServletException {
-    for (ResourceHandler h : m_resourceProvider.getResourceHandlers()) {
-      if (h.getBundle().getEntry(bundlePath) != null) {
-        return h;
+  protected Bundle findBundleContaining(String bundlePath) throws IOException, ServletException {
+    //delegate to static resources
+    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
+      if (bundle.getEntry(bundlePath) != null) {
+        return bundle;
       }
     }
     return null;
   }
 
-  protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final ResourceHandler handler, String bundlePath) throws IOException, ServletException {
-    URL url = handler.getBundle().getEntry(bundlePath);
+  protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final Bundle handler, String bundlePath) throws IOException, ServletException {
+    URL url = handler.getEntry(bundlePath);
     //process
     String input = TextFileUtil.readUTF8(url);
     ScriptProcessor processor = new ScriptProcessor();
@@ -113,7 +113,7 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     processor.setIncludeFileLoader(new ITextFileLoader() {
       @Override
       public String read(String path) throws IOException {
-        URL includeUrl = handler.getBundle().getEntry(path);
+        URL includeUrl = handler.getEntry(path);
         if (includeUrl == null) {
           throw new FileNotFoundException(path);
         }
@@ -132,8 +132,8 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     resp.getOutputStream().write(outputBytes);
   }
 
-  protected void handleScriptLibrary(HttpServletRequest req, HttpServletResponse resp, final ResourceHandler handler, String bundlePath) throws IOException, ServletException {
-    URL url = handler.getBundle().getEntry(bundlePath);
+  protected void handleScriptLibrary(HttpServletRequest req, HttpServletResponse resp, final Bundle handler, String bundlePath) throws IOException, ServletException {
+    URL url = handler.getEntry(bundlePath);
     String input = TextFileUtil.readUTF8(url);
     byte[] outputBytes = input.getBytes("UTF-8");
     int dot = bundlePath.lastIndexOf('.');
@@ -145,5 +145,4 @@ public class JavascriptDebugRequestInterceptor implements IHttpRequestIntercepto
     }
     resp.getOutputStream().write(outputBytes);
   }
-
 }

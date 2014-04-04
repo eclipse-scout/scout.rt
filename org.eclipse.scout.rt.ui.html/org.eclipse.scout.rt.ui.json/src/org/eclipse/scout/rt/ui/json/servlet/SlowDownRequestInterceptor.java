@@ -17,10 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.service.AbstractService;
 
-public class SlowDownRequestInterceptor implements IHttpRequestInterceptor {
+@Priority(100)
+public class SlowDownRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final long SLOW_DOWN_DEFAULT = 1000;
   private static final String SLOW_DOWN_PARAM = "slowDown";
   private static final String SESSION_ATTR_ENABLED = SlowDownRequestInterceptor.class.getSimpleName() + ".enabled";
@@ -28,7 +31,7 @@ public class SlowDownRequestInterceptor implements IHttpRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SlowDownRequestInterceptor.class);
 
   @Override
-  public boolean beforePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (!isEnabledOnSession(req)) {
       return false;
     }
@@ -48,7 +51,7 @@ public class SlowDownRequestInterceptor implements IHttpRequestInterceptor {
   }
 
   @Override
-  public boolean beforeGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     updateState(req);
 
     return false;

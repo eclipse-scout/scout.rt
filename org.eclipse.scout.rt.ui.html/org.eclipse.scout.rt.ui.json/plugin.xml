@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipse.scout.rt.ui.json.servlet.LocalBundleResourceProvider"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.ui.json.servlet.SlowDownRequestInterceptor"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.ui.json.servlet.JavascriptDebugRequestInterceptor"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.ui.json.servlet.JsonServletMainRequestInterceptor"
+            createImmediately="false">
+      </service>
+   </extension>
+
+</plugin>

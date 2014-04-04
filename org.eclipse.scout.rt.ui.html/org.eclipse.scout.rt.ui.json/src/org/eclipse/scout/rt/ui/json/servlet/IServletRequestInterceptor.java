@@ -16,9 +16,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface IHttpRequestInterceptor {
+import org.eclipse.scout.service.IService;
 
-  boolean beforePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+/**
+ * This interceptor contributes to the {@link AbstractJsonServlet}
+ */
+public interface IServletRequestInterceptor extends IService {
 
-  boolean beforeGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  /**
+   * @return true if the request was consumed by the interceptor, no further action is then necessary
+   */
+  boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+
+  /**
+   * @return true if the request was consumed by the interceptor, no further action is then necessary
+   */
+  boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }

@@ -11,31 +11,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceRegistration;
 
 /**
- * Serve files from the bundles 'WebContent' folder
+ * Serve files from the contributing bundles 'WebContent' folder as "/"
  */
-public class ResourceHandler {
+public class LocalBundleResourceProvider extends AbstractService implements IServletResourceProvider {
   private static final long serialVersionUID = 1L;
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
-  private final Bundle m_bundle;
-  private final String m_bundleWebContentFolder;
+  private Bundle m_bundle;
+  private String m_bundleWebContentFolder;
 
-  /**
-   * @param webContentFolder
-   *          by default "WebContent"
-   */
-  public ResourceHandler(Bundle bundle, String webContentFolder) {
-    m_bundle = bundle;
-    m_bundleWebContentFolder = webContentFolder;
+  @Override
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
+    setBundle(registration.getReference().getBundle());
+    setBundleWebContentFolder("WebContent");
   }
 
-  public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  @Override
+  public boolean handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = req.getPathInfo();
     URL url = resolveBundleResource(pathInfo);
     if (url == null) {
@@ -59,8 +60,16 @@ public class ResourceHandler {
     return m_bundle;
   }
 
+  protected void setBundle(Bundle bundle) {
+    m_bundle = bundle;
+  }
+
   protected String getBundleWebContentFolder() {
     return m_bundleWebContentFolder;
+  }
+
+  protected void setBundleWebContentFolder(String folder) {
+    m_bundleWebContentFolder = folder;
   }
 
   /**

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -26,18 +27,40 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRequest;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PostRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PostRequestHandler.class);
-  private IJsonSessionProvider m_jsonSessionProvider;
+/**
+ * This interceptor contributes to the {@link AbstractJsonServlet} as the default interceptor with priority 0
+ */
+@Priority(0)
+public class JsonServletMainRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonServletMainRequestInterceptor.class);
 
-  public PostRequestHandler(IJsonSessionProvider jsonSessionProvider) {
-    m_jsonSessionProvider = jsonSessionProvider;
+  @Override
+  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    //delegate to static resources
+    for (IServletResourceProvider provider : SERVICES.getServices(IServletResourceProvider.class)) {
+      if (provider.handle(servlet, req, resp)) {
+        return true;
+      }
+    }
+    LOG.error("Requested file not found: " + req.getPathInfo());
+    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    return true;
   }
 
-  public void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  @Override
+  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    //serve only /json
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null || !pathInfo.equals("/json")) {
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return true;
+    }
+
     JsonRequest uiReq = new JsonRequest(toJSON(req));
     String sessionAttributeName = "JsonUi#" + uiReq.getSessionPartId();
     HttpSession httpSession = req.getSession();
@@ -48,7 +71,7 @@ public class PostRequestHandler {
       jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
         //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
-        jsonSession = m_jsonSessionProvider.createJsonSession();
+        jsonSession = servlet.createJsonSession();
         jsonSession.init(req, uiReq.getSessionPartId());
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
@@ -66,6 +89,7 @@ public class PostRequestHandler {
 
       LOG.debug("Returned: " + jsonText);
     }
+    return true;
   }
 
   protected JSONObject toJSON(HttpServletRequest req) throws JsonUIException {
