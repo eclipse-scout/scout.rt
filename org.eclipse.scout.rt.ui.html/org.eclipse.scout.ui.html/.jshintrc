@@ -11,8 +11,8 @@
     "jQuery": false,
     "$": false,
 
-    "arrays" : false,
-    "log": false,
+    "arrays" : true,
+    "log": true,
 
     "jasmine": false,
 	"describe": false,

@@ -1,3 +1,4 @@
+/*exported arrays*/
 var arrays = {
   remove: function(arr, element) {
     var index = arr.indexOf(element);
