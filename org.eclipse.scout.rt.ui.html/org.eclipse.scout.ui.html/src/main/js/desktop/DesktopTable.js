@@ -44,7 +44,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlLabel = $tableControl.appendDiv('ControlLabel');
 
   this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
-  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', resetFilter);
+  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', this.resetFilter.bind(this));
   this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
 
   // control buttons have mouse over effects
@@ -59,7 +59,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     });
 
   // create header
-  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader, filterCallback);
+  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader);
 
   // load data and create rows
   this._loadData();
@@ -157,15 +157,15 @@ Scout.DesktopTable.prototype.render = function($parent) {
   }
 
   function controlChart() {
-    new Scout.DesktopTableChart(that.scout, $controlContainer, that, filterCallback);
+    new Scout.DesktopTableChart(that.scout, $controlContainer, that);
   }
 
   function controlGraph() {
-    new Scout.DesktopTableGraph(that.scout, $controlContainer, that.model);
+    new Scout.DesktopTableGraph(that.scout, $controlContainer, that);
   }
 
   function controlMap() {
-    new Scout.DesktopTableMap(that.scout, $controlContainer, that.model, that.model.table, filterCallback);
+    new Scout.DesktopTableMap(that.scout, $controlContainer, that);
   }
 
   function resizeControl(event) {
@@ -209,66 +209,6 @@ Scout.DesktopTable.prototype.render = function($parent) {
     that._drawSelectionBorder();
   }
 
-  function filterCallback(testFunc) {
-    var rowCount = 0,
-      $allRows = $('.table-row', that._$tableDataScroll);
-
-    that._resetSelection();
-
-    $allRows.detach();
-    $allRows.each(function() {
-      var $row = $(this),
-        show = testFunc($row);
-
-      if (show) {
-        showRow($row);
-        rowCount++;
-      } else {
-        hideRow($row);
-      }
-    });
-
-    that._setInfoFilter(rowCount);
-    $allRows.appendTo(that._$tableDataScroll);
-  }
-
-  function resetFilter() {
-    $('.table-row', $tableData).each(function() {
-      showRow($(this));
-    });
-    that._$infoFilter.animateAVCSD('width', 0, function() {
-      $(this).hide();
-    });
-    $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    that._resetSelection();
-  }
-
-  function showRow($row) {
-    $row.show()
-      .animate({
-        'height': '34',
-        'padding-top': '2',
-        'padding-bottom': '2'
-      }, {
-        complete: function() {
-          that._scrollbar.initThumb();
-        }
-      });
-  }
-
-  function hideRow($row) {
-    $row.hide()
-      .animate({
-        'height': '0',
-        'padding-top': '0',
-        'padding-bottom': '0'
-      }, {
-        complete: function() {
-          $(this).hide();
-          that._scrollbar.initThumb();
-        }
-      });
-  }
 
 };
 
@@ -328,7 +268,7 @@ Scout.DesktopTable.prototype._drawSelectionBorder = function() {
 Scout.DesktopTable.prototype._resetSelection = function() {
   $('.row-selected', this._$tableData).removeClass('row-selected');
   this._drawSelectionBorder();
-  $('#MenuRow').remove();
+  $('#RowMenu, #RowDrill').remove();
 };
 
 Scout.DesktopTable.prototype._sort = function() {
@@ -488,6 +428,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
   function onMouseDown(event) {
     log('down');
+
     var $row = $(event.delegateTarget),
       add = true,
       first,
@@ -507,6 +448,8 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
         $selectedRows.removeClass('row-selected');
       }
     }
+
+    $('#RowMenu, #RowDrill').remove();
 
     // just a click...
     selectData(event);
@@ -541,8 +484,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       // draw nice border
       that._drawSelectionBorder();
 
-      // open and animate menu
-      selectionMenu(event.pageX, event.pageY);
 
       //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
       selectionChanged = true;
@@ -557,11 +498,15 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
         sendRowsSelected();
       }
 
+      // open and animate menu
+      selectionMenu(event.pageX, event.pageY);
+
     }
   }
 
   function sendRowsSelected() {
     log('send selection');
+
     var rowIds = [],
       $selectedRows = $('.row-selected');
 
@@ -586,11 +531,11 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       onClick(event);
     }
 
-    sendRowsSelected();
-
     if (event.type == 'doubleClick') {
       onDoubleClick(event);
     }
+
+    sendRowsSelected();
   }
 
   function onClick(event) {
@@ -606,8 +551,10 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   function onDoubleClick(event) {
     log('dbl');
     var $row = $(event.delegateTarget);
+    sendRowAction($row);
+  }
 
-    //Click events are always fired even if a double click event happened. That's why we need to 'manually' prevent the click event from beeing sent
+  function sendRowAction($row) {
     that.scout.preventFromBeeingSent(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id);
 
     that.scout.send(Scout.DesktopTable.EVENT_ROW_ACTION, that.model.table.id, {
@@ -617,43 +564,31 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
 
   function selectionMenu(x, y) {
     // selection
-    var $selectedRows = $('.row-selected');
-
-    //FIXME added by cgu to make sure clickRowMenu is registered for every instance of DesktopTable
-    $('#MenuRow').remove();
+    var $selectedRows = $('.row-selected'),
+      $firstRow = $selectedRows.first();
 
     // make menu - if not already there
-    var $menuRow = $('#MenuRow');
-    if ($menuRow.length === 0) {
-      $menuRow = $('body').appendDiv('MenuRow')
+    var $RowDrill = $('#RowDrill');
+    if ($RowDrill.length === 0) {
+      $RowDrill = that._$tableDataScroll.appendDiv('RowDrill')
+        .on('click', '', function() {
+          sendRowAction($firstRow);
+        });
+    }
+    var $RowMenu = $('#RowMenu');
+    if ($RowMenu.length === 0) {
+      $RowMenu = that._$tableDataScroll.appendDiv('RowMenu')
         .on('click', '', clickRowMenu);
     }
-    // place menu top-left
-    $menuRow.css('left', $selectedRows.first().offset().left - 13)
-      .css('top', $selectedRows.first().offset().top - 13);
 
-    // move to the mouse pointer
-    var moveMenu = function() {
-      var top = $selectedRows.first().offset().top,
-        bottom = $selectedRows.last().offset().top + 32;
+    // place menu
+    var top = $selectedRows.first().offset().top - that._$tableDataScroll.offset().top,
+      bottom = $selectedRows.last().offset().top - that._$tableDataScroll.offset().top + 32,
+      toTop = Math.abs(top - y) > Math.abs(bottom - y) && $selectedRows.length > 1 ? bottom - 7 : top - 19 ,
+      toLeft = Math.max(25, Math.min($firstRow.outerWidth() - 58, x - that._$tableDataScroll.offset().left - 13));
 
-      var toTop = Math.abs(top - y) < Math.abs(bottom - y) ? top - 13 : bottom - 13,
-        toLeft = x - 13;
-
-      $menuRow.stop().animate({
-          'top': toTop
-        }, {
-          complete: function() {
-            $menuRow.animate({
-              'left': toLeft
-            }, 500);
-          }
-        },
-        500);
-    };
-
-    // start movement
-    moveMenu(event);
+    $RowDrill.css('left', toLeft - 15).css('top', toTop);
+    $RowMenu.css('left', toLeft + 15).css('top', toTop);
   }
 
   function clickRowMenu() {
@@ -728,7 +663,7 @@ Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
           if (typeof sum[c] == 'number') {
             $div = $.makeDiv('', '', sum[c])
               .css('text-align', 'right');
-          } else if (c == $cols.eq(c).data('index') == groupColumn) {
+          } else if ($cols.eq(c).data('index') == groupColumn) {
             $div = $.makeDiv('', '', this.getText(groupColumn, row))
               .css('text-align', 'left');
           } else {
@@ -874,4 +809,127 @@ Scout.DesktopTable.prototype.onModelAction = function(event) {
   } else {
     log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
   }
+};
+
+// filter handling
+
+Scout.DesktopTable.prototype.addFilter = function (testFunc) {
+  var that = this,
+    rowCount = 0,
+    $allRows = $('.table-row', that._$tableDataScroll);
+
+  that._resetSelection();
+
+  $allRows.detach();
+  $allRows.each(function() {
+    var $row = $(this),
+      show = testFunc($row);
+
+    if (show) {
+      that.showRow($row);
+      rowCount++;
+    } else {
+      that.hideRow($row);
+    }
+  });
+
+  that._setInfoFilter(rowCount);
+  $allRows.appendTo(that._$tableDataScroll);
+};
+
+Scout.DesktopTable.prototype.resetFilter = function () {
+  var that = this;
+
+  $('.table-row', that._$tableDataScroll).each(function() {
+    that.showRow($(this));
+  });
+
+  log(that);
+  this._$infoFilter.animateAVCSD('width', 0, function() {
+    $(this).hide();
+  });
+
+  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
+  that._resetSelection();
+};
+
+Scout.DesktopTable.prototype.showRow = function ($row) {
+  var that = this;
+
+  $row.show()
+    .animate({
+      'height': '34',
+      'padding-top': '2',
+      'padding-bottom': '2'
+    }, {
+      complete: function() {
+        that._scrollbar.initThumb();
+      }
+    });
+};
+
+Scout.DesktopTable.prototype.hideRow = function ($row) {
+  var that = this;
+
+  $row.hide()
+    .animate({
+      'height': '0',
+      'padding-top': '0',
+      'padding-bottom': '0'
+    }, {
+      complete: function() {
+        $(this).hide();
+        that._scrollbar.initThumb();
+      }
+    });
+};
+
+// move column
+
+Scout.DesktopTable.prototype.moveColumn = function ($header, oldPos, newPos, dragged) {
+  var $headers = $('.header-item, .header-resize'),
+    $moveHeader = $headers.eq(oldPos),
+    $moveResize = $headers.eq(oldPos + 1);
+
+  // store old position of header
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  if (newPos < 0) {
+    $('#TableHeader').prepend($moveResize);
+    $('#TableHeader').prepend($moveHeader);
+  } else {
+    $headers.eq(newPos).after($moveHeader);
+    $headers.eq(newPos).after($moveResize);
+  }
+
+  // move menu
+  var left = $header.offset().left;
+
+  $('#MenuHeaderTitle').animateAVCSD('left', left - 12);
+  $('#MenuHeader').animateAVCSD('left', left - 12);
+
+  // move cells
+  $('.table-row, .table-row-sum').each(function() {
+    var $cells = $(this).children();
+    if (newPos < 0) {
+      $(this).prepend($cells.eq(oldPos / 2));
+    } else {
+      $cells.eq(newPos / 2).after($cells.eq(oldPos / 2));
+    }
+  });
+
+  // move to old position and then animate
+  if (dragged) {
+    $header.css('left', parseInt($header.css('left')) + $header.data('old-pos') - $header.offset().left)
+      .animateAVCSD('left', 0);
+  } else {
+    $headers.each(function() {
+      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+        .animateAVCSD('left', 0);
+    })
+  }
+
 };

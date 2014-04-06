@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableMap = function(scout, $parent, node, table, filterCallback) {
+Scout.DesktopTableMap = function(scout, $parent, desktopTable) {
   // create container
   var $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')
@@ -9,19 +9,19 @@ Scout.DesktopTableMap = function(scout, $parent, node, table, filterCallback) {
     .attrSVG("preserveAspectRatio", "xMidYMid");
 
   // create container
-  var response = scout.sendSync('map', node.outlineId, {
-    "nodeId": node.id
+  var response = scout.sendSync('map', desktopTable.model.outlineId, {
+    "nodeId": desktopTable.model.id
   });
   var map = response.events[0].map;
   var countries = map.objects.countries.geometries;
 
   // find all countries in table
   var tableCountries = [];
-  for (var i = 0; i < table.columns.length; i++) {
-    for (var j = 0; j < node.map.columnIds.length; j++) {
-      if (table.columns[i].id == node.map.columnIds[j]) {
-        for (var r = 0; r < table.rows.length; r++) {
-          var value = table.rows[r].cells[i];
+  for (var i = 0; i < desktopTable.model.table.columns.length; i++) {
+    for (var j = 0; j < desktopTable.model.map.columnIds.length; j++) {
+      if (desktopTable.model.table.columns[i].id == desktopTable.model.map.columnIds[j]) {
+        for (var r = 0; r < desktopTable.model.table.rows.length; r++) {
+          var value = desktopTable.model.table.rows[r].cells[i];
           if (tableCountries.indexOf(value) == -1) tableCountries.push(value);
         }
       }
@@ -107,7 +107,7 @@ Scout.DesktopTableMap = function(scout, $parent, node, table, filterCallback) {
 
     //  filter function
     var testFunc = function($row) {
-      for (var c = 0; c < node.table.columns.length; c++) {
+      for (var c = 0; c < desktopTable.model.table.columns.length; c++) {
         var text = $row.children().eq(c).text();
         if (countries.indexOf(text) > -1) return true;
       }
@@ -115,7 +115,6 @@ Scout.DesktopTableMap = function(scout, $parent, node, table, filterCallback) {
     };
 
     // callback to table
-    filterCallback(testFunc);
-
+    desktopTable.addFilter(testFunc);
   }
 };

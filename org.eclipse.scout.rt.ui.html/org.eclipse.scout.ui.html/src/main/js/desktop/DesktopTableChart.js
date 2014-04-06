@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable, filterCallback) {
+Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable) {
   // group functions for dates
   // todo
   var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
@@ -669,6 +669,6 @@ Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable, filte
     };
 
     // callback to table
-    filterCallback(testFunc);
+    desktopTable.addFilter(testFunc);
   }
 };

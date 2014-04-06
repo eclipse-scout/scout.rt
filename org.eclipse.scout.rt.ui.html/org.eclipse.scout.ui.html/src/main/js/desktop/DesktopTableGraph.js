@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
+Scout.DesktopTableGraph = function(scout, $controlContainer, desktopTable) {
   // create container
   var $graphContainer = $controlContainer.empty()
     .appendSVG('svg', 'GraphContainer');
@@ -14,8 +14,8 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, node) {
     hContainer = $graphContainer.height();
 
   // create container
-  var response = scout.sendSync('graph', node.outlineId, {
-    "nodeId": node.id
+  var response = scout.sendSync('graph', desktopTable.model.outlineId, {
+    "nodeId": desktopTable.model.id
   });
   var graph = response.events[0].graph;
 

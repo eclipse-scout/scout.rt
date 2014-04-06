@@ -342,7 +342,7 @@ line-height: 14px;
 color:#0082A1;	
 }
 
-.header-item:hover{
+.header-item:hover, .header-move{
 color:#FE9915
 }
 
@@ -361,6 +361,11 @@ border-right: 8px solid #FFF;
 .header-item:hover + .header-resize, .header-resize:hover {
 background-color: #EEE;
 }
+
+.header-item.header-move + .header-resize{
+background-color: #FFF ! important;
+}
+
 
 #HeaderOrganize{
 position: absolute;
@@ -470,7 +475,7 @@ border-right: 2px solid #0082a1;
 border-radius: 7px;
 }
 
-#MenuRow {
+#RowMenu {
 position: absolute;
 left: -25px;
 top: 0px;
@@ -482,7 +487,7 @@ cursor: pointer;
 border: 2px solid #0082a1;
 border-radius: 7px;}
 
-#MenuRow:before {
+#RowMenu:before {
 font-family: fontAwesome;
 font-size: 18px;
 line-height: 18px;
@@ -490,7 +495,32 @@ content:"\F0C9";
 color: #0082a1;
 }
 
-#MenuRow:hover:before {
+#RowMenu:hover:before {
+color:#fe9915;
+}
+
+
+#RowDrill {
+position: absolute;
+left: -25px;
+top: 0px;
+background-color: #FFF;
+width: 29px;
+height: 27px;
+padding: 3px 5px 0px 5px;
+cursor: pointer;
+border: 2px solid #0082a1;
+border-radius: 7px;}
+
+#RowDrill:before {
+font-family: fontAwesome;
+font-size: 18px;
+line-height: 18px;
+content:"\F063";
+color: #0082a1;
+}
+
+#RowDrill:hover:before {
 color:#fe9915;
 }
 
@@ -951,8 +981,7 @@ border: 2px solid #0082A1;
 background-color: #FFF;
 padding-bottom: 5px;
 max-height: 80%;
-overflow: hidden;
-}
+overflow: hidden;}
 
 #HeaderTitle{
 padding: 10px 1px 10px 10px;
@@ -991,7 +1020,7 @@ line-height: 26px;
 color: #fff;
 background-color: #e2e2e2;
 cursor: pointer;
-text-align: center;	
+text-align: center;
 }
 
 

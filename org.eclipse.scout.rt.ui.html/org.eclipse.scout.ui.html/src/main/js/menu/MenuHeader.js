@@ -1,13 +1,16 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
+Scout.MenuHeader = function(desktopTable, $header, x, y) {
   //  var response = scout.sendSync('dataModel', model.outlineId, {"nodeId": model.nodeId}),
   //    dataModel = response.events[0].dataModel;
 
   $('.header-menu').remove();
+  $('body').off('mousedown.remove');
+  $('body').off('keydown.remove');
 
-  var id = $header.data('index'),
+  var pos = $header.index(),
+    id = $header.data('index'),
     column = desktopTable.model.table.columns[id];
 
   // create titel
@@ -17,6 +20,8 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
     .css('height', $header.parent().height() + 1)
     .text($header.text());
 
+  if (column.type == 'number') $menuHeaderTitle.css('text-align', 'right');
+
   // create container
   var $menuHeader = $('body').appendDiv('MenuHeader', 'header-menu')
     .css('left', x - 12).css('top', y + $header.parent().height() - 5);
@@ -24,6 +29,10 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   var $headerCommand = $menuHeader.appendDiv('HeaderCommand'),
     $headerFilter = $menuHeader.appendDiv('HeaderFilter'),
     $headerModel = $menuHeader.appendDiv('HeaderModel');
+
+  // every user action will close menu
+  $('body').on('mousedown.remove', removeMenu);
+  $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
   var $commandMove = $headerCommand.appendDiv('', 'header-group');
@@ -118,7 +127,6 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
     .data('label', 'entfernen')
     .click(columnRemove);
 
-
   // filter
   // TODO cru: add scrollbar
   $headerFilter.appendDiv('', 'header-text')
@@ -163,17 +171,21 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   // title should not be wider than menu
   $menuHeaderTitle.width(Math.min($menuHeaderTitle.width(), $menuHeader.width() - 14) );
 
-  // every user action will close menu
-  $('*').one('mousedown keydown mousewheel', removeMenu);
-
   function removeMenu(event) {
-    $menuHeader.animateAVCSD('height', 0, function() {
-      $menuHeader.remove();
-      $menuHeaderTitle.remove();
-    });
-  }
-  // event handling
+    log(event.target);
+    if ($menuHeader.has($(event.target)).length === 0) {
+      $menuHeader.animateAVCSD('height', 0, function() {
+        $menuHeader.remove();
+        $menuHeaderTitle.remove();
+      });
 
+      $('body').off('mousedown.remove');
+      $('body').off('keydown.remove');
+    }
+    return false;
+  }
+
+  // event handling
   function enterCommand() {
     var $command = $(this),
       $text = $command.siblings('.header-text');
@@ -232,46 +244,23 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
   function columnRemove() {}
 
   function moveTop() {
-    var id = $('.selected', $organizeColumn).index();
-    moveTo(id, -1);
+    desktopTable.moveColumn($header, pos, -1);
+    pos = $header.index();
   }
 
   function moveUp() {
-    var id = $('.selected', $organizeColumn).index();
-    moveTo(id, Math.max(id - 2, -1));
+    desktopTable.moveColumn($header, pos, Math.max(pos - 4, -1));
+    pos = $header.index();
   }
 
   function moveDown() {
-    var id = $('.selected', $organizeColumn).index();
-    moveTo(id, Math.min(id + 1, columns.length - 1));
+    desktopTable.moveColumn($header, pos, Math.min(pos + 2, $('.header-item, .header-resize').length - 2));
+    pos = $header.index();
   }
 
   function moveBottom() {
-    var id = $('.selected', $organizeColumn).index();
-    moveTo(id, columns.length - 1);
-  }
-
-  function moveTo(oldPos, newPos) {
-    var $columns = $('.column-item'),
-      $move = $columns.eq(oldPos);
-
-    // store old position
-    $columns.each(function() {
-      $(this).data('old-top', $(this).offset().top);
-    });
-
-    // change order in dom
-    if (newPos == -1) {
-      $organizeColumn.prepend($move);
-    } else {
-      $columns.eq(newPos).after($move);
-    }
-
-    // move to old position and then animate
-    $columns.each(function(i) {
-      $(this).css('top', $(this).data('old-top') - $(this).offset().top)
-        .animateAVCSD('top', 0);
-    });
+    desktopTable.moveColumn($header, pos, $('.header-item, .header-resize').length - 2);
+    pos = $header.index();
   }
 
   function filterClick(event) {
@@ -306,6 +295,6 @@ Scout.MenuHeader = function(desktopTable, $header, filterCallback, x, y) {
     };
 
     // callback to table
-    filterCallback(testFunc);
+    desktopTable.addFilter(testFunc);
   }
 };
