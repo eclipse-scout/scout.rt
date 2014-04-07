@@ -556,4 +556,30 @@ public final class DateUtility {
     }
     return d;
   }
+
+  /**
+   * Calculates the number of days between <code>start</code> and <code>end</code>.
+   * If the end date is before the start date, the result will be positive as well.
+   * Example:
+   * <ul>
+   * <li>start = 1.1.2000, end = 2.1.2000 --> getDaysBetween(start, end) = 1
+   * <li>start = 2.1.2000, end = 1.1.2000 --> getDaysBetween(start, end) = 1
+   * </ul>
+   * returns <code>-1</code> in case of an error (e.g. parameter is null)
+   */
+  public static int getDaysBetween(Date start, Date end) {
+    if (start == null || end == null) {
+      return -1;
+    }
+
+    Calendar startDate = convertDate(start);
+    truncCalendar(startDate);
+    Calendar endDate = convertDate(end);
+    truncCalendar(endDate);
+
+    long endL = endDate.getTimeInMillis() + endDate.getTimeZone().getOffset(endDate.getTimeInMillis());
+    long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
+    int numDays = (int) ((endL - startL) / DAY_MILLIS);
+    return Math.abs(numDays);
+  }
 }

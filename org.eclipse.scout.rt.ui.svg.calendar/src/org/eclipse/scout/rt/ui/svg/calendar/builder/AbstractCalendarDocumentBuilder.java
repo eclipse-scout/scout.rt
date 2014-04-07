@@ -745,7 +745,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private Point getPosition(Date d) {
     if (isInRange(d)) {
-      long dif = (d.getTime() - m_startDate.getTime()) / NUM_MILLIS_PER_DAY;
+      int dif = DateUtility.getDaysBetween(m_startDate, d);
       int x = (int) dif % NUM_DAYS_IN_WEEK;
       int y = (int) dif / NUM_DAYS_IN_WEEK;
       return new Point(x, y);

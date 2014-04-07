@@ -110,7 +110,7 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)}
-   * 
+   *
    * @throws ParseException
    */
   @Test
@@ -124,7 +124,7 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)} for a larger day period
-   * 
+   *
    * @throws ParseException
    */
   @Test
@@ -138,7 +138,7 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)}
-   * 
+   *
    * @throws ParseException
    */
   @Test
@@ -640,4 +640,36 @@ public class DateUtilityTest {
     assertEquals(message + "(DATE)", expected, value);
   }
 
+  @Test
+  public void testDaysBetween() {
+    Calendar cal = Calendar.getInstance();
+    Date d1, d2;
+
+    assertEquals(-1, DateUtility.getDaysBetween(null, null));
+    assertEquals(-1, DateUtility.getDaysBetween(cal.getTime(), null));
+    assertEquals(-1, DateUtility.getDaysBetween(null, cal.getTime()));
+
+    cal.set(2000, Calendar.JANUARY, 1, 0, 0);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(1, DateUtility.getDaysBetween(d1, d2));
+    assertEquals(1, DateUtility.getDaysBetween(d2, d1));
+
+    cal.set(2014, Calendar.FEBRUARY, 23, 0, 0);
+    d1 = cal.getTime();
+    cal.set(2014, Calendar.MARCH, 31, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(36, DateUtility.getDaysBetween(d1, d2));
+    assertEquals(36, DateUtility.getDaysBetween(d2, d1));
+
+    cal.set(2000, Calendar.JANUARY, 1, 23, 59);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(1, DateUtility.getDaysBetween(d1, d2));
+    assertEquals(1, DateUtility.getDaysBetween(d2, d1));
+
+    assertEquals(0, DateUtility.getDaysBetween(d1, d1));
+  }
 }
