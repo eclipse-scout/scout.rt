@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -94,7 +94,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     boolean created = false;
     if (filter == null) {
       created = true;
-      if (col instanceof IProposalColumn<?>) {
+      if (col instanceof IContentAssistColumn<?, ?>) {
         filter = new StringColumnFilter(col);
       }
       else if (String.class.isAssignableFrom(col.getDataType())) {
@@ -177,6 +177,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public byte[] getSerializedFilter(IColumn col) {
     ITableColumnFilter filter = m_filterMap.get(col);
     if (filter != null) {
@@ -195,6 +196,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void setSerializedFilter(byte[] filterData, IColumn col) {
     try {
       if (col != null) {
