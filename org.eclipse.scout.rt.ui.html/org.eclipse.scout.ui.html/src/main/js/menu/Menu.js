@@ -1,21 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-Scout.Menu = function(scout, id, emptySpace, x, y) {
+Scout.Menu = function(scout, menu, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
-
-  // load model
-  var data;
-  if (emptySpace) {
-    data = {
-      "emptySpace": true
-    };
-  }
-  var response = scout.sendSync('menuPopup', id, data);
-  if (response.events.length === 0) {
-    return;
-  }
-  var menu = response.events[0].menus;
 
   // create 2 container, animate do not allow overflow
   var $menuSelect = $('body').appendDiv('MenuSelect')

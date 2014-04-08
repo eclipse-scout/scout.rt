@@ -8,93 +8,84 @@ Scout.Session = function($entryPoint, sessionPartId) {
   this._asyncEvents = [];
   this._asyncRequestQueued;
   this._sessionPartId = sessionPartId;
+  this._deferred;
+
+  //FIXME do we really want to have multiple requests pending?
+  this._requestsPendingCounter = 0;
 
   //FIXME maybe better separate session object from event processing, create ClientSession.js?
   this.widgetMap[sessionPartId] = this;
 };
 
-Scout.Session.prototype.sendSync = function(type, id, data) {
-  return this.send(type, id, data, false);
-};
-
 /**
- * Async == true means: <br>
- * 1. the request is sent asynchronously and the response processed later<br>
- * 2. the request is sent delayed. If send is called multiple times during the same user interaction,
- *    the events are collected and sent in one request at the end of the user interaction
- * <p>
- * If async is set to false, the request will be sent immediately and the response returned.<br>
- * If there are queued async events then these events are sent right before sending the sync request
+ *
+ * Sends the request asynchronously and processes the response later.<br>
+ * Furthermore, the request is sent delayed. If send is called multiple times during the same user interaction,
+ * the events are collected and sent in one request at the end of the user interaction
+ *
  */
-Scout.Session.prototype.send = function(type, id, data, async) {
-  if (async === undefined) {
-    async = true;
-  }
+Scout.Session.prototype.send = function(type, id, data) {
+  this._asyncEvents.push(new Scout.Event(type, id, data));
+  if (!this._asyncRequestQueued) {
+    var that = this;
+    setTimeout(function() {
+      that._sendNow(that._asyncEvents);
+      that._asyncRequestQueued = false;
+      that._asyncEvents = [];
+    }, 0);
 
-  if (async) {
-    this._asyncEvents.push(new Scout.Event(type, id, data));
-    if (!this._asyncRequestQueued) {
-
-      var that = this;
-      setTimeout(function() {
-        that._sendNow(that._asyncEvents, true);
-        that._asyncRequestQueued = false;
-        that._asyncEvents = [];
-      }, 0);
-
-      this._asyncRequestQueued = true;
-    }
-  } else {
-    //Before sending a sync request make sure the queued async request is executed before
-    if (this._asyncRequestQueued) {
-      var message = this._sendNow(this._asyncEvents, false);
-      this._processEvents(message.events);
-      this._asyncEvents = [];
-    }
-
-    var events = [new Scout.Event(type, id, data)];
-    return this._sendNow(events, false);
+    this._asyncRequestQueued = true;
   }
 };
 
-Scout.Session.prototype._sendNow = function(events, async) {
+Scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
     events: events,
     sessionPartId: this._sessionPartId
   };
 
-  var url = 'json';
-  var ret;
   var that = this;
+  this._requestsPendingCounter++;
   $.ajax({
-    async: async,
+    async: true,
     type: "POST",
     dataType: "json",
     cache: false,
-    url: url,
+    url: 'json',
     data: JSON.stringify(request),
     success: function(message) {
-      if (async) {
-        that._processEvents(message.events);
-      } else {
-        ret = message;
+      that._requestsPendingCounter--;
+      that._processEvents(message.events);
+
+      if (that._deferred) {
+        for (var i = 0; i < message.events.length; i++) {
+          that._deferredEventTypes.push(message.events[i].type_);
+        }
+
+        if (that._requestsPendingCounter === 0) {
+          that._deferred.resolve(that._deferredEventTypes);
+          that._deferred = null;
+          that._deferredEventTypes = null;
+        }
       }
     }
   });
-  return ret;
 };
 
-/**
- * Removes the events of the given type and id from the async event queue.
- */
-Scout.Session.prototype.preventFromBeeingSent = function(type, id) {
-  var events = this._asyncEvents.slice();
-  for (var i = 0; i < events.length; i++) {
-    var event = events[i];
-    if (event.type_ === type && event.id === id) {
-      arrays.remove(this._asyncEvents, event);
-    }
+Scout.Session.prototype.listen = function() {
+  if (!this._deferred) {
+    this._deferred = $.Deferred();
+    this._deferredEventTypes = [];
   }
+  return this._deferred;
+};
+
+Scout.Session.prototype.areEventsQueued = function() {
+  return this._asyncEvents.length > 0;
+};
+
+Scout.Session.prototype.areRequestsPending = function() {
+  return this._requestsPendingCounter > 0;
 };
 
 Scout.Session.prototype._processEvents = function(events) {

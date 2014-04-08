@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.ui.json.desktop;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
-import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,14 +39,22 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
+  public static final String EVENT_SELECTION_MENUS_CHANGED = "selectionMenusChanged";
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
+  public static final String PROP_MENUS = "menus";
+  public static final String PROP_NODES = "nodes";
+  public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
+  public static final String PROP_SELECTION_MENUS = "selectionMenus";
+  public static final String PROP_EMPTY_SPACE_MENUS = "emptySpaceMenus";
+  public static final String PROP_DETAIL_TABLE_ID = "detailTableId";
 
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
   private Map<ITable, JsonDesktopTable> m_jsonTables;
   private TreeEventFilter m_treeEventFilter;
+  private MenuManager m_menuManager;
 
   //FIXME remove after model is updated with new properties
   private String PROP_CUSTOM_JSON = "customJson";
@@ -86,6 +92,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     m_treeNodeIds = new HashMap<>();
     m_jsonTables = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModelObject());
+    m_menuManager = new MenuManager(getJsonSession());
   }
 
   @Override
@@ -116,6 +123,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     super.dispose();
     m_treeNodeIds.clear();
     m_treeNodes.clear();
+    m_menuManager.dispose();
   }
 
   public TreeEventFilter getTreeEventFilter() {
@@ -136,12 +144,17 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
           jsonPages.put(pageToJson(childPage));
         }
       }
-      json.put("nodes", jsonPages);
-      json.put("selectedNodeIds", nodeIdsToJson(getModelObject().getSelectedNodes()));
+      json.put(PROP_NODES, jsonPages);
+      json.put(PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModelObject().getSelectedNodes()));
+
+      m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
+      json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
+      m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
+      json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
 
       JsonDesktopTable jsonTable = m_jsonTables.get(getModelObject().getDetailTable());
       if (jsonTable != null) {
-        json.put("detailTableId", jsonTable.getId());
+        json.put(PROP_DETAIL_TABLE_ID, jsonTable.getId());
       }
       return json;
     }
@@ -151,6 +164,13 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleModelTreeEvent(TreeEvent event) throws JsonUIException {
+    switch (event.getType()) {
+      case TreeEvent.TYPE_NODES_SELECTED: {
+        handleModelSelectedNodeMenusChanged(event.getNodes());
+        break;
+      }
+    }
+
     event = getTreeEventFilter().filterIgnorableModelEvent(event);
     if (event == null) {
       return;
@@ -239,7 +259,23 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-      getJsonSession().currentJsonResponse().addActionEvent("nodesSelected", getId(), jsonEvent);
+
+      getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  protected void handleModelSelectedNodeMenusChanged(Collection<ITreeNode> modelNodes) throws JsonUIException {
+    try {
+      JSONObject jsonEvent = new JSONObject();
+      jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
+
+      if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
+        jsonEvent.put(PROP_MENUS, m_menuManager.getJsonSelectionMenus());
+        getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
+      }
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
@@ -378,9 +414,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     else if (EVENT_NODE_EXPANDED.equals(event.getEventType())) {
       handleUiNodeExpanded(event, res);
     }
-    else if ("menuPopup".equals(event.getEventType())) {
-      handleUiMenuPopup(event, res);
-    }
     else if ("graph".equals(event.getEventType())) {
       handleUiGraph(event, res);
     }
@@ -463,29 +496,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }
   }
 
-  protected void handleUiMenuPopup(JsonEvent event, JsonResponse res) throws JsonUIException {
-    try {
-      boolean emptySpace = false;
-      if (event.getEventObject().has("emptySpace")) {
-        emptySpace = event.getEventObject().getBoolean("emptySpace");
-      }
-      List<IMenu> menus = fetchMenus(emptySpace, !emptySpace);
-
-      JSONArray jsonMenus = new JSONArray();
-      for (IMenu menu : menus) {
-        JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
-        jsonMenu.init();
-        jsonMenus.put(jsonMenu.toJson());
-      }
-      JSONObject responseEvent = new JSONObject();
-      responseEvent.put("menus", jsonMenus);
-      getJsonSession().currentJsonResponse().addActionEvent("menuPopup", getId(), responseEvent);
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
-  }
-
   protected void handleUiGraph(JsonEvent event, JsonResponse res) throws JsonUIException {
     JSONObject responseEvent;
     try {
@@ -523,21 +533,33 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), responseEvent);
   }
 
-  protected List<IMenu> fetchMenus(final boolean emptySpaceActions, final boolean nodeActions) {
+  protected List<IMenu> fetchMenusForSelection() {
     final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
+    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (emptySpaceActions) {
-          menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+        //fireNodePopup does not work is tree is changing
+        while (getModelObject().isTreeChanging()) { //FIXME CGU remove after menu refactoring
+          getModelObject().setTreeChanging(false);
         }
-        if (nodeActions) {
-          menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
-        }
+
+        menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
       }
     }.runNow(new NullProgressMonitor());
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
+  }
+
+  protected List<IMenu> fetchMenusForEmptySpace() {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+      }
+    }.runNow(new NullProgressMonitor());
+
+    return menuList;
   }
 
   @Override

@@ -2,11 +2,13 @@ package org.eclipse.scout.rt.ui.json;
 
 import org.json.JSONObject;
 
-public interface IJsonRenderer {
+public interface IJsonRenderer<T extends Object> {
 
   String getId();
 
   String getObjectType();
+
+  T getModelObject();
 
   void init() throws JsonUIException;
 

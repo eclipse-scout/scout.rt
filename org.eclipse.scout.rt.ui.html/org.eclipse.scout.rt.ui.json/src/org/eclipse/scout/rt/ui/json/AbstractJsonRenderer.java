@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRenderer {
+public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
   private final String m_id;
@@ -44,7 +44,8 @@ public abstract class AbstractJsonRenderer<T extends Object> implements IJsonRen
     return m_jsonSession;
   }
 
-  protected T getModelObject() {
+  @Override
+  public T getModelObject() {
     return m_modelObject;
   }
 

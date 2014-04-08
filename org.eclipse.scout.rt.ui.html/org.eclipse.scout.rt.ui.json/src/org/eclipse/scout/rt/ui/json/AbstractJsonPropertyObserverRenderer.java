@@ -15,7 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
-public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> implements IJsonRenderer {
+public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
   private P_PropertyChangeListener m_propertyChangeListener;
 
   public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession) {

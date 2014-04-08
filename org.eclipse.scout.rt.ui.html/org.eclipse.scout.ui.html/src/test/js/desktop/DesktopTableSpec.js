@@ -88,7 +88,7 @@ describe("DesktopTable", function() {
   function selectRowsAndAssert(desktopTable, rowIds) {
     desktopTable.selectRowsByIds(rowIds);
 
-    var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+    var $selectedRows = desktopTable.findSelectedRows();
     expect($selectedRows.length).toBe(rowIds.length);
 
     var selectedRowIds = [];
@@ -140,7 +140,7 @@ describe("DesktopTable", function() {
       var desktopTable = createDesktopTable(model);
       desktopTable.render(scout.$entryPoint);
 
-      var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+      var $selectedRows = desktopTable.findSelectedRows();
       expect($selectedRows.length).toBe(0);
 
       selectRowsAndAssert(desktopTable, ['0', '4']);
@@ -186,7 +186,7 @@ describe("DesktopTable", function() {
       $row.click();
       jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME+1);
 
-      var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+      var $selectedRows = desktopTable.findSelectedRows();
       expect($selectedRows.length).toBe(1);
 
       var $selectedRow = $selectedRows.first();
@@ -198,7 +198,7 @@ describe("DesktopTable", function() {
       var desktopTable = createDesktopTable(model);
       desktopTable.render(scout.$entryPoint);
 
-      var $selectedRows = desktopTable._$tableDataScroll.find('.row-selected');
+      var $selectedRows = desktopTable.findSelectedRows();
       expect($selectedRows.length).toBe(0);
 
       var $rows = desktopTable._$tableDataScroll.children();

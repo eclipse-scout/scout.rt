@@ -91,7 +91,7 @@ float: left;
 height: 57px;
 width: 45px;
 padding: 22px 0px 0px 20px;
-margin-left: 15px; 
+margin-left: 15px;
 cursor: pointer;
 }
 
@@ -112,7 +112,7 @@ top: -10px;
 right: -10px;
 height: 25px;
 width: 10px;
-padding-left: 5px; 
+padding-left: 5px;
 }
 
 .view-item:hover .view-remove:after{
@@ -123,7 +123,7 @@ content: "\f00d";
 }
 
 .view-remove:hover:after {
-color:#FE9915 !important;	
+color:#FE9915 !important;
 }
 
 #ViewLogo {
@@ -139,8 +139,8 @@ background-size: cover;
 
 #DesktopTools{
 position: absolute;
-right: 0px; 
-top: 58px;    
+right: 0px;
+top: 58px;
 z-index: 10;
 height: calc(100% - 58px);
 width: 80px;
@@ -185,8 +185,8 @@ color:#CCC;
 
 .tool-open{
 position: absolute;
-right: 80px; 
-top: 58px; 
+right: 80px;
+top: 58px;
 width: 0px;  /*animate to 300px;*/
 height: calc(100% - 58px);
 border-left:1px solid #CCC;
@@ -209,7 +209,7 @@ min-height: 100px;}
 
 #DesktopTree > .scrollbar{
 right: 18px;
-margin-top: 10px; 
+margin-top: 10px;
 margin-bottom: 10px;
 }
 
@@ -237,7 +237,7 @@ position: relative;
 float: left;
 width: 100%;
 line-height: 32px;
-padding-left: 30px; 
+padding-left: 30px;
 white-space: nowrap;
 cursor: pointer;
 overflow: hidden;
@@ -249,8 +249,8 @@ left: -1px;
 top: -1px;
 width: 29px;
 height: 30px;
-line-height: 24px; 
-padding: 4px 4px 4px 4px; 
+line-height: 24px;
+padding: 4px 4px 4px 4px;
 }
 
 .tree-item-control:before{
@@ -274,7 +274,7 @@ color:#FE9915 !important;
 
 .tree-item.expanded > .tree-item-control:hover:before{
 content:"\F057" !important;
-}	
+}
 
 .tree-item-menu{
 position: absolute;
@@ -282,13 +282,14 @@ right: 1px;
 top: -1px;
 }
 
-.selected > .tree-item-menu:before, .tree-item:hover > .tree-item-menu:before{
+.selected > .tree-item-menu:before{
 font-family: fontAwesome;
 font-size: 24px;
 content:"\F0C9";
 color: #CCC;
 background-color: #fff;
-padding: 3px 3px 3px 3px;}
+padding: 3px 3px 3px 3px;
+}
 
 .tree-item-menu:hover:before{
 color:#9C9C9C !important;
@@ -339,7 +340,7 @@ line-height: 14px;
 .header-item.sort-down,
 .header-item.filter,
 .header-item.group {
-color:#0082A1;	
+color:#0082A1;
 }
 
 .header-item:hover, .header-move{
@@ -377,7 +378,7 @@ cursor: pointer;
 font-family: fontAwesome;
 font-size: 17px;
 line-height: 17px;
-color:#D4D4D4;	
+color:#D4D4D4;
 }
 
 #HeaderOrganize:before {
@@ -395,13 +396,13 @@ color:#FE9915
 position: relative;
 height: calc(100% - 85px);
 width: 100%;
-overflow: hidden;	
+overflow: hidden;
 padding-left: 4px;
 }
 
 #TableData > .scrollbar {
 right: 7px;
-margin-top: 10px; 
+margin-top: 10px;
 margin-bottom: 10px;
 height: calc(100% - 23px);
 }
@@ -416,7 +417,7 @@ width: calc(100% - 11px);
 
 .table-row, .table-row-sum {
 position:relative;
-overflow: hidden;	
+overflow: hidden;
 border-right: 2px solid #FFF;
 border-left: 2px solid #FFF;
 line-height: 26px;
@@ -527,7 +528,7 @@ color:#fe9915;
 /* main table control */
 
 #TableControl {
-position: absolute; 
+position: absolute;
 bottom: 0px;
 height: 50px;
 width: 100%;
@@ -539,7 +540,7 @@ white-space: nowrap;
 #ControlGraph, #ControlChart, #ControlMap {
 padding: 14px 18px 10px 2px;
 float: left;
-cursor: pointer; 
+cursor: pointer;
 }
 
 #ControlGraph:before, #ControlChart:before, #ControlMap:before {
@@ -587,7 +588,7 @@ border-left: 1px solid #CCC;
 color: #bfbfbf;
 white-space: nowrap;
 cursor: pointer;
-line-height: 21px; 
+line-height: 21px;
 }
 
 
@@ -781,7 +782,7 @@ stroke-linecap: round;
 
 .main-chart:hover, .main-chart.selected {
 fill: #fe9915
-}	
+}
 
 
 line.main-axis{
@@ -878,7 +879,7 @@ fill: #fe9915
 .map-item.has-data:hover {
 fill: #fe9915 !important;
 }
-	
+
 
 
 /* menu */
@@ -917,7 +918,7 @@ padding: 3px;}
 
 .menu-item{
 color: #0082A1;
-cursor: pointer; 
+cursor: pointer;
 line-height: 23px;
 padding: 4px 8px 0px 9px;
 }
@@ -1026,7 +1027,7 @@ text-align: center;
 
 .header-command:after {
 position: relative;
-left: 3px;	
+left: 3px;
 top: -6px;
 font-size: 10px;
 line-height: 10px;
@@ -1036,7 +1037,7 @@ line-height: 10px;
 #HeaderCommandMoveTop:before,
 #HeaderCommandMoveUp:before,
 #HeaderCommandMoveDown:before,
-#HeaderCommandMoveBottom:before { 
+#HeaderCommandMoveBottom:before {
 font-size: 20px;
 line-height: 20px;
 }
@@ -1046,27 +1047,27 @@ line-height: 20px;
 #HeaderCommandMoveDown:before { content: "\F105";}
 #HeaderCommandMoveBottom:before { content: "\F101";}
 
-#HeaderCommandSortUp:before, 
-#HeaderCommandSortUpAdd:before { 
+#HeaderCommandSortUp:before,
+#HeaderCommandSortUpAdd:before {
 content: "\F175";
 }
 
 #HeaderCommandSortDown:before,
-#HeaderCommandSortDownAdd:before { 
+#HeaderCommandSortDownAdd:before {
 content: "\F176";
 }
 
-#HeaderCommandSortUpAdd:after, 
+#HeaderCommandSortUpAdd:after,
 #HeaderCommandSortDownAdd:after {
 content: "\F067";
-}  
+}
 
-#HeaderCommandGroupAll:before, 
-#HeaderCommandGroupSort:before, 
+#HeaderCommandGroupAll:before,
+#HeaderCommandGroupSort:before,
 #HeaderCommandGroupRemove:before {
 position: relative;
 top: 1px;
-font-family: sans-serif;	
+font-family: sans-serif;
 content: "\03a3";
 font-size: 20px;
 }
@@ -1122,7 +1123,7 @@ line-height: 22px;
 
 #HeaderCommandShareEmail:before { content: "\F0E0";}
 #HeaderCommandShareGoogle:before { content: "\F0D5";}
-#HeaderCommandShareTwitter:before { content: "\F099	";}
+#HeaderCommandShareTwitter:before { content: "\F099  ";}
 #HeaderCommandShareFacebook:before { content: "\F09A";}
 
 
@@ -1135,7 +1136,7 @@ line-height: 26px;
 background-color: #e2e2e2;
 cursor: pointer;
 margin-bottom: 5px;
-padding: 2px 20px 0px 6px; 
+padding: 2px 20px 0px 6px;
 overflow: hidden;
 white-space: nowrap;
 text-overflow: ellipsis;
@@ -1157,7 +1158,7 @@ background-color: #fe9915 ! important;
 background-color: #ccc;
 }
 
-.header-command.selected:after, 
+.header-command.selected:after,
 .header-command.selected:before {
 color: #fff !important;
 }
@@ -1194,34 +1195,34 @@ background-color: #FFF;
 
 /* scrollbar */
 
-.scrollbar { 
-position: absolute; 
-width: 10px; 
+.scrollbar {
+position: absolute;
+width: 10px;
 height: 100%;
 z-index: 1;
 background-color: white;
-cursor: pointer; 
+cursor: pointer;
 }
 
-.scrollbar-thumb { 
-position: absolute; 
+.scrollbar-thumb {
+position: absolute;
 width: 10px;
 top: 0px;
 z-index: 2;
-background-color: #D4D4D4; 
-cursor: pointer; 
+background-color: #D4D4D4;
+cursor: pointer;
 }
 
 .scrollbar-thumb-move, .scrollbar-thumb:hover{
-background-color: #0082A1; 
-} 
+background-color: #0082A1;
+}
 
 /* key handling */
 
 .key-box {
 position: absolute;
 height: 14px;
-z-index: 100;	
+z-index: 100;
 padding-top: 3px;
 color: #FFF;
 font-size: 11px;

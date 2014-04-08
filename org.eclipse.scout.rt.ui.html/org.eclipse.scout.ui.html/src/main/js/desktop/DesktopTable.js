@@ -18,6 +18,7 @@ Scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
 Scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
 Scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
 Scout.DesktopTable.EVENT_ROW_ACTION = 'rowAction';
+Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
 
 Scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
@@ -208,7 +209,6 @@ Scout.DesktopTable.prototype.render = function($parent) {
 
     that._drawSelectionBorder();
   }
-
 
 };
 
@@ -427,8 +427,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 
   function onMouseDown(event) {
-    log('down');
-
     var $row = $(event.delegateTarget),
       add = true,
       first,
@@ -484,7 +482,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       // draw nice border
       that._drawSelectionBorder();
 
-
       //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
       selectionChanged = true;
     }
@@ -505,8 +502,6 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 
   function sendRowsSelected() {
-    log('send selection');
-
     var rowIds = [],
       $selectedRows = $('.row-selected');
 
@@ -539,24 +534,19 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 
   function onClick(event) {
-    log('click');
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
-    log('send click');
     that.scout.send(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
       "rowId": $row.attr('id')
     });
   }
 
   function onDoubleClick(event) {
-    log('dbl');
     var $row = $(event.delegateTarget);
     sendRowAction($row);
   }
 
   function sendRowAction($row) {
-    that.scout.preventFromBeeingSent(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id);
-
     that.scout.send(Scout.DesktopTable.EVENT_ROW_ACTION, that.model.table.id, {
       "rowId": $row.attr('id')
     });
@@ -584,7 +574,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
     // place menu
     var top = $selectedRows.first().offset().top - that._$tableDataScroll.offset().top,
       bottom = $selectedRows.last().offset().top - that._$tableDataScroll.offset().top + 32,
-      toTop = Math.abs(top - y) > Math.abs(bottom - y) && $selectedRows.length > 1 ? bottom - 7 : top - 19 ,
+      toTop = Math.abs(top - y) > Math.abs(bottom - y) && $selectedRows.length > 1 ? bottom - 7 : top - 19,
       toLeft = Math.max(25, Math.min($firstRow.outerWidth() - 58, x - that._$tableDataScroll.offset().left - 13));
 
     $RowDrill.css('left', toLeft - 15).css('top', toTop);
@@ -598,7 +588,14 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       y = $clicked.offset().top,
       emptySpace = $selectedRows.length === 0;
 
-    new Scout.Menu(that.scout, that.model.table.id, emptySpace, x, y);
+    var menus = that.model.table.selectionMenus;
+    if (emptySpace) {
+      menus = that.model.table.emptySpaceMenus;
+    }
+
+    if (menus && menus.length > 0) {
+      new Scout.Menu(that.scout, menus, x, y);
+    }
   }
 
 };
@@ -801,11 +798,24 @@ Scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
   }
 };
 
+Scout.DesktopTable.prototype.findSelectedRows = function() {
+  return this._$tableDataScroll.find('.row-selected');
+};
+
+Scout.DesktopTable.prototype._onSelectionMenusChanged = function(selectedRowIds, menus) {
+  this.model.table.selectionMenus = menus;
+
+  var $selectedRows = this.findSelectedRows();
+  //FIXME see tree for reference
+};
+
 Scout.DesktopTable.prototype.onModelAction = function(event) {
   if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
     this.insertRows(event.rows);
   } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
+  } else if (event.type_ == Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED) {
+    this._onSelectionMenusChanged(event.selectedRowIds, event.menus);
   } else {
     log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
   }
@@ -813,7 +823,7 @@ Scout.DesktopTable.prototype.onModelAction = function(event) {
 
 // filter handling
 
-Scout.DesktopTable.prototype.addFilter = function (testFunc) {
+Scout.DesktopTable.prototype.addFilter = function(testFunc) {
   var that = this,
     rowCount = 0,
     $allRows = $('.table-row', that._$tableDataScroll);
@@ -837,7 +847,7 @@ Scout.DesktopTable.prototype.addFilter = function (testFunc) {
   $allRows.appendTo(that._$tableDataScroll);
 };
 
-Scout.DesktopTable.prototype.resetFilter = function () {
+Scout.DesktopTable.prototype.resetFilter = function() {
   var that = this;
 
   $('.table-row', that._$tableDataScroll).each(function() {
@@ -853,7 +863,7 @@ Scout.DesktopTable.prototype.resetFilter = function () {
   that._resetSelection();
 };
 
-Scout.DesktopTable.prototype.showRow = function ($row) {
+Scout.DesktopTable.prototype.showRow = function($row) {
   var that = this;
 
   $row.show()
@@ -868,7 +878,7 @@ Scout.DesktopTable.prototype.showRow = function ($row) {
     });
 };
 
-Scout.DesktopTable.prototype.hideRow = function ($row) {
+Scout.DesktopTable.prototype.hideRow = function($row) {
   var that = this;
 
   $row.hide()
@@ -886,7 +896,7 @@ Scout.DesktopTable.prototype.hideRow = function ($row) {
 
 // move column
 
-Scout.DesktopTable.prototype.moveColumn = function ($header, oldPos, newPos, dragged) {
+Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   var $headers = $('.header-item, .header-resize'),
     $moveHeader = $headers.eq(oldPos),
     $moveResize = $headers.eq(oldPos + 1);

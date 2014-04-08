@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.json.JsonUIException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField {
+public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField<T> {
 
   public JsonFormField(T model, IJsonSession session) {
     super(model, session);

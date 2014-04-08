@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.json.form.fields.stringfield.JsonStringField;
+import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
 
 public class JsonRendererFactory {
 
@@ -81,6 +83,13 @@ public class JsonRendererFactory {
 
   public JsonForm createJsonForm(IForm model, IJsonSession session) {
     JsonForm renderer = new JsonForm(model, session);
+    renderer.init();
+
+    return renderer;
+  }
+
+  public JsonMenu createJsonMenu(IMenu model, IJsonSession session) {
+    JsonMenu renderer = new JsonMenu(model, session);
     renderer.init();
 
     return renderer;

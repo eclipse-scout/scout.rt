@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,7 +41,6 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
-import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.json.table.TableEventFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,20 +50,25 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
-  public static final String EVENT_MENU_POPUP = "menuPopup";
+  public static final String EVENT_SELECTION_MENUS_CHANGED = "selectionMenusChanged";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
+  public static final String PROP_MENUS = "menus";
+  public static final String PROP_SELECTION_MENUS = "selectionMenus";
+  public static final String PROP_EMPTY_SPACE_MENUS = "emptySpaceMenus";
 
   private P_ModelTableListener m_modelTableListener;
   private Map<String, ITableRow> m_tableRows;
   private Map<ITableRow, String> m_tableRowIds;
   private TableEventFilter m_tableEventFilter;
+  private MenuManager m_menuManager;
 
   public JsonDesktopTable(ITable modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(modelObject);
+    m_menuManager = new MenuManager(getJsonSession());
   }
 
   @Override
@@ -114,6 +117,10 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
       }
       json.put("rows", jsonRows);
 
+      m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
+      json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
+      m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
+      json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
       return json;
     }
     catch (JSONException e) {
@@ -131,9 +138,6 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
     else if (EVENT_ROWS_SELECTED.equals(event.getEventType())) {
       handleUiRowsSelected(event, res);
-    }
-    else if (EVENT_MENU_POPUP.equals(event.getEventType())) {
-      handleUiMenuPopup(event, res);
     }
   }
 
@@ -193,44 +197,28 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     }
   }
 
-  protected void handleUiMenuPopup(JsonEvent event, JsonResponse res) throws JsonUIException {
-    try {
-      boolean emptySpace = false;
-      if (event.getEventObject().has("emptySpace")) {
-        emptySpace = event.getEventObject().getBoolean("emptySpace");
-      }
-      List<IMenu> menus = fetchMenus(emptySpace, !emptySpace);
-
-      JSONArray jsonMenus = new JSONArray();
-      for (IMenu menu : menus) {
-        JsonMenu jsonMenu = new JsonMenu(menu, getJsonSession());
-        jsonMenu.init();
-        jsonMenus.put(jsonMenu.toJson());
-      }
-      JSONObject responseEvent = new JSONObject();
-      responseEvent.put("menus", jsonMenus);
-      getJsonSession().currentJsonResponse().addActionEvent("menuPopup", getId(), responseEvent);
-    }
-    catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
-    }
-  }
-
-  protected List<IMenu> fetchMenus(final boolean emptySpaceActions, final boolean rowActions) {
+  protected List<IMenu> fetchMenusForSelection() {
     final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Menu popup", getJsonSession().getClientSession()) {
+    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (emptySpaceActions) {
-          menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (rowActions) {
-          menuList.addAll(getModelObject().getUIFacade().fireRowPopupFromUI());
-        }
+        menuList.addAll(getModelObject().getUIFacade().fireRowPopupFromUI());
       }
     }.runNow(new NullProgressMonitor());
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
+  }
+
+  protected List<IMenu> fetchMenusForEmptySpace() {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+      }
+    }.runNow(new NullProgressMonitor());
+
+    return menuList;
   }
 
   protected JSONObject tableRowToJson(ITableRow row) throws JsonUIException {
@@ -399,6 +387,13 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
   }
 
   protected void handleModelTableEvent(TableEvent event) throws JsonUIException {
+    switch (event.getType()) {
+      case TableEvent.TYPE_ROWS_SELECTED: {
+        handleModelSelectionMenusChanged(event.getRows());
+        break;
+      }
+    }
+
     event = getTableEventFilter().filterIgnorableModelEvent(event);
     if (event == null) {
       return;
@@ -485,6 +480,22 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
       }
 
       getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
+    }
+    catch (JSONException e) {
+      throw new JsonUIException(e);
+    }
+  }
+
+  protected void handleModelSelectionMenusChanged(Collection<ITableRow> modelRows) throws JsonUIException {
+    try {
+      JSONObject jsonEvent = new JSONObject();
+      jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
+
+      if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
+        jsonEvent.put(PROP_MENUS, m_menuManager.getJsonSelectionMenus());
+
+        getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
+      }
     }
     catch (JSONException e) {
       throw new JsonUIException(e);

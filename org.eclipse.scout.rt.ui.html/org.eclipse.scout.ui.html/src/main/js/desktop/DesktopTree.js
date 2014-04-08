@@ -12,6 +12,8 @@ Scout.DesktopTree = function(scout, $parent, model) {
   this._addNodes(this.model.nodes);
 };
 
+Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
+
 Scout.DesktopTree.prototype.detach = function() {
   this._$desktopTreeScroll.detach();
   if (this._desktopTable) {
@@ -39,7 +41,7 @@ Scout.DesktopTree.prototype.attachModel = function() {
 };
 
 Scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
-  var $node = this._$desktopTreeScroll.find('#' + nodeId);
+  var $node = this._findNodeById(nodeId);
   this._setNodeExpanded($node, expanded);
 };
 
@@ -130,7 +132,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
 Scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
   var $node;
   if (nodeId) {
-    $node = this._$desktopTreeScroll.find('#' + nodeId);
+    $node = this._findNodeById(nodeId);
     if ($node.data('node') === undefined) {
       //FIXME happens if tree with a selected node gets collapsed selected node should be showed again after outline switch.
       throw "No node found for id " + nodeId;
@@ -159,10 +161,43 @@ Scout.DesktopTree.prototype._setNodeSelected = function($node) {
       "nodeIds": [node.id]
     });
   }
+
+  //Menu visibility depend on selectionMenusChanged event which is triggered by selection -> await possible event
+  //event is NOT fired if the selectionMenus haven't changed
+  var that = this;
+  if (this.scout.areRequestsPending() || this.scout.areEventsQueued()) {
+    this.scout.listen().done(onEventsProcessed);
+  } else {
+    this._showSelectionMenuAndHideOthers();
+  }
+
+  function onEventsProcessed(eventTypes) {
+    //Only process if not already processed by _onSelectionMenuChanged
+    if(eventTypes.indexOf(Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
+      that._showSelectionMenuAndHideOthers($node);
+    }
+  }
+
+};
+
+Scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
+  var hasSelectionMenus = this.model.selectionMenus && this.model.selectionMenus.length > 0;
+  if (hasSelectionMenus && $node.find('.tree-item-menu').length > 0) {
+    //Already there
+    return;
+  }
+
+  if (hasSelectionMenus) {
+    this._addNodeMenu($node);
+  }
+  else {
+    //Don't touch other nodes -> cache 'has menu' state to make it more responsive. Alternative would be to always remove every node menu before adding a new one
+    this._removeNodeMenu($node);
+  }
 };
 
 Scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
-  var $parent = this._$desktopTreeScroll.find('#' + parentNodeId);
+  var $parent = this._findNodeById(parentNodeId);
   var parentNode = $parent.data('node');
   if (parentNode === undefined) {
     throw "No parentNode found for id " + parentNodeId;
@@ -207,10 +242,6 @@ Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       $control.css('transform', 'rotate(90deg)');
     }
 
-    // decorate with menu
-    $node.appendDiv('', 'tree-item-menu')
-      .on('click', '', onNodeMenuClicked);
-
     // append first node and successors
     if ($parent) {
       $node.insertAfter($parent);
@@ -240,16 +271,12 @@ Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
 
   var that = this;
 
-  function onNodeClicked() {
+  function onNodeClicked(event) {
     return that._onNodeClicked(event, $(this));
   }
 
-  function onNodeControlClicked() {
+  function onNodeControlClicked(event) {
     return that._onNodeControlClicked(event, $(this));
-  }
-
-  function onNodeMenuClicked() {
-    return that._onNodeMenuClicked(event, $(this));
   }
 
   // return all created nodes
@@ -282,19 +309,76 @@ Scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
 };
 
 Scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
+  var that = this;
+
+  //This switch is necessary because we keep 'has menu'-state, see also _showSelectionMenuAndHideOthers
   if (!$clicked.parent().isSelected()) {
     //make sure node is selected when activating the menu, otherwise the wrong menus are returned
-    this._setNodeSelected($clicked.parent());
+    this.scout.listen().done(openNodeMenu);
+    this._setNodeSelected($clicked.parent(), true);
+  } else if (this.scout.areRequestsPending() || this.scout.areEventsQueued()) {
+    //Await pending requests before opening the menu, to make sure the selectionMenus haven't changed in the meantime
+    this.scout.listen().done(openNodeMenu);
+  } else {
+    openNodeMenu();
   }
 
-  var nodeId = $clicked.parent().attr('id'),
-    x = $clicked.offset().left,
-    y = $clicked.offset().top,
-    emptySpace = !nodeId;
+  function openNodeMenu() {
+    var nodeId = $clicked.parent().attr('id'),
+      x = $clicked.offset().left,
+      y = $clicked.offset().top,
+      emptySpace = !nodeId;
 
-  new Scout.Menu(this.scout, this.model.id, emptySpace, x, y);
+    var menus = that.model.selectionMenus;
+    if (emptySpace) {
+      menus = that.model.emptySpaceMenus;
+    }
 
-  return false;
+    if (menus && menus.length > 0) {
+      new Scout.Menu(that.scout, menus, x, y);
+    }
+
+    return false;
+  }
+};
+
+Scout.DesktopTree.prototype._onSelectionMenusChanged = function(selectedNodeIds, menus) {
+  this.model.selectionMenus = menus;
+  var $node = this._findNodeById(this.model.selectedNodeIds[0]);
+
+  //Add menu, but only if the selection on the gui hasn't changed in the meantime
+  if (arrays.equalsIgnoreOrder(selectedNodeIds, this.model.selectedNodeIds)) {
+    var $selectedNode = this._findSelectedNodes();
+
+    this._showSelectionMenuAndHideOthers($selectedNode);
+  }
+};
+
+Scout.DesktopTree.prototype._findNodeById = function(nodeId) {
+  return this._$desktopTreeScroll.find('#' + nodeId);
+};
+
+Scout.DesktopTree.prototype._findSelectedNodes = function() {
+  return this._$desktopTreeScroll.find('.selected');
+};
+
+Scout.DesktopTree.prototype._addNodeMenu = function($node) {
+  if ($node.find('.tree-item-menu').length > 0) {
+    return;
+  }
+
+  $node.appendDiv('', 'tree-item-menu')
+    .on('click', '', onNodeMenuClicked);
+
+  var that = this;
+
+  function onNodeMenuClicked(event) {
+    return that._onNodeMenuClicked(event, $(this));
+  }
+};
+
+Scout.DesktopTree.prototype._removeNodeMenu = function($node) {
+  $node.find('.tree-item-menu').remove();
 };
 
 Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
@@ -303,7 +387,7 @@ Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
     this.model.detailTable = null;
   }
 
-  if(event.detailTableId) {
+  if (event.detailTableId) {
     this._desktopTable = this.scout.widgetMap[event.detailTableId];
     this._desktopTable.attach($('#DesktopBench'));
     this.model.detailTable = this._desktopTable.model;
@@ -322,6 +406,8 @@ Scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type_ == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
+  } else if (event.type_ == Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) {
+    this._onSelectionMenusChanged(event.nodeIds, event.menus);
   } else {
     log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
   }
