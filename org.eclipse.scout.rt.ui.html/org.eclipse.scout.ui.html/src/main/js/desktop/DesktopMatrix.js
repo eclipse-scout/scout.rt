@@ -28,7 +28,7 @@ Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
 
   // count, sum, avg
   if (dataGroup == -1) {
-    dataAxis.norm = function(/*f*/) {
+    dataAxis.norm = function(f) {
       return 1;
     };
     dataAxis.group = function(array) {

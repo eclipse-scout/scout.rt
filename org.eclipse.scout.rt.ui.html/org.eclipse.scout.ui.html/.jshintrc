@@ -3,7 +3,6 @@
   "newcap": true,
   "evil":true,
   "undef": true,
-  "unused": true,
   "browser": true,
   "globals": { 
     "Scout": true,

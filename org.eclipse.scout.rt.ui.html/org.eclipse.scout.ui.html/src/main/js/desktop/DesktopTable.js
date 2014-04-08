@@ -531,11 +531,11 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       onClick(event);
     }
 
+    sendRowsSelected();
+
     if (event.type == 'doubleClick') {
       onDoubleClick(event);
     }
-
-    sendRowsSelected();
   }
 
   function onClick(event) {
