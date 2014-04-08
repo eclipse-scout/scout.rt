@@ -763,9 +763,11 @@ public class SwingMock implements IGuiMock {
       state.text = ((JTextComponent) c).getText();
     }
     if (c instanceof AbstractButton) {
-      state.text = ((AbstractButton) c).getText();
+      AbstractButton button = (AbstractButton) c;
+      state.text = button.getText();
+      //selection
+      state.selected = button.isSelected();
     }
-
     return state;
   }
 

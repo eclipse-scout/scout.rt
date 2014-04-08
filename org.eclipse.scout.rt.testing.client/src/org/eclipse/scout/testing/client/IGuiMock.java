@@ -126,6 +126,7 @@ public interface IGuiMock {
     public boolean visible;
     public String foregroundColor;
     public String backgroundColor;
+    public boolean selected;
   }
 
   void initializeMock();

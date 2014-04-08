@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.testing.server.runner;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.testing.shared.DevTestMarker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
@@ -22,7 +21,6 @@ import org.junit.runners.model.Statement;
  *
  */
 @RunWith(ScoutServerTestRunner.class)
-@DevTestMarker
 public class ScoutServerJobWrapperStatementTest {
 
   @Test(expected = ProcessingException.class)

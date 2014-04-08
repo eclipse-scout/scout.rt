@@ -843,7 +843,10 @@ public class SwtMock implements IGuiMock {
       state.text = ((StyledText) c).getText();
     }
     if (c instanceof Button) {
-      state.text = ((Button) c).getText();
+      Button button = (Button) c;
+      state.text = button.getText();
+      // selection
+      state.selected = button.getSelection();
     }
     // visibility
     state.visible = c.isVisible();

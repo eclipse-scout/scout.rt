@@ -34,8 +34,6 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
   private static final long serialVersionUID = 1L;
 
   private boolean m_mandatoryCached;
-  //ticket 86811: avoid double-action in queue
-  private boolean m_handleActionPending;
 
   /**
    * To indicate that this checkbox is used inline within table cell
@@ -177,26 +175,30 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
   }
 
   protected void handleSwingAction(ActionEvent e) {
-    if (getSwingCheckBox().isEnabled()) {
-      final boolean b = getSwingCheckBox().isSelected();
-      if (!m_handleActionPending) {
-        m_handleActionPending = true;
-        //notify Scout
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getScoutObject().getUIFacade().setSelectedFromUI(b);
-            }
-            finally {
-              m_handleActionPending = false;
-            }
-          }
-        };
-        getSwingEnvironment().invokeScoutLater(t, 0);
-        //end notify
-      }
+    if (!getSwingCheckBox().isEnabled()) {
+      return;
     }
+    //notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        final boolean oldSelection = getScoutObject().isChecked();
+        final boolean newSelection = getScoutObject().getUIFacade().setSelectedFromUI();
+        if (oldSelection == newSelection) {
+          // ensure that the UI has the same value as the Scout model
+          // oldSelection != newSelection case is handled by the value property change listener.
+          Runnable r = new Runnable() {
+            @Override
+            public void run() {
+              getSwingCheckBox().setSelected(newSelection);
+            }
+          };
+          getSwingEnvironment().invokeSwingLater(r);
+        }
+      }
+    };
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    //end notify
   }
 
   /*
