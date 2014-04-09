@@ -45,7 +45,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlLabel = $tableControl.appendDiv('ControlLabel');
 
   this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
-  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', this.resetFilter.bind(this));
+  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', this.filterReset.bind(this));
   this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
 
   // control buttons have mouse over effects
@@ -219,8 +219,8 @@ Scout.DesktopTable.prototype._setInfoLoad = function(count) {
 
 Scout.DesktopTable.prototype._setInfoMore = function( /*count*/ ) {};
 
-Scout.DesktopTable.prototype._setInfoFilter = function(count) {
-  this._$infoFilter.html(this._findInfo(count) + ' gefiltert</br>Filter entfernen');
+Scout.DesktopTable.prototype._setInfoFilter = function(count, origin) {
+  this._$infoFilter.html(this._findInfo(count) + ' gefiltert' + (origin ? ' durch ' + origin : '') + '</br>Filter entfernen');
   this._$infoFilter.show().widthToContent();
 };
 
@@ -280,9 +280,8 @@ Scout.DesktopTable.prototype._sort = function() {
   // find all sort columns
   for (var c = 0; c < this.model.table.columns.length; c++) {
     var column = this.model.table.columns[c],
-      order = column.$div.data('sort-order'),
+      order = column.$div.attr('data-sort-order'),
       dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
-
     if (order >= 0) {
       sortColumns[order] = {
         index: c,
@@ -298,7 +297,7 @@ Scout.DesktopTable.prototype._sort = function() {
     for (var s = 0; s < sortColumns.length; s++) {
       var index = sortColumns[s].index,
         valueA = that.getValue(index, $(a).data('row')),
-        valueB = that.getValue(index, $(b).data('row'))
+        valueB = that.getValue(index, $(b).data('row')),
         dir = sortColumns[s].dir == 'up' ? -1 : 1;
 
       if (valueA < valueB) {
@@ -332,35 +331,43 @@ Scout.DesktopTable.prototype._sort = function() {
   }
 };
 
-Scout.DesktopTable.prototype.sortChange = function(index, dir, additional) {
-  // find header div
-  var $header = $('.header-item').eq(index);
+Scout.DesktopTable.prototype.sortChange = function($header, dir, additional, remove) {
+  $header.removeClass('sort-up sort-down');
 
-  // change sort order of clicked header
-  $header.removeClass('sort-up sort-down')
-    .addClass('sort-' + dir);
-
-  // when shift pressed: add, otherwise reset
-  if (additional) {
-    var clickOrder = $header.data('sort-order'),
-      maxOrder = -1;
-
-    $('.header-item').each(function() {
-      var value = $(this).data('sort-order');
-      maxOrder = (typeof value == 'number' && value > maxOrder) ? value : maxOrder;
+  if (remove) {
+    var attr = $header.attr('data-sort-order');
+    $header.siblings().each( function () {
+      if ($(this).attr('data-sort-order') > attr) {
+        $(this).attr('data-sort-order', parseInt($(this).attr('data-sort-order'), 0) - 1);
+      }
     });
-
-    if (clickOrder !== undefined && clickOrder !== null) {
-      $header.data('sort-order', clickOrder);
-    } else {
-      $header.data('sort-order', maxOrder + 1);
-    }
-
+    $header.removeAttr('data-sort-order');
   } else {
-    $header.data('sort-order', 0)
-      .siblings()
-      .removeClass('sort-up sort-down')
-      .data('sort-order', null);
+    // change sort order of clicked header
+    $header.addClass('sort-' + dir);
+
+    // when shift pressed: add, otherwise reset
+    if (additional) {
+      var clickOrder = $header.data('sort-order'),
+        maxOrder = -1;
+
+      $('.header-item').each(function() {
+        var value = parseInt($(this).attr('data-sort-order'), 0);
+        maxOrder = (value > maxOrder) ? value : maxOrder;
+      });
+
+      if (clickOrder !== undefined && clickOrder !== null) {
+        $header.attr('data-sort-order', clickOrder);
+      } else {
+        $header.attr('data-sort-order', maxOrder + 1);
+      }
+
+    } else {
+      $header.attr('data-sort-order', 0)
+        .siblings()
+        .removeClass('sort-up sort-down')
+        .attr('data-sort-order', null);
+    }
   }
 
   // sort and visualize
@@ -627,63 +634,93 @@ Scout.DesktopTable.prototype.getText = function(col, row) {
   return cell.text;
 };
 
-Scout.DesktopTable.prototype.sumData = function(draw, groupColumn) {
+
+Scout.DesktopTable.prototype._group = function() {
   var that = this,
-    table = this.model.table;
+    table = this.model.table,
+    all,
+    groupIndex,
+    $group = $('.group-sort', this._$desktopTable);
 
+  // remove all sum rows
   $('.table-row-sum', this._$tableDataScroll).animateAVCSD('height', 0, $.removeThis, that._scrollbar.initThumb.bind(that._scrollbar));
-  this.sortChange(groupColumn, 'up', false);
 
-  if (draw) {
-    var $rows = $('.table-row:visible', this._$tableDataScroll);
-    var $cols = $('.header-item', this._$desktopTable);
-    var $sumRow = $.makeDiv('', 'table-row-sum'),
+  // find group type
+  if ($('.group-all', this._$desktopTable).length) {
+    all = true;
+  } else if ($group.length) {
+    groupIndex = $group.data('index');
+  } else {
+    return;
+  }
+
+  // prepare data
+  var $rows = $('.table-row:visible', this._$tableDataScroll),
+    $cols = $('.header-item', this._$desktopTable),
+    $sumRow = $.makeDiv('', 'table-row-sum'),
+    sum = [];
+
+  for (var r = 0; r < $rows.length; r++) {
+    var row = $rows.eq(r).data('row');
+
+    // calculate sum per column
+    for (var c = 0; c < $cols.length; c++) {
+      var index = $cols.eq(c).data('index'),
+        value = this.getValue(index, row);
+
+      if (table.columns[index].type == 'number') {
+        sum[c] = (sum[c] || 0) + value;
+      }
+    }
+
+    // test if sum should be shown, if yes: reset sum-array
+    var nextRow = $rows.eq(r + 1).data('row');
+    if ((r == $rows.length - 1) || (!all && this.getText(groupIndex, row) != this.getText(groupIndex, nextRow)) && sum.length > 0) {
+      for (c = 0; c < $cols.length; c++) {
+        var $div;
+
+        if (typeof sum[c] == 'number') {
+          $div = $.makeDiv('', '', sum[c])
+            .css('text-align', 'right');
+        } else if (!all && $cols.eq(c).data('index') == groupIndex) {
+          $div = $.makeDiv('', '', this.getText(groupIndex, row))
+            .css('text-align', 'left');
+        } else {
+          $div = $.makeDiv('', '', '&nbsp');
+        }
+
+        $div.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
+      }
+
+      $sumRow.insertAfter($rows.eq(r))
+        .width(this._tableHeader.totalWidth + 4)
+        .css('height', 0)
+        .animateAVCSD('height', 34, null, that._scrollbar.initThumb.bind(that._scrollbar));
+
+      $sumRow = $.makeDiv('', 'table-row-sum');
       sum = [];
-
-    for (var r = 0; r < $rows.length; r++) {
-      var row = $rows.eq(r).data('row');
-
-      for (var c = 0; c < $cols.length; c++) {
-        var index = $cols.eq(c).data('index'),
-          value = this.getValue(index, row);
-
-        if (table.columns[index].type == 'number') {
-          sum[c] = (sum[c] || 0) + value;
-        }
-      }
-
-      var nextRow = $rows.eq(r + 1).data('row');
-      if ((r == $rows.length - 1) || (this.getText(groupColumn, row) != this.getText(groupColumn, nextRow)) && sum.length > 0) {
-        for (c = 0; c < $cols.length; c++) {
-          var $div;
-
-          if (typeof sum[c] == 'number') {
-            $div = $.makeDiv('', '', sum[c])
-              .css('text-align', 'right');
-          } else if ($cols.eq(c).data('index') == groupColumn) {
-            $div = $.makeDiv('', '', this.getText(groupColumn, row))
-              .css('text-align', 'left');
-          } else {
-            $div = $.makeDiv('', '', '&nbsp');
-          }
-
-          $div.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
-        }
-
-        $sumRow.insertAfter($rows.eq(r))
-          .width(this._tableHeader.totalWidth + 4)
-          .css('height', 0)
-          .animateAVCSD('height', 34, null, that._scrollbar.initThumb.bind(that._scrollbar));
-
-        $sumRow = $.makeDiv('', 'table-row-sum');
-        sum = [];
-      }
     }
   }
 };
 
-Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
 
+Scout.DesktopTable.prototype.groupChange = function($header, draw, all) {
+  $('.group-sort', this._$desktopTable).removeClass('group-sort');
+  $('.group-all', this._$desktopTable).removeClass('group-all');
+
+  if (draw) {
+    if (all) {
+      $header.parent().addClass('group-all');
+    } else {
+      this.sortChange($header, 'up', false);
+      $header.addClass('group-sort');
+    }
+  }
+
+  this._group();
+};
+
+Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
   var minValue,
     maxValue,
     colorFunc;
@@ -694,8 +731,6 @@ Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
     if (v < minValue || minValue === undefined) minValue = v;
     if (v > maxValue || maxValue === undefined) maxValue = v;
   }
-
-  log(minValue, maxValue);
 
   if (mode === 'red') {
     colorFunc = function(cell, value) {
@@ -739,11 +774,11 @@ Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
     if ($(this).data('index') == colorColumn) c = i;
   });
 
-  for (var r = 0; r < $rows.length; r++) {
-    var row = $rows.eq(r).data('row'),
+  for (var s = 0; s < $rows.length; s++) {
+    var row = $rows.eq(s).data('row'),
       value = this.getValue(colorColumn, row);
 
-    colorFunc($rows.eq(r).children().eq(c), value);
+    colorFunc($rows.eq(s).children().eq(c), value);
 
   }
 };
@@ -823,9 +858,16 @@ Scout.DesktopTable.prototype.onModelAction = function(event) {
 
 // filter handling
 
-Scout.DesktopTable.prototype.addFilter = function(testFunc) {
+Scout.DesktopTable.prototype.addFilter = function(origin, testFunc) {
+  // TODO cru: used by map and chart
+
+};
+
+// filter function
+Scout.DesktopTable.prototype.filter = function() {
   var that = this,
     rowCount = 0,
+    origin = [],
     $allRows = $('.table-row', that._$tableDataScroll);
 
   that._resetSelection();
@@ -833,7 +875,13 @@ Scout.DesktopTable.prototype.addFilter = function(testFunc) {
   $allRows.detach();
   $allRows.each(function() {
     var $row = $(this),
-      show = testFunc($row);
+      show = true;
+
+    for (var i = 0; i < that.model.table.columns.length; i++) {
+      if (that.model.table.columns[i].filterFunc ) {
+        show = show && that.model.table.columns[i].filterFunc($row);
+      }
+    }
 
     if (show) {
       that.showRow($row);
@@ -843,24 +891,38 @@ Scout.DesktopTable.prototype.addFilter = function(testFunc) {
     }
   });
 
-  that._setInfoFilter(rowCount);
+  for (var i = 0; i < that.model.table.columns.length; i++) {
+    if (that.model.table.columns[i].filterFunc ) {
+      origin.push(that.model.table.columns[i].$div.text());
+    }
+  }
+
+  that._setInfoFilter(rowCount, origin.join(', '));
   $allRows.appendTo(that._$tableDataScroll);
+
+  that._group();
 };
 
-Scout.DesktopTable.prototype.resetFilter = function() {
+Scout.DesktopTable.prototype.filterReset = function() {
   var that = this;
+
+  that._resetSelection();
 
   $('.table-row', that._$tableDataScroll).each(function() {
     that.showRow($(this));
   });
 
-  log(that);
+
+  for (var i = 0; i < this.model.table.columns.length; i++) {
+    this.model.table.columns[i].filter = [];
+  }
+
   this._$infoFilter.animateAVCSD('width', 0, function() {
     $(this).hide();
   });
 
+  that._group();
   $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-  that._resetSelection();
 };
 
 Scout.DesktopTable.prototype.showRow = function($row) {
@@ -933,13 +995,13 @@ Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, drag
 
   // move to old position and then animate
   if (dragged) {
-    $header.css('left', parseInt($header.css('left')) + $header.data('old-pos') - $header.offset().left)
+    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
       .animateAVCSD('left', 0);
   } else {
     $headers.each(function() {
       $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
         .animateAVCSD('left', 0);
-    })
+    });
   }
 
 };

@@ -23,6 +23,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
       .on('mousedown', '', resizeHeader);
 
     columns[i].$div = $header;
+    columns[i].filter = [];
   }
 
   $tableHeader.appendDiv('HeaderOrganize')
@@ -34,10 +35,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
     if (that.dragDone) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      var index = $header.data('index'),
-        dir = $header.hasClass('sort-up') ? 'down' : 'up';
-
-      desktopTable.sortChange(index, dir, event.shiftKey);
+      desktopTable.sortChange($header, $header.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
     } else {
       var x = $header.offset().left,
         y = $header.offset().top;
@@ -87,7 +85,8 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
   function dragHeader(event) {
     var startX = event.pageX,
       $header = $(this),
-      oldPos = newPos =  $header.index(),
+      oldPos = $header.index(),
+      newPos =  oldPos,
       move = $header.outerWidth() + $header.next().outerWidth(),
       $headers = $header.siblings('.header-item');
 
@@ -106,7 +105,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
       $header.css('left', diff);
 
       // find other affected headers
-      var middle = realMiddle($header)
+      var middle = realMiddle($header);
 
       $headers.each(function(i) {
         var m = realMiddle($($headers[i]));
@@ -124,9 +123,12 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
       });
 
       // find new position of dragged header
-      $($headers.get().reverse()).each(function(i) {
+      var h = (diff < 0) ? $headers : $($headers.get().reverse()),
+          d = (diff < 0) ? 2 : 0;
+
+      h.each(function(i) {
         if ($(this).css('left') != '0px') {
-          newPos = $(this).index() - (diff < 0 ? 2 : 0);
+          newPos = $(this).index() - d;
           return false;
         }
       });
@@ -162,14 +164,18 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
           $(this).next().css('left', '');
         });
 
-      if (oldPos !== newPos) {
-        desktopTable.moveColumn($header, oldPos, newPos, true);
-      } else {
-        $header.animateAVCSD('left', '');
-      }
-
       // remove events
       $('body').off('mousemove');
+
+      // move column
+      if (oldPos !== newPos) {
+        desktopTable.moveColumn($header, oldPos, newPos, true);
+        that.dragDone = false;
+      } else {
+        $header.animateAVCSD('left', '', function () {that.dragDone = false;});
+      }
+
+
     }
   }
 };

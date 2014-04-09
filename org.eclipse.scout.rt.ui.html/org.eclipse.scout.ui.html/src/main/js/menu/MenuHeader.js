@@ -27,8 +27,7 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     .css('left', x - 12).css('top', y + $header.parent().height() - 5);
 
   var $headerCommand = $menuHeader.appendDiv('HeaderCommand'),
-    $headerFilter = $menuHeader.appendDiv('HeaderFilter'),
-    $headerModel = $menuHeader.appendDiv('HeaderModel');
+    $headerFilter = $menuHeader.appendDiv('HeaderFilter')
 
   // every user action will close menu
   $('body').on('mousedown.remove', removeMenu);
@@ -57,26 +56,28 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
   $commandSort.appendDiv('', 'header-text')
     .data('label', 'Sortierung');
 
-  $commandSort.appendDiv('HeaderCommandSortUp', 'header-command')
+  var $sortUp = $commandSort.appendDiv('HeaderCommandSortUp', 'header-command')
     .data('label', 'aufsteigend')
     .click(function() {
-      sort('up', false);
+      sort('up', false, $(this).hasClass('selected'));
     });
-  $commandSort.appendDiv('HeaderCommandSortDown', 'header-command')
+  var $sortDown = $commandSort.appendDiv('HeaderCommandSortDown', 'header-command')
     .data('label', 'absteigend')
     .click(function() {
-      sort('down', false);
+      sort('down', false, $(this).hasClass('selected'));
     });
-  $commandSort.appendDiv('HeaderCommandSortUpAdd', 'header-command')
+  var $sortUpAdd = $commandSort.appendDiv('HeaderCommandSortUpAdd', 'header-command')
     .data('label', 'zusätzlich aufsteigend')
     .click(function() {
-      sort('up', true);
+      sort('up', true, $(this).hasClass('selected'));
     });
-  $commandSort.appendDiv('HeaderCommandSortDownAdd', 'header-command')
+  var $sortDownAdd = $commandSort.appendDiv('HeaderCommandSortDownAdd', 'header-command')
     .data('label', 'zusätzlich absteigend')
     .click(function() {
-      sort('down', true);
+      sort('down', true, $(this).hasClass('selected'));
     });
+
+  sortSelect();
 
   // create buttons in command for grouping
   if (column.type === 'text' || column.type === 'date') {
@@ -84,15 +85,15 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     $commandGroup.appendDiv('', 'header-text')
       .data('label', 'Summe');
 
-    $commandGroup.appendDiv('HeaderCommandGroupAll', 'header-command')
+    var $groupAll = $commandGroup.appendDiv('HeaderCommandGroupAll', 'header-command')
       .data('label', 'über alles')
       .click(groupAll);
-    $commandGroup.appendDiv('HeaderCommandGroupSort', 'header-command')
+
+    var $groupSort = $commandGroup.appendDiv('HeaderCommandGroupSort', 'header-command')
       .data('label', 'gruppiert')
       .click(groupSort);
-    $commandGroup.appendDiv('HeaderCommandGroupRemove', 'header-command')
-      .data('label', 'entfernen')
-      .click(groupRemove);
+
+    groupSelect();
   }
 
   // create buttons in command for coloring
@@ -128,7 +129,6 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     .click(columnRemove);
 
   // filter
-  // TODO cru: add scrollbar
   $headerFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
@@ -137,15 +137,33 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
+  var $headerFilterContainer = $headerFilter.appendDiv('HeaderFilterContainer'),
+    $headerFilterScroll = $headerFilterContainer.appendDiv('HeaderFilterScroll');
+
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
       mark = xAxis.format(key),
       value = cube.getValue([key])[0];
 
-    $headerFilter.appendDiv('', 'header-filter', mark)
+    var $filter = $headerFilterScroll.appendDiv('', 'header-filter', mark)
       .attr('data-xAxis', key)
       .click(filterClick)
       .attr('data-value', value);
+
+    if (column.filter.indexOf(key) > -1) $filter.addClass('selected');
+  }
+
+  var containerHeight = $headerFilterContainer.get(0).offsetHeight,
+    scrollHeight = $headerFilterScroll.get(0).scrollHeight;
+
+  if (containerHeight < scrollHeight) {
+    var scrollbar = new Scout.Scrollbar($headerFilterScroll , 'y');
+    scrollbar.initThumb();
+    $('.header-filter', $headerFilterScroll).css('width', 'calc(100% - 22px)');
+  } else {
+    $headerFilterScroll.css('height', 'auto');
+    scrollHeight = $headerFilterScroll.get(0).offsetHeight;
+    $headerFilterContainer.css('height', scrollHeight);
   }
 
   // name all label elements
@@ -155,7 +173,7 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
 
   // set events to buttons
   $headerCommand
-    .on('mouseenter', '.header-command', enterCommand)
+    .on('mouseenter click', '.header-command', enterCommand)
     .on('mouseleave', '.header-command', leaveCommand);
 
   // copy flags to menu
@@ -172,7 +190,6 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
   $menuHeaderTitle.width(Math.min($menuHeaderTitle.width(), $menuHeader.width() - 14) );
 
   function removeMenu(event) {
-    log(event.target);
     if ($menuHeader.has($(event.target)).length === 0) {
       $menuHeader.animateAVCSD('height', 0, function() {
         $menuHeader.remove();
@@ -188,9 +205,10 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
   // event handling
   function enterCommand() {
     var $command = $(this),
-      $text = $command.siblings('.header-text');
+      $text = $command.siblings('.header-text'),
+      text = $command.hasClass('selected') ? 'entfernen' : $command.data('label');
 
-    $text.text($text.data('label') + ' ' + $command.data('label'));
+    $text.text($text.data('label') + ' ' + text);
   }
 
   function leaveCommand() {
@@ -199,49 +217,6 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
 
     $text.text($text.data('label'));
   }
-
-  function sort(dir, additional) {
-    desktopTable.sortChange(id, dir, additional);
-  }
-
-  function groupAll() {
-    if (!$(this).hasClass('selected')) {
-      $(this).selectOne('selected');
-      desktopTable.sumData(true);
-    }
-  }
-
-  function groupSort() {
-    $(this).selectOne('selected');
-    desktopTable.sumData(true, id);
-  }
-
-  function groupRemove() {
-    $(this).siblings().removeClass('selected');
-    desktopTable.sumData(false);
-  }
-
-  function colorRed() {
-    desktopTable.colorData('red', id);
-  }
-
-  function colorGreen() {
-    desktopTable.colorData('green', id);
-  }
-
-  function colorBar() {
-    desktopTable.colorData('bar', id);
-  }
-
-  function colorRemove() {
-    desktopTable.colorData('remove', id);
-  }
-
-  function columnAdd() {}
-
-  function columnChange() {}
-
-  function columnRemove() {}
 
   function moveTop() {
     desktopTable.moveColumn($header, pos, -1);
@@ -263,38 +238,126 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     pos = $header.index();
   }
 
+  function sort(dir, additional, remove) {
+    desktopTable.groupChange($header, false, false);
+    desktopTable.sortChange($header, dir, additional, remove);
+
+    sortSelect();
+    groupSelect();
+  }
+
+  function sortSelect() {
+    var addIcon = '\uF067',
+      sortCount = $('.header-item[data-sort-order]').length;
+
+    $('.header-command', $commandSort).removeClass('selected');
+
+    if (sortCount == 1) {
+      if ($header.hasClass('sort-up')) {
+        $sortUp.addClass('selected');
+        addIcon = null;
+      } else if ($header.hasClass('sort-down')) {
+        $sortDown.addClass('selected');
+        addIcon = null;
+      }
+    } else if (sortCount > 1) {
+      if ($header.hasClass('sort-up')) {
+        $sortUpAdd.addClass('selected');
+        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
+      } else if ($header.hasClass('sort-down')) {
+        $sortDownAdd.addClass('selected');
+        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
+      }
+    } else {
+      addIcon = null;
+    }
+
+    if (addIcon) {
+      $sortUpAdd.show().attr('data-icon', addIcon);
+      $sortDownAdd.show().attr('data-icon', addIcon);
+    } else {
+      $sortUpAdd.hide();
+      $sortDownAdd.hide();
+    }
+  }
+
+  function groupAll() {
+    desktopTable.groupChange($header, !$(this).hasClass('selected'), true);
+
+    sortSelect();
+    groupSelect();
+  }
+
+  function groupSort() {
+    desktopTable.groupChange($header, !$(this).hasClass('selected'), false);
+
+    sortSelect();
+    groupSelect();
+  }
+
+  function groupSelect () {
+    $groupAll.removeClass('selected');
+    $groupSort.removeClass('selected');
+
+    if  ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
+    if  ($header.hasClass('group-sort')) $groupSort.addClass('selected');
+  }
+
+  function colorRed() {
+    desktopTable.colorData('red', id);
+  }
+
+  function colorGreen() {
+    desktopTable.colorData('green', id);
+  }
+
+  function colorBar() {
+    desktopTable.colorData('bar', id);
+  }
+
+  function colorRemove() {
+    desktopTable.colorData('remove', id);
+  }
+
+
+  function columnAdd() {}
+
+  function columnChange() {}
+
+  function columnRemove() {}
+
   function filterClick(event) {
     var $clicked = $(this);
 
     // change state
-    if (event.ctrlKey) {
-      if ($clicked.hasClass('selected')) {
-        $clicked.removeClass('selected');
-      } else {
-        $clicked.addClass('selected');
-      }
+    if ($clicked.hasClass('selected')) {
+      $clicked.removeClass('selected');
     } else {
-      $clicked.selectOne();
+      $clicked.addClass('selected');
     }
 
     //  prepare filter
-    var filters = [];
+    column.filter = [];
 
-    //  find all filter
+    //  find filter
     $('.selected', $headerFilter).each(function() {
       var dX = parseFloat($(this).attr('data-xAxis'));
-      filters.push(dX);
+      column.filter.push(dX);
     });
 
-    //  filter function
-    var testFunc = function($row) {
-      var textX = $row.children().eq(xAxis.column).text(),
-        nX = xAxis.norm(textX);
+    // filter function
+    if (column.filter.length) {
+      column.filterFunc = function($row) {
+        var textX = $row.children().eq(xAxis.column).text(),
+          nX = xAxis.norm(textX);
 
-      return (filters.indexOf(nX) > -1);
-    };
+        return (column.filter.indexOf(nX) > -1);
+      }
+    } else {
+      column.filterFunc = null;
+    }
 
     // callback to table
-    desktopTable.addFilter(testFunc);
+    desktopTable.filter();
   }
 };

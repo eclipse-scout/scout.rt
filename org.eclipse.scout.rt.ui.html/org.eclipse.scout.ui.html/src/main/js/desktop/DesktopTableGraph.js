@@ -30,7 +30,7 @@ Scout.DesktopTableGraph = function(scout, $controlContainer, desktopTable) {
 
   // create nodes with text and place them randomly
   for (var n = 0; n < graph.nodes.length; n++) {
-    node = graph.nodes[n];
+    var node = graph.nodes[n];
 
     node.$div = $graphContainer.appendSVG('rect', null, 'graph-node ' + node.type)
       .attr('width', wBox).attr('height', hBox)
