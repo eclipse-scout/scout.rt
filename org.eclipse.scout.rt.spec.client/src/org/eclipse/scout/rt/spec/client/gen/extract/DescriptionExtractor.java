@@ -64,7 +64,7 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
   /**
    * @param o
    * @return
-   * @deprecated in scout 3.11 only docs associated with the classId will be supported
+   * @deprecated Will be removed in the 5.0 Release. (together with the getConfiguredDoc() methods)
    */
   @Deprecated
   private String tryReadingGetConfiguredDoc(ITypeWithClassId o) {
