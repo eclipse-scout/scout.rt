@@ -203,6 +203,7 @@ public class OfflineStateSharedVariableNotificationTest {
    * A server session with access to a shared variable for testing purposes.
    */
   private static class TestServerSession extends AbstractServerSession {
+    private static final long serialVersionUID = -3811354009155350753L;
     private static final String KEY_MY_SHARED_VARIABLE = "mySharedVariable";
 
     public TestServerSession() {

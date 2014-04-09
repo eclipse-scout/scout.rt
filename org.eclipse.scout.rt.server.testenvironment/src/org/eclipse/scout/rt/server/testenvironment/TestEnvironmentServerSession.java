@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.server.ThreadContext;
  * @author jbr
  */
 public class TestEnvironmentServerSession extends AbstractServerSession {
-  private static IScoutLogger logger = ScoutLogManager
-      .getLogger(TestEnvironmentServerSession.class);
+  private static final long serialVersionUID = 782294551137415747L;
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(TestEnvironmentServerSession.class);
 
   public TestEnvironmentServerSession() {
     super(true);
@@ -38,6 +38,6 @@ public class TestEnvironmentServerSession extends AbstractServerSession {
 
   @Override
   protected void execLoadSession() throws ProcessingException {
-    logger.info("created a new session for " + getUserId());
+    LOG.info("created a new session for " + getUserId());
   }
 }
