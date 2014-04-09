@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -97,7 +98,10 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return false;
   }
 
-  @ConfigProperty(ConfigProperty.DOC)
+  /**
+   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   */
+  @Deprecated
   @Order(30)
   protected String getConfiguredDoc() {
     return null;

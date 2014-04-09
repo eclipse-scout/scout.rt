@@ -452,9 +452,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
+   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    * @return a documentation text, suitable to be included in external documents
    */
-  @ConfigProperty(ConfigProperty.DOC)
+  @Deprecated
   @Order(200)
   protected String getConfiguredDoc() {
     return null;

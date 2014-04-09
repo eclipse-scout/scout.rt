@@ -172,11 +172,6 @@ public @interface ConfigProperty {
    */
   String TEXT = "TEXT";
   /**
-   * NLS translated Strings referencing text provider services flagged with
-   * <code>IDocumentationTextProviderService</code>.
-   */
-  String DOC = "DOC";
-  /**
    * int
    */
   String VERTICAL_ALIGNMENT = "VERTICAL_ALIGNMENT";

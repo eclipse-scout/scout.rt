@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -250,7 +251,10 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return false;
   }
 
-  @ConfigProperty(ConfigProperty.DOC)
+  /**
+   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   */
+  @Deprecated
   @Order(10)
   protected String getConfiguredDoc() {
     return null;

@@ -101,9 +101,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
+   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    * @return a documentation text, suitable to be included in external documents
    */
-  @ConfigProperty(ConfigProperty.DOC)
+  @Deprecated
   @Order(110)
   protected String getConfiguredDoc() {
     return null;

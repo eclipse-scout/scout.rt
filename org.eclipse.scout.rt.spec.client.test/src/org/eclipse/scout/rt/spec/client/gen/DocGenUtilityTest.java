@@ -209,6 +209,7 @@ public class DocGenUtilityTest {
     /**
      * test documentation
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected String getConfiguredDoc() {
       return TEST_DOC;

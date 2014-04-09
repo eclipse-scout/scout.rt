@@ -616,7 +616,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
-  @ConfigProperty(ConfigProperty.DOC)
+  /**
+   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   */
+  @Deprecated
   @Order(20)
   protected String getConfiguredDoc() {
     return null;
