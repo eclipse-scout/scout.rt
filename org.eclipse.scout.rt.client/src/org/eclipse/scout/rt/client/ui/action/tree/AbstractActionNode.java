@@ -126,7 +126,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
   @Override
   public List<T> getChildActions() {
-    return CollectionUtility.unmodifiableListCopy(getChildActionsInternal());
+    return CollectionUtility.arrayList(getChildActionsInternal());
   }
 
   @Override
