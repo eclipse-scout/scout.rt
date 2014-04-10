@@ -27,7 +27,7 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     .css('left', x - 12).css('top', y + $header.parent().height() - 5);
 
   var $headerCommand = $menuHeader.appendDiv('HeaderCommand'),
-    $headerFilter = $menuHeader.appendDiv('HeaderFilter')
+    $headerFilter = $menuHeader.appendDiv('HeaderFilter');
 
   // every user action will close menu
   $('body').on('mousedown.remove', removeMenu);
@@ -132,8 +132,9 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
   $headerFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
-  var matrix = new Scout.DesktopMatrix(desktopTable),
-    xAxis = matrix.addAxis(id, -1),
+  var group = (column.type === 'date') ?  3 : -1,
+    matrix = new Scout.DesktopMatrix(desktopTable),
+    xAxis = matrix.addAxis(id, group),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
@@ -199,7 +200,7 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
       $('body').off('mousedown.remove');
       $('body').off('keydown.remove');
     }
-    return false;
+
   }
 
   // event handling
@@ -348,11 +349,10 @@ Scout.MenuHeader = function(desktopTable, $header, x, y) {
     // filter function
     if (column.filter.length) {
       column.filterFunc = function($row) {
-        var textX = $row.children().eq(xAxis.column).text(),
+        var textX = desktopTable.getValue(xAxis.column, $row.data('row')),
           nX = xAxis.norm(textX);
-
         return (column.filter.indexOf(nX) > -1);
-      }
+      };
     } else {
       column.filterFunc = null;
     }

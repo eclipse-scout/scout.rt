@@ -864,16 +864,21 @@ Scout.DesktopTable.prototype.filter = function() {
     $allRows = $('.table-row', that._$tableDataScroll);
 
   that._resetSelection();
-  $allRows.detach();
+  $('.table-row-sum', this._$tableDataScroll).hide();
 
   $allRows.each(function() {
     var $row = $(this),
+      rowText = $row.text().toLowerCase(),
       show = true;
 
     for (var i = 0; i < that.model.table.columns.length; i++) {
       if (that.model.table.columns[i].filterFunc ) {
         show = show && that.model.table.columns[i].filterFunc($row);
       }
+    }
+
+    if (that.model.table.filter) {
+      show = show && (rowText.indexOf(that.model.table.filter) > -1);
     }
 
     if (that.model.chart.filterFunc) {
@@ -899,6 +904,10 @@ Scout.DesktopTable.prototype.filter = function() {
     }
   }
 
+  if (that.model.table.filter) {
+    origin.push(that.model.table.filter);
+  }
+
   if (that.model.chart.filterFunc) {
     origin.push(that.model.chart.label);
   }
@@ -907,8 +916,13 @@ Scout.DesktopTable.prototype.filter = function() {
     origin.push(that.model.map.label);
   }
 
-  that._setInfoFilter(rowCount, origin.join(', '));
-  $allRows.appendTo(that._$tableDataScroll);
+  if (origin.length) {
+    that._setInfoFilter(rowCount, origin.join(', '));
+  } else {
+    this._$infoFilter.animateAVCSD('width', 0, function() {
+      $(this).hide();
+    });
+  }
 
   $(':animated', that._$tableDataScroll).promise().done(function() {
     that._group();
@@ -933,6 +947,7 @@ Scout.DesktopTable.prototype.filterReset = function() {
   }
   this.model.chart.filterFunc = null;
   this.model.map.filterFunc = null;
+  this.model.table.filter = null;
   $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
 
   // hide info section
@@ -946,6 +961,7 @@ Scout.DesktopTable.prototype.showRow = function($row) {
 
   if ($row.is(':hidden')) {
     $row.show()
+      .stop()
       .animate({
         'height': '34',
         'padding-top': '2',
@@ -961,16 +977,20 @@ Scout.DesktopTable.prototype.showRow = function($row) {
 Scout.DesktopTable.prototype.hideRow = function($row) {
   var that = this;
 
-    $row.animate({
-      'height': '0',
-      'padding-top': '0',
-      'padding-bottom': '0'
-    }, {
-      complete: function() {
-        $(this).hide();
-        that._scrollbar.initThumb();
-      }
-    });
+  if ($row.is(':visible')) {
+    $row
+      .stop()
+      .animate({
+        'height': '0',
+        'padding-top': '0',
+        'padding-bottom': '0'
+      }, {
+        complete: function() {
+          $(this).hide();
+          that._scrollbar.initThumb();
+        }
+      });
+  }
 };
 
 // move column

@@ -318,6 +318,7 @@ padding-top: 12px;
 /* main table header */
 
 #TableHeader {
+position: relative;
 border-bottom: 1px solid #EEE;
 border-left: 2px solid #FFF;
 white-space: nowrap;
@@ -371,7 +372,7 @@ background-color: #FFF ! important;
 
 #HeaderOrganize{
 position: absolute;
-top: 18px;
+bottom: 6px;
 right: 0px;
 width: 20px;
 heigth: 20px;
@@ -1237,6 +1238,22 @@ border: 2px solid #0082A1;
 background-color: #FFF;
 }
 
+#FilterInput{
+width: 241px;
+border: 1px solid #CCC;
+min-height: 30px;
+font-size: 14px;
+font-family: fontDax;
+padding-left: 6px;
+}
+
+#FilterInput:hover{
+border: 1px solid #AAA;
+}
+
+#FilterInput:focus{
+border-color: #0082A1;
+}
 
 /* scrollbar */
 
@@ -1301,15 +1318,16 @@ width: 20px;
 font-size: 20px;
 }
 
-#TableData .key-box {
+#DesktopTable .key-box{
 right: 24px;
 width: 32px;
 }
 
-#TableData .key-box.top3 { top: 10px;}
-#TableData .key-box.top2 { top: 32px;}
-#TableData .key-box.top1 { top: 54px;}
-#TableData .key-box.bottom1 { bottom: 54px;}
-#TableData .key-box.bottom2 { bottom: 32px;}
-#TableData .key-box.bottom3 { bottom: 10px;}
+#DesktopTable .key-box.top3 { top: 10px;}
+#DesktopTable .key-box.top2 { top: 32px;}
+#DesktopTable .key-box.top1 { top: 54px;}
+#DesktopTable .key-box.bottom1 { bottom: 54px;}
+#DesktopTable .key-box.bottom2 { bottom: 32px;}
+#DesktopTable .key-box.bottom3 { bottom: 10px;}
+#DesktopTable .key-box.char { bottom: 8px; }
 

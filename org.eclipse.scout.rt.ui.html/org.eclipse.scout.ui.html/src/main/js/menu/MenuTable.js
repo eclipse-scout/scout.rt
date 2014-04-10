@@ -4,6 +4,8 @@
 Scout.MenuTable = function(desktopTable, x, y) {
 
   $('.header-menu').remove();
+  $('body').off('mousedown.remove');
+  $('body').off('keydown.remove');
 
   // create titel
   var $menuTableTitle = $('body').appendDiv('MenuTableTitle', 'header-menu')
@@ -12,6 +14,11 @@ Scout.MenuTable = function(desktopTable, x, y) {
   // create container
   var $menuTable = $('body').appendDiv('MenuTable', 'header-menu')
     .css('left', x - 243).css('top', y + 24);
+
+  // every user action will close menu
+  $('body').on('mousedown.remove', removeMenu);
+  $('body').on('keydown.remove', removeMenu);
+
 
   // create buttons in command for set
   var $commandSet = $menuTable.appendDiv('', 'header-group');
@@ -82,6 +89,17 @@ Scout.MenuTable = function(desktopTable, x, y) {
     .data('label', 'mit Facebook')
     .click();
 
+  // text filter
+  var $commandFilter = $menuTable.appendDiv('', 'header-group');
+  $commandFilter.appendDiv('', 'header-text')
+    .data('label', 'Filtern nach');
+
+  $('<input id="FilterInput"></input>')
+    .appendTo($commandFilter)
+    .on('keydown', '', filterKey)
+    .on('input paste', '', filterEnter)
+    .val(desktopTable.model.table.filter);
+
   // name all label elements
   $('.header-text').each(function() {
     $(this).text($(this).data('label'));
@@ -92,15 +110,15 @@ Scout.MenuTable = function(desktopTable, x, y) {
     .on('mouseenter', '.header-command', enterCommand)
     .on('mouseleave', '.header-command', leaveCommand);
 
-  // every user action will close menu
-  $('*').one('mousedown keydown mousewheel', removeMenu);
-
   function removeMenu(event) {
-    $menuTable.animateAVCSD('height', 0, function() {
-      $menuTableTitle.remove();
-      $menuTable.remove();
-    });
-    return true;
+    if ($menuTable.has($(event.target)).length === 0) {
+      $menuTable.animateAVCSD('height', 0, function() {
+        $menuTableTitle.remove();
+        $menuTable.remove();
+      });
+      $('body').off('mousedown.remove');
+      $('body').off('keydown.remove');
+    }
   }
 
   function enterCommand() {
@@ -115,6 +133,27 @@ Scout.MenuTable = function(desktopTable, x, y) {
       $text = $command.siblings('.header-text');
 
     $text.text($text.data('label'));
+  }
+
+  function filterKey(event) {
+    if (event.which == 27) {
+      $menuTable.animateAVCSD('height', 0, function() {
+        $menuTableTitle.remove();
+        $menuTable.remove();
+      });
+      $('body').off('mousedown.remove');
+      $('body').off('keydown.remove');
+    }
+
+    event.stopPropagation();
+  }
+
+  function filterEnter() {
+    var $input = $(this);
+    $input.val($input.val().toLowerCase());
+    desktopTable.model.table.filter = $input.val();
+    desktopTable.filter();
+    event.stopPropagation();
   }
 
   function exportExcel() {
@@ -146,9 +185,7 @@ Scout.MenuTable = function(desktopTable, x, y) {
       html += '<tr>';
 
       for (c = 0; c < table.columns.length; c++) {
-        column = table.columns[c],
-        value = table.rows[r][c];
-        html += '<td>' + value + '</td>';
+        html += '<td>' + desktopTable.getText(c, r) + '</td>';
       }
 
       html += '</tr>';

@@ -48,10 +48,23 @@ Scout.Desktop = function(scout, $parent, model) {
     });
   }
 
-  $(window).keydown(function(event) {
+  $('body').keydown(function(event) {
     // numbers: views
     if (event.which >= 49 && event.which <= 57) {
+      log('view');
       $('.view-item', view.$div).eq(event.which - 49).click();
+    }
+
+    // filter
+    if (event.which >= 65 && event.which <= 90) {
+      $('#HeaderOrganize').click();
+
+      // set focus
+      var $input = $('#FilterInput'),
+        length= $input.val().length;
+
+      $input.focus();
+      $input[0].setSelectionRange(length, length);
     }
 
     // function keys: tools
@@ -168,38 +181,44 @@ Scout.Desktop = function(scout, $parent, model) {
     }
 
     // keys for tree
-    var node = $('.selected', tree.$div),
-      prev = node.prev(),
-      next = node.next();
+    var $node = $('.selected', tree.$div),
+      $prev = $node.prev(),
+      $next = $node.next();
 
-    if (node.hasClass('can-expand')) {
-      if (node.hasClass('expanded')) {
-        node.appendDiv('', 'key-box large', '-');
+    if ($node.hasClass('can-expand')) {
+      if ($node.hasClass('expanded')) {
+        $node.appendDiv('', 'key-box large', '-');
       } else {
-        node.appendDiv('', 'key-box large', '+');
+        $node.appendDiv('', 'key-box large', '+');
       }
-      node.children('.tree-item-control').hide();
+      $node.children('.tree-item-control').hide();
     }
 
-    if (prev) {
-      prev.appendDiv('', 'key-box', '←');
-      prev.children('.tree-item-control').hide();
+    if ($prev.length) {
+      $prev.appendDiv('', 'key-box', '←');
+      $prev.children('.tree-item-control').hide();
     }
 
-    if (next) {
-      next.appendDiv('', 'key-box', '→');
-      next.children('.tree-item-control').hide();
+    if ($next.length) {
+      $next.appendDiv('', 'key-box', '→');
+      $next.children('.tree-item-control').hide();
     }
 
     // keys for table
-    node = $('#TableData', bench.$div);
-    if (node) {
-      node.appendDiv('', 'key-box top3', 'Home');
-      node.appendDiv('', 'key-box top2', 'PgUp');
-      node.appendDiv('', 'key-box top1', '↑');
-      node.appendDiv('', 'key-box bottom1', '↓');
-      node.appendDiv('', 'key-box bottom2', 'PgDn');
-      node.appendDiv('', 'key-box bottom3', 'End');
+    $node = $('#TableData', bench.$div);
+    if ($node.length) {
+      $node.appendDiv('', 'key-box top3', 'Home');
+      $node.appendDiv('', 'key-box top2', 'PgUp');
+      $node.appendDiv('', 'key-box top1', '↑');
+      $node.appendDiv('', 'key-box bottom1', '↓');
+      $node.appendDiv('', 'key-box bottom2', 'PgDn');
+      $node.appendDiv('', 'key-box bottom3', 'End');
+    }
+
+    // keys for header
+    $node = $('#TableHeader', bench.$div);
+    if ($node.length) {
+      $node.prependDiv('', 'key-box char', 'a - z');
     }
   }
 };
