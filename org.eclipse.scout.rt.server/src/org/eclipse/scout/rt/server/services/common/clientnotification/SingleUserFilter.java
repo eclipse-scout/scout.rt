@@ -39,7 +39,7 @@ public class SingleUserFilter implements IClientNotificationFilter {
 
   @Override
   public boolean isMulticast() {
-    return false;
+    return true;
   }
 
   @Override

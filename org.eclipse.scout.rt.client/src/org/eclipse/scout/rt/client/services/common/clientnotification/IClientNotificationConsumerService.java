@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.clientnotification;
 
+import java.util.Set;
+
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
@@ -69,5 +71,9 @@ public interface IClientNotificationConsumerService extends IService {
   void addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
 
   void removeGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
+
+  Set<String> getConsumedNotificationIds();
+
+  void ackConfirmed(Set<String> cnIds, IClientSession session);
 
 }

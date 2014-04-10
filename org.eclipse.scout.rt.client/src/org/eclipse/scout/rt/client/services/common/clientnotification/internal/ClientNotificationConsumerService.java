@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.clientnotification.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.Priority;
@@ -31,6 +35,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
   private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";
 
   private final EventListenerList m_globalListenerList = new EventListenerList();
+  private final Set<String> m_consumedIds = new HashSet<String>();
 
   public ClientNotificationConsumerService() {
   }
@@ -104,6 +109,14 @@ public class ClientNotificationConsumerService extends AbstractService implement
   }
 
   private void fireEvent(IClientSession session, IClientNotification notification, boolean sync) {
+    synchronized (m_consumedIds) {
+      if (m_consumedIds.contains(notification.getId())) {
+        return;
+      }
+      else {
+        m_consumedIds.add(notification.getId());
+      }
+    }
     ClientNotificationConsumerEvent e = new ClientNotificationConsumerEvent(this, notification);
     IClientNotificationConsumerListener[] globalListeners = m_globalListenerList.getListeners(IClientNotificationConsumerListener.class);
     IClientNotificationConsumerListener[] listeners = getServiceState(session).m_listenerList.getListeners(IClientNotificationConsumerListener.class);
@@ -131,6 +144,25 @@ public class ClientNotificationConsumerService extends AbstractService implement
 
   private static class ServiceState {
     EventListenerList m_listenerList = new EventListenerList();
+  }
+
+  @Override
+  public Set<String> getConsumedNotificationIds() {
+    return Collections.unmodifiableSet(m_consumedIds);
+  }
+
+  @Override
+  public void ackConfirmed(final Set<String> cnIds, final IClientSession session) {
+    if (cnIds != null && cnIds.size() > 0) {
+      new ClientAsyncJob("cleanup notifications", session) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          synchronized (m_consumedIds) {
+            m_consumedIds.removeAll(cnIds);
+          }
+        }
+      }.schedule(2000);
+    }
   }
 
 }

@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -118,6 +119,10 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       }
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
       ServiceTunnelRequest call = new ServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
+      // client notification handler
+      IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
+      Set<String> cnIds = cns.getConsumedNotificationIds();
+      call.setConsumedNotifications(cnIds);
       call.setClientSubject(getClientSession().getSubject());
       call.setVirtualSessionId(getClientSession().getVirtualSessionId());
       call.setUserAgent(getClientSession().getUserAgent().createIdentifier());
@@ -140,9 +145,9 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
           perf.addNetworkLatencySample(totalMillis);
         }
       }
-      // client notification handler
-      IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
+
       if (cns != null) {
+        cns.ackConfirmed(cnIds, m_clientSession);
         cns.dispatchClientNotifications(response.getClientNotifications(), m_clientSession);
       }
       // error handler

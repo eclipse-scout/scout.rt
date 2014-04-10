@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -166,6 +167,11 @@ public class DefaultTransactionDelegate {
         return serviceRes;
       }
     }
+    Set<String> consumedNotifications = serviceReq.getConsumedNotifications();
+    IClientNotificationService notificationService = SERVICES.getService(IClientNotificationService.class);
+    if (consumedNotifications != null && consumedNotifications.size() > 0) {
+      notificationService.ackNotifications(consumedNotifications);
+    }
     CallInspector callInspector = null;
     SessionInspector sessionInspector = ProcessInspector.getDefault().getSessionInspector(serverSession, true);
     if (sessionInspector != null) {
@@ -233,7 +239,7 @@ public class DefaultTransactionDelegate {
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       serviceRes.setSoapOperation(soapOperation);
       // add accumulated client notifications as side-payload
-      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
+      IClientNotification[] na = notificationService.getNextNotifications(0);
       serviceRes.setClientNotifications(na);
       return serviceRes;
     }

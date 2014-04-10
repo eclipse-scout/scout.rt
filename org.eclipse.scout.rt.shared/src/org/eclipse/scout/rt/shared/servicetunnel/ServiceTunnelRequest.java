@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.Subject;
@@ -34,6 +35,7 @@ public class ServiceTunnelRequest implements Serializable {
   private String m_userAgent;
   private String m_version;
   private Object m_metaData;
+  private Set<String> m_consumedNotificationIds;
   /**
    * @since 3.8
    */
@@ -157,6 +159,14 @@ public class ServiceTunnelRequest implements Serializable {
     m_userAgent = userAgent;
   }
 
+  public void setConsumedNotifications(Set<String> notificationsIds) {
+    m_consumedNotificationIds = notificationsIds;
+  }
+
+  public Set<String> getConsumedNotifications() {
+    return m_consumedNotificationIds;
+  }
+
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer();
@@ -203,4 +213,5 @@ public class ServiceTunnelRequest implements Serializable {
     buf.append(methodName);
     return buf.toString();
   }
+
 }

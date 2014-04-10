@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.services.common.clientnotification.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.EventListenerList;
@@ -68,25 +69,39 @@ public class ClientNotificationQueue {
     fireEvent(notification, filter);
   }
 
+  public void ackNotifications(Set<String> consumedNotificationIds) {
+    synchronized (m_queueLock) {
+      if (!m_queue.isEmpty()) {
+        IServerSession serverSession = ThreadContext.getServerSession();
+        for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
+          QueueElement e = it.next();
+          if (e.getFilter().isActive()
+              && !e.isConsumedBy(serverSession)
+              && e.getFilter().accept()
+              && consumedNotificationIds.contains(e.getClientNotification().getId())) {
+            e.setConsumedBy(serverSession);
+            if (!e.getFilter().isMulticast()) {
+              it.remove();
+            }
+          }
+        }
+      }
+    }
+  }
+
   public IClientNotification[] getNextNotifications(long blockingTimeout) {
     long endTime = System.currentTimeMillis() + blockingTimeout;
     ArrayList<IClientNotification> list = new ArrayList<IClientNotification>();
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
+          IServerSession serverSession = ThreadContext.getServerSession();
           for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
             QueueElement e = it.next();
             if (e.getFilter().isActive()) {
-              IServerSession serverSession = ThreadContext.getServerSession();
               if (!e.isConsumedBy(serverSession)) {
                 if (e.getFilter().accept()) {
                   list.add(e.getClientNotification());
-                  if (e.getFilter().isMulticast()) {
-                    e.setConsumedBy(serverSession);
-                  }
-                  else {
-                    it.remove();
-                  }
                 }
               }
             }
