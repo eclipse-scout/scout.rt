@@ -20,6 +20,11 @@
   <artifactId>org.eclipse.scout.ui.html</artifactId>
   <packaging>eclipse-plugin</packaging>
 
+  <properties>
+    <script.input.dir>${project.basedir}/src/main/js</script.input.dir>
+    <script.output.dir>../org.eclipse.scout.rt.ui.json/WebContent/res</script.output.dir>
+  </properties>
+
 <build>
   <plugins>
 
@@ -30,7 +35,7 @@
       <executions>
         <execution>
           <id>process-css</id>
-          <phase>test</phase>
+          <phase>package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -38,7 +43,7 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${project.basedir}/src/main/js/scout-4.0.1-template.css</argument>
+              <argument>${script.input.dir}/scout-4.0.1-template.css</argument>
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-4.0.1.css</argument>
               <argument>--root</argument>
@@ -49,7 +54,7 @@
         </execution>
         <execution>
           <id>process-js</id>
-          <phase>test</phase>
+          <phase>package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -57,7 +62,7 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${project.basedir}/src/main/js/scout-4.0.1-template.js</argument>
+              <argument>${script.input.dir}/scout-4.0.1-template.js</argument>
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-4.0.1.js</argument>
               <argument>--root</argument>
@@ -76,7 +81,7 @@
       <executions>
         <execution>
           <id>minify</id>
-          <phase>test</phase>
+          <phase>package</phase>
           <goals>
             <goal>compress</goal>
           </goals>
@@ -87,7 +92,7 @@
         <suffix>-min</suffix>
         <force>true</force>
         <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
-        <outputDirectory>${project.build.directory}/classes/WebContent/res</outputDirectory>
+        <outputDirectory>${script.output.dir}</outputDirectory>
       </configuration>
     </plugin>
 
