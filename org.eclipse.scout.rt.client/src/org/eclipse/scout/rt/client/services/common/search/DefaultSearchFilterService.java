@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.search;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -43,7 +44,7 @@ public class DefaultSearchFilterService extends AbstractService implements ISear
     if (field.getParentField() instanceof ISequenceBox && field.getParentField() instanceof AbstractFormField) {
       AbstractFormField range = (AbstractFormField) field.getParentField();
       if (range.getInitialLabel() != null) {
-        label = range.getInitialLabel() + " " + label;
+        label = range.getInitialLabel() + (StringUtility.isNullOrEmpty(label) ? "" : " " + label);
       }
     }
     //
