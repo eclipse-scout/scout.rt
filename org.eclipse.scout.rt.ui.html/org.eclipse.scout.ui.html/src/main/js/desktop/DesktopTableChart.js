@@ -668,7 +668,8 @@ Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable) {
       }
     };
 
-    // callback to table
-    desktopTable.addFilter(testFunc);
+    // set filter function
+    desktopTable.model.chart.filterFunc = testFunc;
+    desktopTable.filter();
   }
 };

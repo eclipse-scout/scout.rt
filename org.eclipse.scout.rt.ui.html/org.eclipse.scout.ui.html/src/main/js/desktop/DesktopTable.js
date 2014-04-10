@@ -856,13 +856,6 @@ Scout.DesktopTable.prototype.onModelAction = function(event) {
   }
 };
 
-// filter handling
-
-Scout.DesktopTable.prototype.addFilter = function(origin, testFunc) {
-  // TODO cru: used by map and chart
-
-};
-
 // filter function
 Scout.DesktopTable.prototype.filter = function() {
   var that = this,
@@ -871,8 +864,8 @@ Scout.DesktopTable.prototype.filter = function() {
     $allRows = $('.table-row', that._$tableDataScroll);
 
   that._resetSelection();
-
   $allRows.detach();
+
   $allRows.each(function() {
     var $row = $(this),
       show = true;
@@ -883,6 +876,14 @@ Scout.DesktopTable.prototype.filter = function() {
       }
     }
 
+    if (that.model.chart.filterFunc) {
+      show = show && that.model.chart.filterFunc($row);
+    }
+
+    if (that.model.map.filterFunc) {
+      show = show && that.model.map.filterFunc($row);
+    }
+
     if (show) {
       that.showRow($row);
       rowCount++;
@@ -891,60 +892,76 @@ Scout.DesktopTable.prototype.filter = function() {
     }
   });
 
+  // find info text
   for (var i = 0; i < that.model.table.columns.length; i++) {
     if (that.model.table.columns[i].filterFunc ) {
       origin.push(that.model.table.columns[i].$div.text());
     }
   }
 
+  if (that.model.chart.filterFunc) {
+    origin.push(that.model.chart.label);
+  }
+
+  if (that.model.map.filterFunc) {
+    origin.push(that.model.map.label);
+  }
+
   that._setInfoFilter(rowCount, origin.join(', '));
   $allRows.appendTo(that._$tableDataScroll);
 
-  that._group();
+  $(':animated', that._$tableDataScroll).promise().done(function() {
+    that._group();
+  });
+
 };
 
 Scout.DesktopTable.prototype.filterReset = function() {
   var that = this;
 
+  // reset rows
   that._resetSelection();
-
   $('.table-row', that._$tableDataScroll).each(function() {
     that.showRow($(this));
   });
+  that._group();
 
-
+  // set back all filter functions
   for (var i = 0; i < this.model.table.columns.length; i++) {
     this.model.table.columns[i].filter = [];
+    this.model.table.columns[i].filterFunc = null;
   }
+  this.model.chart.filterFunc = null;
+  this.model.map.filterFunc = null;
+  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
 
+  // hide info section
   this._$infoFilter.animateAVCSD('width', 0, function() {
     $(this).hide();
   });
-
-  that._group();
-  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
 };
 
 Scout.DesktopTable.prototype.showRow = function($row) {
   var that = this;
 
-  $row.show()
-    .animate({
-      'height': '34',
-      'padding-top': '2',
-      'padding-bottom': '2'
-    }, {
-      complete: function() {
-        that._scrollbar.initThumb();
-      }
-    });
+  if ($row.is(':hidden')) {
+    $row.show()
+      .animate({
+        'height': '34',
+        'padding-top': '2',
+        'padding-bottom': '2'
+      }, {
+        complete: function() {
+          that._scrollbar.initThumb();
+        }
+      });
+  }
 };
 
 Scout.DesktopTable.prototype.hideRow = function($row) {
   var that = this;
 
-  $row.hide()
-    .animate({
+    $row.animate({
       'height': '0',
       'padding-top': '0',
       'padding-bottom': '0'

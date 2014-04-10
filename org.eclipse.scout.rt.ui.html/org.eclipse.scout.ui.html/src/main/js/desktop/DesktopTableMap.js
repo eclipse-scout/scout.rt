@@ -1,4 +1,3 @@
-// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 Scout.DesktopTableMap = function(scout, $parent, desktopTable) {
@@ -115,6 +114,8 @@ Scout.DesktopTableMap = function(scout, $parent, desktopTable) {
     };
 
     // callback to table
-    desktopTable.addFilter(testFunc);
+    // set filter function
+    desktopTable.model.map.filterFunc = testFunc;
+    desktopTable.filter();
   }
 };
