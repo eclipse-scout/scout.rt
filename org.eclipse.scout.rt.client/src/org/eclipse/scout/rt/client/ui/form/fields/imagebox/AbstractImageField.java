@@ -174,6 +174,10 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    //set container on menus
+    for (IMenu menu : menuList) {
+      menu.setContainerInternal(this);
+    }
     m_menus = menuList.toArray(new IMenu[0]);
   }
 

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.security.Permission;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IOutline extends ITree {
+public interface IOutline extends ITree, ITypeWithClassId {
 
   /**
    * {@link Boolean}

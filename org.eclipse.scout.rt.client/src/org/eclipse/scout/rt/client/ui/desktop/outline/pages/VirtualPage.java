@@ -113,4 +113,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   @Override
   public void setPagePopulateStatus(IProcessingStatus status) {
   }
+
+  /**
+   * not defined on a virtual pages.
+   */
+  @Override
+  public String classId() {
+    return null;
+  }
 }

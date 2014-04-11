@@ -1202,4 +1202,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     return m_containerForm;
   }
 
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
+
 }

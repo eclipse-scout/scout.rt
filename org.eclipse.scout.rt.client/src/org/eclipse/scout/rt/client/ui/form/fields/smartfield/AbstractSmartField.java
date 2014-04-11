@@ -451,6 +451,10 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
+    //set container on menus
+    for (IMenu menu : menuList) {
+      menu.setContainerInternal(this);
+    }
     try {
       injectMenusInternal(menuList);
     }

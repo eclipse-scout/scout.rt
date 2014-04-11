@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.net.URL;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientRule;
@@ -45,7 +46,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
  * <p>
  */
-public interface ITable extends IPropertyObserver, IDNDSupport {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId {
 
   /**
    * String

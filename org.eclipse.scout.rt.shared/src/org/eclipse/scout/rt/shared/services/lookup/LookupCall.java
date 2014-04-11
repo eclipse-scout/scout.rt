@@ -15,6 +15,8 @@ import java.io.Serializable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -55,7 +57,7 @@ import org.eclipse.scout.service.SERVICES;
  * LookupCall: subclass of LocalLookupCall() with implementation of method
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
-public class LookupCall implements Cloneable, Serializable {
+public class LookupCall implements Cloneable, Serializable, ITypeWithClassId {
   private static final long serialVersionUID = 0L;
 
   private Object m_key;
@@ -102,6 +104,11 @@ public class LookupCall implements Cloneable, Serializable {
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
+  }
+
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
   }
 
   public ILookupService getLookupService() {

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
@@ -446,5 +447,57 @@ public final class ConfigurationUtility {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Returns the value of the {@link ClassId} annotation or the class name as fallback, the annotation is undefined.
+   * <p>
+   * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
+   * </p>
+   * 
+   * @param clazz
+   * @return annotated id or class name fallback
+   * @since 3.10.0
+   */
+  public static String getAnnotatedClassIdWithFallback(Class<?> clazz) {
+    return getAnnotatedClassIdWithFallback(clazz, false);
+  }
+
+  /**
+   * Returns the value of the {@link ClassId} annotation or the class name as fallback, the annotation is undefined.
+   * <p>
+   * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
+   * </p>
+   * 
+   * @param clazz
+   * @param simpleName
+   *          use the simple class name instead of the fully qualified class name.
+   * @return annotated id or class name fallback
+   * @since 3.10.0
+   */
+  public static String getAnnotatedClassIdWithFallback(Class<?> clazz, boolean simpleName) {
+    Class<?> replaced = getOriginalClass(clazz);
+    ClassId id = replaced.getAnnotation(ClassId.class);
+    String annotatedClassId = (id == null) ? null : id.value();
+    if (annotatedClassId != null) {
+      return annotatedClassId;
+    }
+    else if (simpleName && !StringUtility.isNullOrEmpty(replaced.getSimpleName())) {
+      return replaced.getSimpleName();
+    }
+    return replaced.getName();
+  }
+
+  /**
+   * If the class is replacing another class, the one that is being replaced is returned. Otherwise the class itself is
+   * returned.
+   * 
+   * @return class to be replaced
+   */
+  private static Class<?> getOriginalClass(Class<?> c) {
+    while (c.isAnnotationPresent(Replace.class)) {
+      c = c.getSuperclass();
+    }
+    return c;
   }
 }

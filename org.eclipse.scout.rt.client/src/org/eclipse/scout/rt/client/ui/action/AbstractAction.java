@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -594,6 +596,15 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    if (getContainer() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    }
+    return simpleClassId;
+  }
+
+  @Override
   public char getMnemonic() {
     Character c = (Character) propertySupport.getProperty(PROP_MNEMONIC);
     return c != null ? c.charValue() : 0x00;
@@ -619,6 +630,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * do not use this method, it is used internally by subclasses
    */
   protected void prepareActionInternal() throws ProcessingException {
+  }
+
+  @Override
+  public ITypeWithClassId getContainer() {
+    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  @Override
+  public void setContainerInternal(ITypeWithClassId container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
   protected class P_UIFacade implements IActionUIFacade {

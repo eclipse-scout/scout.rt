@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,12 +13,13 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.net.URL;
 import java.util.List;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IWizard extends IPropertyObserver {
+public interface IWizard extends IPropertyObserver, ITypeWithClassId {
 
   static enum CloseType {
     /**

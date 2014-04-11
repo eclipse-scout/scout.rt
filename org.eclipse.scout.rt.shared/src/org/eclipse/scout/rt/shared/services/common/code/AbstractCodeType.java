@@ -73,6 +73,11 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, ICode.class);
   }
 
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   @ConfigPropertyValue("false")

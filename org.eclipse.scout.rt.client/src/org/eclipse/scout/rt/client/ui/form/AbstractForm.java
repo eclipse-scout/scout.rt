@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StoppableThread;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -136,6 +137,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private String m_iconId;
   private DataChangeListener m_internalDataChangeListener;
   private IEventHistory<FormEvent> m_eventHistory;
+
+  private String m_classId;
 
   // field replacement support
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
@@ -922,6 +925,29 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public String getFormId() {
     return parseFormId(getClass().getName());
+  }
+
+  /**
+   * <p>
+   * <li>If a classId was set with {@link #setClassId(String)} this value is returned.
+   * <li>Else if the class is annotated with {@link ClassId}, the annotation value is returned.
+   * <li>Otherwise the class name is returned.
+   */
+  @Override
+  public String classId() {
+    if (m_classId != null) {
+      return m_classId;
+    }
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    if (getOuterFormField() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getOuterFormField().classId();
+    }
+    return simpleClassId;
+  }
+
+  @Override
+  public void setClassId(String classId) {
+    m_classId = classId;
   }
 
   @Override
@@ -2086,7 +2112,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code> is
+   * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code>
+   *         is
    *         returned if no form fields are replaced. Do not use this internal method.
    * @since 3.8.2
    */

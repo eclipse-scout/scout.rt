@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -528,6 +530,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
 
     }
+  }
+
+  /**
+   * If the class is annotated with {@link ClassId}, the annotation value is returned.<br/>
+   * Otherwise the class name.
+   */
+  @Override
+  public String classId() {
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), false);
   }
 
   private class P_TableFilterBasedTreeNodeFilter implements ITreeNodeFilter {
