@@ -505,7 +505,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-    getJsonSession().currentJsonResponse().addActionEvent("showGraph", getId(), responseEvent);
+    //event currently handled by table
+    JsonDesktopTable jsonDesktopTable = m_jsonTables.get(getModelObject().getDetailTable());
+    getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", jsonDesktopTable.getId(), responseEvent);
   }
 
   protected void handleUiMap(JsonEvent event, JsonResponse res) throws JsonUIException {
@@ -517,7 +519,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-    getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), responseEvent);
+    //event currently handled by table
+    JsonDesktopTable jsonDesktopTable = m_jsonTables.get(getModelObject().getDetailTable());
+    getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", jsonDesktopTable.getId(), responseEvent);
   }
 
   protected void handleUiDataModel(JsonEvent event, JsonResponse res) throws JsonUIException {
@@ -530,7 +534,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     catch (JSONException | ProcessingException | IOException e) {
       throw new JsonUIException(e);
     }
-    getJsonSession().currentJsonResponse().addActionEvent("showMap", getId(), responseEvent);
+    getJsonSession().currentJsonResponse().addActionEvent("dataModelLoaded", getId(), responseEvent);
   }
 
   protected List<IMenu> fetchMenusForSelection() {

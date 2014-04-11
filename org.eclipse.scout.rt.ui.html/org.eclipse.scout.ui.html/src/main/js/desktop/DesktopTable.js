@@ -19,6 +19,9 @@ Scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
 Scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
 Scout.DesktopTable.EVENT_ROW_ACTION = 'rowAction';
 Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
+Scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
+Scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
+
 
 Scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
@@ -29,24 +32,26 @@ Scout.DesktopTable.prototype.render = function($parent) {
   var $tableHeader = this._$desktopTable.appendDiv('TableHeader'),
     $tableData = this._$desktopTable.appendDiv('TableData');
   this._$desktopTable.appendDiv('TableFooter');
-  var $tableControl = this._$desktopTable.appendDiv('TableControl');
+  this._$tableControl = this._$desktopTable.appendDiv('TableControl');
 
   this._$tableDataScroll = $tableData.appendDiv('TableDataScroll');
   this._$tableData = $tableData;
   this._scrollbar = new Scout.Scrollbar(this._$tableDataScroll, 'y');
 
-  var that = this;
-  var $controlContainer = $tableControl.appendDiv('ControlContainer'),
-    $controlResizeTop = $tableControl.appendDiv('ControlResizeTop'),
-    $controlResizeBottom = $tableControl.appendDiv('ControlResizeBottom'),
-    $controlChart = $tableControl.appendDiv('ControlChart'),
-    $controlGraph = $tableControl.appendDiv('ControlGraph'),
-    $controlMap = $tableControl.appendDiv('ControlMap'),
-    $controlLabel = $tableControl.appendDiv('ControlLabel');
+  this._$controlContainer = this._$tableControl.appendDiv('ControlContainer');
+  this._$controlResizeTop = this._$tableControl.appendDiv('ControlResizeTop');
+  this._$controlResizeBottom = this._$tableControl.appendDiv('ControlResizeBottom');
 
-  this._$infoSelect = $tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
-  this._$infoFilter = $tableControl.appendDiv('InfoFilter').on('click', '', this.filterReset.bind(this));
-  this._$infoLoad = $tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
+  var that = this;
+  var $controlChart = this._$tableControl.appendDiv('ControlChart'),
+    $controlGraph = this._$tableControl.appendDiv('ControlGraph'),
+    $controlMap = this._$tableControl.appendDiv('ControlMap');
+
+  this._$controlLabel = this._$tableControl.appendDiv('ControlLabel');
+
+  this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
+  this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this.filterReset.bind(this));
+  this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._loadData.bind(this));
 
   // control buttons have mouse over effects
   $("body").on("mouseenter", "#control_graph, #control_chart, #control_map",
@@ -95,22 +100,20 @@ Scout.DesktopTable.prototype.render = function($parent) {
     $controlMap.addClass('disabled');
   }
 
-  // named functions
   function controlIn(event) {
-    var close = $(event.target).hasClass('selected') ? ' schliessen' : '';
-    $controlLabel.text($(event.target).data('label') + close);
+    that._controlIn($(event.target));
   }
 
-  function controlOut() {
-    $controlLabel.text('');
+  function controlOut(event) {
+    that._controlOut($(event.target));
   }
 
   function controlClick(event) {
     var $clicked = $(this);
 
     // reset handling resize
-    $controlResizeTop.off('mousedown');
-    $controlResizeBottom.off('mousedown');
+    that._$controlResizeTop.off('mousedown');
+    that._$controlResizeBottom.off('mousedown');
 
     if ($clicked.hasClass('selected')) {
       // classes: unselect and stop resizing
@@ -127,84 +130,44 @@ Scout.DesktopTable.prototype.render = function($parent) {
         500);
 
       // visual: reset label and close control
-      controlOut(event);
-      $tableControl.animateAVCSD('height', 50, null, null, 500);
+      that._controlOut(event);
+      that._$tableControl.animateAVCSD('height', 50, null, null, 500);
 
-      // do not handel the click
+      // do not handle the click
       event.stopImmediatePropagation();
-    } else {
-      // classes: select and allow resizing
-      $clicked.selectOne();
-      $clicked.parent().addClass('resize-on');
-
-      //adjust table
-      that._$tableData.animateAVCSD('height',
-        parseFloat(that._$desktopTable.css('height')) - 444,
-        function() {
-          $(this).css('height', 'calc(100% - 430px');
-        },
-        that._scrollbar.initThumb.bind(that._scrollbar),
-        500);
-
-      // visual: update label, size container and control
-      controlIn(event);
-      $controlContainer.height(340);
-      $tableControl.animateAVCSD('height', 400, null, null, 500);
-
-      // set events for resizing
-      $controlResizeTop.on('mousedown', '', resizeControl);
-      $controlResizeBottom.on('mousedown', '', resizeControl);
     }
   }
 
   function controlChart() {
-    new Scout.DesktopTableChart(that.scout, $controlContainer, that);
+    new Scout.DesktopTableChart(that.scout, that._$controlContainer, that);
+
+    $(this).selectOne();
+    that._showTableControl();
   }
 
   function controlGraph() {
-    new Scout.DesktopTableGraph(that.scout, $controlContainer, that);
+    that.scout.send('graph', that.model.outlineId, {
+      "nodeId": that.model.id
+    });
+
+    $(this).selectOne();
   }
 
   function controlMap() {
-    new Scout.DesktopTableMap(that.scout, $controlContainer, that);
-  }
+    that.scout.send('map', that.model.outlineId, {
+      "nodeId": that.model.id
+    });
 
-  function resizeControl(event) {
-    $('body').addClass('row-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
-
-    var offset = (this.id == 'ControlResizeTop') ? 58 : 108;
-
-    function resizeMove(event) {
-      var h = that._$parent.outerHeight() - event.pageY + offset;
-      if (that._$parent.height() < h + 50) return false;
-
-      $tableControl.height(h);
-      that._$tableData.height('calc(100% - ' + (h + 30) + 'px)');
-      $controlContainer.height(h - 60);
-      that._scrollbar.initThumb();
-    }
-
-    function resizeEnd() {
-      if ($controlContainer.height() < 75) {
-        $('.selected', $tableControl).click();
-      }
-
-      $('body').off('mousemove')
-        .removeClass('row-resize');
-    }
-
-    return false;
+    $(this).selectOne();
   }
 
   function toggleSelect() {
-    var $selectedRows = $('.row-selected', $tableData);
+    var $selectedRows = $('.row-selected', that._$tableData);
 
     if ($selectedRows.length == that.model.table.rows.length) {
       $selectedRows.removeClass('row-selected');
     } else {
-      $('.table-row', $tableData).addClass('row-selected');
+      $('.table-row', that._$tableData).addClass('row-selected');
     }
 
     that._drawSelectionBorder();
@@ -336,7 +299,7 @@ Scout.DesktopTable.prototype.sortChange = function($header, dir, additional, rem
 
   if (remove) {
     var attr = $header.attr('data-sort-order');
-    $header.siblings().each( function () {
+    $header.siblings().each(function() {
       if ($(this).attr('data-sort-order') > attr) {
         $(this).attr('data-sort-order', parseInt($(this).attr('data-sort-order'), 0) - 1);
       }
@@ -634,7 +597,6 @@ Scout.DesktopTable.prototype.getText = function(col, row) {
   return cell.text;
 };
 
-
 Scout.DesktopTable.prototype._group = function() {
   var that = this,
     table = this.model.table,
@@ -702,7 +664,6 @@ Scout.DesktopTable.prototype._group = function() {
     }
   }
 };
-
 
 Scout.DesktopTable.prototype.groupChange = function($header, draw, all) {
   $('.group-sort', this._$desktopTable).removeClass('group-sort');
@@ -844,18 +805,6 @@ Scout.DesktopTable.prototype._onSelectionMenusChanged = function(selectedRowIds,
   //FIXME see tree for reference
 };
 
-Scout.DesktopTable.prototype.onModelAction = function(event) {
-  if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
-    this.insertRows(event.rows);
-  } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
-    this.selectRowsByIds(event.rowIds);
-  } else if (event.type_ == Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED) {
-    this._onSelectionMenusChanged(event.selectedRowIds, event.menus);
-  } else {
-    log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
-  }
-};
-
 // filter function
 Scout.DesktopTable.prototype.filter = function() {
   var that = this,
@@ -872,7 +821,7 @@ Scout.DesktopTable.prototype.filter = function() {
       show = true;
 
     for (var i = 0; i < that.model.table.columns.length; i++) {
-      if (that.model.table.columns[i].filterFunc ) {
+      if (that.model.table.columns[i].filterFunc) {
         show = show && that.model.table.columns[i].filterFunc($row);
       }
     }
@@ -899,7 +848,7 @@ Scout.DesktopTable.prototype.filter = function() {
 
   // find info text
   for (var i = 0; i < that.model.table.columns.length; i++) {
-    if (that.model.table.columns[i].filterFunc ) {
+    if (that.model.table.columns[i].filterFunc) {
       origin.push(that.model.table.columns[i].$div.text());
     }
   }
@@ -1041,4 +990,87 @@ Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, drag
     });
   }
 
+};
+
+Scout.DesktopTable.prototype._controlIn = function($control) {
+  log($control);
+  var close = $control.hasClass('selected') ? ' schliessen' : '';
+  this._$controlLabel.text($control.data('label') + close);
+};
+
+Scout.DesktopTable.prototype._controlOut = function() {
+  this._$controlLabel.text('');
+};
+
+Scout.DesktopTable.prototype._showTableControl = function() {
+  // allow resizing
+  this._$tableControl.addClass('resize-on');
+
+  //adjust table
+  this._$tableData.animateAVCSD('height',
+    parseFloat(this._$desktopTable.css('height')) - 444,
+    function() {
+      $(this).css('height', 'calc(100% - 430px');
+    },
+    this._scrollbar.initThumb.bind(this._scrollbar),
+    500);
+
+  // visual: update label, size container and control
+  this._controlIn(this._$tableControl.children('.selected').first());
+  this._$controlContainer.height(340);
+  this._$tableControl.animateAVCSD('height', 400, null, null, 500);
+
+  // set events for resizing
+  this._$controlResizeTop.on('mousedown', '', resizeControl);
+  this._$controlResizeBottom.on('mousedown', '', resizeControl);
+
+  var that = this;
+  function resizeControl(event) {
+    $('body').addClass('row-resize')
+      .on('mousemove', '', resizeMove)
+      .one('mouseup', '', resizeEnd);
+
+    var offset = (this.id == 'ControlResizeTop') ? 58 : 108;
+
+    function resizeMove(event) {
+      var h = that._$parent.outerHeight() - event.pageY + offset;
+      if (that._$parent.height() < h + 50) return false;
+
+      that._$tableControl.height(h);
+      that._$tableData.height('calc(100% - ' + (h + 30) + 'px)');
+      that._$controlContainer.height(h - 60);
+      that._scrollbar.initThumb();
+    }
+
+    function resizeEnd() {
+      if (that._$controlContainer.height() < 75) {
+        $('.selected', that._$tableControl).click();
+      }
+
+      $('body').off('mousemove')
+        .removeClass('row-resize');
+    }
+
+    return false;
+  }
+};
+
+Scout.DesktopTable.prototype.onModelAction = function(event) {
+  if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
+    this.insertRows(event.rows);
+  } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
+    this.selectRowsByIds(event.rowIds);
+  } else if (event.type_ == Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED) {
+    this._onSelectionMenusChanged(event.selectedRowIds, event.menus);
+  } else if (event.type_ == Scout.DesktopTable.EVENT_MAP_LOADED) {
+    new Scout.DesktopTableMap(this._$controlContainer, this, event.map);
+    //FIXME select control button (only necessary if event is not triggered by user)
+    this._showTableControl();
+  } else if (event.type_ == Scout.DesktopTable.EVENT_GRAPH_LOADED) {
+    new Scout.DesktopTableGraph(this._$controlContainer, event.graph);
+    //FIXME select control button (only necessary if event is not triggered by user)
+    this._showTableControl();
+  } else {
+    log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
+  }
 };

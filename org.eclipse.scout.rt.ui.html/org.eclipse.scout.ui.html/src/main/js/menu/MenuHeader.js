@@ -2,9 +2,6 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 Scout.MenuHeader = function(desktopTable, $header, x, y) {
-  //  var response = scout.sendSync('dataModel', model.outlineId, {"nodeId": model.nodeId}),
-  //    dataModel = response.events[0].dataModel;
-
   $('.header-menu').remove();
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');

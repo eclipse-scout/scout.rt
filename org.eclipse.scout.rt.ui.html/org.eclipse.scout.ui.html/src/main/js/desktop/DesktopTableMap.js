@@ -1,17 +1,13 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableMap = function(scout, $parent, desktopTable) {
+Scout.DesktopTableMap = function($parent, desktopTable, model) {
   // create container
   var $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG("preserveAspectRatio", "xMidYMid");
 
-  // create container
-  var response = scout.sendSync('map', desktopTable.model.outlineId, {
-    "nodeId": desktopTable.model.id
-  });
-  var map = response.events[0].map;
+  var map = model;
   var countries = map.objects.countries.geometries;
 
   // find all countries in table

@@ -168,7 +168,7 @@ Scout.DesktopTree.prototype._setNodeSelected = function($node) {
   if (this.scout.areRequestsPending() || this.scout.areEventsQueued()) {
     this.scout.listen().done(onEventsProcessed);
   } else {
-    this._showSelectionMenuAndHideOthers();
+    this._showSelectionMenuAndHideOthers($node);
   }
 
   function onEventsProcessed(eventTypes) {
