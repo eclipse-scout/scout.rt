@@ -231,7 +231,7 @@ Scout.DesktopTable.prototype._drawSelectionBorder = function() {
 Scout.DesktopTable.prototype._resetSelection = function() {
   $('.row-selected', this._$tableData).removeClass('row-selected');
   this._drawSelectionBorder();
-  $('#RowMenu, #RowDrill').remove();
+  $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
 };
 
 Scout.DesktopTable.prototype._sort = function() {
@@ -380,7 +380,11 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       .appendTo(this._$tableDataScroll)
       .on('mousedown', '', onMouseDown)
       .on('clicks', '', onClicks)
-      .width(this._tableHeader.totalWidth + 4);
+      .width(this._tableHeader.totalWidth + 4)
+      .on('contextmenu', function(e) {
+        e.preventDefault();
+      });
+
   }
 
   // update info and scrollbar
@@ -417,7 +421,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       }
     }
 
-    $('#RowMenu, #RowDrill').remove();
+    $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
 
     // just a click...
     selectData(event);
@@ -534,40 +538,126 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
         .on('click', '', function() {
           sendRowAction($firstRow);
         });
+
+      var h1 = $RowDrill.outerHeight();
+      $RowDrill.height(0).animateAVCSD('height', h1, null, null, 75);
     }
     var $RowMenu = $('#RowMenu');
     if ($RowMenu.length === 0) {
       $RowMenu = that._$tableDataScroll.appendDiv('RowMenu')
         .on('click', '', clickRowMenu);
+
+      var h2 = $RowMenu.outerHeight();
+      $RowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
     }
 
     // place menu
-    var top = $selectedRows.first().offset().top - that._$tableDataScroll.offset().top,
-      bottom = $selectedRows.last().offset().top - that._$tableDataScroll.offset().top + 32,
-      toTop = Math.abs(top - y) > Math.abs(bottom - y) && $selectedRows.length > 1 ? bottom - 7 : top - 19,
-      toLeft = Math.max(25, Math.min($firstRow.outerWidth() - 58, x - that._$tableDataScroll.offset().left - 13));
+    // TODO cru: place on top if mouse movement goes up?
+    var top = $selectedRows.last().offset().top - that._$tableDataScroll.offset().top + 32,
+      left = Math.max(25, Math.min($firstRow.outerWidth() - 164, x - that._$tableDataScroll.offset().left - 13));
 
-    $RowDrill.css('left', toLeft - 15).css('top', toTop);
-    $RowMenu.css('left', toLeft + 15).css('top', toTop);
-  }
+    $RowDrill.css('left', left - 16).css('top', top);
+    $RowMenu.css('left', left + 16).css('top', top);
 
-  function clickRowMenu() {
-    var $clicked = $(this),
-      $selectedRows = $('.row-selected'),
-      x = $clicked.offset().left,
-      y = $clicked.offset().top,
-      emptySpace = $selectedRows.length === 0;
+    // mouse over effect
+    var $showMenu = $selectedRows
+      .add($selectedRows.first().prev())
+      .add($selectedRows.last().next())
+      .add($selectedRows.last().next().next())
+      .add($RowDrill)
+      .add($RowMenu);
 
-    var menus = that.model.table.selectionMenus;
-    if (emptySpace) {
-      menus = that.model.table.emptySpaceMenus;
+    $showMenu
+      .on('mouseenter', '', enterSelection)
+      .on('mouseleave', '', leaveSelection);
+
+    if (event.button == 2) {
+      clickRowMenu();
     }
 
-    if (menus && menus.length > 0) {
-      new Scout.Menu(that.scout, menus, x, y);
+    // TODO cru: remove events?
+
+    function enterSelection (event) {
+        $RowDrill.animateAVCSD('height', h1, null, null, 75);
+        $RowMenu.animateAVCSD('height', h2, null, null, 75);
+    }
+
+    function leaveSelection (event) {
+      if (!$(event.toElement).is($showMenu) && !$('#RowMenuContainer').length) {
+        $RowDrill.animateAVCSD('height', 6, null, null, 75);
+        $RowMenu.animateAVCSD('height', 6, null, null, 75);
+      }
+    }
+
+    function clickRowMenu() {
+      if ($('#RowMenuContainer').length) {
+        removeMenu();
+        return;
+      }
+
+      var menus = that.model.table.selectionMenus;
+      if (menus && menus.length > 0) {
+        // create 2 container, animate do not allow overflow
+        var $RowMenuContainer = $RowMenu.beforeDiv('RowMenuContainer')
+          .css('left', left + 16).css('top', top);
+
+        $showMenu = $showMenu.add($RowMenuContainer);
+
+        // create menu-item and menu-button
+        for (var i = 0; i < menus.length; i++) {
+          if (menus[i].iconId) {
+            $RowMenuContainer.appendDiv('', 'menu-button')
+              .attr('id', menus[i].id)
+              .attr('data-icon', menus[i].iconId)
+              .attr('data-label', menus[i].text)
+              .on('click', '', onMenuItemClicked)
+              .hover(onHoverIn, onHoverOut);
+          } else {
+            $RowMenuContainer.appendDiv('', 'menu-item', menus[i].text)
+            .attr('id', menus[i].id)
+            .on('click', '', onMenuItemClicked);
+          }
+        }
+
+        // wrap menu-buttons and add one div for label
+        $('.menu-button', $RowMenuContainer).wrapAll('<div id="MenuButtons"></div>');
+        $('#MenuButtons', $RowMenuContainer).appendDiv('MenuButtonsLabel');
+        $RowMenuContainer.append($('#MenuButtons', $RowMenuContainer));
+
+        // animated opening
+        var h = $RowMenuContainer.outerHeight();
+        $RowMenuContainer.css('height', 0).animateAVCSD('height', h);
+
+        var t = parseInt($RowMenu.css('top'), 0);
+        $RowMenu.css('top', t).animateAVCSD('top', t + h - 2);
+
+        // TODO cru; every user action will close menu
+        //$('*').one('mousedown keydown mousewheel', removeMenu);
+      }
+
+
+      function onHoverIn () {
+        $('#MenuButtonsLabel').text($(this).data('label'));
+      }
+
+      function onHoverOut () {
+        $('#MenuButtonsLabel').text('');
+      }
+
+      function onMenuItemClicked () {
+      }
+
+      function removeMenu () {
+        var $RowMenuContainer = $('#RowMenuContainer'),
+          h = $RowMenuContainer.outerHeight();
+
+        $RowMenuContainer.animateAVCSD('height', 0, $.removeThis);
+
+        var t = parseInt($RowMenu.css('top'), 0);
+        $RowMenu.css('top', t).animateAVCSD('top', t - h + 2);
+      }
     }
   }
-
 };
 
 Scout.DesktopTable.prototype.getValue = function(col, row) {
@@ -993,7 +1083,6 @@ Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, drag
 };
 
 Scout.DesktopTable.prototype._controlIn = function($control) {
-  log($control);
   var close = $control.hasClass('selected') ? ' schliessen' : '';
   this._$controlLabel.text($control.data('label') + close);
 };
