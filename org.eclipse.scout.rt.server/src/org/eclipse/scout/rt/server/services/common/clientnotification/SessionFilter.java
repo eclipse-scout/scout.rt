@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.server.ThreadContext;
 public class SessionFilter implements IClientNotificationFilter {
   private static final long serialVersionUID = 1L;
   private transient WeakReference<IServerSession> m_sessionRef;
-  private long m_validUntil;
+  private final long m_validUntil;
 
   public SessionFilter(IServerSession session, long timeout) {
     m_sessionRef = new WeakReference<IServerSession>(session);

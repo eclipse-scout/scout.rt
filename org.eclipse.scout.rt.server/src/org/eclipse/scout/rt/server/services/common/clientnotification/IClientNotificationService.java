@@ -39,4 +39,6 @@ public interface IClientNotificationService extends IService {
   void addClientNotificationQueueListener(IClientNotificationQueueListener listener);
 
   void removeClientNotificationQueueListener(IClientNotificationQueueListener listener);
+
+  void ackNotifications(Set<String> notificationIds);
 }

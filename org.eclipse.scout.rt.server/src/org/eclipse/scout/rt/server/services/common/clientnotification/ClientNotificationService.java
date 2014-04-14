@@ -51,4 +51,9 @@ public class ClientNotificationService extends AbstractService implements IClien
     m_clientNotificationQueue.removeClientNotificationQueueListener(listener);
   }
 
+  @Override
+  public void ackNotifications(Set<String> notificationIds) {
+    m_clientNotificationQueue.ackNotifications(notificationIds);
+  }
+
 }

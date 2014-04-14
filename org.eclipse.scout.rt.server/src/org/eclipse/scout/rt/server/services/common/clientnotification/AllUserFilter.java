@@ -18,7 +18,7 @@ import java.util.Date;
  */
 public class AllUserFilter implements IClientNotificationFilter {
   private static final long serialVersionUID = 1L;
-  private long m_validUntil;
+  private final long m_validUntil;
 
   public AllUserFilter(long timeout) {
     m_validUntil = System.currentTimeMillis() + timeout;

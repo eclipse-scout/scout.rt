@@ -166,6 +166,11 @@ public class DefaultTransactionDelegate {
         return serviceRes;
       }
     }
+    Set<String> consumedNotifications = serviceReq.getConsumedNotifications();
+    if (consumedNotifications != null && consumedNotifications.size() > 0) {
+      IClientNotificationService notificationService = SERVICES.getService(IClientNotificationService.class);
+      notificationService.ackNotifications(consumedNotifications);
+    }
     CallInspector callInspector = null;
     SessionInspector sessionInspector = ProcessInspector.getDefault().getSessionInspector(serverSession, true);
     if (sessionInspector != null) {

@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.services.common.clientnotification.internal;
 
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -28,26 +30,33 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.service.AbstractService;
 
+/**
+ * * A service to dispatch incoming client notifications (from the server) to
+ * {@link IClientNotificationConsumerListener} listeners.
+ * <p>
+ * Keeps track of consumed notification ids until the notification expires. Listeners are only notified once that a
+ * notification is arrived.
+ * </p>
+ */
 @Priority(-3)
 public class ClientNotificationConsumerService extends AbstractService implements IClientNotificationConsumerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationConsumerService.class);
   private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";
 
-  private final EventListenerList m_globalListenerList = new EventListenerList();
-
-  public ClientNotificationConsumerService() {
-  }
+  private final ServiceState m_globalServiceState = new ServiceState();
 
   private ServiceState getServiceState(IClientSession session) {
     if (session == null) {
       throw new IllegalStateException("session is null");
     }
-    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
-    if (data == null) {
-      data = new ServiceState();
-      session.setData(SESSION_DATA_KEY, data);
+    synchronized (session) {
+      ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+      if (data == null) {
+        data = new ServiceState();
+        session.setData(SESSION_DATA_KEY, data);
+      }
+      return data;
     }
-    return data;
   }
 
   @Override
@@ -58,71 +67,127 @@ public class ClientNotificationConsumerService extends AbstractService implement
     }
     if (ClientJob.getCurrentSession() == session) {
       // we are sync
-      for (IClientNotification n : notifications) {
-        fireEvent(session, n, true);
-      }
+      fireEvent(session, notifications, true);
     }
     else {
       // async
       new ClientAsyncJob("Dispatch client notifications", session) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          for (IClientNotification n : notifications) {
-            fireEvent(session, n, false);
-          }
+          fireEvent(session, notifications, false);
         }
       }.schedule();
     }
   }
 
+  private void fireEvent(final IClientSession session, final Set<IClientNotification> notifications, boolean sync) {
+    getServiceState(session).fireEvent(notifications, sync, this);
+    m_globalServiceState.fireEvent(notifications, sync, this);
+  }
+
   @Override
   public void addClientNotificationConsumerListener(IClientSession session, IClientNotificationConsumerListener listener) {
-    getServiceState(session).m_listenerList.add(IClientNotificationConsumerListener.class, listener);
+    getServiceState(session).addListener(listener);
   }
 
   @Override
   public void removeClientNotificationConsumerListener(IClientSession session, IClientNotificationConsumerListener listener) {
-    getServiceState(session).m_listenerList.remove(IClientNotificationConsumerListener.class, listener);
+    getServiceState(session).removeListener(listener);
   }
 
   @Override
   public void addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
-    m_globalListenerList.add(IClientNotificationConsumerListener.class, listener);
+    m_globalServiceState.addListener(listener);
   }
 
   @Override
   public void removeGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
-    m_globalListenerList.remove(IClientNotificationConsumerListener.class, listener);
+    m_globalServiceState.removeListener(listener);
   }
 
-  private void fireEvent(IClientSession session, IClientNotification notification, boolean sync) {
-    ClientNotificationConsumerEvent e = new ClientNotificationConsumerEvent(this, notification);
-    IClientNotificationConsumerListener[] globalListeners = m_globalListenerList.getListeners(IClientNotificationConsumerListener.class);
-    IClientNotificationConsumerListener[] listeners = getServiceState(session).m_listenerList.getListeners(IClientNotificationConsumerListener.class);
-    if (globalListeners != null) {
-      for (IClientNotificationConsumerListener listener : globalListeners) {
-        try {
-          listener.handleEvent(e, sync);
-        }
-        catch (Throwable t) {
-          LOG.error("Listener " + listener.getClass().getName() + " on event " + notification, t);
-        }
-      }
-    }
-    if (listeners != null) {
-      for (IClientNotificationConsumerListener listener : listeners) {
-        try {
-          listener.handleEvent(e, sync);
-        }
-        catch (Throwable t) {
-          LOG.error("Listener " + listener.getClass().getName() + " on event " + notification, t);
-        }
-      }
-    }
+  @Override
+  public Set<String> getConsumedNotificationIds(final IClientSession session) {
+    return getServiceState(session).getConsumedIds();
   }
 
+  @Override
+  public Set<String> getGlobalConsumedNotificationIds() {
+    return m_globalServiceState.getConsumedIds();
+  }
+
+  public void removeConsumedNotificationIds(final Set<String> cnIds, final IClientSession session) {
+    getServiceState(session).removeConsumedIds(cnIds);
+  }
+
+  public void removeGlobalConsumedNotificationIds(final Set<String> cnIds) {
+    m_globalServiceState.removeConsumedIds(cnIds);
+  }
+
+  /**
+   * Stores already consumed notification ids and registered listeners.
+   */
   private static class ServiceState {
-    EventListenerList m_listenerList = new EventListenerList();
+    private final EventListenerList m_listenerList = new EventListenerList();
+
+    private final ConcurrentHashMap<String/*notification id*/, Long /*timeout*/> m_consumedIds = new ConcurrentHashMap<String, Long>();
+
+    public Set<String> getConsumedIds() {
+      return CollectionUtility.unmodifiableSetCopy(m_consumedIds.keySet());
+    }
+
+    public void removeConsumedIds(Collection<String> cnIds) {
+      for (String id : cnIds) {
+        m_consumedIds.remove(id);
+      }
+    }
+
+    public void addListener(IClientNotificationConsumerListener listener) {
+      m_listenerList.add(IClientNotificationConsumerListener.class, listener);
+    }
+
+    public void removeListener(IClientNotificationConsumerListener listener) {
+      m_listenerList.remove(IClientNotificationConsumerListener.class, listener);
+    }
+
+    public void fireEvent(final Set<IClientNotification> notifications, boolean sync, IClientNotificationConsumerService service) {
+      for (IClientNotification n : notifications) {
+        ClientNotificationConsumerEvent event = new ClientNotificationConsumerEvent(service, n);
+        fireEvent(n, sync, event);
+      }
+      cleanupExpiredNotifications();
+    }
+
+    private void fireEvent(IClientNotification notification, boolean sync, ClientNotificationConsumerEvent e) {
+      Long validUntil = Long.valueOf(System.currentTimeMillis() + notification.getTimeout());
+      Long previousValue = m_consumedIds.putIfAbsent(notification.getId(), validUntil);
+      if (previousValue == null) {
+        fireEventInternal(notification, sync, e);
+      }
+    }
+
+    private void fireEventInternal(IClientNotification notification, boolean sync, ClientNotificationConsumerEvent e) {
+      IClientNotificationConsumerListener[] listeners = m_listenerList.getListeners(IClientNotificationConsumerListener.class);
+      for (IClientNotificationConsumerListener l : listeners) {
+        try {
+          l.handleEvent(e, sync);
+        }
+        catch (Throwable t) {
+          LOG.error("Listener " + l.getClass().getName() + " on event " + notification, t);
+        }
+      }
+    }
+
+    private void cleanupExpiredNotifications() {
+      for (Entry<String, Long> e : m_consumedIds.entrySet()) {
+        if (isExpired(e.getValue())) {
+          m_consumedIds.remove(e.getKey());
+        }
+      }
+    }
+
+    private boolean isExpired(long validUntil) {
+      return System.currentTimeMillis() >= validUntil;
+    }
   }
 
 }

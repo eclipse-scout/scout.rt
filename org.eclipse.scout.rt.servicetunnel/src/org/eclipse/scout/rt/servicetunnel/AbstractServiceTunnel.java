@@ -91,6 +91,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
       call.setClientSubject(m_session.getSubject());
       call.setVirtualSessionId(m_session.getVirtualSessionId());
       call.setUserAgent(m_session.getUserAgent().createIdentifier());
+      decorateServiceRequest(call);
       //
       ServiceTunnelResponse response = tunnel(call);
       // check if response is interrupted (incomplete /null=interrupted)
@@ -134,6 +135,12 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         throw new ProcessingException(serviceInterfaceClass.getSimpleName() + "." + operation.getName() + "(" + VerboseUtility.dumpObjects(callerArgs) + ")", t);
       }
     }
+  }
+
+  /**
+   * Override this method to do additional things before the service is called
+   */
+  protected void decorateServiceRequest(ServiceTunnelRequest call) {
   }
 
   /**

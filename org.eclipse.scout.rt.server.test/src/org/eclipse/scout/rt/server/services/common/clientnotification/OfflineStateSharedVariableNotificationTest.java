@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -224,7 +225,7 @@ public class OfflineStateSharedVariableNotificationTest {
    * A client notification service for testing purposes.
    */
   private static class MockClientNotificationService extends AbstractService implements IClientNotificationService {
-    private Set<IClientNotification> m_notifications;
+    private final Set<IClientNotification> m_notifications;
 
     public MockClientNotificationService() {
       m_notifications = new HashSet<IClientNotification>();
@@ -232,9 +233,7 @@ public class OfflineStateSharedVariableNotificationTest {
 
     @Override
     public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
-      Set<IClientNotification> result = CollectionUtility.hashSetWithoutNullElements(m_notifications);
-      m_notifications.clear();
-      return result;
+      return CollectionUtility.hashSetWithoutNullElements(m_notifications);
     }
 
     @Override
@@ -250,6 +249,17 @@ public class OfflineStateSharedVariableNotificationTest {
     @Override
     public void removeClientNotificationQueueListener(IClientNotificationQueueListener listener) {
       throw new AssertionError("Should not be called during this test");
+    }
+
+    @Override
+    public void ackNotifications(Set<String> notificationIds) {
+      Iterator<IClientNotification> it = m_notifications.iterator();
+      while (it.hasNext()) {
+        IClientNotification cnf = it.next();
+        if (notificationIds.contains(cnf.getId())) {
+          it.remove();
+        }
+      }
     }
 
   }

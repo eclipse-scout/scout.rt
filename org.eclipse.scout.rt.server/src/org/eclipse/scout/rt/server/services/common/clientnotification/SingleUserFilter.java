@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.server.ThreadContext;
  */
 public class SingleUserFilter implements IClientNotificationFilter {
   private static final long serialVersionUID = 1L;
-  private String m_userId;
-  private long m_validUntil;
+  private final String m_userId;
+  private final long m_validUntil;
 
   public SingleUserFilter(String userId, long timeout) {
     m_userId = userId;

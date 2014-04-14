@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,9 +19,9 @@ public class ClientNotificationQueueEvent implements Serializable {
 
   public static final int TYPE_NOTIFICATION_ADDED = 10;
 
-  private int m_type;
-  private IClientNotification m_notification;
-  private IClientNotificationFilter m_filter;
+  private final int m_type;
+  private final IClientNotification m_notification;
+  private final IClientNotificationFilter m_filter;
 
   public ClientNotificationQueueEvent(IClientNotification notification, IClientNotificationFilter filter, int type) {
     m_notification = notification;

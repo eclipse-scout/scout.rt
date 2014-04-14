@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,19 +15,25 @@ import java.io.Serializable;
 /**
  * Client notifications are used to trigger events from the server to the client
  * (reverse HTTP) <br>
- * These notifications are collected on the server side in a {@link ClientNotificationQueue} /
- * {@link J2eeClientNotificationQueue} and
- * fetched by the {@link ClientNotificationConsumer} using {@link IClientNotificationService} with intelligent polling
- * Note that client
- * notifications must be serializable because they are transferred between
- * server and client. <br>
- * All client notifications must therefore be defined in "shared" plugins known
- * by server and client.
+ * These notifications are collected on the server side in a {@link ClientNotificationQueue} and
+ * fetched by the {@link ClientNotificationConsumer} using {@link IClientNotificationService} with intelligent polling. <br>
+ * Note that client notifications must be serializable because they are transferred between server and client. <br>
+ * All client notifications must therefore be defined in "shared" plugins known by server and client.
  * <p>
  * Examples:
  * <code>AccessControlChangedNotification, SharedContextChangedNotification, CodeTypeChangedNotification</code>
  */
 public interface IClientNotification extends Serializable {
+
+  /**
+   * @return the unique id of this notification.
+   */
+  String getId();
+
+  /**
+   * @return the timeout in ms. After this timeout the notification is expired.
+   */
+  long getTimeout();
 
   /**
    * Merge with other notifications of the same type Same type means

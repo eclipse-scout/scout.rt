@@ -27,14 +27,14 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
 /**
- * element type used in CTIStateCache
+ * Serverside blocking queue to keep track of pending client notifications.
  */
 public class ClientNotificationQueue {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationQueue.class);
-  private EventListenerList m_listenerList = new EventListenerList();
+  private final EventListenerList m_listenerList = new EventListenerList();
 
-  private LinkedList<QueueElement> m_queue;
-  private Object m_queueLock = new Object();
+  private final LinkedList<QueueElement> m_queue;
+  private final Object m_queueLock = new Object();
 
   public ClientNotificationQueue() {
     m_queue = new LinkedList<QueueElement>();
@@ -51,22 +51,21 @@ public class ClientNotificationQueue {
       LOG.debug("put " + notification + " for " + filter);
     }
     synchronized (m_queueLock) {
-      for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
-        QueueElement e = it.next();
-        if (!e.getFilter().isActive()) {
-          it.remove();
-        }
-        else if (e.getClientNotification() == notification) {
-          it.remove();
-        }
-        else if (e.getClientNotification().getClass() == notification.getClass() && filter.equals(e.getFilter()) && notification.coalesce(e.getClientNotification())) {
-          it.remove();
-        }
-      }
-      m_queue.add(new QueueElement(notification, filter));
+      QueueElement newElem = new QueueElement(notification, filter);
+      replaceExistingElements(newElem);
+      m_queue.add(newElem);
       m_queueLock.notifyAll();
     }
     fireEvent(notification, filter);
+  }
+
+  private void replaceExistingElements(QueueElement newElem) {
+    for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
+      QueueElement existingElem = it.next();
+      if (!existingElem.isActive() || existingElem.isReplacableBy(newElem)) {
+        it.remove();
+      }
+    }
   }
 
   public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
@@ -75,24 +74,14 @@ public class ClientNotificationQueue {
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
+          IServerSession serverSession = ThreadContext.getServerSession();
           for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
             QueueElement e = it.next();
-            if (e.getFilter().isActive()) {
-              IServerSession serverSession = ThreadContext.getServerSession();
-              if (!e.isConsumedBy(serverSession)) {
-                if (e.getFilter().accept()) {
-                  list.add(e.getClientNotification());
-                  if (e.getFilter().isMulticast()) {
-                    e.setConsumedBy(serverSession);
-                  }
-                  else {
-                    it.remove();
-                  }
-                }
-              }
-            }
-            else {
+            if (!e.isActive()) {
               it.remove();
+            }
+            else if (e.isConsumable(serverSession)) {
+              list.add(e.getClientNotification());
             }
           }
         }
@@ -113,15 +102,17 @@ public class ClientNotificationQueue {
   }
 
   private class QueueElement {
-    private IClientNotification m_notification;
-    private IClientNotificationFilter m_filter;
-    private Object m_consumedBySessionsLock;
+    private final IClientNotification m_notification;
+    private final IClientNotificationFilter m_filter;
+    private final Object m_consumedBySessionsLock;
     private WeakHashMap<IServerSession, Object> m_consumedBySessions;
+    private final long m_valid_until;
 
     public QueueElement(IClientNotification notification, IClientNotificationFilter filter) {
       m_notification = notification;
       m_filter = filter;
       m_consumedBySessionsLock = new Object();
+      m_valid_until = System.currentTimeMillis() + notification.getTimeout();
     }
 
     public IClientNotification getClientNotification() {
@@ -130,6 +121,26 @@ public class ClientNotificationQueue {
 
     public IClientNotificationFilter getFilter() {
       return m_filter;
+    }
+
+    public boolean isActive() {
+      return !isExpired() && m_filter.isActive();
+    }
+
+    private boolean isExpired() {
+      return System.currentTimeMillis() >= m_valid_until;
+    }
+
+    private boolean isReplacableBy(QueueElement newElem) {
+      return (m_notification == newElem.getClientNotification())
+          || (
+          newElem.getClientNotification().getClass() == m_notification.getClass()
+              && newElem.getFilter().equals(m_filter)
+              && newElem.getClientNotification().coalesce(m_notification));
+    }
+
+    private boolean isConsumable(IServerSession serverSession) {
+      return isActive() && !isConsumedBy(serverSession) && m_filter.accept();
     }
 
     /**
@@ -141,10 +152,6 @@ public class ClientNotificationQueue {
       if (session == null) {
         return false;
       }
-      if (m_consumedBySessions == null) {
-        return false;
-      }
-      //
       synchronized (m_consumedBySessionsLock) {
         if (m_consumedBySessions != null) {
           return m_consumedBySessions.containsKey(session);
@@ -183,9 +190,25 @@ public class ClientNotificationQueue {
 
   private void fireEvent(IClientNotification notification, IClientNotificationFilter filter) {
     IClientNotificationQueueListener[] listeners = m_listenerList.getListeners(IClientNotificationQueueListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        (listeners[i]).queueChanged(new ClientNotificationQueueEvent(notification, filter, ClientNotificationQueueEvent.TYPE_NOTIFICATION_ADDED));
+    for (IClientNotificationQueueListener l : listeners) {
+      l.queueChanged(new ClientNotificationQueueEvent(notification, filter, ClientNotificationQueueEvent.TYPE_NOTIFICATION_ADDED));
+    }
+  }
+
+  public void ackNotifications(Set<String> consumedNotificationIds) {
+    synchronized (m_queueLock) {
+      if (!m_queue.isEmpty()) {
+        IServerSession serverSession = ThreadContext.getServerSession();
+        for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
+          QueueElement e = it.next();
+          if (e.isConsumable(serverSession)
+              && consumedNotificationIds.contains(e.getClientNotification().getId())) {
+            e.setConsumedBy(serverSession);
+            if (!e.getFilter().isMulticast()) {
+              it.remove();
+            }
+          }
+        }
       }
     }
   }

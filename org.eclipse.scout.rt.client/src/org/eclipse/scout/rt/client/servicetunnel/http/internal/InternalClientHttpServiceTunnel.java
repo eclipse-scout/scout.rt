@@ -96,6 +96,14 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   }
 
   @Override
+  protected void decorateServiceRequest(ServiceTunnelRequest call) {
+    IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
+    if (cns != null) {
+      call.setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
+    }
+  }
+
+  @Override
   protected void onInvokeService(long t0, ServiceTunnelResponse response) {
     // performance analyzer
     IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
