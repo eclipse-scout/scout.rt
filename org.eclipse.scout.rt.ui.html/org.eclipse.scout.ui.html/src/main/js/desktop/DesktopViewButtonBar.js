@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopViewButtonBar = function(scout, $parent, viewButtons) {
+scout.DesktopViewButtonBar = function(session, $parent, viewButtons) {
   this.$div;
 
   //  create container
@@ -10,7 +10,7 @@ Scout.DesktopViewButtonBar = function(scout, $parent, viewButtons) {
 
   //  add view-item, all before #viewAdd
   for (var i = 0; i < viewButtons.length; i++) {
-    new Scout.DesktopViewButton(scout, $desktopView, viewButtons[i]);
+    new scout.DesktopViewButton(session, $desktopView, viewButtons[i]);
   }
 
   //  create logo and plus sign
@@ -25,7 +25,7 @@ Scout.DesktopViewButtonBar = function(scout, $parent, viewButtons) {
       "id": "ownView" + c,
       "text": name[0] + ' (' + c + ')'
     };
-    new Scout.DesktopViewButtonOwn(scout, $desktopView, viewButton);
+    new scout.DesktopViewButtonOwn(session, $desktopView, viewButton);
   }
 
 };

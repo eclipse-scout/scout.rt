@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Session = function($entryPoint, sessionPartId) {
+scout.Session = function($entryPoint, sessionPartId) {
   this.widgetMap = {};
   this.locale;
   this.$entryPoint = $entryPoint;
@@ -24,8 +24,8 @@ Scout.Session = function($entryPoint, sessionPartId) {
  * the events are collected and sent in one request at the end of the user interaction
  *
  */
-Scout.Session.prototype.send = function(type, id, data) {
-  this._asyncEvents.push(new Scout.Event(type, id, data));
+scout.Session.prototype.send = function(type, id, data) {
+  this._asyncEvents.push(new scout.Event(type, id, data));
   if (!this._asyncRequestQueued) {
     var that = this;
     setTimeout(function() {
@@ -38,7 +38,7 @@ Scout.Session.prototype.send = function(type, id, data) {
   }
 };
 
-Scout.Session.prototype._sendNow = function(events, deferred) {
+scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
     events: events,
     sessionPartId: this._sessionPartId
@@ -72,7 +72,7 @@ Scout.Session.prototype._sendNow = function(events, deferred) {
   });
 };
 
-Scout.Session.prototype.listen = function() {
+scout.Session.prototype.listen = function() {
   if (!this._deferred) {
     this._deferred = $.Deferred();
     this._deferredEventTypes = [];
@@ -80,16 +80,16 @@ Scout.Session.prototype.listen = function() {
   return this._deferred;
 };
 
-Scout.Session.prototype.areEventsQueued = function() {
+scout.Session.prototype.areEventsQueued = function() {
   return this._asyncEvents.length > 0;
 };
 
-Scout.Session.prototype.areRequestsPending = function() {
+scout.Session.prototype.areRequestsPending = function() {
   return this._requestsPendingCounter > 0;
 };
 
-Scout.Session.prototype._processEvents = function(events) {
-  var scout = this;
+scout.Session.prototype._processEvents = function(events) {
+  var session = this;
   for (var i = 0; i < events.length; i++) {
     var event = events[i],
       widgetId;
@@ -100,7 +100,7 @@ Scout.Session.prototype._processEvents = function(events) {
       widgetId = event.id;
     }
 
-    var widget = scout.widgetMap[widgetId];
+    var widget = session.widgetMap[widgetId];
     if (!widget) {
       throw "No widget found for id " + widgetId;
     }
@@ -120,17 +120,17 @@ Scout.Session.prototype._processEvents = function(events) {
   }
 };
 
-Scout.Session.prototype.init = function() {
+scout.Session.prototype.init = function() {
   // create all widgets for entry point
   this.send('startup', this._sessionPartId);
 };
 
-Scout.Session.prototype.onModelAction = function(event) {
+scout.Session.prototype.onModelAction = function(event) {
   if (event.type_ == 'initialized') {
-    this.locale = new Scout.Locale(event.locale);
-    new Scout.Desktop(this, this.$entryPoint, event.desktop);
+    this.locale = new scout.Locale(event.locale);
+    new scout.Desktop(this, this.$entryPoint, event.desktop);
   } else if (event.type_ == 'localeChanged') {
-    this.locale = new Scout.Locale(event);
+    this.locale = new scout.Locale(event);
     //FIXME inform components to reformat display text?
   }
 };

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.security.AccessController;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -164,6 +165,8 @@ public abstract class AbstractJsonSession implements IJsonSession {
 
   protected void processEvent(JsonEvent event, JsonResponse res) {
     final String id = event.getEventId();
+    DecimalFormat format = new DecimalFormat();
+    format.toLocalizedPattern();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
       throw new JsonUIException("No renderer found for id " + id);

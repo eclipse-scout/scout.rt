@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.MenuTable = function(desktopTable, x, y) {
+scout.MenuTable = function(desktopTable, x, y) {
 
   $('.header-menu').remove();
   $('body').off('mousedown.remove');

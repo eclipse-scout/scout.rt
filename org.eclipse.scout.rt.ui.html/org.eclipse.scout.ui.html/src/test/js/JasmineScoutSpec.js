@@ -6,9 +6,9 @@ describe("JasmineScout", function() {
     function createRequestDataFixture() {
       var requestData = {};
       requestData.events = [];
-      requestData.events.push(new Scout.Event('event1', 1));
-      requestData.events.push(new Scout.Event('event2', 1));
-      requestData.events.push(new Scout.Event('event3', 1));
+      requestData.events.push(new scout.Event('event1', 1));
+      requestData.events.push(new scout.Event('event2', 1));
+      requestData.events.push(new scout.Event('event3', 1));
 
       return requestData;
     }

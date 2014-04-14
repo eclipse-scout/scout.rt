@@ -10,14 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
@@ -28,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonClientSession.class);
+
   private ILocaleListener m_localeListener;
   private boolean m_localeManagedByModel;
   private JsonDesktop m_jsonDesktop;
@@ -133,8 +142,8 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     try {
       jsonObject.put("months", new JSONArray(symbols.getMonths()));
       jsonObject.put("monthsShort", new JSONArray(symbols.getShortMonths()));
-      jsonObject.put("weekdays", new JSONArray(symbols.getWeekdays()));
-      jsonObject.put("weekdaysShort", new JSONArray(symbols.getShortWeekdays()));
+      jsonObject.put("weekdays", new JSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
+      jsonObject.put("weekdaysShort", new JSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
       jsonObject.put("am", symbols.getAmPmStrings()[Calendar.AM]);
       jsonObject.put("pm", symbols.getAmPmStrings()[Calendar.PM]);
     }
@@ -147,13 +156,37 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   protected JSONObject localeToJson(Locale locale) throws JsonUIException {
     JSONObject jsonObject = new JSONObject();
     try {
-      jsonObject.put("decimalFormatSymbols", decimalFormatSymbolsToJson(new DecimalFormatSymbols(locale)));
-      jsonObject.put("dateFormatSymbols", dateFormatSymbolsToJson(new DateFormatSymbols(locale)));
+      DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
+      SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
+      jsonObject.put("decimalFormatPatternDefault", defaultDecimalFormat.toLocalizedPattern());
+      jsonObject.put("dateFormatPatternDefault", defaultDateFormat.toPattern());
+      jsonObject.put("decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
+      jsonObject.put("dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
     }
     return jsonObject;
+  }
+
+  private static DecimalFormat getDefaultDecimalFormat(Locale locale) {
+    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+    if (numberFormat instanceof DecimalFormat) {
+      return (DecimalFormat) numberFormat;
+    }
+
+    LOG.info("No locale specific decimal format available, using default locale");
+    return new DecimalFormat();
+  }
+
+  private static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
+    DateFormat format = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+    if (format instanceof SimpleDateFormat) {
+      return (SimpleDateFormat) format;
+    }
+
+    LOG.info("No locale specific date format available, using default locale");
+    return new SimpleDateFormat();
   }
 
   private class P_LocaleListener implements ILocaleListener {

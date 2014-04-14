@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable) {
+scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
   // group functions for dates
   // todo
   var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
@@ -67,7 +67,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable) {
     .click(drawChart);
 
   // find best x and y axis: best is 9 different entries
-  var matrix = new Scout.DesktopMatrix(desktopTable),
+  var matrix = new scout.DesktopMatrix(session, desktopTable),
     columnCount = matrix.columnCount(),
     comp = function(a, b) {
       return Math.abs(a[1] - 9) - Math.abs(b[1] - 9);
@@ -249,7 +249,7 @@ Scout.DesktopTableChart = function(scout, $controlContainer, desktopTable) {
       dataSum = $('.selected', $dataSelect).hasClass('data-sum');
 
     // build matrix
-    var matrix = new Scout.DesktopMatrix(desktopTable),
+    var matrix = new scout.DesktopMatrix(session, desktopTable),
       dataAxis = matrix.addData(data, dataCount ? -1 : (dataSum ? 1 : 2));
 
     xAxis = matrix.addAxis(axis, axisGroup);

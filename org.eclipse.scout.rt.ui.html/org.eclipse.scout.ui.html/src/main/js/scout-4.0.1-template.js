@@ -2,8 +2,12 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 //
 
+//@include("src/main/js/jquery-scout.js");
+
+// protects $ and undefined from being redefined by another library
+(function(scout, $, undefined) {
+
 //@include("src/main/js/util/arrays.js");
-//@include("src/main/js/Scout.js");
 //@include("src/main/js/Session.js");
 //@include("src/main/js/Event.js");
 //@include("src/main/js/Locale.js");
@@ -28,3 +32,6 @@
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");
+
+
+}(window.scout = window.scout || {}, jQuery));

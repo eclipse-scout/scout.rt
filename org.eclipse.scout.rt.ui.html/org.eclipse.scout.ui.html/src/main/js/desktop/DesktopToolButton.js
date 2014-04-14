@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopToolButton = function(scout, $desktop, toolButtons) {
+scout.DesktopToolButton = function(session, $desktop, toolButtons) {
   this.$div;
 
   // create container

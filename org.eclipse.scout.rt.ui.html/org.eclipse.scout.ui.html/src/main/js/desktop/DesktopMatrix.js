@@ -1,7 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopMatrix = function(desktopTable) {
+scout.DesktopMatrix = function(session, desktopTable) {
+  this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
   this._columns = desktopTable.model.table.columns;
@@ -12,8 +13,9 @@ Scout.DesktopMatrix = function(desktopTable) {
 /**
  * add data axis
  */
-Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
-  var dataAxis = [];
+scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
+  var dataAxis = [],
+    locale = this.locale;
 
   // collect all axis
   this._allData.push(dataAxis);
@@ -23,7 +25,7 @@ Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
 
   // data always is number
   dataAxis.format = function(n) {
-    return $.numberToString(n, 0);
+    return locale.decimalFormat.format(n);
   };
 
   // count, sum, avg
@@ -58,8 +60,9 @@ Scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
 };
 
 //add x or y Axis
-Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
-  var keyAxis = [];
+scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
+  var keyAxis = [],
+    locale = this.locale;
 
   // collect all axis
   this._allAxis.push(keyAxis);
@@ -87,16 +90,16 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
         }
       };
       keyAxis.format = function(n) {
-        return $.dateToString(new Date(n));
+        return locale.dateFormat.format(n);
       };
     } else if (axisGroup === 1) {
       keyAxis.norm = function(f) {
         if (f) {
-          return (new Date(f).getDay() + 6) % 7;
+          return (new Date(f).getDay() + 6) % 7; //start with monday
         }
       };
       keyAxis.format = function(n) {
-        return $.WEEKDAY_LONG[n];
+        return locale.dateFormatSymbols.weekdays[(n + 1) % 7];
       };
     } else if (axisGroup === 2) {
       keyAxis.norm = function(f) {
@@ -105,7 +108,7 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
         }
       };
       keyAxis.format = function(n) {
-        return $.MONTH_LONG[n];
+        return locale.dateFormatSymbols.months[n];
       };
     } else if (axisGroup === 3) {
       keyAxis.norm = function(f) {
@@ -122,7 +125,7 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
       return parseFloat(f);
     };
     keyAxis.format = function(n) {
-      return $.numberToString(n, 0);
+      return locale.decimalFormat.format(n);
     };
   } else {
     keyAxis.norm = function(f) {
@@ -145,7 +148,7 @@ Scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
   return keyAxis;
 };
 
-Scout.DesktopMatrix.prototype.calculateCube = function() {
+scout.DesktopMatrix.prototype.calculateCube = function() {
   var cube = {},
     r, v, k, data, key;
 
@@ -239,7 +242,7 @@ Scout.DesktopMatrix.prototype.calculateCube = function() {
   return cube;
 };
 
-Scout.DesktopMatrix.prototype.columnCount = function() {
+scout.DesktopMatrix.prototype.columnCount = function() {
   var colCount = [];
 
   for (var c = 0; c < this._columns.length; c++) {

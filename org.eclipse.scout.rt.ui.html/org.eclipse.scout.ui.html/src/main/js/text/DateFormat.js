@@ -2,20 +2,33 @@
  *
  * Converts milliseconds to string using java format pattern.<br/>
  * It does not consider timezones.
+ * <p>
+ * locale.dateFormatSymbols contains:
+ * <ul>
+ * <li>weekdays start with Sunday (starts at 0 and not 1 as it does in java)</li>
+ * <li>weekdaysShort start with Sunday (starts at 0 and not 1 as it does in java)</li>
+ * <li>months start with January</li>
+ * <li>monthsShort start with January<7li>
+ * <li>am</li>
+ * <li>pm</li>
+ *</ul>
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-Scout.DateFormat = function(scout, pattern) {
+scout.DateFormat = function(locale, pattern) {
   /*jshint sub:true*/
+  if (!pattern) {
+    pattern = locale.dateFormatPatternDefault;
+  }
 
-  this._symbols = scout.locale.dateFormatSymbols;
+  this._symbols = locale.dateFormatSymbols;
   this.formatFunc = [];
   this.pattern = pattern;
 
-  var patterLibrary = {};
+  var patternLibrary = {};
 
   var that = this;
-  patterLibrary['year'] = [{
+  patternLibrary['year'] = [{
     term: 'yyyy',
     func: function(date) {
       return String(date.getFullYear());
@@ -27,7 +40,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['month'] = [{
+  patternLibrary['month'] = [{
     term: 'MMMM',
     func: function(date) {
       return that._symbols.months[date.getMonth()];
@@ -49,7 +62,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['week in year'] = [{
+  patternLibrary['week in year'] = [{
     term: 'ww',
     func: function(date) {
       return _padding(_weekInYear(date));
@@ -61,7 +74,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['week in month'] = [{
+  patternLibrary['week in month'] = [{
     term: 'WW',
     func: function(date) {
       return _padding(_weekInMonth(date));
@@ -73,7 +86,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['day in month'] = [{
+  patternLibrary['day in month'] = [{
     term: 'dd',
     func: function(date) {
       return _padding(date.getDate());
@@ -85,19 +98,19 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['weekday'] = [{
+  patternLibrary['weekday'] = [{
     term: 'EEEE',
     func: function(date) {
-      return that._symbols.weekdays[date.getDay() + 1];
+      return that._symbols.weekdays[date.getDay()];
     }
   }, {
     term: 'E',
     func: function(date) {
-      return that._symbols.weekdaysShort[date.getDay() + 1];
+      return that._symbols.weekdaysShort[date.getDay()];
     }
   }];
 
-  patterLibrary['hour: 0 - 23'] = [{
+  patternLibrary['hour: 0 - 23'] = [{
     term: 'HH',
     func: function(date) {
       return _padding(date.getHours());
@@ -109,7 +122,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['hour: 1 - 12'] = [{
+  patternLibrary['hour: 1 - 12'] = [{
     term: 'KK',
     func: function(date) {
       return _padding((date.getHours() + 11) % 12 + 1);
@@ -121,14 +134,14 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['am/pm marker'] = [{
+  patternLibrary['am/pm marker'] = [{
     term: 'a',
     func: function(date) {
       return (date.getHours() < 12) ? that._symbols.am : that._symbols.pm;
     }
   }];
 
-  patterLibrary['minutes'] = [{
+  patternLibrary['minutes'] = [{
     term: 'mm',
     func: function(date) {
       return _padding(date.getMinutes());
@@ -140,7 +153,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['seconds'] = [{
+  patternLibrary['seconds'] = [{
     term: 'ss',
     func: function(date) {
       return _padding(date.getSeconds());
@@ -152,7 +165,7 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-  patterLibrary['milliseconds'] = [{
+  patternLibrary['milliseconds'] = [{
     term: 'SSS',
     func: function(date) {
       return ('000' + date.getMilliseconds()).slice(-3);
@@ -164,16 +177,15 @@ Scout.DateFormat = function(scout, pattern) {
     }
   }];
 
-
   var createHandler = function(term, func) {
     return function(string, date) {
       return string.replace(term, func(date));
     };
   };
 
-  for (var l in patterLibrary) {
-    for (var p = 0; p < patterLibrary[l].length; p += 1) {
-      var test = patterLibrary[l][p];
+  for (var l in patternLibrary) {
+    for (var p = 0; p < patternLibrary[l].length; p += 1) {
+      var test = patternLibrary[l][p];
       if (pattern.indexOf(test.term) > -1) {
         this.formatFunc.push(createHandler(test.term, test.func));
         break;
@@ -196,7 +208,7 @@ Scout.DateFormat = function(scout, pattern) {
   }
 };
 
-Scout.DateFormat.prototype.format = function format(time) {
+scout.DateFormat.prototype.format = function format(time) {
   var ret = this.pattern,
     date = new Date(time);
 

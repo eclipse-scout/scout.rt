@@ -1,15 +1,15 @@
 describe("DesktopTree", function() {
-  var scout;
+  var session;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    scout = new Scout.Session($('#sandbox'), '1.1');
+    session = new scout.Session($('#sandbox'), '1.1');
     jasmine.Ajax.installMock();
     jasmine.clock().install();
   });
 
   afterEach(function() {
-    scout = null;
+    session = null;
     jasmine.Ajax.uninstallMock();
     clearAjaxRequests();
     jasmine.clock().uninstall();
@@ -29,7 +29,7 @@ describe("DesktopTree", function() {
   }
 
   function createDesktopTree(model) {
-    return new Scout.DesktopTree(scout, scout.$entryPoint, model);
+    return new scout.DesktopTree(session, session.$entryPoint, model);
   }
 
   describe("constructor", function() {

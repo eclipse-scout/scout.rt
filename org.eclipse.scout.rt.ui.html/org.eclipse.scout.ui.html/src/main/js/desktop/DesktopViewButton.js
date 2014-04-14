@@ -1,10 +1,10 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopViewButton = function(scout, $parent, model) {
+scout.DesktopViewButton = function(session, $parent, model) {
   this._$viewButton;
 
-  scout.widgetMap[model.id] = this;
+  session.widgetMap[model.id] = this;
 
   var state = '';
   if (model.selected) {
@@ -17,12 +17,12 @@ Scout.DesktopViewButton = function(scout, $parent, model) {
 
   function onClick() {
     that._$viewButton.selectOne();
-    scout.send('click', $(this).attr('id'));
+    session.send('click', $(this).attr('id'));
   }
 
 };
 
-Scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
+scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
   if (event.selected !== undefined) {
     if (event.selected) {
       this._$viewButton.selectOne();
@@ -30,4 +30,4 @@ Scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
   }
 };
 
-Scout.DesktopViewButton.prototype.onModelAction = function() {};
+scout.DesktopViewButton.prototype.onModelAction = function() {};

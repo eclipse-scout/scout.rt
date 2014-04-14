@@ -1,6 +1,6 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-Scout.Menu = function(scout, menu, x, y) {
+scout.Menu = function(session, menu, x, y) {
   // remove (without animate) old menu
   $('#MenuSelect, #MenuControl').remove();
 
@@ -66,9 +66,9 @@ Scout.Menu = function(scout, menu, x, y) {
   }
 
   function onMenuItemClicked() {
-    scout.send(Scout.Menu.EVENT_MENU_ACTION, $(this).attr('id'));
+    session.send(scout.Menu.EVENT_MENU_ACTION, $(this).attr('id'));
     return false;
   }
 };
 
-Scout.Menu.EVENT_MENU_ACTION = "menuAction";
+scout.Menu.EVENT_MENU_ACTION = "menuAction";

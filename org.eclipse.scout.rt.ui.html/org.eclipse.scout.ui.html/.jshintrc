@@ -5,20 +5,16 @@
   "undef": true,
   "browser": true,
   "globals": { 
-    "Scout": true,
+    "scout": false,
 
     "jQuery": false,
     "$": false,
-
-    "arrays" : true,
-    "log": true,
-
     "jasmine": false,
-	"describe": false,
+    "describe": false,
     "beforeEach": false,
     "afterEach": false,
     "it": false,
-	"setFixtures": false,
+    "setFixtures": false,
     "sandbox": false,
     "expect": false,
     "spyOn": false,

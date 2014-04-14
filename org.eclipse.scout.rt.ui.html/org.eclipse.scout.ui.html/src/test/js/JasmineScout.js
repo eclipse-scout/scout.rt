@@ -26,7 +26,7 @@ var jasmineScoutMatchers = {
 
         result.pass = true;
         for (i = 0; i < expected.length; i++) {
-          //Prototype may be Scout.Event. If that's the case we need to convert, otherwise equals will fail
+          //Prototype may be Event. If that's the case we need to convert, otherwise equals will fail
           if (Object.getPrototypeOf(expected[i]) !== Object.prototype) {
             expected[i] = $.parseJSON(JSON.stringify(expected[i]));
           }

@@ -1,51 +1,51 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTree = function(scout, $parent, model) {
+scout.DesktopTree = function(session, $parent, model) {
   this.model = model;
-  this.scout = scout;
+  this.session = session;
   this._desktopTable;
 
-  this.scout.widgetMap[model.id] = this;
+  this.session.widgetMap[model.id] = this;
   this._$desktopTreeScroll = $parent.appendDiv('DesktopTreeScroll');
-  this.scrollbar = new Scout.Scrollbar(this._$desktopTreeScroll, 'y');
+  this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.model.nodes);
 };
 
-Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
+scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
 
-Scout.DesktopTree.prototype.detach = function() {
+scout.DesktopTree.prototype.detach = function() {
   this._$desktopTreeScroll.detach();
   if (this._desktopTable) {
     this._desktopTable.detach();
   }
 };
 
-Scout.DesktopTree.prototype.attach = function($container) {
+scout.DesktopTree.prototype.attach = function($container) {
   this._$desktopTreeScroll.appendTo($container);
   if (this._desktopTable) {
     this._desktopTable.attach($('#DesktopBench'));
   }
 };
 
-Scout.DesktopTree.prototype.attachModel = function() {
+scout.DesktopTree.prototype.attachModel = function() {
   if (this.model.selectedNodeIds) {
     var nodeId = this.model.selectedNodeIds[0];
     this.setNodeSelectedById(nodeId);
   }
 
   if (this.model.detailTableId && !this._desktopTable) {
-    this._desktopTable = this.scout.widgetMap[this.model.detailTableId];
+    this._desktopTable = this.session.widgetMap[this.model.detailTableId];
     this._desktopTable.attach($('#DesktopBench'));
   }
 };
 
-Scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
+scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
   var $node = this._findNodeById(nodeId);
   this._setNodeExpanded($node, expanded);
 };
 
-Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
+scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   if (!$node.hasClass('can-expand') || $node.data('expanding') || expanded == $node.hasClass('expanded')) {
     return true;
   }
@@ -53,7 +53,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   var node = $node.data('node');
   if (node.expanded != expanded) {
     if (!this.updateFromModelInProgress) {
-      this.scout.send('nodeExpanded', this.model.id, {
+      this.session.send('nodeExpanded', this.model.id, {
         "nodeId": node.id,
         "expanded": expanded
       });
@@ -129,7 +129,7 @@ Scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   }
 };
 
-Scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
+scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
   var $node;
   if (nodeId) {
     $node = this._findNodeById(nodeId);
@@ -142,7 +142,7 @@ Scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
   this._setNodeSelected($node);
 };
 
-Scout.DesktopTree.prototype._setNodeSelected = function($node) {
+scout.DesktopTree.prototype._setNodeSelected = function($node) {
   if (!$node) {
     this._$desktopTreeScroll.children().select(false);
     return;
@@ -157,7 +157,7 @@ Scout.DesktopTree.prototype._setNodeSelected = function($node) {
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
-    this.scout.send('nodesSelected', this.model.id, {
+    this.session.send('nodesSelected', this.model.id, {
       "nodeIds": [node.id]
     });
   }
@@ -165,22 +165,22 @@ Scout.DesktopTree.prototype._setNodeSelected = function($node) {
   //Menu visibility depend on selectionMenusChanged event which is triggered by selection -> await possible event
   //event is NOT fired if the selectionMenus haven't changed
   var that = this;
-  if (this.scout.areRequestsPending() || this.scout.areEventsQueued()) {
-    this.scout.listen().done(onEventsProcessed);
+  if (this.session.areRequestsPending() || this.session.areEventsQueued()) {
+    this.session.listen().done(onEventsProcessed);
   } else {
     this._showSelectionMenuAndHideOthers($node);
   }
 
   function onEventsProcessed(eventTypes) {
     //Only process if not already processed by _onSelectionMenuChanged
-    if(eventTypes.indexOf(Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
+    if(eventTypes.indexOf(scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
       that._showSelectionMenuAndHideOthers($node);
     }
   }
 
 };
 
-Scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
+scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
   var hasSelectionMenus = this.model.selectionMenus && this.model.selectionMenus.length > 0;
   if (hasSelectionMenus && $node.find('.tree-item-menu').length > 0) {
     //Already there
@@ -196,7 +196,7 @@ Scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
   }
 };
 
-Scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
+scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var $parent = this._findNodeById(parentNodeId);
   var parentNode = $parent.data('node');
   if (parentNode === undefined) {
@@ -211,7 +211,7 @@ Scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   }
 };
 
-Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
+scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
   var $allNodes = $('');
 
   for (var i = nodes.length - 1; i >= 0; i--) {
@@ -252,10 +252,10 @@ Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     // Create tables for table pages
     //FIXME really always create table (no gui is created)
     if (node.table) {
-      var desktopTable = this.scout.widgetMap[node.table.id];
+      var desktopTable = this.session.widgetMap[node.table.id];
       if (!desktopTable) {
         node.outlineId = this.model.id;
-        new Scout.DesktopTable(this.scout, node, this.model.id);
+        new scout.DesktopTable(this.session, node, this.model.id);
       }
     }
 
@@ -283,9 +283,9 @@ Scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
   return $allNodes;
 };
 
-Scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
+scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
   var nodeId = $clicked.attr('id');
-  this.scout.send('nodeClicked', this.model.id, {
+  this.session.send('nodeClicked', this.model.id, {
     "nodeId": nodeId
   });
 
@@ -293,7 +293,7 @@ Scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
   this._setNodeExpanded($clicked, true);
 };
 
-Scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
+scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
   var $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded');
 
@@ -308,17 +308,17 @@ Scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
   return false;
 };
 
-Scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
+scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
   var that = this;
 
   //This switch is necessary because we keep 'has menu'-state, see also _showSelectionMenuAndHideOthers
   if (!$clicked.parent().isSelected()) {
     //make sure node is selected when activating the menu, otherwise the wrong menus are returned
-    this.scout.listen().done(openNodeMenu);
+    this.session.listen().done(openNodeMenu);
     this._setNodeSelected($clicked.parent(), true);
-  } else if (this.scout.areRequestsPending() || this.scout.areEventsQueued()) {
+  } else if (this.session.areRequestsPending() || this.session.areEventsQueued()) {
     //Await pending requests before opening the menu, to make sure the selectionMenus haven't changed in the meantime
-    this.scout.listen().done(openNodeMenu);
+    this.session.listen().done(openNodeMenu);
   } else {
     openNodeMenu();
   }
@@ -335,34 +335,34 @@ Scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
     }
 
     if (menus && menus.length > 0) {
-      new Scout.Menu(that.scout, menus, x, y);
+      new scout.Menu(that.session, menus, x, y);
     }
 
     return false;
   }
 };
 
-Scout.DesktopTree.prototype._onSelectionMenusChanged = function(selectedNodeIds, menus) {
+scout.DesktopTree.prototype._onSelectionMenusChanged = function(selectedNodeIds, menus) {
   this.model.selectionMenus = menus;
   var $node = this._findNodeById(this.model.selectedNodeIds[0]);
 
   //Add menu, but only if the selection on the gui hasn't changed in the meantime
-  if (arrays.equalsIgnoreOrder(selectedNodeIds, this.model.selectedNodeIds)) {
+  if (scout.arrays.equalsIgnoreOrder(selectedNodeIds, this.model.selectedNodeIds)) {
     var $selectedNode = this._findSelectedNodes();
 
     this._showSelectionMenuAndHideOthers($selectedNode);
   }
 };
 
-Scout.DesktopTree.prototype._findNodeById = function(nodeId) {
+scout.DesktopTree.prototype._findNodeById = function(nodeId) {
   return this._$desktopTreeScroll.find('#' + nodeId);
 };
 
-Scout.DesktopTree.prototype._findSelectedNodes = function() {
+scout.DesktopTree.prototype._findSelectedNodes = function() {
   return this._$desktopTreeScroll.find('.selected');
 };
 
-Scout.DesktopTree.prototype._addNodeMenu = function($node) {
+scout.DesktopTree.prototype._addNodeMenu = function($node) {
   if ($node.find('.tree-item-menu').length > 0) {
     return;
   }
@@ -377,26 +377,26 @@ Scout.DesktopTree.prototype._addNodeMenu = function($node) {
   }
 };
 
-Scout.DesktopTree.prototype._removeNodeMenu = function($node) {
+scout.DesktopTree.prototype._removeNodeMenu = function($node) {
   $node.find('.tree-item-menu').remove();
 };
 
-Scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
+scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
   if (this._desktopTable) {
     this._desktopTable.detach();
     this.model.detailTable = null;
   }
 
   if (event.detailTableId) {
-    this._desktopTable = this.scout.widgetMap[event.detailTableId];
+    this._desktopTable = this.session.widgetMap[event.detailTableId];
     this._desktopTable.attach($('#DesktopBench'));
     this.model.detailTable = this._desktopTable.model;
   }
 };
 
-Scout.DesktopTree.prototype.onModelCreate = function() {};
+scout.DesktopTree.prototype.onModelCreate = function() {};
 
-Scout.DesktopTree.prototype.onModelAction = function(event) {
+scout.DesktopTree.prototype.onModelAction = function(event) {
   if (event.type_ == 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
   } else if (event.type_ == 'nodesDeleted') {
@@ -406,9 +406,9 @@ Scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type_ == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
-  } else if (event.type_ == Scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) {
+  } else if (event.type_ == scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) {
     this._onSelectionMenusChanged(event.nodeIds, event.menus);
   } else {
-    log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
+    $.log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
   }
 };

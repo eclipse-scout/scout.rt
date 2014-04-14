@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) {
+scout.DesktopTableHeader = function(session, desktopTable, $tableHeader, filterCallback) {
   var that = this,
     columns = desktopTable.model.table.columns;
 
@@ -39,7 +39,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
     } else {
       var x = $header.offset().left,
         y = $header.offset().top;
-      new Scout.MenuHeader(desktopTable, $header, x, y);
+      new scout.MenuHeader(session, desktopTable, $header, x, y);
     }
 
     return false;
@@ -50,7 +50,7 @@ Scout.DesktopTableHeader = function(desktopTable, $tableHeader, filterCallback) 
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new Scout.MenuTable(desktopTable, x, y);
+    new scout.MenuTable(desktopTable, x, y);
   }
 
   function resizeHeader(event) {

@@ -1,8 +1,8 @@
-Scout.DesktopTreeContainer = function(scout, $parent, model) {
-  this.scout = scout;
+scout.DesktopTreeContainer = function(session, $parent, model) {
+  this.session = session;
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
-  this.desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, model);
+  this.desktopTree = new scout.DesktopTree(this.session, this._$desktopTree, model);
 
   this._$desktopTree.appendDiv('DesktopTreeResize')
     .on('mousedown', '', resizeTree);
@@ -29,22 +29,22 @@ Scout.DesktopTreeContainer = function(scout, $parent, model) {
   }
 };
 
-Scout.DesktopTreeContainer.prototype.onOutlineCreated = function(event) {
+scout.DesktopTreeContainer.prototype.onOutlineCreated = function(event) {
   if (this.desktopTree) {
     this.desktopTree.detach();
   }
-  this.desktopTree = new Scout.DesktopTree(this.scout, this._$desktopTree, event);
+  this.desktopTree = new scout.DesktopTree(this.session, this._$desktopTree, event);
   this.desktopTree.attachModel();
 };
 
-Scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
+scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
   this.desktopTree.detach();
-  this.desktopTree = this.scout.widgetMap[outlineId];
+  this.desktopTree = this.session.widgetMap[outlineId];
   this.desktopTree.attach(this._$desktopTree);
   this.desktopTree.attachModel();
 };
 
-Scout.DesktopTreeContainer.prototype.attachModel = function() {
+scout.DesktopTreeContainer.prototype.attachModel = function() {
   //TODO attachModel only necessary because setNodeSelection relies on desktop bench which is created later, is there a better way?
   this.desktopTree.attachModel();
 };

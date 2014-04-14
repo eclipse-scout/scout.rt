@@ -13,7 +13,7 @@ describe("Session", function() {
 
   function createSession() {
     setFixtures(sandbox());
-    return new Scout.Session($('#sandbox'), '1.1');
+    return new scout.Session($('#sandbox'), '1.1');
   }
 
   describe("send", function() {

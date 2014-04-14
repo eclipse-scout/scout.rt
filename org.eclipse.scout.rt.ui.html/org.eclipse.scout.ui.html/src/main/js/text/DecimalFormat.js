@@ -8,12 +8,15 @@
  *   <li>%</li>
  * </ul>
  */
-Scout.DecimalFormat = function(scout, pattern) {
-  this._symbols = scout.locale.decimalFormatSymbols;
+scout.DecimalFormat = function(locale, pattern) {
+  if (!pattern) {
+    pattern = locale.decimalFormatPatternDefault;
+  }
+
 
   //FIXME HALF_UP is the default, other rounding modes need to be considered as well.
   //this._roundingMode ='HALF_UP';
-
+  this._symbols = locale.decimalFormatSymbols;
   // format function will use these (defaults)
   this.negPrefix = this._symbols.minusSign;
   this.negSuffix = '';
@@ -59,7 +62,7 @@ Scout.DecimalFormat = function(scout, pattern) {
   }
 };
 
-Scout.DecimalFormat.prototype.format = function format(number) {
+scout.DecimalFormat.prototype.format = function format(number) {
   /*jshint newcap: false */
 
   if (number < 0) return this.negPrefix + this.format(-number) + this.negSuffix;

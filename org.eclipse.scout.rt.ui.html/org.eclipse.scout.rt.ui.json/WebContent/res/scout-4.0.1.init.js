@@ -3,7 +3,7 @@ $(document).ready(function() {
   $('.scout').each(function() {
     var portletPartId = $(this).data('partid') || '0',
       sessionPartId = [portletPartId, tabId].join('.');
-    var session = new Scout.Session($(this), sessionPartId);
+    var session = new scout.Session($(this), sessionPartId);
     session.init();
   });
 });

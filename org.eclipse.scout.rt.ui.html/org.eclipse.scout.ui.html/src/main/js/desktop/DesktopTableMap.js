@@ -1,6 +1,6 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTableMap = function($parent, desktopTable, model) {
+scout.DesktopTableMap = function($parent, desktopTable, model) {
   // create container
   var $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')

@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Scrollbar = function($parent, axis) {
+scout.Scrollbar = function($parent, axis) {
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
@@ -54,7 +54,7 @@ Scout.Scrollbar = function($parent, axis) {
 /**
  * Use this function (from outside) if size of tree content changes
  */
-Scout.Scrollbar.prototype.initThumb = function() {
+scout.Scrollbar.prototype.initThumb = function() {
   this._offset = this._$parent[0]["offset" + this._dim];
   this._scroll = this._$parent[0]["scroll" + this._dim];
 
@@ -86,7 +86,7 @@ Scout.Scrollbar.prototype.initThumb = function() {
   }
 };
 
-Scout.Scrollbar.prototype._setThumb = function(posDiff) {
+scout.Scrollbar.prototype._setThumb = function(posDiff) {
   var posOld = this._$thumb.offset()[this._dir] - this._$scrollbar.offset()[this._dir],
     posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff));
 

@@ -1,5 +1,4 @@
-/*exported arrays*/
-var arrays = {
+scout.arrays = {
   remove: function(arr, element) {
     var index = arr.indexOf(element);
     if (index >= 0) {
@@ -22,7 +21,7 @@ var arrays = {
     } else if (arr.length != arr2.length) {
       return false;
     }
-    return arrays.containsAll(arr, arr2);
+    return scout.arrays.containsAll(arr, arr2);
   }
 
 };

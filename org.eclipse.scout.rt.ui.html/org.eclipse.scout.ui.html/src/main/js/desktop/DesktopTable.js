@@ -1,9 +1,9 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopTable = function(scout, model) {
+scout.DesktopTable = function(session, model) {
   this.model = model;
-  this.scout = scout;
+  this.session = session;
   this._$desktopTable;
   this._$tableData;
   this._$tableDataScroll;
@@ -11,19 +11,19 @@ Scout.DesktopTable = function(scout, model) {
   this._$infoFilter;
   this._$infoLoad;
   this._tableHeader;
-  this.scout.widgetMap[model.table.id] = this;
+  this.session.widgetMap[model.table.id] = this;
 };
 
-Scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
-Scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
-Scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
-Scout.DesktopTable.EVENT_ROW_ACTION = 'rowAction';
-Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
-Scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
-Scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
+scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
+scout.DesktopTable.EVENT_ROWS_INSERTED = 'rowsInserted';
+scout.DesktopTable.EVENT_ROW_CLICKED = 'rowClicked';
+scout.DesktopTable.EVENT_ROW_ACTION = 'rowAction';
+scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
+scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
+scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
 
 
-Scout.DesktopTable.prototype.render = function($parent) {
+scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
 
   //create container
@@ -36,7 +36,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
 
   this._$tableDataScroll = $tableData.appendDiv('TableDataScroll');
   this._$tableData = $tableData;
-  this._scrollbar = new Scout.Scrollbar(this._$tableDataScroll, 'y');
+  this._scrollbar = new scout.Scrollbar(this._$tableDataScroll, 'y');
 
   this._$controlContainer = this._$tableControl.appendDiv('ControlContainer');
   this._$controlResizeTop = this._$tableControl.appendDiv('ControlResizeTop');
@@ -65,7 +65,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
     });
 
   // create header
-  this._tableHeader = new Scout.DesktopTableHeader(this, $tableHeader);
+  this._tableHeader = new scout.DesktopTableHeader(this.session, this, $tableHeader);
 
   // load data and create rows
   this._loadData();
@@ -139,14 +139,14 @@ Scout.DesktopTable.prototype.render = function($parent) {
   }
 
   function controlChart() {
-    new Scout.DesktopTableChart(that.scout, that._$controlContainer, that);
+    new scout.DesktopTableChart(that.session, that._$controlContainer, that);
 
     $(this).selectOne();
     that._showTableControl();
   }
 
   function controlGraph() {
-    that.scout.send('graph', that.model.outlineId, {
+    that.session.send('graph', that.model.outlineId, {
       "nodeId": that.model.id
     });
 
@@ -154,7 +154,7 @@ Scout.DesktopTable.prototype.render = function($parent) {
   }
 
   function controlMap() {
-    that.scout.send('map', that.model.outlineId, {
+    that.session.send('map', that.model.outlineId, {
       "nodeId": that.model.id
     });
 
@@ -175,25 +175,25 @@ Scout.DesktopTable.prototype.render = function($parent) {
 
 };
 
-Scout.DesktopTable.prototype._setInfoLoad = function(count) {
+scout.DesktopTable.prototype._setInfoLoad = function(count) {
   this._$infoLoad.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
   this._$infoLoad.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._setInfoMore = function( /*count*/ ) {};
+scout.DesktopTable.prototype._setInfoMore = function( /*count*/ ) {};
 
-Scout.DesktopTable.prototype._setInfoFilter = function(count, origin) {
+scout.DesktopTable.prototype._setInfoFilter = function(count, origin) {
   this._$infoFilter.html(this._findInfo(count) + ' gefiltert' + (origin ? ' durch ' + origin : '') + '</br>Filter entfernen');
   this._$infoFilter.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._setInfoSelect = function(count, all) {
+scout.DesktopTable.prototype._setInfoSelect = function(count, all) {
   var allText = all ? 'Keine' : 'Alle';
   this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren');
   this._$infoSelect.show().widthToContent();
 };
 
-Scout.DesktopTable.prototype._findInfo = function(n) {
+scout.DesktopTable.prototype._findInfo = function(n) {
   if (n === 0) {
     return 'Keine Zeile';
   } else if (n == 1) {
@@ -203,7 +203,7 @@ Scout.DesktopTable.prototype._findInfo = function(n) {
   }
 };
 
-Scout.DesktopTable.prototype._drawSelectionBorder = function() {
+scout.DesktopTable.prototype._drawSelectionBorder = function() {
   // remove nice border
   $('.select-middle, .select-top, .select-bottom, .select-single')
     .removeClass('select-middle select-top select-bottom select-single');
@@ -228,13 +228,13 @@ Scout.DesktopTable.prototype._drawSelectionBorder = function() {
   this._setInfoSelect($selectedRows.length, $selectedRows.length == rowCount);
 };
 
-Scout.DesktopTable.prototype._resetSelection = function() {
+scout.DesktopTable.prototype._resetSelection = function() {
   $('.row-selected', this._$tableData).removeClass('row-selected');
   this._drawSelectionBorder();
   $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
 };
 
-Scout.DesktopTable.prototype._sort = function() {
+scout.DesktopTable.prototype._sort = function() {
   var sortColumns = [];
 
   // remove selection
@@ -294,7 +294,7 @@ Scout.DesktopTable.prototype._sort = function() {
   }
 };
 
-Scout.DesktopTable.prototype.sortChange = function($header, dir, additional, remove) {
+scout.DesktopTable.prototype.sortChange = function($header, dir, additional, remove) {
   $header.removeClass('sort-up sort-down');
 
   if (remove) {
@@ -337,13 +337,13 @@ Scout.DesktopTable.prototype.sortChange = function($header, dir, additional, rem
   this._sort();
 };
 
-Scout.DesktopTable.prototype._loadData = function() {
+scout.DesktopTable.prototype._loadData = function() {
   $('.table-row').remove();
   this._drawData(0);
   this._drawSelectionBorder();
 };
 
-Scout.DesktopTable.prototype._drawData = function(startRow) {
+scout.DesktopTable.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '';
   var table = this.model.table,
@@ -470,7 +470,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       }
 
       // open and animate menu
-      selectionMenu(event.pageX, event.pageY);
+      selectionMenu(event.pageX, event.pageY, event.button);
 
     }
   }
@@ -483,13 +483,13 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       rowIds.push($(this).attr('id'));
     });
 
-    if (arrays.equalsIgnoreOrder(rowIds, that.model.table.selectedRowIds)) {
+    if (scout.arrays.equalsIgnoreOrder(rowIds, that.model.table.selectedRowIds)) {
       return;
     }
 
     that.model.table.selectedRowIds = rowIds;
     if (that.model.table.selectedRowIds) {
-      that.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, that.model.table.id, {
+      that.session.send(scout.DesktopTable.EVENT_ROWS_SELECTED, that.model.table.id, {
         "rowIds": rowIds
       });
     }
@@ -510,7 +510,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   function onClick(event) {
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
-    that.scout.send(Scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
+    that.session.send(scout.DesktopTable.EVENT_ROW_CLICKED, that.model.table.id, {
       "rowId": $row.attr('id')
     });
   }
@@ -521,12 +521,12 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 
   function sendRowAction($row) {
-    that.scout.send(Scout.DesktopTable.EVENT_ROW_ACTION, that.model.table.id, {
+    that.session.send(scout.DesktopTable.EVENT_ROW_ACTION, that.model.table.id, {
       "rowId": $row.attr('id')
     });
   }
 
-  function selectionMenu(x, y) {
+  function selectionMenu(x, y, button) {
     // selection
     var $selectedRows = $('.row-selected'),
       $firstRow = $selectedRows.first();
@@ -571,7 +571,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
       .on('mouseenter', '', enterSelection)
       .on('mouseleave', '', leaveSelection);
 
-    if (event.button == 2) {
+    if (button == 2) {
       clickRowMenu();
     }
 
@@ -660,7 +660,7 @@ Scout.DesktopTable.prototype._drawData = function(startRow) {
   }
 };
 
-Scout.DesktopTable.prototype.getValue = function(col, row) {
+scout.DesktopTable.prototype.getValue = function(col, row) {
   var cell = this.model.table.rows[row].cells[col];
 
   if (cell === null) { //cell may be a number so don't use !cell
@@ -675,7 +675,7 @@ Scout.DesktopTable.prototype.getValue = function(col, row) {
   return cell.text;
 };
 
-Scout.DesktopTable.prototype.getText = function(col, row) {
+scout.DesktopTable.prototype.getText = function(col, row) {
   var cell = this.model.table.rows[row].cells[col];
 
   if (cell === null) { //cell may be a number so don't use !cell
@@ -687,7 +687,7 @@ Scout.DesktopTable.prototype.getText = function(col, row) {
   return cell.text;
 };
 
-Scout.DesktopTable.prototype._group = function() {
+scout.DesktopTable.prototype._group = function() {
   var that = this,
     table = this.model.table,
     all,
@@ -755,7 +755,7 @@ Scout.DesktopTable.prototype._group = function() {
   }
 };
 
-Scout.DesktopTable.prototype.groupChange = function($header, draw, all) {
+scout.DesktopTable.prototype.groupChange = function($header, draw, all) {
   $('.group-sort', this._$desktopTable).removeClass('group-sort');
   $('.group-all', this._$desktopTable).removeClass('group-all');
 
@@ -771,7 +771,7 @@ Scout.DesktopTable.prototype.groupChange = function($header, draw, all) {
   this._group();
 };
 
-Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
+scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
   var minValue,
     maxValue,
     colorFunc;
@@ -834,11 +834,11 @@ Scout.DesktopTable.prototype.colorData = function(mode, colorColumn) {
   }
 };
 
-Scout.DesktopTable.prototype.detach = function() {
+scout.DesktopTable.prototype.detach = function() {
   this._$desktopTable.detach();
 };
 
-Scout.DesktopTable.prototype.attach = function($container) {
+scout.DesktopTable.prototype.attach = function($container) {
   if (!this._$desktopTable) {
     this.render($container);
   } else {
@@ -846,7 +846,7 @@ Scout.DesktopTable.prototype.attach = function($container) {
   }
 };
 
-Scout.DesktopTable.prototype.insertRows = function(rows) {
+scout.DesktopTable.prototype.insertRows = function(rows) {
   //always insert new rows at the end
   var table = this.model.table;
   if (table.rows) {
@@ -859,7 +859,7 @@ Scout.DesktopTable.prototype.insertRows = function(rows) {
   }
 };
 
-Scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
+scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
   var table = this.model.table;
   table.selectedRowIds = rowIds;
 
@@ -878,17 +878,17 @@ Scout.DesktopTable.prototype.selectRowsByIds = function(rowIds) {
 
   if (!this.updateFromModelInProgress) {
     //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
-    this.scout.send(Scout.DesktopTable.EVENT_ROWS_SELECTED, this.model.table.id, {
+    this.session.send(scout.DesktopTable.EVENT_ROWS_SELECTED, this.model.table.id, {
       "rowIds": rowIds
     });
   }
 };
 
-Scout.DesktopTable.prototype.findSelectedRows = function() {
+scout.DesktopTable.prototype.findSelectedRows = function() {
   return this._$tableDataScroll.find('.row-selected');
 };
 
-Scout.DesktopTable.prototype._onSelectionMenusChanged = function(selectedRowIds, menus) {
+scout.DesktopTable.prototype._onSelectionMenusChanged = function(selectedRowIds, menus) {
   this.model.table.selectionMenus = menus;
 
   var $selectedRows = this.findSelectedRows();
@@ -896,7 +896,7 @@ Scout.DesktopTable.prototype._onSelectionMenusChanged = function(selectedRowIds,
 };
 
 // filter function
-Scout.DesktopTable.prototype.filter = function() {
+scout.DesktopTable.prototype.filter = function() {
   var that = this,
     rowCount = 0,
     origin = [],
@@ -920,11 +920,11 @@ Scout.DesktopTable.prototype.filter = function() {
       show = show && (rowText.indexOf(that.model.table.filter) > -1);
     }
 
-    if (that.model.chart.filterFunc) {
+    if (that.model.chart && that.model.chart.filterFunc) {
       show = show && that.model.chart.filterFunc($row);
     }
 
-    if (that.model.map.filterFunc) {
+    if (that.model.map && that.model.map.filterFunc) {
       show = show && that.model.map.filterFunc($row);
     }
 
@@ -947,11 +947,11 @@ Scout.DesktopTable.prototype.filter = function() {
     origin.push(that.model.table.filter);
   }
 
-  if (that.model.chart.filterFunc) {
+  if (that.model.chart && that.model.chart.filterFunc) {
     origin.push(that.model.chart.label);
   }
 
-  if (that.model.map.filterFunc) {
+  if (that.model.map && that.model.map.filterFunc) {
     origin.push(that.model.map.label);
   }
 
@@ -969,7 +969,7 @@ Scout.DesktopTable.prototype.filter = function() {
 
 };
 
-Scout.DesktopTable.prototype.filterReset = function() {
+scout.DesktopTable.prototype.filterReset = function() {
   var that = this;
 
   // reset rows
@@ -995,7 +995,7 @@ Scout.DesktopTable.prototype.filterReset = function() {
   });
 };
 
-Scout.DesktopTable.prototype.showRow = function($row) {
+scout.DesktopTable.prototype.showRow = function($row) {
   var that = this;
 
   if ($row.is(':hidden')) {
@@ -1013,7 +1013,7 @@ Scout.DesktopTable.prototype.showRow = function($row) {
   }
 };
 
-Scout.DesktopTable.prototype.hideRow = function($row) {
+scout.DesktopTable.prototype.hideRow = function($row) {
   var that = this;
 
   if ($row.is(':visible')) {
@@ -1034,7 +1034,7 @@ Scout.DesktopTable.prototype.hideRow = function($row) {
 
 // move column
 
-Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
+scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   var $headers = $('.header-item, .header-resize'),
     $moveHeader = $headers.eq(oldPos),
     $moveResize = $headers.eq(oldPos + 1);
@@ -1082,16 +1082,16 @@ Scout.DesktopTable.prototype.moveColumn = function($header, oldPos, newPos, drag
 
 };
 
-Scout.DesktopTable.prototype._controlIn = function($control) {
+scout.DesktopTable.prototype._controlIn = function($control) {
   var close = $control.hasClass('selected') ? ' schliessen' : '';
   this._$controlLabel.text($control.data('label') + close);
 };
 
-Scout.DesktopTable.prototype._controlOut = function() {
+scout.DesktopTable.prototype._controlOut = function() {
   this._$controlLabel.text('');
 };
 
-Scout.DesktopTable.prototype._showTableControl = function() {
+scout.DesktopTable.prototype._showTableControl = function() {
   // allow resizing
   this._$tableControl.addClass('resize-on');
 
@@ -1144,22 +1144,22 @@ Scout.DesktopTable.prototype._showTableControl = function() {
   }
 };
 
-Scout.DesktopTable.prototype.onModelAction = function(event) {
-  if (event.type_ == Scout.DesktopTable.EVENT_ROWS_INSERTED) {
+scout.DesktopTable.prototype.onModelAction = function(event) {
+  if (event.type_ == scout.DesktopTable.EVENT_ROWS_INSERTED) {
     this.insertRows(event.rows);
-  } else if (event.type_ == Scout.DesktopTable.EVENT_ROWS_SELECTED) {
+  } else if (event.type_ == scout.DesktopTable.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
-  } else if (event.type_ == Scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED) {
+  } else if (event.type_ == scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED) {
     this._onSelectionMenusChanged(event.selectedRowIds, event.menus);
-  } else if (event.type_ == Scout.DesktopTable.EVENT_MAP_LOADED) {
-    new Scout.DesktopTableMap(this._$controlContainer, this, event.map);
+  } else if (event.type_ == scout.DesktopTable.EVENT_MAP_LOADED) {
+    new scout.DesktopTableMap(this._$controlContainer, this, event.map);
     //FIXME select control button (only necessary if event is not triggered by user)
     this._showTableControl();
-  } else if (event.type_ == Scout.DesktopTable.EVENT_GRAPH_LOADED) {
-    new Scout.DesktopTableGraph(this._$controlContainer, event.graph);
+  } else if (event.type_ == scout.DesktopTable.EVENT_GRAPH_LOADED) {
+    new scout.DesktopTableGraph(this._$controlContainer, event.graph);
     //FIXME select control button (only necessary if event is not triggered by user)
     this._showTableControl();
   } else {
-    log("Model event not handled. Widget: DesktopTable. Event: " + event.type_ + ".");
+    $.log("Model event not handled. Widget: scout.DesktopTable. Event: " + event.type_ + ".");
   }
 };

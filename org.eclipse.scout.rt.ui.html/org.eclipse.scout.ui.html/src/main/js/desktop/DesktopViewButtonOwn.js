@@ -1,9 +1,9 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.DesktopViewButtonOwn = function(scout, $parent, viewButton) {
+scout.DesktopViewButtonOwn = function(session, $parent, viewButton) {
 
-  scout.widgetMap[viewButton.id] = this;
+  session.widgetMap[viewButton.id] = this;
 
   this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
   this._$viewButton.on('click', '', onClick)
@@ -16,9 +16,9 @@ Scout.DesktopViewButtonOwn = function(scout, $parent, viewButton) {
 
   function onClick() {
     this._$viewButton.selectOne();
-    //FIXME what to do on scout?
+    //FIXME what to do on session?
     /*
-      scout.send('click', viewButton.id);
+      session.send('click', viewButton.id);
        */
   }
 
@@ -31,7 +31,7 @@ Scout.DesktopViewButtonOwn = function(scout, $parent, viewButton) {
 
 };
 
-Scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
+scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
   if (event.selected !== undefined) {
     if (event.selected) {
       this._$viewButton.selectOne();
@@ -39,4 +39,4 @@ Scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
   }
 };
 
-Scout.DesktopViewButtonOwn.prototype.onModelAction = function() {};
+scout.DesktopViewButtonOwn.prototype.onModelAction = function() {};

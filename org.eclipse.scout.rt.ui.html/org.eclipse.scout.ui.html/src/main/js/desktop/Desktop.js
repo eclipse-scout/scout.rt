@@ -1,19 +1,19 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-Scout.Desktop = function(scout, $parent, model) {
-  this.scout = scout;
+scout.Desktop = function(session, $parent, model) {
+  this.session = session;
   this.tree;
   this._$parent = $parent;
-  this.scout.widgetMap[model.id] = this;
+  this.session.widgetMap[model.id] = this;
 
-  //  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple scout divs with multiple desktops
+  //  this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids, maybe better change to class to support multiple session divs with multiple desktops
 
   // create all 4 containers
-  var view = new Scout.DesktopViewButtonBar(this.scout, $parent, model.viewButtons);
-  var tool = new Scout.DesktopToolButton(this.scout, $parent, model.toolButtons);
-  var tree = new Scout.DesktopTreeContainer(this.scout, $parent, model.outline);
-  var bench = new Scout.DesktopBench(this.scout, $parent);
+  var view = new scout.DesktopViewButtonBar(this.session, $parent, model.viewButtons);
+  var tool = new scout.DesktopToolButton(this.session, $parent, model.toolButtons);
+  var tree = new scout.DesktopTreeContainer(this.session, $parent, model.outline);
+  var bench = new scout.DesktopBench(this.session, $parent);
 
   this.tree = tree;
   this.tree.attachModel();
@@ -51,7 +51,7 @@ Scout.Desktop = function(scout, $parent, model) {
   $('body').keydown(function(event) {
     // numbers: views
     if (event.which >= 49 && event.which <= 57) {
-      log('view');
+      $.log('view');
       $('.view-item', view.$div).eq(event.which - 49).click();
     }
 
@@ -223,34 +223,34 @@ Scout.Desktop = function(scout, $parent, model) {
   }
 };
 
-Scout.Desktop.prototype.onModelPropertyChange = function() {};
+scout.Desktop.prototype.onModelPropertyChange = function() {};
 
-Scout.Desktop.prototype.onModelCreate = function(event) {
+scout.Desktop.prototype.onModelCreate = function(event) {
   if (event.objectType == "Outline") {
     this.tree.onOutlineCreated(event);
   } else if (event.objectType == "Form") {
     if (event.displayHint == "view") {
-      //FIXME separate into Scout.View and Scout.Dialog which use Scout.Form?
-      new Scout.Form(this.scout, this._bench.$container, event);
+      //FIXME separate into View and Dialog which use Form?
+      new scout.Form(this.session, this._bench.$container, event);
     } else if (event.displayHint == "dialog") {
-      new Scout.Form(this.scout, this._$parent, event);
+      new scout.Form(this.session, this._$parent, event);
     } else {
-      log("Form displayHint not handled: '" + event.displayHint + "'.");
+      $.log("Form displayHint not handled: '" + event.displayHint + "'.");
     }
   } else {
-    log("Widget creation not handled for object type '" + event.objectType + "'.");
+    $.log("Widget creation not handled for object type '" + event.objectType + "'.");
   }
 };
 
-Scout.Desktop.prototype.onModelAction = function(event) {
+scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
     this.tree.onOutlineChanged(event.outlineId);
   } else if (event.type_ == 'formRemoved') {
-    var form = this.scout.widgetMap[event.formId];
+    var form = this.session.widgetMap[event.formId];
     if (form) {
       form.hide();
     }
   } else {
-    log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");
+    $.log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");
   }
 };

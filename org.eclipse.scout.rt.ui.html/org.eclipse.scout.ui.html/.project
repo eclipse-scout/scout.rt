@@ -69,10 +69,5 @@
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.m2e.core.prefs</locationURI>
 		</link>
-		<link>
-			<name>.settings/org.eclipse.pde.core.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.pde.core.prefs</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>
