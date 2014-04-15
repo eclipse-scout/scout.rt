@@ -21,8 +21,7 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 public interface INumberField<T extends Number> extends IBasicField<T>, INumberValueContainer<T> {
 
   /**
-   * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
-   *             Will be removed with the M-Release
+   * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}. Will be removed with Scout 5.0
    */
   @SuppressWarnings("deprecation")
   @Override

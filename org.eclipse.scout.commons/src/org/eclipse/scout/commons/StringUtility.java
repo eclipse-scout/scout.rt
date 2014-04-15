@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -49,12 +50,25 @@ public final class StringUtility {
   }
 
   /**
+   * Checks whether the given {@link String} contains visible characters. <br>
+   * More formally:
+   * Checks whether the given {@link String} contains at least one character bigger than the whitespace character:
+   * '\u0020'.
+   * 
    * @param s
-   * @return <code>true</code> if the provided string is not null or empty otherwise <code>false</code> (If the
-   *         string contains only whitespaces it is regarded as empty.)
+   *          The {@link String} to check.
+   * @return <code>true</code> if the provided {@link String} contains visible characters. <code>false</code> otherwise.
    */
   public static boolean hasText(String s) {
-    return s != null && !"".equals(s.trim());
+    if (s == null) {
+      return false;
+    }
+    for (int i = 0; i < s.length(); i++) {
+      if (s.charAt(i) > '\u0020') {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -66,7 +80,7 @@ public final class StringUtility {
     if (wildcardPattern == null) {
       wildcardPattern = "";
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     char[] ch = wildcardPattern.toCharArray();
     for (int i = 0; i < ch.length; i++) {
       switch (ch[i]) {
@@ -1712,5 +1726,60 @@ public final class StringUtility {
   public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
     String stringValue = nvl(value, null);
     return hasText(stringValue) ? stringValue : valueWhenEmpty;
+  }
+
+  /**
+   * Checks whether the given string modification still fulfills the given {@link DecimalFormat} max length constraints.
+   * 
+   * @param format
+   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
+   *          {@link DecimalFormat#getMaximumFractionDigits()}.
+   * @param curText
+   *          The current text (before the modification).
+   * @param offset
+   *          The offset of the modification relative to the curText parameter.
+   * @param replaceLen
+   *          How many characters that will be replaced starting at the given offset.
+   * @param insertText
+   *          The new text that should be inserted at the given replace range.
+   * @return <code>true</code> if the given {@link DecimalFormat} length constraints are still fulfilled after the
+   *         string modification has been applied or if the resulting string is no valid number. <code>false</code>
+   *         otherwise.
+   */
+  public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
+    // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
+    // When changing this implementation also consider updating the js version!
+    if (insertText == null || insertText.length() < 1) {
+      return true;
+    }
+
+    String futureText = null;
+    if (curText == null) {
+      futureText = insertText;
+    }
+    else {
+      StringBuilder docTxt = new StringBuilder(curText.length() + insertText.length());
+      docTxt.append(curText);
+      docTxt.replace(offset, offset + replaceLen, insertText);
+      futureText = docTxt.toString();
+    }
+
+    Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
+    String[] parts = futureText.split(StringUtility.toRegExPattern("" + format.getDecimalFormatSymbols().getDecimalSeparator()));
+    if (parts.length >= 1) {
+      String intPartDigits = pat.matcher(parts[0]).replaceAll("");
+      boolean intPartValid = StringUtility.length(intPartDigits) <= format.getMaximumIntegerDigits();
+      if (!intPartValid) {
+        return false;
+      }
+    }
+    if (parts.length == 2) {
+      String fracPartDigits = pat.matcher(parts[1]).replaceAll("");
+      boolean fracPartValid = StringUtility.length(fracPartDigits) <= format.getMaximumFractionDigits();
+      if (!fracPartValid) {
+        return false;
+      }
+    }
+    return true;
   }
 }

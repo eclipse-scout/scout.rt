@@ -31,7 +31,7 @@ public @interface Doc {
   Filtering filter() default Filtering.ACCEPT;
 
   /**
-   * @deprecated Will be removed with scout 3.11. Uses {@link #filter()} instead. (Is already with scout 3.10 not
+   * @deprecated Will be removed with scout 5.0. Uses {@link #filter()} instead. (Is already with scout 3.10 not
    *             evaluated anymore!)
    */
   @Deprecated

@@ -54,8 +54,7 @@ public interface INumberValueContainer<T extends Number> {
   DecimalFormat getFormat();
 
   /**
-   * Sets whether or not grouping will be used for formatting. Delegates to
-   * {@link DecimalFormat#setGroupingUsed(boolean)} of the internal {@link DecimalFormat} instance
+   * Sets whether or not grouping will be used for formatting.
    */
   void setGroupingUsed(boolean b);
 
@@ -90,4 +89,16 @@ public interface INumberValueContainer<T extends Number> {
 
   RoundingMode getRoundingMode();
 
+  /**
+   * Sets the maximum number of digits allowed in the integer portion of a number.
+   * 
+   * @param maxIntegerDigits
+   *          the maximum number of digits allowed
+   */
+  void setMaxIntegerDigits(int maxIntegerDigits);
+
+  /**
+   * @return The maximum number of digits allowed in the integer portion of a number.
+   */
+  int getMaxIntegerDigits();
 }

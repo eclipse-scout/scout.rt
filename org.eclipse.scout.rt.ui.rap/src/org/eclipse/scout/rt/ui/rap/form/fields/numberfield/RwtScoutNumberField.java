@@ -10,6 +10,14 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.numberfield;
 
+import java.io.InputStream;
+import java.text.DecimalFormat;
+
+import org.eclipse.rap.rwt.scripting.ClientListener;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -23,13 +31,23 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>RwtScoutLongField</h3> ...
+ * <h3>RwtScoutNumberField</h3>
  * 
  * @since 3.7.0 June 2011
  */
 public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutNumberField.class);
+
   private TextFieldEditableSupport m_editableSupport;
+  private static volatile String clientVerifyScript;
+  private static final Object LOCK = new Object();
+
+  // Constants must correspond to the keys used in org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
+  public static final String PROP_MAX_INTEGER_DIGITS = "RwtScoutNumberField.maxInt";
+  public static final String PROP_MAX_FRACTION_DIGITS = "RwtScoutNumberField.maxFra";
+  public static final String PROP_ZERO_DIGIT = "RwtScoutNumberField.zeroDig";
+  public static final String PROP_DECIMAL_SEPARATOR = "RwtScoutNumberField.decSep";
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -40,13 +58,58 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     style |= RwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
     Text text = new StyledTextEx(container, style);
+
+    installClientScripting(text);
     attachFocusListener(text, true);
-    //
+
     setUiContainer(container);
     setUiLabel(label);
     setUiField(text);
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  @SuppressWarnings("restriction")
+  protected void installClientScripting(Text text) {
+    String js = getVerifyClientScript();
+    if (js != null) {
+      text.addListener(SWT.Verify, new ClientListener(js));
+      org.eclipse.rap.rwt.internal.lifecycle.WidgetDataUtil.registerDataKeys(PROP_MAX_INTEGER_DIGITS, PROP_MAX_FRACTION_DIGITS, PROP_ZERO_DIGIT, PROP_DECIMAL_SEPARATOR);
+      handleDecimalFormatChanged(text, getScoutObject().getFormat());
+    }
+  }
+
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (INumberField.PROP_DECIMAL_FORMAT.equals(name)) {
+      handleDecimalFormatChanged(getUiField(), (DecimalFormat) newValue);
+    }
+  }
+
+  protected void handleDecimalFormatChanged(Text text, DecimalFormat format) {
+    text.setData(PROP_MAX_INTEGER_DIGITS, format.getMaximumIntegerDigits());
+    text.setData(PROP_MAX_FRACTION_DIGITS, format.getMaximumFractionDigits());
+    text.setData(PROP_ZERO_DIGIT, "" + format.getDecimalFormatSymbols().getZeroDigit());
+    text.setData(PROP_DECIMAL_SEPARATOR, "" + format.getDecimalFormatSymbols().getDecimalSeparator());
+  }
+
+  private static String getVerifyClientScript() {
+    if (clientVerifyScript == null) {
+      synchronized (LOCK) {
+        if (clientVerifyScript == null) {
+          try {
+            InputStream is = RwtScoutNumberField.class.getClassLoader().getResourceAsStream("org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js");
+            String content = IOUtility.getContentUtf8(is);
+            clientVerifyScript = content;
+          }
+          catch (ProcessingException e) {
+            LOG.error("Unable to read NumberField client verify script.", e);
+          }
+        }
+      }
+    }
+    return clientVerifyScript;
   }
 
   @Override

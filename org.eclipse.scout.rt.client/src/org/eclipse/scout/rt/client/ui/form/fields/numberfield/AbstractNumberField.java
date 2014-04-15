@@ -60,7 +60,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
-   * @deprecated Will be removed with scout 3.11. For setting the format override {@link #initConfig()} and call
+   * @deprecated Will be removed with scout 5.0. For setting the format override {@link #initConfig()} and call
    *             {@link #setFormat(DecimalFormat)}.
    */
   @Deprecated
@@ -101,6 +101,22 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    */
   protected abstract T getConfiguredMaxValue();
 
+  /**
+   * Default used for {@link INumberField#setMaxIntegerDigits(int)}
+   * <p>
+   * Used for formatting and parsing. Specifies the maximum number of digits allowed in the integer portion of a number
+   * (before the decimal separator).<br>
+   * Corresponds to {@link DecimalFormat#setMaximumIntegerDigits(int)}
+   * <p>
+   * 
+   * @return
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(280)
+  protected int getConfiguredMaxIntegerDigits() {
+    return 309;
+  }
+
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return 1;
@@ -114,7 +130,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     setRoundingMode(getConfiguredRoundingMode());
     setGroupingUsed(getConfiguredGroupingUsed());
     if (getConfiguredFormat() != null) {
-      ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).applyPattern(getConfiguredFormat());
+      getFormatInternal().applyPattern(getConfiguredFormat());
     }
     setMinValue(getConfiguredMinValue());
     setMaxValue(getConfiguredMaxValue());
@@ -125,6 +141,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);
+    format.setMaximumIntegerDigits(getConfiguredMaxIntegerDigits());
     propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, format);
   }
 
@@ -147,7 +164,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @Override
   public RoundingMode getRoundingMode() {
-    return ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).getRoundingMode();
+    return getFormatInternal().getRoundingMode();
   }
 
   @Override
@@ -174,7 +191,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @Override
   public DecimalFormat getFormat() {
-    return (DecimalFormat) ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).clone();
+    return (DecimalFormat) getFormatInternal().clone();
   }
 
   /**
@@ -206,7 +223,29 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @Override
   public boolean isGroupingUsed() {
-    return ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).isGroupingUsed();
+    return getFormatInternal().isGroupingUsed();
+  }
+
+  @Override
+  public void setMaxIntegerDigits(int maxIntegerDigits) {
+    try {
+      DecimalFormat format = getFormat();
+      format.setMaximumIntegerDigits(maxIntegerDigits);
+      setFormat(format);
+      if (isInitialized()) {
+        if (shouldUpdateDisplayText(false)) {
+          setDisplayText(execFormatValue(getValue()));
+        }
+      }
+    }
+    finally {
+      setFieldChanging(false);
+    }
+  }
+
+  @Override
+  public int getMaxIntegerDigits() {
+    return getFormatInternal().getMaximumIntegerDigits();
   }
 
   @Override
@@ -287,12 +326,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     if (validValue == null) {
       return "";
     }
-    String displayValue = ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).format(validValue);
+    String displayValue = getFormatInternal().format(validValue);
     return displayValue;
   }
 
   /**
-   * @deprecated Will be removed with scout 3.11, use {@link #getFormat()}.
+   * @deprecated Will be removed with scout 5.0, use {@link #getFormat()}.
    */
   @Deprecated
   protected NumberFormat createNumberFormat() {
@@ -341,11 +380,16 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    */
   protected BigDecimal parseToBigDecimalInternal(String text) throws ProcessingException {
     BigDecimal retVal = null;
-    text = StringUtility.nvl(text, "").trim();
+    if (text == null) {
+      text = "";
+    }
+    else {
+      text = text.trim();
+    }
     if (text.length() > 0) {
       text = ensureSuffix(text);
       ParsePosition p = new ParsePosition(0);
-      BigDecimal valBeforeRounding = (BigDecimal) ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).parse(text, p);
+      BigDecimal valBeforeRounding = (BigDecimal) getFormatInternal().parse(text, p);
       // check for bad syntax
       if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
@@ -379,8 +423,8 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   private String ensureSuffix(String text) {
-    String positiveSuffix = ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).getPositiveSuffix();
-    String negativeSuffix = ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).getNegativeSuffix();
+    String positiveSuffix = getFormatInternal().getPositiveSuffix();
+    String negativeSuffix = getFormatInternal().getNegativeSuffix();
 
     if (positiveSuffix.equals(negativeSuffix)) {
       String trimmedSuffix = StringUtility.trim(positiveSuffix);

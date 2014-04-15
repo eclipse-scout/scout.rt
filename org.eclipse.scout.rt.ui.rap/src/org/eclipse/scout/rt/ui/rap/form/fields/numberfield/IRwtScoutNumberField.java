@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>IRwtScoutLongField</h3> ...
+ * <h3>IRwtScoutNumberField</h3>
  * 
  * @since 3.7.0 June 2011
  */

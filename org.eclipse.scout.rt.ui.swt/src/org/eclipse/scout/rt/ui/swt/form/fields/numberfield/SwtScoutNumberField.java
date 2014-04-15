@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.numberfield;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
@@ -17,12 +18,14 @@ import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>SwtScoutLongField</h3> ...
+ * <h3>SwtScoutNumberField</h3>
  * 
  * @since 1.0.0 14.04.2008
  */
@@ -37,7 +40,8 @@ public class SwtScoutNumberField extends SwtScoutBasicFieldComposite<INumberFiel
     style |= SwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
     Text text = getEnvironment().getFormToolkit().createText(container, style);
-    //
+    text.addVerifyListener(new P_VerifyListener());
+
     setSwtContainer(container);
     setSwtLabel(label);
     setSwtField(text);
@@ -85,5 +89,13 @@ public class SwtScoutNumberField extends SwtScoutBasicFieldComposite<INumberFiel
   @Override
   protected void setCaretOffset(int caretPosition) {
     //nothing to do: SWT sets the caret itself. If startIndex > endIndex it is placed at the beginning.
+  }
+
+  private final class P_VerifyListener implements VerifyListener {
+    @Override
+    public void verifyText(VerifyEvent e) {
+      String curText = ((Text) e.widget).getText();
+      e.doit = StringUtility.isWithinNumberFormatLimits(getScoutObject().getFormat(), curText, e.start, e.end - e.start, e.text);
+    }
   }
 }

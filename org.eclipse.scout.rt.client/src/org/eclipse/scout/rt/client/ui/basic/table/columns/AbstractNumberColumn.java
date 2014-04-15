@@ -50,6 +50,12 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
    */
   protected abstract T getConfiguredMaxValue();
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(280)
+  protected int getConfiguredMaxIntegerDigits() {
+    return 32;
+  }
+
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return 1;
@@ -68,7 +74,7 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
-   * @deprecated Will be removed with scout 3.11. For setting the format override {@link #initConfig()} and call
+   * @deprecated Will be removed with scout 5.0. For setting the format override {@link #initConfig()} and call
    *             {@link #setFormat(DecimalFormat)}.
    */
   @Deprecated
@@ -135,6 +141,7 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);
+    format.setMaximumIntegerDigits(getConfiguredMaxIntegerDigits());
     propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, format);
   }
 
@@ -159,7 +166,7 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
   }
 
   /**
-   * @deprecated Will be removed with scout 3.11. Use {@link #setFormat()}.
+   * @deprecated Will be removed with scout 5.0. Use {@link #setFormat()}.
    */
   @Deprecated
   protected final void setNumberFormat(NumberFormat fmt) {
@@ -174,6 +181,18 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
   @Override
   public NumberFormat getNumberFormat() {
     return getFormat();
+  }
+
+  @Override
+  public void setMaxIntegerDigits(int maxIntegerDigits) {
+    DecimalFormat format = getFormat();
+    format.setMaximumIntegerDigits(maxIntegerDigits);
+    setFormat(format);
+  }
+
+  @Override
+  public int getMaxIntegerDigits() {
+    return getFormatInternal().getMaximumIntegerDigits();
   }
 
   @Override
@@ -295,5 +314,4 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
       cell.setText("");
     }
   }
-
 }

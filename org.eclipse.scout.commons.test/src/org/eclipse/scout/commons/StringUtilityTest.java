@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 import org.junit.Test;
 
@@ -459,4 +460,22 @@ public class StringUtilityTest {
     assertEquals("5", StringUtility.substituteWhenEmpty(new Integer(5), "subsitute"));
   }
 
+  @Test
+  public void testIsWithinNumberFormatLimits() {
+    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance();
+    format.setMaximumIntegerDigits(3);
+    format.setMaximumFractionDigits(2);
+
+    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, "45"));
+    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, "23"));
+
+    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, ".456"));
+    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, ".23"));
+
+    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567"));
+    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56"));
+
+    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567.7"));
+    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56.78"));
+  }
 }

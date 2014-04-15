@@ -33,6 +33,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,40 @@ public final class IOUtility {
    */
   public static byte[] getContent(InputStream stream) throws ProcessingException {
     return getContent(stream, true);
+  }
+
+  /**
+   * Gets the content of the given {@link InputStream} as {@link String}. The {@link Byte}s coming from the
+   * {@link InputStream} are interpreted using the given charsetName.<br>
+   * The {@link InputStream} is automatically closed.
+   * 
+   * @param stream
+   *          The stream to read from.
+   * @param charsetName
+   *          The name of the {@link Charset}.
+   * @return A {@link String} containing the content of the given {@link InputStream}.
+   * @throws ProcessingException
+   */
+  public static String getContent(InputStream stream, String charsetName) throws ProcessingException {
+    try {
+      return new String(IOUtility.getContent(stream), charsetName);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new ProcessingException("Unsupported encoding: '" + charsetName + "'.", e);
+    }
+  }
+
+  /**
+   * Gets the content of the given {@link InputStream} as {@link String}. The content coming from the
+   * {@link InputStream} must have the UTF-8 {@link Charset}.
+   * 
+   * @param stream
+   *          The {@link InputStream} to read from.
+   * @return The content of the given {@link InputStream}.
+   * @throws ProcessingException
+   */
+  public static String getContentUtf8(InputStream stream) throws ProcessingException {
+    return getContent(stream, "UTF-8");
   }
 
   public static byte[] getContent(InputStream stream, boolean autoClose) throws ProcessingException {
@@ -200,7 +235,7 @@ public final class IOUtility {
   }
 
   /**
-   * retrieve content as string (correct charcter conversion)
+   * retrieve content as string (correct character conversion)
    */
   public static String getContent(Reader stream) throws ProcessingException {
     return getContent(stream, true);

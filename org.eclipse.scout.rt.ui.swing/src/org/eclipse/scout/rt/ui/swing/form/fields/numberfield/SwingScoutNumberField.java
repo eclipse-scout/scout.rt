@@ -12,9 +12,14 @@ package org.eclipse.scout.rt.ui.swing.form.fields.numberfield;
 
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -35,6 +40,9 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     container.add(label);
     JTextFieldEx textField = new JTextFieldEx();
     Document doc = textField.getDocument();
+    if (doc instanceof AbstractDocument) {
+      ((AbstractDocument) doc).setDocumentFilter(new P_DocumentFilter());
+    }
     addInputListenersForBasicField(textField, doc);
     //
     container.add(textField);
@@ -74,5 +82,23 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
   @Override
   protected boolean isSelectAllOnFocusInScout() {
     return true; //No such property in Scout for DecimalField.
+  }
+
+  private final class P_DocumentFilter extends DocumentFilter {
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+      Document doc = fb.getDocument();
+      if (StringUtility.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, length, text)) {
+        super.replace(fb, offset, length, text, attrs);
+      }
+    }
+
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+      Document doc = fb.getDocument();
+      if (StringUtility.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, 0, string)) {
+        super.insertString(fb, offset, string, attr);
+      }
+    }
   }
 }

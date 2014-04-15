@@ -37,7 +37,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
    * Configuration
    */
   /**
-   * @deprecated Will be removed with scout 3.11, use {@link #getConfiguredMinValue()}.<br>
+   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMinValue()}.<br>
    *             As long as this deprecated version is overridden in subclasses. This setting wins over
    *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
    */
@@ -47,7 +47,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   }
 
   /**
-   * @deprecated Will be removed with scout 3.11, use {@link #getConfiguredMaxValue()}.<br>
+   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMaxValue()}.<br>
    *             As long as this deprecated version is overridden in subclasses. This setting wins over
    *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
    */
@@ -70,6 +70,13 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaxValue() {
     return Long.MAX_VALUE;
+  }
+
+  @Override
+  @Order(270)
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMaxIntegerDigits() {
+    return 19;
   }
 
   @Override

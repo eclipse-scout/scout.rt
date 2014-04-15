@@ -152,13 +152,14 @@ public final class CollectionUtility {
    * List factory
    */
   public static <T> ArrayList<T> arrayList(T... values) {
-    ArrayList<T> list = new ArrayList<T>();
     if (values != null) {
+      ArrayList<T> list = new ArrayList<T>(values.length);
       for (T v : values) {
         list.add(v);
       }
+      return list;
     }
-    return list;
+    return new ArrayList<T>(0);
   }
 
   public static <T> ArrayList<T> arrayList(T value) {
@@ -173,8 +174,8 @@ public final class CollectionUtility {
     if (input == null) {
       input = new ArrayList<T>();
     }
-    ArrayList<T> result = new ArrayList<T>();
     int endIndex = Math.min(input.size(), maxSize);
+    ArrayList<T> result = new ArrayList<T>(endIndex);
     for (int i = 0; i < endIndex; i++) {
       result.add(input.get(i));
     }
@@ -204,7 +205,7 @@ public final class CollectionUtility {
    */
   public static <T> ArrayList<T> arrayListWithoutNullElements(Collection<? extends T> c) {
     if (c != null) {
-      ArrayList<T> list = new ArrayList<T>();
+      ArrayList<T> list = new ArrayList<T>(c.size());
       for (T o : c) {
         if (o != null) {
           list.add(o);
@@ -274,7 +275,7 @@ public final class CollectionUtility {
   }
 
   /**
-   * @deprecated use {@link #arrayList(Collection)}
+   * @deprecated Will be removed in Scout 5.0. Use {@link #arrayList(Collection)} instead.
    */
   @Deprecated
   public static <T> List<T> copyList(Collection<T> c) {
@@ -294,7 +295,7 @@ public final class CollectionUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#arrayList(Collection)}
+   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#arrayList(Collection)} instead.
    */
   @Deprecated
   public static <T> List<T> toList(Collection<T> c) {
@@ -535,13 +536,14 @@ public final class CollectionUtility {
    * Set factory
    */
   public static <T> HashSet<T> hashSet(T... values) {
-    HashSet<T> set = new HashSet<T>();
     if (values != null) {
+      HashSet<T> set = new HashSet<T>(values.length);
       for (T v : values) {
         set.add(v);
       }
+      return set;
     }
-    return set;
+    return new HashSet<T>(0);
   }
 
   public static <T> HashSet<T> hashSet(T value) {

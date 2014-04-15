@@ -28,8 +28,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   String PROP_PARSING_FRACTION_DIGITS = "parsingFractionDigits";
 
   /**
-   * Sets the minimum fraction digits used for formatting. If value has less fraction digits '0' are appended. Delegates
-   * to {@link DecimalFormat#setMinimumFractionDigits(int)} of the internal {@link DecimalFormat} instance.
+   * Sets the minimum fraction digits used for formatting. If value has less fraction digits '0' are appended.
    * <p>
    * If new value is bigger than {@link #getMaxFractionDigits()} maxFractionDigits is set to the same new value.
    */
@@ -38,8 +37,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   int getMinFractionDigits();
 
   /**
-   * Sets the maximum fraction digits used for formatting. Delegates to
-   * {@link DecimalFormat#setMaximumFractionDigits(int)} of the internal {@link DecimalFormat} instance.<br>
+   * Sets the maximum fraction digits used for formatting and parsing.
    * <p>
    * If new value is smaller than {@link #getMinFractionDigits()} minFractionDigits is set to the same new value.
    */
@@ -62,8 +60,8 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   boolean isPercent();
 
   /**
-   * Sets the number of fraction digits used for parsing. If the text represents a number with more fraction digits the
-   * value is rounded according to {@link #getRoundingMode()}<br>
+   * Sets the number of fraction digits used for rounding. If the text represents a number with more fraction digits the
+   * value is rounded to this number of digits according to {@link #getRoundingMode()}<br>
    * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value over
    * {@link #setValue(Object)}.
    * 

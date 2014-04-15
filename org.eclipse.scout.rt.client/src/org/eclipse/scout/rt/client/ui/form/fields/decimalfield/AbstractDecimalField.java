@@ -45,6 +45,11 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   /**
    * Default for {@link IDecimalField#setFractionDigits(int)}
+   * <p>
+   * Used for rounding the text value coming from the GUI. If the text represents a number with more fraction digits the
+   * value is rounded to this number of digits according to {@link #getRoundingMode()}<br>
+   * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value over
+   * {@link #setValue(Object)}.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
@@ -67,7 +72,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   /**
    * Default for {@link IDecimalField#setMaxFractionDigits(int)}
    * <p>
-   * During formatting and parsing values are rounded to this precision.<br>
+   * Used for formatting and parsing.<br>
    * Corresponds to {@link DecimalFormat#setMaximumFractionDigits(int)}
    * <p>
    * <b>Note:</b> Always define the fraction digits for the displayed value even if you use a multiplier (

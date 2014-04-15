@@ -21,7 +21,7 @@ public interface INumberColumn<T extends Number> extends IColumn<T>, INumberValu
   boolean isValidateOnAnyKey();
 
   /**
-   * @deprecated Will be removed with scout 3.11. Use {@link #getFormat()}.
+   * @deprecated Will be removed with scout 5.0. Use {@link #getFormat()}.
    */
   @Deprecated
   NumberFormat getNumberFormat();
