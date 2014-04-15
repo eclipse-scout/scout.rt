@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -96,8 +97,8 @@ public final class HTMLUtility {
     }
 
     // Remove quotes in style attribute which are not closed.
-    htmlText = HTMLUtility.removeUnclosedStyleQuotes(htmlText, true);
-    htmlText = HTMLUtility.removeUnclosedStyleQuotes(htmlText, false);
+    htmlText = removeUnclosedStyleQuotes(htmlText, true);
+    htmlText = removeUnclosedStyleQuotes(htmlText, false);
 
     // fix incorrect single tag endings ( <br/ > <br /> )
     htmlText = htmlText.replaceAll("/\\s+>", "/>");
@@ -141,6 +142,13 @@ public final class HTMLUtility {
   }
 
   /**
+   * @see #cleanupHtml(String, boolean, boolean, DefaultFont, Color)
+   */
+  public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont) {
+    return cleanupHtml(rawHtml, ensureContentType, cleanupCss, defaultFont, null);
+  }
+
+  /**
    * <p>
    * Applies some intelligence to the HTML document to ensure a valid HTML document.
    * </p>
@@ -155,9 +163,11 @@ public final class HTMLUtility {
    *          </small>
    * @param defaultFont
    *          to ensure default font set
+   * @param defaultHyperlinkColor
+   *          the default color used for hyperlinks (&lt;a&gt; elements) - used for CSS cleanup only
    * @return the formatted HTML document
    */
-  public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont) {
+  public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont, Color defaultHyperlinkColor) {
     rawHtml = StringUtility.nvl(rawHtml, "");
 
     try {
@@ -230,17 +240,11 @@ public final class HTMLUtility {
       rawHtml = eliminateVerticalScrollbar(rawHtml);
 
       // 6) cleanup CSS of document
-      if (cleanupCss) {
-        HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(rawHtml);
-        if (htmlDoc != null) {
-          htmlDoc = HTMLUtility.cleanupCss(htmlDoc, defaultFont);
-          rawHtml = HTMLUtility.toHtmlText(htmlDoc);
-        }
-      }
+      rawHtml = adjustCssIfNeeded(rawHtml, cleanupCss, defaultFont, defaultHyperlinkColor);
 
       // 7) ensure <META> element with content-type and charset (This must be done after 6) as <META> tags are removed in cleanup)
       if (ensureContentType) {
-        rawHtml = HTMLUtility.addHtmlMetaElement("content-type", "text/html;charset=UTF-8", rawHtml);
+        rawHtml = addHtmlMetaElement("content-type", "text/html;charset=UTF-8", rawHtml);
       }
     }
     catch (Throwable t) {
@@ -252,11 +256,41 @@ public final class HTMLUtility {
   }
 
   /**
-   * HTML has several troubles with some CSS and tag style concepts.
+   * Formats the HTML source if either {@code cleanupCss == true} or {@code defaultHyperlinkColor != null}. If the
+   * latter holds, a definition for hyperlink colors will be added to the CSS accordingly (unless such a definition
+   * already exists). If {@code cleanupCss == true} the method {@link #cleanupCss(HTMLDocument, DefaultFont)} will be
+   * called.
+   * <p>
+   * If none of the conditions hold, the HTML source is not changed.
    * 
-   * @param htmlDoc
-   * @param defaultFont
-   * @return
+   * @return the adjusted HTML source according to the description above.
+   */
+  private static String adjustCssIfNeeded(String rawHtml, boolean cleanupCss, DefaultFont defaultFont, Color defaultHyperlinkColor) {
+    if (cleanupCss || defaultHyperlinkColor != null) {
+      HTMLDocument htmlDoc = toHtmlDocument(rawHtml);
+      if (htmlDoc != null) {
+        if (defaultHyperlinkColor != null) {
+          String colorAttributeValue = ColorUtility.rgbToText(defaultHyperlinkColor.getRed(), defaultHyperlinkColor.getGreen(), defaultHyperlinkColor.getBlue());
+          StyleSheet styleSheet = htmlDoc.getStyleSheet();
+          Style aStyle = styleSheet.getStyle("a");
+          if (aStyle == null) {
+            aStyle = styleSheet.addStyle("a", null);
+          }
+          if (aStyle.getAttribute(CSS.Attribute.COLOR) == null) {
+            styleSheet.addCSSAttribute(aStyle, CSS.Attribute.COLOR, colorAttributeValue);
+          }
+        }
+        if (cleanupCss) {
+          htmlDoc = cleanupCss(htmlDoc, defaultFont);
+        }
+        rawHtml = toHtmlText(htmlDoc);
+      }
+    }
+    return rawHtml;
+  }
+
+  /**
+   * HTML has several troubles with some CSS and tag style concepts.
    */
   public static HTMLDocument cleanupCss(HTMLDocument htmlDoc, DefaultFont defaultFont) {
     if (htmlDoc == null) {

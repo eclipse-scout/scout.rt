@@ -191,15 +191,6 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
     super.detachScout();
   }
 
-  @Override
-  protected void setForegroundFromScout(String scoutColor) {
-    if (getScoutObject().getDisplayStyle() == IButton.DISPLAY_STYLE_LINK && scoutColor == null) {
-      // XXX BSH Get rid of hard-coded color value when bug 346438 is fixed
-      scoutColor = "67A8CE";
-    }
-    super.setForegroundFromScout(scoutColor);
-  }
-
   protected void setIconIdFromScout(String s) {
     if (s != null) {
       Image icon = getUiEnvironment().getIcon(s);

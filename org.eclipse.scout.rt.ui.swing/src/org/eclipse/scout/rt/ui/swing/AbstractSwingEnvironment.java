@@ -41,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.ColorUIResource;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -1085,6 +1086,8 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       cleanHtml = "";
     }
 
+    ColorUIResource hyperlinkColor = (ColorUIResource) UIManager.getDefaults().get("Hyperlink.foreground");
+
     if (uiComposite.getScoutObject() instanceof IHtmlField) {
       IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
       if (htmlField.isHtmlEditor()) {
@@ -1099,11 +1102,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         }
       }
       else {
-        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()), hyperlinkColor);
       }
     }
     else if (uiComposite.getScoutObject() instanceof IMailField) {
-      cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+      cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()), hyperlinkColor);
     }
 
     return cleanHtml;

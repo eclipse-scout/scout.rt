@@ -13,6 +13,7 @@ package org.eclipse.scout.commons;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.awt.Color;
 import java.io.InputStream;
 
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -556,6 +557,84 @@ public class HTMLUtilityTest {
 
     defaultFont = createDefaultFont(10, 0xA0FF00, "Arial");
     assertEquals(output, HTMLUtility.cleanupHtml(input, false, false, defaultFont));
+  }
+
+  @Test
+  public void testStyleHtmlDefaultHyperlinkColor() throws Exception {
+    String input = "";
+    String output = "";
+    Color color = new Color(0xFF00FF);
+
+    /*
+     * no color defined should do no CSS changes and no formatting
+     */
+    input = "<a href=\"x\">link to x</a>";
+    output = "" +
+        "<html>" +
+        "<head>" +
+        "</head>" +
+        "<body style=\"overflow:auto;\">" +
+        "<a href=\"x\">link to x</a>" +
+        "</body>" +
+        "</html>" +
+        "";
+    assertEquals(output, HTMLUtility.cleanupHtml(input, false, false, null));
+    assertEquals(output, HTMLUtility.cleanupHtml(input, false, false, null, null));
+
+    /*
+     * color != null should put this color in a CSS definition for hyperlinks
+     * (if there is not such definition already) and format the HTML source
+     */
+    input = "<a href=\"x\">link to x</a>";
+    output = "" +
+        "<html>" +
+        "<head>" +
+        /* */"<style type=\"text/css\">" +
+        /* */"a {color: " + ColorUtility.rgbToText(color.getRed(), color.getGreen(), color.getBlue()) + ";}\n" +
+        /* */"</style>" +
+        "</head>" +
+        "<body style=\"overflow:auto;\">" +
+        "<a href=\"x\">link to x</a>" +
+        "</body>" +
+        "</html>" +
+        "";
+    assertEquals(formatHtml(output), HTMLUtility.cleanupHtml(input, false, false, null, color));
+
+    /*
+     * color != null should NOT put this color in a CSS definition for hyperlinks
+     * if there is such a definition already - but the HTML source will be formatted
+     * because it has been transformed for the analysis
+     */
+    input = "" +
+        "<html>" +
+        "  <head>" +
+        "    <style type=\"text/css\">" +
+        "      a {color: #000000;}\n" +
+        "    </style>" +
+        "  </head>" +
+        "  <body>" +
+        "    <a href=\"x\">link to x</a>" +
+        "  </body>" +
+        "</html>" +
+        "";
+    output = "" +
+        "<html>" +
+        "<head>" +
+        "<style type=\"text/css\">" +
+        "a {color: #000000;}\n" +
+        "</style>" +
+        "</head>" +
+        "<body style=\"overflow:auto;\">" +
+        "<a href=\"x\">link to x</a>" +
+        "</body>" +
+        "</html>" +
+        "";
+    assertEquals(formatHtml(output), HTMLUtility.cleanupHtml(input, false, false, null, color));
+
+  }
+
+  private String formatHtml(String htmlText) {
+    return HTMLUtility.toHtmlText(HTMLUtility.toHtmlDocument(htmlText));
   }
 
   @Test

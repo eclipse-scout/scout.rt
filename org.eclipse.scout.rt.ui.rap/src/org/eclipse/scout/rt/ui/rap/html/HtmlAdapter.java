@@ -196,11 +196,14 @@ public class HtmlAdapter {
         }
       }
       else {
+        Color c = m_uiEnvironment.getFormToolkit().getHyperlinkGroup().getForeground();
+        java.awt.Color hyperlinkColor = new java.awt.Color(c.getRed(), c.getGreen(), c.getBlue());
+
         /*
-         * Because @{link SwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
+         * Because @{link RwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
          * Also, the CSS needs not to be cleaned as the native browser is used.
          */
-        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, true, false, createDefaultFontSettings(uiComposite));
+        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, true, false, createDefaultFontSettings(uiComposite), hyperlinkColor);
       }
     }
 

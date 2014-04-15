@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.util;
 
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -36,6 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -52,6 +54,14 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     super(kit);
     kit.getColors().setForeground(null);
     kit.getColors().setBackground(null);
+    initializeHyperlinkColors();
+  }
+
+  protected void initializeHyperlinkColors() {
+    RGB linkButtonBlue = new RGB(103, 168, 206); /* #67A8CE */
+    JFaceResources.getColorRegistry().put(JFacePreferences.HYPERLINK_COLOR, linkButtonBlue);
+    JFaceResources.getColorRegistry().put(JFacePreferences.ACTIVE_HYPERLINK_COLOR, linkButtonBlue);
+    refreshHyperlinkColors();
   }
 
   public ScrolledFormEx createScrolledFormEx(Composite parent, int style) {
