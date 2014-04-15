@@ -25,6 +25,10 @@ import org.json.JSONObject;
 public class JsonResponse {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
+  public static final int ERR_SESSION_TIMEOUT = 10;
+
+  private Integer m_errorCode;
+  private String m_errorMessage;
   private final List<JSONObject> m_eventList;
   private final Map<String/*id*/, JSONObject> m_idToPropertyChangeEventMap;
 
@@ -113,6 +117,8 @@ public class JsonResponse {
         eventArray.put(e);
       }
       response.put("events", eventArray);
+      response.put("errorCode", m_errorCode);
+      response.put("errorMessage", m_errorMessage);
     }
     catch (JSONException ex) {
       LOG.error("", ex);
@@ -122,6 +128,14 @@ public class JsonResponse {
 
   public List<JSONObject> getEventList() {
     return Collections.unmodifiableList(m_eventList);
+  }
+
+  public void setErrorCode(Integer errorCode) {
+    m_errorCode = errorCode;
+  }
+
+  public void setErrorMessage(String errorMessage) {
+    m_errorMessage = errorMessage;
   }
 
 }

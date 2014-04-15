@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -110,8 +111,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       createAndRegisterJsonForm(form);
     }
 
-    JsonDesktopTree jsonOutline = JsonRendererFactory.get().createJsonDesktopTree(getDesktop().getOutline(), getJsonSession());
-    m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
+    if (getDesktop().getOutline() != null) {
+      JsonDesktopTree jsonOutline = JsonRendererFactory.get().createJsonDesktopTree(getDesktop().getOutline(), getJsonSession());
+      m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
+    }
 
     //FIXME add listener afterwards -> don't handle events, refactor
     super.attachModel();
@@ -130,6 +133,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       getDesktop().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
     }
+
+    for (JsonForm form : CollectionUtility.arrayList(m_jsonForms.values())) {
+      disposeAndUnregisterJsonForm(form.getModelObject());
+    }
   }
 
   @Override
@@ -147,7 +154,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
         viewButtons.put(jsonViewButton.toJson());
       }
       json.put("viewButtons", viewButtons);
-      json.put("outline", m_jsonOutlines.get(getDesktop().getOutline()).toJson());
+      JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
+      if (jsonDesktopTree != null) {
+        json.put("outline", jsonDesktopTree.toJson());
+      }
       json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME
 
       return json;
@@ -188,6 +198,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       }
       case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
         handleModelMessageBoxAdded(event.getMessageBox());
+        break;
+      }
+      case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+        handleModelDesktopClosed();
         break;
       }
     }
@@ -280,6 +294,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
         messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
       }
     }.runNow(new NullProgressMonitor());
+  }
+
+  protected void handleModelDesktopClosed() {
+    LOG.info("Desktop closed.");
+    //FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done for all, logout is done for all as well, gmail does the same).
+    //Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
   protected void attachFormListener(IForm form) {

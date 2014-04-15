@@ -19,6 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonRequest {
+  public static final String PROP_STARTUP = "startup";
+  public static final String PROP_EVENTS = "events";
+
   private final JSONObject m_request;
 
   public JsonRequest(JSONObject request) {
@@ -36,7 +39,7 @@ public class JsonRequest {
 
   public List<JsonEvent> getEvents() {
     try {
-      JSONArray events = m_request.getJSONArray("events");
+      JSONArray events = m_request.getJSONArray(PROP_EVENTS);
       List<JsonEvent> actionList = new ArrayList<>();
       for (int i = 0; i < events.length(); i++) {
         actionList.add(new JsonEvent(events.getJSONObject(i)));
@@ -50,5 +53,9 @@ public class JsonRequest {
 
   public JSONObject getRequestObject() {
     return m_request;
+  }
+
+  public boolean isStartupRequest() {
+    return Boolean.TRUE.equals(m_request.opt(PROP_STARTUP));
   }
 }

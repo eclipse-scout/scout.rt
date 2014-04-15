@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.json.desktop;
 
 import static org.eclipse.scout.rt.ui.json.testing.JsonTestUtility.extractEventsFromResponse;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -105,6 +106,17 @@ public class JsonDesktopTreeTest {
 
     List<ITreeNode> treeNodes = jsonDesktopTree.extractTreeNodes(responseEvents.get(0));
     Assert.assertEquals(firstNode, treeNodes.get(0));
+  }
+
+  @Test
+  public void testDispose() {
+    IOutline outline = new OutlineWithOneNode();
+    JsonDesktopTree object = createJsonDesktopTreeWithMocks(outline);
+    WeakReference<JsonDesktopTree> ref = new WeakReference<JsonDesktopTree>(object);
+
+    object.dispose();
+    object = null;
+    JsonTestUtility.assertGC(ref);
   }
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {

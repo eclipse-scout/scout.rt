@@ -46,6 +46,12 @@ public class JsonRendererFactory {
     m_instance = rendererFactory;
   }
 
+  public static void init() {
+    if (m_instance == null) {
+      m_instance = new JsonRendererFactory();
+    }
+  }
+
   public JsonClientSession createJsonClientSession(IClientSession model, IJsonSession session, String id) {
     JsonClientSession renderer = new JsonClientSession(model, session, id);
     renderer.init();

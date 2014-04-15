@@ -19,16 +19,22 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-public abstract class AbstractJsonSession implements IJsonSession {
+public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
@@ -103,8 +109,7 @@ public abstract class AbstractJsonSession implements IJsonSession {
   }
 
   public void dispose() throws JsonUIException {
-    //FIXME call dispose (from session invalidation listener and desktop close event?)
-    for (IJsonRenderer renderer : m_jsonRenderers.values()) {
+    for (IJsonRenderer renderer : CollectionUtility.arrayList(m_jsonRenderers.values())) {
       renderer.dispose();
     }
   }
@@ -178,6 +183,34 @@ public abstract class AbstractJsonSession implements IJsonSession {
     catch (Throwable t) {
       LOG.error("Handling event. Type: " + event.getEventType() + ", Id: " + id, t);
     }
+  }
+
+  @Override
+  public void valueBound(HttpSessionBindingEvent event) {
+  }
+
+  @Override
+  public void valueUnbound(HttpSessionBindingEvent event) {
+    LOG.info("Terminating json session " + event.getName() + "...");
+
+    //Detach from model
+    dispose();
+
+    //Dispose model
+    final IClientSession clientSession = getClientSession();
+    if (!clientSession.isActive()) {
+      //client session was probably already stopped by the model itself
+      return;
+    }
+
+    new ClientSyncJob("Disoposing client session", clientSession) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
+      }
+    }.runNow(new NullProgressMonitor());
+
+    LOG.info("Session " + event.getName() + " terminated.");
   }
 
 }

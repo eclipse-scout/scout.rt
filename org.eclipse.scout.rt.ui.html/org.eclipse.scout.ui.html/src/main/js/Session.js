@@ -9,6 +9,7 @@ scout.Session = function($entryPoint, sessionPartId) {
   this._asyncRequestQueued;
   this._sessionPartId = sessionPartId;
   this._deferred;
+  this._startup;
 
   //FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
@@ -44,6 +45,11 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     sessionPartId: this._sessionPartId
   };
 
+  if (this._startup) {
+    request.startup = true;
+    this._startup = false;
+  }
+
   var that = this;
   this._requestsPendingCounter++;
   $.ajax({
@@ -55,6 +61,13 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     data: JSON.stringify(request),
     success: function(message) {
       that._requestsPendingCounter--;
+
+      if (message.errorMessage) {
+        that.$entryPoint.html('');
+        that.$entryPoint.text(message.errorMessage);
+        return;
+      }
+
       that._processEvents(message.events);
 
       if (that._deferred) {
@@ -122,6 +135,7 @@ scout.Session.prototype._processEvents = function(events) {
 
 scout.Session.prototype.init = function() {
   // create all widgets for entry point
+  this._startup = true;
   this.send('startup', this._sessionPartId);
 };
 

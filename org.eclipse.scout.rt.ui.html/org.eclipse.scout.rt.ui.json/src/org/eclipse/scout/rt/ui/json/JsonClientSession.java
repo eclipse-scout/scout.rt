@@ -97,7 +97,8 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    //FIXME A little strange that startup doesn't actually trigger startup of the client session
+    //FIXME A little strange that startup doesn't actually trigger startup of the client session, maybe should not be handled by client session but by json session instead
+    //Probably better use JsonRequest.isStartupRequest instead
     if ("startup".equals(event.getEventType())) {
       handleUiStartup(event, res);
     }

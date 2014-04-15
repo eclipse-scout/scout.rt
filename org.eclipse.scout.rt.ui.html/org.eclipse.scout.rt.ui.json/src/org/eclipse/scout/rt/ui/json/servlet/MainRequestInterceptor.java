@@ -70,6 +70,14 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     synchronized (this) {
       jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
+        if (!uiReq.isStartupRequest()) {
+          LOG.info("Request cannot be processed due to session timeout.");
+          writeResponse(resp, createSessionTimeoutJsonResponse());
+          return true;
+        }
+
+        LOG.info("Creating new json session " + sessionAttributeName + "...");
+
         //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
         jsonSession = servlet.createJsonSession();
         jsonSession.init(req, uiReq.getSessionPartId());
@@ -80,16 +88,27 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     //GUI requests for the same session must be processed consecutively
     synchronized (jsonSession) {
       JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
-      String jsonText = uiRes.toJson().toString();
-      byte[] data = jsonText.getBytes("UTF-8");
-      resp.setContentLength(data.length);
-      resp.setContentType("application/json");
-      resp.setCharacterEncoding("UTF-8");
-      resp.getOutputStream().write(data);
-
-      LOG.debug("Returned: " + jsonText);
+      writeResponse(resp, uiRes);
     }
     return true;
+  }
+
+  protected JsonResponse createSessionTimeoutJsonResponse() {
+    JsonResponse uiResp = new JsonResponse();
+    uiResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
+    uiResp.setErrorMessage("Session has expired, please reload the page"); //FIXME use TEXTS
+    return uiResp;
+  }
+
+  protected void writeResponse(HttpServletResponse resp, JsonResponse uiRes) throws IOException {
+    String jsonText = uiRes.toJson().toString();
+    byte[] data = jsonText.getBytes("UTF-8");
+    resp.setContentLength(data.length);
+    resp.setContentType("application/json");
+    resp.setCharacterEncoding("UTF-8");
+    resp.getOutputStream().write(data);
+
+    LOG.debug("Returned: " + jsonText);
   }
 
   protected JSONObject toJSON(HttpServletRequest req) throws JsonUIException {

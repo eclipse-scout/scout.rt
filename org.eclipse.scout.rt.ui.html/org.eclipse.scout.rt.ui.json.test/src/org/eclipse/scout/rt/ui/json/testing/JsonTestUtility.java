@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json.testing;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.mockito.Mockito;
 
 public class JsonTestUtility {
@@ -57,6 +59,24 @@ public class JsonTestUtility {
       }
     }
     return list;
+  }
+
+  public static void assertGC(WeakReference<?> ref) {
+    int maxRuns = 50;
+    for (int i = 0; i < maxRuns; i++) {
+      if (ref.get() == null) {
+        return;
+      }
+
+      System.gc();
+      try {
+        Thread.sleep(50);
+      }
+      catch (InterruptedException e) {
+      }
+    }
+
+    Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
 }

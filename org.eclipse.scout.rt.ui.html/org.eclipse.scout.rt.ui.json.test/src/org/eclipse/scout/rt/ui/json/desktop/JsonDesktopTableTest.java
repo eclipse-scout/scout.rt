@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.json.desktop;
 
 import static org.eclipse.scout.rt.ui.json.testing.JsonTestUtility.extractEventsFromResponse;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -19,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTable;
 import org.eclipse.scout.rt.ui.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.json.testing.JsonTestUtility;
@@ -105,6 +105,17 @@ public class JsonDesktopTableTest {
     Assert.assertEquals(row4, tableRows.get(0));
   }
 
+  @Test
+  public void testDispose() {
+    Table table = new Table();
+    JsonDesktopTable object = createJsonDesktopTableWithMocks(table);
+    WeakReference<JsonDesktopTable> ref = new WeakReference<JsonDesktopTable>(object);
+
+    object.dispose();
+    object = null;
+    JsonTestUtility.assertGC(ref);
+  }
+
   public static JsonDesktopTable createJsonDesktopTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
 
@@ -124,4 +135,5 @@ public class JsonDesktopTableTest {
     event.getEventObject().put(JsonDesktopTable.PROP_ROW_IDS, rowIds);
     return event;
   }
+
 }
