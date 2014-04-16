@@ -172,7 +172,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public String classId() {
-    return getContainer().classId() + ITypeWithClassId.ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass()) + ITypeWithClassId.ID_CONCAT_SYMBOL + getContainer().classId();
   }
 
   /*
