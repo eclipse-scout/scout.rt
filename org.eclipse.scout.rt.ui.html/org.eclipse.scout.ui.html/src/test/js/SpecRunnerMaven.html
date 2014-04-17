@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+  This spec runner is used by the maven build.
+  You can use it too while developing by executing
+  mvn jasmine:bdd and connecting to http://localhost:8234/ with your browser.
+  Alternatively, use SpecRunner.html.
+ -->
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset="UTF-8">
+  $if(autoRefresh)$
+  <meta http-equiv="refresh" content="$autoRefreshInterval$">
+  $endif$
+  <title>Jasmine Spec Runner</title>
+  <script type="text/javascript">
+    window.onerror = function(msg,url,line) {
+      if (document.head) {
+        var jserror = document.head.getAttribute('jmp_jserror') || '';
+        if (jserror) {
+          jserror += ':!:';
+        }
+        jserror += msg;
+        document.head.setAttribute('jmp_jserror',jserror);
+      }
+    };
+  </script>
+  <link rel="shortcut icon" type="image/png" href="../../../libjs/jasmine-2.0.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="../../../libjs/jasmine-2.0.0/jasmine.css">
+
+  <script type="text/javascript" src="../../../libjs/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/jasmine.js"></script>
+  <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/boot.js"></script>
+  <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
+  <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/plugins/mock-ajax.js"></script>
+  <script type="text/javascript" src="src/jasmine/JasmineScout.js"></script>
+  <script type="text/javascript" src="src/jasmine/JasmineMavenReporter.js"></script>
+  <script type="text/javascript" src="src/jasmine/boot.ext.js"></script>
+  $allScriptTags$
+</head>
+<body>
+  <script type="text/javascript">
+  if(window.location.href.indexOf("ManualSpecRunner.html") !== -1) {
+    document.body.appendChild(document.createTextNode("Warning: opening this HTML file directly from the file system is deprecated. You should instead try running `mvn jasmine:bdd` from the command line, and then visit `http://localhost:8234` in your browser. "))
+  }
+  </script>
+</body>
+</html>

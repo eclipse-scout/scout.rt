@@ -7,16 +7,17 @@
   <link rel="shortcut icon" type="image/png" href="../../../libjs/jasmine-2.0.0/jasmine_favicon.png">
   <link rel="stylesheet" type="text/css" href="../../../libjs/jasmine-2.0.0/jasmine.css">
 
-<script type="text/javascript" src="../../../libjs/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="../../../libjs/jquery-2.1.0.js"></script>
   <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/jasmine.js"></script>
   <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/jasmine-html.js"></script>
   <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/boot.js"></script>
   <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
   <script type="text/javascript" src="../../../libjs/jasmine-2.0.0/plugins/mock-ajax.js"></script>
-  <script type="text/javascript" src="JasmineScout.js"></script>
+  <script type="text/javascript" src="../../main/js/jasmine/JasmineScout.js"></script>
+  <script type="text/javascript" src="../../main/js/jasmine/JasmineMavenReporter.js"></script>
+  <script type="text/javascript" src="../../main/js/jasmine/boot.ext.js"></script>
 
   <!-- include source files here... -->
-  <script>var scout = {};</script>
   <script type="text/javascript" src="../../../src/main/js/jquery-scout.js"></script>
   <script type="text/javascript" src="../../../src/main/js/util/arrays.js"></script>
   <script type="text/javascript" src="../../../src/main/js/Session.js"></script>
@@ -45,14 +46,12 @@
 
   <!-- include spec files here... -->
   <script type="text/javascript" src="JasmineScoutSpec.js"></script>
-  <script type="text/javascript" src="ScoutSpec.js"></script>
   <script type="text/javascript" src="SessionSpec.js"></script>
   <script type="text/javascript" src="desktop/DesktopTreeSpec.js"></script>
   <script type="text/javascript" src="desktop/DesktopTableSpec.js"></script>
   <script type="text/javascript" src="text/DecimalFormatSpec.js"></script>
   <script type="text/javascript" src="text/DateFormatSpec.js"></script>
   <script type="text/javascript" src="util/arraysSpec.js"></script>
-
 </head>
 
 <body>
