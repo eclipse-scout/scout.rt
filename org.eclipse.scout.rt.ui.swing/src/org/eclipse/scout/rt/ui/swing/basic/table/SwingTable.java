@@ -42,11 +42,12 @@ class SwingTable extends JTableEx {
 
   public void setOptimalColumnWidth(TableColumn tc) {
     int modelIndex = tc.getModelIndex();
+    int viewIndex = convertColumnIndexToView(modelIndex);
     int dw = getIntercellSpacing().width;
     Insets is = new Insets(0, 0, 0, 0);
     int wmax = 16;
     if (getTableHeader() != null) {
-      Component hcomp = getTableHeader().getDefaultRenderer().getTableCellRendererComponent(this, tc.getHeaderValue(), false, false, 0, modelIndex);
+      Component hcomp = getTableHeader().getDefaultRenderer().getTableCellRendererComponent(this, tc.getHeaderValue(), false, false, 0, viewIndex);
       wmax = SwingLayoutUtility.getSize(hcomp, SwingLayoutUtility.PREF).width;
       if (hcomp instanceof JComponent) {
         ((JComponent) hcomp).getInsets(is);
@@ -60,9 +61,9 @@ class SwingTable extends JTableEx {
       }
     }
     for (int r = 0, nr = getRowCount(); r < nr; r++) {
-      TableCellRenderer renderer = getCellRenderer(r, modelIndex);
+      TableCellRenderer renderer = getCellRenderer(r, viewIndex);
       if (renderer != null) {
-        JComponent comp = (JComponent) prepareRenderer(renderer, r, modelIndex);
+        JComponent comp = (JComponent) prepareRenderer(renderer, r, viewIndex);
         int w = SwingLayoutUtility.getSize(comp, SwingLayoutUtility.PREF).width;
         if (comp instanceof JComponent) {
           (comp).getInsets(is);

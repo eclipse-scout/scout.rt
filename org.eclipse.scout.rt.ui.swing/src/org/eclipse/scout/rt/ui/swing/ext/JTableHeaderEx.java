@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,7 +44,7 @@ public class JTableHeaderEx extends JTableHeader {
         if (renderer == null) {
           renderer = getDefaultRenderer();
         }
-        Component comp = renderer.getTableCellRendererComponent(getTable(), value, false, false, 0, col.getModelIndex());
+        Component comp = renderer.getTableCellRendererComponent(getTable(), value, false, false, 0, getTable().convertColumnIndexToView(col.getModelIndex()));
         Dimension d;
         if (comp instanceof JLabel) {
           ((JLabel) comp).setVerticalAlignment(SwingConstants.TOP);
