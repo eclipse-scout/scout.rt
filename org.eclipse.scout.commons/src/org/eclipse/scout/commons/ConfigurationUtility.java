@@ -62,7 +62,6 @@ public final class ConfigurationUtility {
         if (candidate.isAnnotationPresent(Order.class)) {
           Order order = (Order) candidate.getAnnotation(Order.class);
           orderedClassesMap.put(new CompositeObject(order.value(), i), (Class<T>) candidate);
-          i++;
         }
         else {
           if (!candidate.isAnnotationPresent(Replace.class)) {
@@ -70,6 +69,7 @@ public final class ConfigurationUtility {
           }
           orderedClassesMap.put(new CompositeObject(Double.MAX_VALUE, i), (Class<T>) candidate);
         }
+        i++;
       }
     }
     return Collections.unmodifiableList(new ArrayList<Class<? extends T>>(orderedClassesMap.values()));
