@@ -53,7 +53,7 @@ public class ClientNotificationQueue {
     synchronized (m_queueLock) {
       for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
         QueueElement e = it.next();
-        if (!e.getFilter().isActive()) {
+        if (!e.isActive()) {
           it.remove();
         }
         else if (e.getClientNotification() == notification) {
@@ -75,7 +75,7 @@ public class ClientNotificationQueue {
         IServerSession serverSession = ThreadContext.getServerSession();
         for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
           QueueElement e = it.next();
-          if (e.getFilter().isActive()
+          if (e.isActive()
               && !e.isConsumedBy(serverSession)
               && e.getFilter().accept()
               && consumedNotificationIds.contains(e.getClientNotification().getId())) {
@@ -98,7 +98,7 @@ public class ClientNotificationQueue {
           IServerSession serverSession = ThreadContext.getServerSession();
           for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
             QueueElement e = it.next();
-            if (e.getFilter().isActive()) {
+            if (e.isActive()) {
               if (!e.isConsumedBy(serverSession)) {
                 if (e.getFilter().accept()) {
                   list.add(e.getClientNotification());
@@ -131,11 +131,13 @@ public class ClientNotificationQueue {
     private IClientNotificationFilter m_filter;
     private Object m_consumedBySessionsLock;
     private WeakHashMap<IServerSession, Object> m_consumedBySessions;
+    private final long m_valid_until;
 
     public QueueElement(IClientNotification notification, IClientNotificationFilter filter) {
       m_notification = notification;
       m_filter = filter;
       m_consumedBySessionsLock = new Object();
+      m_valid_until = System.currentTimeMillis() + notification.getTimeout();
     }
 
     public IClientNotification getClientNotification() {
@@ -144,6 +146,14 @@ public class ClientNotificationQueue {
 
     public IClientNotificationFilter getFilter() {
       return m_filter;
+    }
+
+    public boolean isActive() {
+      return !isExpired() && m_filter.isActive();
+    }
+
+    private boolean isExpired() {
+      return System.currentTimeMillis() >= m_valid_until;
     }
 
     /**

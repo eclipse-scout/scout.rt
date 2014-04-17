@@ -19,41 +19,21 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.service.IService;
 
 /**
- * This service is used to listen for and handle client notifications. It is
- * also used by {@link IServiceTunnel} to dispatch notifications received by
- * every service response.
+ * A service to dispatch incoming client notifications (from the server) to {@link IClientNotificationConsumerListener}
+ * listeners.
  */
 @Priority(-3)
 public interface IClientNotificationConsumerService extends IService {
 
   /**
-   * The {@link IServiceTunnel} calles this method whenever client notifications
+   * The {@link IServiceTunnel} calls this method whenever client notifications
    * have been received. This method is normally not called by clients
    */
   void dispatchClientNotifications(IClientNotification[] notifications, IClientSession session);
 
   /**
-   * A consumer of client notifications can add a listener to this service. The
-   * listener is notified immediately on new notifications, in whatever Thread
-   * 
-   * @deprecated use {@link #addClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
-   *             instead. Services that register in their {@link IService#initializeService()} phase normally use
-   *             {@link #addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener)}
-   */
-  @Deprecated
-  void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
-
-  /**
-   * @deprecated use
-   *             {@link #removeClientNotificationConsumerListener(IClientSession, IClientNotificationConsumerListener)}
-   *             instead
-   */
-  @Deprecated
-  void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
-
-  /**
    * A consumer of client notifications can add a listener on this service. The
-   * listener is notified immediately on new notifications, in whatever thread
+   * listener is notified immediately on new notifications (for given session), in whatever thread
    */
   void addClientNotificationConsumerListener(IClientSession session, IClientNotificationConsumerListener listener);
 
@@ -64,16 +44,23 @@ public interface IClientNotificationConsumerService extends IService {
    * listener is notified immediately on new notifications, in whatever thread.
    * A global listener is notified on any client session, this can be used to attach generic functionality for any
    * session.
+   * <p>
    * Note that this does not imply that a client notification is broadcast to any client session. It simply means that
-   * whenever a client session receives a notification,
-   * this listener is informed.
+   * whenever a client session receives a notification, this listener is informed.
+   * </p>
    */
   void addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
 
   void removeGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener);
 
-  Set<String> getConsumedNotificationIds();
+  /**
+   * Returns the ids for the received notifications for a given client session.
+   */
+  Set<String> getConsumedNotificationIds(IClientSession session);
 
-  void ackConfirmed(Set<String> cnIds, IClientSession session);
+  /**
+   * Returns the ids for the received notifications for a any client session
+   */
+  Set<String> getGlobalConsumedNotificationIds();
 
 }

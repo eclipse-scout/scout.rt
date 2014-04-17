@@ -61,4 +61,9 @@ public interface IClientNotification extends Serializable {
    *          com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
    */
   void setOriginNode(int node);
+
+  /**
+   * @return the timeout in ms. After this timeout the notification is expired.
+   */
+  long getTimeout();
 }

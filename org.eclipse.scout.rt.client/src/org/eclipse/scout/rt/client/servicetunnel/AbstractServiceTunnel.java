@@ -121,7 +121,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       ServiceTunnelRequest call = new ServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
       // client notification handler
       IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
-      Set<String> cnIds = cns.getConsumedNotificationIds();
+      Set<String> cnIds = cns.getConsumedNotificationIds(getClientSession());
       call.setConsumedNotifications(cnIds);
       call.setClientSubject(getClientSession().getSubject());
       call.setVirtualSessionId(getClientSession().getVirtualSessionId());
@@ -147,7 +147,6 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       }
 
       if (cns != null) {
-        cns.ackConfirmed(cnIds, m_clientSession);
         cns.dispatchClientNotifications(response.getClientNotifications(), m_clientSession);
       }
       // error handler
