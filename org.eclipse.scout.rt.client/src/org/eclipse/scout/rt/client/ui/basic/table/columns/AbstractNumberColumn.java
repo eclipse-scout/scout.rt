@@ -74,7 +74,7 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
-   * @deprecated Will be removed with scout 5.0. For setting the format override {@link #initConfig()} and call
+   * @deprecated Will be removed in the 5.0 Release. For setting the format override {@link #initConfig()} and call
    *             {@link #setFormat(DecimalFormat)}.
    */
   @Deprecated
@@ -166,7 +166,7 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
   }
 
   /**
-   * @deprecated Will be removed with scout 5.0. Use {@link #setFormat()}.
+   * @deprecated Will be removed in the 5.0 Release. Use {@link #setFormat()}.
    */
   @Deprecated
   protected final void setNumberFormat(NumberFormat fmt) {

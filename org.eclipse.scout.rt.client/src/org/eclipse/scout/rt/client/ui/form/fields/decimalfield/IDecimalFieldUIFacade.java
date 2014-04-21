@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberFieldUIFaca
 
 /**
  * @Deprecated Use {@link IBasicFieldUIFacade} instead
- *             Will be removed with the M-Release
+ *             Will be removed in the 5.0 Release.
  */
 @SuppressWarnings("deprecation")
 @Deprecated

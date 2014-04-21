@@ -15,8 +15,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 
 /**
- * @Deprecated: use {@link ClientHttpServiceTunnel} instead
- *              To be removed with the K-Release
+ * @deprecated: use {@link ClientHttpServiceTunnel} instead
+ *              Will be removed in the 5.0 Release
  */
 @Deprecated
 @SuppressWarnings("deprecation")

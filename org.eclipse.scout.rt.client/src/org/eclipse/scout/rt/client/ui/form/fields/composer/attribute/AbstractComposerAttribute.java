@@ -38,7 +38,7 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
   /**
    * @deprecated the id must always by the class simple name
    *             for dynamic attributes use {@link IComposerField#getMetaDataOfAttribute(IComposerAttribute)}.
-   *             Will be removed in the M-Release.
+   *             Will be removed in the 5.0 Release.
    */
   @Deprecated
   @ConfigProperty(ConfigProperty.STRING)
@@ -93,7 +93,7 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
   }
 
   /**
-   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
+   * @deprecated processing logic belongs to server. Will be removed in the 5.0 Release.
    */
   @Deprecated
   protected String getConfiguredStatement() {
@@ -101,7 +101,7 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
   }
 
   /**
-   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
+   * @deprecated processing logic belongs to server. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public String getLegacyStatement() {

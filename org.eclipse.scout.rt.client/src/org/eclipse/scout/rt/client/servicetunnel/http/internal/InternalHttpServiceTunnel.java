@@ -23,11 +23,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
- * @Deprecated: the new class is
+ * @deprecated: the new class is
  *              {@link org.eclipse.scout.rt.client.servicetunnel.http.internal.InternalClientHttpServiceTunnel}.
  *              If you have used this internal class, consider
  *              {@link org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel} instead.
- *              To be removed with the K-Release
+ *              Will be removed in the 5.0 Release
  */
 @Deprecated
 @SuppressWarnings("deprecation")

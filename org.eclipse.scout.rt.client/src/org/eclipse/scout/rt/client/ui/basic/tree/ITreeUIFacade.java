@@ -41,7 +41,7 @@ public interface ITreeUIFacade {
   void fireNodeActionFromUI(ITreeNode node);
 
   /**
-   * @deprecated will be removed in the M-Release. Use {@link AbstractTree#isDragEnabled()} instead.
+   * @deprecated Will be removed in the 5.0 Release. Use {@link AbstractTree#isDragEnabled()} instead.
    */
   @Deprecated
   boolean getNodesDragEnabledFromUI();
@@ -50,7 +50,7 @@ public interface ITreeUIFacade {
 
   /**
    * Called after the drag operation was finished
-   *
+   * 
    * @since 4.0-M7
    */
   void fireDragFinishedFromUI();
@@ -59,7 +59,7 @@ public interface ITreeUIFacade {
 
   /**
    * Called if the drop node is changed during a drag and drop operation
-   *
+   * 
    * @since 4.0-M7
    */
   void fireNodeDropTargetChangedFromUI(ITreeNode node);

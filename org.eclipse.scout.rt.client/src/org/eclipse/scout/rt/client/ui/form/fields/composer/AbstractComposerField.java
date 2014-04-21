@@ -406,7 +406,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   /**
-   * @deprecated use {@link #getEntities()} instead. Will be removed in the M-Release.
+   * @deprecated use {@link #getEntities()} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public List<IComposerEntity> getComposerEntities() {
@@ -420,7 +420,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   /**
-   * @deprecated use {@link #getAttributes()} instead. Will be removed in the M-Release.
+   * @deprecated use {@link #getAttributes()} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public List<IComposerAttribute> getComposerAttributes() {

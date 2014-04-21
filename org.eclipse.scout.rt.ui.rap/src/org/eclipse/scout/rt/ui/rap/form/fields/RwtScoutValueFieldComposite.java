@@ -46,7 +46,7 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   /**
    * Forces UI Input to be verified.
    * 
-   * @deprecated Use {@link RwtScoutComposite#runUiInputVerifier()} instead. Will be removed in the M-Release.
+   * @deprecated Use {@link RwtScoutComposite#runUiInputVerifier()} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void verifyUiInput() {

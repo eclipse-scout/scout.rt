@@ -138,7 +138,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * @deprecated processing logic belongs to server. Will be removed in the M-Release.
+   * @deprecated processing logic belongs to server. Will be removed in the 5.0 Release.
    */
   @Deprecated
   protected String getConfiguredSearchTerm() {
@@ -146,7 +146,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * @deprecated Will be removed in the M-Release.
+   * @deprecated Will be removed in the 5.0 Release.
    */
   @Deprecated
   public final String getLegacySearchTerm() {
@@ -617,7 +617,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    */
   @Deprecated
   @Order(20)

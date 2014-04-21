@@ -686,6 +686,10 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return getValue();
   }
 
+  /**
+   * @return
+   * @deprecated Will be removed in the 5.0 Release. Use {@link #getCheckedKey()} instead
+   */
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override
@@ -693,6 +697,10 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return CollectionUtility.firstElement(getCheckedLookupRows());
   }
 
+  /**
+   * @return
+   * @deprecated Will be removed in the 5.0 Release.. Use {@link #getCheckedKeys()} instead
+   */
   @SuppressWarnings({"deprecation", "unchecked"})
   @Deprecated
   @Override

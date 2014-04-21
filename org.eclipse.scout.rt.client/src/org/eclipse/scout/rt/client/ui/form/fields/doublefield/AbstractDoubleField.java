@@ -38,7 +38,7 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
    */
 
   /**
-   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMinValue()}.<br>
+   * @deprecated Will be removed in the 5.0 Release., use {@link #getConfiguredMinValue()}.<br>
    *             As long as this deprecated version is overridden in subclasses. This setting wins over
    *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
    */
@@ -48,7 +48,7 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
   }
 
   /**
-   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMaxValue()}.<br>
+   * @deprecated Will be removed in the 5.0 Release., use {@link #getConfiguredMaxValue()}.<br>
    *             As long as this deprecated version is overridden in subclasses. This setting wins over
    *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
    */

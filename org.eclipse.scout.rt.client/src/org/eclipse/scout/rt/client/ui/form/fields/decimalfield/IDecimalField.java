@@ -23,7 +23,7 @@ public interface IDecimalField<T extends Number> extends INumberField<T>, IDecim
 
   /**
    * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
-   *             Will be removed with the M-Release
+   *             Will be removed in the 5.0 Release.
    */
   @Override
   @Deprecated

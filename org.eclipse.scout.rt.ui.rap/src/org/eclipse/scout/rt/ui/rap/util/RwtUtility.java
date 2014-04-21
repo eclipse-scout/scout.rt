@@ -1501,7 +1501,7 @@ public final class RwtUtility {
   }
 
   /**
-   * @deprecated Use {@link #runUiInputVerifier(Control)} instead. Will be removed in the M-Release.
+   * @deprecated Use {@link #runUiInputVerifier(Control)} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public static void verifyUiInput(Control control) {

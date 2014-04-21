@@ -59,7 +59,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPageWithNodes()} in combination with getter and setter on the page
    *             instead.
    */
@@ -78,7 +78,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPageWithNodes(boolean, String)} in combination with getter and setter on the page
    *             instead.
    */

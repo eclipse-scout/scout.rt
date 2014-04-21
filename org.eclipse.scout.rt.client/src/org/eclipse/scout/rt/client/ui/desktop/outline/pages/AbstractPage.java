@@ -87,7 +87,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPage()} in combination with getter and setter (page variable) instead.
    */
   @Deprecated
@@ -101,7 +101,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPage(boolean)} in combination with getter and setter (page variable) instead.
    */
   @Deprecated
@@ -180,7 +180,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
-   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    * @return a documentation text, suitable to be included in external documents
    */
   /**

@@ -40,7 +40,7 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractExtensiblePageWithNodes()} in combination with getter and setter (page variable)
    *             instead.
    */
@@ -59,7 +59,7 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractExtensiblePageWithNodes(boolean, String)} in combination with getter and setter
    *             (page
    *             variable) instead.

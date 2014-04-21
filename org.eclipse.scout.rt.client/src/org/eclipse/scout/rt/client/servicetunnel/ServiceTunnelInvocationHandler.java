@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.servicetunnel;
 import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 
 /**
- * @Deprecated: use {@link org.eclipse.scout.rt.servicetunnel.ServiceTunnelInvocationHandler} instead
- *              To be removed with the M-Release
+ * @deprecated: use {@link org.eclipse.scout.rt.servicetunnel.ServiceTunnelInvocationHandler} instead
+ *              Will be removed in the 5.0 Release
  */
 @Deprecated
 public class ServiceTunnelInvocationHandler extends org.eclipse.scout.rt.servicetunnel.ServiceTunnelInvocationHandler {

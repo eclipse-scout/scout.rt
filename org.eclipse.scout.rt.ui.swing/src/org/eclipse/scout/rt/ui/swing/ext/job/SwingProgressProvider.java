@@ -35,7 +35,7 @@ public class SwingProgressProvider extends ProgressProvider implements IProperty
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingProgressProvider.class);
 
   /**
-   * @deprecated replaced by {@link #PROP_MONITOR_PROPERTIES}. Will be removed with M-Release.
+   * @deprecated replaced by {@link #PROP_MONITOR_PROPERTIES}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public static final String PROP_ACTIVE_MONITOR = "activeMonitor";

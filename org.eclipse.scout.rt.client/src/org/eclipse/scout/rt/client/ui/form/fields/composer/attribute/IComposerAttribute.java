@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
 /**
- * @deprecated use {@link IDataModelAttribute}. Will be removed in the M-Release.
+ * @deprecated use {@link IDataModelAttribute}. Will be removed in the 5.0 Release.
  */
 @Deprecated
 public interface IComposerAttribute extends IDataModelAttribute {
@@ -30,7 +30,7 @@ public interface IComposerAttribute extends IDataModelAttribute {
   /**
    * @deprecated the id must always by the class simple name
    *             for dynamic attributes use {@link IComposerField#getMetaDataOfAttribute(IComposerAttribute)}.
-   *             Will be removed in the M-Release.
+   *             Will be removed in the 5.0 Release.
    */
   @Deprecated
   void setId(String s);

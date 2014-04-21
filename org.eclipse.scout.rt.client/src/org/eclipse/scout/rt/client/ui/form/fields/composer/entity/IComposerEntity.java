@@ -20,13 +20,13 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 public interface IComposerEntity extends IDataModelEntity {
 
   /**
-   * @deprecated the id must always by the class simple name. Will be removed in the M-Release.
+   * @deprecated the id must always by the class simple name. Will be removed in the 5.0 Release.
    */
   @Deprecated
   String getId();
 
   /**
-   * @deprecated the id must always by the class simple name. Will be removed in the M-Release.
+   * @deprecated the id must always by the class simple name. Will be removed in the 5.0 Release.
    */
   @Deprecated
   void setId(String s);

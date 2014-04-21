@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @Deprecated: Will be removed in the 5.0 Release: The "Screenshot" feature did never work in RAP because it is just
+ * @deprecated: Will be removed in the 5.0 Release: The "Screenshot" feature did never work in RAP because it is just
  *              not possible like this. (see http://www.eclipse.org/forums/index.php/t/282556/) Therefore the
  *              WidgetPrinter will be removed including the event handling for the events used for this feature.
  */

@@ -128,7 +128,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * @Deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
+   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    */
   @Deprecated
   @Order(40)

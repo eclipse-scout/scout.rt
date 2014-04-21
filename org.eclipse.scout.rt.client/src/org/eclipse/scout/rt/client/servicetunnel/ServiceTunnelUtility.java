@@ -15,8 +15,8 @@ import java.lang.reflect.InvocationHandler;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 
 /**
- * @Deprecated: use {@link org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility} instead
- *              To be removed with the M-Release
+ * @deprecated: use {@link org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility} instead
+ *              Will be removed in the 5.0 Release
  */
 @Deprecated
 public final class ServiceTunnelUtility {

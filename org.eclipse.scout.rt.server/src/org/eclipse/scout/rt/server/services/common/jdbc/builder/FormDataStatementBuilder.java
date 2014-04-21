@@ -385,7 +385,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
 
   @Deprecated
@@ -394,7 +394,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator) {
@@ -402,7 +402,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator, boolean plainBind) {
@@ -410,7 +410,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
@@ -418,7 +418,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(Class<?>[] fieldTypes, String sqlAttribute, int operator) {
@@ -426,7 +426,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(ClassIdentifier[] fieldTypeIdentifiers, String sqlAttribute, int operator) {
@@ -434,7 +434,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use setBasicDefinition instead
+   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setValueDefinition(ValuePartDefinition def) {
@@ -718,7 +718,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use {@link #getBasicPartDefinitions()} instead
+   * @deprecated use {@link #getBasicPartDefinitions()} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public List<BasicPartDefinition> getValuePartDefinitions() {
@@ -912,7 +912,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated use {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)} instead
+   * @deprecated use {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)} instead. Will
+   *             be removed in the 5.0 Release.
    */
   @Deprecated
   public String buildComposerEntityNode(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
@@ -1298,7 +1299,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @deprecated moved to {@link EntityContributionUtility}
+   * @deprecated moved to {@link EntityContributionUtility}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   protected String autoBracketSelectPart(String s) {

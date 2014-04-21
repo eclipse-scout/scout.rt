@@ -402,7 +402,7 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   /**
-   * @Deprecated: use setServiceTunnel(IClientServiceTunnel) instead. Will be removed in the M-Release.
+   * @deprecated: use setServiceTunnel(IClientServiceTunnel) instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   @SuppressWarnings("deprecation")

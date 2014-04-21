@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
 /**
  * @Deprecated Use {@link IBasicFieldUIFacade} instead
- *             Will be removed with the M-Release
+ *             Will be removed in the 5.0 Release.
  */
 @Deprecated
 public interface INumberFieldUIFacade extends IBasicFieldUIFacade {

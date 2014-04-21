@@ -103,7 +103,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   /**
    * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
    * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   * @deprecated will be renamed to setParentEntityInternal and set to package private. Will be removed in the 5.0
+   *             Release.
    */
   @Deprecated
   IDataModelEntity getParentEntity();
@@ -111,7 +112,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   /**
    * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
    * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   * @deprecated will be renamed to setParentEntityInternal and set to package private. Will be removed in the 5.0
+   *             Release.
    */
   @Deprecated
   void setParentEntity(IDataModelEntity parent);

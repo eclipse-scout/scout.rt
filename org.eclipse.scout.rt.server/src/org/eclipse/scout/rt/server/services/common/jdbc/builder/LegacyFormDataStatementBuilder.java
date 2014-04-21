@@ -33,7 +33,7 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #getDataModelAttributePartDefinitions()}
+   * @deprecated use {@link #getDataModelAttributePartDefinitions()}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public Map<Class<?>, DataModelAttributePartDefinition> getComposerAttributePartDefinitions() {
@@ -41,7 +41,7 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #getDataModelEntityPartDefinitions()}
+   * @deprecated use {@link #getDataModelEntityPartDefinitions()}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public Map<Class<?>, DataModelEntityPartDefinition> getComposerEntityPartDefinitions() {
@@ -49,7 +49,7 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String)}
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String)}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
@@ -57,7 +57,8 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, boolean)}
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, boolean)}. Will be removed in the 5.0
+   *             Release.
    */
   @Deprecated
   public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
@@ -65,7 +66,8 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, String, boolean)}
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, String, boolean)}. Will be removed in the
+   *             5.0 Release.
    */
   @Deprecated
   public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
@@ -73,7 +75,8 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(DataModelAttributePartDefinition)}
+   * @deprecated use {@link #setDataModelAttributeDefinition(DataModelAttributePartDefinition)}. Will be removed in the
+   *             5.0 Release.
    */
   @Deprecated
   public void setComposerAttributeDefinition(ComposerAttributePartDefinition def) {
@@ -81,7 +84,7 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelEntityDefinition(Class, String)}
+   * @deprecated use {@link #setDataModelEntityDefinition(Class, String)}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
@@ -89,7 +92,7 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelEntityDefinition(Class, String, String)}
+   * @deprecated use {@link #setDataModelEntityDefinition(Class, String, String)}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
@@ -97,7 +100,8 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #setDataModelEntityDefinition(DataModelEntityPartDefinition)}
+   * @deprecated use {@link #setDataModelEntityDefinition(DataModelEntityPartDefinition)}. Will be removed in the 5.0
+   *             Release.
    */
   @Deprecated
   public void setComposerEntityDefinition(ComposerEntityPartDefinition def) {
@@ -113,7 +117,8 @@ public class LegacyFormDataStatementBuilder extends FormDataStatementBuilder {
   }
 
   /**
-   * @deprecated use {@link #createSqlPart(Integer, String, int, List, List, boolean, Map)}
+   * @deprecated use {@link #createSqlPart(Integer, String, int, List, List, boolean, Map)}. Will be removed in the 5.0
+   *             Release.
    */
   @Deprecated
   public String createStatementPart(final Integer aggregationType, String sql, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {

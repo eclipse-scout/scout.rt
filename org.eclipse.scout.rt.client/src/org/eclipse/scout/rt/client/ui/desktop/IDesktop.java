@@ -422,7 +422,7 @@ public interface IDesktop extends IPropertyObserver {
   void openUrlInBrowser(String url, IUrlTarget target);
 
   /**
-   * @deprecated use {@link #openUrlInBrowser(String)}
+   * @deprecated use {@link #openUrlInBrowser(String)}. Will be removed in the 5.0 Release.
    */
   @Deprecated
   void openBrowserWindow(String path);

@@ -90,7 +90,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPageWithTable()} in combination with getter and setter (page variable) instead.
    */
   @Deprecated
@@ -104,7 +104,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPageWithTable(boolean)} in combination with getter and setter (page variable)
    *             instead.
    */
@@ -119,7 +119,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractPageWithTable(boolean, String)} in combination with getter and setter (page
    *             variable) instead.
    */

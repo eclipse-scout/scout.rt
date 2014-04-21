@@ -38,7 +38,7 @@ public class ComposerAttributePartDefinition extends DataModelAttributePartDefin
   }
 
   /**
-   * @deprecated use {@link #getWhereClause() }
+   * @deprecated use {@link #getWhereClause() } Will be removed in the 5.0 Release.
    */
   @Deprecated
   public String getSqlAttribute() {

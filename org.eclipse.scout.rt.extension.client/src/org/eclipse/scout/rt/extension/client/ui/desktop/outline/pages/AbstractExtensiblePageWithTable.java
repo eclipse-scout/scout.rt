@@ -36,7 +36,7 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractExtensiblePageWithTable()} in combination with getter and setter (page variable)
    *             instead.
    */
@@ -51,7 +51,7 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractExtensiblePageWithTable(boolean)} in combination with getter and setter (page
    *             variable) instead.
    */
@@ -66,7 +66,7 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed in the 6.0 Release.
    *             Use {@link #AbstractExtensiblePageWithTable(boolean, String)} in combination with getter and setter
    *             (page
    *             variable) instead.

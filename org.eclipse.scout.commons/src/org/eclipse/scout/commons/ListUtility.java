@@ -71,7 +71,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#format(Collection, String)} instead
+   * @deprecated use {@link CollectionUtility#format(Collection, String)} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public static <T> String format(Collection<T> list, String delimiter) {
@@ -92,7 +92,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#format(Collection)} instead
+   * @deprecated use {@link CollectionUtility#format(Collection)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static String format(Collection<?> list) {
@@ -100,7 +100,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#format(Collection, boolean)} instead
+   * @deprecated use {@link CollectionUtility#format(Collection, boolean)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static <T> String format(Collection<T> c, boolean quoteStrings) {
@@ -131,7 +131,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#parse(String)} instead
+   * @deprecated use {@link CollectionUtility#parse(String)} instead. Will be removed in the 5.0 Release.
    */
   @Deprecated
   public static List<Object> parse(String text) {
@@ -194,7 +194,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#hasElements(Object[])} instead
+   * @deprecated use {@link CollectionUtility#hasElements(Object[])} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static int length(Object array) {
@@ -214,7 +214,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#arrayList(Object...)} instead.
+   * @deprecated use {@link CollectionUtility#arrayList(Object...)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static <T> ArrayList<T> arrayList(T... values) {
@@ -222,7 +222,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#arrayList(Object)} instead.
+   * @deprecated use {@link CollectionUtility#arrayList(Object)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static <T> ArrayList<T> arrayList(T value) {
@@ -230,7 +230,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#unmodifiableList(List)} instead.
+   * @deprecated use {@link CollectionUtility#unmodifiableList(List)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static <T> List<T> unmodifiableList(List<? extends T> list) {
@@ -238,7 +238,7 @@ public final class ListUtility {
   }
 
   /**
-   * @deprecated use {@link CollectionUtility#getElement(List, int)} instead.
+   * @deprecated use {@link CollectionUtility#getElement(List, int)} instead. Will be removed in the 5.0 Release
    */
   @Deprecated
   public static <T> T getElement(List<? extends T> list, int index) {

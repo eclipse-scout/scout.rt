@@ -155,14 +155,14 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   /**
    * @return
-   * @deprecated will be removed with version 3.11. Use {@link #getCheckedKey()} instead
+   * @deprecated Will be removed in the 5.0 Release. Use {@link #getCheckedKey()} instead
    */
   @Deprecated
   ILookupRow getCheckedLookupRow();
 
   /**
    * @return
-   * @deprecated will be removed with version 3.11. Use {@link #getCheckedKeys()} instead
+   * @deprecated Will be removed in the 5.0 Release.. Use {@link #getCheckedKeys()} instead
    */
   @Deprecated
   Set<ILookupRow> getCheckedLookupRows();

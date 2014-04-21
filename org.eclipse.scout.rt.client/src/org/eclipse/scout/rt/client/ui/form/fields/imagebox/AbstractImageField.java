@@ -70,8 +70,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   /**
-   * @deprecated Will be removed in 5.0 release. This property never had any effect and can safely be removed without
-   *             replacement.
+   * @deprecated Will be removed in the 5.0 Release. This property never had any effect and can safely be removed
+   *             without replacement.
    */
   @Order(310)
   @Deprecated
