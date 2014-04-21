@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,9 +39,7 @@ public class CsvHelperTest {
         {"c", "c", "c", "c", "c"},
         {"d", "d", "d", "d", "d"}
     };
-
-    List<String> columnNames = new ArrayList<String>();
-    columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
+    List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
     File testFile = null;
     try {

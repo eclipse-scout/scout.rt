@@ -25,27 +25,26 @@ import org.junit.Test;
  */
 public class CompositeObjectTest {
 
-  static final CompositeObject sameLongValue = new CompositeObject(1234L);
-  static final CompositeObject otherLongValue = new CompositeObject(9876L);
-  static final CompositeObject sameDoubleValue = new CompositeObject(9876d);
-  static final CompositeObject otherDoubleValue = new CompositeObject(1234d);
+  private static final CompositeObject sameLongValue = new CompositeObject(1234L);
+  private static final CompositeObject otherLongValue = new CompositeObject(9876L);
+  private static final CompositeObject sameDoubleValue = new CompositeObject(9876d);
+  private static final CompositeObject otherDoubleValue = new CompositeObject(1234d);
+  private static final CompositeObject sameLongArray = new CompositeObject(1234L, 5678L, 8901L);
+  private static final CompositeObject otherLongArray = new CompositeObject(9876L, 5432L, 2109L);
+  private static final CompositeObject other2LongArray = new CompositeObject(9876L, 5432L, 1L);
+  private static final CompositeObject other3LongArray = new CompositeObject(9876L, 5432L, null);
+  private static final CompositeObject other4LongArray = new CompositeObject(1234L, 5678L, null);
+  private static final CompositeObject sameDoubleArray = new CompositeObject(9876d, 5432d, 2109d);
+  private static final CompositeObject otherDoubleArray = new CompositeObject(1234d, 5678d, 8901d);
+  private static final CompositeObject other2DoubleArray = new CompositeObject(1234d, 5678d, 1d);
+  private static final CompositeObject other3DoubleArray = new CompositeObject(1234d, 5678d, null);
+  private static final CompositeObject other4DoubleArray = new CompositeObject(9876d, 5432d, null);
 
-  static final CompositeObject sameLongArray = new CompositeObject(1234L, 5678L, 8901L);
-  static final CompositeObject otherLongArray = new CompositeObject(9876L, 5432L, 2109L);
-  static final CompositeObject other2LongArray = new CompositeObject(9876L, 5432L, 1L);
-  static final CompositeObject other3LongArray = new CompositeObject(9876L, 5432L, null);
-  static final CompositeObject other4LongArray = new CompositeObject(1234L, 5678L, null);
-  static final CompositeObject sameDoubleArray = new CompositeObject(9876d, 5432d, 2109d);
-  static final CompositeObject otherDoubleArray = new CompositeObject(1234d, 5678d, 8901d);
-  static final CompositeObject other2DoubleArray = new CompositeObject(1234d, 5678d, 1d);
-  static final CompositeObject other3DoubleArray = new CompositeObject(1234d, 5678d, null);
-  static final CompositeObject other4DoubleArray = new CompositeObject(9876d, 5432d, null);
+  private CompositeObject m_compObjLongValue;
+  private CompositeObject m_compObjDoubleValue;
 
-  CompositeObject m_compObjLongValue;
-  CompositeObject m_compObjDoubleValue;
-
-  CompositeObject m_compObjLongArray;
-  CompositeObject m_compObjDoubleArray;
+  private CompositeObject m_compObjLongArray;
+  private CompositeObject m_compObjDoubleArray;
 
   @Before
   public void setUp() {

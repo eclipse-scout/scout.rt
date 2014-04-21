@@ -36,8 +36,8 @@ public class ClassIdentifierTest {
 
   @Test
   public void testAbstractClass() {
-    ClassIdentifier cid = new ClassIdentifier(Template.class);
-    assertArrayEquals(new Class[]{Template.class}, cid.getClasses());
+    ClassIdentifier cid = new ClassIdentifier(AbstractTemplate.class);
+    assertArrayEquals(new Class[]{AbstractTemplate.class}, cid.getClasses());
   }
 
   @Test
@@ -51,8 +51,8 @@ public class ClassIdentifierTest {
 
   @Test
   public void testTemplateClassUsingShortestPath() {
-    ClassIdentifier aid = new ClassIdentifier(Foo.A.class, Template.InnerClass.class);
-    ClassIdentifier bid = new ClassIdentifier(Foo.B.class, Template.InnerClass.class);
+    ClassIdentifier aid = new ClassIdentifier(Foo.A.class, AbstractTemplate.InnerClass.class);
+    ClassIdentifier bid = new ClassIdentifier(Foo.B.class, AbstractTemplate.InnerClass.class);
     assertFalse(aid.equals(bid));
     assertNotSame(aid.getClasses()[0], bid.getClasses()[0]);
     assertSame(aid.getLastSegment(), bid.getLastSegment());
@@ -80,16 +80,16 @@ public class ClassIdentifierTest {
     assertArrayEquals(new ClassIdentifier[]{new ClassIdentifier(String.class), new ClassIdentifier(Integer.class)}, cids);
   }
 
-  public abstract static class Template {
+  public abstract static class AbstractTemplate {
     public class InnerClass {
     }
   }
 
   public static class Foo {
-    public class A extends Template {
+    public class A extends AbstractTemplate {
     }
 
-    public class B extends Template {
+    public class B extends AbstractTemplate {
     }
   }
 }

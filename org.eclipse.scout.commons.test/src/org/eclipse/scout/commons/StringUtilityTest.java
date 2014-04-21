@@ -437,7 +437,7 @@ public class StringUtilityTest {
     assertEquals("value", StringUtility.nvl("value", "subsitute"));
     assertEquals("subsitute", StringUtility.nvl(null, "subsitute"));
     assertEquals("", StringUtility.nvl("", "subsitute"));
-    assertEquals("5", StringUtility.nvl(new Integer(5), "subsitute"));
+    assertEquals("5", StringUtility.nvl(Integer.valueOf(5), "subsitute"));
   }
 
   @Test
@@ -457,7 +457,7 @@ public class StringUtilityTest {
     assertEquals("subsitute", StringUtility.substituteWhenEmpty(null, "subsitute"));
     assertEquals("subsitute", StringUtility.substituteWhenEmpty("", "subsitute"));
     assertEquals("subsitute", StringUtility.substituteWhenEmpty("\t\n  \t\n", "subsitute"));
-    assertEquals("5", StringUtility.substituteWhenEmpty(new Integer(5), "subsitute"));
+    assertEquals("5", StringUtility.substituteWhenEmpty(Integer.valueOf(5), "subsitute"));
   }
 
   @Test

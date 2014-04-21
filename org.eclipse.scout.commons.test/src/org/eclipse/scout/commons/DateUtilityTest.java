@@ -206,19 +206,19 @@ public class DateUtilityTest {
    */
   @Test
   public void testDuration() {
-    final Calendar _15_00 = getCalendar(15, 0);
-    final Calendar _15_15 = getCalendar(15, 15);
-    final Calendar _14_45 = getCalendar(14, 45);
-    final Calendar _15_30 = getCalendar(15, 30);
-    final Calendar _16_00 = getCalendar(16, 00);
-    final Calendar _17_00 = getCalendar(17, 0);
-    assertCorrectDuration(_15_00, _15_00);
-    assertCorrectDuration(_15_00, _15_15);
-    assertCorrectDuration(_15_00, _14_45);
-    assertCorrectDuration(_15_00, _15_30);
-    assertCorrectDuration(_15_00, _16_00);
-    assertCorrectDuration(_15_00, _17_00);
-    assertCorrectDuration(_17_00, _15_00);
+    final Calendar c1500 = getCalendar(15, 0);
+    final Calendar c1515 = getCalendar(15, 15);
+    final Calendar c1445 = getCalendar(14, 45);
+    final Calendar c1530 = getCalendar(15, 30);
+    final Calendar c1600 = getCalendar(16, 00);
+    final Calendar c1700 = getCalendar(17, 0);
+    assertCorrectDuration(c1500, c1500);
+    assertCorrectDuration(c1500, c1515);
+    assertCorrectDuration(c1500, c1445);
+    assertCorrectDuration(c1500, c1530);
+    assertCorrectDuration(c1500, c1600);
+    assertCorrectDuration(c1500, c1700);
+    assertCorrectDuration(c1700, c1500);
   }
 
   public void assertCorrectDuration(Calendar start, Calendar end) {
