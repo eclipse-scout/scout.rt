@@ -63,6 +63,14 @@ public interface IDateField extends IBasicField<Date> {
    * 
    * @param l
    */
+  void setAutoDate(Date d);
+
+  /**
+   * if {@link IDateField#isHasDate()} == true the auto date is considered if only a time input occurs.<br>
+   * <b>NOTE:</b> in case of null the current date will be taken.
+   * 
+   * @param l
+   */
   void setAutoTimeMillis(int hour, int minute, int second);
 
   /**

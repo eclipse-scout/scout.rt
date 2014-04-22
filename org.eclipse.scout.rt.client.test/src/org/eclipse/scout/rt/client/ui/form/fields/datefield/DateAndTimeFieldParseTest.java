@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -367,6 +370,46 @@ public class DateAndTimeFieldParseTest {
       expectSuccess(testField, "00.00.13", "00.00.13");
       expectSuccess(testField, "20.00.00", "20.00.00");
     }
+  }
+
+  @Test
+  public void testTimeAutoDate1() throws Exception {
+    IDateField testField = m_form.getDateWithTimeField();
+    testField.setValue(null);
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+    testField.getUIFacade().setTimeFromUI(DateUtility.parse("02072012 0620", "ddMMyyyy hhmm"));
+    String today = DateUtility.format(new Date(), "ddMMyyyy");
+    Assert.assertEquals("Auto Date", today + " 0620", DateUtility.format(testField.getValue(), "ddMMyyyy hhmm"));
+  }
+
+  @Test
+  public void testTimeAutoDate2() throws Exception {
+    IDateField testField = m_form.getDateWithTimeField();
+    testField.setValue(null);
+    testField.setAutoDate(DateUtility.parse("01012013", "ddMMyyyy"));
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+    testField.getUIFacade().setTimeFromUI(DateUtility.parse("02072012 0620", "ddMMyyyy hhmm"));
+    Assert.assertEquals("Auto Date", DateUtility.parse("01012013 0620", "ddMMyyyy hhmm"), testField.getValue());
+  }
+
+  @Test
+  public void testTimeAutoDate3() throws Exception {
+    IDateField testField = m_form.getDateWithTimeField();
+    testField.setValue(null);
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+    testField.getUIFacade().setTimeTextFromUI("06:20");
+    String today = DateUtility.format(new Date(), "ddMMyyyy");
+    Assert.assertEquals("Auto Date", today + " 0620", DateUtility.format(testField.getValue(), "ddMMyyyy hhmm"));
+  }
+
+  @Test
+  public void testTimeAutoDate4() throws Exception {
+    IDateField testField = m_form.getDateWithTimeField();
+    testField.setValue(null);
+    testField.setAutoDate(DateUtility.parse("01012013", "ddMMyyyy"));
+    LocaleThreadLocal.set(new Locale("de", "CH"));
+    testField.getUIFacade().setTimeTextFromUI("06:20");
+    Assert.assertEquals("Auto Date", DateUtility.parse("01012013 0620", "ddMMyyyy hhmm"), testField.getValue());
   }
 
   private void expectSuccess(IDateField field, String input, String expectedDisplayText) {

@@ -92,6 +92,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   private IDateFieldUIFacade m_uiFacade;
   private String m_format;
   private long m_autoTimeMillis;
+  private Date m_autoDate;
 
   public AbstractDateField() {
     this(true);
@@ -129,6 +130,15 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Order(270)
   protected long getConfiguredAutoTimeMillis() {
     return 0;
+  }
+
+  /**
+   * When a time without date is picked, this date value is used as day.<br>
+   * <b>NOTE:</b> in case of null the current date will be taken.
+   */
+  @Order(270)
+  protected Date getConfiguredAutoDate() {
+    return null;
   }
 
   /**
@@ -193,6 +203,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
     setAutoTimeMillis(getConfiguredAutoTimeMillis());
+    setAutoDate(getConfiguredAutoDate());
   }
 
   @Override
@@ -242,6 +253,11 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   @Override
+  public void setAutoDate(Date d) {
+    m_autoDate = d;
+  }
+
+  @Override
   public void setAutoTimeMillis(int hour, int minute, int second) {
     setAutoTimeMillis(((hour * 60L + minute) * 60L + second) * 1000L);
   }
@@ -251,11 +267,15 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return m_autoTimeMillis;
   }
 
+  public Date getAutoDate() {
+    return m_autoDate;
+  }
+
   @Override
   public void adjustDate(int days, int months, int years) {
     Date d = getValue();
     if (d == null) {
-      d = new Date();
+      d = applyAutoDate(d);
       d = applyAutoTime(d);
     }
     else {
@@ -273,7 +293,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   public void adjustTime(int minutes, int hours, int reserved) {
     Date d = getValue();
     if (d == null) {
-      d = new Date();
+      d = applyAutoDate(d);
       d = applyAutoTime(d);
     }
     else {
@@ -352,9 +372,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       else if (pctx == ParseContext.Time) {
         d = parseTimeInternal(text, customFormat ? getIsolatedTimeFormat() : null);
         Date currentValue = getValue();
-        if (currentValue == null) {
-          currentValue = new Date();
-        }
+        currentValue = applyAutoDate(currentValue);
         d = DateUtility.createDateTime(currentValue, d);
       }
     }
@@ -421,6 +439,18 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     c.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
     c.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
     d = c.getTime();
+    return d;
+  }
+
+  private Date applyAutoDate(Date d) {
+    if (d != null) {
+      return d;
+    }
+    d = getAutoDate();
+    if (d == null) {
+      // use today's date
+      d = new Date();
+    }
     return d;
   }
 
@@ -1059,10 +1089,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       try {
         Date oldDate = getValue();
         if (d != null) {
-          if (oldDate == null) {
-            // use today's date
-            oldDate = new Date();
-          }
+          oldDate = applyAutoDate(oldDate);
           // preserve date
           Calendar calOld = Calendar.getInstance();
           calOld.setTime(oldDate);
