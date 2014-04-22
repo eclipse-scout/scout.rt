@@ -81,6 +81,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("dwg", "application/acad");
     EXT_TO_MIME_TYPE_MAP.put("dxf", "application/dxf");
     EXT_TO_MIME_TYPE_MAP.put("dxr", "application/x-director");
+    EXT_TO_MIME_TYPE_MAP.put("eml", "message/rfc822");
     EXT_TO_MIME_TYPE_MAP.put("eps", "application/postscript");
     EXT_TO_MIME_TYPE_MAP.put("etx", "text/x-setext");
     EXT_TO_MIME_TYPE_MAP.put("exe", "application/octet-stream");
@@ -101,6 +102,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("ief", "image/ief");
     EXT_TO_MIME_TYPE_MAP.put("iges", "model/iges");
     EXT_TO_MIME_TYPE_MAP.put("igs", "model/iges");
+    EXT_TO_MIME_TYPE_MAP.put("ini", "text/plain");
     EXT_TO_MIME_TYPE_MAP.put("ips", "application/x-ipscript");
     EXT_TO_MIME_TYPE_MAP.put("ipx", "application/x-ipix");
     EXT_TO_MIME_TYPE_MAP.put("jpe", "image/jpeg");
@@ -129,6 +131,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("mpg", "video/mpeg");
     EXT_TO_MIME_TYPE_MAP.put("mpga", "audio/mpeg");
     EXT_TO_MIME_TYPE_MAP.put("ms", "application/x-troff-ms");
+    EXT_TO_MIME_TYPE_MAP.put("msg", "application/vnd.ms-outlook");
     EXT_TO_MIME_TYPE_MAP.put("msh", "model/mesh");
     EXT_TO_MIME_TYPE_MAP.put("nc", "application/x-netcdf");
     EXT_TO_MIME_TYPE_MAP.put("oda", "application/oda");
@@ -202,6 +205,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("vivo", "video/vnd.vivo");
     EXT_TO_MIME_TYPE_MAP.put("vrml", "model/vrml");
     EXT_TO_MIME_TYPE_MAP.put("wav", "audio/x-wav");
+    EXT_TO_MIME_TYPE_MAP.put("woff", "application/font-woff");
     EXT_TO_MIME_TYPE_MAP.put("wrl", "model/vrml");
     EXT_TO_MIME_TYPE_MAP.put("xbm", "image/x-xbitmap");
     EXT_TO_MIME_TYPE_MAP.put("xlc", "application/vnd.ms-excel");
@@ -214,9 +218,6 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("xwd", "image/x-xwindowdump");
     EXT_TO_MIME_TYPE_MAP.put("xyz", "chemical/x-pdb");
     EXT_TO_MIME_TYPE_MAP.put("zip", "application/zip");
-    EXT_TO_MIME_TYPE_MAP.put("msg", "application/vnd.ms-outlook");
-    EXT_TO_MIME_TYPE_MAP.put("eml", "message/rfc822");
-    EXT_TO_MIME_TYPE_MAP.put("ini", "text/plain");
   }
 
   public static void extractArchive(File archiveFile, File destinationDir) throws IOException {
