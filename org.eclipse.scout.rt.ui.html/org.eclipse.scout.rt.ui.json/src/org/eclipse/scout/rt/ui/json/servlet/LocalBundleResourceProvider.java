@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
@@ -20,6 +22,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class LocalBundleResourceProvider extends AbstractService implements IServletResourceProvider {
   private static final long serialVersionUID = 1L;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LocalBundleResourceProvider.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
@@ -38,20 +41,38 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
   @Override
   public boolean handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = req.getPathInfo();
+    pathInfo = resolvePath(pathInfo);
     URL url = resolveBundleResource(pathInfo);
     if (url == null) {
       return false;
     }
+
     URLConnection connection = url.openConnection();
     long lastModified = connection.getLastModified();
     int contentLength = connection.getContentLength();
-    int lastDot = pathInfo.lastIndexOf('.');
-    String contentType = FileUtility.getContentTypeForExtension(lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo);
-    if (setResponseHeaders(req, resp, contentType, lastModified, contentLength) == HttpServletResponse.SC_NOT_MODIFIED) {
+    int status = processCacheHeaders(req, resp, lastModified, contentLength);
+    if (status == HttpServletResponse.SC_NOT_MODIFIED) {
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
+
+    //Return file regularly if the client (browser) does not already have it or if the file has changed in the meantime
     byte[] content = fileContent(url);
     resp.setContentLength(content.length);
+
+    //Prefer mime type mapping from container
+    String contentType = servlet.getServletContext().getMimeType(pathInfo);
+    if (contentType == null) {
+      int lastDot = pathInfo.lastIndexOf('.');
+      contentType = FileUtility.getContentTypeForExtension(lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo);
+    }
+    if (contentType == null) {
+      LOG.warn("Could not determine content type of file " + pathInfo);
+    }
+    else {
+      resp.setContentType(contentType);
+    }
+
     resp.getOutputStream().write(content);
     return true;
   }
@@ -72,6 +93,16 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
     m_bundleWebContentFolder = folder;
   }
 
+  protected String resolvePath(String pathInfo) {
+    if (pathInfo == null) {
+      return null;
+    }
+    if (pathInfo.equals("/")) {
+      pathInfo = "/index.html";
+    }
+    return pathInfo;
+  }
+
   /**
    * resolve a web path /res/scout.css to a bundle resource WebContent/res/scout.css
    */
@@ -79,16 +110,19 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
     if (pathInfo == null) {
       return null;
     }
-    if (pathInfo.equals("/")) {
-      pathInfo = "/index.html";
-    }
     return getBundle().getEntry(getBundleWebContentFolder() + pathInfo);
   }
 
-  protected int setResponseHeaders(final HttpServletRequest req, final HttpServletResponse resp, String contentType, long lastModified, int contentLength) {
+  /**
+   * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
+   * Also writes cache headers (last modified and etag) if the file needs to be returned.
+   * 
+   * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
+   *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
+   */
+  protected int processCacheHeaders(final HttpServletRequest req, final HttpServletResponse resp, long lastModified, int contentLength) {
     String etag = null;
-    if (lastModified != -1 && contentLength != -1)
-    {
+    if (lastModified != -1 && contentLength != -1) {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 
@@ -97,7 +131,6 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
     // HTTP 1.1 clients should be using it
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1) {
-      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return HttpServletResponse.SC_NOT_MODIFIED;
     }
     else {
@@ -106,27 +139,18 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
       // fidelity
       // of the IMS header generally doesn't include milli-seconds
       if (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + 999)) {
-        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return HttpServletResponse.SC_NOT_MODIFIED;
       }
     }
 
-    // return the full contents regularly
-    if (contentLength != -1) {
-      resp.setContentLength(contentLength);
-    }
-
-    if (contentType != null) {
-      resp.setContentType(contentType);
-    }
-
+    // File needs to be returned regularly, write cache headers
     if (lastModified > 0) {
       resp.setDateHeader(LAST_MODIFIED, lastModified);
     }
-
     if (etag != null) {
       resp.setHeader(ETAG, etag);
     }
+
     return HttpServletResponse.SC_ACCEPTED;
   }
 
