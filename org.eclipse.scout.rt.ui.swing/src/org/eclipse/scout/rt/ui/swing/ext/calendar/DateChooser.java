@@ -139,7 +139,7 @@ public class DateChooser {
     m_viewDate = truncDate(new Date());
     m_model = new EmptyCalendarModel();
 
-    displayMode = Math.min(3, Math.max(displayMode, 1));
+    displayMode = Math.min(4, Math.max(displayMode, 1));
     m_displayMode = displayMode;
     m_largeVersion = largeVersion;
     m_dateMap = new HashMap<Date, AbstractCalendarCell>();
