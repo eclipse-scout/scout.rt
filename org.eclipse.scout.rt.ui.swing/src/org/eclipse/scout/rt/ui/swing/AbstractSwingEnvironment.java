@@ -866,6 +866,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   @Override
+  public JFrameEx createJFrameEx() {
+    return new JFrameEx();
+  }
+
+  @Override
   public ISwingScoutView createDialog(Window owner, IForm form) {
     ISwingScoutBoundsProvider boundsProvider = null;
     if (form.isCacheBounds()) {

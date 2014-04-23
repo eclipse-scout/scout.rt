@@ -104,7 +104,9 @@ public class JFrameEx extends JFrame {
       @Override
       protected void reflow() {
         if (m_autoCorrectSize) {
-          JFrameEx.this.pack();
+          JFrameEx d = JFrameEx.this;
+          d.pack();
+          SwingUtility.adjustBoundsToScreen(d);
         }
       }
     };

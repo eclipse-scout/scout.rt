@@ -181,10 +181,6 @@ public class SwingScoutPopup implements ISwingScoutView {
           // toggle preference
           m_positionBelowReferenceField = !m_positionBelowReferenceField;
         }
-        if (System.getProperty("java.version", "1.5").startsWith("1.5")) {
-          m_swingWindow.validate();
-          m_swingWindow.getRootPane().revalidate();
-        }
       }
     }
     catch (Throwable t) {

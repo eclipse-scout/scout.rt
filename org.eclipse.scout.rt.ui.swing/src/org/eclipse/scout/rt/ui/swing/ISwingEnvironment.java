@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
+import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
@@ -369,6 +370,13 @@ public interface ISwingEnvironment {
    * @return
    */
   JDialogEx createJDialogEx(Frame swingParent);
+
+  /**
+   * Enables customization of JFrameE by returning subtypes.
+   * 
+   * @return
+   */
+  JFrameEx createJFrameEx();
 
   /**
    * Creates a swing scout table instance for the given table model. The default implementation returns a

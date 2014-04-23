@@ -52,8 +52,8 @@ public class SwtShellValidateRoot extends DefaultValidateRoot {
     Point prefSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
     if (curShellBounds != null && prefSize != null) {
       // if perfSize is higher than the displays current height area reduce the height to the parent height to keep forms scrollable
-      if (prefSize.y > Display.getCurrent().getBounds().height) {
-        prefSize.y = Display.getCurrent().getBounds().height;
+      if (prefSize.y > Display.getCurrent().getClientArea().height) {
+        prefSize.y = Display.getCurrent().getClientArea().height;
       }
       int dhPref = 0;
       dhPref = prefSize.y - curShellBounds.height;

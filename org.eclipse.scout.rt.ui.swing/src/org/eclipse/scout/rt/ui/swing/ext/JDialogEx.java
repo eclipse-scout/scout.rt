@@ -17,6 +17,8 @@ import java.awt.GraphicsConfiguration;
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
 
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
+
 /**
  * JDialog using bug fixed {@link JRootPaneEx} with min/max size
  * validation
@@ -81,7 +83,9 @@ public class JDialogEx extends JDialog {
 
       @Override
       protected void reflow() {
-        JDialogEx.this.pack();
+        JDialogEx d = JDialogEx.this;
+        d.pack();
+        SwingUtility.adjustBoundsToScreen(d);
       }
     };
     rp.setName("Synth.Dialog");

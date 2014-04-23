@@ -1096,6 +1096,20 @@ public final class SwingUtility {
   }
 
   /**
+   * Adjusts the window such that it fits on the screen, if necessary.
+   * 
+   * @param window
+   */
+  public static void adjustBoundsToScreen(Window window) {
+    Rectangle origBounds = window.getBounds();
+    Rectangle newBounds = SwingUtility.validateRectangleOnScreen(origBounds, false, true);
+    if (!newBounds.equals(origBounds)) {
+      window.setLocation(newBounds.getLocation());
+      window.setSize(newBounds.getSize());
+    }
+  }
+
+  /**
    * @return true if the pixel coordinate is just one pixel left of the
    *         scrollpanes right border. This can be used to avoid double-border
    *         line aliasing effeect where single-lines are needed

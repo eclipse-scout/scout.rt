@@ -63,7 +63,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_boundsProvider = boundsProvider;
     m_listenerList = new EventListenerList();
     //
-    m_swingFrame = new JFrameEx();
+    m_swingFrame = env.createJFrameEx();
     m_swingFrame.getRootPane().putClientProperty(SwingBusyIndicator.BUSY_SUPPORTED_CLIENT_PROPERTY, true);
     JComponent contentPane = (JComponent) m_swingFrame.getContentPane();
     contentPane.setLayout(new BorderLayoutEx());
@@ -155,6 +155,16 @@ public class SwingScoutFrame implements ISwingScoutView {
   @Override
   public void openView() {
     m_opened = true;
+    adjustSize();
+    if (m_opened) {
+      m_swingFrame.setVisible(true);
+    }
+  }
+
+  /**
+   * Adjust size and location according to properties and screen size.
+   */
+  protected void adjustSize() {
     m_swingFrame.pack();
     m_swingFrame.pack();// in case some wrapped fields were not able to respond
     // to first preferred size request.
@@ -169,17 +179,9 @@ public class SwingScoutFrame implements ISwingScoutView {
         m_swingFrame.setBounds(c);
       }
     }
-    Rectangle a = m_swingFrame.getBounds();
-    Rectangle b = SwingUtility.validateRectangleOnScreen(a, false, true);
-    if (!b.equals(a)) {
-      m_swingFrame.setLocation(b.getLocation());
-      m_swingFrame.setSize(b.getSize());
-    }
+    SwingUtility.adjustBoundsToScreen(m_swingFrame);
     if (m_maximized) {
       setMaximized(m_maximized);
-    }
-    if (m_opened) {
-      m_swingFrame.setVisible(true);
     }
   }
 

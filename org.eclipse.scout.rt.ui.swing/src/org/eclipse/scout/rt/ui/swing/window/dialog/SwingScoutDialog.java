@@ -184,6 +184,16 @@ public class SwingScoutDialog implements ISwingScoutView {
   @Override
   public void openView() {
     m_opened = true;
+    adjustSize();
+    if (m_opened) {
+      m_swingDialog.setVisible(true);
+    }
+  }
+
+  /**
+   * Adjust size and location according to properties and screen size.
+   */
+  protected void adjustSize() {
     // preferred size
     m_swingDialog.pack();
     m_swingDialog.pack();// in case some wrapped fields were not able to
@@ -199,17 +209,10 @@ public class SwingScoutDialog implements ISwingScoutView {
         m_swingDialog.setBounds(c);
       }
     }
-    Rectangle a = m_swingDialog.getBounds();
-    Rectangle b = SwingUtility.validateRectangleOnScreen(a, false, true);
-    if (!b.equals(a)) {
-      m_swingDialog.setLocation(b.getLocation());
-      m_swingDialog.setSize(b.getSize());
-    }
+
+    SwingUtility.adjustBoundsToScreen(m_swingDialog);
     if (m_maximized) {
       setMaximized(m_maximized);
-    }
-    if (m_opened) {
-      m_swingDialog.setVisible(true);
     }
   }
 
