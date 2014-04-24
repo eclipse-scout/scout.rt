@@ -43,7 +43,7 @@ public abstract class AbstractTestWithGuiScript {
 
   private boolean m_testActive;
 
-  protected IClientSession clientSession;
+  protected IClientSession m_clientSession;
 
   protected abstract Class<? extends IClientSession> getSessionClass();
 
@@ -72,7 +72,7 @@ public abstract class AbstractTestWithGuiScript {
   }
 
   protected void resetSession() throws Throwable {
-    IDesktop desktop = clientSession.getDesktop();
+    IDesktop desktop = m_clientSession.getDesktop();
     desktop.setAvailableOutlines(null);
     desktop.setOutline((IOutline) null);
     for (IMessageBox m : desktop.getMessageBoxStack()) {
@@ -132,12 +132,12 @@ public abstract class AbstractTestWithGuiScript {
     if (guiMockService == null) {
       return;
     }
-    clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(getSessionClass(), guiMockService.initUserAgent());
-    final IGuiMock gui = guiMockService.createMock(clientSession);
+    m_clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(getSessionClass(), guiMockService.initUserAgent());
+    final IGuiMock gui = guiMockService.createMock(m_clientSession);
     gui.beforeTest();
     try {
       //
-      final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {
+      final ClientSyncJob runModelJob = new ClientSyncJob("Run", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor m) throws Throwable {
           resetSession();
@@ -147,7 +147,7 @@ public abstract class AbstractTestWithGuiScript {
       runModelJob.setUser(false);
       runModelJob.setSystem(true);
       //
-      final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", clientSession) {
+      final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor m) throws Throwable {
           try {

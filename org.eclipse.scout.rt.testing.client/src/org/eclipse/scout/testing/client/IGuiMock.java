@@ -13,6 +13,9 @@ package org.eclipse.scout.testing.client;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.testing.shared.WaitCondition;
+
 /**
  * This interface is used to support gui testing with an abstraction layer.
  * <p>
@@ -29,7 +32,6 @@ public interface IGuiMock {
   enum GuiStrategy {
     Swt,
     Swing,
-    Vaadin,
     Rap
   }
 
@@ -373,4 +375,28 @@ public interface IGuiMock {
    * Click right on magnifier of a smartfield
    */
   void clickRightOnSmartFieldMagnifier(FieldState fieldState);
+
+  /**
+   * Invokes the given {@link WaitCondition} in the Scout model thread and waits until it is completed. This may freeze
+   * the UI while the {@link WaitCondition} is executing.
+   * 
+   * @param r
+   *          The {@link WaitCondition} to execute.
+   * @param startTimeout
+   *          A timeout defining the offset between the time the {@link WaitCondition} has been scheduled and the time
+   *          it actually starts. If the startTimeout has passed, the {@link WaitCondition} is no longer processed. A
+   *          value <=0 means no timeout.
+   * @param runTimeout
+   *          Defines how long it should be waited the most for the {@link WaitCondition} to complete after it has been
+   *          scheduled. A value <=0 means no timeout.
+   * @return The result of the {@link WaitCondition#run()} method.
+   * @throws The
+   *           exception thrown by the {@link WaitCondition}.
+   */
+  <T> T invokeScoutAndWait(final WaitCondition<T> r, long startTimeout, long runTimeout) throws Throwable;
+
+  /**
+   * @return Gets the {@link IClientSession} associated with the current {@link IGuiMock}.
+   */
+  IClientSession getClientSession();
 }
