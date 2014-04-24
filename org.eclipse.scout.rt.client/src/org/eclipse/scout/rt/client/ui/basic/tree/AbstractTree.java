@@ -537,6 +537,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
     }
+    if (!inode.isFilterAccepted() && isSelectedNode(inode)) {
+      // invisible nodes cannot be selected
+      deselectNode(inode);
+    }
     // make parent path accepted
     if ((!parentAccepted) && inode.isFilterAccepted()) {
       ITreeNode tmp = inode.getParentNode();
@@ -2525,39 +2529,23 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         try {
           setTreeChanging(true);
-          //
-          HashSet<ITreeNode> requestedNodes = new HashSet<ITreeNode>(Arrays.asList(resolveVirtualNodes(resolveNodes(nodes))));
-          for (ITreeNode node : requestedNodes) {
+
+          Set<ITreeNode> validNodes = new HashSet<ITreeNode>(nodes.length);
+          for (ITreeNode n : resolveVirtualNodes(resolveNodes(nodes))) {
+            if (n.isFilterAccepted()) {
+              validNodes.add(n);
+            }
+          }
+
+          // load children for selection
+          for (ITreeNode node : validNodes) {
             if (node.isChildrenLoaded()) {
               if (node.isChildrenDirty() || node.isChildrenVolatile()) {
                 node.loadChildren();
               }
             }
           }
-          ArrayList<ITreeNode> validNodes = new ArrayList<ITreeNode>();
-          if (isMultiSelect()) {
-            // When multiselection is enabled
-            // check filtered nodes
-            // add existing selected nodes that are masked by filter
-            for (ITreeNode node : getSelectedNodes()) {
-              if (!node.isFilterAccepted()) {
-                validNodes.add(node);
-              }
-            }
-            // remove all filtered from requested
-            requestedNodes.removeAll(validNodes);
-            // add remainder
-            for (ITreeNode node : requestedNodes) {
-              validNodes.add(node);
-            }
-          }
-          else {
-            for (ITreeNode node : requestedNodes) {
-              if (node.isFilterAccepted()) {
-                validNodes.add(node);
-              }
-            }
-          }
+
           selectNodes(validNodes.toArray(new ITreeNode[validNodes.size()]), false);
         }
         finally {
