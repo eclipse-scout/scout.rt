@@ -193,7 +193,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   *
+   * 
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -212,7 +212,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   *
+   * 
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -246,7 +246,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   *
+   * 
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -262,7 +262,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   *
+   * 
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -274,7 +274,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   *
+   * 
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -294,7 +294,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   @ConfigOperation
@@ -489,7 +489,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   *
+   * 
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -566,6 +566,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           break;
         }
       }
+    }
+    if (!inode.isFilterAccepted() && isSelectedNode(inode)) {
+      // invisible nodes cannot be selected
+      deselectNode(inode);
     }
     // make parent path accepted
     if ((!parentAccepted) && inode.isFilterAccepted()) {
@@ -1411,7 +1415,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     try {
       setTreeChanging(true);
-      //
       Set<ITreeNode> resolvedNodes = new HashSet<ITreeNode>(nodes.size());
       for (ITreeNode node : nodes) {
         ITreeNode resolvedNode = resolveVirtualNode(node);
@@ -1419,7 +1422,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           resolvedNodes.add(resolvedNode);
         }
       }
-      return CollectionUtility.unmodifiableSetCopy(resolvedNodes);
+      return resolvedNodes;
     }
     finally {
       setTreeChanging(false);
@@ -1908,7 +1911,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   *
+   * 
    * @param nodes
    * @return
    */
@@ -2165,7 +2168,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
@@ -2175,7 +2178,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * This method gets called after the drag action has been finished.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireDragFinished() {
@@ -2564,40 +2567,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         try {
           setTreeChanging(true);
-          //
-          Collection<ITreeNode> requestedNodes = resolveVirtualNodes(resolveNodes(nodes));
-          for (ITreeNode node : requestedNodes) {
+
+          Set<ITreeNode> validNodes = resolveVirtualNodes(resolveNodes(nodes));
+
+          // remove filtered (invisible) nodes from selection
+          Iterator<ITreeNode> iterator = validNodes.iterator();
+          while (iterator.hasNext()) {
+            if (!iterator.next().isFilterAccepted()) {
+              iterator.remove();
+            }
+          }
+
+          // load children for selection
+          for (ITreeNode node : validNodes) {
             if (node.isChildrenLoaded()) {
               if (node.isChildrenDirty() || node.isChildrenVolatile()) {
                 node.loadChildren();
               }
             }
           }
-          Set<ITreeNode> workingSet = new HashSet<ITreeNode>(requestedNodes);
-          List<ITreeNode> validNodes = new ArrayList<ITreeNode>();
-          if (isMultiSelect()) {
-            // When multiselection is enabled
-            // check filtered nodes
-            // add existing selected nodes that are masked by filter
-            for (ITreeNode node : getSelectedNodes()) {
-              if (!node.isFilterAccepted()) {
-                validNodes.add(node);
-              }
-            }
-            // remove all filtered from requested
-            workingSet.removeAll(validNodes);
-            // add remainder
-            for (ITreeNode node : workingSet) {
-              validNodes.add(node);
-            }
-          }
-          else {
-            for (ITreeNode node : workingSet) {
-              if (node.isFilterAccepted()) {
-                validNodes.add(node);
-              }
-            }
-          }
+
           selectNodes(validNodes, false);
         }
         finally {
