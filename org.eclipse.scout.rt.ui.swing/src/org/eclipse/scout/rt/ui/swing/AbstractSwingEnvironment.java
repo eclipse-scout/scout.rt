@@ -49,6 +49,7 @@ import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.job.JobEx;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
+import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
@@ -116,6 +118,9 @@ import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);
+
+  public static final String PROP_TEST_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
+  public static final String COMPONENT_TEST_KEY = "TEST_COMP_NAME";
 
   private boolean m_initialized;
   private IClientSession m_scoutSession;
@@ -852,6 +857,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_formFieldFactory = new FormFieldFactory();
     }
     ISwingScoutFormField ui = m_formFieldFactory.createFormField(parent, field, this);
+    assignTestId(ui, field);
     decorate(field, ui);
     return ui;
   }
@@ -1006,6 +1012,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(JComponent parent, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, model);
     ui.createField(model, this);
+    assignTestId(ui, model);
     decorate(model, ui);
     return ui;
   }
@@ -1014,8 +1021,22 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(ISwingScoutView targetViewComposite, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, targetViewComposite, model);
     ui.createField(model, this);
+    assignTestId(ui, model);
     decorate(model, ui);
     return ui;
+  }
+
+  protected void assignTestId(ISwingScoutComposite uiField, ITypeWithClassId model) {
+    if (isTestIdsEnabled()) {
+      JComponent swingField = uiField.getSwingField();
+      if (swingField != null) {
+        swingField.putClientProperty(COMPONENT_TEST_KEY, model.classId());
+      }
+    }
+  }
+
+  protected boolean isTestIdsEnabled() {
+    return StringUtility.parseBoolean(System.getProperty(PROP_TEST_IDS_ENABLED));
   }
 
   @Override

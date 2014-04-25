@@ -187,15 +187,6 @@ public interface ISwtEnvironment {
    */
   Font getFont(Font templateFont, String newName, Integer newStyle, Integer newSize);
 
-  // properties
-  // int getPropertyInt(String propertyName);
-  //
-  // String getPropertyString(String propertyName);
-  //
-  // Object getProperty(String propertyName);
-  //
-  // boolean getPropertyBool(String propertyName);
-
   IDesktop getScoutDesktop();
 
   void showStandaloneForm(IForm form);
