@@ -770,6 +770,17 @@ Button {
   background-color:transparent;
 }
 
+FileUpload {
+  cursor:pointer;
+  color:#ffffff;
+  font:bold 14px Arial,Helvetica,sans-serif;
+  background-color:transparent;
+  background-image:gradient(linear,left top,left bottom,from(#7ab9dd),to(#67a8ce));
+  animation:hoverOut 500ms ease-out;
+  border-radius:5px;
+  padding:4px 5px;
+}
+
 Button[PUSH] {
   background-image:gradient(linear,left top,left bottom,from(#53a4d3),to(#4890ba));
   color:#ffffff;
@@ -819,6 +830,13 @@ Button[TOGGLE]:disabled {
   text-shadow:0px 1px 0px #fff;
 }
 
+FileUpload:disabled {
+  background-image:gradient(linear,left top,left bottom,from(#dee1e7),to(#c2d4de));
+  cursor:default;
+  color:#6B7B84;
+  background-color:transparent;
+}
+
 Button[PUSH]:hover {
   background-image:gradient(linear,left top,left bottom,from(#fe9915),to(#be7414));
   border:1px solid #91560a;
@@ -826,9 +844,13 @@ Button[PUSH]:hover {
 
 Button[TOGGLE]:hover { background-image:gradient(linear,left top,left bottom,from(#55aedb),to(#489aca)); }
 
+FileUpload:hover { background-image:gradient(linear,left top,left bottom,from(#55aedb),to(#489aca)); }
+
 Button[PUSH]:pressed { animation:none; }
 
 Button[TOGGLE]:pressed { animation:none; }
+
+FileUpload:pressed { animation:none; }
 
 Button-FocusIndicator[PUSH] {
   background-color:transparent;
@@ -846,6 +868,14 @@ Button-FocusIndicator[TOGGLE] {
   padding:0px;
   opacity:1;
   background-image:none;
+}
+
+FileUpload-FocusIndicator {
+  background-color:transparent;
+  border:1px solid #b0cce3;
+  margin:1px;
+  padding:0px;
+  opacity:1;
 }
 
 Button[TOGGLE]:selected { background-image:gradient(linear,left top,left bottom,from(#4b8cbd),color-stop(35%,#65a5cf),color-stop(75%,#6bacd1),to(#67a8ce)); }
