@@ -11,11 +11,15 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.imagebox;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.rap.rwt.client.ClientFile;
+import org.eclipse.rap.rwt.dnd.ClientFileTransfer;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -49,6 +53,8 @@ import org.eclipse.swt.widgets.Menu;
  * @since 3.8.0
  */
 public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> implements IRwtScoutImageBox {
+
+  private static final String CLIENT_FILE_TYPE_IMAGE = "image";
 
   private Image m_image;
 
@@ -216,6 +222,23 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
   private class P_DndSupport extends AbstractRwtScoutDndSupport {
     public P_DndSupport(IPropertyObserver scoutObject, IDNDSupport scoutDndSupportable, Control control) {
       super(scoutObject, scoutDndSupportable, control, RwtScoutImageField.this.getUiEnvironment());
+    }
+
+    @Override
+    protected TransferObject createScoutTransferableObjectFromFileUpload(DropTargetEvent event, List<File> uploadedFiles) {
+      if (ClientFileTransfer.getInstance().isSupportedType(event.currentDataType) && (getScoutObject().getDropType() & IDNDSupport.TYPE_IMAGE_TRANSFER) != 0) {
+        ClientFile[] clientFiles = (ClientFile[]) event.data;
+        int index = 0;
+        for (ClientFile clientFile : clientFiles) {
+          String clientFileType = clientFile.getType();
+          if (clientFileType != null && StringUtility.lowercase(clientFileType).startsWith(CLIENT_FILE_TYPE_IMAGE)) {
+            ImageData imageData = new ImageData(uploadedFiles.get(index).getAbsolutePath());
+            return new ImageTransferObject(imageData);
+          }
+          index++;
+        }
+      }
+      return super.createScoutTransferableObjectFromFileUpload(event, uploadedFiles);
     }
 
     @Override

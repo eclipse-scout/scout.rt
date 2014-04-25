@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.dnd.ClientFileTransfer;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -167,8 +168,8 @@ public final class RwtUtility {
   public static TransferObject createScoutTransferable(DropTargetEvent event) {
     if (event == null || event.currentDataType == null) {
       return null;
-
     }
+
     Exception ex = null;
     if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
       String[] fileNames = (String[]) event.data;
@@ -217,17 +218,32 @@ public final class RwtUtility {
     return null;
   }
 
+  public static TransferObject createScoutTransferableFromClientFile(DropTargetEvent event, List<File> uploadedFiles) {
+    if (event == null || event.currentDataType == null) {
+      return null;
+    }
+
+    TransferObject scoutTransferObject = null;
+    if (ClientFileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+      scoutTransferObject = new FileListTransferObject(uploadedFiles);
+    }
+    return scoutTransferObject;
+  }
+
   /**
    * @param scoutTransferTypes
    * @return all transfer objects or an empty array NOT NULL
    */
   public static Transfer[] convertScoutTransferTypes(int scoutTransferTypes) {
     ArrayList<Transfer> uiTransferList = new ArrayList<Transfer>();
+    boolean addClientFileTransfer = false;
     if ((IDNDSupport.TYPE_FILE_TRANSFER & scoutTransferTypes) != 0) {
       uiTransferList.add(FileTransfer.getInstance());
+      addClientFileTransfer = true;
     }
     if ((IDNDSupport.TYPE_IMAGE_TRANSFER & scoutTransferTypes) != 0) {
       uiTransferList.add(ImageTransfer.getInstance());
+      addClientFileTransfer = true;
     }
     if ((IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER & scoutTransferTypes) != 0) {
       uiTransferList.add(JVMLocalObjectTransfer.getInstance());
@@ -235,8 +251,10 @@ public final class RwtUtility {
     if ((IDNDSupport.TYPE_TEXT_TRANSFER & scoutTransferTypes) != 0) {
       uiTransferList.add(TextTransfer.getInstance());
     }
+    if (addClientFileTransfer) {
+      uiTransferList.add(ClientFileTransfer.getInstance());
+    }
     return uiTransferList.toArray(new Transfer[uiTransferList.size()]);
-
   }
 
   public static int getHorizontalAlignment(int scoutAlignment) {
