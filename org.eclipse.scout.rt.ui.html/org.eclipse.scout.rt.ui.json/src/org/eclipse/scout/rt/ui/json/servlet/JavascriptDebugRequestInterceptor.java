@@ -37,6 +37,7 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
   private static final String DEBUG_PARAM = "debug";
   //path = $1 $3 $4 $5 with $1=folder, $3=basename, $4="-min", $5=".js" or ".css"
   private static final Pattern SCRIPT_FILE_PATTERN = Pattern.compile("(/(\\w+/)*)([^/]+)([-.]min)(\\.(js|css))");
+  private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]*\\.[0-9]*\\.[0-9]*)");
 
   @Override
   public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -54,7 +55,8 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     Matcher mat = SCRIPT_FILE_PATTERN.matcher(pathInfo);
     if (mat.matches()) {
       //is there a template for this script?
-      String bundlePath = "src/main/js/" + mat.group(3) + "-template" + mat.group(5);
+      String name = extractName(mat);
+      String bundlePath = "src/main/js/" + name + "-template" + mat.group(5);
       Bundle handler = findBundleContaining(bundlePath);
       if (handler != null) {
         LOG.info("replacing " + pathInfo + " by live processing /" + bundlePath);
@@ -73,6 +75,22 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     }
 
     return false;
+  }
+
+  /**
+   * Returns the name without the version suffix.
+   */
+  protected String extractName(Matcher matcher) {
+    String name = matcher.group(3);
+    int versionStart = name.lastIndexOf('-');
+    if (versionStart > -1) {
+      String version = name.substring(versionStart + 1);
+      Matcher versionMatcher = VERSION_PATTERN.matcher(version);
+      if (versionMatcher.matches()) {
+        return name.substring(0, versionStart);
+      }
+    }
+    return name;
   }
 
   protected boolean checkDebugEnabled(HttpServletRequest req, HttpServletResponse resp) {

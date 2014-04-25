@@ -23,6 +23,7 @@
   <properties>
     <script.input.dir>${project.basedir}/src/main/js</script.input.dir>
     <script.output.dir>../org.eclipse.scout.rt.ui.json/WebContent/res</script.output.dir>
+    <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
 <build>
@@ -43,9 +44,28 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${script.input.dir}/scout-4.0.1-template.css</argument>
+              <argument>${script.input.dir}/scout-template.css</argument>
               <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-4.0.1.css</argument>
+              <argument>${project.build.directory}/process_script/scout-${scout.script.version}.css</argument>
+              <argument>--root</argument>
+              <argument>${project.basedir}</argument>
+            </arguments>
+            <classpathScope>compile</classpathScope>
+          </configuration>
+        </execution>
+        <execution>
+          <id>process-mobile-css</id>
+          <phase>package</phase>
+          <goals>
+            <goal>java</goal>
+          </goals>
+          <configuration>
+            <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
+            <arguments>
+              <argument>--i</argument>
+              <argument>${script.input.dir}/scout-mobile-template.css</argument>
+              <argument>--o</argument>
+              <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.css</argument>
               <argument>--root</argument>
               <argument>${project.basedir}</argument>
             </arguments>
@@ -62,9 +82,28 @@
             <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
             <arguments>
               <argument>--i</argument>
-              <argument>${script.input.dir}/scout-4.0.1-template.js</argument>
+              <argument>${script.input.dir}/scout-template.js</argument>
               <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-4.0.1.js</argument>
+              <argument>${project.build.directory}/process_script/scout-${scout.script.version}.js</argument>
+              <argument>--root</argument>
+              <argument>${project.basedir}</argument>
+            </arguments>
+            <classpathScope>compile</classpathScope>
+          </configuration>
+        </execution>
+        <execution>
+          <id>process-mobile-js</id>
+          <phase>package</phase>
+          <goals>
+            <goal>java</goal>
+          </goals>
+          <configuration>
+            <mainClass>org.eclipse.scout.ui.html.ScriptProcessor</mainClass>
+            <arguments>
+              <argument>--i</argument>
+              <argument>${script.input.dir}/scout-mobile-template.js</argument>
+              <argument>--o</argument>
+              <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.js</argument>
               <argument>--root</argument>
               <argument>${project.basedir}</argument>
             </arguments>

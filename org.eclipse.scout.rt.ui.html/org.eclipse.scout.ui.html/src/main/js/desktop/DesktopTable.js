@@ -4,6 +4,11 @@
 scout.DesktopTable = function(session, model) {
   this.model = model;
   this.session = session;
+
+  this.config = {
+    contextMenuEnabled : true
+  };
+
   this._$desktopTable;
   this._$tableData;
   this._$tableDataScroll;
@@ -11,7 +16,10 @@ scout.DesktopTable = function(session, model) {
   this._$infoFilter;
   this._$infoLoad;
   this._tableHeader;
-  this.session.widgetMap[model.table.id] = this;
+
+  if (session && model) {
+    this.session.widgetMap[model.table.id] = this;
+  }
 };
 
 scout.DesktopTable.EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -22,20 +30,24 @@ scout.DesktopTable.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
 scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
 scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
 
-
 scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
 
   //create container
   this._$desktopTable = this._$parent.appendDiv('DesktopTable');
 
-  var $tableHeader = this._$desktopTable.appendDiv('TableHeader'),
-    $tableData = this._$desktopTable.appendDiv('TableData');
+  this._$tableHeader = this._$desktopTable.appendDiv('TableHeader');
+  if (!this.model.table.headerVisible) {
+    //FIXME maybe better to not create at all?
+    this._$tableHeader.hide();
+  }
+  this._tableHeader = new scout.DesktopTableHeader(this.session, this, this._$tableHeader);
+
+  this._$tableData = this._$desktopTable.appendDiv('TableData');
   this._$desktopTable.appendDiv('TableFooter');
   this._$tableControl = this._$desktopTable.appendDiv('TableControl');
 
-  this._$tableDataScroll = $tableData.appendDiv('TableDataScroll');
-  this._$tableData = $tableData;
+  this._$tableDataScroll = this._$tableData.appendDiv('TableDataScroll');
   this._scrollbar = new scout.Scrollbar(this._$tableDataScroll, 'y');
 
   this._$controlContainer = this._$tableControl.appendDiv('ControlContainer');
@@ -63,9 +75,6 @@ scout.DesktopTable.prototype.render = function($parent) {
     function() {
       $('#control_label').text('');
     });
-
-  // create header
-  this._tableHeader = new scout.DesktopTableHeader(this.session, this, $tableHeader);
 
   // load data and create rows
   this._loadData();
@@ -343,6 +352,28 @@ scout.DesktopTable.prototype._loadData = function() {
   this._drawSelectionBorder();
 };
 
+scout.DesktopTable.prototype._buildRowDiv = function(row, index) {
+  var rowClass = 'table-row ',
+    table = this.model.table;
+
+  if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
+    rowClass += 'row-selected ';
+  }
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + '>';
+  for (var c = 0; c < row.cells.length; c++) {
+    var column = table.columns[c],
+      width = column.width,
+      style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
+      allign = (column.type == 'number') ? 'text-align: right; ' : '',
+      value = this.getText(c, index);
+
+    rowDiv += '<div style="' + style + allign + '">' + value + '</div>';
+  }
+  rowDiv += '</div>';
+
+  return rowDiv;
+};
+
 scout.DesktopTable.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '';
@@ -353,25 +384,7 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
   if (table.rows && table.rows.length > 0) {
     for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
       var row = table.rows[r];
-
-      var rowClass = 'table-row ';
-      if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
-        rowClass += 'row-selected ';
-      }
-
-      rowString += '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + r + '>';
-
-      for (var c = 0; c < row.cells.length; c++) {
-        var column = table.columns[c],
-          width = column.width,
-          style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
-          allign = (column.type == 'number') ? 'text-align: right; ' : '',
-          value = this.getText(c, r);
-
-        rowString += '<div style="' + style + allign + '">' + value + '</div>';
-      }
-
-      rowString += '</div>';
+      rowString += this._buildRowDiv(row, r);
     }
     numRowsLoaded = r;
 
@@ -469,9 +482,9 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
         sendRowsSelected();
       }
 
-      // open and animate menu
-      selectionMenu(event.pageX, event.pageY, event.button);
-
+      if (that.config.contextMenuEnabled) {
+        showSelectionMenu(event.pageX, event.pageY, event.button);
+      }
     }
   }
 
@@ -526,7 +539,7 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
     });
   }
 
-  function selectionMenu(x, y, button) {
+  function showSelectionMenu(x, y, button) {
     // selection
     var $selectedRows = $('.row-selected'),
       $firstRow = $selectedRows.first();
@@ -577,12 +590,12 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
 
     // TODO cru: remove events?
 
-    function enterSelection (event) {
-        $RowDrill.animateAVCSD('height', h1, null, null, 75);
-        $RowMenu.animateAVCSD('height', h2, null, null, 75);
+    function enterSelection(event) {
+      $RowDrill.animateAVCSD('height', h1, null, null, 75);
+      $RowMenu.animateAVCSD('height', h2, null, null, 75);
     }
 
-    function leaveSelection (event) {
+    function leaveSelection(event) {
       if (!$(event.toElement).is($showMenu) && !$('#RowMenuContainer').length) {
         $RowDrill.animateAVCSD('height', 6, null, null, 75);
         $RowMenu.animateAVCSD('height', 6, null, null, 75);
@@ -614,8 +627,8 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
               .hover(onHoverIn, onHoverOut);
           } else {
             $RowMenuContainer.appendDiv('', 'menu-item', menus[i].text)
-            .attr('id', menus[i].id)
-            .on('click', '', onMenuItemClicked);
+              .attr('id', menus[i].id)
+              .on('click', '', onMenuItemClicked);
           }
         }
 
@@ -635,19 +648,17 @@ scout.DesktopTable.prototype._drawData = function(startRow) {
         //$('*').one('mousedown keydown mousewheel', removeMenu);
       }
 
-
-      function onHoverIn () {
+      function onHoverIn() {
         $('#MenuButtonsLabel').text($(this).data('label'));
       }
 
-      function onHoverOut () {
+      function onHoverOut() {
         $('#MenuButtonsLabel').text('');
       }
 
-      function onMenuItemClicked () {
-      }
+      function onMenuItemClicked() {}
 
-      function removeMenu () {
+      function removeMenu() {
         var $RowMenuContainer = $('#RowMenuContainer'),
           h = $RowMenuContainer.outerHeight();
 
@@ -1114,6 +1125,7 @@ scout.DesktopTable.prototype._showTableControl = function() {
   this._$controlResizeBottom.on('mousedown', '', resizeControl);
 
   var that = this;
+
   function resizeControl(event) {
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
@@ -1141,6 +1153,20 @@ scout.DesktopTable.prototype._showTableControl = function() {
     }
 
     return false;
+  }
+};
+
+scout.Desktop.prototype._handleModelHeaderVisibleChange = function(headerVisible) {
+  if (headerVisible) {
+    this._$tableHeader.show();
+  } else {
+    this._$tableHeader.hide();
+  }
+};
+
+scout.DesktopTable.prototype.onModelPropertyChange = function(event) {
+  if (event.headerVisible !== undefined) {
+    this._handleModelHeaderVisibleChange(event.headerVisible);
   }
 };
 

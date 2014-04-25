@@ -30,18 +30,20 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
 
   private Bundle m_bundle;
   private String m_bundleWebContentFolder;
+  private IndexResolver m_indexResolver;
 
   @Override
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
     setBundle(registration.getReference().getBundle());
     setBundleWebContentFolder("WebContent");
+    setIndexResolver(new IndexResolver());
   }
 
   @Override
   public boolean handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = req.getPathInfo();
-    pathInfo = resolvePath(pathInfo);
+    pathInfo = resolvePath(req, pathInfo);
     URL url = resolveBundleResource(pathInfo);
     if (url == null) {
       return false;
@@ -93,12 +95,20 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
     m_bundleWebContentFolder = folder;
   }
 
-  protected String resolvePath(String pathInfo) {
+  protected IndexResolver getIndexResolver() {
+    return m_indexResolver;
+  }
+
+  protected void setIndexResolver(IndexResolver indexResolver) {
+    m_indexResolver = indexResolver;
+  }
+
+  protected String resolvePath(HttpServletRequest req, String pathInfo) {
     if (pathInfo == null) {
       return null;
     }
     if (pathInfo.equals("/")) {
-      pathInfo = "/index.html";
+      pathInfo = getIndexResolver().resolve(req);
     }
     return pathInfo;
   }

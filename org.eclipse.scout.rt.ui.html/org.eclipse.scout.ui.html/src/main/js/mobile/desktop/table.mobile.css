@@ -1,0 +1,40 @@
+.table-row, .table-row-sum {
+  padding: 4px 0px 4px 0px;
+  margin-bottom: 0px;
+  border-bottom: 1px solid #EEE;
+}
+
+.table-row > h3 {
+  font-size: 16px;
+  margin: 0 0;
+}
+
+.table-row > p {
+  margin: 0 0;
+}
+
+.table-row > p:after {
+  font-family: fontAwesome;
+  content: "\F054";
+  color: grey;
+  position: absolute;
+  display: block;
+  width: 22px;
+  height: 22px;
+  top: 50%;
+  margin-top: -11px;
+  right: 10px;
+}
+
+
+.table-row.select-top,
+.table-row.select-middle,
+.table-row.select-bottom,
+.table-row.select-single {
+  border: 0px;
+  border-radius: 0px;
+
+  padding: 4px 0px 4px 0px !important;
+  background-color: #fe9915;
+  color: white;
+}

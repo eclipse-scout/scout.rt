@@ -69,6 +69,9 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(modelObject);
     m_menuManager = new MenuManager(getJsonSession());
+
+    delegateProperty(ITable.PROP_HEADER_VISIBLE);
+    //FIXME add missing
   }
 
   @Override
@@ -121,6 +124,9 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
       json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
       m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
       json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
+
+      json.put(ITable.PROP_HEADER_VISIBLE, getModelObject().isHeaderVisible());
+
       return json;
     }
     catch (JSONException e) {
@@ -226,7 +232,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
       IColumn column = row.getTable().getColumnSet().getColumn(colIndex);
       if (column.isDisplayable()) {
-        jsonCells.put(tableCellToJson(row.getCell(colIndex), column));
+        jsonCells.put(cellToJson(row.getCell(colIndex), column));
       }
     }
 
@@ -242,7 +248,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
     return jsonRow;
   }
 
-  protected Object tableCellToJson(ICell cell, IColumn column) throws JsonUIException {
+  protected Object cellToJson(ICell cell, IColumn column) throws JsonUIException {
     JSONObject jsonCell = new JSONObject();
     try {
       jsonCell.put("value", getCellValue(cell, column));
@@ -295,6 +301,8 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
       json.put("text", column.getHeaderCell().getText());
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
+      json.put("summary", column.isSummary());
+      json.put(IColumn.PROP_VISIBLE, column.isVisible()); //FIXME property change, really transmit invisible cols?
 
       if (column instanceof INumberColumn<?>) {
         //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols

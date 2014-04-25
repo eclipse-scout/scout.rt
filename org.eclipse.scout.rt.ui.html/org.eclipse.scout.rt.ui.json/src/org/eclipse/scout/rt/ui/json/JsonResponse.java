@@ -83,6 +83,8 @@ public class JsonResponse {
         m_eventList.add(event);
         m_idToPropertyChangeEventMap.put(id, event);
       }
+
+      //FIXME handle null values (null text -> empty text, otherwise it won't be transferred
       event.put(propertyName, newValue);
     }
     catch (JSONException ex) {

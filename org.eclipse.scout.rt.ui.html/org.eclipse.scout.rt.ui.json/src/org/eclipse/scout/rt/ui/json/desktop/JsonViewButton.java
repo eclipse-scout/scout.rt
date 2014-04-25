@@ -13,9 +13,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewButton> {
+  public static final String EVENT_CLICK = "click";
 
   public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
+
+    delegateProperty(IViewButton.PROP_TEXT);
+    delegateProperty(IViewButton.PROP_SELECTED);
   }
 
   @Override
@@ -28,7 +32,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
     JSONObject json = super.toJson();
     try {
       json.put(IViewButton.PROP_TEXT, getModelObject().getText());
-      json.put("selected", getModelObject().isSelected());
+      json.put(IViewButton.PROP_SELECTED, getModelObject().isSelected());
       return json;
     }
     catch (JSONException e) {
@@ -37,18 +41,8 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  protected void handleModelPropertyChange(String name, Object newValue) {
-    if (IViewButton.PROP_SELECTED.equals(name)) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
-    }
-    else {
-      super.handleModelPropertyChange(name, newValue);
-    }
-  }
-
-  @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    if ("click".equals(event.getEventType())) {
+    if (EVENT_CLICK.equals(event.getEventType())) {
       handleUiClick(event, res);
     }
     else {

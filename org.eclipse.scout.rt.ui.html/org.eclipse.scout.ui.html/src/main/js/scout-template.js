@@ -3,14 +3,15 @@
 //
 
 //@include("src/main/js/jquery-scout.js");
+//@include("src/main/js/js-extensions.js");
 
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
 
 //@include("src/main/js/util/arrays.js");
-//@include("src/main/js/Session.js");
-//@include("src/main/js/Event.js");
-//@include("src/main/js/Locale.js");
+//@include("src/main/js/session/Session.js");
+//@include("src/main/js/session/Event.js");
+//@include("src/main/js/session/Locale.js");
 //@include("src/main/js/desktop/Desktop.js");
 //@include("src/main/js/desktop/DesktopBench.js");
 //@include("src/main/js/desktop/DesktopMatrix.js");
@@ -32,6 +33,5 @@
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");
-
 
 }(window.scout = window.scout || {}, jQuery));

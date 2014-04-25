@@ -100,3 +100,17 @@ Erweiterbarkeit
 - Wie kann das Projekte eine bestehende Komponente erweitern / patchen?
   Komponente registrieren -> ok
   Komponente erweitern (extends) -> unklar. Nur via Build-Prozess? Oder genügt es, alle Scout-Komponenten öffentlich zu machen (scout.Table = Table)? Dann könnte man "JS-Vererbung" verwenden
+
+Mobile
+- Separates CSS und Javascript für mobile? Basierend auf scout.css?
+  - Vorteile:
+    - Man muss mobile Komponentent nicht mit eigenen CSS-Klassen bestücken (z.B. braucht es table-row-mobile nicht)
+    - man kann CSS / JS für nicht verwendete Komponenten weglassen
+    -> scout.js sowies scout-mobile.js sind so schlank wie möglich
+- Eventuell css eigenschaften mittels @Override verändern, damit das mobile css nicht unnötig aufgeblasen wird?
+
+Plugin-Struktur
+- Aufteilung html / json ok, aber zur Zeit ist es nicht optimal.
+  - pom.xml von ui.html generiert files für ui.json? Muss das WebContent im ui.json drin sein?
+  - ScriptProcessor ist im Html-Plugin drin, processing wird aber im json plugin gemacht
+  -> eigentlich sind beide voneinander abhängig, was ein bisschen komisch ist.

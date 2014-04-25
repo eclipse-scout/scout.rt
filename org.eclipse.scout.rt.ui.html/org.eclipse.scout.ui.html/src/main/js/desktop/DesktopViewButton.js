@@ -28,6 +28,10 @@ scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
       this._$viewButton.selectOne();
     }
   }
+  else if (event.text !== undefined) {
+    this._$viewButton.text = event.text;
+  }
+
 };
 
 scout.DesktopViewButton.prototype.onModelAction = function() {};

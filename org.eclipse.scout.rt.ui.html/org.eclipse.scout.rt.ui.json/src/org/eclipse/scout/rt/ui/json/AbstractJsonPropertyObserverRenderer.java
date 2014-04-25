@@ -12,14 +12,22 @@ package org.eclipse.scout.rt.ui.json;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
 public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
   private P_PropertyChangeListener m_propertyChangeListener;
+  private Set<String> m_propertiesToDelegate;
 
   public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
+    m_propertiesToDelegate = new HashSet<>();
+  }
+
+  protected void delegateProperty(String name) {
+    m_propertiesToDelegate.add(name);
   }
 
   @Override
@@ -41,6 +49,9 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
   }
 
   protected void handleModelPropertyChange(String name, Object newValue) {
+    if (m_propertiesToDelegate.contains(name)) {
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
+    }
   }
 
   private class P_PropertyChangeListener implements PropertyChangeListener {
