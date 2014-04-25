@@ -64,7 +64,7 @@ public interface ICacheStoreService extends IService {
    *          value identifying key
    * @return the value
    */
-  public Object getClientAttribute(HttpServletRequest req, HttpServletResponse res, String key);
+  Object getClientAttribute(HttpServletRequest req, HttpServletResponse res, String key);
 
   /**
    * returns the value to the given key in dependency of the requesting client, refreshes the expiration time

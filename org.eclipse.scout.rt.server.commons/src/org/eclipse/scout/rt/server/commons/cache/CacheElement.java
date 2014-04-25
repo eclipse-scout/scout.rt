@@ -38,7 +38,7 @@ final class CacheElement implements ICacheElement, Serializable {
 
   @Override
   public void setExpiration(Integer expiration) {
-    m_expiration = expiration * 1000l;
+    m_expiration = expiration * 1000L;
   }
 
   public long getCreationTime() {

@@ -148,7 +148,7 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
    *          Object to serialize
    * @return {@link String}
    */
-  protected String serializedString(ICacheElement e) throws ProcessingException {
+  protected String serializedString(Object e) throws ProcessingException {
     try {
       byte[] bytes = m_objs.serialize(e);
       return StringUtility.bytesToHex(bytes);
@@ -165,18 +165,18 @@ public abstract class AbstractCacheStoreService extends AbstractService implemen
    *          bytestream
    * @return deserialized Object
    */
-  protected ICacheElement deserializeCacheElement(String s) {
+  protected Object deserialize(String s) {
     if (s == null) {
       return null;
     }
     try {
       byte[] bytes = StringUtility.hexToBytes(s);
       if (bytes != null) {
-        return m_objs.deserialize(bytes, ICacheElement.class);
+        return m_objs.deserialize(bytes, Object.class);
       }
     }
     catch (ClassNotFoundException e) {
-      LOG.error("Error during deserializization ", e);
+      LOG.error("ClassNotFoundException error during deserializization ", e);
     }
     catch (IOException e) {
       LOG.error("Error during deserializization ", e);

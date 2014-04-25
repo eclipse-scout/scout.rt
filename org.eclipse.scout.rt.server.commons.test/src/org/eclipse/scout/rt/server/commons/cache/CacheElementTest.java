@@ -22,7 +22,6 @@ public class CacheElementTest {
 
   private final String m_testValue = "testValue";
   private final Integer testExpiration = Integer.valueOf(10000);
-  private final String m_testKey = "testKey";
 
   @Test
   public void testCacheElement() {

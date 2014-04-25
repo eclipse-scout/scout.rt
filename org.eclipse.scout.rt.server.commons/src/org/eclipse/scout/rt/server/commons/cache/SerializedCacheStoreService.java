@@ -45,7 +45,7 @@ public class SerializedCacheStoreService extends AbstractCacheStoreService {
 
   @Override
   public Object getClientAttribute(HttpServletRequest req, HttpServletResponse res, String key) {
-    ICacheElement e = deserializeCacheElement((String) req.getSession(true).getAttribute(key));
+    ICacheElement e = (ICacheElement) deserialize((String) req.getSession(true).getAttribute(key));
     if (e != null && e.isActive()) {
       return e.getValue();
     }
@@ -62,7 +62,7 @@ public class SerializedCacheStoreService extends AbstractCacheStoreService {
 
   @Override
   public void touchClientAttribute(HttpServletRequest req, HttpServletResponse res, String key, Integer expiration) {
-    ICacheElement e = deserializeCacheElement((String) req.getSession(true).getAttribute(key));
+    ICacheElement e = (ICacheElement) deserialize((String) req.getSession(true).getAttribute(key));
     if (e != null) {
       if (e.isActive()) {
         e.setExpiration(expiration);
