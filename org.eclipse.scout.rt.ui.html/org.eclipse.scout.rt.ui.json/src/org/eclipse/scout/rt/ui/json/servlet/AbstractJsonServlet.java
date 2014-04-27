@@ -47,7 +47,7 @@ public abstract class AbstractJsonServlet extends HttpServletEx implements IJson
     LOG.info("GET request started.");
 
     String pathInfo = req.getPathInfo();
-    if (pathInfo == null || pathInfo.equals("")) {
+    if (req.getRequestURI().endsWith(getServletContext().getContextPath())) {
       resp.sendRedirect(req.getRequestURI() + "/");
       return;
     }
