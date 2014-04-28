@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
+scout.DesktopChart = function(session, $controlContainer, table, model) {
   // group functions for dates
   // todo
   var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
@@ -10,9 +10,16 @@ scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
     countDesc = 'Anzahl';
 
   var removeChart = null,
-    columns = desktopTable.model.table.columns,
+    columns = table.model.columns,
     xAxis,
-    yAxis;
+    yAxis,
+    filter = {};
+
+  this._table = table;
+  this._filterResetListener = table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+    //  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
+    $controlContainer.find('.main-chart.selected').removeClassSVG('selected');
+  });
 
   // create container
   var $chartSelect = $controlContainer.empty().appendDiv('ChartSelect');
@@ -67,7 +74,7 @@ scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
     .click(drawChart);
 
   // find best x and y axis: best is 9 different entries
-  var matrix = new scout.DesktopMatrix(session, desktopTable),
+  var matrix = new scout.DesktopChartMatrix(session, table),
     columnCount = matrix.columnCount(),
     comp = function(a, b) {
       return Math.abs(a[1] - 9) - Math.abs(b[1] - 9);
@@ -249,7 +256,7 @@ scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
       dataSum = $('.selected', $dataSelect).hasClass('data-sum');
 
     // build matrix
-    var matrix = new scout.DesktopMatrix(session, desktopTable),
+    var matrix = new scout.DesktopChartMatrix(session, table),
       dataAxis = matrix.addData(data, dataCount ? -1 : (dataSum ? 1 : 2));
 
     xAxis = matrix.addAxis(axis, axisGroup);
@@ -655,7 +662,8 @@ scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
     });
 
     //  filter function
-    var testFunc = function($row) {
+    var filterFunc = function($row) {
+      //FIXME does not work anymore if column gets moved
       var textX = $row.children().eq(xAxis.column).text(),
         nX = xAxis.norm(textX);
 
@@ -668,8 +676,16 @@ scout.DesktopTableChart = function(session, $controlContainer, desktopTable) {
       }
     };
 
-    // set filter function
-    desktopTable.model.chart.filterFunc = testFunc;
-    desktopTable.filter();
+    var filter = table.getFilter(scout.DesktopChart.FILTER_KEY) || {};
+    filter.label = model.label;
+    filter.accept = filterFunc;
+    table.registerFilter(scout.DesktopChart.FILTER_KEY, filter);
+    table.filter();
   }
+};
+
+scout.DesktopChart.FILTER_KEY = 'CHART';
+
+scout.DesktopChart.prototype.dispose = function() {
+  this._table.events.removeListener(this._filterResetListener);
 };

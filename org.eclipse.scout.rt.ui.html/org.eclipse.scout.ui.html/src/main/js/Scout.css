@@ -1,4 +1,3 @@
-/* SCOUT GUI 0.2 */
 /* (c) Copyright 2013-2014, BSI Business Systems Integration AG */
 /* position, size, look, others */
 
@@ -308,7 +307,7 @@ height: calc(100% - 58px);
 width: calc(100% - 380px);
 }
 
-#DesktopTable {
+.table {
 height: 100%;
 width: 100%;
 overflow: hidden;
@@ -317,7 +316,7 @@ padding-top: 12px;
 
 /* main table header */
 
-#TableHeader {
+.table-header {
 position: relative;
 border-bottom: 1px solid #EEE;
 border-left: 2px solid #FFF;
@@ -394,7 +393,7 @@ color:#FE9915
 
 /* main table data */
 
-#TableData {
+.table-data {
 position: relative;
 height: calc(100% - 85px);
 width: 100%;
@@ -402,14 +401,14 @@ overflow: hidden;
 padding-left: 4px;
 }
 
-#TableData > .scrollbar {
+.table-data > .scrollbar {
 right: 7px;
 margin-top: 10px;
 margin-bottom: 10px;
 height: calc(100% - 23px);
 }
 
-#TableDataScroll {
+.table-data-scroll {
 position: absolute;
 top: 0px;
 height: 100%;
@@ -546,35 +545,33 @@ padding-left: 10px;
 white-space: nowrap;
 }
 
-#ControlGraph, #ControlChart, #ControlMap {
+.control{
 padding: 14px 18px 10px 2px;
 float: left;
 cursor: pointer;
 }
 
-#ControlGraph:before, #ControlChart:before, #ControlMap:before {
+.control:hover:before {
+color: #FE9915;
+}
+
+.control.disabled:hover, .control.disabled:before{
+cursor: default;
+color:#CCC;
+}
+
+.control-graph:before, .control-chart:before, .control-map:before {
 font-family: fontAwesome;
 font-size: 24px;
 color:#0082A1;
 }
 
-#ControlGraph:before {content:"\F0E8";}
-#ControlChart:before {content:"\F080";}
-#ControlMap:before {content:"\F0AC";}
+.control-graph:before {content:"\F0E8";}
+.control-chart:before {content:"\F080";}
+.control-map:before {content:"\F0AC";}
 
 
-#ControlGraph:hover:before, #ControlChart:hover:before, #ControlMap:hover:before  {
-color: #FE9915;
-}
-
-#ControlGraph.disabled:hover, #ControlGraph.disabled:before,
-#ControlChart.disabled:hover, #ControlChart.disabled:before,
-#ControlMap.disabled:hover, #ControlMap.disabled:before{
-cursor: default;
-color:#CCC;
-}
-
-#ControlLabel {
+.control-label {
 float: left;
 padding-top: 18px;
 color: #0082A1;
@@ -967,7 +964,7 @@ color: #FE9915;
 
 /* header menu */
 
-#MenuHeaderTitle {
+#TableColumnHeaderMenuTitle {
 position: fixed;
 z-index: 104;
 border-top: 2px solid #0082A1;
@@ -984,7 +981,7 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 
-#MenuHeader {
+#TableColumnHeaderMenu {
 position: fixed;
 z-index: 103;
 border: 2px solid #0082A1;
@@ -1218,7 +1215,7 @@ color: #fff !important;
 
 /* table menu */
 
-#MenuTableTitle {
+#TableOrganizeMenuTitle {
 position: fixed;
 z-index: 104;
 border-top: 2px solid #0082A1;
@@ -1233,11 +1230,11 @@ background-color: #FFF;
 color:#FE9915
 }
 
-#MenuTableTitle:before {
+#TableOrganizeMenuTitle:before {
 content:"\F013";
 }
 
-#MenuTable {
+#TableOrganizeMenu {
 position: fixed;
 z-index: 103;
 padding: 10px 1px 0px 10px;
@@ -1325,16 +1322,16 @@ width: 20px;
 font-size: 20px;
 }
 
-#DesktopTable .key-box{
+.table .key-box{
 right: 24px;
 width: 32px;
 }
 
-#DesktopTable .key-box.top3 { top: 10px;}
-#DesktopTable .key-box.top2 { top: 32px;}
-#DesktopTable .key-box.top1 { top: 54px;}
-#DesktopTable .key-box.bottom1 { bottom: 54px;}
-#DesktopTable .key-box.bottom2 { bottom: 32px;}
-#DesktopTable .key-box.bottom3 { bottom: 10px;}
-#DesktopTable .key-box.char { bottom: 8px; }
+.table .key-box.top3 { top: 10px;}
+.table .key-box.top2 { top: 32px;}
+.table .key-box.top1 { top: 54px;}
+.table .key-box.bottom1 { bottom: 54px;}
+.table .key-box.bottom2 { bottom: 32px;}
+.table .key-box.bottom3 { bottom: 10px;}
+.table .key-box.char { bottom: 8px; }
 

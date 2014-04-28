@@ -1,9 +1,9 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTableHeader = function(session, desktopTable, $tableHeader, filterCallback) {
+scout.TableHeader = function(session, table, $tableHeader, filterCallback) {
   var that = this,
-    columns = desktopTable.model.table.columns;
+    columns = table.model.columns;
 
   this.totalWidth = 0;
   this.dragDone = false;
@@ -35,11 +35,11 @@ scout.DesktopTableHeader = function(session, desktopTable, $tableHeader, filterC
     if (that.dragDone) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      desktopTable.sortChange($header, $header.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
+      table.sortChange($header, $header.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
     } else {
       var x = $header.offset().left,
         y = $header.offset().top;
-      new scout.MenuHeader(session, desktopTable, $header, x, y);
+      new scout.TableColumnHeaderMenu(session, table, $header, x, y);
     }
 
     return false;
@@ -50,7 +50,7 @@ scout.DesktopTableHeader = function(session, desktopTable, $tableHeader, filterC
       x = $clicked.offset().left,
       y = $clicked.offset().top;
 
-    new scout.MenuTable(desktopTable, x, y);
+    new scout.TableOrganizeMenu(table, x, y);
   }
 
   function resizeHeader(event) {
@@ -169,7 +169,7 @@ scout.DesktopTableHeader = function(session, desktopTable, $tableHeader, filterC
 
       // move column
       if (oldPos !== newPos) {
-        desktopTable.moveColumn($header, oldPos, newPos, true);
+        table.moveColumn($header, oldPos, newPos, true);
         that.dragDone = false;
       } else {
         $header.animateAVCSD('left', '', function () {that.dragDone = false;});

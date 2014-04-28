@@ -3,6 +3,7 @@
 
 scout.DesktopTree = function(session, $parent, model) {
   this.model = model;
+  this._selectedNodes = [];
   this.session = session;
   this._desktopTable;
 
@@ -29,14 +30,17 @@ scout.DesktopTree.prototype.attach = function($container) {
 };
 
 scout.DesktopTree.prototype.attachModel = function() {
-  if (this.model.selectedNodeIds) {
-    var nodeId = this.model.selectedNodeIds[0];
-    this.setNodeSelectedById(nodeId);
-  }
+  var selectedNode;
 
-  if (this.model.detailTableId && !this._desktopTable) {
-    this._desktopTable = this.session.widgetMap[this.model.detailTableId];
-    this._desktopTable.attach($('#DesktopBench'));
+  if (this._selectedNodes.length > 0) {
+    selectedNode = this._selectedNodes[0];
+    this.setNodeSelectedById(selectedNode.id);
+
+
+    if (selectedNode.type === 'table' && !this._desktopTable) {
+      this._desktopTable = this.session.widgetMap[selectedNode.id];
+      this._desktopTable.attach($('#DesktopBench'));
+    }
   }
 };
 
@@ -152,8 +156,20 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
   }
   var node = $node.data('node');
   this.model.selectedNodeIds = [node.id];
+  this._selectedNodes = [node];
 
   $node.selectOne();
+
+  if (this._desktopTable) {
+    this._desktopTable.detach();
+//    this.model.detailTable = null;
+  }
+
+  if (node.type === 'table') {
+    this._desktopTable = this.session.widgetMap[node.id];
+    this._desktopTable.attach($('#DesktopBench'));
+    this.model.detailTable = this._desktopTable.model;
+  }
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
@@ -173,7 +189,7 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
 
   function onEventsProcessed(eventTypes) {
     //Only process if not already processed by _onSelectionMenuChanged
-    if(eventTypes.indexOf(scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
+    if (eventTypes.indexOf(scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
       that._showSelectionMenuAndHideOthers($node);
     }
   }
@@ -189,8 +205,7 @@ scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
 
   if (hasSelectionMenus) {
     this._addNodeMenu($node);
-  }
-  else {
+  } else {
     //Don't touch other nodes -> cache 'has menu' state to make it more responsive. Alternative would be to always remove every node menu before adding a new one
     this._removeNodeMenu($node);
   }
@@ -252,10 +267,16 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     // Create tables for table pages
     //FIXME really always create table (no gui is created)
     if (node.table) {
-      var desktopTable = this.session.widgetMap[node.table.id];
+      var desktopTable = this.session.widgetMap[node.id];
       if (!desktopTable) {
         node.outlineId = this.model.id;
-        new scout.DesktopTable(this.session, node, this.model.id);
+        new scout.DesktopTable(this.session, node);
+      }
+    }
+
+    if (this.model.selectedNodeIds && this.model.selectedNodeIds.indexOf(node.id) > -1) {
+      if (this._selectedNodes.indexOf(node) <= -1) {
+        this._selectedNodes.push(node);
       }
     }
 
@@ -382,16 +403,7 @@ scout.DesktopTree.prototype._removeNodeMenu = function($node) {
 };
 
 scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
-  if (this._desktopTable) {
-    this._desktopTable.detach();
-    this.model.detailTable = null;
-  }
 
-  if (event.detailTableId) {
-    this._desktopTable = this.session.widgetMap[event.detailTableId];
-    this._desktopTable.attach($('#DesktopBench'));
-    this.model.detailTable = this._desktopTable.model;
-  }
 };
 
 scout.DesktopTree.prototype.onModelCreate = function() {};

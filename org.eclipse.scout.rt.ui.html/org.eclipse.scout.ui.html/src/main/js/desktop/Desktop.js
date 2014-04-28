@@ -94,6 +94,7 @@ scout.Desktop = function(session, $parent, model) {
       return false;
     }
 
+    //FIXME this belongs to table (TableKeystrokeSupport.js?) (use case: 2 tables on a form)
     // table handling
     // todo: make clicked row visible
     if ([38, 40, 36, 35, 33, 34].indexOf(event.which) > -1) {
@@ -205,7 +206,7 @@ scout.Desktop = function(session, $parent, model) {
     }
 
     // keys for table
-    $node = $('#TableData', bench.$div);
+    $node = $('.table-data', bench.$div);
     if ($node.length) {
       $node.appendDiv('', 'key-box top3', 'Home');
       $node.appendDiv('', 'key-box top2', 'PgUp');
@@ -216,7 +217,7 @@ scout.Desktop = function(session, $parent, model) {
     }
 
     // keys for header
-    $node = $('#TableHeader', bench.$div);
+    $node = $('.table-header', bench.$div);
     if ($node.length) {
       $node.prependDiv('', 'key-box char', 'a - z');
     }

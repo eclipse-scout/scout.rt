@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MobileDesktopTable = function(session, $parent, model) {
-  this.base(session, $parent, model);
+scout.MobileTable = function(session, model) {
+  this.base(session, model);
 
   this.config.contextMenuEnabled = false;
 
@@ -11,12 +11,12 @@ scout.MobileDesktopTable = function(session, $parent, model) {
 
   this._headerColumns = [];
 };
-scout.MobileDesktopTable.inheritsFrom(scout.DesktopTable);
+scout.MobileTable.inheritsFrom(scout.Table);
 
 /**
  * @override
  */
-scout.MobileDesktopTable.prototype._drawData = function(startRow) {
+scout.MobileTable.prototype._drawData = function(startRow) {
   this._headerColumns = this._computeHeaderColumns();
 
   this.base.prototype._drawData.call(this, startRow);
@@ -25,7 +25,7 @@ scout.MobileDesktopTable.prototype._drawData = function(startRow) {
 /**
  * @override
  */
-scout.MobileDesktopTable.prototype._buildRowDiv = function(row, index) {
+scout.MobileTable.prototype._buildRowDiv = function(row, index) {
   var rowClass = 'table-row table-row-mobile ',
     table = this.model.table,
     column, value, headerText = "";
@@ -67,7 +67,7 @@ scout.MobileDesktopTable.prototype._buildRowDiv = function(row, index) {
   return '<div id="' + row.id + '" class="' + rowClass + '">' + cellContent + '</div>';
 };
 
-scout.MobileDesktopTable.prototype._computeHeaderColumns = function() {
+scout.MobileTable.prototype._computeHeaderColumns = function() {
   var columns = this.model.table.columns,
     column,
     headerColumns = [], i;
@@ -96,6 +96,6 @@ scout.MobileDesktopTable.prototype._computeHeaderColumns = function() {
   return headerColumns;
 };
 
-scout.MobileDesktopTable.prototype._isColumnNameNecessary = function(column) {
+scout.MobileTable.prototype._isColumnNameNecessary = function(column) {
   return true;
 };

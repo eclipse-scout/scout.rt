@@ -1,19 +1,19 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopMatrix = function(session, desktopTable) {
+scout.DesktopChartMatrix = function(session, table) {
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
-  this._columns = desktopTable.model.table.columns;
-  this._rows = desktopTable.model.table.rows;
-  this._desktopTable = desktopTable;
+  this._columns = table.model.columns;
+  this._rows = table.model.rows;
+  this._table = table;
 };
 
 /**
  * add data axis
  */
-scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
+scout.DesktopChartMatrix.prototype.addData = function(data, dataGroup) {
   var dataAxis = [],
     locale = this.locale;
 
@@ -60,7 +60,7 @@ scout.DesktopMatrix.prototype.addData = function(data, dataGroup) {
 };
 
 //add x or y Axis
-scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
+scout.DesktopChartMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale;
 
@@ -148,7 +148,7 @@ scout.DesktopMatrix.prototype.addAxis = function(axis, axisGroup) {
   return keyAxis;
 };
 
-scout.DesktopMatrix.prototype.calculateCube = function() {
+scout.DesktopChartMatrix.prototype.calculateCube = function() {
   var cube = {},
     r, v, k, data, key;
 
@@ -157,7 +157,7 @@ scout.DesktopMatrix.prototype.calculateCube = function() {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = this._desktopTable.getValue(this._allAxis[k].column, r);
+      key = this._table.getValue(this._allAxis[k].column, r);
       var normKey = this._allAxis[k].norm(key);
 
       if (normKey !== undefined) {
@@ -170,7 +170,7 @@ scout.DesktopMatrix.prototype.calculateCube = function() {
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = this._desktopTable.getValue(this._allData[v].column, r);
+      data = this._table.getValue(this._allData[v].column, r);
       normData = this._allData[v].norm(data);
       var normData = this._allData[v].norm(data);
       if (normData !== undefined) {
@@ -242,14 +242,14 @@ scout.DesktopMatrix.prototype.calculateCube = function() {
   return cube;
 };
 
-scout.DesktopMatrix.prototype.columnCount = function() {
+scout.DesktopChartMatrix.prototype.columnCount = function() {
   var colCount = [];
 
   for (var c = 0; c < this._columns.length; c++) {
     colCount.push([c, []]);
 
     for (var r = 0; r < this._rows.length; r++) {
-      var v = this._desktopTable.getValue(c, r);
+      var v = this._table.getValue(c, r);
       if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
 

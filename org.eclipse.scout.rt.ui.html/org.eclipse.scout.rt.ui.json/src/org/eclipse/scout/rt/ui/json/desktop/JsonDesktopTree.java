@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +53,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
-  private Map<ITable, JsonDesktopTable> m_jsonTables;
+  private Map<ITable, JsonTable> m_jsonTables;
   private TreeEventFilter m_treeEventFilter;
   private MenuManager m_menuManager;
 
@@ -152,7 +153,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
       json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
 
-      JsonDesktopTable jsonTable = m_jsonTables.get(getModelObject().getDetailTable());
+      JsonTable jsonTable = m_jsonTables.get(getModelObject().getDetailTable());
       if (jsonTable != null) {
         json.put(PROP_DETAIL_TABLE_ID, jsonTable.getId());
       }
@@ -242,7 +243,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
         m_treeNodeIds.remove(node);
         m_treeNodes.remove(nodeId);
-        JsonDesktopTable table = m_jsonTables.remove(node);
+        JsonTable table = m_jsonTables.remove(node);
         if (table != null) {
           table.dispose();
         }
@@ -331,9 +332,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
         ITable table = pageWithTable.getTable();
         if (table != null) {
-          JsonDesktopTable jsonTable = m_jsonTables.get(table);
+          JsonTable jsonTable = m_jsonTables.get(table);
           if (jsonTable == null) {
-            jsonTable = JsonRendererFactory.get().createJsonDesktopTable(table, getJsonSession());
+            jsonTable = JsonRendererFactory.get().createJsonTable(table, getJsonSession());
             m_jsonTables.put(table, jsonTable);
           }
           json.put("table", m_jsonTables.get(table).toJson());
@@ -498,30 +499,30 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
   protected void handleUiGraph(JsonEvent event, JsonResponse res) throws JsonUIException {
     JSONObject responseEvent;
+    String nodeId;
     try {
       responseEvent = new JSONObject();
       responseEvent.put("graph", new JSONObject(GRAPH));
+      nodeId = event.getEventObject().getString(PROP_NODE_ID);
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-    //event currently handled by table
-    JsonDesktopTable jsonDesktopTable = m_jsonTables.get(getModelObject().getDetailTable());
-    getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", jsonDesktopTable.getId(), responseEvent);
+    getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", nodeId, responseEvent);
   }
 
   protected void handleUiMap(JsonEvent event, JsonResponse res) throws JsonUIException {
     JSONObject responseEvent;
+    String nodeId;
     try {
       responseEvent = new JSONObject();
       responseEvent.put("map", new JSONObject(MAP));
+      nodeId = event.getEventObject().getString(PROP_NODE_ID);
     }
     catch (JSONException e) {
       throw new JsonUIException(e.getMessage(), e);
     }
-    //event currently handled by table
-    JsonDesktopTable jsonDesktopTable = m_jsonTables.get(getModelObject().getDetailTable());
-    getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", jsonDesktopTable.getId(), responseEvent);
+    getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", nodeId, responseEvent);
   }
 
   protected void handleUiDataModel(JsonEvent event, JsonResponse res) throws JsonUIException {
@@ -571,7 +572,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     if (IOutline.PROP_DETAIL_TABLE.equals(name)) {
       ITable table = (ITable) newValue;
 
-      JsonDesktopTable jsonTable = m_jsonTables.get(table);
+      JsonTable jsonTable = m_jsonTables.get(table);
       String tableId = null;
       if (jsonTable != null) {
         tableId = jsonTable.getId();

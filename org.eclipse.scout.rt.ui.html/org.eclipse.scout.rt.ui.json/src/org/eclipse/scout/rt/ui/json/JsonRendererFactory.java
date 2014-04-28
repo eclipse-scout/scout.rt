@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
-import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTable;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
@@ -30,6 +29,7 @@ import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.json.form.fields.stringfield.JsonStringField;
 import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
+import org.eclipse.scout.rt.ui.json.table.JsonTable;
 
 public class JsonRendererFactory {
 
@@ -66,8 +66,8 @@ public class JsonRendererFactory {
     return renderer;
   }
 
-  public JsonDesktopTable createJsonDesktopTable(ITable model, IJsonSession session) {
-    JsonDesktopTable renderer = new JsonDesktopTable(model, session);
+  public JsonTable createJsonTable(ITable model, IJsonSession session) {
+    JsonTable renderer = new JsonTable(model, session);
     renderer.init();
 
     return renderer;

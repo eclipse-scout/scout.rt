@@ -1,22 +1,26 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTableMap = function($parent, desktopTable, model) {
+scout.DesktopMap = function($parent, table, model) {
   // create container
   var $mapContainer = $parent.empty()
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
-    .attrSVG("preserveAspectRatio", "xMidYMid");
+    .attrSVG("preserveAspectRatio", "xMidYMid"),
+    filter = {},
+    countries = model.objects.countries.geometries;
 
-  var map = model;
-  var countries = map.objects.countries.geometries;
+  this._table = table;
+  this._filterResetListener = table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+    $mapContainer.find('.map-item.selected').removeClassSVG('selected');
+  });
 
   // find all countries in table
   var tableCountries = [];
-  for (var i = 0; i < desktopTable.model.table.columns.length; i++) {
-    for (var j = 0; j < desktopTable.model.map.columnIds.length; j++) {
-      if (desktopTable.model.table.columns[i].id == desktopTable.model.map.columnIds[j]) {
-        for (var r = 0; r < desktopTable.model.table.rows.length; r++) {
-          var value = desktopTable.model.table.rows[r].cells[i];
+  for (var i = 0; i < table.model.columns.length; i++) {
+    for (var j = 0; j < model.columnIds.length; j++) {
+      if (table.model.columns[i].id == model.columnIds[j]) {
+        for (var r = 0; r < table.model.rows.length; r++) {
+          var value = table.model.rows[r].cells[i];
           if (tableCountries.indexOf(value) == -1) tableCountries.push(value);
         }
       }
@@ -43,8 +47,8 @@ scout.DesktopTableMap = function($parent, desktopTable, model) {
           x, y;
 
         // loop all points of arc
-        for (var s = 0; s < map.arcs[arc].length; s++) {
-          var line = map.arcs[arc][s];
+        for (var s = 0; s < model.arcs[arc].length; s++) {
+          var line = model.arcs[arc][s];
 
           // first point is absolute, all other delta
           if (s === 0) {
@@ -101,8 +105,8 @@ scout.DesktopTableMap = function($parent, desktopTable, model) {
     });
 
     //  filter function
-    var testFunc = function($row) {
-      for (var c = 0; c < desktopTable.model.table.columns.length; c++) {
+    var filterFunc = function($row) {
+      for (var c = 0; c < table.model.columns.length; c++) {
         var text = $row.children().eq(c).text();
         if (countries.indexOf(text) > -1) return true;
       }
@@ -111,7 +115,16 @@ scout.DesktopTableMap = function($parent, desktopTable, model) {
 
     // callback to table
     // set filter function
-    desktopTable.model.map.filterFunc = testFunc;
-    desktopTable.filter();
+    var filter = table.getFilter(scout.DesktopMap.FILTER_KEY) || {};
+    filter.label = model.label;
+    filter.accept = filterFunc;
+    table.registerFilter(scout.DesktopMap.FILTER_KEY, filter);
+    table.filter();
   }
+};
+
+scout.DesktopMap.FILTER_KEY = 'MAP';
+
+scout.DesktopMap.prototype.dispose = function() {
+  this._table.events.removeListener(this._filterResetListener);
 };

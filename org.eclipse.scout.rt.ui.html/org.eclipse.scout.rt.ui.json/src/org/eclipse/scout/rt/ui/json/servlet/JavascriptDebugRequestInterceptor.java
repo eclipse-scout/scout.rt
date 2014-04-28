@@ -94,7 +94,7 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
   }
 
   protected boolean checkDebugEnabled(HttpServletRequest req, HttpServletResponse resp) {
-    HttpSession session = req.getSession(true);
+    HttpSession session = req.getSession(true); //FIXME this is probably NOT the right place to create new sessions
     if (session == null) {
       return false;
     }
@@ -138,7 +138,9 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
         return TextFileUtil.readUTF8(includeUrl);
       }
     });
-    processor.setShowLineNumbers(true);
+    if (bundlePath.endsWith(".js")) {
+      processor.setShowLineNumbers(true);
+    }
     byte[] outputBytes = processor.process().getBytes("UTF-8");
     int dot = bundlePath.lastIndexOf('.');
     String contentType = FileUtility.getContentTypeForExtension(bundlePath.substring(dot + 1));

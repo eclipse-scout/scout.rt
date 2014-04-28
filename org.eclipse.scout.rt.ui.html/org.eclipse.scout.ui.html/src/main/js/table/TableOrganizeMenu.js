@@ -1,24 +1,23 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MenuTable = function(desktopTable, x, y) {
+scout.TableOrganizeMenu = function(table, x, y) {
 
   $('.header-menu').remove();
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');
 
   // create titel
-  var $menuTableTitle = $('body').appendDiv('MenuTableTitle', 'header-menu')
+  var $menuTableTitle = $('body').appendDiv('TableOrganizeMenuTitle', 'header-menu')
     .css('left', x - 8).css('top', y - 8);
 
   // create container
-  var $menuTable = $('body').appendDiv('MenuTable', 'header-menu')
+  var $menuTable = $('body').appendDiv('TableOrganizeMenu', 'header-menu')
     .css('left', x - 243).css('top', y + 24);
 
   // every user action will close menu
   $('body').on('mousedown.remove', removeMenu);
   $('body').on('keydown.remove', removeMenu);
-
 
   // create buttons in command for set
   var $commandSet = $menuTable.appendDiv('', 'header-group');
@@ -50,8 +49,8 @@ scout.MenuTable = function(desktopTable, x, y) {
     .data('label', 'auf Slot 3')
     .click();
   $commandReset.appendDiv('HeaderCommandResetDefault', 'header-command')
-  .data('label', 'auf Werkseinstellung')
-  .click();
+    .data('label', 'auf Werkseinstellung')
+    .click();
 
   // create buttons in command for export
   var $commandExport = $menuTable.appendDiv('', 'header-group');
@@ -94,11 +93,18 @@ scout.MenuTable = function(desktopTable, x, y) {
   $commandFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
+  var filter = table.getFilter(scout.DesktopMap.FILTER_KEY),
+    filterText;
+
+  if (filter) {
+    filterText = filter.text;
+  }
+
   $('<input id="FilterInput"></input>')
     .appendTo($commandFilter)
     .on('keydown', '', filterKey)
     .on('input paste', '', filterEnter)
-    .val(desktopTable.model.table.filter);
+    .val(filterText);
 
   // name all label elements
   $('.header-text').each(function() {
@@ -151,13 +157,31 @@ scout.MenuTable = function(desktopTable, x, y) {
   function filterEnter() {
     var $input = $(this);
     $input.val($input.val().toLowerCase());
-    desktopTable.model.table.filter = $input.val();
-    desktopTable.filter();
+
+    var filter = table.getFilter(scout.DesktopMap.FILTER_KEY);
+    if (!filter && $input.val()) {
+      filter = {
+        accept: function($row) {
+          var rowText = $row.text().toLowerCase();
+          return rowText.indexOf(this.text) > -1;
+        }
+      };
+      table.registerFilter(scout.DesktopMap.FILTER_KEY, filter);
+    } else if (!$input.val()) {
+      table.unregisterFilter(scout.DesktopMap.FILTER_KEY);
+    }
+
+    if (filter) {
+      filter.text = $input.val();
+      filter.label = filter.text;
+    }
+
+    table.filter();
     event.stopPropagation();
   }
 
   function exportExcel() {
-    var table = desktopTable.model.table;
+    var tableModel = table.model;
     // http://jsfiddle.net/cmewv/537/
     var uri = 'data:application/vnd.ms-excel;base64,',
       template = '<html xmlns:o="urn:schemas-microsoft-com:office:office"' +
@@ -171,8 +195,8 @@ scout.MenuTable = function(desktopTable, x, y) {
     var html = '<table><tr>';
 
     var c, column;
-    for (c = 0; c < table.columns.length; c++) {
-      column = table.columns[c];
+    for (c = 0; c < tableModel.columns.length; c++) {
+      column = tableModel.columns[c];
 
       if (column.type == 'key') continue;
 
@@ -181,11 +205,11 @@ scout.MenuTable = function(desktopTable, x, y) {
 
     html += '</tr>';
 
-    for (var r = 0; r < table.rows.length; r++) {
+    for (var r = 0; r < tableModel.rows.length; r++) {
       html += '<tr>';
 
-      for (c = 0; c < table.columns.length; c++) {
-        html += '<td>' + desktopTable.getText(c, r) + '</td>';
+      for (c = 0; c < tableModel.columns.length; c++) {
+        html += '<td>' + table.getText(c, r) + '</td>';
       }
 
       html += '</tr>';
@@ -199,3 +223,5 @@ scout.MenuTable = function(desktopTable, x, y) {
     window.location.href = uri + template;
   }
 };
+
+scout.TableOrganizeMenu.FILTER_KEY = 'TABLE';

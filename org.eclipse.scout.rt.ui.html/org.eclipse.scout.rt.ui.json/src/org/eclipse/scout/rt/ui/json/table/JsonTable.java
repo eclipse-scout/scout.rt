@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.desktop;
+package org.eclipse.scout.rt.ui.json.table;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,12 +41,12 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonUIException;
-import org.eclipse.scout.rt.ui.json.table.TableEventFilter;
+import org.eclipse.scout.rt.ui.json.desktop.MenuManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITable> {
+public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
@@ -63,7 +63,7 @@ public class JsonDesktopTable extends AbstractJsonPropertyObserverRenderer<ITabl
   private TableEventFilter m_tableEventFilter;
   private MenuManager m_menuManager;
 
-  public JsonDesktopTable(ITable modelObject, IJsonSession jsonSession) {
+  public JsonTable(ITable modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
