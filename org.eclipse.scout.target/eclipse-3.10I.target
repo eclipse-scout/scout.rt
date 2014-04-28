@@ -18,16 +18,12 @@
       <unit id="org.eclipse.emf.common.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.emf.ecore.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
 
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
-            <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
-    </location>
-
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20140227085123/repository/"/>
+      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20140428023358/repository/"/>
 
       <unit id="javax.servlet" version="3.0.0.v201112011016"/>
       <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
@@ -90,6 +86,8 @@
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
       <unit id="com.google.guava" version="12.0.0.v201212092141"/>
       <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
+      <unit id="com.google.guava" version="15.0.0.v201403281430"/>
+      <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="rap_nightly" location="http://download.eclipse.org/rt/rap/nightly/runtime/"/>

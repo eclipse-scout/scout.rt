@@ -20,10 +20,10 @@
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20140227085123/repository/"/>
+      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20140428023358/repository/"/>
 
-      <unit id="javax.servlet" version="3.0.0.v201112011016"/>
-      <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
+      <unit id="javax.servlet" version="3.1.0.v20140303-1611"/>
+      <unit id="javax.servlet.source" version="3.1.0.v20140303-1611"/>
       <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
       <unit id="javax.wsdl.source" version="1.6.2.v201012040545"/>
       <unit id="javax.xml" version="1.3.4.v201005080400"/>
@@ -83,6 +83,8 @@
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
       <unit id="com.google.guava" version="12.0.0.v201212092141"/>
       <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
+      <unit id="com.google.guava" version="15.0.0.v201403281430"/>
+      <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="rap_2.3" location="http://download.eclipse.org/rt/rap/2.3/M2-20140311-0943/"/>
