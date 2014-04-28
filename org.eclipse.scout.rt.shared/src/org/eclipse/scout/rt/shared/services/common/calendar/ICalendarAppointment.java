@@ -21,6 +21,11 @@ public interface ICalendarAppointment extends ICalendarItem {
   int STATUS_OUTOFOFFICE = 3;
 
   /**
+   * Working-Elsewhere status as supported since Outlook 2013
+   */
+  int STATUS_WORKING_ELSEWHERE = 4;
+
+  /**
    * @return the internal person id (as {@link Long} if it is a number)
    * @throws UnsupportedOperationException
    *           if internal person id is not <code>null</code> or a number

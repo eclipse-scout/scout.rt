@@ -183,11 +183,21 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     m_location = a;
   }
 
+  /**
+   * One of {@link ICalendarAppointment#STATUS_BUSY}, {@link ICalendarAppointment#STATUS_FREE},
+   * {@link ICalendarAppointment#STATUS_OUTOFOFFICE}, {@link ICalendarAppointment#STATUS_TENTATIVE},
+   * {@link ICalendarAppointment#STATUS_WORKING_ELSEWHERE}
+   */
   @Override
   public int getBusyStatus() {
     return m_busyStatus;
   }
 
+  /**
+   * One of {@link ICalendarAppointment#STATUS_BUSY}, {@link ICalendarAppointment#STATUS_FREE},
+   * {@link ICalendarAppointment#STATUS_OUTOFOFFICE}, {@link ICalendarAppointment#STATUS_TENTATIVE},
+   * {@link ICalendarAppointment#STATUS_WORKING_ELSEWHERE}
+   */
   @Override
   public void setBusyStatus(int a) {
     m_busyStatus = a;
