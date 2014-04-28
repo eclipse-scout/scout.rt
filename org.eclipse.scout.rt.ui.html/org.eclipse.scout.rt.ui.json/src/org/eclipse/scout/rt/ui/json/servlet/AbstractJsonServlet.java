@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
@@ -46,8 +47,10 @@ public abstract class AbstractJsonServlet extends HttpServletEx implements IJson
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("GET request started.");
 
-    String pathInfo = req.getPathInfo();
-    if (req.getRequestURI().endsWith(getServletContext().getContextPath())) {
+    //The servlet is registered at '/'. To make relative urls work we need to make sure the request url has a trailing '/'.
+    //It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
+    String contextPath = getServletContext().getContextPath();
+    if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
       resp.sendRedirect(req.getRequestURI() + "/");
       return;
     }
