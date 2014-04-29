@@ -56,7 +56,7 @@ public class SwtEnvironmentUiTest {
 
   @After
   public void tearDown() {
-    System.clearProperty(AbstractSwtEnvironment.PROP_TEST_IDS_ENABLED);
+    System.clearProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED);
   }
 
   /**
@@ -64,7 +64,7 @@ public class SwtEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedForm() {
-    System.setProperty(AbstractSwtEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
     assertEquals(TEST_CLASS_ID, getTestId(f));
@@ -75,7 +75,7 @@ public class SwtEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedField() {
-    System.setProperty(AbstractSwtEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutFormField f = env.createFormField(new Shell(), m_testForm.getStringField());
     assertEquals(TEST_CLASS_ID, getTestId(f));
@@ -86,7 +86,7 @@ public class SwtEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedGroupBox() {
-    System.setProperty(AbstractSwtEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutFormField f = env.createFormField(new Shell(), m_testForm.getRootGroupBox());
     assertEquals(TEST_MAIN_BOX_CLASS_ID, getTestId(f));
@@ -97,7 +97,7 @@ public class SwtEnvironmentUiTest {
    */
   @Test
   public void testClassIdNotAssignedDisabled() throws Exception {
-    System.setProperty(AbstractSwtEnvironment.PROP_TEST_IDS_ENABLED, "false");
+    System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "false");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
     assertNull(getTestId(f));
@@ -145,10 +145,10 @@ public class SwtEnvironmentUiTest {
   private Object getTestId(ISwtScoutComposite c) {
     Control swtField = c.getSwtField();
     if (swtField != null) {
-      return swtField.getData(AbstractSwtEnvironment.COMPONENT_TEST_KEY);
+      return swtField.getData(AbstractSwtEnvironment.WIDGET_ID_KEY);
     }
     else if (c.getSwtContainer() != null) {
-      return c.getSwtContainer().getData(AbstractSwtEnvironment.COMPONENT_TEST_KEY);
+      return c.getSwtContainer().getData(AbstractSwtEnvironment.WIDGET_ID_KEY);
     }
     return null;
   }

@@ -59,7 +59,7 @@ public class SwingEnvironmentUiTest {
 
   @After
   public void tearDown() {
-    System.clearProperty(AbstractSwingEnvironment.PROP_TEST_IDS_ENABLED);
+    System.clearProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED);
   }
 
   /**
@@ -67,7 +67,7 @@ public class SwingEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedForm() throws Exception {
-    System.setProperty(AbstractSwingEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutForm f = env.createForm((JComponent) null, m_testForm);
     assertEquals(TEST_CLASS_ID, getTestId(f));
@@ -82,7 +82,7 @@ public class SwingEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedField() throws Exception {
-    System.setProperty(AbstractSwingEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutFormField f = env.createFormField((JComponent) null, m_testForm.getStringField());
     assertEquals(TEST_CLASS_ID, getTestId(f));
@@ -93,7 +93,7 @@ public class SwingEnvironmentUiTest {
    */
   @Test
   public void testClassIdAssignedGroupBox() throws Exception {
-    System.setProperty(AbstractSwingEnvironment.PROP_TEST_IDS_ENABLED, "true");
+    System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutFormField f = env.createFormField((JComponent) null, m_testForm.getRootGroupBox());
     assertEquals(TEST_MAIN_BOX_CLASS_ID, getTestId(f));
@@ -104,7 +104,7 @@ public class SwingEnvironmentUiTest {
    */
   @Test
   public void testClassIdNotAssignedDisabled() throws Exception {
-    System.setProperty(AbstractSwingEnvironment.PROP_TEST_IDS_ENABLED, "false");
+    System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "false");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutForm f = env.createForm((JComponent) null, m_testForm);
     assertNull(getTestId(f));
@@ -134,7 +134,7 @@ public class SwingEnvironmentUiTest {
   }
 
   private Object getTestId(ISwingScoutComposite c) {
-    return c.getSwingField().getClientProperty(AbstractSwingEnvironment.COMPONENT_TEST_KEY);
+    return c.getSwingField().getClientProperty(AbstractSwingEnvironment.WIDGET_ID_KEY);
   }
 
   /**

@@ -139,8 +139,8 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
-  public static final String COMPONENT_TEST_KEY = "TEST_COMP_NAME";
-  public static final String PROP_TEST_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
+  public static final String WIDGET_ID_KEY = "TEST_COMP_NAME";
+  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
 
   private final Bundle m_applicationBundle;
 
@@ -1510,26 +1510,26 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   public ISwtScoutForm createForm(Composite parent, IForm scoutForm) {
     SwtScoutForm uiForm = new SwtScoutForm();
     uiForm.createField(parent, scoutForm, this);
-    assignTestId(uiForm, scoutForm);
+    assignWidgetId(uiForm, scoutForm);
     return uiForm;
   }
 
-  protected void assignTestId(ISwtScoutComposite<?> uiField, ITypeWithClassId model) {
-    if (isTestIdsEnabled()) {
+  protected void assignWidgetId(ISwtScoutComposite<?> uiField, ITypeWithClassId model) {
+    if (isWidgetIdsEnabled()) {
       Control swtField = uiField.getSwtField();
       if (swtField != null) {
-        swtField.setData(COMPONENT_TEST_KEY, model.classId());
+        swtField.setData(WIDGET_ID_KEY, model.classId());
       }
       else if (uiField.getSwtContainer() != null) {
         Composite swtContainer = uiField.getSwtContainer();
-        swtContainer.setData(COMPONENT_TEST_KEY, model.classId());
+        swtContainer.setData(WIDGET_ID_KEY, model.classId());
       }
 
     }
   }
 
-  protected boolean isTestIdsEnabled() {
-    return StringUtility.parseBoolean(System.getProperty(PROP_TEST_IDS_ENABLED));
+  protected boolean isWidgetIdsEnabled() {
+    return StringUtility.parseBoolean(System.getProperty(PROP_WIDGET_IDS_ENABLED));
   }
 
   @Override
@@ -1538,7 +1538,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_formFieldFactory = new FormFieldFactory(m_applicationBundle);
     }
     ISwtScoutFormField<IFormField> uiField = m_formFieldFactory.createFormField(parent, model, this);
-    assignTestId(uiField, model);
+    assignWidgetId(uiField, model);
     return uiField;
   }
 

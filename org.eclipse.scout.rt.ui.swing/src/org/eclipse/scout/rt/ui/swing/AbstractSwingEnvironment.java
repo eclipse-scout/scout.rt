@@ -119,8 +119,8 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);
 
-  public static final String PROP_TEST_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
-  public static final String COMPONENT_TEST_KEY = "TEST_COMP_NAME";
+  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
+  public static final String WIDGET_ID_KEY = "TEST_COMP_NAME"; //default used for testing in jubula
 
   private boolean m_initialized;
   private IClientSession m_scoutSession;
@@ -857,7 +857,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_formFieldFactory = new FormFieldFactory();
     }
     ISwingScoutFormField ui = m_formFieldFactory.createFormField(parent, field, this);
-    assignTestId(ui, field);
+    assignWidgetId(ui, field);
     decorate(field, ui);
     return ui;
   }
@@ -1012,7 +1012,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(JComponent parent, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, model);
     ui.createField(model, this);
-    assignTestId(ui, model);
+    assignWidgetId(ui, model);
     decorate(model, ui);
     return ui;
   }
@@ -1021,22 +1021,22 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(ISwingScoutView targetViewComposite, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, targetViewComposite, model);
     ui.createField(model, this);
-    assignTestId(ui, model);
+    assignWidgetId(ui, model);
     decorate(model, ui);
     return ui;
   }
 
-  protected void assignTestId(ISwingScoutComposite uiField, ITypeWithClassId model) {
-    if (isTestIdsEnabled()) {
+  protected void assignWidgetId(ISwingScoutComposite uiField, ITypeWithClassId model) {
+    if (isWidgetIdsEnabled()) {
       JComponent swingField = uiField.getSwingField();
       if (swingField != null) {
-        swingField.putClientProperty(COMPONENT_TEST_KEY, model.classId());
+        swingField.putClientProperty(WIDGET_ID_KEY, model.classId());
       }
     }
   }
 
-  protected boolean isTestIdsEnabled() {
-    return StringUtility.parseBoolean(System.getProperty(PROP_TEST_IDS_ENABLED));
+  protected boolean isWidgetIdsEnabled() {
+    return StringUtility.parseBoolean(System.getProperty(PROP_WIDGET_IDS_ENABLED));
   }
 
   @Override
