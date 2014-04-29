@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.swt.form.fields.stringfield;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.swt.internal.StyledTextFieldUndoRedoSupport;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
-import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Typical string field (see {@link SwtScoutStringPlainTextField} for masked input fields)
  */
+@SuppressWarnings("restriction")
 public class SwtScoutStringField extends SwtScoutStringFieldComposite implements ISwtScoutStringField {
   private MouseListener m_linkTrigger;
 
@@ -47,7 +48,7 @@ public class SwtScoutStringField extends SwtScoutStringFieldComposite implements
     int style = getSwtStyle(getScoutObject());
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, style);
 
-    if (VersionUtility.isEclipseVersionLessThan35()) {
+    if (CompatibilityUtility.isEclipseVersionLessThan35()) {
       //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
       //FIXME we need a bugfix for bug 350237
     }

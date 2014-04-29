@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.labelfield;
 
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -21,7 +22,6 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
-import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Control;
  * 
  * @since 1.0.0 28.04.2008
  */
+@SuppressWarnings("restriction")
 public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField> implements ISwtScoutLabelField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutLabelField.class);
 
@@ -53,7 +54,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     //Editing the text is never allowed at label fields
     text.setEditable(false);
 
-    if (VersionUtility.isEclipseVersionLessThan35()) {
+    if (CompatibilityUtility.isEclipseVersionLessThan35()) {
       //FIXME we need a bugfix for bug 350237
     }
     else {

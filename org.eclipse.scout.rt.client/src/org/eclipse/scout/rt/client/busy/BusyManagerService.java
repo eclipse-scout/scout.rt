@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.IJobChangeListenerEx;
 import org.eclipse.scout.rt.client.JobChangeAdapterEx;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Version;
 
 /**
  * The busy manager is the primary place to register/unregister {@link IBusyHandler} per {@link IClientSession}
@@ -34,6 +36,7 @@ import org.osgi.framework.ServiceRegistration;
  * @author imo
  * @since 3.8
  */
+@SuppressWarnings("restriction")
 @Priority(-1000)
 public class BusyManagerService extends AbstractService implements IBusyManagerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusyManagerService.class);
@@ -52,10 +55,14 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
     Job.getJobManager().addJobChangeListener(m_jobChangeListener);
-    //Bug in eclipse job manager: sometimes a delayed scheduled job is not run after the delay but remains sleeping forever.
-    //To work around this issue, a call to IJobManager.resume() wakes up these jobs.
-    m_jobManagerResumeThread = new JobManagerResumeThread();
-    m_jobManagerResumeThread.start();
+
+    if (CompatibilityUtility.isEclipseVersionLessThan(new Version("3.7.2"))) {
+      //Bug in eclipse job manager: sometimes a delayed scheduled job is not run after the delay but remains sleeping forever.
+      //To work around this issue, a call to IJobManager.resume() wakes up these jobs.
+      //See https://bugs.eclipse.org/bugs/show_bug.cgi?id=366170. Bug has been fixed for indigo sr2.
+      m_jobManagerResumeThread = new JobManagerResumeThread();
+      m_jobManagerResumeThread.start();
+    }
   }
 
   @Override
