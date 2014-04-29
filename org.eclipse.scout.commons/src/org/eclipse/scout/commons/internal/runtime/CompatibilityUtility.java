@@ -8,27 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.util;
+package org.eclipse.scout.commons.internal.runtime;
 
-import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.commons.BundleContextUtility;
 import org.osgi.framework.Version;
 
-public class VersionUtility {
+/**
+ * @since 3.10.1
+ */
+public class CompatibilityUtility {
 
-  /**
-   * Lotus Notes 8.5.2 requires Eclipse 3.4. With this function it is possible to check the version to ensure backward
-   * compatibility.
-   */
-  public static boolean isEclipseVersionLessThan35() {
-
-    String versionProperty = Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version");
+  public static boolean isEclipseVersionLessThan(Version version) {
+    String versionProperty = BundleContextUtility.getProperty("osgi.framework.version");
     if (versionProperty != null) {
       Version frameworkVersion = new Version(versionProperty);
-      if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() <= 5) {
-        return true;
-      }
+      return frameworkVersion.compareTo(version) < 0;
     }
 
     return false;
+  }
+
+  public static boolean isEclipseVersionLessThan35() {
+    return isEclipseVersionLessThan(new Version("3.5"));
   }
 }

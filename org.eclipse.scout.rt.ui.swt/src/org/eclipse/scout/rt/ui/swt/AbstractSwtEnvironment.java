@@ -38,6 +38,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -78,7 +79,6 @@ import org.eclipse.scout.rt.ui.swt.util.ISwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
-import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
@@ -137,6 +137,7 @@ import org.osgi.framework.Bundle;
  * 
  * @since 1.0.0 06.03.2008
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
   public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.widgetIdsEnabled";
@@ -1194,7 +1195,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             }
             case IProcessingStatus.CANCEL: {
               //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-              if (VersionUtility.isEclipseVersionLessThan35()) {
+              if (CompatibilityUtility.isEclipseVersionLessThan35()) {
                 iconId = SWT.ICON_INFORMATION;
               }
               else {

@@ -19,6 +19,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.ui.swt.SwtShellValidateRoot;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutToolbarAction;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
-import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
@@ -52,6 +52,7 @@ import org.eclipse.ui.forms.widgets.Form;
  * 
  * @since 1.0.9 18.07.2008
  */
+@SuppressWarnings("restriction")
 public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDialog.class);
 
@@ -233,7 +234,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   protected void setSaveNeededFromScout(boolean modified) {
-    if (VersionUtility.isEclipseVersionLessThan35()) {
+    if (CompatibilityUtility.isEclipseVersionLessThan35()) {
       return;
     }
 
