@@ -61,11 +61,11 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   private Form m_rootForm;
   private Composite m_rootArea;
   private P_EditorListener m_editorListener;
-  private OptimisticLock m_closeLock;
-  private OptimisticLock m_closeFromModel = new OptimisticLock();
+  private final OptimisticLock m_closeLock;
+  private final OptimisticLock m_closeFromModel;
 
-  private PropertyChangeListener m_formPropertyListener;
-  private OptimisticLock m_layoutLock;
+  private final PropertyChangeListener m_formPropertyListener;
+  private final OptimisticLock m_layoutLock;
   private ISwtScoutForm m_uiForm;
   private Image m_titleImageBackup;
   private AnimatedBusyImage m_busyImage;
@@ -73,6 +73,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   public AbstractScoutEditorPart() {
     m_layoutLock = new OptimisticLock();
     m_closeLock = new OptimisticLock();
+    m_closeFromModel = new OptimisticLock();
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
   }
 

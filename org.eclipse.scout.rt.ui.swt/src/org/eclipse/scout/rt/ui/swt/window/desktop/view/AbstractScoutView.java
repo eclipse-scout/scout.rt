@@ -53,20 +53,18 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutView.class);
-  // public static enum ViewState{OPEN, CLOSING_UI, CLOSING_MODEL, CLOSED}
 
   private P_ViewListener m_viewListener;
-  private OptimisticLock m_closeLock;
-  private OptimisticLock m_closeFromModel = new OptimisticLock();
-  // private ViewState m_viewState;
-  private OptimisticLock m_layoutLock = new OptimisticLock();
+  private final OptimisticLock m_closeLock;
+  private final OptimisticLock m_closeFromModel;
+  private final OptimisticLock m_layoutLock;
 
   private Form m_rootForm;
   private Composite m_rootArea;
 
   private IForm m_scoutForm;
 
-  private PropertyChangeListener m_formPropertyListener;
+  private final PropertyChangeListener m_formPropertyListener;
   private ISwtScoutForm m_uiForm;
 
   private AnimatedBusyImage m_busyImage;
@@ -75,6 +73,8 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   public AbstractScoutView() {
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
     m_closeLock = new OptimisticLock();
+    m_closeFromModel = new OptimisticLock();
+    m_layoutLock = new OptimisticLock();
   }
 
   @Override
