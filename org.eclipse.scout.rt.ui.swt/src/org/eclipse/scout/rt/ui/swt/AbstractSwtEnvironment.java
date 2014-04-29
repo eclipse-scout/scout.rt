@@ -139,8 +139,8 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
+  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.widgetIdsEnabled";
   public static final String WIDGET_ID_KEY = "TEST_COMP_NAME";
-  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
 
   private final Bundle m_applicationBundle;
 

@@ -119,7 +119,7 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);
 
-  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.testIdsEnabled";
+  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.widgetIdsEnabled";
   public static final String WIDGET_ID_KEY = "TEST_COMP_NAME"; //default used for testing in jubula
 
   private boolean m_initialized;
