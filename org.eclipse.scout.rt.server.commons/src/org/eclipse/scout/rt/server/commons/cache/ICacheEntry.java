@@ -11,16 +11,18 @@
 package org.eclipse.scout.rt.server.commons.cache;
 
 /**
- * A cached value that may expire
+ * A cached value that may expire. Used to be shared between server nodes.
  * 
+ * @param T
+ *          type of the cached value
  * @since 4.0.0
  */
-public interface ICacheElement {
+public interface ICacheEntry<T> {
 
   /**
-   * @return the actual value
+   * cached value
    */
-  Object getValue();
+  public T getValue();
 
   /**
    * @return <code>true</code> if not expired
@@ -31,10 +33,11 @@ public interface ICacheElement {
    * @param expiration
    *          time in ms until the value expires
    */
-  void setExpiration(Integer expiration);
+  void setExpiration(Long expiration);
 
   /**
    * Resets the the time created to the current time
    */
-  void resetCreationTime();
+  void touch();
+
 }

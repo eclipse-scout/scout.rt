@@ -16,16 +16,16 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
- * Test for {@link CacheElement}
+ * Test for {@link CacheEntry}
  */
 public class CacheElementTest {
 
   private final String m_testValue = "testValue";
-  private final Integer testExpiration = Integer.valueOf(10000);
+  private final Long testExpiration = 1000L;
 
   @Test
   public void testCacheElement() {
-    ICacheElement cacheElement = new CacheElement(m_testValue, testExpiration);
+    ICacheEntry cacheElement = new CacheEntry<Object>(m_testValue, testExpiration, System.currentTimeMillis());
     assertTrue(cacheElement.isActive());
     assertEquals(m_testValue, cacheElement.getValue());
   }

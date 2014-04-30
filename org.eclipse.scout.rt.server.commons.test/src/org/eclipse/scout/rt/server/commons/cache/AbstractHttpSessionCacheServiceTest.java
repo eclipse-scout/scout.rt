@@ -24,16 +24,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * <b>abstract</b> Test class for {@link AbstractCacheStoreService}
+ * <b>abstract</b> Test class for {@link AbstractHttpSessionCacheService}
  */
-public abstract class AbstractCacheStoreServiceTest {
+public abstract class AbstractHttpSessionCacheServiceTest {
   protected HttpServletResponse m_responseMock;
   protected HttpServletRequest m_requestMock;
   protected final String m_testValue = "testValue";
   protected final Integer testExpiration = Integer.valueOf(10000);
   protected String m_testKey = "testKey";
   protected TestHttpSession m_testSession;
-  protected AbstractCacheStoreService m_cacheService;
+  protected AbstractHttpSessionCacheService m_cacheService;
 
   @Before
   public void setup() {
@@ -44,27 +44,26 @@ public abstract class AbstractCacheStoreServiceTest {
     m_cacheService = createCacheService();
   }
 
-  protected abstract AbstractCacheStoreService createCacheService();
+  protected abstract AbstractHttpSessionCacheService createCacheService();
 
   @Test
-  public void testGetExpiredAttribute() throws Exception {
-    m_cacheService.setClientAttribute(m_requestMock, m_responseMock, m_testKey, m_testValue, 0);
-    m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey);
-    assertNull(m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey));
+  public void testGetExpired() {
+    m_cacheService.put(m_testKey, m_testValue, m_requestMock, m_responseMock, 0L);
+    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
+    assertNull(m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
     assertFalse(m_testSession.getAttributeNames().hasMoreElements());
   }
 
   @Test
-  public void testGetUnknownAttribute() throws Exception {
-    m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey);
-    assertNull(m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey));
+  public void testGetUnknown() {
+    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
+    assertNull(m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
   }
 
   @Test
-  public void testSetClientAttribute() {
-    m_cacheService.setClientAttribute(m_requestMock, m_responseMock, m_testKey, m_testValue);
-    m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey);
-    assertEquals(m_testValue, m_cacheService.getClientAttribute(m_requestMock, m_responseMock, m_testKey));
+  public void testPut() {
+    m_cacheService.put(m_testKey, m_testValue, m_requestMock, m_responseMock);
+    assertEquals(m_testValue, m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
     assertTrue(m_testSession.getAttributeNames().hasMoreElements());
   }
 

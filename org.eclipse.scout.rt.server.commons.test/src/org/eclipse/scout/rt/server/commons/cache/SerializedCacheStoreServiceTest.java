@@ -16,22 +16,22 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 /**
- * Test for {@link SerializedCacheStoreService}
+ * Test for {@link SerializedCacheService}
  */
-public class SerializedCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
+public class SerializedCacheStoreServiceTest extends AbstractHttpSessionCacheServiceTest {
 
   @Test
   public void testTouchAttribute() throws ProcessingException {
-    CacheElement cacheElemSpy = new CacheElement(m_testValue, testExpiration, -1);
+    CacheEntry cacheElemSpy = new CacheEntry<Object>(m_testValue, testExpiration, -1);
     assertEquals(-1, cacheElemSpy.getCreationTime());
     m_testSession.setAttribute(m_testKey, m_cacheService.serializedString(cacheElemSpy));
-    m_cacheService.touchClientAttribute(m_requestMock, m_responseMock, m_testKey);
+    m_cacheService.touch(m_testKey, m_requestMock, m_responseMock);
     assertEquals(-1, cacheElemSpy.getCreationTime());
   }
 
   @Override
-  protected AbstractCacheStoreService createCacheService() {
-    return new SerializedCacheStoreService();
+  protected AbstractHttpSessionCacheService createCacheService() {
+    return new SerializedCacheService();
   }
 
 }

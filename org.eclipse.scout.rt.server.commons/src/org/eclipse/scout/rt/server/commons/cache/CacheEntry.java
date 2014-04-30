@@ -2,16 +2,16 @@ package org.eclipse.scout.rt.server.commons.cache;
 
 import java.io.Serializable;
 
-final class CacheElement implements ICacheElement, Serializable {
+final class CacheEntry<T> implements ICacheEntry<T>, Serializable {
   private static final long serialVersionUID = 1L;
-  private final Object m_value;
+  private final T m_value;
   private long m_creationTime;
   private long m_expiration;
 
-  CacheElement(Object value, Integer expiration, long creationTime) {
+  CacheEntry(T value, long expiration, long creationTime) {
     m_creationTime = creationTime;
     m_value = value;
-    setExpiration(expiration);
+    m_expiration = expiration;
   }
 
   /**
@@ -22,7 +22,7 @@ final class CacheElement implements ICacheElement, Serializable {
    * @param expiration
    *          time in seconds
    */
-  CacheElement(Object value, Integer expiration) {
+  CacheEntry(T value, Long expiration) {
     this(value, expiration, System.currentTimeMillis());
   }
 
@@ -32,13 +32,13 @@ final class CacheElement implements ICacheElement, Serializable {
   }
 
   @Override
-  public Object getValue() {
+  public T getValue() {
     return m_value;
   }
 
   @Override
-  public void setExpiration(Integer expiration) {
-    m_expiration = expiration * 1000L;
+  public void setExpiration(Long expiration) {
+    m_expiration = expiration;
   }
 
   public long getCreationTime() {
@@ -46,7 +46,7 @@ final class CacheElement implements ICacheElement, Serializable {
   }
 
   @Override
-  public void resetCreationTime() {
+  public void touch() {
     m_creationTime = System.currentTimeMillis();
   }
 
@@ -76,7 +76,7 @@ final class CacheElement implements ICacheElement, Serializable {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    CacheElement other = (CacheElement) obj;
+    CacheEntry other = (CacheEntry) obj;
     if (m_creationTime != other.m_creationTime) {
       return false;
     }

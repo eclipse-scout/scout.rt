@@ -18,22 +18,31 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 
 /**
- * Test for {@link StickySessionCacheStoreService}
+ * Test for {@link StickySessionCacheService}
  */
-public class StickySessionCacheStoreServiceTest extends AbstractCacheStoreServiceTest {
+public class StickySessionCacheStoreServiceTest extends AbstractHttpSessionCacheServiceTest {
 
   @Test
   public void testTouchAttribute() {
-    ICacheElement mockCacheElement = mock(ICacheElement.class);
-    when(mockCacheElement.isActive()).thenReturn(true);
-    m_testSession.setAttribute(m_testKey, mockCacheElement);
-    m_cacheService.touchClientAttribute(m_requestMock, m_responseMock, m_testKey);
-    verify(mockCacheElement, times(1)).resetCreationTime();
+    ICacheEntry mockEntry = mock(ICacheEntry.class);
+    when(mockEntry.isActive()).thenReturn(true);
+    m_testSession.setAttribute(m_testKey, mockEntry);
+    m_cacheService.touch(m_testKey, m_requestMock, m_responseMock);
+    verify(mockEntry, times(1)).touch();
   }
 
+//  @Test
+//  public void testExpiredValuesRemoved() {
+//    ICacheEntry mockEntry = mock(ICacheEntry.class);
+//    when(mockEntry.isActive()).thenReturn(true);
+//    m_testSession.setAttribute(m_testKey, mockEntry);
+//    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
+//    verify(m_testSession, times(1)).removeAttribute(m_testKey);
+//  }
+
   @Override
-  protected AbstractCacheStoreService createCacheService() {
-    return new StickySessionCacheStoreService();
+  protected AbstractHttpSessionCacheService createCacheService() {
+    return new StickySessionCacheService();
   }
 
 }
