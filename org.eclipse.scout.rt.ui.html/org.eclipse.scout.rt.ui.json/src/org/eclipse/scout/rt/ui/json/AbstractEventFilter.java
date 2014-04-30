@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 
 public abstract class AbstractEventFilter<EVENT extends EventObject> {
   private List<EVENT> m_ignorableModelEvents;
@@ -25,7 +26,7 @@ public abstract class AbstractEventFilter<EVENT extends EventObject> {
   public abstract EVENT filterIgnorableModelEvent(EVENT event);
 
   public List<EVENT> getIgnorableModelEvents() {
-    return Collections.unmodifiableList(m_ignorableModelEvents);
+    return CollectionUtility.arrayList(m_ignorableModelEvents);
   }
 
   public void addIgnorableModelEvent(EVENT event) {

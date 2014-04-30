@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.json.JSONArray;
@@ -129,7 +129,7 @@ public class JsonResponse {
   }
 
   public List<JSONObject> getEventList() {
-    return Collections.unmodifiableList(m_eventList);
+    return CollectionUtility.arrayList(m_eventList);
   }
 
   public void setErrorCode(Integer errorCode) {

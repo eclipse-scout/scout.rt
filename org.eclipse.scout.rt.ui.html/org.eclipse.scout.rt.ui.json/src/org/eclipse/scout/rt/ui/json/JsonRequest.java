@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.json;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -40,11 +39,11 @@ public class JsonRequest {
   public List<JsonEvent> getEvents() {
     try {
       JSONArray events = m_request.getJSONArray(PROP_EVENTS);
-      List<JsonEvent> actionList = new ArrayList<>();
+      List<JsonEvent> actionList = new ArrayList<>(events.length());
       for (int i = 0; i < events.length(); i++) {
         actionList.add(new JsonEvent(events.getJSONObject(i)));
       }
-      return Collections.unmodifiableList(actionList);
+      return actionList;
     }
     catch (JSONException e) {
       throw new JsonUIException(e);
