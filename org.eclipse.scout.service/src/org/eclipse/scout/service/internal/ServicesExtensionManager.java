@@ -12,9 +12,12 @@ package org.eclipse.scout.service.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -26,6 +29,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.ExtensionPointTracker.Listener;
 import org.eclipse.scout.service.DefaultServiceFactory;
+import org.eclipse.scout.service.INullService;
 import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.IServiceInitializerFactory;
 import org.eclipse.scout.service.ServiceConstants;
@@ -33,15 +37,19 @@ import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 public class ServicesExtensionManager implements Listener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesExtensionManager.class);
+  private static final boolean SERVICE_CACHE_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("org.eclipse.scout.service.cache.enabled"));
+
   public static final String PROP_DEFAULT_PROXY_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultProxyServiceRanking";
   public static final String PROP_DEFAULT_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultServiceRanking";
 
   private final HashMap<IExtension, List<ServiceRegistration>> m_serviceRegistrations = new HashMap<IExtension, List<ServiceRegistration>>();
   private final HashMap<IExtension, IServiceInitializerFactory> m_serviceInitFactories = new HashMap<IExtension, IServiceInitializerFactory>();
+  private final Map<ServiceReference, DirectServiceAccessor> m_directServiceAccessorCache = Collections.synchronizedMap(new HashMap<ServiceReference, DirectServiceAccessor>());
 
   public Collection<IServiceInitializerFactory> getServiceIntializerFactories() {
     return m_serviceInitFactories.values();
@@ -157,6 +165,7 @@ public class ServicesExtensionManager implements Listener {
           final ServiceRegistration reg = context.registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
           list.add(reg);
           if (factory instanceof IServiceFactory) {
+            addToDirectAccessorCache(extension, (IServiceFactory) factory, clazzes, reg);
             ((IServiceFactory) factory).serviceRegistered(reg);
           }
         }
@@ -181,6 +190,7 @@ public class ServicesExtensionManager implements Listener {
           ServiceRegistration reg = context.registerService(clazzes.toArray(new String[clazzes.size()]), factory, initParams);
           list.add(reg);
           if (factory instanceof IServiceFactory) {
+            addToDirectAccessorCache(extension, (IServiceFactory) factory, clazzes, reg);
             ((IServiceFactory) factory).serviceRegistered(reg);
           }
         }
@@ -226,6 +236,7 @@ public class ServicesExtensionManager implements Listener {
         }
       }
     }
+    removeFromDirectAccessorCache(extension);
   }
 
   private Object createServiceFactory(Bundle bundle, String factoryClazz, Class<?> serviceClass) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -236,6 +247,69 @@ public class ServicesExtensionManager implements Listener {
     catch (Throwable t) {
       return c.newInstance();
     }
+  }
+
+  private void addToDirectAccessorCache(IExtension extension, IServiceFactory factory, Collection<String> clazzes, ServiceRegistration reg) {
+    if (!SERVICE_CACHE_ENABLED) {
+      return;
+    }
+    DirectServiceAccessor a = new DirectServiceAccessor(extension, factory, reg);
+    m_directServiceAccessorCache.put(reg.getReference(), a);
+  }
+
+  private void removeFromDirectAccessorCache(IExtension owner) {
+    if (!SERVICE_CACHE_ENABLED) {
+      return;
+    }
+    synchronized (m_directServiceAccessorCache) {
+      for (Iterator<DirectServiceAccessor> it = m_directServiceAccessorCache.values().iterator(); it.hasNext();) {
+        DirectServiceAccessor a = it.next();
+        if (a.getOwner() == owner) {
+          it.remove();
+        }
+      }
+    }
+  }
+
+  public void clearDirectAccessorCache() {
+    if (!SERVICE_CACHE_ENABLED) {
+      return;
+    }
+    m_directServiceAccessorCache.clear();
+  }
+
+  /**
+   * safely get and immediately unget the service in an atomic section using the service reference as lock
+   */
+  public <S> S fastResolveService(Class<S> serviceInterfaceClass, BundleContext context, ServiceReference ref) {
+    if (ref == null) {
+      return null;
+    }
+    synchronized (ref) {
+      try {
+        S service = fastGetService(context, ref);
+        if (service instanceof INullService) {
+          return null;
+        }
+        return service;
+      }
+      finally {
+        context.ungetService(ref);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <S> S fastGetService(BundleContext context, ServiceReference ref) {
+    if (SERVICE_CACHE_ENABLED) {
+      //use fast-access cache!
+      DirectServiceAccessor a = m_directServiceAccessorCache.get(ref);
+      if (a != null) {
+        return (S) a.getServiceImpl(context);
+      }
+    }
+    //slow
+    return (S) context.getService(ref);
   }
 
 }
