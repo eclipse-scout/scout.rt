@@ -269,7 +269,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   public List<String> getFileExtensions() {
-    return CollectionUtility.unmodifiableListCopy(m_fileExtensions);
+    return CollectionUtility.arrayList(m_fileExtensions);
   }
 
   @Override
@@ -313,7 +313,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override
@@ -424,46 +424,45 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
     String retVal = null;
-    if (text != null && text.trim().length() == 0) {
-      text = null;
+    if (!StringUtility.hasText(text)) {
+      return null;
     }
-    if (text != null) {
-      text = text.trim();
-      text = StringUtility.unquoteText(text);
-      File f = new File(text);
-      String p = "";
-      if (f.isAbsolute()) {
-        p = f.getParent();
-      }
-      else {
-        // inherit path from existing value
-        File existingFile = getValueAsFile();
-        if (existingFile != null && existingFile.isAbsolute()) {
-          p = existingFile.getParent();
-        }
-      }
-      String n = f.getName();
-      String e = "";
-      if (n.indexOf('.') >= 0) {
-        int i = n.lastIndexOf('.');
-        e = n.substring(i);
-        n = n.substring(0, i);
-      }
-      text = n;
-      if (p.length() == 0 && getDirectory() != null) {
-        p = getDirectory().getAbsolutePath();
-      }
-      if (e.length() == 0 && CollectionUtility.hasElements(m_fileExtensions)) {
-        e = "." + CollectionUtility.firstElement(m_fileExtensions);
-      }
-      text = p;
-      if (p.length() > 0) {
-        text += File.separator;
-      }
-      text += n;
-      text += e;
-      retVal = text;
+
+    text = text.trim();
+    text = StringUtility.unquoteText(text);
+    File f = new File(text);
+    String p = "";
+    if (f.isAbsolute()) {
+      p = f.getParent();
     }
+    else {
+      // inherit path from existing value
+      File existingFile = getValueAsFile();
+      if (existingFile != null && existingFile.isAbsolute()) {
+        p = existingFile.getParent();
+      }
+    }
+    String n = f.getName();
+    String e = "";
+    if (n.indexOf('.') >= 0) {
+      int i = n.lastIndexOf('.');
+      e = n.substring(i);
+      n = n.substring(0, i);
+    }
+    text = n;
+    if (p.length() == 0 && getDirectory() != null) {
+      p = getDirectory().getAbsolutePath();
+    }
+    if (e.length() == 0 && CollectionUtility.hasElements(m_fileExtensions)) {
+      e = "." + CollectionUtility.firstElement(m_fileExtensions);
+    }
+    text = p;
+    if (p.length() > 0) {
+      text += File.separator;
+    }
+    text += n;
+    text += e;
+    retVal = text;
     return retVal;
   }
 

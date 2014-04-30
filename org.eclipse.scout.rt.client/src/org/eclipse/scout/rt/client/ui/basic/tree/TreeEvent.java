@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
@@ -112,14 +111,14 @@ public class TreeEvent extends EventObject {
   /**
    * Node has changed in a way that may affect its presentation (e.g. text, font, color...) but no structural changes
    * occurred
-   *
+   * 
    * @since 3.10.0-M5
    */
   public static final int TYPE_NODE_CHANGED = 850;
 
   /**
    * A node has changed during a drag and drop operation
-   *
+   * 
    * @since 4.0-M7
    */
   public static final int TYPE_NODE_DROP_TARGET_CHANGED = 860;
@@ -193,12 +192,7 @@ public class TreeEvent extends EventObject {
   }
 
   public Collection<ITreeNode> getDeselectedNodes() {
-    if (m_deselectedNodes != null) {
-      return CollectionUtility.unmodifiableCollection(m_deselectedNodes);
-    }
-    else {
-      return Collections.emptySet();
-    }
+    return CollectionUtility.arrayList(m_deselectedNodes);
   }
 
   protected void setDeselectedNodes(Collection<ITreeNode> deselectedNodes) {
@@ -215,13 +209,7 @@ public class TreeEvent extends EventObject {
   }
 
   public Collection<ITreeNode> getNewSelectedNodes() {
-
-    if (m_newSelectedNodes != null) {
-      return CollectionUtility.unmodifiableCollection(m_newSelectedNodes);
-    }
-    else {
-      return Collections.emptySet();
-    }
+    return CollectionUtility.arrayList(m_newSelectedNodes);
   }
 
   protected void setNewSelectedNodes(Collection<ITreeNode> newSelectedNodes) {
@@ -238,12 +226,7 @@ public class TreeEvent extends EventObject {
   }
 
   public Collection<ITreeNode> getNodes() {
-    if (m_nodes != null) {
-      return CollectionUtility.unmodifiableCollection(m_nodes);
-    }
-    else {
-      return Collections.emptySet();
-    }
+    return CollectionUtility.arrayList(m_nodes);
   }
 
   public ITreeNode getChildNode() {
@@ -279,12 +262,7 @@ public class TreeEvent extends EventObject {
    * used by TYPE_ROW_POPUP to add actions
    */
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenus != null) {
-      return Collections.unmodifiableList(m_popupMenus);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**

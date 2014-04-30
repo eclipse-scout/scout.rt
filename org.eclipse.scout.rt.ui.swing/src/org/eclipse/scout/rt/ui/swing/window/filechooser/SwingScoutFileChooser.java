@@ -281,11 +281,10 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
 
     public ExtensionFileFilter(List<String> extensions) {
       if (extensions == null) {
-        m_extensions = Collections.emptyList();
+        m_extensions = CollectionUtility.emptyArrayList();
       }
       else {
-        ArrayList<String> list = new ArrayList<String>();
-
+        ArrayList<String> list = new ArrayList<String>(extensions.size());
         for (String extension : extensions) {
           if (extension != null && !extension.equals("*")) {
             list.add(extension.toLowerCase());
@@ -313,7 +312,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     }
 
     public List<String> getExtensions() {
-      return CollectionUtility.unmodifiableList(m_extensions);
+      return CollectionUtility.arrayList(m_extensions);
     }
 
     @Override

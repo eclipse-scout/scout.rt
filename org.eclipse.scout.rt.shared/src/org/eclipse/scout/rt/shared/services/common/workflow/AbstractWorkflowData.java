@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.workflow;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -283,10 +282,10 @@ public abstract class AbstractWorkflowData implements Serializable {
     int a = m_currentStepIndex;
     int b = m_stepList.size() - 1;
     if (a <= b && b < m_stepList.size()) {
-      return Collections.unmodifiableList(m_stepList.subList(a, b + 1));
+      return CollectionUtility.arrayList(m_stepList.subList(a, b + 1));
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -297,10 +296,10 @@ public abstract class AbstractWorkflowData implements Serializable {
     int a = 0;
     int b = m_currentStepIndex;
     if (a <= b && b < m_stepList.size()) {
-      return Collections.unmodifiableList(m_stepList.subList(a, b + 1));
+      return CollectionUtility.arrayList(m_stepList.subList(a, b + 1));
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

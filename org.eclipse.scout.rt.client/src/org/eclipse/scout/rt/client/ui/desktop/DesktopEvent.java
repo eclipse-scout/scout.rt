@@ -14,12 +14,11 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -225,12 +224,7 @@ public class DesktopEvent extends EventObject {
    * used by TYPE_TRAY_POPUP to add menus
    */
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenus != null) {
-      return Collections.unmodifiableList(m_popupMenus);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**
@@ -246,7 +240,7 @@ public class DesktopEvent extends EventObject {
   }
 
   public Map<String, Object> getPrintParameters() {
-    return new HashMap<String, Object>(m_printParameters);
+    return CollectionUtility.copyMap(m_printParameters);
   }
 
   @Override

@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.services.lookup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -65,9 +65,9 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
     List<List<ILookupRow<?>>> results = split.getCombinedResults();
 
     //set null results to empty list
-    List<ILookupRow<?>> emptyList = Collections.emptyList();
     for (int i = 0; i < results.size(); i++) {
       if (results.get(i) == null) {
+        List<ILookupRow<?>> emptyList = CollectionUtility.emptyArrayList();
         results.set(i, emptyList);
       }
     }

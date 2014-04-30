@@ -11,9 +11,9 @@
 package org.eclipse.scout.commons.parsers.sql;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -71,9 +71,8 @@ final class SqlParserToken {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<IToken> getChildren() {
-      return m_children != null ? m_children : Collections.EMPTY_LIST;
+      return CollectionUtility.arrayList(m_children);
     }
 
     @Override
@@ -85,14 +84,13 @@ final class SqlParserToken {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Comment> getComments() {
-      return m_comments != null ? m_comments : Collections.EMPTY_LIST;
+      return CollectionUtility.arrayList(m_comments);
     }
 
     @Override
     public String toString() {
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       if (getText() != null) {
         buf.append(getText());
       }

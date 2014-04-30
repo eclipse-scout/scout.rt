@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -403,7 +402,7 @@ public class UserNavigationHistory {
     List<Bookmark> bookmarks = getBookmarks();
     Bookmark current = getActiveBookmark();
     // children
-    List<IMenu> newList = new ArrayList<IMenu>();
+    List<IMenu> newList = new ArrayList<IMenu>(bookmarks.size());
     for (Bookmark b : bookmarks) {
       try {
         ActivateNavigationHistoryMenu m = new ActivateNavigationHistoryMenu(b);
@@ -418,7 +417,7 @@ public class UserNavigationHistory {
         LOG.error("could not initialize menu for bookmark '" + b + "'.", e);
       }
     }
-    return Collections.unmodifiableList(newList);
+    return newList;
   }
 
   /**

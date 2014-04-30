@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -150,7 +149,7 @@ public class TableEvent extends java.util.EventObject {
   //next 840, check method AbstractTable.processEventBuffer
 
   private final int m_type;
-  private List<? extends ITableRow> m_rows = Collections.emptyList();
+  private List<? extends ITableRow> m_rows;
   private List<IMenu> m_popupMenus;
   private boolean m_consumed;
   private TransferObject m_dragObject;
@@ -160,16 +159,13 @@ public class TableEvent extends java.util.EventObject {
   private boolean m_sortInMemoryAllowed;
 
   public TableEvent(ITable source, int type) {
-    super(source);
-    m_type = type;
+    this(source, type, null);
   }
 
   public TableEvent(ITable source, int type, List<? extends ITableRow> rows) {
     super(source);
     m_type = type;
-    if (CollectionUtility.hasElements(rows)) {
-      m_rows = rows;
-    }
+    m_rows = CollectionUtility.arrayList(rows);
   }
 
   public ITable getTable() {
@@ -181,14 +177,11 @@ public class TableEvent extends java.util.EventObject {
   }
 
   public List<ITableRow> getRows() {
-    return Collections.unmodifiableList(m_rows);
+    return CollectionUtility.arrayList(m_rows);
   }
 
   protected void setRows(List<? extends ITableRow> rows) {
-    if (rows == null) {
-      m_rows = Collections.emptyList();
-    }
-    m_rows = rows;
+    m_rows = CollectionUtility.arrayList(rows);
   }
 
   public int getRowCount() {
@@ -231,12 +224,7 @@ public class TableEvent extends java.util.EventObject {
    * used by TYPE_ROW_POPUP to add actions
    */
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenus != null) {
-      return Collections.unmodifiableList(m_popupMenus);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**
@@ -297,12 +285,7 @@ public class TableEvent extends java.util.EventObject {
    * TYPE_COLUMN_ORDER_CHANGED,TYPE_SORT_REQUEST,TYPE_COLUMN_HEADERS_CHANGED
    */
   public Collection<IColumn<?>> getColumns() {
-    if (m_columns != null) {
-      return Collections.unmodifiableCollection(m_columns);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_columns);
   }
 
   public IColumn getFirstColumn() {
@@ -326,7 +309,7 @@ public class TableEvent extends java.util.EventObject {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName() + "[");
     // decode type
     try {

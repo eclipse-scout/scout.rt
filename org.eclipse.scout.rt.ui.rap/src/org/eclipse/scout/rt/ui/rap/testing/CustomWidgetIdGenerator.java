@@ -79,7 +79,7 @@ public class CustomWidgetIdGenerator {
     String scoutObjectId = createScoutObjectId(scoutObject, widget);
     String id = prefix + "_" + scoutObjectId;
     //Replace invalid characters, see also UITestUtil.isValidId
-    id = id.replace("$", ".");
+    id = id.replace('$', '.');
 
     //The ids have to be unique, therefore a sequence number is attached
     Integer useCount = m_existingIds.get(id);

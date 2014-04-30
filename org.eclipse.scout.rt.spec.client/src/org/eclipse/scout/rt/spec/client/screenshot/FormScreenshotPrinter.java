@@ -90,7 +90,7 @@ public class FormScreenshotPrinter {
   }
 
   protected File getPrintFile(String baseName) {
-    String ext = getContentType().substring(getContentType().lastIndexOf("/") + 1);
+    String ext = getContentType().substring(getContentType().lastIndexOf('/') + 1);
     return new File(getDestinationFolder(), baseName + "." + ext);
   }
 

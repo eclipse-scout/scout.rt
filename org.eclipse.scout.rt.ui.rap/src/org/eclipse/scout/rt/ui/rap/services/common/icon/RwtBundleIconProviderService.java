@@ -56,7 +56,7 @@ public class RwtBundleIconProviderService extends IconProviderService {
 
   private IconSpec getContributedIconSpec(String iconName) {
     // remove file format if given
-    int index = iconName.lastIndexOf(".");
+    int index = iconName.lastIndexOf('.');
     if (index > 0) {
       iconName = iconName.substring(0, index);
     }

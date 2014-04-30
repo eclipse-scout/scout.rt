@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
         rootNodes.addAll(e.getValue());
       }
     }
-    return Collections.unmodifiableList(rootNodes);
+    return rootNodes;
   }
 
   public ITreeNode createTreeNode(ILookupRow<LOOKUP_ROW_TYPE> lookupRow, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {

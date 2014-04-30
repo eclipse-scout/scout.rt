@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.shared.services.lookup.fixture;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
@@ -219,7 +219,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
   }
 
   private abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor<ICode<CODE_ID_TYPE>> {
-    private ArrayList<ICode<CODE_ID_TYPE>> m_list = new ArrayList<ICode<CODE_ID_TYPE>>();
+    private final ArrayList<ICode<CODE_ID_TYPE>> m_list = new ArrayList<ICode<CODE_ID_TYPE>>();
 
     public P_AbstractCollectingCodeVisitor() {
     }
@@ -238,7 +238,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
     }
 
     public List<ICode<CODE_ID_TYPE>> getCodes() {
-      return Collections.unmodifiableList(m_list);
+      return CollectionUtility.arrayList(m_list);
     }
   }
 }

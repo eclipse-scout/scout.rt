@@ -214,8 +214,9 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * @see IDesktop#refreshPages(List)
    * @param pageTypes
+   *          Must be classes that implement {@link IPage}.
    */
-  void refreshPages(Class<? extends IPage>... pageTypes);
+  void refreshPages(Class<?>... pageTypes);
 
   /**
    * add Property Observer

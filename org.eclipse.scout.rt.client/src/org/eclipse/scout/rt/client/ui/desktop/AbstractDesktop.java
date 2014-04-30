@@ -28,7 +28,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -411,7 +410,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   public List<IDesktopExtension> getDesktopExtensions() {
-    return CollectionUtility.unmodifiableListCopy(m_desktopExtensions);
+    return CollectionUtility.arrayList(m_desktopExtensions);
   }
 
   /**
@@ -651,12 +650,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IForm> getViewStack() {
-    return CollectionUtility.unmodifiableList(CollectionUtility.arrayList(m_viewStack));
+    return CollectionUtility.arrayList(m_viewStack);
   }
 
   @Override
   public List<IForm> getDialogStack() {
-    return CollectionUtility.unmodifiableList(CollectionUtility.arrayList(m_dialogStack));
+    return CollectionUtility.arrayList(m_dialogStack);
   }
 
   /**
@@ -805,7 +804,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IMessageBox> getMessageBoxStack() {
-    return CollectionUtility.unmodifiableListCopy(m_messageBoxStack);
+    return CollectionUtility.arrayList(m_messageBoxStack);
   }
 
   @Override
@@ -830,7 +829,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IOutline> getAvailableOutlines() {
-    return CollectionUtility.unmodifiableListCopy(m_availableOutlines);
+    return CollectionUtility.arrayList(m_availableOutlines);
   }
 
   @Override
@@ -960,7 +959,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public Set<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.unmodifiableSetCopy(propertySupport.<IKeyStroke> getPropertySet(PROP_KEY_STROKES));
+    return CollectionUtility.hashSet(propertySupport.<IKeyStroke> getPropertySet(PROP_KEY_STROKES));
   }
 
   @Override
@@ -998,7 +997,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override
@@ -1027,12 +1026,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IToolButton> getToolButtons() {
-    return CollectionUtility.unmodifiableListCopy(m_toolButtons);
+    return CollectionUtility.arrayList(m_toolButtons);
   }
 
   @Override
   public List<IViewButton> getViewButtons() {
-    return CollectionUtility.unmodifiableListCopy(m_viewButtons);
+    return CollectionUtility.arrayList(m_viewButtons);
   }
 
   @Override
@@ -1515,8 +1514,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void refreshPages(Class<? extends IPage>... pageTypes) {
-    refreshPages(CollectionUtility.arrayList(pageTypes));
+  public void refreshPages(Class<?>... pageTypes) {
+    for (IOutline outline : getAvailableOutlines()) {
+      outline.refreshPages(pageTypes);
+    }
   }
 
   @Override
@@ -2002,8 +2003,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public List<IForm> getUnsavedForms() {
     List<IForm> saveNeededForms = new ArrayList<IForm>();
-    @SuppressWarnings("unchecked")
-    List<IForm> openForms = ListUtility.combine(getViewStack(), getDialogStack());
+    List<IForm> openForms = CollectionUtility.combine(getViewStack(), getDialogStack());
     // last element on the stack is the first that needs to be saved: iterate from end to start
     for (int i = openForms.size() - 1; i >= 0; i--) {
       IForm f = openForms.get(i);
@@ -2011,6 +2011,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         saveNeededForms.add(f);
       }
     }
-    return CollectionUtility.unmodifiableList(CollectionUtility.arrayList(saveNeededForms));
+    return saveNeededForms;
   }
 }

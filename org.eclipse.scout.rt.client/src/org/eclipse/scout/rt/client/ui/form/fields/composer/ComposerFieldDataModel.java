@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -38,10 +37,11 @@ public class ComposerFieldDataModel extends AbstractDataModel {
 
   @Override
   protected List<IDataModelAttribute> createAttributes() {
-    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     Class<?>[] all = ConfigurationUtility.getDeclaredPublicClasses(m_field.getClass());
     List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
-    for (Class<? extends IDataModelAttribute> c : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
+    List<Class<? extends IDataModelAttribute>> sortedAndFiltered = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class);
+    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>(sortedAndFiltered.size());
+    for (Class<? extends IDataModelAttribute> c : sortedAndFiltered) {
       try {
         IDataModelAttribute a = ConfigurationUtility.newInnerInstance(m_field, c);
         attributes.add(a);
@@ -50,15 +50,16 @@ public class ComposerFieldDataModel extends AbstractDataModel {
         LOG.warn(null, e);
       }
     }
-    return Collections.unmodifiableList(attributes);
+    return attributes;
   }
 
   @Override
   protected List<IDataModelEntity> createEntities() {
-    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(m_field.getClass());
     List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
-    for (Class<? extends IDataModelEntity> entityClazz : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
+    List<Class<? extends IDataModelEntity>> sortedAndFiltered = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class);
+    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>(sortedAndFiltered.size());
+    for (Class<? extends IDataModelEntity> entityClazz : sortedAndFiltered) {
       try {
         entities.add(ConfigurationUtility.newInnerInstance(m_field, entityClazz));
       }
@@ -66,7 +67,6 @@ public class ComposerFieldDataModel extends AbstractDataModel {
         LOG.warn(null, e);
       }
     }
-    return Collections.unmodifiableList(entities);
+    return entities;
   }
-
 }

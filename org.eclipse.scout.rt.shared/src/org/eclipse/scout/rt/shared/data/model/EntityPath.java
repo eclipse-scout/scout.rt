@@ -11,8 +11,9 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 
 /**
  * This path represents the forward path from the data model root to an entity
@@ -43,16 +44,16 @@ public final class EntityPath implements IDataModelPath {
    * @param useCopyOfList
    *          if true then the entityPath list is assumed to be mutable and a copy of it is taken.
    */
-  public EntityPath(List<IDataModelEntity> entityPath, boolean useCopyOfList) {
+  protected EntityPath(List<IDataModelEntity> entityPath, boolean useCopyOfList) {
     if (entityPath == null || entityPath.size() == 0) {
-      m_entityPath = Collections.emptyList();
+      m_entityPath = CollectionUtility.emptyArrayList();
     }
     else {
       if (useCopyOfList) {
-        m_entityPath = Collections.unmodifiableList(new ArrayList<IDataModelEntity>(entityPath));
+        m_entityPath = CollectionUtility.arrayList(entityPath);
       }
       else {
-        m_entityPath = Collections.unmodifiableList(entityPath);
+        m_entityPath = entityPath;
       }
     }
     m_hashCode = m_entityPath.hashCode();
@@ -62,7 +63,7 @@ public final class EntityPath implements IDataModelPath {
    * @return the path of elements from root to last
    */
   public List<IDataModelEntity> elements() {
-    return m_entityPath;
+    return CollectionUtility.arrayList(m_entityPath);
   }
 
   /**

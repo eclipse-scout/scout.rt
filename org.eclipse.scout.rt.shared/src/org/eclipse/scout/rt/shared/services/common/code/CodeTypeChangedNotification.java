@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +36,7 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
         throw new ProcessingException("Code type '" + codeTypeClazz.getName() + "' is not serializable!");
       }
     }
-    m_codeTypes = types;
+    m_codeTypes = CollectionUtility.arrayList(types);
   }
 
   @Override
@@ -54,12 +53,12 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
   }
 
   public List<Class<? extends ICodeType<?, ?>>> getCodeTypes() {
-    return Collections.unmodifiableList(m_codeTypes);
+    return CollectionUtility.arrayList(m_codeTypes);
   }
 
   @Override
   public String toString() {
-    StringBuffer b = new StringBuffer(getClass().getSimpleName());
+    StringBuilder b = new StringBuilder(getClass().getSimpleName());
     b.append("[");
     if (CollectionUtility.hasElements(m_codeTypes)) {
       Iterator<Class<? extends ICodeType<?, ?>>> codeTypeIt = m_codeTypes.iterator();

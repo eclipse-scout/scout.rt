@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -722,19 +720,19 @@ public class FormDataStatementBuilder implements DataModelConstants {
    */
   @Deprecated
   public List<BasicPartDefinition> getValuePartDefinitions() {
-    return Collections.unmodifiableList(m_basicDefs);
+    return getBasicPartDefinitions();
   }
 
   public List<BasicPartDefinition> getBasicPartDefinitions() {
-    return Collections.unmodifiableList(m_basicDefs);
+    return CollectionUtility.arrayList(m_basicDefs);
   }
 
   public Map<Class<?>, DataModelAttributePartDefinition> getDataModelAttributePartDefinitions() {
-    return Collections.unmodifiableMap(m_dataModelAttMap);
+    return CollectionUtility.copyMap(m_dataModelAttMap);
   }
 
   public Map<Class<?>, DataModelEntityPartDefinition> getDataModelEntityPartDefinitions() {
-    return Collections.unmodifiableMap(m_dataModelEntMap);
+    return CollectionUtility.copyMap(m_dataModelEntMap);
   }
 
   public String getWhereConstraints() {
@@ -869,7 +867,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * do not use or override this method, it is protected for unit test purposes
    */
-  @SuppressWarnings("unchecked")
   protected EntityContribution buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
     EntityContribution contrib = new EntityContribution();
     // check if only one condition
@@ -889,7 +886,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         // remove possible outer join signs (+) in where / having constraint
         // this is necessary because outer joins are not allowed in OR clause
         // the removal of outer joins does not influence the result set
-        buf.append(CollectionUtility.format(ListUtility.combine(subContrib.getWhereParts(), subContrib.getHavingParts()), " AND ").replaceAll("\\(\\+\\)", ""));
+        buf.append(CollectionUtility.format(CollectionUtility.combine(subContrib.getWhereParts(), subContrib.getHavingParts()), " AND ").replaceAll("\\(\\+\\)", ""));
         buf.append(")");
         count++;
       }

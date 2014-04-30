@@ -15,12 +15,12 @@ import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -961,11 +961,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public List<T> getValues() {
-    List<T> values = new ArrayList<T>();
-    for (int i = 0; i < m_table.getRowCount(); i++) {
+    int rowCount = m_table.getRowCount();
+    List<T> values = new ArrayList<T>(rowCount);
+    for (int i = 0; i < rowCount; i++) {
       values.add(getValue(m_table.getRow(i)));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
@@ -976,25 +977,26 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
         values.add(getValue(row));
       }
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getValues(Collection<? extends ITableRow> rows) {
-    List<T> values = new ArrayList<T>();
+    List<T> values = new ArrayList<T>(rows.size());
     for (ITableRow row : rows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getSelectedValues() {
-    List<T> values = new ArrayList<T>();
-    for (ITableRow row : m_table.getSelectedRows()) {
+    List<ITableRow> selectedRows = m_table.getSelectedRows();
+    List<T> values = new ArrayList<T>(selectedRows.size());
+    for (ITableRow row : selectedRows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
@@ -1015,11 +1017,11 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public List<String> getDisplayTexts() {
-    List<String> values = new ArrayList<String>();
+    List<String> values = new ArrayList<String>(m_table.getRowCount());
     for (int i = 0; i < m_table.getRowCount(); i++) {
       values.add(getDisplayText(m_table.getRow(i)));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
@@ -1035,61 +1037,67 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public List<String> getSelectedDisplayTexts() {
-    List<String> values = new ArrayList<String>();
-    for (ITableRow row : m_table.getSelectedRows()) {
+    List<ITableRow> selectedRows = m_table.getSelectedRows();
+    List<String> values = new ArrayList<String>(selectedRows.size());
+    for (ITableRow row : selectedRows) {
       values.add(getDisplayText(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getInsertedValues() {
-    List<T> values = new ArrayList<T>();
-    for (ITableRow row : m_table.getInsertedRows()) {
+    List<ITableRow> insertedRows = m_table.getInsertedRows();
+    List<T> values = new ArrayList<T>(insertedRows.size());
+    for (ITableRow row : insertedRows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getUpdatedValues() {
-    List<T> values = new ArrayList<T>();
-    for (ITableRow row : m_table.getUpdatedRows()) {
+    List<ITableRow> updatedRows = m_table.getUpdatedRows();
+    List<T> values = new ArrayList<T>(updatedRows.size());
+    for (ITableRow row : updatedRows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getDeletedValues() {
-    List<T> values = new ArrayList<T>();
-    for (ITableRow row : m_table.getDeletedRows()) {
+    List<ITableRow> deletedRows = m_table.getDeletedRows();
+    List<T> values = new ArrayList<T>(deletedRows.size());
+    for (ITableRow row : deletedRows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<T> getNotDeletedValues() {
-    List<T> values = new ArrayList<T>();
-    for (ITableRow row : m_table.getNotDeletedRows()) {
+    List<ITableRow> notDeletedRows = m_table.getNotDeletedRows();
+    List<T> values = new ArrayList<T>(notDeletedRows.size());
+    for (ITableRow row : notDeletedRows) {
       values.add(getValue(row));
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override
   public List<ITableRow> findRows(Collection<? extends T> keys) {
-    List<ITableRow> values = new ArrayList<ITableRow>();
     if (keys != null) {
+      List<ITableRow> values = new ArrayList<ITableRow>(keys.size());
       for (T t : keys) {
         ITableRow row = findRow(t);
         if (row != null) {
           values.add(row);
         }
       }
+      return values;
     }
-    return Collections.unmodifiableList(values);
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override
@@ -1101,7 +1109,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
         values.add(row);
       }
     }
-    return Collections.unmodifiableList(values);
+    return values;
   }
 
   @Override

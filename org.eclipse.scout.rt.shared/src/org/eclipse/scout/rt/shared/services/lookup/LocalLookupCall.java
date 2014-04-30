@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
@@ -77,11 +77,15 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   @Override
   public List<? extends ILookupRow<T>> getDataByKey() throws ProcessingException {
     if (getKey() == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     Object key = getKey();
-    ArrayList<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
-    for (ILookupRow<T> row : execCreateLookupRows()) {
+    List<? extends ILookupRow<T>> rows = execCreateLookupRows();
+    if (rows == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    ArrayList<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>(rows.size());
+    for (ILookupRow<T> row : rows) {
       if (key.equals(row.getKey())) {
         list.add(row);
       }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
 public class HtmlTable extends HtmlComponent {
@@ -66,7 +67,7 @@ public class HtmlTable extends HtmlComponent {
     if (m_sortInfo.getColumnIndex() == columnIndex) {
       out.print("<b>");
     }
-    if (content == null || content.trim().length() == 0) {
+    if (!StringUtility.hasText(content)) {
       out.print("&nbsp;");
     }
     else {

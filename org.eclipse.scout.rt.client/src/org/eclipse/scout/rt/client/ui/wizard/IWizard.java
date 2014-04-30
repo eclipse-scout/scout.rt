@@ -218,7 +218,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
   /**
    * set the list of active steps
    */
-  void setSteps(IWizardStep<? extends IForm>... steps);
+  void setSteps(IWizardStep<?>... steps);
 
   /**
    * set the list of active steps

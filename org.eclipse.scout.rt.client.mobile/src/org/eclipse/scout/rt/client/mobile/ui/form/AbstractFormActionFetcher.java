@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -37,9 +36,7 @@ public abstract class AbstractFormActionFetcher implements IActionFetcher {
       return ActionButtonBarUtility.convertButtonsToActions(getForm().getRootGroupBox().getCustomProcessButtons());
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-
   }
-
 }

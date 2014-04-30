@@ -34,11 +34,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
 
@@ -78,7 +78,7 @@ public class CsvHelper {
    * @return column headers
    */
   public List<String> getColumnNames() {
-    return Collections.unmodifiableList(m_colNames);
+    return CollectionUtility.arrayList(m_colNames);
   }
 
   public void setColumnNames(List<String> list) {
@@ -94,7 +94,7 @@ public class CsvHelper {
    * @return column data types
    */
   public List<String> getColumnTypes() {
-    return Collections.unmodifiableList(m_colTypes);
+    return CollectionUtility.arrayList(m_colTypes);
   }
 
   public void setColumnTypes(List<String> list) {

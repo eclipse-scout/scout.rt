@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.calendar;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
@@ -67,9 +67,8 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
       result = p.getItems(LocaleThreadLocal.get(), minDate, maxDate);
     }
     else {
-      result = Collections.emptySet();
+      result = CollectionUtility.hashSet();
     }
     return result;
   }
-
 }

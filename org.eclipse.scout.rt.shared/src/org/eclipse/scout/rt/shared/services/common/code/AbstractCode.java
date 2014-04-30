@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -263,7 +262,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   @Override
   public List<? extends ICode<T>> getChildCodes(boolean activeOnly) {
     if (m_codeList == null) {
-      return Collections.emptyList();
+      return new ArrayList<ICode<T>>(0);
     }
     List<ICode<T>> result = new ArrayList<ICode<T>>(m_codeList);
     if (activeOnly) {
@@ -273,7 +272,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         }
       }
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   @Override

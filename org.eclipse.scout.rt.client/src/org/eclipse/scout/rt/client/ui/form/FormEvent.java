@@ -14,9 +14,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.IPageField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
@@ -124,12 +124,7 @@ public class FormEvent extends EventObject {
   }
 
   public Map<String, Object> getPrintParameters() {
-    if (m_printParameters != null) {
-      return new HashMap<String, Object>(m_printParameters);
-    }
-    else {
-      return new HashMap<String, Object>();
-    }
+    return CollectionUtility.copyMap(m_printParameters);
   }
 
   @Override

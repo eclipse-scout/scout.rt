@@ -283,15 +283,15 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     }
     //
     String filename = canonicalSimpleName;
-    if (spec.getLocale() != null && filename.lastIndexOf(".") != -1) {
+    if (spec.getLocale() != null && filename.lastIndexOf('.') != -1) {
       //check locale string for hacking patterns (only allow
       String localeText = spec.getLocale().toString().replaceAll("__", "_");
       if (!LOCALE_SECURITY_PATTERN.matcher(localeText).matches()) {
         throw new SecurityException("invalid or unaccessible path");
       }
       String[] checkedLocaleParts = localeText.split("_", 3);
-      String prefix = filename.substring(0, filename.lastIndexOf("."));
-      String suffix = filename.substring(filename.lastIndexOf("."));
+      String prefix = filename.substring(0, filename.lastIndexOf('.'));
+      String suffix = filename.substring(filename.lastIndexOf('.'));
       for (int i = checkedLocaleParts.length - 1; i >= 0; i--) {
         if (prefix.toLowerCase().endsWith(checkedLocaleParts[i].toLowerCase())) {
           prefix = prefix.substring(0, prefix.length() - checkedLocaleParts[i].length());
@@ -306,11 +306,11 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       filename = prefix + localeText + suffix;
       File test = new File(canonicalFolder, filename);
       while (!test.exists()) {
-        if (localeText.indexOf("_") == -1) {
+        if (localeText.indexOf('_') == -1) {
           filename = canonicalSimpleName;
           break;
         }
-        localeText = localeText.substring(0, localeText.lastIndexOf("_"));
+        localeText = localeText.substring(0, localeText.lastIndexOf('_'));
         filename = prefix + localeText + suffix;
         test = new File(canonicalFolder, filename);
       }

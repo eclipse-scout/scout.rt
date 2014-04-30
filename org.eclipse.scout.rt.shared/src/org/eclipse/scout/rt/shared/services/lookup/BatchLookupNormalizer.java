@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -56,7 +56,7 @@ public class BatchLookupNormalizer {
     m_forwardMapping = null;
     m_normalizedCalls = null;
     if (calls == null || calls.size() == 0) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     m_originalLength = calls.size();
     m_forwardMapping = new int[m_originalLength];
@@ -87,7 +87,7 @@ public class BatchLookupNormalizer {
     }
     normMap = null;//gc
     m_normalizedCalls = normList;
-    return m_normalizedCalls;
+    return CollectionUtility.arrayList(m_normalizedCalls);
   }
 
   /**
@@ -95,20 +95,19 @@ public class BatchLookupNormalizer {
    */
   public List<List<ILookupRow<?>>> denormalizeResults(List<List<ILookupRow<?>>> normalizedResults) throws ProcessingException {
     if (m_originalLength == 0 || normalizedResults == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     if (normalizedResults.size() != m_normalizedCalls.size()) {
       throw new IllegalArgumentException("normalized result array must have length " + m_normalizedCalls.size() + " (" + normalizedResults.size() + ")");
     }
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
-//    ILookupRow<?>[][] result = new ILookupRow<?>[m_originalLength][];
+    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>(m_originalLength);
     for (int i = 0; i < m_originalLength; i++) {
       int mapIndex = m_forwardMapping[i];
       if (mapIndex >= 0) {
         result.add(normalizedResults.get(mapIndex));
       }
       else {
-        result.add(null);//new ArrayList<ILookupRow<?>>(0));
+        result.add(null);
       }
     }
     return result;

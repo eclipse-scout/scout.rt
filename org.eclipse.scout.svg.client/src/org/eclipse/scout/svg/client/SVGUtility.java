@@ -31,6 +31,7 @@ import org.apache.batik.dom.svg.SVGOMRect;
 import org.apache.batik.swing.svg.GVTTreeBuilder;
 import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -308,7 +309,7 @@ public final class SVGUtility {
     float wrap = wordWrap.floatValue();
     ArrayList<String> wrappedLines = new ArrayList<String>(lines.size());
     for (String line : lines) {
-      if (line.trim().length() == 0) {
+      if (!StringUtility.hasText(line)) {
         wrappedLines.add("");
         continue;
       }

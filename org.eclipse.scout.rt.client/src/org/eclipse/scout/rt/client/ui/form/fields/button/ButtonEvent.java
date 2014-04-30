@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public class ButtonEvent extends EventObject {
@@ -68,11 +68,6 @@ public class ButtonEvent extends EventObject {
   }
 
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenuList == null) {
-      return Collections.emptyList();
-    }
-    else {
-      return Collections.unmodifiableList(m_popupMenuList);
-    }
+    return CollectionUtility.arrayList(m_popupMenuList);
   }
 }

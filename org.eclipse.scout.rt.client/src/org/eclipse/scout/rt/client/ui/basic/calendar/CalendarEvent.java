@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 @SuppressWarnings("serial")
@@ -96,12 +96,7 @@ public class CalendarEvent extends java.util.EventObject {
    * collect actions
    */
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenus != null) {
-      return Collections.unmodifiableList(m_popupMenus);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**
@@ -119,7 +114,7 @@ public class CalendarEvent extends java.util.EventObject {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("CalendarEvent[");
     // decode type
     try {

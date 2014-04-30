@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.zip.CRC32;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -153,12 +153,7 @@ public class Bookmark implements Serializable, Cloneable {
   }
 
   public List<AbstractPageState> getPath() {
-    if (m_path == null) {
-      return Collections.emptyList();
-    }
-    else {
-      return Collections.unmodifiableList(m_path);
-    }
+    return CollectionUtility.arrayList(m_path);
   }
 
   public void addPathElement(AbstractPageState state) {

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -22,6 +21,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -168,7 +168,7 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public Map<String, Object> getSharedVariableMap() {
-    return Collections.unmodifiableMap(m_sharedVariableMap);
+    return CollectionUtility.copyMap(m_sharedVariableMap);
   }
 
   /**

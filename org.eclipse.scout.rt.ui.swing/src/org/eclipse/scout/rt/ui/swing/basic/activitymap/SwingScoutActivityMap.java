@@ -248,7 +248,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     setSelectionFromScout();
   }
 
-  private void setResourceIdsFromScout(Object[] resourceIds) {
+  private void setResourceIdsFromScout() {
     getSwingActivityMap().setModel(new SwingActivityMapModel(getScoutActivityMap(), m_metricsTable));
   }
 
@@ -383,13 +383,11 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     }
     else if (name.equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS) ||
         name.equals(IActivityMap.PROP_SELECTED_BEGIN_TIME) ||
-        name.equals(IActivityMap.PROP_SELECTED_END_TIME)
-
-    ) {
+        name.equals(IActivityMap.PROP_SELECTED_END_TIME)) {
       setSelectionFromScout();
     }
     else if (name.equals(IActivityMap.PROP_RESOURCE_IDS)) {
-      setResourceIdsFromScout((Object[]) newValue);
+      setResourceIdsFromScout();
     }
     else if (name.equals(IActivityMap.PROP_DRAW_SECTIONS)) {
       getSwingActivityMap().getSelector().setDrawSections((Boolean) newValue);

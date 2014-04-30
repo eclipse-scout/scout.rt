@@ -357,7 +357,7 @@ public class FormulaParser {
       if (s.startsWith("+")) {
         s = s.substring(1);
       }
-      if (s.indexOf(".") >= 0) {
+      if (s.indexOf('.') >= 0) {
         throw new ParseException("only supporting integer numbers: " + s, index);
       }
       else {

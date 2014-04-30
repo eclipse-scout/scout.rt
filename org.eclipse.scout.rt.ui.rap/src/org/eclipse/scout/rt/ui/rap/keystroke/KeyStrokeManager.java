@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.keystroke;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -235,7 +234,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       }
     }
     if (keyStrokes == null) {
-      keyStrokes = Collections.emptyList();
+      keyStrokes = CollectionUtility.emptyArrayList();
     }
     return keyStrokes;
   }

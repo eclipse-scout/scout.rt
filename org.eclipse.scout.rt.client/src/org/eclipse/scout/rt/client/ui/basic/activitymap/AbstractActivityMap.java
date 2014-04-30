@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -257,7 +256,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = Collections.unmodifiableList(menuList);
+    m_menus = menuList;
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -421,9 +420,9 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   @Override
   public List<ActivityCell<RI, AI>> resolveActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
     if (cells == null) {
-      cells = Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    List<ActivityCell<RI, AI>> result = new ArrayList<ActivityCell<RI, AI>>();
+    List<ActivityCell<RI, AI>> result = new ArrayList<ActivityCell<RI, AI>>(cells.size());
     for (ActivityCell<RI, AI> cell : cells) {
       if (resolveActivityCell(cell) == cell) {
         result.add(cell);
@@ -448,13 +447,13 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         all.addAll(list);
       }
     }
-    return Collections.unmodifiableList(all);
+    return all;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public List<ActivityCell<RI, AI>> getAllActivityCells() {
-    return Collections.unmodifiableList(new ArrayList(m_activities.values()));
+    return new ArrayList(m_activities.values());
   }
 
   @Override
@@ -560,21 +559,14 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   public List<RI> getSelectedResourceIds() {
     List<RI> a = (List<RI>) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
     if (a == null) {
-      a = Collections.emptyList();
+      a = CollectionUtility.emptyArrayList();
     }
     return a;
   }
 
   @Override
   public void setSelectedResourceIds(List<? extends RI> resourceIds) {
-    List<RI> internalResourceIds;
-    if (resourceIds == null) {
-      internalResourceIds = Collections.emptyList();
-    }
-    else {
-      internalResourceIds = new ArrayList<RI>(resourceIds);
-    }
-
+    List<RI> internalResourceIds = CollectionUtility.arrayList(resourceIds);
     m_selectedResourceIds.clear();
     m_selectedResourceIds.addAll(internalResourceIds);
     propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, internalResourceIds);
@@ -585,17 +577,17 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   public List<RI> getResourceIds() {
     List<RI> resourceIds = (List<RI>) propertySupport.getProperty(PROP_RESOURCE_IDS);
     if (resourceIds == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    return Collections.unmodifiableList(resourceIds);
+    return CollectionUtility.arrayList(resourceIds);
   }
 
   @Override
   public void setResourceIds(List<? extends RI> resourceIds) {
     if (resourceIds == null) {
-      resourceIds = Collections.emptyList();
+      resourceIds = CollectionUtility.emptyArrayList();
     }
-    // delete activities of resourceIds that no Objecter exist
+    // delete activities of resourceIds that no Object exists
     HashSet<RI> eliminatedResourceIdSet = new HashSet<RI>();
     eliminatedResourceIdSet.addAll(getResourceIds());
     eliminatedResourceIdSet.removeAll(resourceIds);
@@ -628,7 +620,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
   @Override
   public List<IMenu> getMenus() {
-    return m_menus;
+    return CollectionUtility.arrayList(m_menus);
   }
 
   private List<IMenu> fireEditActivityPopup(ActivityCell<RI, AI> cell) {
@@ -640,7 +632,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       return e.getPopupMenus();
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

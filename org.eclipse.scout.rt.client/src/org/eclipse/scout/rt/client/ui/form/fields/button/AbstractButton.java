@@ -294,7 +294,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override

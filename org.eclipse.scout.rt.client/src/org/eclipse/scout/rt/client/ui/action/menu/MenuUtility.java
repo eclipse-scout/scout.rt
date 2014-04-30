@@ -11,11 +11,12 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -38,11 +39,11 @@ public final class MenuUtility {
    */
   public static List<IKeyStroke> getKeyStrokesFromMenus(List<? extends IMenu> menu) {
     Set<String> keys = new HashSet<String>();
-    List<IKeyStroke> keyStrokes = new ArrayList<IKeyStroke>();
     if (menu != null) {
+      List<IKeyStroke> keyStrokes = new ArrayList<IKeyStroke>(menu.size());
       for (IMenu m : menu) {
         String s = m.getKeyStroke();
-        if (s != null && s.trim().length() > 0) {
+        if (StringUtility.hasText(s)) {
           try {
             KeyStroke ks = new KeyStroke(s, m);
             ks.initAction();
@@ -55,8 +56,9 @@ public final class MenuUtility {
           }
         }
       }
+      return keyStrokes;
     }
-    return Collections.unmodifiableList(keyStrokes);
+    return CollectionUtility.emptyArrayList();
   }
 
   /**
@@ -99,6 +101,6 @@ public final class MenuUtility {
         }
       }
     }
-    return Collections.unmodifiableList(filteredMenus);
+    return filteredMenus;
   }
 }

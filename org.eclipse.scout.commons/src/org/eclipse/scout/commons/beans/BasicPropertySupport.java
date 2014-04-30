@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +115,7 @@ public class BasicPropertySupport implements IEventListenerSource {
     // loop and catch exception instead of using lock (better performance)
     for (int i = 0; i < 10; i++) {
       try {
-        return new HashMap<String, Object>(m_props);
+        return CollectionUtility.copyMap(m_props);
       }
       catch (ConcurrentModificationException cme) {
         if (LOG.isDebugEnabled()) {
@@ -124,7 +123,7 @@ public class BasicPropertySupport implements IEventListenerSource {
         }
       }
     }
-    return new HashMap<String, Object>(m_props);
+    return CollectionUtility.copyMap(m_props);
   }
 
   public void putPropertiesMap(Map<String, Object> map) {
@@ -207,12 +206,12 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof List) {
-        eventOldValue = Collections.unmodifiableList(CollectionUtility.arrayList((List) oldValue));
+        eventOldValue = CollectionUtility.arrayList((List) oldValue);
       }
       // fire a copy
       List<T> eventNewValue = null;
       if (newValue != null) {
-        eventNewValue = Collections.unmodifiableList(CollectionUtility.arrayList(newValue));
+        eventNewValue = CollectionUtility.arrayList(newValue);
       }
       firePropertyChangeImpl(name, eventOldValue, eventNewValue);
       return propChanged;
@@ -240,12 +239,12 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof Set) {
-        eventOldValue = Collections.unmodifiableSet(CollectionUtility.hashSet((Set) oldValue));
+        eventOldValue = CollectionUtility.hashSet((Set) oldValue);
       }
       // fire a copy
       Set<T> eventNewValue = null;
       if (newValue != null) {
-        eventNewValue = Collections.unmodifiableSet(CollectionUtility.hashSet(newValue));
+        eventNewValue = CollectionUtility.hashSet(newValue);
       }
       firePropertyChangeImpl(name, eventOldValue, eventNewValue);
       return propChanged;

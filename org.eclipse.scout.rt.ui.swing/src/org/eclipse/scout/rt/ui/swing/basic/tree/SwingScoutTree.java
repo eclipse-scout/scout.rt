@@ -26,7 +26,6 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TooManyListenersException;
@@ -720,7 +719,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * update the given node
-   *
+   * 
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -891,7 +890,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   *
+   * 
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -958,9 +957,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   public static List<ITreeNode> treePathsToScoutNodes(Collection<? extends TreePath> paths) {
     if (!CollectionUtility.hasElements(paths)) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    List<ITreeNode> scoutNodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> scoutNodes = new ArrayList<ITreeNode>(paths.size());
     for (TreePath path : paths) {
       scoutNodes.add(treePathToScoutNode(path));
     }
@@ -977,9 +976,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   public static List<TreePath> scoutNodesToTreePaths(Collection<? extends ITreeNode> scoutNodes) {
     if (!CollectionUtility.hasElements(scoutNodes)) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    List<TreePath> paths = new ArrayList<TreePath>();
+    List<TreePath> paths = new ArrayList<TreePath>(scoutNodes.size());
     for (ITreeNode node : scoutNodes) {
       paths.add(scoutNodeToTreePath(node));
     }
@@ -1095,7 +1094,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   *
+   * 
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {

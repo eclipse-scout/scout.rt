@@ -257,7 +257,7 @@ public class BrowserInfoBuilder {
   }
 
   private Version parseIosVersion(String userAgent) {
-    userAgent = userAgent.replace("_", ".");
+    userAgent = userAgent.replace('_', '.');
     return parseSystemVersion(userAgent, "\\sOS\\s([^\\s;]+)");
   }
 

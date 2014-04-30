@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.ui.swt.window.filechooser;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -118,10 +118,10 @@ public class SwtScoutFileChooser {
     }
     String selectedDirecotry = dialog.open();
     if (StringUtility.hasText(selectedDirecotry)) {
-      return Collections.singletonList(new File(selectedDirecotry));
+      return CollectionUtility.arrayList(new File(selectedDirecotry));
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

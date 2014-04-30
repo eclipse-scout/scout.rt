@@ -40,7 +40,7 @@ public class SwingMailAttachment {
           extension = ".eml";
         }
         filename = IOUtility.getTempFileName(extension);
-        filename = filename.substring(filename.lastIndexOf("\\") + 1, filename.length());
+        filename = filename.substring(filename.lastIndexOf('\\') + 1, filename.length());
       }
       m_file = new File(tempFolder, filename);
       IOUtility.writeContent(new FileOutputStream(m_file), IOUtility.getContent(m_part.getInputStream()));

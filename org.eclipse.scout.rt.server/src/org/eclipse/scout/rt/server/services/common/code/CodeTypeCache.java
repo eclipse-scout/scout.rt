@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.code;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -71,11 +70,11 @@ public class CodeTypeCache {
   }
 
   public List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    List<ICodeType<?, ?>> instances = new ArrayList<ICodeType<?, ?>>();
+    List<ICodeType<?, ?>> instances = new ArrayList<ICodeType<?, ?>>(types.size());
     for (Class<? extends ICodeType<?, ?>> codeTypeClazz : types) {
       instances.add(getCodeType(codeTypeClazz));
     }
-    return Collections.unmodifiableList(instances);
+    return instances;
   }
 
   @SuppressWarnings("unchecked")

@@ -34,7 +34,6 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
@@ -1048,21 +1047,21 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   protected List<ITableRow> swingToScoutRows(int[] swingRows) {
     if (swingRows == null || swingRows.length == 0) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
 
     ITable table = getScoutObject();
     if (table != null) {
-      List<ITableRow> result = new ArrayList<ITableRow>();
+      List<ITableRow> result = new ArrayList<ITableRow>(swingRows.length);
       for (int swingRowIndex : swingRows) {
         ITableRow row = table.getFilteredRow(swingRowIndex);
         if (row != null) {
           result.add(row);
         }
       }
-      return Collections.unmodifiableList(result);
+      return result;
     }
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   protected int scoutToSwingRow(ITableRow row) {

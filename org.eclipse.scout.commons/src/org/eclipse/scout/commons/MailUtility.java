@@ -232,7 +232,7 @@ public final class MailUtility {
 
   public static DataSource createDataSource(File file) throws ProcessingException {
     try {
-      int indexDot = file.getName().lastIndexOf(".");
+      int indexDot = file.getName().lastIndexOf('.');
       if (indexDot > 0) {
         String fileName = file.getName();
         String ext = fileName.substring(indexDot + 1);

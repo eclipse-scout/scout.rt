@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class GroupBoxProcessButtonGrid {
         it.remove();
       }
     }
-    m_buttons = Collections.unmodifiableList(buttonList);
+    m_buttons = buttonList;
     layoutStatic();
   }
 

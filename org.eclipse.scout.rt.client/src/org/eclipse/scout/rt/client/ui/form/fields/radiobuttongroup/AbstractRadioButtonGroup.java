@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -123,7 +122,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   protected void initConfig() {
-    m_fields = Collections.emptyList();
+    m_fields = CollectionUtility.emptyArrayList();
     m_grid = new RadioButtonGroupGrid(this);
     super.initConfig();
     // Configured CodeType
@@ -285,7 +284,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       data = call.getDataByAll();
     }
     else {
-      data = Collections.emptyList();
+      data = CollectionUtility.emptyArrayList();
     }
 
     // Filter the result
@@ -514,15 +513,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   public List<IFormField> getFields() {
-    return CollectionUtility.unmodifiableListCopy(m_fields);
+    return CollectionUtility.arrayList(m_fields);
   }
 
   @Override
   public List<IRadioButton<T>> getButtons() {
     if (m_radioButtons == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    return CollectionUtility.unmodifiableListCopy(m_radioButtons);
+    return CollectionUtility.arrayList(m_radioButtons);
   }
 
   @Override

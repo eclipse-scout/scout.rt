@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -31,7 +32,7 @@ public class LegacySearchFilter extends SearchFilter implements Cloneable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LegacySearchFilter.class);
 
   private int m_sBindSeq;
-  private HashMap<String, Object> m_binds = new HashMap<String, Object>();
+  private Map<String, Object> m_binds = new HashMap<String, Object>();
   private StringBuffer m_where = new StringBuffer("");
 
   public LegacySearchFilter() {
@@ -156,14 +157,14 @@ public class LegacySearchFilter extends SearchFilter implements Cloneable {
   public Object clone() {
     LegacySearchFilter f = (LegacySearchFilter) super.clone();
     f.m_sBindSeq = m_sBindSeq;
-    f.m_binds = new HashMap<String, Object>(m_binds);
+    f.m_binds = CollectionUtility.copyMap(m_binds);
     f.m_where = new StringBuffer(m_where);
     return f;
   }
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("SearchFilter[");
     if (m_where != null && m_where.length() > 0) {
       buf.append(m_where);

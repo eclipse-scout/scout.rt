@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.SERVICES;
 
@@ -48,11 +49,15 @@ public final class CODES {
     return SERVICES.getService(ICodeService.class).findCodeTypeById(partitionId, codeTypeId);
   }
 
-  public static List<ICodeType<?, ?>> getCodeTypes(Class<? extends ICodeType<?, ?>>... types) {
-    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-    if (types != null) {
-      for (Class<? extends ICodeType<?, ?>> t : types) {
-        typeList.add(t);
+  @SuppressWarnings("unchecked")
+  public static List<ICodeType<?, ?>> getCodeTypes(Class<?>... types) {
+    if (types == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>(types.length);
+    for (Class<?> t : types) {
+      if (ICodeType.class.isAssignableFrom(t)) {
+        typeList.add((Class<? extends ICodeType<?, ?>>) t);
       }
     }
     return SERVICES.getService(ICodeService.class).getCodeTypes(typeList);
@@ -70,11 +75,15 @@ public final class CODES {
     return SERVICES.getService(ICodeService.class).reloadCodeType(type);
   }
 
-  public static List<ICodeType<?, ?>> reloadCodeTypes(Class<? extends ICodeType<?, ?>>... types) throws ProcessingException {
-    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-    if (types != null) {
-      for (Class<? extends ICodeType<?, ?>> t : types) {
-        typeList.add(t);
+  @SuppressWarnings("unchecked")
+  public static List<ICodeType<?, ?>> reloadCodeTypes(Class<?>... types) throws ProcessingException {
+    if (types == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>(types.length);
+    for (Class<?> t : types) {
+      if (ICodeType.class.isAssignableFrom(t)) {
+        typeList.add((Class<? extends ICodeType<?, ?>>) t);
       }
     }
     return SERVICES.getService(ICodeService.class).reloadCodeTypes(typeList);

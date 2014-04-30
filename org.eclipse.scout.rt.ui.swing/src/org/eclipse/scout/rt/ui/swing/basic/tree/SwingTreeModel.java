@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swing.basic.tree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -57,7 +56,7 @@ public class SwingTreeModel implements TreeModel {
         m_childIndexMap.put(children.get(i), i);
       }
     }
-    return Collections.unmodifiableList(children);
+    return CollectionUtility.arrayList(children);
   }
 
   private int getCachedChildIndex(ITreeNode parent, ITreeNode child) {

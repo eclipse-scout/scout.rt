@@ -73,7 +73,7 @@ public class PrintFormsAction extends AbstractAction {
   }
 
   public List<Class<? extends IForm>> getFormTypes() {
-    return CollectionUtility.unmodifiableList(m_formTypes);
+    return CollectionUtility.arrayList(m_formTypes);
   }
 
   public void setFormTypes(List<Class<? extends IForm>> formTypes) {
@@ -119,7 +119,7 @@ public class PrintFormsAction extends AbstractAction {
   }
 
   public List<File> getPrintedFiles() {
-    return CollectionUtility.unmodifiableList(m_printedFiles);
+    return CollectionUtility.arrayList(m_printedFiles);
   }
 
   @SuppressWarnings("unchecked")
@@ -269,7 +269,7 @@ public class PrintFormsAction extends AbstractAction {
 
   protected void printForm(IForm f, String contextName) {
     String name = f.getClass().getName() + (getFormImageIndex() > 0 ? "_" + getFormImageIndex() : "");
-    String ext = getContentType().substring(getContentType().lastIndexOf("/") + 1);
+    String ext = getContentType().substring(getContentType().lastIndexOf('/') + 1);
     HashMap<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("file", new File(getDestinationFolder(), name + (contextName != null ? contextName : "") + "." + ext));
     parameters.put("contentType", getContentType());
@@ -280,7 +280,7 @@ public class PrintFormsAction extends AbstractAction {
 
   protected void printFormField(IForm form, IFormField f, String contextName) {
     String name = form.getClass().getName() + "_" + getFormImageIndex() + "_" + f.getClass().getSimpleName();
-    String ext = getContentType().substring(getContentType().lastIndexOf("/") + 1);
+    String ext = getContentType().substring(getContentType().lastIndexOf('/') + 1);
     HashMap<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("file", new File(getDestinationFolder(), name + (contextName != null ? contextName : "") + "." + ext));
     parameters.put("contentType", getContentType());

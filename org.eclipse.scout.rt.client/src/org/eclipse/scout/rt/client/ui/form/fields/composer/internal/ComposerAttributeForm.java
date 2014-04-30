@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -64,7 +63,7 @@ public class ComposerAttributeForm extends AbstractForm {
    * form property
    */
   public List<IDataModelAttribute> getAvailableAttributes() {
-    return CollectionUtility.unmodifiableListCopy(m_validAttributes);
+    return CollectionUtility.arrayList(m_validAttributes);
   }
 
   public void setAvailableAttributes(List<? extends IDataModelAttribute> attributes0) throws ProcessingException {
@@ -77,7 +76,7 @@ public class ComposerAttributeForm extends AbstractForm {
    * form properties
    */
   public List<Object> getSelectedValues() {
-    return CollectionUtility.unmodifiableListCopy(m_selectedValues);
+    return CollectionUtility.arrayList(m_selectedValues);
   }
 
   public void setSelectedValues(List<? extends Object> o) {
@@ -91,7 +90,7 @@ public class ComposerAttributeForm extends AbstractForm {
   }
 
   public List<String> getSelectedDisplayValues() {
-    return CollectionUtility.unmodifiableListCopy(m_selectedDisplayValues);
+    return CollectionUtility.arrayList(m_selectedDisplayValues);
   }
 
   public void setSelectedDisplayValues(List<String> s) {
@@ -213,15 +212,14 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected List<ILookupRow<IDataModelAttribute>> execLoadTableData() throws ProcessingException {
-          List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>();
           List<IDataModelAttribute> a = getAvailableAttributes();
+          List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>(a.size());
           for (IDataModelAttribute attribute : a) {
             if (attribute.isVisible()) {
               result.add(new LookupRow<IDataModelAttribute>(attribute, attribute.getText(), attribute.getIconId()));
             }
-
           }
-          return Collections.unmodifiableList(result);
+          return result;
         }
 
         @Override
@@ -280,8 +278,8 @@ public class ComposerAttributeForm extends AbstractForm {
           if (att != null) {
             ops = att.getOperators();
           }
-          List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>();
           if (ops != null) {
+            List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>(ops.size());
             for (IDataModelAttributeOp op : ops) {
               String text = op.getText();
               if (text != null && text.indexOf("{0}") >= 0) {
@@ -292,8 +290,9 @@ public class ComposerAttributeForm extends AbstractForm {
               }
               result.add(new LookupRow<IDataModelAttributeOp>(op, text));
             }
+            return result;
           }
-          return Collections.unmodifiableList(result);
+          return new ArrayList<ILookupRow<IDataModelAttributeOp>>(0);
         }
 
         @Override

@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -190,10 +191,10 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     //    Subject subject=Subject.getSubject(AccessController.getContext());
     if (subject == null) {
       Principal principal = req.getUserPrincipal();
-      if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
+      if (principal == null || !StringUtility.hasText(principal.getName())) {
         principal = null;
         String name = req.getRemoteUser();
-        if (name != null && name.trim().length() > 0) {
+        if (StringUtility.hasText(name)) {
           principal = new SimplePrincipal(name);
         }
       }

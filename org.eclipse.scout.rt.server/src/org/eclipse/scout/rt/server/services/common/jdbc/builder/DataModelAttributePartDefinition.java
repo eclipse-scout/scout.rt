@@ -77,7 +77,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
     tmp = StringUtility.removeTag(tmp, "fromPart");
     tmp = StringUtility.removeTag(tmp, "wherePart");
     tmp = StringUtility.removeTag(tmp, "havingPart");
-    if (tmp.trim().length() == 0) {
+    if (!StringUtility.hasText(tmp)) {
       return null;
     }
     if ((" " + tmp).matches(".*[^a-zA-Z_$]SELECT[^a-zA-Z_$].*")) {

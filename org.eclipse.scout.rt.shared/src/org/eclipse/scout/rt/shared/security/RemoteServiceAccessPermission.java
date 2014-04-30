@@ -31,7 +31,7 @@ public class RemoteServiceAccessPermission extends Permission {
    * pattern may contain multiple * as wildcards
    */
   public RemoteServiceAccessPermission(String interfaceTypeName, String methodName) {
-    super(interfaceTypeName.replace("$", ".") + "#" + methodName);
+    super(interfaceTypeName.replace('$', '.') + "#" + methodName);
   }
 
   @Override

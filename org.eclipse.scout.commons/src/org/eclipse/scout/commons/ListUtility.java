@@ -12,15 +12,24 @@ package org.eclipse.scout.commons;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility} instead.
+ */
+@Deprecated
 public final class ListUtility {
 
   private ListUtility() {
   }
 
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#arrayList(Object...)} instead.
+   */
+  @Deprecated
   public static List<Object> toList(Object... array) {
     ArrayList<Object> list = new ArrayList<Object>();
     if (array != null) {
@@ -31,10 +40,18 @@ public final class ListUtility {
     return list;
   }
 
+  /**
+   * @deprecated Will be removed in Scout 5.0.
+   */
+  @Deprecated
   public static <T> T[] toArray(T... array) {
     return array;
   }
 
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link Arrays#copyOf(Object[], int)} instead.
+   */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public static <T> T[] copyArray(T[] a) {
     T[] copy = (T[]) Array.newInstance(a.getClass().getComponentType(), a.length);
@@ -43,31 +60,22 @@ public final class ListUtility {
   }
 
   /**
-   * @return true if list contains any (at least 1) of the values
+   * @return true if list contains any (at least 1) of the values.
+   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#containsAny(Collection, Collection)}
+   *             instead.
    */
+  @Deprecated
   public static <T> boolean containsAny(Collection<T> list, Collection<T> values) {
-    if (list != null) {
-      for (T o : values) {
-        if (list.contains(o)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return CollectionUtility.containsAny(list, values);
   }
 
   /**
    * @return true if list contains any (at least 1) of the values
+   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#containsAny(Collection, Object...)} instead.
    */
+  @Deprecated
   public static <T> boolean containsAny(Collection<T> list, T... values) {
-    if (list != null) {
-      for (T o : values) {
-        if (list.contains(o)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return CollectionUtility.containsAny(list, values);
   }
 
   /**
@@ -136,7 +144,7 @@ public final class ListUtility {
   @Deprecated
   public static List<Object> parse(String text) {
     List<Object> list = null;
-    if (text != null && text.trim().length() > 0) {
+    if (StringUtility.hasText(text)) {
       String[] a = text.split(",");
       for (String s : a) {
         Object o;
@@ -151,7 +159,7 @@ public final class ListUtility {
         else if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\"")) {
           o = s.substring(1, s.length() - 2);
         }
-        else if (s.indexOf(".") >= 0) {
+        else if (s.indexOf('.') >= 0) {
           // try to make double
           try {
             o = new Double(Double.parseDouble(s));
@@ -178,19 +186,11 @@ public final class ListUtility {
   }
 
   /**
-   * combine all lists into one list containing all elements the order of the
-   * items is preserved
+   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#combine(Collection...)} instead.
    */
+  @Deprecated
   public static <T> List<T> combine(Collection<T>... collections) {
-    List<T> list = null;
-    if (collections != null && collections.length > 0) {
-      for (Collection<T> c : collections) {
-        for (T t : c) {
-          list = CollectionUtility.appendList(list, t);
-        }
-      }
-    }
-    return CollectionUtility.arrayList(list);
+    return CollectionUtility.combine(collections);
   }
 
   /**
@@ -227,14 +227,6 @@ public final class ListUtility {
   @Deprecated
   public static <T> ArrayList<T> arrayList(T value) {
     return CollectionUtility.arrayList(value);
-  }
-
-  /**
-   * @deprecated use {@link CollectionUtility#unmodifiableList(List)} instead. Will be removed in the 5.0 Release
-   */
-  @Deprecated
-  public static <T> List<T> unmodifiableList(List<? extends T> list) {
-    return CollectionUtility.unmodifiableList(list);
   }
 
   /**

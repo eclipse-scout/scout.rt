@@ -105,7 +105,7 @@ public class PlatformService extends AbstractService implements IPlatformService
     else if (f.isDirectory() != folderMode) {
       f = null;
     }
-    else if (f.getAbsolutePath().indexOf("*") >= 0) {
+    else if (f.getAbsolutePath().indexOf('*') >= 0) {
       f = null;
     }
     //

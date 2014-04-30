@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -41,8 +42,7 @@ import org.eclipse.scout.rt.shared.validate.annotations.ValidateAnnotationMarker
 public final class ValidationUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ValidationUtility.class);
 
-  @SuppressWarnings("unchecked")
-  public static final Collection<Annotation> NO_ANNOTATIONS = Collections.unmodifiableList(Collections.EMPTY_LIST);
+  public static final Collection<Annotation> NO_ANNOTATIONS = Collections.emptyList();
 
   private ValidationUtility() {
   }
@@ -412,11 +412,11 @@ public final class ValidationUtility {
         meta.fields[index] = entry.getKey();
         Collection<Annotation> value = entry.getValue();
         if (value.size() == 0) {
-          meta.fieldAnnotationList[index] = NO_ANNOTATIONS;
+          meta.fieldAnnotationList[index] = CollectionUtility.arrayList(NO_ANNOTATIONS);
         }
         else {
           //make collection safe
-          meta.fieldAnnotationList[index] = Collections.unmodifiableCollection(value);
+          meta.fieldAnnotationList[index] = CollectionUtility.arrayList(value);
         }
         //next index
         index++;
@@ -491,7 +491,7 @@ public final class ValidationUtility {
     meta = new MethodMetaData();
     meta.paramAnnotationList = new Collection[paramCount];
     for (int p = 0; p < paramCount; p++) {
-      meta.paramAnnotationList[p] = Collections.unmodifiableCollection(annListPerParam[p]);
+      meta.paramAnnotationList[p] = CollectionUtility.arrayList(annListPerParam[p]);
     }
     methodMetaDataCache.put(m, meta);
     return meta;

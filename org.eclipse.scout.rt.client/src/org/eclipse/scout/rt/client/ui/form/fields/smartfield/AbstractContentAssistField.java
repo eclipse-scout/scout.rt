@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -466,8 +465,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
     }
-    m_menus = Collections.unmodifiableList(menuList);
-
+    m_menus = menuList;
   }
 
   @Override
@@ -489,7 +487,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override

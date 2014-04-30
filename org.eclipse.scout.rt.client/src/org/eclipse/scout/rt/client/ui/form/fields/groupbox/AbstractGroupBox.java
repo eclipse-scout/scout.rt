@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -283,11 +282,11 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         controlList.add(field);
       }
     }
-    m_controlFields = Collections.unmodifiableList(controlList);
-    m_groupBoxes = Collections.unmodifiableList(groupList);
-    m_customButtons = Collections.unmodifiableList(customButtonList);
-    m_systemButtons = Collections.unmodifiableList(systemButtonList);
-    //
+    m_controlFields = controlList;
+    m_groupBoxes = groupList;
+    m_customButtons = customButtonList;
+    m_systemButtons = systemButtonList;
+
     setExpandable(getConfiguredExpandable());
     setExpanded(getConfiguredExpanded());
     setBorderVisible(getConfiguredBorderVisible());
@@ -336,7 +335,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         }
       }
     }
-    return Collections.unmodifiableList(list);
+    return list;
   }
 
   @Override
@@ -383,22 +382,22 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public List<IGroupBox> getGroupBoxes() {
-    return CollectionUtility.unmodifiableListCopy(m_groupBoxes);
+    return CollectionUtility.arrayList(m_groupBoxes);
   }
 
   @Override
   public List<IFormField> getControlFields() {
-    return CollectionUtility.unmodifiableListCopy(m_controlFields);
+    return CollectionUtility.arrayList(m_controlFields);
   }
 
   @Override
   public List<IButton> getCustomProcessButtons() {
-    return CollectionUtility.unmodifiableListCopy(m_customButtons);
+    return CollectionUtility.arrayList(m_customButtons);
   }
 
   @Override
   public List<IButton> getSystemProcessButtons() {
-    return CollectionUtility.unmodifiableListCopy(m_systemButtons);
+    return CollectionUtility.arrayList(m_systemButtons);
   }
 
   public void setBodyGrid(IGroupBoxBodyGrid bodyGrid) {

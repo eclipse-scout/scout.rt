@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.ui.action;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
@@ -29,7 +29,7 @@ public final class ActionUtility {
    */
   public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes) {
     if (actionNodes == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
 
     // only visible
@@ -71,15 +71,16 @@ public final class ActionUtility {
   }
 
   public static <T extends IAction> ArrayList<T> getVisibleActions(List<T> actions) {
-    ArrayList<T> result = new ArrayList<T>();
     if (actions != null) {
+      ArrayList<T> result = new ArrayList<T>(actions.size());
       for (T a : actions) {
         if (a.isVisible()) {
           result.add(a);
         }
       }
+      return result;
     }
-    return result;
+    return CollectionUtility.emptyArrayList();
   }
 
   public static void initActions(List<? extends IAction> actions) throws ProcessingException {

@@ -201,7 +201,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   @Override
   public Set<RemoteFile> getAttachments() {
-    return CollectionUtility.unmodifiableSetCopy(m_attachments);
+    return CollectionUtility.hashSet(m_attachments);
   }
 
   @Override

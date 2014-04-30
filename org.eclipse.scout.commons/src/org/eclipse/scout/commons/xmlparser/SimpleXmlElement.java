@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 /**
@@ -258,7 +259,7 @@ public class SimpleXmlElement {
   }
 
   public Map<String, String> getAttributes() {
-    return new HashMap<String, String>(m_attributeMap);
+    return CollectionUtility.copyMap(m_attributeMap);
   }
 
   /**

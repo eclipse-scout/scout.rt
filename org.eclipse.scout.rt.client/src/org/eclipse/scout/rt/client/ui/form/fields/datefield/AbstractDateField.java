@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -349,10 +350,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    */
   @Override
   protected Date parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.trim().length() == 0) {
-      text = null;
-    }
-    if (text == null) {
+    if (!StringUtility.hasText(text)) {
       return null;
     }
     Date d = null;
@@ -554,11 +552,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    */
   private Date parseDateTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
-    if (text != null && text.trim().length() == 0) {
-      text = null;
-    }
-    if (text == null) {
-      return retVal;
+    if (!StringUtility.hasText(text)) {
+      return null;
     }
     BooleanHolder includesTime = new BooleanHolder(false);
     Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
@@ -599,11 +594,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    */
   private Date parseTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
-    if (text != null && text.trim().length() == 0) {
-      text = null;
-    }
-    if (text == null) {
-      return retVal;
+    if (!StringUtility.hasText(text)) {
+      return null;
     }
     BooleanHolder includesTime = new BooleanHolder(false);
     retVal = parseTimeFormatsInternal(text, defaultFormat, includesTime);
@@ -969,7 +961,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         if (df instanceof SimpleDateFormat) {
           String pattern = ((SimpleDateFormat) df).toPattern();
           if (pattern.contains(".")) {
-            SimpleDateFormat df2 = new SimpleDateFormat(pattern.replace(".", ","), LocaleThreadLocal.get());
+            SimpleDateFormat df2 = new SimpleDateFormat(pattern.replace('.', ','), LocaleThreadLocal.get());
             df2.setLenient(false);
             d = df2.parse(text);
           }

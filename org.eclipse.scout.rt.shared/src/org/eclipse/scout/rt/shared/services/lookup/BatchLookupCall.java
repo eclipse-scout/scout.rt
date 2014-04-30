@@ -12,13 +12,14 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 
 public class BatchLookupCall implements Serializable {
   private static final long serialVersionUID = 0L;
 
-  private List<ILookupCall<?>> m_calls;
+  private final List<ILookupCall<?>> m_calls;
 
   public BatchLookupCall() {
     m_calls = new ArrayList<ILookupCall<?>>();
@@ -37,6 +38,6 @@ public class BatchLookupCall implements Serializable {
   }
 
   public List<ILookupCall<?>> getCallBatch() {
-    return Collections.unmodifiableList(m_calls);
+    return CollectionUtility.arrayList(m_calls);
   }
 }

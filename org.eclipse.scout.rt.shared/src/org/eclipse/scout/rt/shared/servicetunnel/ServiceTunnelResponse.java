@@ -75,7 +75,7 @@ public class ServiceTunnelResponse implements java.io.Serializable {
   }
 
   public Set<IClientNotification> getClientNotifications() {
-    return CollectionUtility.unmodifiableSet(m_clientNotifications);
+    return CollectionUtility.hashSet(m_clientNotifications);
   }
 
   public void setClientNotifications(Collection<? extends IClientNotification> clientNotifications) {

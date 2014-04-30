@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -149,7 +148,7 @@ public abstract class AbstractTableRowBuilder<T> {
   }
 
   public List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException {
-    List<ITableRow> result = new ArrayList<ITableRow>();
+    List<ITableRow> result = new ArrayList<ITableRow>(codes.size());
     for (ICode<?> code : codes) {
       ITableRow row = createRow(new Object[]{code.getId(), code.getText()});
       row.setIconId(code.getIconId());
@@ -158,7 +157,7 @@ public abstract class AbstractTableRowBuilder<T> {
       row.setFont(code.getFont());
       result.add(row);
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   protected abstract ITableRow createEmptyTableRow();

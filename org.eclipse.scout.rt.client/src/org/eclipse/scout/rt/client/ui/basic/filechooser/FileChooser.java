@@ -59,7 +59,7 @@ public class FileChooser implements IFileChooser {
 
   @Override
   public List<String> getFileExtensions() {
-    return CollectionUtility.unmodifiableList(m_fileExtensions);
+    return CollectionUtility.arrayList(m_fileExtensions);
   }
 
   public void setFileExtensions(List<String> fileExtensions) {
@@ -130,7 +130,7 @@ public class FileChooser implements IFileChooser {
 
   @Override
   public List<File> getFiles() {
-    return CollectionUtility.unmodifiableListCopy(m_files);
+    return CollectionUtility.arrayList(m_files);
   }
 
   @Override

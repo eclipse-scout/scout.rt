@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,8 @@ import java.awt.Rectangle;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.FontUIResource;
+
+import org.eclipse.scout.commons.StringUtility;
 
 public class TitledGroupBorder implements Border {
   private static final int SPACE_BEFORE = 12;
@@ -85,7 +87,7 @@ public class TitledGroupBorder implements Border {
         font = c.getFont();
       }
       String text = getText();
-      if (text != null && text.trim().length() == 0) {
+      if (!StringUtility.hasText(text)) {
         text = null;
       }
       Color color = getTextColor(c);

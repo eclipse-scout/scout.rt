@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -132,8 +132,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       }
     }
     injectAttributesInternal(attributes);
-    m_attributes = new ArrayList<IDataModelAttribute>();
-    m_attributes.addAll(attributes);
+    m_attributes = new ArrayList<IDataModelAttribute>(attributes);
     for (IDataModelAttribute a : m_attributes) {
       a.setParentEntity(this);
     }
@@ -273,12 +272,12 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public List<IDataModelAttribute> getAttributes() {
-    return Collections.unmodifiableList(m_attributes);
+    return CollectionUtility.arrayList(m_attributes);
   }
 
   @Override
   public List<IDataModelEntity> getEntities() {
-    return Collections.unmodifiableList(m_entities);
+    return CollectionUtility.arrayList(m_entities);
   }
 
   @Override

@@ -212,7 +212,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     while (uiSelectionIt.hasNext()) {
       sortedRows.add((ITableRow) uiSelectionIt.next());
     }
-    return Collections.unmodifiableList(new ArrayList<ITableRow>(sortedRows));
+    return CollectionUtility.arrayList(sortedRows);
   }
 
   protected void setRowHeightFromScout() {
@@ -461,13 +461,13 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
   private List<ITableRow> filterTableRows(List<? extends ITableRow> rows) {
     if (rows == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     if (m_tableRowSelectionFilters.size() == 0) {
-      return Collections.unmodifiableList(rows);
+      return CollectionUtility.arrayList(rows);
     }
 
-    List<ITableRow> filteredRows = new ArrayList<ITableRow>();
+    List<ITableRow> filteredRows = new ArrayList<ITableRow>(rows.size());
     for (ITableRow row : rows) {
       boolean accept = false;
       for (ITableRowFilter filter : m_tableRowSelectionFilters) {
@@ -483,7 +483,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
     }
 
-    return Collections.unmodifiableList(filteredRows);
+    return filteredRows;
   }
 
   protected void handleUiRowClick(final ITableRow row) {

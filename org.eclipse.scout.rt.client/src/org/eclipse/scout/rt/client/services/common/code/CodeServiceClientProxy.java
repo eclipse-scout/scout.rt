@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.services.common.code;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -203,8 +202,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
 
   @Override
   public List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    List<Class<? extends ICodeType<?, ?>>> missingTypes = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-    List<ICodeType<?, ?>> instances = new ArrayList<ICodeType<?, ?>>();
+    List<ICodeType<?, ?>> instances = new ArrayList<ICodeType<?, ?>>(types.size());
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
       for (Class<? extends ICodeType<?, ?>> codeTypeClazz : types) {
@@ -212,12 +210,9 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
         if (codeType != null) {
           instances.add(codeType);
         }
-        else {
-          missingTypes.add(codeTypeClazz);
-        }
       }
     }
-    return Collections.unmodifiableList(instances);
+    return instances;
   }
 
   @Override
@@ -325,13 +320,13 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   @Override
   public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
     if (classPrefix == null) {
-      return Collections.emptySet();
+      return CollectionUtility.hashSet();
     }
     ServiceState state = getServiceState();
     synchronized (state.m_codeTypeClassDescriptorMapLock) {
       Set<BundleClassDescriptor> a = state.m_codeTypeClassDescriptorMap.get(classPrefix);
       if (a != null) {
-        return CollectionUtility.unmodifiableSet(a);
+        return CollectionUtility.hashSet(a);
       }
       // load code types from server-side
       Set<BundleClassDescriptor> verifiedCodeTypes = new HashSet<BundleClassDescriptor>();
@@ -346,9 +341,9 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
           LOG.error("Missing code-type in client: " + d.getClassName() + ", defined in server-side bundle " + d.getBundleSymbolicName());
         }
       }
-      //
+
       state.m_codeTypeClassDescriptorMap.put(classPrefix, verifiedCodeTypes);
-      return CollectionUtility.unmodifiableSet(verifiedCodeTypes);
+      return verifiedCodeTypes;
     }
   }
 

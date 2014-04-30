@@ -283,7 +283,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         sortEnabled = getScoutObject().isSortEnabled();
       }
       else {
-        scoutColumnsOrdered = Collections.emptyList();
+        scoutColumnsOrdered = CollectionUtility.emptyArrayList();
       }
       if (m_columnManager == null) {
         m_columnManager = new TableColumnManager();
@@ -396,7 +396,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     while (uiSelectionIt.hasNext()) {
       sortedRows.add((ITableRow) uiSelectionIt.next());
     }
-    return Collections.unmodifiableList(new ArrayList<ITableRow>(sortedRows));
+    return CollectionUtility.arrayList(sortedRows);
   }
 
   protected void updateKeyStrokeFormScout() {

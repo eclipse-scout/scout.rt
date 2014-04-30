@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.activitymap;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class ActivityMapEvent extends java.util.EventObject {
   public static final int TYPE_NEW_ACTIVITY_POPUP = 701;
 
   private int m_type;
-  private List<? extends ActivityCell> m_activities = Collections.emptyList();
+  private List<? extends ActivityCell> m_activities = CollectionUtility.emptyArrayList();
   private List<IMenu> m_popupMenus;
   private Object m_resourceId;
   private MinorTimeColumn m_column;
@@ -116,11 +115,11 @@ public class ActivityMapEvent extends java.util.EventObject {
   }
 
   public List<ActivityCell> getActivities() {
-    return Collections.unmodifiableList(m_activities);
+    return CollectionUtility.arrayList(m_activities);
   }
 
   protected void setActivities(List<? extends ActivityCell> activities) {
-    m_activities = activities;
+    m_activities = CollectionUtility.arrayList(activities);
   }
 
   public int getActivityCount() {
@@ -163,12 +162,7 @@ public class ActivityMapEvent extends java.util.EventObject {
    * used by TYPE_NEW_ACTIVITY_POPUP and TYPE_EDIT_ACTIVITY_POPUP to add actions
    */
   public List<IMenu> getPopupMenus() {
-    if (m_popupMenus != null) {
-      return Collections.unmodifiableList(m_popupMenus);
-    }
-    else {
-      return Collections.emptyList();
-    }
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**

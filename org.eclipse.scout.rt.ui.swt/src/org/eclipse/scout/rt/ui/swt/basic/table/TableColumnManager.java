@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.swt.basic.table;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -28,11 +27,11 @@ public class TableColumnManager {
   }
 
   public List<IColumn<?>> getOrderedColumns(int[] columnOrder) {
-    List<IColumn<?>> result = new ArrayList<IColumn<?>>();
+    List<IColumn<?>> result = new ArrayList<IColumn<?>>(columnOrder.length);
     for (int index : columnOrder) {
       result.add(m_initialColumns.get(index));
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   public boolean applyNewOrder(List<IColumn<?>> newOrder) {

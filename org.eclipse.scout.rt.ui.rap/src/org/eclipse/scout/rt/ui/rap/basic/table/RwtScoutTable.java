@@ -223,7 +223,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         sortEnabled = getScoutObject().isSortEnabled();
       }
       else {
-        scoutColumnsOrdered = Collections.emptyList();
+        scoutColumnsOrdered = CollectionUtility.emptyArrayList();
       }
       if (m_uiColumnManager == null) {
         m_uiColumnManager = new TableColumnManager();
@@ -1280,7 +1280,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         return scoutMenusRef.get();
       }
 
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

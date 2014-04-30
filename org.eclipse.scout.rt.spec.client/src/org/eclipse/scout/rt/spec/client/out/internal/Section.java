@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.spec.client.out.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 
@@ -58,7 +58,7 @@ public class Section implements IDocSection {
 
   @Override
   public List<IDocSection> getSubSections() {
-    return Collections.unmodifiableList(m_subSections);
+    return CollectionUtility.arrayList(m_subSections);
   }
 
   @Override

@@ -800,7 +800,7 @@ public final class HTMLUtility {
         String postStyleContent = matcherStyleTag.group(3);
         // ensure overflow:auto in style attribute
         if (!styleContent.toLowerCase().contains("overflow")) {
-          if (styleContent.trim().length() > 0 && !styleContent.endsWith(";")) {
+          if (StringUtility.hasText(styleContent) && !styleContent.endsWith(";")) {
             styleContent += ";";
           }
           styleContent += "overflow:auto;";
@@ -809,7 +809,7 @@ public final class HTMLUtility {
       }
       else {
         // no style attribute available
-        int endBracket = contentBodyTag.lastIndexOf(">");
+        int endBracket = contentBodyTag.lastIndexOf('>');
         contentBodyTag = contentBodyTag.substring(0, endBracket) + " style=\"overflow:auto;\">";
         rawHtml = matcherBodyTag.replaceAll(contentBodyTag);
       }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -187,7 +186,7 @@ public class OutlineMediator {
     ITreeNode node = pageWithNodes.getTreeNodeFor(e.getFirstRow());
     if (node instanceof IPageWithTable<?>) {
       IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-      List<ITableRow> emptyList = Collections.emptyList();
+      List<ITableRow> emptyList = CollectionUtility.emptyArrayList();
       List<IMenu> menus = tablePage.getTable().fetchMenusForRowsInternal(emptyList);
       if (menus != null) {
         e.addPopupMenus(menus);

@@ -73,7 +73,7 @@ public class ImageFieldEvent extends EventObject {
    * used by TYPE_POPUP to add actions
    */
   public List<IMenu> getPopupMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_popupMenus);
+    return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**

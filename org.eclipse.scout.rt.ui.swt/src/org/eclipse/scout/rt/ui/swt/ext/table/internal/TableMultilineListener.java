@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swt.ext.table.internal;
 import java.text.BreakIterator;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ListUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
@@ -249,7 +249,7 @@ public class TableMultilineListener implements Listener {
    */
   private boolean isWrapped(int uiColumnIndex, Table table) {
     int columnIndex = ((IColumn<?>) table.getColumn(uiColumnIndex).getData(ISwtScoutTable.KEY_SCOUT_COLUMN)).getColumnIndex();
-    return ListUtility.containsAny(m_wrapTextColumns, columnIndex);
+    return CollectionUtility.containsAny(m_wrapTextColumns, columnIndex);
   }
 
   /**

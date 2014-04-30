@@ -251,17 +251,17 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @Override
   public Set<ICalendarItem> getItems(Date minDate, Date maxDate) {
     ensureItemsLoadedInternal(minDate, maxDate);
-    Set<ICalendarItem> list = new HashSet<ICalendarItem>();
     Set<ICalendarItem> allItems = propertySupport.getPropertySet(PROP_ITEMS);
     if (CollectionUtility.hasElements(allItems)) {
-
+      Set<ICalendarItem> list = new HashSet<ICalendarItem>(allItems.size());
       for (ICalendarItem item : allItems) {
         if (item.isIntersecting(minDate, maxDate)) {
           list.add(item);
         }
       }
+      return list;
     }
-    return CollectionUtility.unmodifiableSet(list);
+    return CollectionUtility.hashSet();
   }
 
   @Override
@@ -278,7 +278,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableList(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override

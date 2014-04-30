@@ -14,7 +14,6 @@ import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -437,7 +436,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       });
     }
-    m_baseKeyStrokes = Collections.unmodifiableList(ksList);
+    m_baseKeyStrokes = ksList;
     setKeyStrokesInternal(m_baseKeyStrokes);
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
@@ -498,7 +497,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override
@@ -519,7 +518,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public List<ITreeNodeFilter> getNodeFilters() {
-    return CollectionUtility.unmodifiableListCopy(m_nodeFilters);
+    return CollectionUtility.arrayList(m_nodeFilters);
   }
 
   @Override
@@ -771,7 +770,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      menus = Collections.emptyList();
+      menus = CollectionUtility.emptyArrayList();
     }
 
     //Compute the Keystrokes: base + keyStroke for the current Menus.
@@ -807,7 +806,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public List<ITreeNode> findNodes(final Collection<?> primaryKeys) {
     if (primaryKeys == null || primaryKeys.size() <= 0) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
 
     final Set<Object> keySet = new HashSet<Object>(primaryKeys);
@@ -1225,7 +1224,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public List<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.unmodifiableListCopy(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+    return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
   }
 
   @Override
@@ -1411,7 +1410,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes) throws ProcessingException {
     if (!CollectionUtility.hasElements(nodes)) {
-      return Collections.emptySet();
+      return CollectionUtility.hashSet();
     }
     try {
       setTreeChanging(true);
@@ -1528,7 +1527,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public Set<ITreeNode> getDeletedNodes() {
-    return CollectionUtility.unmodifiableSetCopy(m_deletedNodes.values());
+    return CollectionUtility.hashSet(m_deletedNodes.values());
   }
 
   @Override
@@ -1558,7 +1557,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     };
     visitNode(getRootNode(), v);
-    return CollectionUtility.unmodifiableSetCopy(v.getNodes());
+    return CollectionUtility.hashSet(v.getNodes());
   }
 
   @Override
@@ -1588,7 +1587,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     };
     visitNode(getRootNode(), v);
-    return CollectionUtility.unmodifiableSetCopy(v.getNodes());
+    return CollectionUtility.hashSet(v.getNodes());
   }
 
   @Override
@@ -1608,7 +1607,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public Set<ITreeNode> getSelectedNodes() {
-    return CollectionUtility.unmodifiableSetCopy(m_selectedNodes);
+    return CollectionUtility.hashSet(m_selectedNodes);
   }
 
   @Override
@@ -1647,7 +1646,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       LOG.warn("could not resolve virtual nodes.", e);
     }
     if (nodes == null) {
-      nodes = Collections.emptySet();
+      nodes = CollectionUtility.hashSet();
     }
     HashSet<ITreeNode> newSelection = new HashSet<ITreeNode>();
     if (append) {
@@ -1875,7 +1874,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         return true;
       }
     });
-    return CollectionUtility.unmodifiableSetCopy(list);
+    return CollectionUtility.hashSet(list);
   }
 
   @Override
@@ -1917,9 +1916,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   private List<ITreeNode> resolveNodes(Collection<? extends ITreeNode> nodes) {
     if (!CollectionUtility.hasElements(nodes)) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
-    List<ITreeNode> resolvedNodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> resolvedNodes = new ArrayList<ITreeNode>(nodes.size());
     for (ITreeNode node : nodes) {
       if (resolveNode(node) != null) {
         resolvedNodes.add(node);
@@ -2044,9 +2043,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     addLocalPopupMenus(e);
     fireTreeEventInternal(e);
     //separate node menus and empty space actions
-    ArrayList<IMenu> nodeMenus = new ArrayList<IMenu>();
+    List<IMenu> popupMenus = e.getPopupMenus();
+    ArrayList<IMenu> nodeMenus = new ArrayList<IMenu>(popupMenus.size());
     ArrayList<IMenu> emptySpaceMenus = new ArrayList<IMenu>();
-    for (IMenu menu : e.getPopupMenus()) {
+    for (IMenu menu : popupMenus) {
       if (menu.isVisible()) {
         if (menu.isEmptySpaceAction()) {
           emptySpaceMenus.add(menu);
@@ -2060,7 +2060,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       nodeMenus.add(0, new MenuSeparator());
     }
     nodeMenus.addAll(0, emptySpaceMenus);
-    return Collections.unmodifiableList(nodeMenus);
+    return nodeMenus;
   }
 
   private void fireNodeClick(ITreeNode node) {
@@ -2460,7 +2460,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     public List<ITreeNode> getNodes() {
-      return CollectionUtility.unmodifiableList(m_list);
+      return CollectionUtility.arrayList(m_list);
     }
   }// end private class
 
@@ -2606,13 +2606,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public List<IMenu> fireNodePopupFromUI() {
       try {
         pushUIProcessor();
-        //
         Collection<ITreeNode> nodes = resolveVirtualNodes(getSelectedNodes());
         return fetchMenusForNodesInternal(nodes);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        return Collections.emptyList();
+        return CollectionUtility.emptyArrayList();
       }
       finally {
         popUIProcessor();
@@ -2623,8 +2622,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public List<IMenu> fireEmptySpacePopupFromUI() {
       try {
         pushUIProcessor();
-        //
-        Set<ITreeNode> emptySet = Collections.emptySet();
+        Set<ITreeNode> emptySet = CollectionUtility.hashSet();
         return fetchMenusForNodesInternal(emptySet);
       }
       finally {
@@ -2636,7 +2634,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public void fireNodeClickFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
-        //
         node = resolveNode(node);
         node = resolveVirtualNode(node);
         if (node != null) {

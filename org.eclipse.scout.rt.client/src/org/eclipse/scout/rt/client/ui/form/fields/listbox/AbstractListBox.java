@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -185,7 +184,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
     }
     // (b) get data direct
     else {
-      data = Collections.emptyList();
+      data = CollectionUtility.emptyArrayList();
       data = filterLookupResult(null, data);
     }
     return data;
@@ -251,7 +250,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   protected void initConfig() {
     m_uiFacade = createUIFacade();
-    m_fields = Collections.emptyList();
+    m_fields = CollectionUtility.emptyArrayList();
     super.initConfig();
     setFilterActiveRows(getConfiguredFilterActiveRows());
     setFilterActiveRowsValue(TriState.TRUE);
@@ -340,7 +339,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = Collections.unmodifiableList(fieldList);
+    m_fields = fieldList;
   }
 
   @SuppressWarnings("unchecked")
@@ -604,12 +603,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public Set<T> getValue() {
-    return CollectionUtility.unmodifiableSetCopy(super.getValue());
+    return CollectionUtility.hashSet(super.getValue());
   }
 
   @Override
   public Set<T> getInitValue() {
-    return CollectionUtility.unmodifiableSetCopy(super.getInitValue());
+    return CollectionUtility.hashSet(super.getInitValue());
   }
 
   @Override
@@ -655,12 +654,13 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   @SuppressWarnings("unchecked")
   @Override
   public Set<ILookupRow<T>> getCheckedLookupRows() {
-    Set<ILookupRow<T>> result = new HashSet<ILookupRow<T>>();
-    for (ITableRow row : getTable().getCheckedRows()) {
+    Collection<ITableRow> checkedRows = getTable().getCheckedRows();
+    Set<ILookupRow<T>> result = new HashSet<ILookupRow<T>>(checkedRows.size());
+    for (ITableRow row : checkedRows) {
       ICell cell = row.getCell(1);
       result.add(new LookupRow<T>((T) row.getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled()));
     }
-    return Collections.unmodifiableSet(result);
+    return result;
   }
 
   @Override
@@ -694,7 +694,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
     if (checkedKeys != null) {
       result.removeAll(checkedKeys);
     }
-    return CollectionUtility.unmodifiableSet(result);
+    return result;
   }
 
   @Override
@@ -866,7 +866,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public List<IFormField> getFields() {
-    return CollectionUtility.unmodifiableListCopy(m_fields);
+    return CollectionUtility.arrayList(m_fields);
   }
 
   @Override

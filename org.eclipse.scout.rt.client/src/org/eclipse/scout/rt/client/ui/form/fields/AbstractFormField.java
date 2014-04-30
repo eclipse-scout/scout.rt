@@ -1757,9 +1757,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public List<IKeyStroke> getLocalKeyStrokes() {
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
-
-    for (Class<? extends IKeyStroke> keystrokeClazz : getConfiguredKeyStrokes()) {
+    List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
+    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size());
+    for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
       IKeyStroke ks;
       try {
         ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
@@ -1770,13 +1770,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + keystrokeClazz.getName(), t));
       }
     }
-    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksMap.values());
-    return Collections.unmodifiableList(ksList);
+    return CollectionUtility.arrayList(ksMap.values());
   }
 
   @Override
   public List<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.unmodifiableListCopy(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+    return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
   }
 
   private class P_MasterListener implements MasterListener {

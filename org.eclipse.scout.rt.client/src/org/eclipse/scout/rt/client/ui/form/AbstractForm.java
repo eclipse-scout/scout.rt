@@ -640,7 +640,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public List<IToolButton> getToolButtons() {
-    return CollectionUtility.unmodifiableListCopy(m_toolbuttons);
+    return CollectionUtility.arrayList(m_toolbuttons);
   }
 
   /**

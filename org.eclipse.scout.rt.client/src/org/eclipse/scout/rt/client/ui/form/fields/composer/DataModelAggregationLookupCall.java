@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -44,7 +44,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
       }
       catch (Throwable t) {
         LOG.error("Failed updating aggregation lookup rows for attribute " + attribute);
-        m_lookupRows = new ArrayList<ILookupRow<Integer>>();
+        m_lookupRows = CollectionUtility.emptyArrayList();
       }
     }
   }
@@ -119,7 +119,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
       return m_lookupRows;
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

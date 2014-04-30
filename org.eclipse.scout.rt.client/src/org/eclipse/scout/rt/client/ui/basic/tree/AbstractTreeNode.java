@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -691,20 +690,22 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   @Override
   public List<ITreeNode> getFilteredChildNodes() {
-    synchronized (m_filteredChildNodesLock) {
-      if (m_filteredChildNodes == null) {
-        synchronized (m_childNodeListLock) {
-          List<ITreeNode> list = new ArrayList<ITreeNode>(m_childNodeList.size());
-          for (ITreeNode node : m_childNodeList) {
-            if (node.isFilterAccepted()) {
-              list.add(node);
+    if (m_filteredChildNodes == null) {
+      synchronized (m_filteredChildNodesLock) {
+        if (m_filteredChildNodes == null) {
+          synchronized (m_childNodeListLock) {
+            List<ITreeNode> list = new ArrayList<ITreeNode>(m_childNodeList.size());
+            for (ITreeNode node : m_childNodeList) {
+              if (node.isFilterAccepted()) {
+                list.add(node);
+              }
             }
+            m_filteredChildNodes = list;
           }
-          m_filteredChildNodes = list;
         }
       }
     }
-    return Collections.unmodifiableList(m_filteredChildNodes);
+    return CollectionUtility.arrayList(m_filteredChildNodes);
   }
 
   @Override
@@ -733,7 +734,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   @Override
   public List<ITreeNode> getChildNodes() {
     synchronized (m_childNodeListLock) {
-      return Collections.unmodifiableList(m_childNodeList);
+      return CollectionUtility.arrayList(m_childNodeList);
     }
   }
 

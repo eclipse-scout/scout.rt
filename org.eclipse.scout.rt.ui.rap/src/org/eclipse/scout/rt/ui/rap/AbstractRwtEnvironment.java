@@ -38,7 +38,6 @@ import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -631,7 +630,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
     boolean internalExclusive = exclusive;
     //If F1-F12 is set we wan't to have this exclusive to the application, else the browser will reload the page
-    if (ListUtility.containsAny(fKeyList, stroke.getKeyCode())) {
+    if (CollectionUtility.containsAny(fKeyList, stroke.getKeyCode())) {
       internalExclusive = true;
     }
     m_keyStrokeManager.addGlobalKeyStroke(stroke, internalExclusive);

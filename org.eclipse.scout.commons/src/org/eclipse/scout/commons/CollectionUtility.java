@@ -121,8 +121,26 @@ public final class CollectionUtility {
    * @param values
    * @return <code>true</code> if the collection contains one of the values.
    */
+  public static <T> boolean containsAny(Collection<T> c, Collection<? extends T> values) {
+    if (values == null || c == null) {
+      return false;
+    }
+    HashSet<T> set = hashSet(c);
+    for (T value : values) {
+      if (set.contains(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param c
+   * @param values
+   * @return <code>true</code> if the collection contains one of the values.
+   */
   public static <T> boolean containsAny(Collection<T> c, T... values) {
-    if (values == null) {
+    if (values == null || c == null) {
       return false;
     }
     HashSet<T> set = hashSet(c);
@@ -159,6 +177,17 @@ public final class CollectionUtility {
       }
       return list;
     }
+    return emptyArrayList();
+  }
+
+  /**
+   * Returns a new empty {@link ArrayList}.<br>
+   * This method differs to {@link Collections#emptyList()} in that way that the {@link ArrayList} returned by this
+   * method can be modified hence is no shared instance.
+   * 
+   * @return An empty but modifiable {@link ArrayList} with an initial capacity of <code>0</code>.
+   */
+  public static <T> ArrayList<T> emptyArrayList() {
     return new ArrayList<T>(0);
   }
 
@@ -193,7 +222,7 @@ public final class CollectionUtility {
     if (c != null) {
       return new ArrayList<T>(c);
     }
-    return new ArrayList<T>(0);
+    return emptyArrayList();
   }
 
   /**
@@ -213,7 +242,7 @@ public final class CollectionUtility {
       }
       return list;
     }
-    return new ArrayList<T>(0);
+    return emptyArrayList();
   }
 
   /**
@@ -312,7 +341,7 @@ public final class CollectionUtility {
 
   public static <T, V extends T> List<T> appendList(List<T> list, V o) {
     if (list == null) {
-      list = new ArrayList<T>(1);
+      list = new ArrayList<T>();
     }
     list.add(o);
     return list;
@@ -402,7 +431,7 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> copyMap(Map<T, U> m) {
     if (m == null || m.size() == 0) {
-      return new HashMap<T, U>();
+      return new HashMap<T, U>(0);
     }
     else {
       return new HashMap<T, U>(m);
@@ -419,14 +448,14 @@ public final class CollectionUtility {
 
   public static <T, U> U getObject(Map<T, U> map, T key) {
     if (map == null) {
-      map = new HashMap<T, U>();
+      return null;
     }
     return map.get(key);
   }
 
   public static <T, U> Map<T, U> removeObject(Map<T, U> map, T key) {
     if (map == null) {
-      map = new HashMap<T, U>();
+      return new HashMap<T, U>();
     }
     map.remove(key);
     return map;
@@ -447,13 +476,23 @@ public final class CollectionUtility {
   }
 
   public static <T, U> Map<T, U> putAllObjects(Map<T, U> targetMap, Map<T, U> sourceMap) {
+    if (targetMap == null && sourceMap == null) {
+      return new HashMap<T, U>();
+    }
     if (targetMap == null) {
-      targetMap = new HashMap<T, U>();
+      return new HashMap<T, U>(sourceMap);
+    }
+    if (sourceMap == null) {
+      return targetMap; // nothing to add
     }
     targetMap.putAll(sourceMap);
     return targetMap;
   }
 
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link #copyMap(Map)} if required.
+   */
+  @Deprecated
   public static <T, U> Map<T, U> getEmptyMap(Map<T, U> m) {
     return new HashMap<T, U>();
   }
@@ -493,27 +532,37 @@ public final class CollectionUtility {
 
   public static <T extends Comparable, U> U getObjectSortedMap(SortedMap<T, U> map, T key) {
     if (map == null) {
-      map = new TreeMap<T, U>();
+      return null;
     }
     return map.get(key);
   }
 
   public static <T extends Comparable, U> SortedMap<T, U> removeObjectSortedMap(SortedMap<T, U> map, T key) {
     if (map == null) {
-      map = new TreeMap<T, U>();
+      return new TreeMap<T, U>();
     }
     map.remove(key);
     return map;
   }
 
   public static <T extends Comparable, U> SortedMap<T, U> putAllObjectsSortedMap(SortedMap<T, U> targetMap, Map<T, U> sourceMap) {
+    if (targetMap == null && sourceMap == null) {
+      return new TreeMap<T, U>();
+    }
     if (targetMap == null) {
-      targetMap = new TreeMap<T, U>();
+      return new TreeMap<T, U>(sourceMap);
+    }
+    if (sourceMap == null) {
+      return targetMap; // nothing to add
     }
     targetMap.putAll(sourceMap);
     return targetMap;
   }
 
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link #copySortedMap(SortedMap)} if required.
+   */
+  @Deprecated
   public static <T, U> SortedMap<T, U> getEmptySortedMap(SortedMap<T, U> m) {
     return new TreeMap<T, U>();
   }
@@ -555,65 +604,20 @@ public final class CollectionUtility {
   }
 
   /**
-   * null safe wrapper of {@link Collections#unmodifiableCollection(Collection)}
-   * 
-   * @param collection
-   * @return a unmodifiable collection of the given input. Never null.
-   * @see {@link Collections#unmodifiableCollection(Collection)}
+   * combine all lists into one list containing all elements. the order of the
+   * items is preserved
    */
-  public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> collection) {
-    if (collection != null) {
-      return Collections.unmodifiableCollection(collection);
+  @SuppressWarnings("unchecked")
+  public static <T> List<T> combine(Collection<?>... collections) {
+    List<T> list = new ArrayList<T>();
+    if (collections != null && collections.length > 0) {
+      for (Collection<?> c : collections) {
+        for (Object t : c) {
+          list.add((T) t);
+        }
+      }
     }
-    return Collections.emptyList();
-  }
-
-  /**
-   * null safe wrapper of {@link Collections#unmodifiableSet(Set)}
-   * 
-   * @param set
-   * @return a unmodifiable set containing the given input. Never null.
-   * @see {@link Collections#unmodifiableSet(Set)}
-   */
-  public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
-    if (set != null) {
-      return Collections.unmodifiableSet(set);
-    }
-    return Collections.emptySet();
-  }
-
-  /**
-   * to create an unmodifiable copy of the input set.
-   * 
-   * @param set
-   * @return an unmodifiable copy of the input set. If the input set is null an empty unmodifiable set gets returned.
-   */
-  public static <T> Set<T> unmodifiableSetCopy(Collection<? extends T> set) {
-    return Collections.unmodifiableSet(hashSet(set));
-  }
-
-  /**
-   * null safe wrapper of {@link Collections#unmodifiableList(List)}
-   * 
-   * @param list
-   * @return an unmodifiable list containing the given input. Never null.
-   * @see {@link Collections#unmodifiableList(List)}
-   */
-  public static <T> List<T> unmodifiableList(List<? extends T> list) {
-    if (list != null) {
-      return Collections.unmodifiableList(list);
-    }
-    return Collections.emptyList();
-  }
-
-  /**
-   * to create an unmodifiable copy of the input list.
-   * 
-   * @param list
-   * @return an unmodifiable copy of the input list. If the input list is null an empty unmodifiable list gets returned.
-   */
-  public static <T> List<T> unmodifiableListCopy(Collection<? extends T> list) {
-    return Collections.unmodifiableList(arrayList(list));
+    return list;
   }
 
   public static boolean isEmpty(Collection<?> c) {
@@ -640,7 +644,7 @@ public final class CollectionUtility {
 
   public static List<Object> parse(String text) {
     List<Object> list = null;
-    if (text != null && text.trim().length() > 0) {
+    if (StringUtility.hasText(text)) {
       String[] a = text.split(",");
       for (String s : a) {
         Object o;
@@ -655,7 +659,7 @@ public final class CollectionUtility {
         else if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\"")) {
           o = s.substring(1, s.length() - 2);
         }
-        else if (s.indexOf(".") >= 0) {
+        else if (s.indexOf('.') >= 0) {
           // try to make double
           try {
             o = new Double(Double.parseDouble(s));

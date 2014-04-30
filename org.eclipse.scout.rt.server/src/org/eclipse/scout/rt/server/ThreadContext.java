@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -53,7 +54,7 @@ public final class ThreadContext {
   }
 
   public static Map<Class, Object> backup() {
-    HashMap<Class, Object> copyMap = new HashMap<Class, Object>();
+    Map<Class, Object> copyMap = new HashMap<Class, Object>(4);
     copyMap.put(HttpServletRequest.class, ThreadContext.getHttpServletRequest());
     copyMap.put(HttpServletResponse.class, ThreadContext.getHttpServletResponse());
     copyMap.put(IServerSession.class, ThreadContext.getServerSession());
@@ -62,7 +63,7 @@ public final class ThreadContext {
   }
 
   public static void restore(Map<Class, Object> map) {
-    HashMap<Class, Object> copyMap = (map != null ? new HashMap<Class, Object>(map) : new HashMap<Class, Object>());
+    Map<Class, Object> copyMap = CollectionUtility.copyMap(map);
     ThreadContext.putHttpServletRequest((HttpServletRequest) copyMap.remove(HttpServletRequest.class));
     ThreadContext.putHttpServletResponse((HttpServletResponse) copyMap.remove(HttpServletResponse.class));
     ThreadContext.putServerSession((IServerSession) copyMap.remove(IServerSession.class));

@@ -169,7 +169,7 @@ public class BatchNormalizerTest {
 
   private static List<ILookupRow<?>> createCallResult(ILookupCall call) {
     List<ILookupRow<?>> result = new ArrayList<ILookupRow<?>>();
-    result.add(new LookupRow(call.getKey(), dumpCall(call)));
+    result.add(new LookupRow<Object>(call.getKey(), dumpCall(call)));
     return result;
   }
 

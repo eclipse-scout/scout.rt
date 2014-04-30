@@ -60,7 +60,7 @@ public final class FormUtility {
     //Legacy
     if (form instanceof ISearchForm && rootData.weightY < 0) {
       String viewId = ("" + form.getDisplayViewId()).toUpperCase();
-      if (viewId.indexOf("SEARCH") >= 0 || viewId.indexOf("S") >= 0) {
+      if (viewId.indexOf("SEARCH") >= 0 || viewId.indexOf('S') >= 0) {
         rootData.weightY = 0;
       }
     }

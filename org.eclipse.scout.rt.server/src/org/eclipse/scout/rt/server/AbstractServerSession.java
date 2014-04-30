@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -97,7 +97,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public Map<String, Object> getSharedVariableMap() {
-    return Collections.unmodifiableMap(m_sharedVariableMap);
+    return CollectionUtility.copyMap(m_sharedVariableMap);
   }
 
   /**

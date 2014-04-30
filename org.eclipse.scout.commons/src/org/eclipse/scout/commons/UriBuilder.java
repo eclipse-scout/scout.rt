@@ -196,6 +196,6 @@ public class UriBuilder {
   }
 
   public Map<String, String> getParameters() {
-    return new HashMap<String, String>(m_parameters);
+    return CollectionUtility.copyMap(m_parameters);
   }
 }

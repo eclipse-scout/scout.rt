@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 
 /**
@@ -41,10 +41,10 @@ public class AbstractPagingSupport {
   public List<ITableRow> getElementsOfCurrentPage(List<? extends ITableRow> rows) {
     initProperties();
     if (m_pageSize <= 0 || m_currentPageStartRowIndex < 0 || m_currentPageStartRowIndex >= rows.size()) {
-      return Collections.unmodifiableList(rows);
+      return CollectionUtility.arrayList(rows);
     }
     if (m_currentPageStartRowIndex == 0 && rows.size() < m_pageSize) {
-      return Collections.unmodifiableList(rows);
+      return CollectionUtility.arrayList(rows);
     }
 
     int currentPageEndRowIndex = Math.min(m_currentPageStartRowIndex + m_pageSize, rows.size()) - 1;
@@ -64,7 +64,7 @@ public class AbstractPagingSupport {
       currentPage.add(m_nextElementsTableRow);
     }
 
-    return Collections.unmodifiableList(currentPage);
+    return currentPage;
   }
 
   protected ITableRow createPreviousElementsTableRow() {

@@ -95,7 +95,7 @@ public class WidgetPrinter {
     File tmpFile = new File(m_printedFile.getAbsolutePath() + ".tmp");
     tmpFile.getParentFile().mkdirs();
     BufferedImage img = createBufferedImage();
-    String imageFormat = contentType.substring(contentType.indexOf("/") + 1);
+    String imageFormat = contentType.substring(contentType.indexOf('/') + 1);
     boolean ok = ImageIO.write(img, imageFormat, tmpFile);
     if (!ok) {
       throw new IOException("no appropriate writer was found for imageFormat \"" + imageFormat + "\"");

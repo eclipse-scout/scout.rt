@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -279,8 +278,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     List<RI> resourceIds = getResourceIdColumnInternal().getValues(resourceRows);
     try {
       getActivityMap().setActivityMapChanging(true);
-      //
-      execPopulateActivities(Collections.unmodifiableList(resourceIds), Collections.unmodifiableList(resourceRows));
+      execPopulateActivities(CollectionUtility.arrayList(resourceIds), CollectionUtility.arrayList(resourceRows));
     }
     finally {
       getActivityMap().setActivityMapChanging(false);
@@ -299,14 +297,14 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   @Override
   public List<ITableRow> activityCellsToResourceRows(List<? extends ActivityCell<RI, AI>> activityCells) {
-    List<ITableRow> resourceRowSet = new ArrayList<ITableRow>();
+    List<ITableRow> resourceRowSet = new ArrayList<ITableRow>(activityCells.size());
     for (ActivityCell<RI, AI> cell : activityCells) {
       ITableRow resourceRow = getResourceIdColumnInternal().findRow(cell.getResourceId());
       if (resourceRow != null) {
         resourceRowSet.add(resourceRow);
       }
     }
-    return Collections.unmodifiableList(resourceRowSet);
+    return resourceRowSet;
   }
 
   @Override

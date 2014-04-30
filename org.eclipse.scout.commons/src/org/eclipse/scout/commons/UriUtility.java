@@ -16,7 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +58,7 @@ public final class UriUtility {
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) throws ProcessingException {
     if (url == null) {
-      return Collections.emptyMap();
+      return new HashMap<String, String>(0);
     }
     return getQueryParameters(urlToUri(url), encoding);
   }
@@ -86,10 +85,11 @@ public final class UriUtility {
    */
   public static Map<String, String> getQueryParameters(URI uri, String encoding) throws ProcessingException {
     if (uri == null || uri.getQuery() == null) {
-      return Collections.emptyMap();
+      return new HashMap<String, String>(0);
     }
-    Map<String, String> result = new HashMap<String, String>();
-    for (String param : uri.getQuery().split("&")) {
+    String[] params = uri.getQuery().split("&");
+    Map<String, String> result = new HashMap<String, String>(params.length);
+    for (String param : params) {
       String[] parts = StringUtility.split(param, "=");
       if (parts.length != 2) {
         throw new ProcessingException("invalid query parameter: '" + param + "'");

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -73,7 +72,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
       searchText = result.getSearchText();
     }
     if (rows == null) {
-      rows = Collections.emptyList();
+      rows = CollectionUtility.emptyArrayList();
     }
 
     try {

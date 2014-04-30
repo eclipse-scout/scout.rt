@@ -132,7 +132,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
     private final ConcurrentHashMap<String/*notification id*/, Long /*timeout*/> m_consumedIds = new ConcurrentHashMap<String, Long>();
 
     public Set<String> getConsumedIds() {
-      return CollectionUtility.unmodifiableSetCopy(m_consumedIds.keySet());
+      return CollectionUtility.hashSet(m_consumedIds.keySet());
     }
 
     public void removeConsumedIds(Collection<String> cnIds) {

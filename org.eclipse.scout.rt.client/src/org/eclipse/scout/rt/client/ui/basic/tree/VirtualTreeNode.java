@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -302,7 +302,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public List<IMenu> getMenus() {
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override
@@ -382,7 +382,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public List<ITreeNode> getFilteredChildNodes() {
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override
@@ -403,7 +403,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public List<ITreeNode> getChildNodes() {
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override

@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -437,7 +436,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
         }
       }
     }
-    return Collections.unmodifiableList(list);
+    return list;
   }
 
   private void loadCodes() throws ProcessingException {

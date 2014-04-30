@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.jdbc;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -58,15 +58,15 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
   }
 
   public List<ValueToken> getValueTokens() {
-    return Collections.unmodifiableList(m_valueTokens);
+    return CollectionUtility.arrayList(m_valueTokens);
   }
 
   public List<WildcardStringToken> getWildcardStringTokens() {
-    return Collections.unmodifiableList(m_wildcardStringTokens);
+    return CollectionUtility.arrayList(m_wildcardStringTokens);
   }
 
   public List<AndNodeToken> getTreeTokens() {
-    return Collections.unmodifiableList(m_treeTokens);
+    return CollectionUtility.arrayList(m_treeTokens);
   }
 
   @Override
@@ -142,7 +142,7 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
     }
 
     public List<TreeNodeToken> getChildren() {
-      return Collections.unmodifiableList(m_children);
+      return CollectionUtility.arrayList(m_children);
     }
 
     public boolean isNegative() {
@@ -190,7 +190,7 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
     }
 
     public List<Object> getValues() {
-      return Collections.unmodifiableList(m_values);
+      return CollectionUtility.arrayList(m_values);
     }
   }
 

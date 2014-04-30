@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.BindModel;
@@ -713,7 +714,7 @@ public class SqlParser {
     for (Iterator<IToken> it = list.iterator(); it.hasNext();) {
       IToken item = it.next();
       if (item instanceof Raw) {
-        if (item.getText().trim().length() == 0) {
+        if (!StringUtility.hasText(item.getText())) {
           it.remove();
         }
       }

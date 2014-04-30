@@ -151,7 +151,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   protected List<IMenu> firePopup() {

@@ -410,13 +410,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @Deprecated
   public List<IComposerEntity> getComposerEntities() {
-    List<IComposerEntity> result = new ArrayList<IComposerEntity>();
-    for (IDataModelEntity e : m_dataModel.getEntities()) {
+    List<IDataModelEntity> entities = m_dataModel.getEntities();
+    List<IComposerEntity> result = new ArrayList<IComposerEntity>(entities.size());
+    for (IDataModelEntity e : entities) {
       if (e instanceof IComposerEntity) {
         result.add((IComposerEntity) e);
       }
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   /**
@@ -424,14 +425,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @Deprecated
   public List<IComposerAttribute> getComposerAttributes() {
-    List<IComposerAttribute> result = new ArrayList<IComposerAttribute>();
     List<IDataModelAttribute> attributes = m_dataModel.getAttributes();
+    List<IComposerAttribute> result = new ArrayList<IComposerAttribute>(attributes.size());
     for (IDataModelAttribute attribute : attributes) {
       if (attribute instanceof IComposerAttribute) {
         result.add((IComposerAttribute) attribute);
       }
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   @Override

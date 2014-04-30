@@ -151,7 +151,7 @@ public class BundleBrowser {
           else {
             className = path.substring(m_prefix.length(), path.length() - 6);
           }
-          if (path.indexOf("$") < 0 || m_includeInnerTypes) {
+          if (path.indexOf('$') < 0 || m_includeInnerTypes) {
             className = className.replaceAll("[/]", ".");
             m_set.add(className);
           }

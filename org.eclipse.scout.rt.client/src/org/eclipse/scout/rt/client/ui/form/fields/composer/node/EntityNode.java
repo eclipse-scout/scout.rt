@@ -90,7 +90,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   public List<Object> getValues() {
-    return CollectionUtility.unmodifiableListCopy(m_values);
+    return CollectionUtility.arrayList(m_values);
   }
 
   public void setValues(List<? extends Object> values) {
@@ -98,7 +98,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   public List<String> getTexts() {
-    return CollectionUtility.unmodifiableListCopy(m_texts);
+    return CollectionUtility.arrayList(m_texts);
   }
 
   public void setTexts(List<String> texts) {

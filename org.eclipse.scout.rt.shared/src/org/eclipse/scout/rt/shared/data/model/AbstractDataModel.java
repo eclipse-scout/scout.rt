@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,10 +47,11 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
   }
 
   protected List<IDataModelAttribute> createAttributes() {
-    ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
-    for (Class<? extends IDataModelAttribute> attributeClazz : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class)) {
+    List<Class<? extends IDataModelAttribute>> sortedAndFiltered = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class);
+    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>(sortedAndFiltered.size());
+    for (Class<? extends IDataModelAttribute> attributeClazz : sortedAndFiltered) {
       try {
         attributes.add(ConfigurationUtility.newInnerInstance(this, attributeClazz));
       }
@@ -59,14 +59,15 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
         LOG.warn(null, e);
       }
     }
-    return Collections.unmodifiableList(attributes);
+    return attributes;
   }
 
   protected List<IDataModelEntity> createEntities() {
-    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
-    for (Class<? extends IDataModelEntity> dataModelEntityClazz : ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class)) {
+    List<Class<? extends IDataModelEntity>> sortedAndFiltered = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class);
+    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>(sortedAndFiltered.size());
+    for (Class<? extends IDataModelEntity> dataModelEntityClazz : sortedAndFiltered) {
       try {
         entities.add(ConfigurationUtility.newInnerInstance(this, dataModelEntityClazz));
       }
@@ -74,7 +75,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
         LOG.warn(null, e);
       }
     }
-    return Collections.unmodifiableList(entities);
+    return entities;
   }
 
   @SuppressWarnings("deprecation")
@@ -119,12 +120,12 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
 
   @Override
   public List<IDataModelAttribute> getAttributes() {
-    return CollectionUtility.unmodifiableListCopy(m_attributes);
+    return CollectionUtility.arrayList(m_attributes);
   }
 
   @Override
   public List<IDataModelEntity> getEntities() {
-    return CollectionUtility.unmodifiableListCopy(m_entities);
+    return CollectionUtility.arrayList(m_entities);
   }
 
   @Override

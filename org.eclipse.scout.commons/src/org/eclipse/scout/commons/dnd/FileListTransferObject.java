@@ -38,7 +38,7 @@ public class FileListTransferObject extends TransferObject {
   }
 
   public List<File> getFiles() {
-    return CollectionUtility.unmodifiableList(m_files);
+    return CollectionUtility.arrayList(m_files);
   }
 
   public List<String> getFilenames() {

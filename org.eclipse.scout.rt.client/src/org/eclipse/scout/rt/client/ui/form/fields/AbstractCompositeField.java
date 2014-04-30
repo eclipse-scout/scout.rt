@@ -14,10 +14,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
@@ -69,7 +69,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      * E.g. setEnabled(getConfiguredEnabled()) would enable/disable all children when called
      * after field creation. -> all fields would have the enabled state of the MainBox.
      */
-    m_fields = Collections.emptyList();
+    m_fields = CollectionUtility.emptyArrayList();
     super.initConfig();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
@@ -112,7 +112,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = Collections.unmodifiableList(fieldList);
+    m_fields = fieldList;
     // attach a proxy controller to each child field in the group for: visible, saveNeeded
     for (IFormField f : m_fields) {
       f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
@@ -245,7 +245,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public List<IFormField> getFields() {
-    return m_fields;
+    return CollectionUtility.arrayList(m_fields);
   }
 
   @Override

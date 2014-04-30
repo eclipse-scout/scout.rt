@@ -20,12 +20,16 @@ import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.fixture.TestServerSession;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractServerSession}
  */
+@RunWith(ScoutServerTestRunner.class)
 public class AbstractServerSessionTest {
 
   private IObjectSerializer m_objs;
@@ -66,8 +70,7 @@ public class AbstractServerSessionTest {
     assertEquals(expected.getUserId(), actual.getUserId());
     assertEquals(expected.getBundle(), actual.getBundle());
     assertEquals(expected.getVirtualSessionId(), actual.getVirtualSessionId());
-//   TODO tsw fix serialization
-//    ScoutAssert.assertListEquals(expected.getSharedVariableMap().entrySet(), actual.getSharedVariableMap().entrySet());
+    ScoutAssert.assertListEquals(expected.getSharedVariableMap().entrySet(), actual.getSharedVariableMap().entrySet());
   }
 
 }

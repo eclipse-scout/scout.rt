@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.StringUtility;
 
 /**
  * file path with / as delimiter
@@ -108,7 +109,7 @@ public class RemoteFile implements Serializable {
     if (charsetName != null) {
       m_charsetName = charsetName;
     }
-    if (dir != null && dir.trim().length() > 0) {
+    if (StringUtility.hasText(dir)) {
       dir = dir.replace('\\', '/').trim();
       if (!dir.endsWith("/")) {
         dir = dir + "/";

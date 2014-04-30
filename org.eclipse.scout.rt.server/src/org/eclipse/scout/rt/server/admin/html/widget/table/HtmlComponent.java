@@ -301,7 +301,7 @@ public class HtmlComponent {
 
   public void tableCell(String content, int rows, int cols, String color) {
     startTableCell(rows, cols, color);
-    if (content == null || content.trim().length() == 0) {
+    if (!StringUtility.hasText(content)) {
       out.print("&nbsp;");
     }
     else {
@@ -312,7 +312,7 @@ public class HtmlComponent {
 
   public void tableHeaderCell(String content) {
     out.print("<th>");
-    if (content == null || content.trim().length() == 0) {
+    if (!StringUtility.hasText(content)) {
       out.print("&nbsp;");
     }
     else {

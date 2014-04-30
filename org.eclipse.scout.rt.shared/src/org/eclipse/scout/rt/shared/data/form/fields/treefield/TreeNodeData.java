@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.data.form.fields.treefield;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -71,15 +70,15 @@ public class TreeNodeData implements Serializable, Cloneable {
   }
 
   public List<Object> getValues() {
-    return Collections.unmodifiableList(m_values);
+    return CollectionUtility.arrayList(m_values);
   }
 
   public void setValues(List<? extends Object> a) {
-    m_values = a;
+    m_values = CollectionUtility.arrayList(a);
   }
 
   public List<String> getTexts() {
-    return CollectionUtility.unmodifiableList(m_texts);
+    return CollectionUtility.arrayList(m_texts);
   }
 
   public void setTexts(List<String> a) {

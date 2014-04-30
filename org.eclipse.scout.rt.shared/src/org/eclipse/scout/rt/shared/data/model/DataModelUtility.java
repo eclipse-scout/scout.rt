@@ -305,7 +305,7 @@ public final class DataModelUtility {
    */
   public static List<? extends IDataModelEntity> sortEntities(List<? extends IDataModelEntity> entities) {
     if (CollectionUtility.isEmpty(entities)) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     entities = new ArrayList<IDataModelEntity>(entities);
     Collections.sort(entities, new Comparator<IDataModelEntity>() {
@@ -336,7 +336,7 @@ public final class DataModelUtility {
    */
   public static List<? extends IDataModelAttribute> sortAttributes(List<? extends IDataModelAttribute> attributes) {
     if (CollectionUtility.isEmpty(attributes)) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     attributes = new ArrayList<IDataModelAttribute>(attributes);
     Collections.sort(attributes, new Comparator<IDataModelAttribute>() {

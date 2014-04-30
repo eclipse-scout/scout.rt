@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.commons.CollectionUtility;
+
 /**
  * An object that stores client job specific context properties.
  * <p>
@@ -32,8 +34,8 @@ public class ClientJobContext implements Iterable<Entry<Object, Object>> {
   }
 
   public ClientJobContext(ClientJobContext properties) {
-    if (properties != null && properties.m_properties != null) {
-      m_properties = new HashMap<Object, Object>(properties.m_properties);
+    if (properties != null && properties.m_properties != null && properties.m_properties.size() > 0) {
+      m_properties = CollectionUtility.copyMap(properties.m_properties);
     }
   }
 

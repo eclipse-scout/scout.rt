@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -202,7 +201,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = Collections.unmodifiableList(menuList);
+    m_menus = menuList;
     // producers
     ArrayList<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>();
     for (Class<? extends ICalendarItemProvider> itemProviderClazz : getConfiguredProducers()) {
@@ -433,7 +432,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   public List<IMenu> getMenus() {
-    return m_menus;
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override
@@ -522,7 +521,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   @Override
   public Set<CalendarComponent> getComponents() {
-    return CollectionUtility.unmodifiableSetCopy(propertySupport.<CalendarComponent> getPropertySet(PROP_COMPONENTS));
+    return CollectionUtility.hashSet(propertySupport.<CalendarComponent> getPropertySet(PROP_COMPONENTS));
   }
 
   private void updateComponentsInternal(ICalendarItemProvider[] changedProviders) {
@@ -570,7 +569,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
-  public Collection<CalendarItemConflict> findConflictingItems(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, Class<? extends ICalendarItemProvider>... providerTypes) {
+  /**
+   * @param componentsByProvider
+   * @param providerTypes
+   *          {@link ICalendarItemProvider} classes
+   * @return
+   */
+  public Collection<CalendarItemConflict> findConflictingItems(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, Class<?>... providerTypes) {
     if (providerTypes != null && providerTypes.length >= 2) {
       HashMap<String, List<CalendarComponent>> classificationMap = new HashMap<String, List<CalendarComponent>>();
       for (int i = 0; i < providerTypes.length; i++) {
@@ -645,7 +650,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       return conflicts;
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -676,7 +681,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       return e.getPopupMenus();
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

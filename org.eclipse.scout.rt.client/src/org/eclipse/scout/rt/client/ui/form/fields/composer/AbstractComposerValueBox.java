@@ -401,7 +401,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (value == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(value));
+      return CollectionUtility.arrayList(value);
     }
 
     @Override
@@ -938,7 +938,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override
@@ -1012,7 +1012,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override
@@ -1088,7 +1088,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override
@@ -1156,7 +1156,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override
@@ -1224,7 +1224,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override
@@ -1292,7 +1292,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
       if (a == null && b == null) {
         return null;
       }
-      return Collections.unmodifiableList(CollectionUtility.arrayList(a, b));
+      return CollectionUtility.arrayList(a, b);
     }
 
     @Override

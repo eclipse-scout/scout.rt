@@ -532,7 +532,7 @@ public final class IOUtility {
     if (filename == null) {
       return null;
     }
-    int i = filename.lastIndexOf(".");
+    int i = filename.lastIndexOf('.');
     if (i < 0) {
       return null;
     }

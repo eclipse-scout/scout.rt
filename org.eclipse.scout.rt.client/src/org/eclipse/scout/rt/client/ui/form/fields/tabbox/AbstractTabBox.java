@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -178,7 +177,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         LOG.warn("Tabboxes only allow instance of IGroupBox as inner fields. '" + field.getClass().getName() + "' is not instance of IGroupBox!");
       }
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   @Override

@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.spec.client.config.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.ArrayComparator;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -38,7 +38,7 @@ public class DefaultTypesTableConfig implements IDocEntityTableConfig<Class<?>> 
 
   @Override
   public List<IDocFilter<Class<?>>> getFilters() {
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override

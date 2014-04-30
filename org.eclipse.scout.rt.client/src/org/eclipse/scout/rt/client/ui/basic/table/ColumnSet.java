@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -246,13 +245,13 @@ public class ColumnSet {
 
   public List<IColumn<?>> getAllColumnsInUserOrder() {
     List<IColumn<?>> visibleCols = getVisibleColumns();
-    //
+
     int counter = 0;
     TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
     for (IColumn col : visibleCols) {
       sortMap.put(new CompositeObject(col.getVisibleColumnIndexHint(), counter++), col);
     }
-    //
+
     for (IColumn<?> column : getColumns()) {
       if (column.isDisplayable() && column.isVisible()) {
         //already in map
@@ -261,7 +260,7 @@ public class ColumnSet {
         sortMap.put(new CompositeObject(column.getVisibleColumnIndexHint(), counter++), column);
       }
     }
-    return Collections.unmodifiableList(new ArrayList<IColumn<?>>(sortMap.values()));
+    return CollectionUtility.arrayList(sortMap.values());
   }
 
   public int[] getDisplayableColumnIndexes() {
@@ -348,7 +347,7 @@ public class ColumnSet {
   }
 
   public List<IColumn<?>> getColumns() {
-    return CollectionUtility.unmodifiableListCopy(m_columns);
+    return CollectionUtility.arrayList(m_columns);
   }
 
   public List<IColumn<?>> getKeyColumns() {
@@ -356,7 +355,7 @@ public class ColumnSet {
     for (int i = 0; i < m_keyIndexes.length; i++) {
       keyColumns.add(getColumn(m_keyIndexes[i]));
     }
-    return Collections.unmodifiableList(keyColumns);
+    return keyColumns;
   }
 
   public List<IColumn<?>> getDisplayableColumns() {
@@ -364,7 +363,7 @@ public class ColumnSet {
     for (int i = 0; i < m_displayableIndexes.length; i++) {
       a.add(getColumn(m_displayableIndexes[i]));
     }
-    return Collections.unmodifiableList(a);
+    return a;
   }
 
   public List<IColumn<?>> getVisibleColumns() {
@@ -372,7 +371,7 @@ public class ColumnSet {
     for (int i = 0; i < m_visibleIndexes.length; i++) {
       a.add(getColumn(m_visibleIndexes[i]));
     }
-    return Collections.unmodifiableList(a);
+    return a;
   }
 
   public IColumn getFirstVisibleColumn() {
@@ -406,7 +405,7 @@ public class ColumnSet {
         summaryColumns.add(c);
       }
     }
-    return Collections.unmodifiableList(summaryColumns);
+    return summaryColumns;
   }
 
   public int getIndexFor(IColumn column) {
@@ -467,7 +466,7 @@ public class ColumnSet {
       //
       List<IColumn<?>> resolvedColumns = resolveColumns(columns);
       if (columns == null) {
-        columns = Collections.emptySet();
+        columns = CollectionUtility.hashSet();
       }
       if (resolvedColumns.size() > 0 || columns.size() == 0) {
         List<IColumn<?>> newColumns = new ArrayList<IColumn<?>>();
@@ -547,16 +546,17 @@ public class ColumnSet {
   }
 
   public List<IColumn<?>> resolveColumns(Collection<? extends IColumn> columns) {
-    List<IColumn<?>> result = new ArrayList<IColumn<?>>();
     if (columns != null) {
+      List<IColumn<?>> result = new ArrayList<IColumn<?>>(columns.size());
       for (IColumn col : columns) {
         IColumn resolvedCol = resolveColumn(col);
         if (resolvedCol != null) {
           result.add(resolvedCol);
         }
       }
+      return result;
     }
-    return Collections.unmodifiableList(result);
+    return CollectionUtility.emptyArrayList();
   }
 
   /*
@@ -628,21 +628,21 @@ public class ColumnSet {
    * @return only user sort columns
    */
   public List<IColumn<?>> getUserSortColumns() {
-    return CollectionUtility.unmodifiableListCopy(m_userSortColumns);
+    return CollectionUtility.arrayList(m_userSortColumns);
   }
 
   /**
    * @return only permanent head sort columns
    */
   public List<IColumn<?>> getPermanentHeadSortColumns() {
-    return CollectionUtility.unmodifiableListCopy(m_permanentHeadSortColumns);
+    return CollectionUtility.arrayList(m_permanentHeadSortColumns);
   }
 
   /**
    * @return only permanent tail sort columns
    */
   public List<IColumn<?>> getPermanentTailSortColumns() {
-    return CollectionUtility.unmodifiableListCopy(m_permanentTailSortColumns);
+    return CollectionUtility.arrayList(m_permanentTailSortColumns);
   }
 
   public SortSpec getSortSpec() {

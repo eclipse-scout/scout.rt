@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.beans.IntrospectionException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ColumnData;
 import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -79,7 +79,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       m_ignoredColumns = ignoredColumns;
     }
     else {
-      m_ignoredColumns = Collections.emptySet();
+      m_ignoredColumns = CollectionUtility.hashSet();
     }
   }
 

@@ -53,10 +53,10 @@ public class DefaultSearchFilterService extends AbstractService implements ISear
       AbstractComposerField composerField = (AbstractComposerField) field;
       ITreeNode rootNode = composerField.getTree().getRootNode();
       if (rootNode != null) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         new ComposerDisplayTextBuilder().build(rootNode, buf, "");
         String s = buf.toString();
-        if (s.trim().length() > 0) {
+        if (StringUtility.hasText(s)) {
           search.addDisplayText(s);
         }
       }

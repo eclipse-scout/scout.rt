@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.testing.shared.services.lookup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -30,7 +30,7 @@ import org.osgi.framework.ServiceRegistration;
  * @since 3.9.0
  */
 public class TestingLookupService implements ILookupService<Long> {
-  private List<ILookupRow<Long>> m_rows = Collections.unmodifiableList(new ArrayList<ILookupRow<Long>>());
+  private List<ILookupRow<Long>> m_rows = new ArrayList<ILookupRow<Long>>();
 
   public TestingLookupService() {
   }
@@ -40,11 +40,11 @@ public class TestingLookupService implements ILookupService<Long> {
   }
 
   public List<ILookupRow<Long>> getRows() {
-    return m_rows;
+    return CollectionUtility.arrayList(m_rows);
   }
 
   public void setRows(List<ILookupRow<Long>> rows) {
-    m_rows = Collections.unmodifiableList(new ArrayList<ILookupRow<Long>>(rows));
+    m_rows = CollectionUtility.arrayList(rows);
   }
 
   @Override

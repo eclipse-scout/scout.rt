@@ -81,7 +81,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
   }
 
   public List<IForm> getUnsavedForms() {
-    return CollectionUtility.unmodifiableList(m_forms);
+    return CollectionUtility.arrayList(m_forms);
   }
 
   @Order(10.0)

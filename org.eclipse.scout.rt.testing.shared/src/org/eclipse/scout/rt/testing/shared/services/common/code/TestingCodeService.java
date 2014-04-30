@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.testing.shared.services.common.code;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -111,14 +111,14 @@ public class TestingCodeService extends AbstractService implements ICodeService 
   @Override
   public List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
     synchronized (m_codeTypeMapLock) {
-      List<ICodeType<?, ?>> result = new ArrayList<ICodeType<?, ?>>();
+      List<ICodeType<?, ?>> result = new ArrayList<ICodeType<?, ?>>(types.size());
       for (Class<? extends ICodeType<?, ?>> type : types) {
         ICodeType<?, ?> ct = getCodeType(type);
         if (ct != null) {
           result.add(ct);
         }
       }
-      return Collections.unmodifiableList(result);
+      return result;
     }
   }
 
@@ -208,13 +208,14 @@ public class TestingCodeService extends AbstractService implements ICodeService 
   @Override
   public List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
     synchronized (m_codeTypeMapLock) {
-      List<ICodeType<?, ?>> result = new ArrayList<ICodeType<?, ?>>();
-      for (ICodeType<?, ?> ct : m_codeTypes.values()) {
+      Collection<ICodeType<?, ?>> values = m_codeTypes.values();
+      List<ICodeType<?, ?>> result = new ArrayList<ICodeType<?, ?>>(values.size());
+      for (ICodeType<?, ?> ct : values) {
         if (ct.getClass().getName().startsWith(classPrefix)) {
           result.add(ct);
         }
       }
-      return Collections.unmodifiableList(result);
+      return result;
     }
   }
 

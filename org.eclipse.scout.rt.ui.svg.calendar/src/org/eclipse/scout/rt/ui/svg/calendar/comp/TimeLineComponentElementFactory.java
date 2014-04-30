@@ -87,12 +87,8 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
 
     // create elements for all (non-full-day) calendar components
     HashMap<CalendarComponent, Element> ret = new HashMap<CalendarComponent, Element>(list.size());
-    int fullDayIndex = 0;
     for (CalendarComponentComposite c : list) {
       Element e = createComponentElement(container, containerDimension, c, maxIndex + 1, numFullDay, list, day);
-      if (c.comp.isFullDay()) {
-        fullDayIndex++;
-      }
       if (e != null) {
         ret.put(c.comp, e);
       }

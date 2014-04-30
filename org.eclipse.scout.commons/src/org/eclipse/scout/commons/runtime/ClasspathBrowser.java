@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -136,18 +136,26 @@ public class ClasspathBrowser {
   }
 
   private void visitJar(File f) throws Exception {
-    JarFile jarFile = new JarFile(f);
-    if (DEBUG_PATH) {
-      log("  visit jar " + f + " with " + jarFile.size() + " elements");
-    }
-    for (Enumeration en = jarFile.entries(); en.hasMoreElements();) {
-      JarEntry entry = (JarEntry) en.nextElement();
-      if (entry.isDirectory()) {
-        // nop
+    JarFile jarFile = null;
+    try {
+      jarFile = new JarFile(f);
+      if (DEBUG_PATH) {
+        log("  visit jar " + f + " with " + jarFile.size() + " elements");
       }
-      else {
-        String entryName = entry.getName();
-        visitEntry(entryName);
+      for (Enumeration en = jarFile.entries(); en.hasMoreElements();) {
+        JarEntry entry = (JarEntry) en.nextElement();
+        if (entry.isDirectory()) {
+          // nop
+        }
+        else {
+          String entryName = entry.getName();
+          visitEntry(entryName);
+        }
+      }
+    }
+    finally {
+      if (jarFile != null) {
+        jarFile.close();
       }
     }
   }
@@ -219,7 +227,7 @@ public class ClasspathBrowser {
   }
 
   protected boolean acceptClass(String className) {
-    if (className.indexOf("$") >= 0) {
+    if (className.indexOf('$') >= 0) {
       return false;
     }
     if (className.startsWith("java.")) {

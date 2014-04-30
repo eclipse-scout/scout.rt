@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
   }
 
   public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
@@ -83,7 +82,7 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
   }
 
   public static List<IMenu> collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
@@ -108,7 +107,7 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
   }
 
   public static List<IMenu> collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, IRwtEnvironment uiEnvironment) {
@@ -133,7 +132,7 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return Collections.unmodifiableList(menuList);
+    return menuList;
   }
 
   public static List<IMenu> collectRowMenus(final ITable table, IRwtEnvironment uiEnvironment) {

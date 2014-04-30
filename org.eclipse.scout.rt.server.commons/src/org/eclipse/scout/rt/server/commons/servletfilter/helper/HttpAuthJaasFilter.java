@@ -108,7 +108,7 @@ public class HttpAuthJaasFilter implements Filter {
       return false;
     }
     String name = subject.getPrincipals().iterator().next().getName();
-    if (name == null || name.trim().length() == 0) {
+    if (!StringUtility.hasText(name)) {
       return false;
     }
     return true;

@@ -37,6 +37,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.EncryptionUtility;
 import org.eclipse.scout.commons.SoapHandlingUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -242,7 +243,7 @@ public class SoapWsseJaasFilter implements Filter {
       return false;
     }
     String name = subject.getPrincipals().iterator().next().getName();
-    if (name == null || name.trim().length() == 0) {
+    if (!StringUtility.hasText(name)) {
       return false;
     }
     return true;

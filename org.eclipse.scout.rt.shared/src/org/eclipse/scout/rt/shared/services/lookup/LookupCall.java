@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.TriState;
@@ -303,13 +303,10 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    */
   @Override
   public List<? extends ILookupRow<KEY_TYPE>> getDataByKey() throws ProcessingException {
-    if (getKey() == null) {
-      return Collections.emptyList();
-    }
-    if (getLookupService() != null) {
+    if (getKey() != null && getLookupService() != null) {
       return getLookupService().getDataByKey(this);
     }
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   /**
@@ -370,7 +367,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return getLookupService().getDataByText(this);
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -431,7 +428,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return getLookupService().getDataByAll(this);
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -492,7 +489,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return getLookupService().getDataByRec(this);
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -628,7 +627,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public List<IWizardStep<? extends IForm>> getAvailableSteps() {
-    return CollectionUtility.<IWizardStep<? extends IForm>> unmodifiableListCopy(m_availableStepList);
+    return CollectionUtility.<IWizardStep<? extends IForm>> arrayList(m_availableStepList);
   }
 
   @Override
@@ -645,11 +644,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public List<IWizardStep<? extends IForm>> getSteps() {
-    return CollectionUtility.<IWizardStep<? extends IForm>> unmodifiableListCopy(m_stepList);
+    return CollectionUtility.<IWizardStep<? extends IForm>> arrayList(m_stepList);
   }
 
   @Override
-  public void setSteps(IWizardStep<? extends IForm>... steps) {
+  public void setSteps(IWizardStep<?>... steps) {
     if (steps == null) {
       steps = new IWizardStep<?>[0];
     }
@@ -918,20 +917,20 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   public List<IWizardStep<? extends IForm>> getHistory() {
     int index = getStepIndex(getActiveStep());
     if (m_stepList.size() > 0 && index >= 0) {
-      return CollectionUtility.unmodifiableListCopy(m_stepList.subList(0, Math.min(index, m_stepList.size())));
+      return CollectionUtility.arrayList(m_stepList.subList(0, Math.min(index, m_stepList.size())));
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
   public List<IWizardStep<? extends IForm>> getExpectedFuture() {
     int index = getStepIndex(getActiveStep());
     if (m_stepList.size() > 0 && index < m_stepList.size()) {
-      return CollectionUtility.unmodifiableListCopy(m_stepList.subList(Math.max(index + 1, 0), m_stepList.size()));
+      return CollectionUtility.arrayList(m_stepList.subList(Math.max(index + 1, 0), m_stepList.size()));
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 

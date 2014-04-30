@@ -11,13 +11,15 @@
 package org.eclipse.scout.rt.shared.services.common.context;
 
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 
 /**
@@ -27,7 +29,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   private static final long serialVersionUID = 1L;
 
   private int m_version;
-  private HashMap<String, Object> m_variables;
+  private Map<String, Object> m_variables;
   private transient BasicPropertySupport m_propertySupport;
 
   public SharedVariableMap() {
@@ -38,7 +40,12 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   public SharedVariableMap(SharedVariableMap map) {
     m_version = map.m_version;
-    m_variables = new HashMap<String, Object>(map.m_variables);
+    m_variables = CollectionUtility.copyMap(map.m_variables);
+  }
+
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+    ois.defaultReadObject();
+    m_propertySupport = new BasicPropertySupport(this);
   }
 
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -56,7 +63,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   public void updateInternal(SharedVariableMap newMap) {
     if (newMap.getVersion() != getVersion()) {
-      m_variables = new HashMap<String, Object>(newMap.m_variables);
+      m_variables = CollectionUtility.copyMap(newMap.m_variables);
       m_version = newMap.getVersion();
     }
   }
@@ -74,7 +81,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   private void mapChanged() {
     m_version++;
     if (m_propertySupport != null) {
-      m_propertySupport.firePropertyChange("values", null, new HashMap<String, Object>(m_variables));
+      m_propertySupport.firePropertyChange("values", null, CollectionUtility.copyMap(m_variables));
     }
   }
 
@@ -102,7 +109,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   @Override
   public Set<java.util.Map.Entry<String, Object>> entrySet() {
-    return Collections.unmodifiableSet(m_variables.entrySet());
+    return CollectionUtility.hashSet(m_variables.entrySet());
   }
 
   @Override
@@ -117,7 +124,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   @Override
   public Set<String> keySet() {
-    return Collections.unmodifiableSet(m_variables.keySet());
+    return CollectionUtility.hashSet(m_variables.keySet());
   }
 
   /**
@@ -156,7 +163,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   @Override
   public Collection<Object> values() {
-    return Collections.unmodifiableCollection(m_variables.values());
+    return CollectionUtility.arrayList(m_variables.values());
   }
 
   @Override

@@ -123,7 +123,7 @@ public class LogoutFilter implements Filter {
 
     //Clean url, otherwise IE might run into an infinite loop
     String referer = request.getHeader("Referer");
-    int index = referer.indexOf("#");
+    int index = referer.indexOf('#');
     if (index >= 0) {
       referer = referer.substring(0, index);
     }

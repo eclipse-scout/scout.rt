@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -217,11 +216,11 @@ public class TableRow implements ITableRow {
     if (keyColumns.length == 0) {
       keyColumns = m_columnSet.getAllColumnIndexes();
     }
-    List<Object> pk = new ArrayList<Object>();
+    List<Object> pk = new ArrayList<Object>(keyColumns.length);
     for (int keyIndex : keyColumns) {
       pk.add(getCellValue(keyIndex));
     }
-    return Collections.unmodifiableList(pk);
+    return pk;
   }
 
   @Override

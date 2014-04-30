@@ -118,7 +118,7 @@ public class AccessControlStore {
   public void clearCache() {
     // notify with a filter, that will be accepted nowhere
     SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
-    clearCacheOfUserIds(CollectionUtility.unmodifiableSet(m_store.keySet()));
+    clearCacheOfUserIds(CollectionUtility.hashSet(m_store.keySet()));
   }
 
   /**

@@ -15,11 +15,11 @@ import java.security.Permission;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -244,12 +244,12 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @Override
   public List<IDataModelAttributeOp> getOperators() {
-    return Collections.unmodifiableList(m_operators);
+    return CollectionUtility.arrayList(m_operators);
   }
 
   @Override
   public void setOperators(List<? extends IDataModelAttributeOp> ops) {
-    m_operators = ops;
+    m_operators = CollectionUtility.arrayList(ops);
   }
 
   @Override

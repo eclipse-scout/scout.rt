@@ -1153,7 +1153,7 @@ public final class StringUtility {
    * @since 3.8.2
    */
   public static String splitCamelCase(String s) {
-    if (s == null || s.trim().length() == 0) {
+    if (!hasText(s)) {
       return null;
     }
     return s.replaceAll(
@@ -1597,15 +1597,15 @@ public final class StringUtility {
   public static String concatenateTokens(String... s) {
     String retVal = "";
     if (s != null && s.length > 0) {
-      StringBuffer b = new StringBuffer();
+      StringBuilder b = new StringBuilder();
       String suffix = s[0];
-      if (suffix != null && suffix.trim().length() > 0) {
+      if (StringUtility.hasText(suffix)) {
         b.append(suffix.trim());
       }
       for (int i = 1, l = s.length - 1; i < l; i = i + 2) {
         String del = s[i];
         suffix = s[i + 1];
-        if (suffix != null && suffix.trim().length() > 0) {
+        if (StringUtility.hasText(suffix)) {
           if (b.length() > 0) {
             b.append(del);
           }

@@ -852,7 +852,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
           try {
             Class c = Platform.getBundle(desc.getBundleSymbolicName()).loadClass(desc.getClassName());
             if (suffix.length() > 0) {
-              c = Platform.getBundle(desc.getBundleSymbolicName()).loadClass(desc.getClassName() + suffix.replace(".", "$"));
+              c = Platform.getBundle(desc.getBundleSymbolicName()).loadClass(desc.getClassName() + suffix.replace('.', '$'));
               return c;
             }
             else {

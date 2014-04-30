@@ -680,7 +680,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
       List<String> extensions = null;
       try {
         String fileName = m_file.getName();
-        String fileExt = m_file.getName().substring(fileName.lastIndexOf(".") + 1, fileName.length());
+        String fileExt = m_file.getName().substring(fileName.lastIndexOf('.') + 1, fileName.length());
         extensions = Collections.singletonList(fileExt);
       }
       catch (Exception e) {

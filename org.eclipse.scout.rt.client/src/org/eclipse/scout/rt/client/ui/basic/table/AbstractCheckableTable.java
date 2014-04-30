@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -154,7 +153,7 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
       }
     }
 
-    return Collections.unmodifiableList(rows);
+    return rows;
   }
 
   @Override

@@ -72,9 +72,11 @@ public interface IOutline extends ITree, ITypeWithClassId {
   void refreshPages(List<Class<? extends IPage>> pageTypes);
 
   /**
+   * @param pageTypes
+   *          Must be classes that implement {@link IPage}.
    * @see #refreshPages(List)
    */
-  void refreshPages(Class<? extends IPage>... pageTypes);
+  void refreshPages(Class<?>... pageTypes);
 
   /**
    * Unload and release unused pages, such as closed and non-selected nodes

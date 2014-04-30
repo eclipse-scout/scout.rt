@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -184,14 +185,13 @@ public final class DataModelAttributeOp implements DataModelConstants {
     }
 
     public static String buildText(Integer aggregationType, String attributeText, String opText) {
-      List<String> valueTexts = Collections.emptyList();
+      List<String> valueTexts = CollectionUtility.emptyArrayList();
       return buildText(aggregationType, attributeText, opText, valueTexts);
 
     }
 
     public static String buildText(Integer aggregationType, String attributeText, String opText, String valueTexts) {
       return buildText(aggregationType, attributeText, opText, Collections.singletonList(valueTexts));
-
     }
 
     public static String buildText(Integer aggregationType, String attributeText, String opText, List<String> valueTexts) {

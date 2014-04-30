@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -48,7 +48,7 @@ public class BatchLookupResultCache {
    */
   public List<ILookupRow<?>> getDataByKey(ILookupCall call) throws ProcessingException {
     if (call == null || call.getKey() == null) {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
     List<ILookupRow<?>> result = getCachedResult(call);
     if (result == null) {
@@ -101,7 +101,11 @@ public class BatchLookupResultCache {
     if (call == null || !isCacheable(call.getClass())) {
       return null;
     }
-    return m_cache.get(call);
+    List<ILookupRow<?>> list = m_cache.get(call);
+    if (list == null) {
+      return null;
+    }
+    return CollectionUtility.arrayList(list);
   }
 
   /**

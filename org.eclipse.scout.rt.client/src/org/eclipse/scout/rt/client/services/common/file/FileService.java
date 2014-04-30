@@ -58,19 +58,19 @@ public class FileService extends AbstractService implements IFileService {
   public File getRemoteFile(String dir, String simpleName, Locale locale, boolean checkCache) throws ProcessingException {
     RemoteFile spec = null;
     File f = null;
-    if (locale != null && simpleName != null && simpleName.lastIndexOf(".") != -1) {
+    if (locale != null && simpleName != null && simpleName.lastIndexOf('.') != -1) {
       String filename = simpleName;
       String language = locale.toString().replaceAll("__", "_");
-      String prefix = filename.substring(0, filename.lastIndexOf(".")) + "_";
-      String suffix = filename.substring(filename.lastIndexOf("."));
+      String prefix = filename.substring(0, filename.lastIndexOf('.')) + "_";
+      String suffix = filename.substring(filename.lastIndexOf('.'));
       filename = prefix + language + suffix;
       File test = getFileLocation(dir, filename, false);
       while (!test.exists()) {
-        if (language.indexOf("_") == -1) {
+        if (language.indexOf('_') == -1) {
           filename = simpleName;
           break;
         }
-        language = language.substring(0, language.lastIndexOf("_"));
+        language = language.substring(0, language.lastIndexOf('_'));
         filename = prefix + language + suffix;
         test = getFileLocation(dir, filename, false);
       }

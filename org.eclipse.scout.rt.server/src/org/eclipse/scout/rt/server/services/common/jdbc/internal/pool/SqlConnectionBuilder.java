@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
@@ -41,7 +42,7 @@ public class SqlConnectionBuilder {
     else {
       Properties p = null;
       String s = sqlService.getJdbcProperties();
-      if (s != null && s.trim().length() == 0) {
+      if (!StringUtility.hasText(s)) {
         s = null;
       }
       if (s != null) {

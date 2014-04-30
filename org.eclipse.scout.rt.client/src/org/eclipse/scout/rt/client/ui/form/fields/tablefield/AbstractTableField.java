@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -674,7 +673,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (getTable() != null) {
       return MenuUtility.getKeyStrokesFromMenus(getTable().getMenus());
     }
-    return Collections.emptyList();
+    return CollectionUtility.emptyArrayList();
   }
 
   private class P_ManagedTableListener extends TableAdapter {

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -24,7 +23,7 @@ public class TableColumnManager {
   private List<IColumn<?>> m_currentOrder;
 
   public void initialize(List<? extends IColumn<?>> initialColumns) {
-    m_initialColumns = Collections.unmodifiableList(initialColumns);
+    m_initialColumns = CollectionUtility.arrayList(initialColumns);
     m_currentOrder = m_initialColumns;
   }
 
@@ -41,7 +40,7 @@ public class TableColumnManager {
       return false;
     }
     else {
-      m_currentOrder = Collections.unmodifiableList(newOrder);
+      m_currentOrder = CollectionUtility.arrayList(newOrder);
       return true;
     }
   }

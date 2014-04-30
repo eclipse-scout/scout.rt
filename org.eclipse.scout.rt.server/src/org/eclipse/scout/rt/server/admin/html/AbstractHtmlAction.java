@@ -14,9 +14,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
+
 public abstract class AbstractHtmlAction implements Runnable, Serializable {
   private static final long serialVersionUID = -1352934517273013173L;
-  private HashMap<String, String> m_formParameters = new HashMap<String, String>();
+  private Map<String, String> m_formParameters = new HashMap<String, String>();
   private String m_plainText;
   private String m_htmlText;
   private Throwable m_exception;
@@ -32,7 +34,7 @@ public abstract class AbstractHtmlAction implements Runnable, Serializable {
   }
 
   public void setFormParameters(Map<String, String> m) {
-    m_formParameters = new HashMap<String, String>(m);
+    m_formParameters = CollectionUtility.copyMap(m);
   }
 
   public Map getFormParameters() {

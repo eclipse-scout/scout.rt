@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,7 +96,7 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
     };
     Arrays.sort(array, comparator);
 
-    List<IMobileAction> sortedActions = new ArrayList<IMobileAction>();
+    List<IMobileAction> sortedActions = new ArrayList<IMobileAction>(array.length);
     for (IButton scoutButton : array) {
       if (relevantSystemTypes.contains(scoutButton.getSystemType())) {
         try {
@@ -108,7 +107,7 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
         }
       }
     }
-    return Collections.unmodifiableList(sortedActions);
+    return sortedActions;
   }
 
   protected List<IMobileAction> createLeftActions() {

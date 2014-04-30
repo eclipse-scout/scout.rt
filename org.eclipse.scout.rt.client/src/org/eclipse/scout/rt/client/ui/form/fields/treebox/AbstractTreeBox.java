@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -272,7 +271,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   protected void initConfig() {
     m_uiFacade = createUIFacade();
-    m_fields = Collections.emptyList();
+    m_fields = CollectionUtility.emptyArrayList();
     super.initConfig();
     setFilterActiveNodes(getConfiguredFilterActiveNodes());
     setFilterActiveNodesValue(TriState.TRUE);
@@ -369,7 +368,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = Collections.unmodifiableList(fieldList);
+    m_fields = fieldList;
   }
 
   @Override
@@ -524,7 +523,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       return subTree;
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -546,7 +545,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       return subTree;
     }
     else {
-      return Collections.emptyList();
+      return CollectionUtility.emptyArrayList();
     }
   }
 
@@ -637,12 +636,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public Set<T> getValue() {
-    return CollectionUtility.unmodifiableSetCopy(super.getValue());
+    return CollectionUtility.hashSet(super.getValue());
   }
 
   @Override
   public Set<T> getInitValue() {
-    return CollectionUtility.unmodifiableSetCopy(super.getInitValue());
+    return CollectionUtility.hashSet(super.getInitValue());
   }
 
   @Override
@@ -707,9 +706,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   public Set<ILookupRow> getCheckedLookupRows() {
     Collection<ITreeNode> treeNodes = getTree().getCheckedNodes();
     if (treeNodes == null || treeNodes.isEmpty()) {
-      return Collections.emptySet();
+      return CollectionUtility.hashSet();
     }
-    Set<ILookupRow> lookupRows = new HashSet<ILookupRow>();
+    Set<ILookupRow> lookupRows = new HashSet<ILookupRow>(treeNodes.size());
     Iterator<ITreeNode> it = treeNodes.iterator();
     while (it.hasNext()) {
       ITreeNode node = it.next();
@@ -719,7 +718,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         lookupRows.add(new LookupRow(node.getPrimaryKey(), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled(), parentNode != null ? parentNode.getPrimaryKey() : null, isNodeActive(node)));
       }
     }
-    return Collections.unmodifiableSet(lookupRows);
+    return lookupRows;
   }
 
   @Override
@@ -752,7 +751,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     if (a != null) {
       set.removeAll(a);
     }
-    return Collections.unmodifiableSet(set);
+    return set;
   }
 
   @Override
@@ -1051,7 +1050,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public List<IFormField> getFields() {
-    return CollectionUtility.unmodifiableListCopy(m_fields);
+    return CollectionUtility.arrayList(m_fields);
   }
 
   @Override

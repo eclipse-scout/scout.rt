@@ -75,18 +75,18 @@ public class AttributeNode extends AbstractComposerNode {
    * guaranteed to never return null
    */
   public List<Object> getValues() {
-    return CollectionUtility.unmodifiableListCopy(m_values);
+    return CollectionUtility.arrayList(m_values);
   }
 
   public void setValues(List<? extends Object> values) {
-    m_values = CollectionUtility.unmodifiableListCopy(values);
+    m_values = CollectionUtility.arrayList(values);
   }
 
   /**
    * guaranteed to never return null
    */
   public List<String> getTexts() {
-    return CollectionUtility.unmodifiableListCopy(m_texts);
+    return CollectionUtility.arrayList(m_texts);
   }
 
   public void setTexts(List<String> s) {

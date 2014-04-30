@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -189,7 +188,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
       menu.setContainerInternal(this);
     }
 
-    m_menus = Collections.unmodifiableList(menuList);
+    m_menus = menuList;
   }
 
   @Override
@@ -279,7 +278,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.unmodifiableListCopy(m_menus);
+    return CollectionUtility.arrayList(m_menus);
   }
 
   @Override

@@ -20,6 +20,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.view.TopView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -97,7 +98,7 @@ public class AdminSession implements Serializable {
   }
 
   private void setActionMap(Map<String, AbstractHtmlAction> newActionMap) {
-    m_actionMap = new HashMap<String, AbstractHtmlAction>(newActionMap);
+    m_actionMap = CollectionUtility.copyMap(newActionMap);
   }
 
   public TopView getTopView() {

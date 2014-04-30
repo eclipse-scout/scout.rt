@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 public class ActionButtonBarUtility {
 
   public static List<IMobileAction> convertButtonsToActions(List<IButton> buttons) throws ProcessingException {
-    List<IMobileAction> menuList = new ArrayList<IMobileAction>();
+    List<IMobileAction> menuList = new ArrayList<IMobileAction>(buttons.size());
     for (IButton button : buttons) {
       IMobileAction action = convertButtonToAction(button);
       if (action != null) {

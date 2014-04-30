@@ -14,7 +14,6 @@ import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,6 +25,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -486,15 +486,15 @@ public final class SwtUtility {
 
   @SuppressWarnings("unchecked")
   public static <T> List<T> getItemsOfSelection(Class<T> t, StructuredSelection selection) {
-    List<T> result = new ArrayList<T>();
     if (selection != null) {
+      List<T> result = new ArrayList<T>(selection.size());
       Iterator it = selection.iterator();
       while (it.hasNext()) {
         result.add((T) it.next());
       }
+      return result;
     }
-    return Collections.unmodifiableList(result);
-
+    return CollectionUtility.emptyArrayList();
   }
 
   static {

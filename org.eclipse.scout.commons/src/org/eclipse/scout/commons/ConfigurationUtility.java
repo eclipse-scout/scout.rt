@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +54,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<? extends T>> sortFilteredClassesByOrderAnnotation(List<? extends Class> classes, Class<T> filter) {
-    TreeMap<CompositeObject, Class<T>> orderedClassesMap = new TreeMap<CompositeObject, Class<T>>();
+    TreeMap<CompositeObject, Class<? extends T>> orderedClassesMap = new TreeMap<CompositeObject, Class<? extends T>>();
     int i = 0;
     for (Class candidate : classes) {
       if (filter.isAssignableFrom(candidate)) {
@@ -72,7 +71,7 @@ public final class ConfigurationUtility {
         i++;
       }
     }
-    return Collections.unmodifiableList(new ArrayList<Class<? extends T>>(orderedClassesMap.values()));
+    return CollectionUtility.arrayList(orderedClassesMap.values());
   }
 
   /**
@@ -111,7 +110,7 @@ public final class ConfigurationUtility {
       sortMap.put(new CompositeObject(order, index), element);
       index++;
     }
-    return Collections.unmodifiableList(new ArrayList<T>(sortMap.values()));
+    return CollectionUtility.arrayList(sortMap.values());
   }
 
   /**
@@ -167,7 +166,7 @@ public final class ConfigurationUtility {
         result.add(c);
       }
     }
-    return Collections.unmodifiableList(result);
+    return result;
   }
 
   /**
@@ -297,12 +296,12 @@ public final class ConfigurationUtility {
   public static <T> List<Class<? extends T>> removeReplacedClasses(List<? extends Class<? extends T>> classes) {
     Set<Class<? extends T>> replacingClasses = getReplacingLeafClasses(classes);
     if (replacingClasses.isEmpty()) {
-      // there are no replacing classes -> return original array
-      return Collections.unmodifiableList(classes);
+      // there are no replacing classes -> return original list copy
+      return CollectionUtility.arrayList(classes);
     }
 
     // compute resulting list of ordered classes
-    List<Class<? extends T>> list = new ArrayList<Class<? extends T>>();
+    List<Class<? extends T>> list = new ArrayList<Class<? extends T>>(classes.size());
     for (Class<? extends T> c : classes) {
       list.add(c);
     }
@@ -329,7 +328,7 @@ public final class ConfigurationUtility {
       list.remove(classToBeReplaced);
     }
 
-    return Collections.unmodifiableList(list);
+    return list;
   }
 
   /**
@@ -357,8 +356,8 @@ public final class ConfigurationUtility {
   public static <T> Map<Class<?>, Class<? extends T>> getReplacementMapping(List<? extends Class<? extends T>> classes) {
     Set<Class<? extends T>> replacingClasses = getReplacingLeafClasses(classes);
     if (replacingClasses.isEmpty()) {
-      // there are no replacing classes -> return original array
-      return Collections.emptyMap();
+      // there are no replacing classes
+      return new HashMap<Class<?>, Class<? extends T>>(0);
     }
 
     // compute resulting replacement mapping
@@ -414,7 +413,7 @@ public final class ConfigurationUtility {
     }
 
     if (replacingClasses.isEmpty()) {
-      return Collections.emptySet();
+      return replacingClasses;
     }
 
     // remove transitive replacements (e.g. if A replaces B and B replaces C, A and B are replacing classes but we are interested in A only)
