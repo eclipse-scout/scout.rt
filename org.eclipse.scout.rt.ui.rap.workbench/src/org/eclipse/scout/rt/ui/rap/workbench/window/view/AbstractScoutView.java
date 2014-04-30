@@ -45,26 +45,26 @@ import org.eclipse.ui.part.ViewPart;
 @SuppressWarnings("deprecation")
 public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutView.class);
+  // public static enum ViewState{OPEN, CLOSING_UI, CLOSING_MODEL, CLOSED}
 
   private IRwtWorkbenchEnvironment m_uiEnvironment;
 
   private P_ViewListener m_viewListener;
-  private final OptimisticLock m_closeLock;
-  private final OptimisticLock m_closeFromModel;
-  private final OptimisticLock m_layoutLock;
+  private OptimisticLock m_closeLock;
+  private OptimisticLock m_closeFromModel = new OptimisticLock();
+  // private ViewState m_viewState;
+  private OptimisticLock m_layoutLock = new OptimisticLock();
 
   private Form m_rootForm;
   private Composite m_rootArea;
 
   private IForm m_scoutForm;
 
-  private final PropertyChangeListener m_formPropertyListener;
+  private PropertyChangeListener m_formPropertyListener;
 
   public AbstractScoutView() {
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
     m_closeLock = new OptimisticLock();
-    m_closeFromModel = new OptimisticLock();
-    m_layoutLock = new OptimisticLock();
   }
 
   @Override

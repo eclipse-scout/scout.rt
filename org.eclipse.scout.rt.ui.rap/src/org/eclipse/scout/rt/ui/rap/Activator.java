@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.Hashtable;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.MultiClientSessionCookieStore;
 import org.eclipse.scout.rt.ui.rap.login.internal.InternalNetAuthenticator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -27,6 +32,7 @@ public class Activator extends AbstractUIPlugin {
 
   private static final String CLIENT_LOG_LEVEL = "org.eclipse.rwt.clientLogLevel";
   private static final String ALL_CLIENT_LOG_LEVEL = "ALL";
+  public static final String MULTI_CLIENT_SESSION_COOKIESTORE = "org.eclipse.scout.rt.multiClientSessionCookieStoreEnabled";
 
   private static Activator m_plugin;
 
@@ -47,7 +53,8 @@ public class Activator extends AbstractUIPlugin {
     // register net authenticator ui
     Hashtable<String, Object> map = new Hashtable<String, Object>();
     map.put(Constants.SERVICE_RANKING, -1);
-    m_netAuthRegistration = Activator.getDefault().getBundle().getBundleContext().registerService(java.net.Authenticator.class.getName(), new InternalNetAuthenticator(), map);
+    m_netAuthRegistration = context.registerService(java.net.Authenticator.class.getName(), new InternalNetAuthenticator(), map);
+    installCookieStore(context);
   }
 
   @Override
@@ -58,5 +65,12 @@ public class Activator extends AbstractUIPlugin {
     }
     m_plugin = null;
     super.stop(context);
+  }
+
+  private void installCookieStore(BundleContext context) {
+    boolean isMultiClientSessionCookieStoreEnabled = StringUtility.parseBoolean(context.getProperty(MULTI_CLIENT_SESSION_COOKIESTORE));
+    if (isMultiClientSessionCookieStoreEnabled) {
+      CookieHandler.setDefault(new CookieManager(new MultiClientSessionCookieStore(), CookiePolicy.ACCEPT_ALL));
+    }
   }
 }

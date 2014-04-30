@@ -15,9 +15,9 @@ import java.net.CookieManager;
 
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.MultiClientSessionCookieStore;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientTest;
 import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthenticator;
-import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientSessionCookieStore;
 
 /**
  * A custom test environment (e.g. for running tests in Maven Tycho) implementing this interface will be used by
