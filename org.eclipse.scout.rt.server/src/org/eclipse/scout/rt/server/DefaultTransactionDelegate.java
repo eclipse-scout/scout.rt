@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
@@ -179,20 +180,7 @@ public class DefaultTransactionDelegate {
     ServiceTunnelResponse serviceRes = null;
     try {
       //do checks
-      Class<?> serviceInterfaceClass = null;
-      for (Bundle b : m_loaderBundles) {
-        try {
-          serviceInterfaceClass = b.loadClass(serviceReq.getServiceInterfaceClassName());
-          break;
-        }
-        catch (ClassNotFoundException e) {
-          // nop
-        }
-      }
-      //check access: existence
-      if (serviceInterfaceClass == null) {
-        throw new ClassNotFoundException(serviceReq.getServiceInterfaceClassName());
-      }
+      Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
       //check access: service proxy allowed
       Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, serviceReq.getArgs());

@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
@@ -192,12 +193,14 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     Map<Class, Object> backup = ThreadContext.backup();
     Locale oldLocale = LocaleThreadLocal.get();
     ScoutTexts oldTexts = TextsThreadLocal.get();
+    ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       ThreadContext.putServerSession(m_serverSession);
       ThreadContext.putTransaction(transaction);
       LocaleThreadLocal.set(m_serverSession.getLocale());
       TextsThreadLocal.set(m_serverSession.getTexts());
       ActiveTransactionRegistry.register(transaction);
+      Thread.currentThread().setContextClassLoader(SerializationUtility.getClassLoader());
       //
       IStatus status = runTransaction(monitor);
       if (status == null) {
@@ -279,6 +282,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       }
       LocaleThreadLocal.set(oldLocale);
       TextsThreadLocal.set(oldTexts);
+      Thread.currentThread().setContextClassLoader(oldContextClassLoader);
     }
   }
 
