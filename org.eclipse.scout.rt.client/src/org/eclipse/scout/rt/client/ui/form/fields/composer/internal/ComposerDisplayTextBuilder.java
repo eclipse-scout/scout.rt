@@ -31,14 +31,14 @@ public class ComposerDisplayTextBuilder {
   private void visitAndNodes(List<? extends ITreeNode> nodes, StringBuilder buf, String prefix) {
     Iterator<? extends ITreeNode> nodeIt = nodes.iterator();
     ITreeNode node = null;
-    boolean skitDoNext = false;
-    while (nodeIt.hasNext() || skitDoNext) {
+    boolean skipDoNext = false;
+    while (nodeIt.hasNext() || skipDoNext) {
       // to ensure visit first node after an either or...
-      if (!skitDoNext) {
+      if (!skipDoNext) {
         node = nodeIt.next();
       }
       // reset
-      skitDoNext = false;
+      skipDoNext = false;
 
       if (node instanceof EntityNode) {
         visitEntityNode((EntityNode) node, buf, prefix);
@@ -47,7 +47,6 @@ public class ComposerDisplayTextBuilder {
         visitAttributeNode((AttributeNode) node, buf, prefix);
       }
       else if (node instanceof EitherOrNode) {
-        skitDoNext = true;
         List<EitherOrNode> eitherOrNodes = new ArrayList<EitherOrNode>();
         eitherOrNodes.add((EitherOrNode) node);
         while (nodeIt.hasNext()) {
@@ -56,6 +55,7 @@ public class ComposerDisplayTextBuilder {
             eitherOrNodes.add((EitherOrNode) node);
           }
           else {
+            skipDoNext = true;
             break;
           }
         }
