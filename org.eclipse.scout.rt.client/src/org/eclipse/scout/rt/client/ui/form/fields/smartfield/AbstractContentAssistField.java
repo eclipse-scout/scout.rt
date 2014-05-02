@@ -1030,13 +1030,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       prepareKeyLookup(call, key);
       data = call.getDataByKey();
     }
-    List<ILookupRow<KEY_TYPE>> result;
-    if (data != null) {
-      result = new ArrayList<ILookupRow<KEY_TYPE>>(data);
-    }
-    else {
-      result = new ArrayList<ILookupRow<KEY_TYPE>>();
-    }
+    List<ILookupRow<KEY_TYPE>> result = CollectionUtility.arrayList(data);
     filterKeyLookup(call, result);
     return cleanupResultList(result);
   }

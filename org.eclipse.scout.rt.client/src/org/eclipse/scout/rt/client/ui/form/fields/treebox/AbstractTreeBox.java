@@ -534,8 +534,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     if (call != null) {
       call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
       prepareLookupCall(call, null);
-      // create a modifiable copy of the result for enable filtering in next steps.
-      data = new ArrayList<ILookupRow<T>>(call.getDataByAll());
+      data = call.getDataByAll();
       data = filterLookupResult(call, data);
       if (data != null && data.size() > 1000) {
         LOG.warn("TreeBox " + getClass().getSimpleName() + " has loadIncremental=false but produced more than 1000 rows; check if this is intended.");
@@ -550,14 +549,19 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   private List<? extends ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) throws ProcessingException {
-    List<ILookupRow<T>> result;
-    if (data != null) {
-      result = new ArrayList<ILookupRow<T>>(data);
-    }
-    else {
-      result = new ArrayList<ILookupRow<T>>();
-    }
+    List<ILookupRow<T>> result = CollectionUtility.arrayList(data);
     execFilterLookupResult(call, result);
+    Iterator<ILookupRow<T>> resultIt = result.iterator();
+    while (resultIt.hasNext()) {
+      ILookupRow<T> row = resultIt.next();
+      if (row == null) {
+        resultIt.remove();
+      }
+      else if (row.getKey() == null) {
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for tree box '" + getClass().getName() + "'.");
+        resultIt.remove();
+      }
+    }
     return result;
   }
 

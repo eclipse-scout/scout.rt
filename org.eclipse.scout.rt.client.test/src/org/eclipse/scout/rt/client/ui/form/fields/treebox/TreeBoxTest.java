@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -143,6 +144,14 @@ public class TreeBoxTest {
     assertTrue(CollectionUtility.isEmpty(values));
   }
 
+  @Test
+  public void testNullKeys() throws Exception {
+    AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
+    treeBox.initField();
+    treeBox.checkAllKeys();
+    Assert.assertEquals(14, treeBox.getCheckedKeyCount()); // assert the null key is not available
+  }
+
   public class SimpleTreeBox extends AbstractTreeBox<Long> {
 
     @Override
@@ -186,6 +195,7 @@ public class TreeBoxTest {
       list.add(new LookupRow<Long>(12L, "C-B-B", null, null, null, null, null, true, /*parent*/9L, true));
       list.add(new LookupRow<Long>(13L, "C-B-C", null, null, null, null, null, true, /*parent*/9L, true));
       list.add(new LookupRow<Long>(14L, "C-B-D", null, null, null, null, null, true, /*parent*/9L, true));
+      list.add(new LookupRow<Long>(null, "null key", null, null, null, null, null, true, /*parent*/9L, true));
       return list;
     }
   }

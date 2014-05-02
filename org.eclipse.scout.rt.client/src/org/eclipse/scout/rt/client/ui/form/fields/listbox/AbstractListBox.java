@@ -184,8 +184,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
     }
     // (b) get data direct
     else {
-      data = CollectionUtility.emptyArrayList();
-      data = filterLookupResult(null, data);
+      data = filterLookupResult(null, null);
     }
     return data;
   }
@@ -492,11 +491,16 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   private List<ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) throws ProcessingException {
     // create a copy for the custom filter method
-    List<ILookupRow<T>> result = new ArrayList<ILookupRow<T>>(data);
+    List<ILookupRow<T>> result = CollectionUtility.arrayList(data);
     execFilterLookupResult(call, result);
     Iterator<ILookupRow<T>> resultIt = result.iterator();
     while (resultIt.hasNext()) {
-      if (resultIt.next() == null) {
+      ILookupRow<T> row = resultIt.next();
+      if (row == null) {
+        resultIt.remove();
+      }
+      else if (row.getKey() == null) {
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for list box '" + getClass().getName() + "'.");
         resultIt.remove();
       }
     }

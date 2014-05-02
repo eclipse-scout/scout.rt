@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -275,29 +276,22 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * @throws ProcessingException
    */
   private List<ILookupRow<T>> getLookupRows() throws ProcessingException {
-    List<? extends ILookupRow<T>> data;
-    ILookupCall<T> call = null;
+    List<ILookupRow<T>> data;
+    ILookupCall<T> call = getLookupCall();
     // Get the data
-    if (getLookupCall() != null) {
-      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
+    if (call != null) {
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
       prepareLookupCall(call);
-      data = call.getDataByAll();
+      data = CollectionUtility.arrayList(call.getDataByAll());
     }
     else {
       data = CollectionUtility.emptyArrayList();
     }
 
     // Filter the result
-    ArrayList<ILookupRow<T>> result;
-    if (data != null) {
-      result = new ArrayList<ILookupRow<T>>(data);
-    }
-    else {
-      result = new ArrayList<ILookupRow<T>>();
-    }
-    filterLookup(call, result);
+    filterLookup(call, data);
 
-    return result;
+    return data;
   }
 
   private void prepareLookupCall(ILookupCall<T> call) {
@@ -315,6 +309,19 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   private void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
     execFilterLookupResult(call, result);
+
+    // filter invalid rows
+    Iterator<ILookupRow<T>> resultIt = result.iterator();
+    while (resultIt.hasNext()) {
+      ILookupRow<T> row = resultIt.next();
+      if (row == null) {
+        resultIt.remove();
+      }
+      else if (row.getKey() == null) {
+        LOG.warn("The key of a lookup row may not be null. Row has been removed for radio button group '" + getClass().getName() + "'.");
+        resultIt.remove();
+      }
+    }
   }
 
   @Override

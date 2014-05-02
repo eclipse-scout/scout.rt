@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractRadioButtonGroup}
- *
+ * 
  * @since 4.0.0-M7
  */
 @RunWith(ScoutClientTestRunner.class)
@@ -237,6 +237,7 @@ public class AbstractRadioButtonGroupTest {
       rows.add(new LookupRow<Long>(1L, "Business Systems Integration AG"));
       rows.add(new LookupRow<Long>(2L, "Eclipse"));
       rows.add(new LookupRow<Long>(3L, "Google"));
+      rows.add(new LookupRow<Long>(null, "null value"));
       return rows;
     }
   }
