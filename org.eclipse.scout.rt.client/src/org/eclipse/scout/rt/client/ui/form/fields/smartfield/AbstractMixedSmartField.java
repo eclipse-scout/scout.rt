@@ -375,6 +375,7 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
           setActiveFilter(TriState.TRUE);
           smartForm = createProposalForm();
           smartForm.startForm();
+          smartForm.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
           if (smartForm.isFormOpen()) {
             doSearch(newText, selectCurrentValue, false);
             registerProposalFormInternal(smartForm);
