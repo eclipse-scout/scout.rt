@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate;
 /**
  * This filter is registered under the extension point <code>org.eclipse.equinox.http.registry.filters</code> and
  * triggers all registered servlet filters under extension point
- * <code>org.eclipse.scout.http.servletfilter.filters</code>.<br>
+ * <code>org.eclipse.scout.rt.server.commons.filters</code>.<br>
  * The reason for this delegation filter is the support of rankings in the scout servlet filters. In case of security
  * filters a ranking is strong requirement to support chainable security filters.
  */

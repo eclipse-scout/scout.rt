@@ -634,7 +634,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   protected String createSqlDump(boolean statementWithBinds, boolean statementPlainText) {
-    StringBuffer debugBindBuf = new StringBuffer();
+    StringBuilder debugBindBuf = new StringBuilder();
     if (m_currentInputBindMap == null) {
       try {
         prepareInputStatementAndBinds();
@@ -679,9 +679,12 @@ public class StatementProcessor implements IStatementProcessor {
         debugBindBuf.append(out.getToken().getParsedToken());
         debugBindBuf.append(" => ");
         debugBindBuf.append(out.getToken().getReplaceToken());
-        debugBindBuf.append(" [");
-        debugBindBuf.append(out.getBindType().getSimpleName());
-        debugBindBuf.append("]");
+        Class bindType = out.getBindType();
+        if (bindType != null) {
+          debugBindBuf.append(" [");
+          debugBindBuf.append(bindType.getSimpleName());
+          debugBindBuf.append("]");
+        }
         debugBindBuf.append("\n");
       }
     }

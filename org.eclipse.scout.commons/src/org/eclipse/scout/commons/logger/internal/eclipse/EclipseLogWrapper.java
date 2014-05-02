@@ -69,7 +69,7 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
       bundle = Activator.getDefault().getBundle();
     }
     //
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (record.getSourceClassName() != null) {
       buf.append(record.getSourceClassName());
       if (record.getSourceMethodName() != null) {
@@ -80,14 +80,26 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
     else {
       buf.append(record.getLoggerName());
     }
+    buf.append(' ');
+    buf.append(record.getMessage());
+
     if (bundle != null) {
+      Throwable thrown = record.getThrown();
+      if (thrown != null) {
+        String message = thrown.getMessage();
+        if (message != null) {
+          buf.append('\n');
+          buf.append(message);
+        }
+      }
+
       int scoutLevel = JavaLogUtility.javaToScoutLevel(record.getLevel());
       int severity = EclipseLogUtility.scoutToEclipseLevel(scoutLevel);
-      Status status = new Status(severity, bundle.getSymbolicName(), 0, buf.toString() + " " + record.getMessage(), record.getThrown());
+      Status status = new Status(severity, bundle.getSymbolicName(), 0, buf.toString(), thrown);
       Platform.getLog(bundle).log(status);
     }
     else {
-      System.err.println("Failed logging entry " + record.getLoggerName() + " " + buf.toString() + " " + record.getMessage());
+      System.err.println("Failed logging entry " + record.getLoggerName() + " " + buf.toString());
     }
   }
 
