@@ -133,7 +133,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         ));
     // add configured child codes
     for (ICode<T> childCode : execCreateChildCodes()) {
-      addChildCodeInternal(childCode);
+      addChildCodeInternal(-1, childCode);
     }
   }
 
@@ -323,17 +323,54 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   }
 
   @Override
-  public void addChildCodeInternal(ICode<T> code) {
-    code.setCodeTypeInternal(m_codeType);
-    code.setParentCodeInternal(this);
+  public void addChildCodeInternal(int index, ICode<T> code) {
+    if (code == null) {
+      return;
+    }
+    int oldIndex = removeChildCodeInternal(code.getId());
+    if (oldIndex >= 0 && index < 0) {
+      index = oldIndex;
+    }
     if (m_codeMap == null) {
       m_codeMap = new HashMap<T, ICode<T>>();
     }
-    m_codeMap.put(code.getId(), code);
     if (m_codeList == null) {
       m_codeList = new ArrayList<ICode<T>>();
     }
-    m_codeList.add(code);
+    code.setCodeTypeInternal(m_codeType);
+    code.setParentCodeInternal(this);
+    m_codeMap.put(code.getId(), code);
+    if (index < 0) {
+      m_codeList.add(code);
+    }
+    else {
+      m_codeList.add(Math.min(index, m_codeList.size()), code);
+    }
+  }
+
+  @Override
+  public int removeChildCodeInternal(T codeId) {
+    if (m_codeMap == null) {
+      return -1;
+    }
+    ICode<T> droppedCode = m_codeMap.remove(codeId);
+    if (droppedCode == null) {
+      return -1;
+    }
+    int index = -1;
+    if (m_codeList != null) {
+      for (Iterator<ICode<T>> it = m_codeList.iterator(); it.hasNext();) {
+        index++;
+        ICode<T> candidateCode = it.next();
+        if (candidateCode == droppedCode) {
+          it.remove();
+          break;
+        }
+      }
+    }
+    droppedCode.setCodeTypeInternal(null);
+    droppedCode.setParentCodeInternal(null);
+    return index;
   }
 
   @Override

@@ -439,7 +439,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     return list;
   }
 
-  private void loadCodes() throws ProcessingException {
+  protected void loadCodes() throws ProcessingException {
     m_rootCodeMap = new HashMap<CODE_ID, CODE>();
     m_rootCodeList = new ArrayList<CODE>();
     //
@@ -505,13 +505,13 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     for (CODE code : allCodesOrdered) {
       CODE parentCode = codeToParentCodeMap.get(code);
       if (parentCode != null) {
-        parentCode.addChildCodeInternal(code);
+        parentCode.addChildCodeInternal(-1, code);
       }
       else {
-        this.addChildCodeInternal(code);
+        this.addRootCodeInternal(-1, code);
       }
     }
-    //3 mark all chidren of inactive codes also as inactive
+    // 3 mark all chidren of inactive codes also as inactive
     visit(new ICodeVisitor<ICode<CODE_ID>>() {
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
@@ -527,11 +527,64 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     }, false);
   }
 
-  private void addChildCodeInternal(CODE code) {
+  /**
+   * do not use this internal method unless the intention is in fact to change the structure of the possibly shared
+   * {@link ICodeType}
+   * <p>
+   * Add a new root code, owerwrite (drop) existing root code
+   * 
+   * @since 4.0
+   * @param index
+   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1
+   *          and the codeId did not exist, then the code is appended to the end.
+   */
+  protected void addRootCodeInternal(int index, CODE code) {
+    if (code == null) {
+      return;
+    }
+    int oldIndex = removeRootCodeInternal(code.getId());
+    if (oldIndex >= 0 && index < 0) {
+      index = oldIndex;
+    }
     code.setCodeTypeInternal(this);
     code.setParentCodeInternal(null);
     m_rootCodeMap.put(code.getId(), code);
-    m_rootCodeList.add(code);
+    if (index < 0) {
+      m_rootCodeList.add(code);
+    }
+    else {
+      m_rootCodeList.add(Math.min(index, m_rootCodeList.size()), code);
+    }
+  }
+
+  /**
+   * do not use this internal method unless the intention is in fact to change the structure of the possibly shared
+   * {@link ICodeType}
+   * <p>
+   * Remove a root code
+   * 
+   * @since 4.0
+   * @return the index the code had in the list or -1
+   */
+  protected int removeRootCodeInternal(CODE_ID codeId) {
+    CODE droppedCode = m_rootCodeMap.get(codeId);
+    if (droppedCode == null) {
+      return -1;
+    }
+    int index = -1;
+    if (m_rootCodeList != null) {
+      for (Iterator<CODE> it = m_rootCodeList.iterator(); it.hasNext();) {
+        index++;
+        CODE candidateCode = it.next();
+        if (candidateCode == droppedCode) {
+          it.remove();
+          break;
+        }
+      }
+    }
+    droppedCode.setCodeTypeInternal(null);
+    droppedCode.setParentCodeInternal(null);
+    return index;
   }
 
   @Override
