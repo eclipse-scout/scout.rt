@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.json.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +30,7 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
     try {
 //      json.put(PROP_VALUE, valueToJson()); //FIXME
@@ -38,7 +38,7 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,14 +51,14 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     super.attachModel();
 
     m_rootGroupBox = JsonRendererFactory.get().createJsonFormField(getModelObject().getRootGroupBox(), getJsonSession());
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject jsonForm = super.toJson();
     try {
       jsonForm.put(PROP_TITLE, getModelObject().getTitle());
@@ -75,7 +75,7 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
       return jsonForm;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -94,13 +94,13 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
     if (EVENT_FORM_CLOSING.equals(event.getEventType())) {
       handleUiFormClosing(event, res);
     }
   }
 
-  public void handleUiFormClosing(JsonEvent event, JsonResponse res) throws JsonUIException {
+  public void handleUiFormClosing(JsonEvent event, JsonResponse res) throws JsonException {
 
     new ClientSyncJob("Form closing", getJsonSession().getClientSession()) {
       @Override

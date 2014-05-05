@@ -20,8 +20,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -31,7 +32,7 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST
  */
-public abstract class AbstractJsonServlet extends HttpServletEx implements IJsonSessionProvider {
+public abstract class AbstractJsonServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
 
@@ -39,9 +40,11 @@ public abstract class AbstractJsonServlet extends HttpServletEx implements IJson
     JsonRendererFactory.init(createJsonRendererFactory());
   }
 
-  public JsonRendererFactory createJsonRendererFactory() throws JsonUIException {
+  public JsonRendererFactory createJsonRendererFactory() throws JsonException {
     return new JsonRendererFactory();
   }
+
+  public abstract IJsonSession createJsonSession();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

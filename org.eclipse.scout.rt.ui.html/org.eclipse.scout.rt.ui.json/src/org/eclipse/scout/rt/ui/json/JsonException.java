@@ -13,18 +13,18 @@ package org.eclipse.scout.rt.ui.json;
 /**
  *
  */
-public class JsonUIException extends RuntimeException {
+public class JsonException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  public JsonUIException(String message) {
+  public JsonException(String message) {
     super(message);
   }
 
-  public JsonUIException(Throwable cause) {
+  public JsonException(Throwable cause) {
     super(cause);
   }
 
-  public JsonUIException(String message, Throwable cause) {
+  public JsonException(String message, Throwable cause) {
     super(message, cause);
   }
 }

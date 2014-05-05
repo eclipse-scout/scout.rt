@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
 import org.json.JSONArray;
@@ -102,7 +102,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     super.attachModel();
     if (m_modelTreeListener == null) {
       m_modelTreeListener = new P_ModelTreeListener();
@@ -111,7 +111,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   @Override
-  protected void detachModel() throws JsonUIException {
+  protected void detachModel() throws JsonException {
     super.detachModel();
     if (m_modelTreeListener != null) {
       getModelObject().removeTreeListener(m_modelTreeListener);
@@ -120,7 +120,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   @Override
-  public void dispose() throws JsonUIException {
+  public void dispose() throws JsonException {
     super.dispose();
     m_treeNodeIds.clear();
     m_treeNodes.clear();
@@ -132,7 +132,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
     try {
       JSONArray jsonPages = new JSONArray();
@@ -160,11 +160,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
-  protected void handleModelTreeEvent(TreeEvent event) throws JsonUIException {
+  protected void handleModelTreeEvent(TreeEvent event) throws JsonException {
     switch (event.getType()) {
       case TreeEvent.TYPE_NODES_SELECTED: {
         handleModelSelectedNodeMenusChanged(event.getNodes());
@@ -201,7 +201,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }
   }
 
-  protected void handleModelNodeExpanded(ITreeNode modelNode) throws JsonUIException {
+  protected void handleModelNodeExpanded(ITreeNode modelNode) throws JsonException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_NODE_ID, m_treeNodeIds.get(modelNode));
@@ -209,11 +209,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       getJsonSession().currentJsonResponse().addActionEvent("nodeExpanded", getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
-  protected void handleModelNodesInserted(TreeEvent event) throws JsonUIException {
+  protected void handleModelNodesInserted(TreeEvent event) throws JsonException {
     try {
       JSONObject jsonEvent = new JSONObject();
 
@@ -227,11 +227,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       getJsonSession().currentJsonResponse().addActionEvent("nodesInserted", getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
-  protected void handleModelNodesDeleted(Collection<ITreeNode> modelNodes) throws JsonUIException {
+  protected void handleModelNodesDeleted(Collection<ITreeNode> modelNodes) throws JsonException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
@@ -252,11 +252,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
-  protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) throws JsonUIException {
+  protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) throws JsonException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
@@ -264,11 +264,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
-  protected void handleModelSelectedNodeMenusChanged(Collection<ITreeNode> modelNodes) throws JsonUIException {
+  protected void handleModelSelectedNodeMenusChanged(Collection<ITreeNode> modelNodes) throws JsonException {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
@@ -279,7 +279,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
@@ -307,7 +307,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     return id;
   }
 
-  protected JSONObject pageToJson(IPage page) throws JsonUIException {
+  protected JSONObject pageToJson(IPage page) throws JsonException {
     try {
       String id = getOrCreatedNodeId(page);
       String parentNodeId = getOrCreatedNodeId(page.getParentPage());
@@ -363,7 +363,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -379,10 +379,10 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     return null;
   }
 
-  public ITreeNode getTreeNodeForNodeId(String nodeId) throws JsonUIException {
+  public ITreeNode getTreeNodeForNodeId(String nodeId) throws JsonException {
     ITreeNode node = m_treeNodes.get(nodeId);
     if (node == null) {
-      throw new JsonUIException("No node found for id " + nodeId);
+      throw new JsonException("No node found for id " + nodeId);
     }
     return node;
   }
@@ -400,12 +400,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       return nodes;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
     if ("nodeClicked".equals(event.getEventType())) {
       handleUiNodeClick(event, res);
     }
@@ -429,7 +429,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }
   }
 
-  protected void handleUiNodeClick(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiNodeClick(JsonEvent event, JsonResponse res) throws JsonException {
     try {
       final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString(PROP_NODE_ID));
 
@@ -441,11 +441,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }.runNow(new NullProgressMonitor());
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
-  protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) throws JsonException {
     try {
       final List<ITreeNode> nodes = extractTreeNodes(event.getEventObject());
 
@@ -465,11 +465,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }.runNow(new NullProgressMonitor());
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
-  protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) throws JsonException {
     try {
       final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString(PROP_NODE_ID));
       final boolean expanded = event.getEventObject().getBoolean("expanded");
@@ -493,11 +493,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       }.runNow(new NullProgressMonitor());
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
-  protected void handleUiGraph(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiGraph(JsonEvent event, JsonResponse res) throws JsonException {
     JSONObject responseEvent;
     String nodeId;
     try {
@@ -506,12 +506,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       nodeId = event.getEventObject().getString(PROP_NODE_ID);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
     getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", nodeId, responseEvent);
   }
 
-  protected void handleUiMap(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiMap(JsonEvent event, JsonResponse res) throws JsonException {
     JSONObject responseEvent;
     String nodeId;
     try {
@@ -520,12 +520,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       nodeId = event.getEventObject().getString(PROP_NODE_ID);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
     getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", nodeId, responseEvent);
   }
 
-  protected void handleUiDataModel(JsonEvent event, JsonResponse res) throws JsonUIException {
+  protected void handleUiDataModel(JsonEvent event, JsonResponse res) throws JsonException {
     JSONObject responseEvent;
     try {
       responseEvent = new JSONObject();
@@ -533,7 +533,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       responseEvent.put("dataModel", new JSONObject(jsonData));
     }
     catch (JSONException | ProcessingException | IOException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
     getJsonSession().currentJsonResponse().addActionEvent("dataModelLoaded", getId(), responseEvent);
   }

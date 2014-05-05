@@ -18,7 +18,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonRequest {
+
   public static final String PROP_STARTUP = "startup";
+  public static final String PROP_SESSION_PART_ID = "sessionPartId";
+  public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_EVENTS = "events";
 
   private final JSONObject m_request;
@@ -29,16 +32,19 @@ public class JsonRequest {
 
   public String getSessionPartId() {
     try {
-      return m_request.getString("sessionPartId");
+      return m_request.getString(PROP_SESSION_PART_ID);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
   public List<JsonEvent> getEvents() {
     try {
-      JSONArray events = m_request.getJSONArray(PROP_EVENTS);
+      JSONArray events = m_request.optJSONArray(PROP_EVENTS);
+      if (events == null) {
+        return new ArrayList<>(0);
+      }
       List<JsonEvent> actionList = new ArrayList<>(events.length());
       for (int i = 0; i < events.length(); i++) {
         actionList.add(new JsonEvent(events.getJSONObject(i)));
@@ -46,7 +52,7 @@ public class JsonRequest {
       return actionList;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
@@ -56,5 +62,17 @@ public class JsonRequest {
 
   public boolean isStartupRequest() {
     return Boolean.TRUE.equals(m_request.opt(PROP_STARTUP));
+  }
+
+  /**
+   * Only set on startup requests
+   */
+  public String getUserAgent() {
+    try {
+      return m_request.getString(PROP_USER_AGENT);
+    }
+    catch (JSONException e) {
+      throw new JsonException(e);
+    }
   }
 }

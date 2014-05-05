@@ -7,9 +7,11 @@
 
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
+//@include("src/main/js/main.js");
 
 //@include("src/main/js/util/arrays.js");
 //@include("src/main/js/util/EventSupport.js");
+//@include("src/main/js/util/KeystrokeManager.js");
 //@include("src/main/js/session/Session.js");
 //@include("src/main/js/session/Event.js");
 //@include("src/main/js/session/Locale.js");
@@ -19,11 +21,13 @@
 //@include("src/main/js/desktop/DesktopTable.js");
 //@include("src/main/js/desktop/DesktopChart.js");
 //@include("src/main/js/desktop/DesktopGraph.js");
+//@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");
 //@include("src/main/js/table/Table.js");
 //@include("src/main/js/table/TableHeader.js");
 //@include("src/main/js/table/TableFooter.js");
 //@include("src/main/js/table/TableColumnHeaderMenu.js");
 //@include("src/main/js/table/TableOrganizeMenu.js");
+//@include("src/main/js/table/TableKeystrokeAdapter.js");
 //@include("src/main/js/desktop/DesktopMap.js");
 //@include("src/main/js/desktop/DesktopToolButton.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");

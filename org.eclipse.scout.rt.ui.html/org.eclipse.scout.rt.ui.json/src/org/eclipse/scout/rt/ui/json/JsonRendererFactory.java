@@ -53,10 +53,7 @@ public class JsonRendererFactory {
   }
 
   public JsonClientSession createJsonClientSession(IClientSession model, IJsonSession session, String id) {
-    JsonClientSession renderer = new JsonClientSession(model, session, id);
-    renderer.init();
-
-    return renderer;
+    return new JsonClientSession(model, session, id);
   }
 
   public JsonDesktop createJsonDesktop(IDesktop model, IJsonSession session) {

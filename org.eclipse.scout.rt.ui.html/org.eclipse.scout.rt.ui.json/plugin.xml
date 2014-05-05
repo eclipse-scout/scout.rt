@@ -8,14 +8,6 @@
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.json.servlet.SlowDownRequestInterceptor"
-            createImmediately="false">
-      </service>
-      <service
-            class="org.eclipse.scout.rt.ui.json.servlet.JavascriptDebugRequestInterceptor"
-            createImmediately="false">
-      </service>
-      <service
             class="org.eclipse.scout.rt.ui.json.servlet.MainRequestInterceptor"
             createImmediately="false">
       </service>

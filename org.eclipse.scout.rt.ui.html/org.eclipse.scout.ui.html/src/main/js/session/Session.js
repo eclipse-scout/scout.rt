@@ -10,6 +10,7 @@ scout.Session = function($entryPoint, sessionPartId) {
   this._sessionPartId = sessionPartId;
   this._deferred;
   this._startup;
+  this.userAgent;
 
   //FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
@@ -48,6 +49,9 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   if (this._startup) {
     request.startup = true;
     this._startup = false;
+  }
+  if (this.userAgent) {
+    request.userAgent = this.userAgent;
   }
 
   var that = this;
@@ -133,17 +137,19 @@ scout.Session.prototype._processEvents = function(events) {
   }
 };
 
-scout.Session.prototype.init = function() {
+scout.Session.prototype.init = function(userAgent) {
   // create all widgets for entry point
   this._startup = true;
-  this.send('startup', this._sessionPartId);
+  this._sendNow();
+};
+
+scout.Session.prototype.onModelCreate = function(event) {
+  this.locale = new scout.Locale(event.locale);
+  new scout.Desktop(this, this.$entryPoint, event.desktop);
 };
 
 scout.Session.prototype.onModelAction = function(event) {
-  if (event.type_ == 'initialized') {
-    this.locale = new scout.Locale(event.locale);
-    new scout.Desktop(this, this.$entryPoint, event.desktop);
-  } else if (event.type_ == 'localeChanged') {
+  if (event.type_ == 'localeChanged') {
     this.locale = new scout.Locale(event);
     //FIXME inform components to reformat display text?
   }

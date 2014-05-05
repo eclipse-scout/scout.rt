@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.json.JSONException;
@@ -34,7 +34,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     super.attachModel();
 
     //FIXME Hold JsonTable globally? and share with other elements like desktop? generally hold every model object globally? when to dispose? only on model dispose?
@@ -43,7 +43,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
 
     try {
@@ -51,7 +51,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
@@ -84,7 +84,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
       }
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 

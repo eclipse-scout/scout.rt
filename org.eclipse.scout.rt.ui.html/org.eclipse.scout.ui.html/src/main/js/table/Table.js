@@ -20,6 +20,7 @@ scout.Table = function(session, model) {
 
   this.events = new scout.EventSupport();
   this._filterMap = {};
+  this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 };
 
 scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -59,6 +60,7 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype.detach = function() {
   this.$container.detach();
+  scout.keystrokeManager.removeAdapter(this._keystrokeAdapter);
 };
 
 scout.Table.prototype.attach = function($container) {
@@ -67,6 +69,7 @@ scout.Table.prototype.attach = function($container) {
   } else {
     this.$container.appendTo($container);
   }
+  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 };
 
 scout.Table.prototype.drawSelection = function() {
@@ -716,6 +719,10 @@ scout.Table.prototype.insertRows = function(rows) {
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
+  if(!Array.isArray(rowIds)) {
+    rowIds = [rowIds];
+  }
+
   var table = this.model;
   table.selectedRowIds = rowIds;
 
@@ -731,6 +738,8 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 
     this.drawSelection();
   }
+
+  //FIXME selection menu is not shown when using this method
 
   if (!this.updateFromModelInProgress) {
     //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
@@ -774,7 +783,7 @@ scout.Table.prototype.filter = function() {
 
     for (var key in that._filterMap) {
       var filter = that._filterMap[key];
-      show &= filter.accept($row);
+      show = show && filter.accept($row);
     }
 
     if (show) {

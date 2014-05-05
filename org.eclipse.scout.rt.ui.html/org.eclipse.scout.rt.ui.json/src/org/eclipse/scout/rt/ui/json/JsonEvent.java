@@ -28,7 +28,7 @@ public class JsonEvent {
       return m_event.getString(TYPE);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 
@@ -37,7 +37,7 @@ public class JsonEvent {
       return m_event.getString(ID);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
   }
 

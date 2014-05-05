@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +28,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
     try {
       json.put(IViewButton.PROP_TEXT, getModelObject().getText());
@@ -36,12 +36,12 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
     if (EVENT_CLICK.equals(event.getEventType())) {
       handleUiClick(event, res);
     }

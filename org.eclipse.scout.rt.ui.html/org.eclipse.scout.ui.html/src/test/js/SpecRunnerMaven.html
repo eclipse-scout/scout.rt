@@ -4,7 +4,7 @@
   You can use it too while developing by executing
   mvn jasmine:bdd and connecting to http://localhost:8234/ with your browser.
   Alternatively, use SpecRunner.html.
-  //FIXME we need to find a better way to manage dependencies. At the moment we have to include the files at 4 different places.
+  //FIXME we need to find a better way to manage dependencies. At the moment we have to include the files at 3 different places.
  -->
 <html>
 <head>
@@ -43,6 +43,7 @@
   <script type="text/javascript" src="src/main/js/jquery-scout.js"></script>
   <script type="text/javascript" src="src/main/js/util/EventSupport.js"></script>
   <script type="text/javascript" src="src/main/js/util/arrays.js"></script>
+  <script type="text/javascript" src="src/main/js/util/KeystrokeManager.js"></script>
   <script type="text/javascript" src="src/main/js/session/Session.js"></script>
   <script type="text/javascript" src="src/main/js/session/Event.js"></script>
   <script type="text/javascript" src="src/main/js/session/Locale.js"></script>
@@ -58,10 +59,12 @@
   <script type="text/javascript" src="src/main/js/desktop/DesktopTree.js"></script>
   <script type="text/javascript" src="src/main/js/desktop/DesktopViewButton.js"></script>
   <script type="text/javascript" src="src/main/js/desktop/DesktopViewButtonBar.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopKeystrokeAdapter.js"></script>
   <script type="text/javascript" src="src/main/js/table/Table.js"></script>
   <script type="text/javascript" src="src/main/js/table/TableHeader.js"></script>
   <script type="text/javascript" src="src/main/js/table/TableFooter.js"></script>
   <script type="text/javascript" src="src/main/js/table/TableColumnHeaderMenu.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableKeystrokeAdapter.js"></script>
   <script type="text/javascript" src="src/main/js/form/Form.js"></script>
   <script type="text/javascript" src="src/main/js/form/fields/tablefield/TableField.js"></script>
   <script type="text/javascript" src="src/main/js/menu/Menu.js"></script>

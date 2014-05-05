@@ -31,7 +31,7 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     super.attachModel();
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();
@@ -40,7 +40,7 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
   }
 
   @Override
-  protected void detachModel() throws JsonUIException {
+  protected void detachModel() throws JsonException {
     super.detachModel();
     if (m_propertyChangeListener != null) {
       getModelObject().removePropertyChangeListener(m_propertyChangeListener);

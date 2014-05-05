@@ -50,27 +50,41 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public void init(HttpServletRequest request, String sessionId) throws JsonUIException {
+  public void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException {
     m_currentHttpRequest = request;
-    UserAgent userAgent = createUserAgent();
+    UserAgent userAgent = createUserAgent(jsonReq);
     Subject subject = initSubject();
     if (subject == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
 
-    m_jsonClientSession = new JsonClientSession(clientSession, this, sessionId); //FIXME use sessionId use createUniqueIdFor? duplicates possible?
+    m_jsonClientSession = JsonRendererFactory.get().createJsonClientSession(clientSession, this, jsonReq.getSessionPartId()); //FIXME use sessionId or use createUniqueIdFor? duplicates possible?
     m_jsonClientSession.init();
 
     if (!clientSession.isActive()) {
-      throw new JsonUIException("ClientSession is not active, there must be a problem with loading or starting");
+      throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
     }
+
+    m_currentJsonResponse.addCreateEvent(jsonReq.getSessionPartId(), m_jsonClientSession.toJson());
     LOG.info("JsonSession initialized.");
   }
 
-  protected UserAgent createUserAgent() {
-    //FIXME create UiLayer.Json, or better let deliver from real gui -> html?
-    return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
+  protected UserAgent createUserAgent(JsonRequest jsonReq) {
+    String browserId = m_currentHttpRequest.getHeader("User-Agent");
+    String userAgent = jsonReq.getRequestObject().optString("userAgent", null);
+    if (userAgent == null) {
+      //FIXME create UiLayer.HTML
+      return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, browserId);
+    }
+    else {
+      //FIXME it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      if (!userAgent.contains("|")) {
+        userAgent = UiLayer.RAP.getIdentifier() + "|" + userAgent;
+      }
+      userAgent += "|" + browserId;
+      return UserAgent.createByIdentifier(userAgent);
+    }
   }
 
   protected Subject initSubject() {
@@ -108,7 +122,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  public void dispose() throws JsonUIException {
+  public void dispose() throws JsonException {
     for (IJsonRenderer renderer : CollectionUtility.arrayList(m_jsonRenderers.values())) {
       renderer.dispose();
     }
@@ -151,14 +165,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonUIException {
+  public JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException {
     m_currentHttpRequest = httpReq;
 
     //FIXME should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
     m_jsonClientSession.processRequestLocale(httpReq.getLocale());
 
     final JsonResponse res = currentJsonResponse();
-    //FIXME maybe rename event to action? request=actions, response=events?
     for (JsonEvent event : jsonReq.getEvents()) {
       processEvent(event, res);
     }
@@ -174,7 +187,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     format.toLocalizedPattern();
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
-      throw new JsonUIException("No renderer found for id " + id);
+      throw new JsonException("No renderer found for id " + id);
     }
     try {
       LOG.info("Handling event. Type: " + event.getEventType() + ", Id: " + id);

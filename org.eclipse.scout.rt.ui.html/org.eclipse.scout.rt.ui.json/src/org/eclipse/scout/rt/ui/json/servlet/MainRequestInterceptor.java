@@ -26,16 +26,16 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRequest;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This interceptor contributes to the {@link AbstractJsonServlet} as the default interceptor with priority 0
+ * This interceptor contributes to the {@link AbstractJsonServlet} as the default interceptor
  */
-@Priority(-1)
+@Priority(-100)
 public class MainRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MainRequestInterceptor.class);
 
@@ -80,7 +80,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
 
         //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
         jsonSession = servlet.createJsonSession();
-        jsonSession.init(req, uiReq.getSessionPartId());
+        jsonSession.init(req, uiReq);
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
     }
@@ -111,7 +111,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     LOG.debug("Returned: " + jsonText);
   }
 
-  protected JSONObject toJSON(HttpServletRequest req) throws JsonUIException {
+  protected JSONObject toJSON(HttpServletRequest req) throws JsonException {
     try {
       String jsonData = IOUtility.getContent(req.getReader());
       LOG.debug("Received: " + jsonData);
@@ -122,7 +122,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       return new JSONObject(jsonData);
     }
     catch (ProcessingException | IOException | JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 

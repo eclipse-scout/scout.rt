@@ -48,7 +48,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
 
   @Override
   public String getObjectType() {
-    return null; //not used
+    return "ClientSession";
   }
 
   @Override
@@ -83,29 +83,20 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
-    JSONObject jsonObject = new JSONObject();//not necessary to call super
+  public JSONObject toJson() throws JsonException {
+    JSONObject jsonObject = super.toJson();
     try {
       jsonObject.put("desktop", m_jsonDesktop.toJson());
       jsonObject.put("locale", localeToJson(getModelObject().getLocale()));
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
     return jsonObject;
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
-    //FIXME A little strange that startup doesn't actually trigger startup of the client session, maybe should not be handled by client session but by json session instead
-    //Probably better use JsonRequest.isStartupRequest instead
-    if ("startup".equals(event.getEventType())) {
-      handleUiStartup(event, res);
-    }
-  }
-
-  protected void handleUiStartup(JsonEvent event, JsonResponse res) throws JsonUIException {
-    res.addActionEvent("initialized", getId(), toJson());
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
   }
 
   protected void processRequestLocale(final Locale locale) {
@@ -122,7 +113,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     }.runNow(new NullProgressMonitor());
   }
 
-  protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) throws JsonUIException {
+  protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) throws JsonException {
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("digit", String.valueOf(symbols.getDigit()));
@@ -133,12 +124,12 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       jsonObject.put("patternSeparator", String.valueOf(symbols.getPatternSeparator()));
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
     return jsonObject;
   }
 
-  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) throws JsonUIException {
+  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) throws JsonException {
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("months", new JSONArray(symbols.getMonths()));
@@ -149,12 +140,12 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       jsonObject.put("pm", symbols.getAmPmStrings()[Calendar.PM]);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
     return jsonObject;
   }
 
-  protected JSONObject localeToJson(Locale locale) throws JsonUIException {
+  protected JSONObject localeToJson(Locale locale) throws JsonException {
     JSONObject jsonObject = new JSONObject();
     try {
       DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
@@ -165,7 +156,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       jsonObject.put("dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
     }
     catch (JSONException e) {
-      throw new JsonUIException(e);
+      throw new JsonException(e);
     }
     return jsonObject;
   }

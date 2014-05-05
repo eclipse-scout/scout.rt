@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.fixtures.JsonSessionMock;
-import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -46,10 +45,10 @@ public class JsonTableTest {
     Assert.assertNull(table.getSelectedRow());
 
     ITableRow row = table.getRow(2);
-    JsonTable jsonDesktopTable = createJsonDesktopTableWithMocks(table);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
 
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTable.getOrCreatedRowId(row));
-    jsonDesktopTable.handleUiEvent(event, new JsonResponse());
+    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    jsonTable.handleUiEvent(event, new JsonResponse());
 
     Assert.assertTrue(row.isSelected());
   }
@@ -63,12 +62,12 @@ public class JsonTableTest {
     table.fill(5);
 
     ITableRow row = table.getRow(2);
-    JsonTable jsonDesktopTable = createJsonDesktopTableWithMocks(table);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
 
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTable.getOrCreatedRowId(row));
-    jsonDesktopTable.handleUiEvent(event, new JsonResponse());
+    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    jsonTable.handleUiEvent(event, new JsonResponse());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonDesktopTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     Assert.assertTrue(responseEvents.size() == 0);
   }
 
@@ -88,28 +87,28 @@ public class JsonTableTest {
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
 
-    JsonTable jsonDesktopTable = createJsonDesktopTableWithMocks(table);
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTable.getOrCreatedRowId(row2));
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     Assert.assertFalse(row2.isSelected());
     Assert.assertFalse(row4.isSelected());
 
-    jsonDesktopTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event, new JsonResponse());
 
     Assert.assertFalse(row2.isSelected());
     Assert.assertTrue(row4.isSelected());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonDesktopTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     Assert.assertTrue(responseEvents.size() == 1);
 
-    List<ITableRow> tableRows = jsonDesktopTable.extractTableRows(responseEvents.get(0));
+    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0));
     Assert.assertEquals(row4, tableRows.get(0));
   }
 
   @Test
   public void testDispose() {
     Table table = new Table();
-    JsonTable object = createJsonDesktopTableWithMocks(table);
+    JsonTable object = createJsonTableWithMocks(table);
     WeakReference<JsonTable> ref = new WeakReference<JsonTable>(object);
 
     object.dispose();
@@ -117,16 +116,16 @@ public class JsonTableTest {
     JsonTestUtility.assertGC(ref);
   }
 
-  public static JsonTable createJsonDesktopTableWithMocks(ITable table) {
+  public static JsonTable createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
 
-    JsonTable jsonDesktopTable = new JsonTable(table, jsonSession);
-    jsonDesktopTable.init();
+    JsonTable jsonTable = new JsonTable(table, jsonSession);
+    jsonTable.init();
 
     //init treeNode map
-    jsonDesktopTable.toJson();
+    jsonTable.toJson();
 
-    return jsonDesktopTable;
+    return jsonTable;
   }
 
   public static JsonEvent createJsonSelectedEvent(String rowId) throws JSONException {

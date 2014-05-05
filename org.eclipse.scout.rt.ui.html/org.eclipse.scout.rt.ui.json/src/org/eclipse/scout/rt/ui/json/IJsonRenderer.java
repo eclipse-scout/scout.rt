@@ -10,11 +10,11 @@ public interface IJsonRenderer<T extends Object> {
 
   T getModelObject();
 
-  void init() throws JsonUIException;
+  void init() throws JsonException;
 
-  void dispose() throws JsonUIException;
+  void dispose() throws JsonException;
 
-  JSONObject toJson() throws JsonUIException;
+  JSONObject toJson() throws JsonException;
 
-  void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException;
+  void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException;
 }

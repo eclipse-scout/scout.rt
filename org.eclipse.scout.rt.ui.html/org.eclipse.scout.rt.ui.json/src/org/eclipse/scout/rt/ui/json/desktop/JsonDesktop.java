@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,7 +86,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -126,7 +126,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  protected void detachModel() throws JsonUIException {
+  protected void detachModel() throws JsonException {
     super.detachModel();
 
     if (m_desktopListener != null) {
@@ -140,7 +140,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
     try {
       JSONArray forms = new JSONArray();
@@ -149,22 +149,32 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       }
       json.put("forms", forms);
 
-      JSONArray viewButtons = new JSONArray();
-      for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
-        viewButtons.put(jsonViewButton.toJson());
+      boolean formBased = isFormBased();
+      if (!formBased) {
+        JSONArray viewButtons = new JSONArray();
+        for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
+          viewButtons.put(jsonViewButton.toJson());
+        }
+        json.put("viewButtons", viewButtons);
+
+        JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
+        if (jsonDesktopTree != null) {
+          json.put("outline", jsonDesktopTree.toJson());
+        }
       }
-      json.put("viewButtons", viewButtons);
-      JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
-      if (jsonDesktopTree != null) {
-        json.put("outline", jsonDesktopTree.toJson());
-      }
+
       json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME
 
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
+  }
+
+  protected boolean isFormBased() {
+    //FIXME add property to desktop.  PROP_FORM_BASED Devicetransformer should set it to true in case of mobile
+    return getJsonSession().getClientSession().getUserAgent().getUiDeviceType().isTouchDevice();
   }
 
   protected JsonForm createAndRegisterJsonForm(IForm form) {
@@ -183,7 +193,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     return jsonForm.getId();
   }
 
-  protected void handleModelDesktopEvent(DesktopEvent event) throws JsonUIException {
+  protected void handleModelDesktopEvent(DesktopEvent event) throws JsonException {
     switch (event.getType()) {
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
@@ -207,7 +217,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     }
   }
 
-  protected void handleModelFormChanged(FormEvent event) throws JsonUIException {
+  protected void handleModelFormChanged(FormEvent event) throws JsonException {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED: {
         handleModelFormClosed(event.getForm());
@@ -231,7 +241,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       }
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -250,7 +260,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       }
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -262,7 +272,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -281,7 +291,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 
@@ -316,7 +326,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonUIException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
   }
 
   protected class P_DesktopListener implements DesktopListener {

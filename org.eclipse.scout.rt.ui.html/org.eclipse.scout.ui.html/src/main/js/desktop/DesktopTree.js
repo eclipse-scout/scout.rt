@@ -162,13 +162,11 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
 
   if (this._desktopTable) {
     this._desktopTable.detach();
-//    this.model.detailTable = null;
   }
 
   if (node.type === 'table') {
     this._desktopTable = this.session.widgetMap[node.id];
     this._desktopTable.attach($('#DesktopBench'));
-    this.model.detailTable = this._desktopTable.model;
   }
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not

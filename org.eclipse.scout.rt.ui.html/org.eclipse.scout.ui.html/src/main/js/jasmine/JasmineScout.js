@@ -31,7 +31,7 @@ var jasmineScoutMatchers = {
             expected[i] = $.parseJSON(JSON.stringify(expected[i]));
           }
 
-          result.pass &= util.contains(actualEvents, expected[i], customEqualityTesters);
+          result.pass = result.pass && util.contains(actualEvents, expected[i], customEqualityTesters);
         }
 
         if (!result.pass) {

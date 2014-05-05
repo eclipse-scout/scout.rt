@@ -42,18 +42,18 @@ public class JsonResponse {
    * @param object
    *          must have an 'id' and a 'objectType'
    */
-  public void addCreateEvent(String parentId, JSONObject object) throws JsonUIException {
+  public void addCreateEvent(String parentId, JSONObject object) throws JsonException {
     if (object == null) {
       return;
     }
     try {
-      String id = object.getString("id");
+      String id = object.optString("id", null);
       if (id == null) {
-        throw new JsonUIException("id is null");
+        throw new JsonException("id is null");
       }
-      String objectType = object.getString("objectType");
+      String objectType = object.optString("objectType", null);
       if (objectType == null) {
-        throw new JsonUIException("objectType is null");
+        throw new JsonException("objectType is null");
       }
       object.put("type_", "create");
       if (parentId != null) {
@@ -62,17 +62,17 @@ public class JsonResponse {
       m_eventList.add(object);
     }
     catch (JSONException ex) {
-      throw new JsonUIException(ex);
+      throw new JsonException(ex);
     }
   }
 
   /**
    * event must have an 'id'
    */
-  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) throws JsonUIException {
+  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) throws JsonException {
     try {
       if (id == null) {
-        throw new JsonUIException("id is null");
+        throw new JsonException("id is null");
       }
       //coalesce
       JSONObject event = m_idToPropertyChangeEventMap.get(id);
@@ -88,14 +88,14 @@ public class JsonResponse {
       event.put(propertyName, newValue);
     }
     catch (JSONException ex) {
-      throw new JsonUIException(ex);
+      throw new JsonException(ex);
     }
   }
 
   /**
    * event must have an 'id'
    */
-  public void addActionEvent(String eventType, String id, JSONObject eventData) throws JsonUIException {
+  public void addActionEvent(String eventType, String id, JSONObject eventData) throws JsonException {
     try {
       if (id == null) {
         throw new JSONException("id is null");
@@ -107,7 +107,7 @@ public class JsonResponse {
       m_eventList.add(event);
     }
     catch (JSONException ex) {
-      throw new JsonUIException(ex);
+      throw new JsonException(ex);
     }
   }
 

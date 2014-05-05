@@ -15,12 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.json.AbstractJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonRequest;
+import org.eclipse.scout.rt.ui.json.JsonException;
 
 public class JsonSessionMock extends AbstractJsonSession {
 
   @Override
-  public void init(HttpServletRequest request, String sessionId) throws JsonUIException {
+  public void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException {
     // nop
     // For a fully initialized jsonSession use TestEnvironmentJsonSession
   }

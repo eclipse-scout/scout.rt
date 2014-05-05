@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
-import org.eclipse.scout.rt.ui.json.JsonUIException;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.json.JSONArray;
@@ -38,7 +38,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
     super.attachModel();
 
     for (IFormField field : getModelObject().getControlFields()) {
@@ -48,7 +48,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = super.toJson();
     try {
       json.put("borderDecoration", getModelObject().getBorderDecoration());
@@ -62,7 +62,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 

@@ -50,17 +50,17 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   }
 
   @Override
-  public final void init() throws JsonUIException {
+  public final void init() throws JsonException {
     getJsonSession().registerJsonRenderer(getId(), this);
     attachModel();
     m_initialized = true;
   }
 
-  protected void attachModel() throws JsonUIException {
+  protected void attachModel() throws JsonException {
   }
 
   @Override
-  public void dispose() throws JsonUIException {
+  public void dispose() throws JsonException {
     if (!m_initialized) {
       return;
     }
@@ -68,7 +68,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
     getJsonSession().unregisterJsonRenderer(getId());
   }
 
-  protected void detachModel() throws JsonUIException {
+  protected void detachModel() throws JsonException {
   }
 
   public boolean isInitialized() {
@@ -76,7 +76,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonUIException {
+  public JSONObject toJson() throws JsonException {
     JSONObject json = new JSONObject();
     try {
       json.put("objectType", getObjectType());
@@ -85,7 +85,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
       return json;
     }
     catch (JSONException e) {
-      throw new JsonUIException(e.getMessage(), e);
+      throw new JsonException(e.getMessage(), e);
     }
   }
 

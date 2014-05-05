@@ -18,6 +18,8 @@ scout.DesktopTable = function(session, model) {
   if (session && model) {
     this.session.widgetMap[model.id] = this;
   }
+
+  this.table = new scout.Table(this.session, this.model.table);
 };
 
 scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
@@ -25,8 +27,6 @@ scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
 
 scout.DesktopTable.prototype.render = function($parent) {
   this._$parent = $parent;
-
-  this.table = new scout.Table(this.session, this.model.table);
   this.table.attach(this._$parent);
 
   var chartControl = {
@@ -85,14 +85,14 @@ scout.DesktopTable.prototype.render = function($parent) {
 };
 
 scout.DesktopTable.prototype.detach = function() {
-  this.table.$container.detach();
+  this.table.detach();
 };
 
 scout.DesktopTable.prototype.attach = function($parent) {
   if (!this.table) {
     this.render($parent);
   } else {
-    this.table.$container.appendTo($parent);
+    this.table.attach($parent);
   }
 };
 

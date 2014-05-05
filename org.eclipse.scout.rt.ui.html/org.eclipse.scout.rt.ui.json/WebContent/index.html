@@ -3,11 +3,18 @@
   <head>
     <title>Scout HTML UI</title>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+
     <link rel="shortcut icon" type="image/x-icon" href="res/favicon.ico">
     <link rel="stylesheet" type="text/css" href="res/scout-5.0.0-min.css">
+
     <script src="res/jquery-2.1.0.min.js"></script>
     <script src="res/scout-5.0.0-min.js"></script>
-    <script src="res/scout-5.0.0.init.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        scout.init();
+      });
+    </script>
   </head>
   <body>
     <div id="Desktop" class="scout " data-partid="1"></div>

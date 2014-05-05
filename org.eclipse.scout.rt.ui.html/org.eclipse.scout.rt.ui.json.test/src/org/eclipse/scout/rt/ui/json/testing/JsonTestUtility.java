@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonRequest;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -30,9 +32,19 @@ public class JsonTestUtility {
   public static IJsonSession createAndInitializeJsonSession() {
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
+    Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
+
+    JSONObject jsonReqObj = new JSONObject();
+    try {
+      jsonReqObj.put(JsonRequest.PROP_SESSION_PART_ID, "1.1");
+    }
+    catch (JSONException e) {
+      throw new JsonException(e);
+    }
+    JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
 
     IJsonSession jsonSession = new TestEnvironmentJsonSession();
-    jsonSession.init(request, "1.1");
+    jsonSession.init(request, jsonRequest);
 
     return jsonSession;
   }
