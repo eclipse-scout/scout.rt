@@ -28,6 +28,14 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.PageExtens
  */
 public abstract class AbstractExtensibleOutline extends AbstractOutline implements IExtensibleScoutObject {
 
+  public AbstractExtensibleOutline() {
+    super();
+  }
+
+  public AbstractExtensibleOutline(boolean callInitialzier) {
+    super(callInitialzier);
+  }
+
   @Override
   protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
