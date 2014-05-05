@@ -17,6 +17,8 @@ public abstract class AbstractClientNotification implements IClientNotification 
   private int m_node;
   private final String m_notificationId = UUID.randomUUID().toString();
   private final long m_timeout;
+  private String m_originServerNode;
+  private String m_providingServerNodeId;
   private static final long DEFAULT_TIMEOUT = 1000 * 60 * 10; // 10 min
 
   public AbstractClientNotification(long timeout) {
@@ -24,7 +26,7 @@ public abstract class AbstractClientNotification implements IClientNotification 
   }
 
   public AbstractClientNotification() {
-    m_timeout = DEFAULT_TIMEOUT;
+    this(DEFAULT_TIMEOUT);
   }
 
   @Override
@@ -37,14 +39,45 @@ public abstract class AbstractClientNotification implements IClientNotification 
     return m_notificationId;
   }
 
+  /**
+   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public int getOriginNode() {
     return m_node;
   }
 
+  /**
+   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setOriginNode(int node) {
     m_node = node;
+    m_originServerNode = String.valueOf(node);
+  }
+
+  @Override
+  public String getOriginalServerNode() {
+    return m_originServerNode;
+  }
+
+  @Override
+  public void setOriginalServerNode(String originServerNodeId) {
+    m_originServerNode = originServerNodeId;
+  }
+
+  @Override
+  public String getProvidingServerNode() {
+    return m_providingServerNodeId;
+  }
+
+  @Override
+  public void setProvidingServerNode(String providingServerNodeId) {
+    m_providingServerNodeId = providingServerNodeId;
   }
 
   @Override

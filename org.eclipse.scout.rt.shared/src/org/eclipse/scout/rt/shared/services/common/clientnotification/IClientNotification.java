@@ -50,8 +50,15 @@ public interface IClientNotification extends Serializable {
    * 
    * @return node (the property com.bsiag.crm.server#nodeId is one of
    *         com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
+   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
    */
+  @Deprecated
   int getOriginNode();
+
+  /**
+   * the node where the notification is originally fired. For cluster environments.
+   */
+  String getOriginalServerNode();
 
   /**
    * Sets the node where the notification is orignially fired. This is for
@@ -60,6 +67,27 @@ public interface IClientNotification extends Serializable {
    * @param node
    *          (the property com.bsiag.crm.server#nodeId is one of
    *          com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
+   * @deprecated use {@link #setOriginalServerNode(String)}. Will be removed in Release 5.0
    */
+  @Deprecated
   void setOriginNode(int node);
+
+  /**
+   * Sets the node where the notification is originally fired. For cluster environments.
+   * 
+   * @param nodeId
+   */
+  void setOriginalServerNode(String nodeId);
+
+  /**
+   * @return id of the server node delivering the notification to the client
+   */
+  String getProvidingServerNode();
+
+  /**
+   * id of the server node delivering the notification to the client
+   * 
+   * @param nodeId
+   */
+  void setProvidingServerNode(String nodeId);
 }
