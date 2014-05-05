@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookupRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
 
-  public static final LookupRow[] EMPTY_ARRAY = new LookupRow[0];
+  public static final LookupRow<?>[] EMPTY_ARRAY = new LookupRow[0];
 
   public static final int KEY_BIT = 1;
   public static final int TEXT_BIT = 2;
@@ -79,30 +79,59 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   /**
-   * Cell array containing the following values <br>
-   * Object key <br>
-   * String text <br>
-   * String iconId <br>
-   * String tooltip <br>
-   * String background color <br>
-   * String foreground color <br>
-   * String font <br>
-   * Boolean enabled <br>
-   * Object parentKey used in hierarchical structures to point to the parents
-   * primary key <br>
-   * Boolean active (0,1) see {@link TriState#parseTriState(Object)}
+   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class keyClass)} instead.
    */
+  @Deprecated
   public LookupRow(Object[] cells) {
     this(cells, (cells == null ? 0 : cells.length));
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, int maxColumnIndex, Class keyClass)}
+   *             instead.
+   */
+  @Deprecated
   public LookupRow(Object[] cells, int maxColumnIndex) {
+    this(cells, maxColumnIndex, Object.class);
+  }
+
+  public LookupRow(Object[] cells, Class<?> keyClass) {
+    this(cells, (cells == null ? 0 : cells.length), keyClass);
+  }
+
+  /**
+   * Creates a new lookup row with the given cells as data.
+   * 
+   * @param cells
+   *          array containing the following values:<br>
+   *          Object key (use keyClass to specify the type of the key) <br>
+   *          String text <br>
+   *          String iconId <br>
+   *          String tooltip <br>
+   *          String background color <br>
+   *          String foreground color <br>
+   *          String font <br>
+   *          Boolean enabled <br>
+   *          Object parentKey used in hierarchical structures to point to the parents
+   *          primary key <br>
+   *          Boolean active (0,1) see {@link TriState#parseTriState(Object)}
+   * @param maxColumnIndex
+   *          index describing the last column in cells that should be evaluated
+   * @param keyClass
+   *          Describes the class of the key column (first column) in the given cells. This must correspond to the
+   *          generic type of this lookup row.
+   */
+  @SuppressWarnings("unchecked")
+  public LookupRow(Object[] cells, int maxColumnIndex, Class<?> keyClass) {
     if (cells != null) {
       int keyIndex = 0, textIndex = 1, iconIndex = 2, ttIndex = 3, bgIndex = 4, fgIndex = 5, fontIndex = 6, enabledIndex = 7, parentKeyIndex = 8, activeIndex = 9;
       //
       if (cells.length > keyIndex && keyIndex <= maxColumnIndex && cells[keyIndex] != null) {
-        setKey((ID_TYPE) cells[keyIndex]);
+        Object key = cells[keyIndex];
+        if (keyClass != null && !keyClass.isAssignableFrom(key.getClass())) {
+          throw new IllegalArgumentException("Invalid key type for LookupRow. Expected: '" + keyClass.getName() + "', actual: '" + key.getClass().getName() + "'.");
+        }
+        setKey((ID_TYPE) key);
       }
       if (cells.length > textIndex && textIndex <= maxColumnIndex && cells[textIndex] != null) {
         if (cells[textIndex] != null) {
@@ -165,7 +194,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
         }
       }
       if (cells.length > parentKeyIndex && parentKeyIndex <= maxColumnIndex && cells[parentKeyIndex] != null) {
-        setParentKey((ID_TYPE) cells[parentKeyIndex]);
+        Object parentKey = cells[parentKeyIndex];
+        if (keyClass != null && !keyClass.isAssignableFrom(parentKey.getClass())) {
+          throw new IllegalArgumentException("Invalid parent key type for LookupRow. Expected: '" + keyClass.getName() + "', actual: '" + parentKey.getClass().getName() + "'.");
+        }
+
+        setParentKey((ID_TYPE) parentKey);
       }
       if (cells.length > activeIndex && activeIndex <= maxColumnIndex && cells[activeIndex] != null) {
         if (cells[activeIndex] instanceof Boolean) {
@@ -296,9 +330,10 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * Convenience helper for transforming Object[][] data into CodeRow[] <br>
-   * The Object[][] must contain rows with the elements in the following order: <br>
-   * see {@link #LookupRow(Object[])}
+   * 
+   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class<?> keyClass)} instead.
    */
+  @Deprecated
   public static ILookupRow<?>[] createLookupRowArray(Object[][] data) {
     if (data == null || data.length == 0) {
       return LookupRow.EMPTY_ARRAY;

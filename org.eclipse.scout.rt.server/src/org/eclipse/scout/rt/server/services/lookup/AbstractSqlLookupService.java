@@ -16,16 +16,20 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
@@ -50,6 +54,10 @@ import org.eclipse.scout.service.SERVICES;
  * Valid xml tags are: &lt;key&gt;, &lt;text&gt;, &lt;all&gt;, &lt;rec&gt;
  */
 public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<T> {
+
+  private static final Pattern REFUSING_ALL_TAGS_REGEX = Pattern.compile("<all>\\s*and\\s*([0-9]+)\\s*=\\s*([0-9]+)\\s*</all>", Pattern.DOTALL);
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlLookupService.class);
 
   public AbstractSqlLookupService() {
   }
@@ -82,7 +90,19 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
     if (getConfiguredSortColumn() >= 0) {
       sortData(data, getConfiguredSortColumn());
     }
-    return createLookupRowArray(data, call);
+    try {
+      Class<?> genericsParameterClass = Object.class;
+      try {
+        genericsParameterClass = TypeCastUtility.getGenericsParameterClass(getClass(), ILookupService.class);
+      }
+      catch (IllegalArgumentException e) {
+        LOG.warn("Unable to calculate type parameters for lookup service '" + getClass().getName() + "'. No key type validation will be performed.");
+      }
+      return createLookupRowArray(data, call, genericsParameterClass);
+    }
+    catch (IllegalArgumentException e) {
+      throw new ProcessingException("Unable to load lookup rows for lookup service '" + getClass().getName() + "'.", e);
+    }
   }
 
   @Override
@@ -147,7 +167,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   }
 
   protected static boolean containsRefusingAllTag(String sqlSelect) {
-    Matcher m = Pattern.compile("<all>\\s*and\\s*([0-9]+)\\s*=\\s*([0-9]+)\\s*</all>", Pattern.DOTALL).matcher(sqlSelect.toLowerCase());
+    Matcher m = REFUSING_ALL_TAGS_REGEX.matcher(sqlSelect.toLowerCase());
     if (m.find()) {
       if (!m.group(1).equals(m.group(2))) {
         return true;

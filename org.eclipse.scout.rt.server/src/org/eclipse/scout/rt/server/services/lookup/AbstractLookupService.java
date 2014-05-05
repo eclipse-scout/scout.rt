@@ -29,7 +29,7 @@ import org.eclipse.scout.service.AbstractService;
 public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends AbstractService implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
 
   /**
-   * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall)}.<br>
+   * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall, Class)}.<br>
    * The sort indices are 0-based.
    */
   public static void sortData(Object[][] data, int... sortColumns) {
@@ -37,10 +37,28 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends Abstrac
   }
 
   /**
-   * @see #createLookupRowArray(Object[][], int, LookupCall)
+   * @see #createLookupRowArray(Object[][], int, ILookupCall, Class)
    */
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call, Class<?> keyClass) throws ProcessingException {
+    return createLookupRowArray(data, data != null && data.length > 0 ? data[0].length : 0, call, keyClass);
+  }
+
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link #createLookupRowArray(Object[][], ILookupCall, Class)}
+   *             instead.
+   */
+  @Deprecated
   public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call) throws ProcessingException {
     return createLookupRowArray(data, data != null && data.length > 0 ? data[0].length : 0, call);
+  }
+
+  /**
+   * @deprecated Will be removed in Scout 5.0. Use {@link #createLookupRowArray(Object[][], int, ILookupCall, Class)}
+   *             instead.
+   */
+  @Deprecated
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call) throws ProcessingException {
+    return createLookupRowArray(data, maxColumnIndex, call, Object.class);
   }
 
   /**
@@ -49,7 +67,7 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends Abstrac
    * @param maxColumnIndex
    *          the maximum column index to be used to create the code rows, all
    *          column indexes >= columnCount are ignored
-   *          <p>
+   * @param data
    *          The Object[][] must contain rows with the elements in the following order:
    *          <ul>
    *          <li>Object key
@@ -63,12 +81,16 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends Abstrac
    *          <li>Object parentKey used in hierarchical structures to point to the parents primary key
    *          <li>Boolean active (0,1) see {@link TriState#parseTriState(Object)}
    *          </ul>
+   * @param call
+   * @param keyClass
+   *          Class describing the type of the key column in the data. Usually corresponds to the LOOKUP_ROW_KEY_TYPE
+   *          type parameter of the lookup service.
    */
-  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call) throws ProcessingException {
+  public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call, Class<?> keyClass) throws ProcessingException {
     List<ILookupRow<KEY_TYPE>> list = new ArrayList<ILookupRow<KEY_TYPE>>(data.length);
     Boolean active = call.getActive().getBooleanValue();
     for (int i = 0; i < data.length; i++) {
-      LookupRow<KEY_TYPE> row = new LookupRow<KEY_TYPE>(data[i], maxColumnIndex);
+      LookupRow<KEY_TYPE> row = new LookupRow<KEY_TYPE>(data[i], maxColumnIndex, keyClass);
       // check active flag
       if (active == null || active.booleanValue() == row.isActive()) {
         list.add(row);
