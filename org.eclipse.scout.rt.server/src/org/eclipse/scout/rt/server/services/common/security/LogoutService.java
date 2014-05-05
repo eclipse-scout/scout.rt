@@ -10,24 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
 public class LogoutService extends AbstractService implements ILogoutService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogoutService.class);
 
-  public LogoutService() {
-  }
-
   @Override
   public void logout() {
+    SERVICES.getService(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
+    SERVICES.getService(IHttpSessionCacheService.class).remove(Subject.class.getName(), ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
     try {
       HttpSession session = ThreadContext.getHttpServletRequest().getSession();
       session.invalidate();
