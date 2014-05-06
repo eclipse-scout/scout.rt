@@ -973,7 +973,8 @@ Button-FocusIndicator.datefield {
   border: none;
 }
 /* DateChooserDialog */
-Shell.datechooser-dialog {
+Shell.datechooser-dialog,
+Shell[TITLE].datechooser-dialog {
   border: 2px solid #67a8ce;
   border-radius: 0px;
   background-color: #f4f8fc;
@@ -1780,7 +1781,8 @@ Button-FocusIndicator.timefield {
   border: none;
 }
 /* TimeChooserDialog */
-Shell.timechooser-dialog {
+Shell.timechooser-dialog,
+Shell[TITLE].timechooser-dialog {
   border: 2px solid #67a8ce;
   border-radius: 0px;
   background-color: #f4f8fc;

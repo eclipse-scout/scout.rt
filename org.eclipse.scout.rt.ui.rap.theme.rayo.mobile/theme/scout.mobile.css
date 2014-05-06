@@ -1025,6 +1025,12 @@ Shell.datechooser-dialog {
   background-color:#f4f8fc;
 }
 
+Shell[TITLE].datechooser-dialog {
+  border:2px solid #67a8ce;
+  border-radius:0px;
+  background-color:#f4f8fc;
+}
+
 Composite.datechooser-dialog { background-color:transparent; }
 
 Label.datechooser-dialog {
@@ -1964,6 +1970,12 @@ Button-FocusIndicator.timefield {
 }
 
 Shell.timechooser-dialog {
+  border:2px solid #67a8ce;
+  border-radius:0px;
+  background-color:#f4f8fc;
+}
+
+Shell[TITLE].timechooser-dialog {
   border:2px solid #67a8ce;
   border-radius:0px;
   background-color:#f4f8fc;
