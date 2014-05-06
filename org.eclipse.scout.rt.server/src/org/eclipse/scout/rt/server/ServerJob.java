@@ -25,12 +25,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
@@ -43,9 +45,12 @@ import org.eclipse.scout.rt.shared.TextsThreadLocal;
 public abstract class ServerJob extends JobEx implements IServerSessionProvider {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJob.class);
 
-  private IServerSession m_serverSession;
+  //use classloader from SerializationUtility in Server Job
+  private static final String customClassloaderProperty = "org.eclipse.scout.rt.server.customServerJobClassloader";
+  private final IServerSession m_serverSession;
   private Subject m_subject;
   private long m_transactionSequence;
+  private final boolean m_useCostomClassLoader;
 
   /**
    * Perform a transaction on a {@link IServerSession} within a security {@link Subject} (optional)<br>
@@ -72,6 +77,16 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     }
     m_serverSession = serverSession;
     m_subject = subject;
+    m_useCostomClassLoader = isUseCustomClassloader();
+  }
+
+  private boolean isUseCustomClassloader() {
+    try {
+      return StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(customClassloaderProperty));
+    }
+    catch (Exception e) {
+      return false;
+    }
   }
 
   /**
@@ -200,7 +215,9 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       LocaleThreadLocal.set(m_serverSession.getLocale());
       TextsThreadLocal.set(m_serverSession.getTexts());
       ActiveTransactionRegistry.register(transaction);
-      Thread.currentThread().setContextClassLoader(SerializationUtility.getClassLoader());
+      if (m_useCostomClassLoader) {
+        Thread.currentThread().setContextClassLoader(SerializationUtility.getClassLoader());
+      }
       //
       IStatus status = runTransaction(monitor);
       if (status == null) {
