@@ -12,5 +12,5 @@
 <booleanAttribute key="M2_UPDATE_SNAPSHOTS" value="false"/>
 <booleanAttribute key="M2_WORKSPACE_RESOLUTION" value="false"/>
 <stringAttribute key="bad_container_name" value="jasmine.server"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="C:/Users/cgu/git/eclipse.scout/org.eclipse.scout.rt.ui.html/org.eclipse.scout.ui.html"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:/org.eclipse.scout.ui.html}"/>
 </launchConfiguration>
