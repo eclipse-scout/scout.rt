@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.spec.client.gen.extract;
 import java.util.ArrayList;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
+import org.eclipse.scout.rt.shared.services.common.code.CODES;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
@@ -29,17 +31,20 @@ public class CodeTypeCodesExtractor extends AbstractNamedTextExtractor<Class<?>>
   /**
    * @return fully qualified class name.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public String getText(Class<?> c) {
-    FallbackTextExtractor<Class<?>> codeNameExtractor = new FallbackTextExtractor<Class<?>>(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.type"), "_name", true), new SimpleTypeTextExtractor<Class<?>>());
+    SimpleTypeTextExtractor<Class<?>> fallBackExtractor = new SimpleTypeTextExtractor<Class<?>>();
     if (!ICodeType.class.isAssignableFrom(c)) {
       // TODO ASA scout 4.0: can generic param be further typed Class<? extends ICodeType>?
       return null;
     }
     ArrayList<String> codes = new ArrayList<String>();
     for (Class innerClass : c.getDeclaredClasses()) {
-      if (AbstractCode.class.isAssignableFrom(innerClass)) {
-        codes.add(codeNameExtractor.getText(innerClass));
+      if (ICode.class.isAssignableFrom(innerClass)) {
+        ICode code = CODES.getCode((Class<ICode>) innerClass);
+        String codeText = (code != null) ? code.getText() : null;
+        codes.add(StringUtility.nvl(codeText, fallBackExtractor.getText(innerClass)));
       }
     }
     return CollectionUtility.format(codes);

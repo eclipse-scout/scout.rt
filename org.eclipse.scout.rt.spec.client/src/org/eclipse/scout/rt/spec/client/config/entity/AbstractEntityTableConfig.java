@@ -26,10 +26,6 @@ import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
  */
 public abstract class AbstractEntityTableConfig<T extends ITypeWithClassId> implements IDocEntityTableConfig<T> {
 
-  /**
-   * Default filters for {@link org.eclipse.scout.rt.client.ui.form.fields.IFormField IFormField}: Ignores Types
-   * annotated with {@link org.eclipse.scout.commons.annotations.Doc#ignore() Doc#ignore()}==false
-   */
   @Override
   public List<IDocFilter<T>> getFilters() {
     List<IDocFilter<T>> filters = new ArrayList<IDocFilter<T>>();

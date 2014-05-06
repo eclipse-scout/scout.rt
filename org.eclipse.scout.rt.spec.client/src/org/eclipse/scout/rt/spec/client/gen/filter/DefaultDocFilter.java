@@ -29,7 +29,8 @@ public class DefaultDocFilter<T> implements IDocFilter<T> {
 
   @Override
   public Filtering accept(T o) {
-    Doc docAnnotation = o.getClass().getAnnotation(Doc.class);
+    Class<? extends Object> clazz = (o instanceof Class) ? (Class<?>) o : o.getClass();
+    Doc docAnnotation = clazz.getAnnotation(Doc.class);
     if (docAnnotation != null) {
       return docAnnotation.filter();
     }

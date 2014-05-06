@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
+import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
@@ -73,7 +74,7 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
   }
 
   protected boolean acceptClass(Class c) {
-    return isDocType(c, m_supertype, m_listTypesWithoutDoc);
+    return DocGenUtility.isAccepted(c, getEntityListConfig().getFilters()) && isDocType(c, m_supertype, m_listTypesWithoutDoc);
   }
 
   /**
