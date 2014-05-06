@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
+
 public interface IBooleanFieldUIFacade {
 
   /**

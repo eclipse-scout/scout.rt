@@ -4,6 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -14,13 +15,13 @@ import org.eclipse.swt.widgets.Menu;
  * SWT's RadioButton and Checkbox don't support multiline in their labels.
  * A pure SWT Label however supports multiline.
  * Therefore this class was created, it is a composite of a button and a label.
- *
+ * 
  * @since 3.10.0-M4
  */
 public abstract class MultilineButton extends Composite {
 
   protected Label m_label;
-  protected ButtonEx m_btn;
+  protected Button m_btn;
 
   public MultilineButton(Composite parent, int style) {
     super(parent, style);
@@ -29,7 +30,7 @@ public abstract class MultilineButton extends Composite {
   }
 
   protected void createContent(Composite parent, int style) {
-    this.m_btn = new ButtonEx(parent, style);
+    this.m_btn = new Button(parent, style);
     this.m_label = new Label(parent, 0);
   }
 
@@ -131,7 +132,7 @@ public abstract class MultilineButton extends Composite {
     return m_label;
   }
 
-  public ButtonEx getButton() {
+  public Button getButton() {
     return m_btn;
   }
 

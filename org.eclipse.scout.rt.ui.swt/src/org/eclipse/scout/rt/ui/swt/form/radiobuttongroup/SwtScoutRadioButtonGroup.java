@@ -55,7 +55,7 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
         swtButton.addListener(SWT.KeyDown, m_swtButtonListener);
         m_swtRadioButtons.add(swtButton);
         if (swtButton.getSelection()) {
-          buttonArea.setTabList(new Control[]{swtButton.getParent()});
+          buttonArea.setTabList(new Control[]{swtButton.getParent().getParent()});
         }
       }
     }

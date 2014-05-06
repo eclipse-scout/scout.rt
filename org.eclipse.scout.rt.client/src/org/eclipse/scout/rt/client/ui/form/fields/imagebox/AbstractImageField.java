@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -27,6 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.FormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -39,7 +40,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   private IImageFieldUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
-  private List<IMenu> m_menus;
+  private IContextMenu m_contextMenu;
   private double m_zoomDelta;
   private double m_panDelta;
   private double m_rotateDelta;
@@ -141,7 +142,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected void execDropRequest(TransferObject transferObject) throws ProcessingException {
   }
 
-  private List<Class<? extends IMenu>> getConfiguredMenus() {
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
@@ -169,7 +170,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
+    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
       try {
         menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
@@ -183,12 +184,9 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    //set container on menus
-    for (IMenu menu : menuList) {
-      menu.setContainerInternal(this);
-    }
-
-    m_menus = menuList;
+    m_contextMenu = new FormFieldContextMenu<IImageField>(this);
+    m_contextMenu.setChildActions(menuList);
+    m_contextMenu.setContainerInternal(this);
   }
 
   @Override
@@ -277,8 +275,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   @Override
+  public IContextMenu getContextMenu() {
+    return m_contextMenu;
+  }
+
+  @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
+    return getContextMenu().getChildActions();
   }
 
   @Override

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 
 /**
  * Utility class for menus
@@ -31,6 +32,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
  */
 public final class MenuUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MenuUtility.class);
+
+  private MenuUtility() {
+  }
 
   /**
    * Collects all keyStrokes from an array of menus
@@ -61,46 +65,52 @@ public final class MenuUtility {
     return CollectionUtility.emptyArrayList();
   }
 
-  /**
-   * Filters a given list of menus belonging to a specific value field by returning a list containing only valid
-   * menus.
-   * A menu is considered to be valid if at least the value field is enabled or if the menu does not inherit its
-   * accessibility.
-   * Additionally, the menu has either to be
-   * <ul>
-   * an empty space action and visible menu or
-   * </ul>
-   * <ul>
-   * a single selection action and visible menu and the value field contains a non-null value
-   * </ul>
-   * The method prepareAction of a valid menu is executed if the parameter executePrepareAction is <code>true</code>
-   * 
-   * @since 4.0.0-M6
-   */
-  public static <T> List<IMenu> filterValidMenus(IValueField<T> valueField, List<IMenu> menusToFilter, boolean executePrepareAction) {
-    T value = valueField.getValue();
-    List<IMenu> filteredMenus = new ArrayList<IMenu>(menusToFilter.size());
-    for (IMenu m : menusToFilter) {
-      IMenu validMenu = null;
-      if ((!m.isInheritAccessibility()) || valueField.isEnabled()) {
-        if (m.isEmptySpaceAction()) {
-          validMenu = m;
-        }
-        else if (m.isSingleSelectionAction()) {
-          if (value != null) {
-            validMenu = m;
+  public static <T extends IActionNode<?>> boolean isVisible(T menu) {
+    if (!menu.isVisible()) {
+      return false;
+    }
+    if (menu.hasChildActions()) {
+      boolean visible = false;
+      for (Object o : menu.getChildActions()) {
+        if (o instanceof IActionNode<?>) {
+          IActionNode<?> m = (IActionNode<?>) o;
+          if (!m.isSeparator() && m.isVisible()) {
+            visible = true;
+            break;
           }
         }
       }
-      if (validMenu != null) {
-        if (executePrepareAction) {
-          validMenu.prepareAction();
+      return visible;
+    }
+    return true;
+  }
+
+  /**
+   * @param original
+   * @return a list of all visible menus an eliminated multiple occurrences of separators.
+   */
+  public static <T extends IActionNode<?>> List<T> consolidateMenus(List<T> original) {
+    LinkedList<T> consolidatedMenus = new LinkedList<T>();
+    T lastMenu = null;
+    for (T m : original) {
+      if (isVisible(m)) {
+        if (m.isSeparator()) {
+          if (lastMenu != null && !lastMenu.isSeparator()) {
+            consolidatedMenus.add(m);
+          }
         }
-        if (validMenu.isVisible()) {
-          filteredMenus.add(validMenu);
+        else {
+          consolidatedMenus.add(m);
         }
+        lastMenu = m;
       }
     }
-    return filteredMenus;
+
+    // remove tailing separators
+    while (!consolidatedMenus.isEmpty() && consolidatedMenus.getLast().isSeparator()) {
+        consolidatedMenus.removeLast();
+    }
+    return consolidatedMenus;
   }
+
 }

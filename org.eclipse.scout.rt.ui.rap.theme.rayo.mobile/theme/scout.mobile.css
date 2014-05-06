@@ -788,6 +788,7 @@ Button[PUSH] {
   border-radius:5px;
   cursor:pointer;
   padding:4px 5px;
+  margin-top:3px;
   font:bold 12px Arial,Helvetica,sans-serif;
   border:1px solid #3a7597;
 }
@@ -1282,6 +1283,44 @@ Button.menuButton:selected:hover { background-image:url(theme/img/button/icon_me
 Button.menuButton:pressed { background-image:url(theme/img/button/icon_menu_mouse_over.png); }
 
 Button.menuButton:hover { background-image:url(theme/img/button/icon_menu_mouse_over.png); }
+
+Composite.contextMenuMarker {
+  padding:0px 0px 0px 0px;
+  border:none;
+  background-image:none;
+}
+
+Composite.contextMenuMarker-disabled {
+  padding:0px 0px 0px 0px;
+  border:none;
+  border-radius:4px;
+}
+
+Composite[BORDER].contextMenuMarker {
+  padding:0px 2px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+  background-image:none;
+}
+
+Composite[BORDER].contextMenuMarker-disabled {
+  padding:0px 2px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
+}
+
+Label.menuDropDown {
+  background-image:url(theme/img/button/menuDropdown.png);
+  background-repeat:no-repeat;
+  cursor:pointer;
+}
+
+Label[BORDER].menuDropDown {
+  background-image:url(theme/img/button/menuDropdown.png);
+  background-repeat:no-repeat;
+  border:none;
+  cursor:pointer;
+}
 
 ScrollBar {
   background-color:transparent;

@@ -15,6 +15,7 @@ import java.security.Permission;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
@@ -37,10 +38,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
   String PROP_VISIBLE = "visible";
   String PROP_MNEMONIC = "mnemonic";
   String PROP_KEYSTROKE = "keystroke";
-  /**
-   * property-type: String
-   */
-  String PROP_SEPARATOR = "separator";
 
   /**
    * @throws ProcessingException
@@ -73,10 +70,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
 
   void setIconId(String iconId);
 
-  boolean isSeparator();
-
-  void setSeparator(boolean b);
-
   String getText();
 
   void setText(String text);
@@ -105,6 +98,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
   String getTooltipText();
 
   void setTooltipText(String text);
+
+  boolean isSeparator();
+
+  void setSeparator(boolean b);
 
   boolean isSelected();
 
@@ -177,27 +174,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
    */
   void setVisibleGranted(boolean b);
 
-  /**
-   * action is chosen on a single selected item
-   */
-  boolean isSingleSelectionAction();
-
-  void setSingleSelectionAction(boolean b);
-
-  /**
-   * action is chosen on any of multiple (>=2) selected items
-   */
-  boolean isMultiSelectionAction();
-
-  void setMultiSelectionAction(boolean b);
-
-  /**
-   * action is chosen on empty space (not on items)
-   */
-  boolean isEmptySpaceAction();
-
-  void setEmptySpaceAction(boolean b);
-
   boolean isToggleAction();
 
   void setToggleAction(boolean b);
@@ -206,7 +182,11 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * called before this action is used
+   * 
+   * @deprecated will be removed with V 5.0 use prepare on {@link IMenu} instead (for all not menus prepare does not
+   *             make any sense).
    */
+  @Deprecated
   void prepareAction();
 
   /**

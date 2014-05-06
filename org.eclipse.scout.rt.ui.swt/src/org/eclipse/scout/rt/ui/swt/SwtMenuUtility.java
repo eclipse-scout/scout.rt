@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -23,10 +22,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.ui.swt.action.AbstractSwtScoutMenu;
-import org.eclipse.scout.rt.ui.swt.action.SwtScoutCheckboxMenuItem;
-import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuItem;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 public final class SwtMenuUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtMenuUtility.class);
@@ -34,77 +32,58 @@ public final class SwtMenuUtility {
   private SwtMenuUtility() {
   }
 
-  public static void fillContextMenu(List<? extends IMenu> scoutMenus, Menu menu, ISwtEnvironment environment) {
-    if (CollectionUtility.isEmpty(scoutMenus)) {
-      return;
+  /**
+   * @param parentMenu
+   * @return
+   */
+  public static MenuItem createSwtMenuItem(Menu parentMenu, IMenu scoutMenu, ISwtEnvironment environment) {
+    MenuItem swtMenuItem = null;
+    if (scoutMenu.isSeparator()) {
+      swtMenuItem = new MenuItem(parentMenu, SWT.SEPARATOR);
     }
-    for (IMenu scoutMenu : ActionUtility.visibleNormalizedActions(scoutMenus)) {
-      createMenuItem(scoutMenu, menu, environment);
+    else if (scoutMenu.hasChildActions()) {
+      swtMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
+      createChildMenu(swtMenuItem, scoutMenu.getChildActions(), environment);
     }
+    else if (scoutMenu.isToggleAction()) {
+      swtMenuItem = new MenuItem(parentMenu, SWT.CHECK);
+    }
+    else {
+      swtMenuItem = new MenuItem(parentMenu, SWT.PUSH);
+    }
+    return swtMenuItem;
   }
 
   /**
-   * NEW
+   * @param swtMenuItem
+   * @param childActions
    */
-  public static AbstractSwtScoutMenu createMenuItem(IMenu scoutMenu, Menu swtMenu, ISwtEnvironment environment) {
-    if (!isVisible(scoutMenu)) {
-      return null;
-    }
-    if (scoutMenu.hasChildActions()) {
-      return new org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuGroup(scoutMenu, swtMenu, environment);
-    }
-    if (scoutMenu.isToggleAction()) {
-      return new SwtScoutCheckboxMenuItem(scoutMenu, swtMenu, environment);
-    }
-    return new SwtScoutMenuItem(scoutMenu, swtMenu, environment);
+  public static Menu createChildMenu(MenuItem swtMenuItem, List<IMenu> childActions, ISwtEnvironment environment) {
+    Menu menu = new Menu(swtMenuItem);
+    fillMenu(menu, childActions, environment);
+    swtMenuItem.setMenu(menu);
+    return menu;
   }
 
-  public static boolean isVisible(IMenu menu) {
-    if (!menu.isVisible()) {
-      return false;
-    }
-    if (menu.hasChildActions()) {
-      boolean visible = false;
-      for (IMenu m : menu.getChildActions()) {
-
-        if (!m.isSeparator() && m.isVisible()) {
-          visible = true;
-          break;
-        }
-      }
-      return visible;
-    }
-    return true;
+  /**
+   * @param swtMenuItem
+   * @param childActions
+   */
+  public static void fillMenu(Menu menu, List<IMenu> childActions, ISwtEnvironment environment) {
+    fillMenu(menu, childActions, environment, false);
   }
 
-  public static List<IMenu> consolidateMenus(List<IMenu> original) {
-    List<IMenu> consolidatedMenus = new ArrayList<IMenu>(original.size());
-    IMenu lastMenu = null;
-    for (IMenu m : original) {
-      if (isVisible(m)) {
-        if (m.isSeparator()) {
-          if (lastMenu != null && !lastMenu.isSeparator()) {
-            consolidatedMenus.add(m);
-          }
-        }
-        else {
-          consolidatedMenus.add(m);
-        }
-        lastMenu = m;
-      }
+  public static void fillMenu(Menu menu, List<IMenu> childActions, ISwtEnvironment environment, boolean separatorFirstIfHasMenus) {
+    List<IMenu> visibleNormalizedActions = ActionUtility.visibleNormalizedActions(childActions);
+    if (separatorFirstIfHasMenus && visibleNormalizedActions.size() > 0) {
+      new MenuItem(menu, SWT.SEPARATOR);
     }
-    // remove tailing separators
+    for (IMenu childMenu : visibleNormalizedActions) {
+      environment.createMenuItem(menu, childMenu);
+    }
 
-    for (int i = consolidatedMenus.size() - 1; i > -1; i--) {
-      if (consolidatedMenus.get(i).isSeparator()) {
-        consolidatedMenus.remove(i);
-      }
-      else {
-        break;
-      }
-    }
-    return consolidatedMenus;
   }
+
 
   public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();

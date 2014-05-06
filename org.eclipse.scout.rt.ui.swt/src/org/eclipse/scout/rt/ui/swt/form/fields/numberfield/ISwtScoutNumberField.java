@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.numberfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.custom.StyledText;
 
 /**
  * <h3>ISwtScoutLongField</h3> ...
@@ -22,6 +22,6 @@ import org.eclipse.swt.widgets.Text;
 public interface ISwtScoutNumberField extends ISwtScoutFormField<INumberField<?>> {
 
   @Override
-  Text getSwtField();
+  StyledText getSwtField();
 
 }

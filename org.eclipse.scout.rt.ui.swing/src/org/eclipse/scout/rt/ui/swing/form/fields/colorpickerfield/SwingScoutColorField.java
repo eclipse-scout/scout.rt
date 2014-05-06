@@ -11,9 +11,15 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
@@ -21,28 +27,36 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
-import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 
 public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorField> implements ISwingScoutColorField {
   private JTextField m_colorPreview;
+
+  private ContextMenuDecorationItem m_contextMenuMarker;
+  private SwingScoutContextMenu m_contextMenu;
+  private DropDownDecorationItem m_dropdownIcon;
 
   @Override
   protected void initializeSwing() {
@@ -56,7 +70,7 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
     m_colorPreview.setEditable(false);
     container.add(m_colorPreview);
 
-    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
+    JTextComponent textField = createTextField(container);
     Document doc = textField.getDocument();
     addInputListenersForBasicField(textField, doc);
     if (doc instanceof AbstractDocument) {
@@ -78,24 +92,17 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
         setInputDirty(true);
       }
     });
-    container.add(textField);
-    textField.addDropDownButtonListener(new IDropDownButtonListener() {
-      @Override
-      public void iconClicked(Object source) {
-        getSwingField().requestFocus();
-        handleUiPickColor();
-      }
-
-      @Override
-      public void menuClicked(Object source) {
-
-        handleSwingPopup((JComponent) source);
-      }
-    });
 
     setSwingContainer(container);
     setSwingLabel(label);
     setSwingField(textField);
+
+    // key mappings
+    InputMap inputMap = textField.getInputMap(JTextField.WHEN_FOCUSED);
+    inputMap.put(SwingUtility.createKeystroke("F2"), "colorPicker");
+    inputMap.put(SwingUtility.createKeystroke("DOWN"), "colorPicker");
+    ActionMap actionMap = textField.getActionMap();
+    actionMap.put("colorPicker", new P_SwingColorPickerAction());
 
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
@@ -110,6 +117,62 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
 
   }
 
+  /**
+   * Create and add the text field to the container.
+   * <p>
+   * May add additional components to the container.
+   */
+  protected JTextComponent createTextField(JComponent container) {
+    JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    container.add(textField);
+    IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
+    // context menu marker
+    m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
+    m_contextMenuMarker.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+      }
+    });
+    decorationGroup.addDecoration(m_contextMenuMarker);
+
+    // smart chooser decoration
+    m_dropdownIcon = new DropDownDecorationItem(textField, getSwingEnvironment());
+    m_dropdownIcon.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) {
+          m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+        }
+        else {
+          getSwingField().requestFocus();
+          handleUiPickColor();
+        }
+      }
+    });
+    decorationGroup.addDecoration(m_dropdownIcon);
+
+    textField.setDecorationIcon(decorationGroup);
+    return textField;
+
+  }
+
+  @Override
+  protected void installContextMenu() {
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+        }
+      }
+    });
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingField(), getScoutObject().getContextMenu(), getSwingEnvironment());
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
@@ -118,8 +181,8 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
   }
 
   @Override
-  public JTextFieldWithDropDownButton getSwingField() {
-    return (JTextFieldWithDropDownButton) super.getSwingField();
+  public JTextComponent getSwingField() {
+    return (JTextComponent) super.getSwingField();
   }
 
   protected void handleUiPickColor() {
@@ -137,32 +200,10 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
     }
   }
 
-  protected void handleSwingPopup(final JComponent target) {
-    final List<IMenu> scoutMenus = getScoutObject().getMenus();
-    if (CollectionUtility.hasElements(scoutMenus)) {
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-
-          // <bsh 2010-10-08>
-          // The default implemention positions the popup menu on the left side of the
-          // "target" component. This is no longer correct in Rayo. So we use the target's
-          // width and substract a certain amount.
-          int x = 0;
-          if (target instanceof JTextFieldWithDropDownButton) {
-            JTextFieldWithDropDownButton tf = (JTextFieldWithDropDownButton) target;
-            x = tf.getWidth() - tf.getMargin().right;
-          }
-          Point point = new Point(x, target.getHeight());
-          // </bsh>
-          // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), target, point, scoutMenus).enqueue();
-        }
-      };
-      getSwingEnvironment().invokeScoutLater(t, 5678);
-      // end notify
-    }
+  @Override
+  protected void setEnabledFromScout(boolean b) {
+    super.setEnabledFromScout(b);
+    m_dropdownIcon.setEnabled(b);
   }
 
   @Override
@@ -181,13 +222,11 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
    */
   protected void updateIconIdFromScout() {
     String iconId = getScoutObject().getIconId();
-    JTextFieldWithDropDownButton field = getSwingField();
     if (iconId == null) {
-      field.setDropDownButtonVisible(false);
+      m_dropdownIcon.setVisible(false);
     }
     else {
-      field.setDropDownButtonVisible(true);
-      field.setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
+      m_dropdownIcon.setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
     }
   }
 
@@ -207,5 +246,14 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
   @Override
   protected boolean isSelectAllOnFocusInScout() {
     return true; //No such property in Scout for DateField.
+  }
+
+  private class P_SwingColorPickerAction extends AbstractAction {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      handleUiPickColor();
+    }
   }
 }

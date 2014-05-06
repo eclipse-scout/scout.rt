@@ -855,7 +855,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       List<IMenu> menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getUiEnvironment());
 
       Menu menu = ((Menu) e.getSource());
-      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), menu);
+
+      RwtMenuUtility.fillMenu(menu, menus, getUiEnvironment());
     }
 
   } // end class P_ContextMenuListener

@@ -11,9 +11,12 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -34,14 +37,20 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldContextMenu;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-@ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @ScoutSdkIgnore
+@ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
 public abstract class AbstractValueField<T> extends AbstractFormField implements IValueField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractValueField.class);
@@ -50,7 +59,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   private int m_valueParsing;
   private int m_valueValidating;
   private T m_initValue;
-  private boolean m_autoDisplayText;
+  private EventListenerList m_listenerList;
   private EventListenerList m_listeningSlaves;// my slaves
 
   public AbstractValueField() {
@@ -65,17 +74,96 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
    * Configuration
    */
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoDisplayText() {
+    return true;
+  }
+
+  /**
+   * Specifies if the default system menus (cut, copy, paste) should be available on this field.
+   * 
+   * @return true if the default system menus should be available, false otherwise.
+   */
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
     return true;
   }
 
   @Override
   protected void initConfig() {
-    m_listeningSlaves = new EventListenerList();
     super.initConfig();
+    m_listeningSlaves = new EventListenerList();
+    m_listenerList = new EventListenerList();
     setAutoDisplayText(getConfiguredAutoDisplayText());
+    setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
+
+    // menus
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + 4);
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      try {
+        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
+      }
+      catch (Exception e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+      }
+    }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    //set container on menus
+    IContextMenu contextMenu = new ValueFieldContextMenu(this);
+    contextMenu.setContainerInternal(this);
+    contextMenu.setChildActions(menuList);
+    setContextMenu(contextMenu);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
+  }
+
+  protected void setContextMenu(IContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  protected void initFieldInternal() throws ProcessingException {
+    super.initFieldInternal();
+    // init actions
+    ActionUtility.initActions(getMenus());
+  }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(foca);
+  }
+
+  @Override
+  public List<IKeyStroke> getContributedKeyStrokes() {
+    return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
   /*
@@ -369,6 +457,16 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     return m_valueValidating > 0;
   }
 
+  @Override
+  public void addValueFieldListener(ValueFieldListener listener) {
+    m_listenerList.add(ValueFieldListener.class, listener);
+  }
+
+  @Override
+  public void removeValueFieldListener(ValueFieldListener listener) {
+    m_listenerList.remove(ValueFieldListener.class, listener);
+  }
+
   private void setValueValidating(boolean b) {
     if (b) {
       m_valueValidating++;
@@ -548,12 +646,22 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   public boolean isAutoDisplayText() {
-    return m_autoDisplayText;
+    return propertySupport.getPropertyBool(PROP_AUTO_DISPLAY_TEXT);
   }
 
   @Override
   public void setAutoDisplayText(boolean b) {
-    m_autoDisplayText = b;
+    propertySupport.setPropertyBool(PROP_AUTO_DISPLAY_TEXT, b);
+  }
+
+  @Override
+  public boolean isAutoAddDefaultMenus() {
+    return propertySupport.getPropertyBool(PROP_AUTO_ADD_DEFAULT_MENUS);
+  }
+
+  @Override
+  public void setAutoAddDefaultMenus(boolean b) {
+    propertySupport.setPropertyBool(PROP_AUTO_ADD_DEFAULT_MENUS, b);
   }
 
   /**
@@ -586,4 +694,5 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     }
     return b;
   }
+
 }

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -29,7 +32,20 @@ public class ColumnFilterMenu extends AbstractMenu {
   }
 
   @Override
-  protected void execPrepareAction() throws ProcessingException {
+  protected void execInitAction() throws ProcessingException {
+    m_table.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (ITable.PROP_CONTEXT_COLUMN.equals(evt.getPropertyName())) {
+          updateVisibility();
+        }
+      }
+
+    });
+    updateVisibility();
+  }
+
+  private void updateVisibility() {
     setVisible(m_table != null && m_table.getColumnFilterManager() != null && m_table.getContextColumn() != null);
   }
 

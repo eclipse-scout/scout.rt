@@ -37,10 +37,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -84,7 +80,6 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
 
-  private List<IMenu> m_menus;
   private TriState m_activeFilter;
   private boolean m_activeFilterEnabled;
   private boolean m_browseAutoExpandAll;
@@ -344,18 +339,6 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     return true;
   }
 
-  private List<Class<? extends IMenu>> getConfiguredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return MenuUtility.getKeyStrokesFromMenus(getMenus());
-  }
-
   // override to freeze
   @Override
   protected final boolean getConfiguredAutoDisplayText() {
@@ -445,54 +428,6 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
-    // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
-      try {
-        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
-      }
-    }
-    try {
-      injectMenusInternal(menuList);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
-    //set container on menus
-    for (IMenu menu : menuList) {
-      menu.setContainerInternal(this);
-    }
-    m_menus = menuList;
-  }
-
-  @Override
-  protected void initFieldInternal() throws ProcessingException {
-    super.initFieldInternal();
-    // init actions
-    ActionUtility.initActions(getMenus());
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
-   * 
-   * @param menuList
-   *          live and mutable list of configured menus
-   */
-  protected void injectMenusInternal(List<IMenu> menuList) {
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
-  }
-
-  @Override
-  public boolean hasMenus() {
-    return CollectionUtility.hasElements(m_menus);
   }
 
   /**

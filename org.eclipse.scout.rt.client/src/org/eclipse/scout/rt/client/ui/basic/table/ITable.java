@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -93,6 +94,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link IColumn}
    */
   String PROP_CONTEXT_COLUMN = "contextColumn";
+
+  /**
+   * {@link ITableColumnFilterManager}
+   */
+  String PROP_COLUMN_FILTER_MANAGER = "columnFilterManger";
   /**
    * {@link List<IKeyStroke>}
    */
@@ -116,9 +122,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   String PROP_CONTAINER = "container";
 
   /**
-   * @since 4.0.0
+   * @since 4.0.0 {@link IContextMenu}
    */
-  String PROP_MENUS = "menus";
+  String PROP_CONTEXT_MENU = "contextMenus";
   /**
    * Host for local urls that call back to the table itself and can be handled by overriding
    * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
@@ -130,6 +136,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
    */
   String LOCAL_URL_PREFIX = "http://" + LOCAL_URL_HOST + "/";
+
+  /**
+   * {@link ITableCustomizer}
+   */
+  String PROP_TABLE_CUSTOMIZER = "tableCustomizer";
 
   void initTable() throws ProcessingException;
 
@@ -296,11 +307,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * apply transfer data to this table
    */
   void updateTable(AbstractTableFieldData source) throws ProcessingException;
-
-  /**
-   * get all menus (new, edit, both)
-   */
-  List<IMenu> getMenus();
 
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
@@ -903,4 +909,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @param menu
    */
   void addMenu(IMenu menu);
+
+  /**
+   * @return
+   */
+  List<IMenu> getMenus();
+
+  /**
+   * @return
+   */
+  IContextMenu getContextMenu();
 }

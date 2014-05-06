@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -62,6 +63,8 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.swt.action.menu.ISwtScoutMenuItem;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutMenuItem;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
@@ -110,6 +113,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -1541,6 +1545,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     ISwtScoutFormField<IFormField> uiField = m_formFieldFactory.createFormField(parent, model, this);
     assignWidgetId(uiField, model);
     return uiField;
+  }
+
+  @Override
+  public ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu) {
+    return new SwtScoutMenuItem(scoutMenu, uiMenu, this);
   }
 
   @Override

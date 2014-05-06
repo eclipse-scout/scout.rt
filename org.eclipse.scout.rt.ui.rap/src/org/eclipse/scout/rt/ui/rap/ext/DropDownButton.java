@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
-public class DropDownButton extends Button implements IDropDownButtonForPatch {
+public class DropDownButton extends Button {
   private static final long serialVersionUID = 1L;
 
   private Rectangle m_buttonArea = new Rectangle(1, 1, 13, 17);
@@ -133,7 +133,6 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     return contextMenu;
   }
 
-  @Override
   public void fireSelectionEvent(SelectionEvent e) {
     if (isButtonEnabled()) {
       for (SelectionListener l : m_eventListeners.getListeners(SelectionListener.class)) {
@@ -152,36 +151,30 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     m_eventListeners.remove(SelectionListener.class, listener);
   }
 
-  @Override
   public void addMenuListener(MenuListener listener) {
     m_eventListeners.add(MenuListener.class, listener);
   }
 
-  @Override
   public void removeMenuListener(MenuListener listener) {
     m_eventListeners.remove(MenuListener.class, listener);
   }
 
-  @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     setCustomVariant();
     addOrRemoveMouseListener();
   }
 
-  @Override
   public boolean isDropdownEnabled() {
     return m_dropdownEnabled;
   }
 
-  @Override
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
     setCustomVariant();
     addOrRemoveMouseListener();
   }
 
-  @Override
   public boolean isButtonEnabled() {
     return m_buttonEnabled;
   }

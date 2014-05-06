@@ -10,9 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.stringfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
+import org.eclipse.scout.rt.ui.swt.action.menu.text.TextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
+import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -22,22 +33,64 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
 
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private SwtScoutContextMenu m_contextMenu;
+
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = createContainer(parent);
     setSwtContainer(container);
-    // layout
-    getSwtContainer().setLayout(getContainerLayout());
 
     StatusLabelEx label = createLabel(container);
     setSwtLabel(label);
 
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment());
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
+
     int style = getSwtStyle(getScoutObject());
-    Text textField = getEnvironment().getFormToolkit().createText(container, style);
+    Text textField = getEnvironment().getFormToolkit().createText(m_menuMarkerComposite, style);
     setSwtField(textField);
     addModifyListenerForBasicField(textField);
     textField.addSelectionListener(new P_SwtTextSelectionListener());
     textField.addVerifyListener(new P_TextVerifyListener());
+
+    // layout
+    getSwtContainer().setLayout(getContainerLayout());
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+  }
+
+  @Override
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+
+    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+        getScoutObject().isAutoAddDefaultMenus() ? new TextAccess(getSwtField()) : null, null);
+    getSwtField().setMenu(fieldMenu.getSwtMenu());
   }
 
   @Override

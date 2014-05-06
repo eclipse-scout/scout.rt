@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.DndAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -22,18 +20,11 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 
 /**
@@ -42,11 +33,7 @@ import org.eclipse.swt.widgets.ScrollBar;
  * @since 1.0.0 15.04.2008
  */
 public class StyledTextEx extends StyledText {
-  private Listener m_traversHandlingListener = new P_TraverseHandlingListener();
-  private Menu m_copyPasteMenu;
-  private MenuItem m_cutItem;
-  private MenuItem m_copyItem;
-  private MenuItem m_pasteItem;
+  private final Listener m_traversHandlingListener = new P_TraverseHandlingListener();
 
   public StyledTextEx(Composite parent, int style) {
     super(parent, style);
@@ -57,80 +44,6 @@ public class StyledTextEx extends StyledText {
     if ((style & SWT.MULTI) != 0) {
       attachMultiLineListeners();
     }
-
-    m_copyPasteMenu = new Menu(getShell(), SWT.POP_UP);
-
-    m_copyPasteMenu.addMenuListener(new MenuListener() {
-      @Override
-      public void menuHidden(MenuEvent e) {
-      }
-
-      @Override
-      public void menuShown(MenuEvent e) {
-        if (isEnabled()) {
-          m_cutItem.setEnabled(StringUtility.hasText(getSelectionText()) && getEditable());
-          m_pasteItem.setEnabled(getEditable());
-        }
-      }
-    });
-
-    m_cutItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
-    m_cutItem.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        cut();
-      }
-    });
-    m_cutItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Cut"));
-
-    m_copyItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
-    m_copyItem.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (isEnabled()) {
-          copy();
-        }
-        else {
-          //Ticket 86'427: Kopieren - Einfügen
-          boolean hasSelection = StringUtility.hasText(getSelectionText());
-          if (hasSelection) {
-            copy();
-          }
-          else {
-            setSelection(0, getText().length());
-            copy();
-            setCaretOffset(0);
-          }
-        }
-      }
-    });
-    m_copyItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Copy"));
-
-    m_pasteItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
-    m_pasteItem.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        paste();
-      }
-    });
-    m_pasteItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Paste"));
-
-//@19.01.11 sle: not used, provided by org.eclipse.ui-Extension
-//    addKeyListener(new KeyAdapter() {
-//      @Override
-//      public void keyPressed(KeyEvent e) {
-//        if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
-//          switch (e.keyCode) {
-//            case 'a':
-//            case 'A':
-//              selectAll();
-//              break;
-//            default:
-//              //ignore everything else
-//          }
-//        }
-//      }
-//    });
 
     // DND
     P_DndListener dndListener = new P_DndListener();
@@ -150,35 +63,6 @@ public class StyledTextEx extends StyledText {
 
   @Override
   protected void checkSubclass() {
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    super.setEnabled(enabled);
-    if (!isDisposed()) {
-      if (enabled) {
-        m_cutItem.setEnabled(true);
-        m_copyItem.setEnabled(true);
-        m_pasteItem.setEnabled(true);
-        setMenu(m_copyPasteMenu);
-      }
-      else {
-        setMenu(null);
-      }
-    }
-
-    Composite parent = getParent();
-    if (parent != null && !parent.isDisposed()) {
-      if (enabled) {
-        parent.setMenu(null);
-      }
-      else {
-        m_cutItem.setEnabled(false);
-        m_copyItem.setEnabled(true);
-        m_pasteItem.setEnabled(false);
-        parent.setMenu(m_copyPasteMenu);
-      }
-    }
   }
 
   protected void attachMultiLineListeners() {

@@ -14,6 +14,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.4.0,4.0.0)";visibility:=reexpo
  org.eclipse.scout.rt.client;bundle-version="[4.0.0,4.1.0)"
 Export-Package: org.eclipse.scout.rt.ui.swt,
  org.eclipse.scout.rt.ui.swt.action,
+ org.eclipse.scout.rt.ui.swt.action.menu,
+ org.eclipse.scout.rt.ui.swt.action.menu.text,
  org.eclipse.scout.rt.ui.swt.basic,
  org.eclipse.scout.rt.ui.swt.basic.application,
  org.eclipse.scout.rt.ui.swt.basic.calendar,

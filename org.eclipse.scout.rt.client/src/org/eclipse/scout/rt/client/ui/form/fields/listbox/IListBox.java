@@ -55,8 +55,6 @@ public interface IListBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   ITable getTable();
 
-  IListBoxUIFacade getUIFacade();
-
   /**
    * @return true: a filter is added to the listbox table that only accepts
    *         checked rows<br>

@@ -41,7 +41,7 @@ public abstract class AbstractWorkflowData implements Serializable {
   private int m_currentStepIndex;
 
   /*
-   * The following fields are not diretcly used by the workflow framework
+   * The following fields are not directly used by the workflow framework
    */
   private long m_definitionNr;
   private long m_workflowNr;
@@ -63,7 +63,7 @@ public abstract class AbstractWorkflowData implements Serializable {
   }
 
   protected void initConfig() {
-    for (Class<AbstractWorkflowStepData> workflowStepDataClazz : getConfiguredStepDatas()) {
+    for (Class<? extends AbstractWorkflowStepData> workflowStepDataClazz : getConfiguredStepDatas()) {
       AbstractWorkflowStepData f;
       try {
         f = ConfigurationUtility.newInnerInstance(this, workflowStepDataClazz);

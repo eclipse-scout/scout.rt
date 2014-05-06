@@ -165,7 +165,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * @return the row-level permission to delete bookmarks, default is {@link getDeletePermission()}
    * @throws ProcessingException
    */
-  protected Permission getDeletePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
+  protected Permission getDeletePermission(List<Bookmark> bookmarks) throws ProcessingException {
     return getDeletePermission();
   }
 
@@ -175,7 +175,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * @return the row-level permission to update bookmarks, default is {@link getUpdatePermission()}
    * @throws ProcessingException
    */
-  protected Permission getUpdatePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
+  protected Permission getUpdatePermission(List<Bookmark> bookmarks) throws ProcessingException {
     return getUpdatePermission();
   }
 
@@ -494,7 +494,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
+      protected void execInitAction() throws ProcessingException {
         setVisiblePermission(getUpdatePermission());
       }
 
@@ -512,7 +512,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
+      protected void execPrepareAction() throws ProcessingException {
         ITreeNode node = getSelectedNode();
         setVisible(!isBookmarkNode(node));
         setVisiblePermission(getUpdatePermission());
@@ -557,7 +557,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
+      protected void execPrepareAction() throws ProcessingException {
         setEnabled(!isProtected());
         setVisiblePermission(getUpdatePermission());
       }
@@ -596,7 +596,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
+      protected void execPrepareAction() throws ProcessingException {
         setEnabled(!isProtected());
         setVisiblePermission(getDeletePermission());
         setText(getConfiguredText());
@@ -731,6 +731,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+        super.execOwnerValueChanged(newOwnerValue);
+      }
+
+      @Override
       protected void execPrepareAction() throws ProcessingException {
         ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
@@ -854,7 +859,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execPrepareAction() throws ProcessingException {
-        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {

@@ -26,10 +26,10 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableFon
 
   private final ITable m_scoutTable;
   private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
-  private final IRwtScoutTableForPatch m_uiTable;
+  private final RwtScoutTable m_uiTable;
   private final TableColumnManager m_columnManager;
 
-  public RwtScoutTableModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
+  public RwtScoutTableModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
     m_uiTable = uiTable;
     m_columnManager = columnManager;
@@ -95,7 +95,7 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableFon
     }
   }
 
-  public IRwtScoutTableForPatch getRwtScoutTable() {
+  public RwtScoutTable getRwtScoutTable() {
     return m_uiTable;
   }
 }

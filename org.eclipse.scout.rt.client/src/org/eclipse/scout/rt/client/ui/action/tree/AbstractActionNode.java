@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -49,7 +50,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   protected void initConfig() {
     super.initConfig();
     // menus
-    ArrayList<T> nodeList = new ArrayList<T>();
+    List<T> nodeList = new ArrayList<T>();
     List<? extends Class<? extends IActionNode>> ma = getConfiguredChildActions();
     for (Class<? extends IActionNode> a : ma) {
 
@@ -69,6 +70,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute action nodes.", e);
     }
+    // add
     setChildActions(nodeList);
   }
 
@@ -81,6 +83,19 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    *          and added to composite field
    */
   protected void injectActionNodesInternal(List<T> nodeList) {
+  }
+
+  @Override
+  public void setContainerInternal(ITypeWithClassId container) {
+    super.setContainerInternal(container);
+    // children
+    updateContaineronChildren();
+  }
+
+  protected void updateContaineronChildren() {
+    for (T childAction : getChildActions()) {
+      childAction.setContainerInternal(getContainer());
+    }
   }
 
   /*
@@ -101,6 +116,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    * 
    * @throws ProcessingException
    */
+  @SuppressWarnings("deprecation")
   @Override
   protected void prepareActionInternal() throws ProcessingException {
     super.prepareActionInternal();
@@ -130,8 +146,9 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   }
 
   @Override
-  public void setChildActions(List<T> newList) {
-    propertySupport.setPropertyList(PROP_CHILD_ACTIONS, CollectionUtility.arrayListWithoutNullElements(newList));
+  public void setChildActions(List<? extends T> newList) {
+    propertySupport.setPropertyList(PROP_CHILD_ACTIONS, CollectionUtility.<T> arrayList(newList));
+    updateContaineronChildren();
   }
 
   @Override

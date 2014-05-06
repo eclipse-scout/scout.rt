@@ -845,7 +845,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
             scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
           }
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);

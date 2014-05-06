@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -58,28 +58,39 @@ public class DropDownButtonLayout implements LayoutManager2 {
   @Override
   public Dimension minimumLayoutSize(Container parent) {
     Dimension d = m_push.getMinimumSize();
-    d.width += m_menuWidth;
+    if (m_menu.isVisible()) {
+      d.width += m_menuWidth;
+    }
     return d;
   }
 
   @Override
   public Dimension preferredLayoutSize(Container parent) {
     Dimension d = m_push.getPreferredSize();
-    d.width += m_menuWidth;
+    if (m_menu.isVisible()) {
+      d.width += m_menuWidth;
+    }
     return d;
   }
 
   @Override
   public Dimension maximumLayoutSize(Container target) {
     Dimension d = m_push.getMaximumSize();
-    d.width += m_menuWidth;
+    if (m_menu.isVisible()) {
+      d.width += m_menuWidth;
+    }
     return d;
   }
 
   @Override
   public void layoutContainer(Container parent) {
     Dimension size = parent.getSize();
-    m_push.setBounds(0, 0, size.width - m_menuWidth, size.height);
-    m_menu.setBounds(size.width - m_menuWidth, 0, m_menuWidth, size.height);
+    if (m_menu.isVisible()) {
+      m_push.setBounds(0, 0, size.width - m_menuWidth, size.height);
+      m_menu.setBounds(size.width - m_menuWidth, 0, m_menuWidth, size.height);
+    }
+    else {
+      m_push.setBounds(0, 0, size.width, size.height);
+    }
   }
 }

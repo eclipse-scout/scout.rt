@@ -43,6 +43,26 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
     }
   }
 
+//  @Override
+//  protected void setUiField(Control swtField) {
+//    super.setUiField(swtField);
+//    installMenuSupport();
+//  }
+
+//  protected void installMenuSupport() {
+//    RwtScoutMenuSupport.install(getUiField(), getUiField().getParent(), new IMenuProvider() {
+//      @Override
+//      public List<IMenu> getValidMenus(MenuContext menuContext) {
+//        return getScoutObject().getUIFacade().fireMenuFromUI(menuContext);
+//      }
+//
+//      @Override
+//      public List<IMenu> getAllMenus() {
+//        return getScoutObject().getMenus();
+//      }
+//    }, getScoutObject(), getUiEnvironment(), null);
+//  }
+
   /**
    * Forces UI Input to be verified.
    * 

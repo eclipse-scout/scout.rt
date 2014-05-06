@@ -11,11 +11,14 @@
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
@@ -263,4 +266,14 @@ public interface ICalendar extends IPropertyObserver {
    * UI interface
    */
   ICalendarUIFacade getUIFacade();
+
+  /**
+   * @return An unmodifiable list of all menus defined for this calendar.
+   */
+  List<IMenu> getMenus();
+
+  /**
+   * @return An unmodifiable list of all {@link ICalendarItemProvider}s defined for this calendar.
+   */
+  List<ICalendarItemProvider> getCalendarItemProviders();
 }

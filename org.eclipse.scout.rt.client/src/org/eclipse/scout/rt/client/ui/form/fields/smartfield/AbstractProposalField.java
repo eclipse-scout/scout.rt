@@ -19,8 +19,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -253,21 +251,6 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
         return true;
       }
-    }
-
-    @Override
-    public List<IMenu> firePopupFromUI() {
-      return MenuUtility.filterValidMenus(AbstractProposalField.this, getMenus(), true);
-    }
-
-    /**
-     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
-     * method <code>prepareAction</code> on the menu objects.
-     */
-    @Override
-    public boolean hasValidMenusFromUI() {
-      List<IMenu> validMenus = MenuUtility.filterValidMenus(AbstractProposalField.this, getMenus(), false);
-      return validMenus.size() > 0;
     }
 
     @Override

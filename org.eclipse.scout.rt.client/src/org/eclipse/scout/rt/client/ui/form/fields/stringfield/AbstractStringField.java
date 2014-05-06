@@ -155,9 +155,9 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
-    super.initConfig();
     setMaxLength(getConfiguredMaxLength());
     setInputMasked(getConfiguredInputMasked());
+    super.initConfig();
     if (getConfiguredFormatLower()) {
       setFormatLower();
     }

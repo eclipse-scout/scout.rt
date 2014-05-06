@@ -101,6 +101,13 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     return null;
   }
 
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
+  }
+
   /**
    * Called before any lookup is performed
    */
@@ -633,5 +640,4 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       super.initConfig();
     }
   }
-
 }

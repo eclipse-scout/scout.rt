@@ -34,11 +34,9 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
     return ScoutTexts.get("CopyWidthsOfColumnsMenu");
   }
 
-  /**
-   * This menu is only visible in development mode
-   */
   @Override
-  protected void execPrepareAction() throws ProcessingException {
+  protected void execInitAction() throws ProcessingException {
+    // This menu is only visible in development mode
     setVisible(Platform.inDevelopmentMode());
   }
 

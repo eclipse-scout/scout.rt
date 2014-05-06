@@ -68,7 +68,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   private boolean m_autoExpandAll;
   private boolean m_autoCheckChildNodes;
   private boolean m_loadIncremental;
-  private ITreeBoxUIFacade m_uiFacade;
   private ITreeNodeFilter m_activeNodesFilter;
   private ITreeNodeFilter m_checkedNodesFilter;
   // children
@@ -156,6 +155,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
   protected boolean getConfiguredAutoExpandAll() {
+    return false;
+  }
+
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
     return false;
   }
 
@@ -270,7 +276,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
-    m_uiFacade = createUIFacade();
     m_fields = CollectionUtility.emptyArrayList();
     super.initConfig();
     setFilterActiveNodes(getConfiguredFilterActiveNodes());
@@ -404,15 +409,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public final ITree getTree() {
     return m_tree;
-  }
-
-  protected ITreeBoxUIFacade createUIFacade() {
-    return new P_TreeBoxUIFacade();
-  }
-
-  @Override
-  public ITreeBoxUIFacade getUIFacade() {
-    return m_uiFacade;
   }
 
   @Override
@@ -1165,9 +1161,4 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  /*
-   * UI Notifications
-   */
-  protected class P_TreeBoxUIFacade implements ITreeBoxUIFacade {
-  }
 }

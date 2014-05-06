@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
 
@@ -102,15 +103,15 @@ public class CsvHelper {
     m_colFormat = new ArrayList<Format>(list.size());
     for (Iterator<String> it = list.iterator(); it.hasNext();) {
       String s = it.next();
-      String sLow = (s != null ? s.toLowerCase() : null);
+      String sLow = StringUtility.lowercase(s);
       Format f = null;
       if (s == null) {
         f = null;
       }
-      else if (sLow.equals("string")) {
+      else if ("string".equals(sLow)) {
         f = null;
       }
-      else if (sLow.startsWith("integer")) {
+      else if ("integer".startsWith(sLow)) {
         if (s.length() >= 8) {// integer_<format>
           f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(m_locale));
           ((DecimalFormat) f).setParseIntegerOnly(true);
@@ -119,7 +120,7 @@ public class CsvHelper {
           f = NumberFormat.getIntegerInstance(m_locale);
         }
       }
-      else if (sLow.startsWith("float")) {
+      else if ("float".startsWith(sLow)) {
         if (s.length() >= 6) {// float_<format>
           f = new DecimalFormat(s.substring(6), new DecimalFormatSymbols(m_locale));
         }
@@ -127,7 +128,7 @@ public class CsvHelper {
           f = NumberFormat.getNumberInstance(m_locale);
         }
       }
-      else if (sLow.startsWith("date")) {
+      else if ("date".startsWith(sLow)) {
         if (s.length() >= 5) {
           f = new SimpleDateFormat(s.substring(5), m_locale);
         }

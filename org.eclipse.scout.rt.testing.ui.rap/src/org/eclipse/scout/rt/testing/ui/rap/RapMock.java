@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
+import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.testing.client.AbstractGuiMock;
@@ -918,7 +918,7 @@ public class RapMock extends AbstractGuiMock {
     if (c instanceof Tree) {
       return FieldType.Tree;
     }
-    if (c instanceof IDropDownButtonForPatch) {
+    if (c instanceof DropDownButton) {
       return FieldType.DropdownButton;
     }
     if (c instanceof Button) {

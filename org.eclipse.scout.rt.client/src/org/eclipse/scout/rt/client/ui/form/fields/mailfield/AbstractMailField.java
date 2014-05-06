@@ -88,6 +88,13 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     return ScoutTexts.get("EmailSent");
   }
 
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
+  }
+
   /**
    * @param url
    * @param path

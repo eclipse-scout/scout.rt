@@ -80,7 +80,7 @@ public class RwtScoutMainMenuButton extends RwtScoutComposite<IDesktop> implemen
     });
     m_menuButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_MENU_BUTTON);
     Menu contextMenu = new Menu(m_menuButton.getShell(), SWT.POP_UP);
-    RwtMenuUtility.fillContextMenu(getScoutObject().getMenus(), getUiEnvironment(), contextMenu);
+    RwtMenuUtility.fillMenu(contextMenu, getScoutObject().getMenus(), getUiEnvironment());
     m_menuButton.setMenu(contextMenu);
 
     return m_menuButton;

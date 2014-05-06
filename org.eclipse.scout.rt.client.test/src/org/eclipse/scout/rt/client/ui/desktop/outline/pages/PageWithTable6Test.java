@@ -15,7 +15,6 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -51,47 +50,30 @@ public class PageWithTable6Test {
     PageWithTable.Table table = page.getTable();
     //
     table.selectRow(null);
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{});
+    assertMenus(table, new String[]{"New Account"});
     //
     table.selectRow(0);
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{"Edit Account"});
+    assertMenus(table, new String[]{"Edit Account"});
     //
     table.selectRow(1);
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{});
+    assertMenus(table, new String[]{});
     //
     table.selectAllRows();
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{});
+    assertMenus(table, new String[]{});
     //
     table.selectRow(1);
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{});
-    //
+    assertMenus(table, new String[]{});
+
     table.selectRow(0);
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{"Edit Account"});
+    assertMenus(table, new String[]{"Edit Account"});
     //
     table.deselectAllRows();
-    assertEmptySpaceMenus(table, new String[]{"New Account"});
-    assertRowMenus(table, new String[]{});
+    assertMenus(table, new String[]{"New Account"});
   }
 
-  private static void assertEmptySpaceMenus(PageWithTable.Table table, String[] expectedMenus) {
+  private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
     ArrayList<String> actualMenus = new ArrayList<String>();
-    for (IMenu m : table.getUIFacade().fireEmptySpacePopupFromUI()) {
-      if (m.isVisible() && m.isEnabled()) {
-        actualMenus.add(m.getText());
-      }
-    }
-    assertArrayEquals(expectedMenus, actualMenus.toArray(new String[0]));
-  }
-
-  private static void assertRowMenus(PageWithTable.Table table, String[] expectedMenus) {
-    List<String> actualMenus = new ArrayList<String>();
-    for (IMenu m : table.getUIFacade().fireRowPopupFromUI()) {
+    for (IMenu m : table.getContextMenu().getChildActions()) {
       if (m.isVisible() && m.isEnabled()) {
         actualMenus.add(m.getText());
       }

@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.swt.basic.comp.HyperlinkEx;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineCheckbox;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
@@ -35,6 +34,7 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -163,8 +163,8 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     return client;
   }
 
-  public ButtonEx createButtonEx(Composite parent, int style) {
-    ButtonEx button = new ButtonEx(parent, style | SWT.FLAT);
+  public Button createButton(Composite parent, int style) {
+    Button button = new Button(parent, style | SWT.FLAT);
     adapt(button, false, false);
     return button;
   }

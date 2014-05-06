@@ -32,13 +32,19 @@ public class TestFormWithTemplateSmartfield extends AbstractForm {
     @Order(10.0)
     @ClassId(TEST_SMARTFIELD_ID_1)
     public class SmartField1 extends SmartfieldTestTemplate {
+      @Override
+      protected boolean getConfiguredAutoAddDefaultMenus() {
+        return false;
+      }
     }
 
     @Order(20.0)
     @ClassId(TEST_SMARTFIELD_ID_2)
     public class SmartField2 extends SmartfieldTestTemplate {
+      @Override
+      protected boolean getConfiguredAutoAddDefaultMenus() {
+        return false;
+      }
     }
-
   }
-
 }

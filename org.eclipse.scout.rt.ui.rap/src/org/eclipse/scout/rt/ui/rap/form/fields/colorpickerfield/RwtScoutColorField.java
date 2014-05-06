@@ -11,35 +11,31 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.ColorUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -49,17 +45,17 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
 
 public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField> implements IRwtScoutColorField {
-  private Menu m_contextMenu;
   private Label m_colorPreviewLabel;
   private Button m_colorPickButton;
   private Composite m_colorPickerContainer;
 
   private TextFieldEditableSupport m_editableSupport;
   private Color m_previewColor;
+  private RwtContextMenuMarkerComposite m_markerComposite;
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -86,12 +82,15 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     Label splitLabel = getUiEnvironment().getFormToolkit().createLabel(m_colorPickerContainer, "");
     splitLabel.setData(RWT.CUSTOM_VARIANT, "colorpickerfield_splitLabel");
 
-    StyledText textField = new StyledTextEx(m_colorPickerContainer, SWT.SINGLE);
+    m_markerComposite = new RwtContextMenuMarkerComposite(m_colorPickerContainer, getUiEnvironment(), SWT.NONE);
+    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+
+    StyledText textField = new StyledTextEx(m_markerComposite, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
     textField.setData(RWT.CUSTOM_VARIANT, getColorPickerFieldVariant());
 
-    m_colorPickButton = getUiEnvironment().getFormToolkit().createButtonEx(m_colorPickerContainer, SWT.PUSH);
+    m_colorPickButton = getUiEnvironment().getFormToolkit().createButton(m_colorPickerContainer, "", SWT.PUSH);
     m_colorPickButton.setImage(getUiEnvironment().getIcon(AbstractIcons.Palette));
 
     // listeners
@@ -100,17 +99,14 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
       private static final long serialVersionUID = 1L;
 
       @Override
-      public void mouseDown(MouseEvent e) {
-        handleSwtPickColor();
+      public void mouseUp(MouseEvent e) {
+        if (e.button == 1) {
+          handleUiPickColor();
+        }
       }
     });
 
-    // context menu
-    m_contextMenu = new Menu(m_colorPreviewLabel.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener((Control) m_colorPickButton, getUiField()));
-    m_colorPreviewLabel.setMenu(m_contextMenu);
-
-    m_colorPickerContainer.setTabList(new Control[]{textField});
+    m_colorPickerContainer.setTabList(new Control[]{m_markerComposite});
     m_colorPickButton.addFocusListener(new FocusAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -124,6 +120,9 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     setUiLabel(label);
     setUiField(textField);
 
+    // key binding
+    getUiEnvironment().addKeyStroke(textField, new P_F2KeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ArrowDownKeyStroke(), false);
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
 
@@ -139,12 +138,19 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     splitLabel.setLayoutData(splitLabelData);
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    textField.setLayoutData(textLayoutData);
+    m_markerComposite.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
     buttonLayoutData.heightHint = 20;
     buttonLayoutData.widthHint = 20;
     m_colorPickButton.setLayoutData(buttonLayoutData);
+  }
+
+  @Override
+  protected void installContextMenu() {
+    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
+    m_colorPickButton.setMenu(contextMenu.getUiMenu());
+    m_colorPreviewLabel.setMenu(contextMenu.getUiMenu());
   }
 
   protected String getColorPickerFieldVariant() {
@@ -199,13 +205,15 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     getUiEnvironment().dispatchImmediateUiJobs();
   }
 
-  protected void handleSwtPickColor() {
+  protected void handleUiPickColor() {
 
     ColorDialog colorDialog = new ColorDialog(getUiContainer().getShell());
     colorDialog.setText(ScoutTexts.get("ColorPickerSelectColor"));
-    RGB rgb = org.eclipse.scout.rt.ui.rap.basic.ColorUtility.toRGB(getScoutObject().getValue());
-    if (rgb != null) {
-      colorDialog.setRGB(rgb);
+    if (getScoutObject().getValue() != null) {
+      RGB rgb = org.eclipse.scout.rt.ui.rap.basic.ColorUtility.toRGB(getScoutObject().getValue());
+      if (rgb != null) {
+        colorDialog.setRGB(rgb);
+      }
     }
     RGB selectedColor = colorDialog.open();
     if (selectedColor != null) {
@@ -267,39 +275,25 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     super.handleScoutPropertyChange(name, newValue);
   }
 
-  private class P_ContextMenuListener extends MenuAdapterEx {
-    private static final long serialVersionUID = 1L;
-
-    public P_ContextMenuListener(Control menuControl, Control keyStrokeWidget) {
-      super(menuControl, keyStrokeWidget);
+  private class P_F2KeyStroke extends RwtKeyStroke {
+    public P_F2KeyStroke() {
+      super(SWT.F2);
     }
 
     @Override
-    public void menuShown(MenuEvent e) {
-      super.menuShown(e);
-
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
-          scoutMenusRef.set(scoutMenus);
-        }
-      };
-      JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden within
-      // the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        Menu menu = ((Menu) e.getSource());
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), getUiEnvironment(), menu);
-      }
+    public void handleUiAction(Event e) {
+      handleUiPickColor();
     }
-  } // end class P_ContextMenuListener
+  }
 
+  private class P_ArrowDownKeyStroke extends RwtKeyStroke {
+    public P_ArrowDownKeyStroke() {
+      super(SWT.ARROW_DOWN);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      handleUiPickColor();
+    }
+  }
 }

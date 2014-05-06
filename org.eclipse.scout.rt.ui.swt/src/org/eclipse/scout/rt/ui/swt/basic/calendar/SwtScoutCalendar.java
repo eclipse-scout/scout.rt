@@ -94,12 +94,13 @@ public class SwtScoutCalendar extends SwtCalendar {
 
   @Override
   public void showGeneralContextMenu(Menu manager) {
-    SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
+    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), m_field.getEnvironment());
+    //SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
   }
 
   @Override
   public void showItemContextMenu(Menu manager, Object item) {
-    SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
+    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment()), m_field.getEnvironment());
   }
 
   @Override

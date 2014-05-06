@@ -159,7 +159,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execPrepareAction() {
+    protected void execInitAction() throws ProcessingException {
       setVisiblePermission(new CreateUserBookmarkPermission());
     }
 
@@ -177,7 +177,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execPrepareAction() {
+    protected void execInitAction() throws ProcessingException {
       setVisiblePermission(new CreateGlobalBookmarkPermission());
     }
 

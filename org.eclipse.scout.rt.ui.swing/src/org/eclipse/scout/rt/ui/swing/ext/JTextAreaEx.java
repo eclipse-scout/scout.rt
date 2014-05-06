@@ -52,7 +52,6 @@ public class JTextAreaEx extends JTextArea {
     UndoableEditObserver.attach(this);
     TextBlockDragAndDrop.attach(this);
     SwingUtility.installAlternateCopyPaste(this);
-    SwingUtility.installCopyPasteMenu(this);
     // consume the enter key stroke
     KeyStroke relesedEnter = KeyStroke.getKeyStroke("released ENTER");
     getInputMap().put(relesedEnter, ACTION_ENTER_RELEASED);

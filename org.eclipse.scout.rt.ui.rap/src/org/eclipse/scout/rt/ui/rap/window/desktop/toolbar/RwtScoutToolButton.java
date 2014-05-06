@@ -21,7 +21,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IRwtScoutToolButtonForPatch {
+public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IRwtScoutToolButton {
 
   private final boolean m_iconVisible;
   private final boolean m_textVisible;

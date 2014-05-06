@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
@@ -59,8 +60,6 @@ public interface IImageField extends IFormField, IDNDSupport {
   void setImage(Object imgObj);
 
   byte[] getByteArrayValue();
-
-  List<IMenu> getMenus();
 
   @Override
   List<IKeyStroke> getKeyStrokes();
@@ -138,4 +137,14 @@ public interface IImageField extends IFormField, IDNDSupport {
   boolean isScrollBarEnabled();
 
   void setScrollBarEnabled(boolean b);
+
+  /**
+   * @return
+   */
+  List<IMenu> getMenus();
+
+  /**
+   * @return
+   */
+  IContextMenu getContextMenu();
 }

@@ -279,7 +279,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       super.menuShown(e);
 
       Menu menu = ((Menu) e.getSource());
-      RwtMenuUtility.fillContextMenu(getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment(), menu);
+      RwtMenuUtility.fillMenu(menu, getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment());
     }
   } // end class P_ContextMenuListener
 

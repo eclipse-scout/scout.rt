@@ -317,14 +317,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * do not broadcast this change to all children
-   */
-  @Override
-  public void setVisible(boolean b) {
-    super.setVisible(b);
-  }
-
-  /**
    * when granting of enabled property changes, broadcast and set this property
    * on all children that have no permission set
    */

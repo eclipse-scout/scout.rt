@@ -12,111 +12,56 @@ package org.eclipse.scout.rt.ui.swt.internal;
 
 import java.util.Stack;
 
-import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
-import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MenuItem;
 
 public class StyledTextFieldUndoRedoSupport {
-
-  private StyledTextEx m_styledText;
-
-  private MenuListener m_menuListener;
-  private MenuItem m_undoRedoSeparator;
-  private MenuItem m_undoItem;
-  private MenuItem m_redoItem;
-  private SelectionAdapter m_undoSelectionAdapter;
-  private SelectionAdapter m_redoSelectionAdapter;
-
-  private ExtendedModifyListener m_modifyListener;
-  private KeyAdapter m_keyAdapter;
-
   private static final int MAX_STACK_SIZE = 25;
-  private boolean fillUndo = true;
-  private boolean clearRedo = true;
-  private Stack<P_TextChange> undoStack;
-  private Stack<P_TextChange> redoStack;
+
+  private StyledText m_styledText;
+
+  private volatile int m_inactiveCounter = 0;
+  private volatile boolean m_clearRedo = true;
+  private Stack<P_TextChange> m_undoStack;
+  private Stack<P_TextChange> m_redoStack;
 
   private boolean disposed = true;
 
-  public StyledTextFieldUndoRedoSupport(StyledTextEx styledText) {
+  public StyledTextFieldUndoRedoSupport(StyledText styledText) {
     m_styledText = styledText;
     init();
   }
 
   private void init() {
+    m_undoStack = new Stack<P_TextChange>();
+    m_redoStack = new Stack<P_TextChange>();
 
-    m_menuListener = new MenuListener() {
-      @Override
-      public void menuHidden(MenuEvent e) {
-      }
-
-      @Override
-      public void menuShown(MenuEvent e) {
-        if (m_styledText.isEnabled()) {
-          m_undoItem.setEnabled(!undoStack.isEmpty() && m_styledText.getEditable());
-          m_redoItem.setEnabled(!redoStack.isEmpty() && m_styledText.getEditable());
-        }
-      }
-    };
-    m_styledText.getMenu().addMenuListener(m_menuListener);
-
-    undoStack = new Stack<P_TextChange>();
-    redoStack = new Stack<P_TextChange>();
-
-    m_modifyListener = new ExtendedModifyListener() {
+    m_styledText.addExtendedModifyListener(new ExtendedModifyListener() {
       @Override
       public void modifyText(ExtendedModifyEvent event) {
-        if (fillUndo) {
-          if (clearRedo) {
-            redoStack.clear();
+        if (isActive()) {
+          if (m_clearRedo) {
+            m_redoStack.clear();
           }
-          if (undoStack.size() == MAX_STACK_SIZE) {
-            undoStack.remove(0);
+          if (m_undoStack.size() == MAX_STACK_SIZE) {
+            m_undoStack.remove(0);
           }
-          undoStack.push(new P_TextChange(event.start, event.length, event.replacedText));
+          m_undoStack.push(new P_TextChange(event.start, event.length, event.replacedText));
         }
         else {
-          if (redoStack.size() == MAX_STACK_SIZE) {
-            redoStack.remove(0);
+          if (m_redoStack.size() == MAX_STACK_SIZE) {
+            m_redoStack.remove(0);
           }
-          redoStack.push(new P_TextChange(event.start, event.length, event.replacedText));
+          m_redoStack.push(new P_TextChange(event.start, event.length, event.replacedText));
         }
       }
-    };
-    m_styledText.addExtendedModifyListener(m_modifyListener);
+    });
 
-    m_undoRedoSeparator = new MenuItem(m_styledText.getMenu(), SWT.SEPARATOR);
-    m_undoItem = new MenuItem(m_styledText.getMenu(), SWT.PUSH);
-    m_undoSelectionAdapter = new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        undo();
-      }
-    };
-    m_undoItem.addSelectionListener(m_undoSelectionAdapter);
-    m_undoItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Undo"));
-
-    m_redoItem = new MenuItem(m_styledText.getMenu(), SWT.PUSH);
-    m_redoSelectionAdapter = new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        redo();
-      }
-    };
-    m_redoItem.addSelectionListener(m_redoSelectionAdapter);
-    m_redoItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Redo"));
-
-    m_keyAdapter = new KeyAdapter() {
+    m_styledText.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
         if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
@@ -134,91 +79,89 @@ public class StyledTextFieldUndoRedoSupport {
           }
         }
       }
-    };
-    m_styledText.addKeyListener(m_keyAdapter);
-
-    disposed = false;
+    });
   }
 
-  public boolean isDisposed() {
-    return disposed;
+  public StyledText getStyledText() {
+    return m_styledText;
   }
 
-  public void dispose() {
-    if (!m_styledText.isDisposed()) {
-      m_styledText.removeExtendedModifyListener(m_modifyListener);
-      m_styledText.removeKeyListener(m_keyAdapter);
+  public boolean isActive() {
+    return m_inactiveCounter == 0;
+  }
 
-      if (m_styledText.getMenu() != null && !m_styledText.getMenu().isDisposed()) {
-        m_styledText.getMenu().removeMenuListener(m_menuListener);
+  /**
+   * set inactive to avoid changes are recorded.
+   * <strong>Should be called in a try finally block only!</strong>
+   * 
+   * @param active
+   */
+  public boolean setActive(boolean active) {
+    if (active) {
+      m_inactiveCounter++;
+    }
+    else if (m_inactiveCounter > 0) {
+      m_inactiveCounter--;
+    }
+    return m_inactiveCounter == 0;
+  }
+
+  public boolean hasUndoChanges() {
+    return !m_undoStack.isEmpty();
+  }
+
+  public boolean hasRedoChanges() {
+    return !m_redoStack.isEmpty();
+  }
+
+  public void undo() {
+    if (!m_undoStack.isEmpty()) {
+      // Get the last change
+      P_TextChange change = m_undoStack.pop();
+
+      try {
+        setActive(false);
+        // Replace the changed text
+        m_styledText.replaceTextRange(change.getStart(), change.getLength(), change.getReplacedText());
+
+        // Move the caret
+        m_styledText.setCaretOffset(change.getStart());
+
+        // Scroll the screen
+        m_styledText.setTopIndex(m_styledText.getLineAtOffset(change.getStart()));
+
+        // select inserted text
+        int length = change.getLength() == 0 ? change.getReplacedText().length() : change.getLength();
+        m_styledText.setSelectionRange(change.getStart(), length);
+      }
+      finally {
+        setActive(true);
       }
     }
-
-    if (!m_undoRedoSeparator.isDisposed()) {
-      m_undoRedoSeparator.dispose();
-    }
-
-    if (!m_undoItem.isDisposed()) {
-      m_undoItem.removeSelectionListener(m_undoSelectionAdapter);
-      m_undoItem.dispose();
-    }
-
-    if (!m_redoItem.isDisposed()) {
-      m_redoItem.removeSelectionListener(m_redoSelectionAdapter);
-      m_redoItem.dispose();
-    }
-
-    undoStack.clear();
-    redoStack.clear();
-
-    disposed = true;
   }
 
-  public void clearStacks() {
-    undoStack.clear();
-    redoStack.clear();
-  }
+  public void redo() {
+    if (m_redoStack.size() > 0) {
+      P_TextChange change = m_redoStack.pop();
 
-  private void undo() {
-    if (!undoStack.isEmpty()) {
-      // Get the last change
-      P_TextChange change = undoStack.pop();
+      try {
+        m_clearRedo = false;
+        // Replace the changed text
+        m_styledText.replaceTextRange(change.getStart(), change.getLength(), change.getReplacedText());
 
-      fillUndo = false;
-      // Replace the changed text
-      m_styledText.replaceTextRange(change.getStart(), change.getLength(), change.getReplacedText());
+        // Move the caret
+        m_styledText.setCaretOffset(change.getStart());
 
-      // Move the caret
-      m_styledText.setCaretOffset(change.getStart());
+        // Scroll the screen
+        m_styledText.setTopIndex(m_styledText.getLineAtOffset(change.getStart()));
 
-      // Scroll the screen
-      m_styledText.setTopIndex(m_styledText.getLineAtOffset(change.getStart()));
-
-      // select inserted text
-      int length = change.getLength() == 0 ? change.getReplacedText().length() : change.getLength();
-      m_styledText.setSelectionRange(change.getStart(), length);
-      fillUndo = true;
-    }
-  }
-
-  private void redo() {
-    if (redoStack.size() > 0) {
-      P_TextChange change = redoStack.pop();
-
-      clearRedo = false;
-      // Replace the changed text
-      m_styledText.replaceTextRange(change.getStart(), change.getLength(), change.getReplacedText());
-
-      // Move the caret
-      m_styledText.setCaretOffset(change.getStart());
-
-      // Scroll the screen
-      m_styledText.setTopIndex(m_styledText.getLineAtOffset(change.getStart()));
-
-      // select inserted text
-      int length = change.getLength() == 0 ? change.getReplacedText().length() : change.getLength();
-      m_styledText.setSelectionRange(change.getStart(), length);
-      clearRedo = true;
+        // select inserted text
+        int length = change.getLength() == 0 ? change.getReplacedText().length() : change.getLength();
+        m_styledText.setSelectionRange(change.getStart(), length);
+      }
+      finally {
+        m_clearRedo = true;
+      }
     }
   }
 

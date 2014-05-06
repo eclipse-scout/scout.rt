@@ -10,14 +10,9 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
 public interface IColorFieldUiFacade extends IBasicFieldUIFacade {
-
-  List<IMenu> firePopupFromUI();
 
   /**
    * @param value

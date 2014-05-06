@@ -30,8 +30,6 @@ import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -350,21 +348,6 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
     }
 
     @Override
-    public List<IMenu> firePopupFromUI() {
-      return MenuUtility.filterValidMenus(AbstractMixedSmartField.this, getMenus(), true);
-    }
-
-    /**
-     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
-     * method <code>prepareAction</code> on the menu objects.
-     */
-    @Override
-    public boolean hasValidMenusFromUI() {
-      List<IMenu> validMenus = MenuUtility.filterValidMenus(AbstractMixedSmartField.this, getMenus(), false);
-      return validMenus.size() > 0;
-    }
-
-    @Override
     public void openProposalFromUI(String newText, boolean selectCurrentValue) {
       if (newText == null) {
         newText = BROWSE_ALL_TEXT;
@@ -424,7 +407,6 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
     public void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }
-
   }
 
   private class P_GetLookupRowByKeyJob extends ClientSyncJob {

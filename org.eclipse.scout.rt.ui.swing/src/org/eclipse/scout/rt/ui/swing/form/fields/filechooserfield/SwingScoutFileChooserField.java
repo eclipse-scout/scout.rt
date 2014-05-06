@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.filechooserfield;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -31,20 +33,27 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
-import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 
 public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IFileChooserField> implements ISwingScoutFileChooserField {
   private static final long serialVersionUID = 1L;
+  private ContextMenuDecorationItem m_contextMenuMarker;
+  private SwingScoutContextMenu m_contextMenu;
+  private DropDownDecorationItem m_dropdownIcon;
 
   @Override
   protected void initializeSwing() {
@@ -90,21 +99,68 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
    * May add additional components to the container.
    */
   protected JTextComponent createTextField(JComponent container) {
-    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
+    JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
     container.add(textField);
-    textField.addDropDownButtonListener(new IDropDownButtonListener() {
+    IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
+    // context menu marker
+    m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
+    m_contextMenuMarker.addMouseListener(new MouseAdapter() {
       @Override
-      public void iconClicked(Object source) {
-        getSwingTextField().requestFocus();
-        handleSwingFileChooserAction();
-      }
-
-      @Override
-      public void menuClicked(Object source) {
-        handleSwingPopup((JComponent) source);
+      public void mouseClicked(MouseEvent e) {
+        m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
       }
     });
+    decorationGroup.addDecoration(m_contextMenuMarker);
+
+    // smart chooser decoration
+    m_dropdownIcon = new DropDownDecorationItem(textField, getSwingEnvironment());
+    m_dropdownIcon.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) {
+          m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+        }
+        else {
+          getSwingTextField().requestFocus();
+          handleSwingFileChooserAction();
+        }
+      }
+    });
+    decorationGroup.addDecoration(m_dropdownIcon);
+
+    textField.setDecorationIcon(decorationGroup);
     return textField;
+//    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
+//    container.add(textField);
+//    textField.addDropDownButtonListener(new IDropDownButtonListener() {
+//      @Override
+//      public void iconClicked(Object source) {
+//        getSwingTextField().requestFocus();
+//        handleSwingFileChooserAction();
+//      }
+//
+//      @Override
+//      public void menuClicked(Object source) {
+//        handleSwingPopup((JComponent) source);
+//      }
+//    });
+//    return textField;
+  }
+
+  @Override
+  protected void installContextMenu() {
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+        }
+      }
+    });
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTextField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
   @Override
@@ -117,26 +173,20 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     super.attachScout();
     IFileChooserField f = getScoutObject();
     setFileIconIdFromScout(f.getFileIconId());
-    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
-    }
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingTextField()).setMenuEnabled(calculateDropDownButtonEnabled());
-    }
     JTextComponent swingField = getSwingTextField();
     swingField.setText(s);
   }
 
   private boolean calculateDropDownButtonEnabled() {
-    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
+    final Holder<List<IMenu>> menuHolder = new Holder<List<IMenu>>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
+        menuHolder.setValue(getScoutObject().getContextMenu().getChildActions());
       }
     };
     JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
@@ -146,7 +196,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     catch (InterruptedException ex) {
       //nop
     }
-    return hasValidMenus.get();
+    return MenuUtility.consolidateMenus(menuHolder.getValue()).size() > 0;
   }
 
   @Override
@@ -160,15 +210,14 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
-    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingTextField()).setDropDownButtonEnabled(b);
-    }
+    m_dropdownIcon.setEnabled(b);
+//    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+//      ((JTextFieldWithDropDownButton) getSwingTextField()).setDropDownButtonEnabled(b);
+//    }
   }
 
   protected void setFileIconIdFromScout(String s) {
-    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) getSwingField()).setIconGroup(new IconGroup(getSwingEnvironment(), s));
-    }
+    m_dropdownIcon.setIconGroup(new IconGroup(getSwingEnvironment(), s));
   }
 
   @Override
@@ -203,17 +252,19 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
   protected void handleSwingFocusGained() {
     super.handleSwingFocusGained();
     JTextComponent swingField = getSwingTextField();
-    if (swingField.getDocument().getLength() > 0) {
+    if (!isMenuOpened() && swingField.getDocument().getLength() > 0) {
       swingField.setCaretPosition(swingField.getDocument().getLength());
       swingField.moveCaretPosition(0);
     }
+    setMenuOpened(false);
   }
 
   protected boolean isFileChooserEnabled() {
-    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-      return (((JTextFieldWithDropDownButton) getSwingTextField()).isDropDownButtonEnabled());
-    }
-    return false;
+    return m_dropdownIcon.isEnabled();
+//    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+//      return (((JTextFieldWithDropDownButton) getSwingTextField()).isDropDownButtonEnabled());
+//    }
+//    return false;
   }
 
   protected void handleSwingFileChooserAction() {
@@ -242,32 +293,34 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     }
   }
 
-  protected void handleSwingPopup(final JComponent target) {
-    if (getScoutObject().hasMenus()) {
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
-          // <bsh 2010-10-08>
-          // The default implemention positions the popup menu on the left side of the
-          // "target" component. This is no longer correct in Rayo. So we use the target's
-          // width and substract a certain amount.
-          int x = 0;
-          if (target instanceof JTextFieldWithDropDownButton) {
-            JTextFieldWithDropDownButton tf = (JTextFieldWithDropDownButton) target;
-            x = tf.getWidth() - tf.getMargin().right;
-          }
-          Point point = new Point(x, target.getHeight());
-          // </bsh>
-          // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), target, point, scoutMenus).enqueue();
-        }
-      };
-      getSwingEnvironment().invokeScoutLater(t, 5678);
-      // end notify
-    }
-  }
+//  protected void handleSwingPopup(final JComponent target) {
+//    if (getScoutObject().getContextMenu().hasChildActions()) {
+//      // notify Scout
+//
+//      // <bsh 2010-10-08>
+//      // The default implementation positions the popup menu on the left side of the
+//      // "target" component. This is no longer correct in Rayo. So we use the target's
+//      // width and subtract a certain amount.
+//      int x = 0;
+//      if (target instanceof JTextFieldWithDropDownButton) {
+//        JTextFieldWithDropDownButton tf = (JTextFieldWithDropDownButton) target;
+//        x = tf.getWidth() - tf.getMargin().right;
+//      }
+//      final Point point = new Point(x, target.getHeight());
+//      // </bsh>
+//
+//      Runnable t = new Runnable() {
+//        @Override
+//        public void run() {
+//          List<IMenu> scoutMenus = ActionUtility.visibleNormalizedActions(getScoutObject().getContextMenu().getChildActions());
+//          // call swing menu
+//          new SwingPopupWorker(getSwingEnvironment(), target, point, scoutMenus).enqueue();
+//        }
+//      };
+//      getSwingEnvironment().invokeScoutLater(t, 5678);
+//      // end notify
+//    }
+//  }
 
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {

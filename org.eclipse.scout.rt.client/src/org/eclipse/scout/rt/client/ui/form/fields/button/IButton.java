@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -32,6 +33,7 @@ public interface IButton extends IFormField {
   String PROP_ICON_ID = "iconId";
   String PROP_IMAGE = "image";
   String PROP_SELECTED = "selected";
+  String PROP_CONTEXT_MENU = "contextMenu";
 
   /*
    * System Types
@@ -73,10 +75,6 @@ public interface IButton extends IFormField {
 
   void setImage(Object nativeImg);
 
-  boolean hasMenus();
-
-  List<IMenu> getMenus();
-
   /**
    * display style<br>
    * default, toggle, radio
@@ -112,4 +110,14 @@ public interface IButton extends IFormField {
   void requestPopup();
 
   IButtonUIFacade getUIFacade();
+
+  /**
+   * @return
+   */
+  List<IMenu> getMenus();
+
+  /**
+   * @return
+   */
+  IContextMenu getContextMenu();
 }

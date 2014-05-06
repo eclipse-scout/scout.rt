@@ -19,6 +19,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 
 public interface IDataModelEntity extends IPropertyObserver {
 
+  String PROP_VISIBLE = "visible";
+
   /**
    * @return meta data for the attribute, default returns null
    *         <p>

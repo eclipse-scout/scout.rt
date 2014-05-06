@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-public class DropDownFileUpload extends FileUpload implements IDropDownFileUploadForPatch {
+public class DropDownFileUpload extends FileUpload {
   private static final long serialVersionUID = 1L;
 
   private Rectangle m_buttonArea = new Rectangle(1, 1, 13, 17);
@@ -91,7 +91,6 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     return contextMenu;
   }
 
-  @Override
   public void fireSelectionEvent(SelectionEvent e) {
     if (isButtonEnabled()) {
       for (SelectionListener l : m_eventListeners.getListeners(SelectionListener.class)) {
@@ -110,17 +109,14 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     m_eventListeners.remove(SelectionListener.class, listener);
   }
 
-  @Override
   public void addMenuListener(MenuListener listener) {
     m_eventListeners.add(MenuListener.class, listener);
   }
 
-  @Override
   public void removeMenuListener(MenuListener listener) {
     m_eventListeners.remove(MenuListener.class, listener);
   }
 
-  @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     if (!StringUtility.hasText(m_originalVariant)) {
@@ -131,18 +127,15 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     super.setEnabled(isButtonEnabled());
   }
 
-  @Override
   public boolean isDropdownEnabled() {
     return m_dropdownEnabled;
   }
 
-  @Override
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
     super.setEnabled(isButtonEnabled());
   }
 
-  @Override
   public boolean isButtonEnabled() {
     return m_buttonEnabled;
   }

@@ -4,16 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.datefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Button;
 
 /**
  * <h3>ISwtScoutDateField</h3> ...
@@ -22,9 +22,9 @@ import org.eclipse.swt.custom.StyledText;
  */
 public interface ISwtScoutDateField extends ISwtScoutFormField<IDateField> {
 
-  ButtonEx getDateChooserButton();
+  Button getDateChooserButton();
 
-  ButtonEx getTimeChooserButton();
+  Button getTimeChooserButton();
 
   @Override
   StyledText getSwtField();

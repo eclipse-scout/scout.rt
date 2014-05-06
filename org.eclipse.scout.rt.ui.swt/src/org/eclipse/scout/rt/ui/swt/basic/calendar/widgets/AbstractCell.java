@@ -102,6 +102,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   /** create context menu (dynamically, gets filled when used) */
   protected void setupMenu() {
     // context menu
+
     m_contextMenu = new Menu(getShell(), SWT.POP_UP);
 
     setMenu(m_contextMenu);

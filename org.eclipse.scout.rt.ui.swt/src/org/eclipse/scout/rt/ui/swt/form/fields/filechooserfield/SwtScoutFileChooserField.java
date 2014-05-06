@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -21,10 +21,12 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
+import org.eclipse.scout.rt.ui.swt.action.menu.text.StyledTextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
@@ -33,20 +35,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileChooserField> implements ISwtScoutFileChooserField {
 
-  private DropDownButton m_fileChooserButton;
-  private Menu m_contextMenu;
+  private Button m_fileChooserButton;
   private TextFieldEditableSupport m_editableSupport;
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private SwtScoutContextMenu m_contextMenu;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -54,35 +56,83 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    m_fileChooserButton = new DropDownButton(container, SWT.DROP_DOWN);
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment());
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
+
+    StyledText textField = getEnvironment().getFormToolkit().createStyledText(m_menuMarkerComposite, SWT.SINGLE);
+    textField.setMargins(2, 2, 2, 2);
+    m_fileChooserButton = getEnvironment().getFormToolkit().createButton(container, "", SWT.PUSH);
+    // listener is used.
+    m_fileChooserButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseDown(MouseEvent e) {
+        handleSwtInputVerifier();
+      }
+
+      @Override
+      public void mouseUp(MouseEvent e) {
+        // check left click
+        if (e.button == 1) {
+          handleSwtFileChooserAction();
+        }
+      }
+    });
     m_fileChooserButton.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
         getSwtField().setFocus();
       }
     });
-    container.setTabList(new Control[]{textField});
+
+    container.setTabList(new Control[]{m_menuMarkerComposite});
     //
     setSwtContainer(container);
     setSwtLabel(label);
     setSwtField(textField);
 
-    // context menu
-    m_contextMenu = new Menu(m_fileChooserButton.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener());
-    m_fileChooserButton.setMenu(m_contextMenu);
-    // listener
-    P_SwtFileChooserButtonListener swtBrowseButtonListener = new P_SwtFileChooserButtonListener();
-    getSwtFileChooserButton().addSelectionListener(swtBrowseButtonListener);
-
     // layout
     getSwtContainer().setLayout(new LogicalGridLayout(1, 0));
-    m_fileChooserButton.setLayoutData(LogicalGridDataBuilder.createSmartButton());
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    m_fileChooserButton.setLayoutData(LogicalGridDataBuilder.createButton1());
   }
 
   @Override
-  public DropDownButton getSwtFileChooserButton() {
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+    getSwtFileChooserButton().setMenu(m_contextMenu.getSwtMenu());
+
+    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+        getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
+    getSwtField().setMenu(fieldMenu.getSwtMenu());
+  }
+
+  @Override
+  public Button getSwtFileChooserButton() {
     return m_fileChooserButton;
   }
 
@@ -98,30 +148,10 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   protected void attachScout() {
     super.attachScout();
     setFileIconIdFromScout(getScoutObject().getFileIconId());
-    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
-  }
-
-  private boolean calculateDropDownButtonEnabled() {
-    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
-      }
-    };
-    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      //nop
-    }
-    return hasValidMenus.get();
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    getSwtFileChooserButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (s == null) {
       s = "";
     }
@@ -244,42 +274,4 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
       handleSwtFileChooserAction();
     }
   }
-
-  private class P_ContextMenuListener extends MenuAdapter {
-    @Override
-    public void menuShown(MenuEvent e) {
-      for (MenuItem item : m_contextMenu.getItems()) {
-        disposeMenuItem(item);
-      }
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          scoutMenusRef.set(getScoutObject().getUIFacade().firePopupFromUI());
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden within
-      // the scheduled time the popup will be handled.
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
-    }
-
-    private void disposeMenuItem(MenuItem item) {
-      Menu menu = item.getMenu();
-      if (menu != null) {
-        for (MenuItem childItem : menu.getItems()) {
-          disposeMenuItem(childItem);
-        }
-        menu.dispose();
-      }
-      item.dispose();
-    }
-
-  } // end class P_ContextMenuListener
 }

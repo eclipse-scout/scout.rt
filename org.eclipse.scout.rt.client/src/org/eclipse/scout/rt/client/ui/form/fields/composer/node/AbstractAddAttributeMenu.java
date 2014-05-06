@@ -37,6 +37,11 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
     return ScoutTexts.get("ExtendedSearchAddAttributeMenu");
   }
 
+  /**
+   * replace with listener in execInitAction and updateVisibility support. Therefore the parentNode must be held as a
+   * property on {@link ITreeNode}
+   */
+  @SuppressWarnings("deprecation")
   @Override
   protected void execPrepareAction() throws ProcessingException {
     EntityNode eNode = null;

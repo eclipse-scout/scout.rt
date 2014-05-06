@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -37,10 +40,20 @@ public class AddEntityMenu extends AbstractMenu {
   protected void execInitAction() throws ProcessingException {
     setText(ScoutTexts.get("ExtendedSearchAddEntityPrefix") + " " + m_entity.getText());
     setIconId(m_entity.getIconId());
+    m_entity.addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IDataModelEntity.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          updateVisibility();
+        }
+      }
+
+    });
+    updateVisibility();
   }
 
-  @Override
-  protected void execPrepareAction() {
+  private void updateVisibility() {
     setVisible(m_entity.isVisible());
   }
 

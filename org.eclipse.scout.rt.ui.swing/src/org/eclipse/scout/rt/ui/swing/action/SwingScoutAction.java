@@ -104,7 +104,6 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
   }
 
   private void setKeyStrokeFromScout(String s) {
-
     if (s != null) {
       getSwingAction().putValue(Action.ACCELERATOR_KEY, SwingUtility.createKeystroke(new org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke(s)));
     }
@@ -137,22 +136,20 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
   }
 
   private void handleSwingAction() {
-    if (SwingUtility.runInputVerifier()) {
-      if (!m_handleActionPending) {
-        m_handleActionPending = true;
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              getScoutObject().getUIFacade().fireActionFromUI();
-            }
-            finally {
-              m_handleActionPending = false;
-            }
+    if (!m_handleActionPending) {
+      m_handleActionPending = true;
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getScoutObject().getUIFacade().fireActionFromUI();
           }
-        };
-        getSwingEnvironment().invokeScoutLater(t, 0);
-      }
+          finally {
+            m_handleActionPending = false;
+          }
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(t, 0);
     }
   }
 

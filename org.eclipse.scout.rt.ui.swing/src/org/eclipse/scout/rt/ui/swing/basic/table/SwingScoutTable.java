@@ -777,19 +777,28 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     m_swingAutoOptimizeColumnWidthsJob.schedule(200);
   }
 
-  protected void handleSwingEmptySpacePopup(final MouseEvent e) {
+  protected void handleSwingEmptySpaceSelection(final MouseEvent e) {
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return;
     }
+
     //
     if (getScoutObject() != null) {
       // notify Scout
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
-          // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          // reset selection
+
+          if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+            System.out.println("reset selction " + e.getModifiers());
+            getScoutObject().getUIFacade().setSelectedRowsFromUI(new ArrayList<ITableRow>(0));
+          }
+          if (e.isPopupTrigger()) {
+            List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
+            // call swing menu
+            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+          }
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -833,7 +842,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         public void run() {
           List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -944,7 +953,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         public void run() {
           // call swing menu
           List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -1584,16 +1593,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     public void mousePressed(MouseEvent e) {
       closeEditor();
       // Mac popup
-      if (e.isPopupTrigger()) {
-        handleSwingEmptySpacePopup(e);
-      }
+      handleSwingEmptySpaceSelection(e);
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      if (e.isPopupTrigger()) {
-        handleSwingEmptySpacePopup(e);
-      }
+      handleSwingEmptySpaceSelection(e);
     }
   }// end private class
 

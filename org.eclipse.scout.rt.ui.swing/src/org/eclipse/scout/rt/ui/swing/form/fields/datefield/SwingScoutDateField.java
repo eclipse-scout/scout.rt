@@ -11,6 +11,10 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.datefield;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -33,18 +37,23 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
-import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithTransparentIcon;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
@@ -59,6 +68,10 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
   private String m_displayTextToVerify;
   // cache
   private SwingScoutDropDownPopup m_proposalPopup;
+
+  private ContextMenuDecorationItem m_contextMenuMarker;
+  private DropDownDecorationItem m_dropdownIcon;
+  private SwingScoutContextMenu m_contextMenu;
 
   public boolean isIgnoreLabel() {
     return m_ignoreLabel;
@@ -138,29 +151,65 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
    * May add additional components to the container.
    */
   protected JTextField createDateField(JComponent container) {
-    JTextFieldWithTransparentIcon textField = new JTextFieldWithTransparentIcon();
-    initializeDateField(textField);
+    JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
     container.add(textField);
-    return textField;
-  }
-
-  protected void initializeDateField(JTextFieldWithTransparentIcon textField) {
-    textField.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
-    textField.addDropDownButtonListener(new IDropDownButtonListener() {
+    IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
+    // context menu marker
+    m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
+    m_contextMenuMarker.addMouseListener(new MouseAdapter() {
       @Override
-      public void iconClicked(Object source) {
-        getSwingDateField().requestFocus();
-        handleSwingDateChooserAction();
-      }
-
-      @Override
-      public void menuClicked(Object source) {
+      public void mouseClicked(MouseEvent e) {
+        m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
       }
     });
+    decorationGroup.addDecoration(m_contextMenuMarker);
+
+    // dropdown decoration
+    m_dropdownIcon = new DropDownDecorationItem(textField, getSwingEnvironment());
+    m_dropdownIcon.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
+    m_dropdownIcon.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) {
+          m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+        }
+        else {
+          getSwingDateField().requestFocus();
+          handleSwingDateChooserAction();
+        }
+      }
+    });
+    decorationGroup.addDecoration(m_dropdownIcon);
+
+    textField.setDecorationIcon(decorationGroup);
+    return textField;
+
+  }
+
+  @Override
+  protected void installContextMenu() {
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+        }
+      }
+    });
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingDateField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
   public JTextField getSwingDateField() {
     return (JTextField) getSwingField();
+  }
+
+  @Override
+  protected void setEnabledFromScout(boolean b) {
+    super.setEnabledFromScout(b);
+    m_dropdownIcon.setEnabled(b);
   }
 
   @Override
@@ -214,16 +263,6 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();
     return true;// continue always
-  }
-
-  @Override
-  protected void handleSwingFocusGained() {
-    super.handleSwingFocusGained();
-    JTextComponent swingField = getSwingDateField();
-    if (swingField.getDocument().getLength() > 0) {
-      swingField.setCaretPosition(swingField.getDocument().getLength());
-      swingField.moveCaretPosition(0);
-    }
   }
 
   private void acceptProposalFromSwing(final Date newDate) {

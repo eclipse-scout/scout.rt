@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -40,6 +42,13 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
     propertySupport.setProperty(PROP_DISPLAY_TEXT, execFormatValue(getValue()));
+  }
+
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
   }
 
   @Override
@@ -109,5 +118,4 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
       return isChecked();
     }
   }
-
 }

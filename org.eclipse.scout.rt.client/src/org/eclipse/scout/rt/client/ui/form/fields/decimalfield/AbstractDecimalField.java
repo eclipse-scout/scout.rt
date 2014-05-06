@@ -280,7 +280,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   }
 
   /**
-   * When {@link IDecimalFieldUIFacade} is removed, this class will implements IBasicFieldUIFacade.
+   * When {@link IDecimalFieldUIFacade} is removed, this class will implement IBasicFieldUIFacade.
    */
   @SuppressWarnings("deprecation")
   private class P_UIFacade implements IDecimalFieldUIFacade {
@@ -293,6 +293,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setWhileTyping(whileTyping);
       return parseValue(newText);
     }
-  }
 
+  }
 }

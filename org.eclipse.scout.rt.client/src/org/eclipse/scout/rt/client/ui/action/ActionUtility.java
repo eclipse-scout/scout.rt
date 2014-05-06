@@ -16,6 +16,8 @@ import java.util.ListIterator;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 
 /**
  *
@@ -33,7 +35,7 @@ public final class ActionUtility {
     }
 
     // only visible
-    ArrayList<T> cleanedActions = getVisibleActions(actionNodes);
+    List<T> cleanedActions = getVisibleActions(actionNodes);
 
     // remove multiple and leading separators
     T prevSeparator = null;
@@ -70,11 +72,35 @@ public final class ActionUtility {
     return cleanedActions;
   }
 
-  public static <T extends IAction> ArrayList<T> getVisibleActions(List<T> actions) {
+  public static <T extends IAction> List<T> getVisibleActions(List<T> actions) {
+
     if (actions != null) {
-      ArrayList<T> result = new ArrayList<T>(actions.size());
+      List<T> result = new ArrayList<T>(actions.size());
       for (T a : actions) {
-        if (a.isVisible()) {
+        // action nodes with subnodes are only visible when at least one leaf is visible
+        if (a instanceof IActionNode<?>) {
+          final BooleanHolder visibleHolder = new BooleanHolder(false);
+          a.acceptVisitor(new IActionVisitor() {
+            @Override
+            public int visit(IAction action) {
+              if (action instanceof IActionNode) {
+                if (((IActionNode) action).hasChildActions()) {
+                  return CONTINUE;
+                }
+              }
+              if (action.isVisible()) {
+                visibleHolder.setValue(true);
+                return CANCEL;
+
+              }
+              return CONTINUE;
+            }
+          });
+          if (visibleHolder.getValue()) {
+            result.add(a);
+          }
+        }
+        else if (a.isVisible()) {
           result.add(a);
         }
       }

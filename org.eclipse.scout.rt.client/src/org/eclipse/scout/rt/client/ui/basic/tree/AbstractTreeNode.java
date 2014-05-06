@@ -140,7 +140,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     return node;
   }
 
-  private List<Class<? extends IMenu>> getConfiguredMenus() {
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
@@ -154,7 +154,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     m_defaultExpanded = getConfiguredExpanded();
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
+    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);

@@ -32,5 +32,4 @@ public interface ILabelField extends IValueField<String> {
    */
   boolean isSelectable();
 
-  ILabelFieldUIFacade getUIFacade();
 }

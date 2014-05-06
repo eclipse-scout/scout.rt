@@ -54,7 +54,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   private boolean m_initialized;
   private List<IMenu> m_menus;
-  private ICalendarItemProvider[] m_providers;
+  private List<ICalendarItemProvider> m_providers;
   private final HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private ICalendarUIFacade m_uiFacade;
   private int m_calendarChanging;
@@ -135,7 +135,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
-  private List<Class<? extends IMenu>> getConfiguredMenus() {
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
@@ -186,7 +186,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
+    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
@@ -202,6 +202,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     m_menus = menuList;
+
     // producers
     ArrayList<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>();
     for (Class<? extends ICalendarItemProvider> itemProviderClazz : getConfiguredProducers()) {
@@ -212,7 +213,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         LOG.warn(null, e);
       }
     }
-    m_providers = producerList.toArray(new ICalendarItemProvider[0]);
+    m_providers = producerList;
+
     // attach change listener for item updates
     for (final ICalendarItemProvider p : m_providers) {
       p.addPropertyChangeListener(
@@ -220,7 +222,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
             @Override
             public void propertyChange(PropertyChangeEvent e) {
               if (e.getPropertyName().equals(ICalendarItemProvider.PROP_ITEMS)) {
-                updateComponentsInternal(new ICalendarItemProvider[]{p});
+                List<ICalendarItemProvider> modified = new ArrayList<ICalendarItemProvider>(1);
+                modified.add(p);
+                updateComponentsInternal(modified);
               }
               else if (e.getPropertyName().equals(ICalendarItemProvider.PROP_LOAD_IN_PROGRESS)) {
                 updateLoadInProgressInternal();
@@ -252,7 +256,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   @Override
   public void initCalendar() throws ProcessingException {
     // init menus
-    ActionUtility.initActions(getMenus());
+    ActionUtility.initActions(m_menus);
     execInitCalendar();
     /*
      * add property change listener to - reload calendar items when view range
@@ -431,8 +435,14 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     fireCalendarEventBatchInternal(coalescedEvents);
   }
 
+  @Override
   public List<IMenu> getMenus() {
     return CollectionUtility.arrayList(m_menus);
+  }
+
+  @Override
+  public List<ICalendarItemProvider> getCalendarItemProviders() {
+    return CollectionUtility.arrayList(m_providers);
   }
 
   @Override
@@ -524,7 +534,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return CollectionUtility.hashSet(propertySupport.<CalendarComponent> getPropertySet(PROP_COMPONENTS));
   }
 
-  private void updateComponentsInternal(ICalendarItemProvider[] changedProviders) {
+  private void updateComponentsInternal(List<ICalendarItemProvider> changedProviders) {
     Range<Date> d = getViewRange();
     if (d.getFrom() != null && d.getTo() != null) {
       for (ICalendarItemProvider p : changedProviders) {
@@ -537,9 +547,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         m_componentsByProvider.put(p.getClass(), components);
       }
       // filter and resolve item conflicts
-      HashSet<Class<? extends ICalendarItemProvider>> providerTypes = new HashSet<Class<? extends ICalendarItemProvider>>();
-      for (int i = 0; i < changedProviders.length; i++) {
-        providerTypes.add(changedProviders[i].getClass());
+      HashSet<Class<? extends ICalendarItemProvider>> providerTypes = new HashSet<Class<? extends ICalendarItemProvider>>(changedProviders.size());
+      for (ICalendarItemProvider provider : changedProviders) {
+        providerTypes.add(provider.getClass());
       }
       execFilterCalendarItems(providerTypes, m_componentsByProvider);
       // complete list
@@ -687,7 +697,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   private void addComponentPopupMenus(CalendarEvent e, CalendarComponent comp) {
     // calendar
-    for (IMenu menu : getMenus()) {
+    for (IMenu menu : m_menus) {
       // pass 1
       if (menu.isSingleSelectionAction()) {
         // pass 2
@@ -720,7 +730,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   private void addNewPopupMenus(CalendarEvent e) {
     // calendar
-    for (IMenu menu : getMenus()) {
+    for (IMenu menu : m_menus) {
       // pass 1
       if (!menu.isSingleSelectionAction()) {
         menu.prepareAction();

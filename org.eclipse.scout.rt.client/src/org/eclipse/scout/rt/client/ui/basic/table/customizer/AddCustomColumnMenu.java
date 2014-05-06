@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -31,10 +34,22 @@ public class AddCustomColumnMenu extends AbstractMenu {
   @Override
   protected void execInitAction() throws ProcessingException {
     setVisiblePermission(new CreateCustomColumnPermission());
+    m_table.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (ITable.PROP_TABLE_CUSTOMIZER.equals(evt.getPropertyName())) {
+          updateVisibility();
+        }
+      }
+    });
+    updateVisibility();
+
   }
 
-  @Override
-  protected void execPrepareAction() throws ProcessingException {
+  /**
+   *
+   */
+  private void updateVisibility() {
     setVisible(m_table.getTableCustomizer() != null);
   }
 

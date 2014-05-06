@@ -34,14 +34,14 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
   private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
-  private final IRwtScoutTableForPatch m_uiTable;
+  private final RwtScoutTable m_uiTable;
   private final TableColumnManager m_columnManager;
   private Image m_imgCheckboxFalse;
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
   private int m_defaultRowHeight;
 
-  public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
+  public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
     m_uiTable = uiTable;
     m_columnManager = columnManager;
@@ -55,7 +55,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     return m_scoutTable;
   }
 
-  public IRwtScoutTableForPatch getUiTable() {
+  public RwtScoutTable getUiTable() {
     return m_uiTable;
   }
 

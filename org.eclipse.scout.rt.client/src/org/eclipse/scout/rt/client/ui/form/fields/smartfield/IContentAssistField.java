@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -181,10 +180,6 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
    * @since 22.05.2009
    */
   void setUniquelyDefinedValue(boolean background) throws ProcessingException;
-
-  List<IMenu> getMenus();
-
-  boolean hasMenus();
 
   /**
    * updates the lookup rows with the same search text as last time.

@@ -17,17 +17,22 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
+import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -55,6 +60,8 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   private TextFieldEditableSupport m_editableSupport;
   private P_UpperLowerCaseVerifyListener m_upperLowerCaseVerifyListener;
 
+  private RwtContextMenuMarkerComposite m_markerComposite;
+
   public RwtScoutStringField() {
   }
 
@@ -63,7 +70,10 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    int style = SWT.BORDER;
+    m_markerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
+    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+
+    int style = SWT.None;// SWT.BORDER;
     //Password
     if (getScoutObject().isInputMasked()) {
       style |= SWT.PASSWORD;
@@ -80,7 +90,8 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
-    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(container, style);
+    style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
+    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_markerComposite, style);
 
     setUiContainer(container);
     setUiLabel(label);
@@ -91,6 +102,12 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     // layout
     LogicalGridLayout layout = new LogicalGridLayout(1, 0);
     getUiContainer().setLayout(layout);
+    m_markerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+  }
+
+  @Override
+  protected void installContextMenu() {
+    new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
   }
 
   protected void addDefaultUiListeners(StyledText textField) {

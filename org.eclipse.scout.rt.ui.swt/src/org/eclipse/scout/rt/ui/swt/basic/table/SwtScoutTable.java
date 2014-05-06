@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
@@ -187,9 +188,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addListener(SWT.KeyUp, swtTableListener);
 
     // context menu
-    Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
-    contextMenu.addMenuListener(new P_ContextMenuListener());
-    m_contextMenu = contextMenu;
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment()).getSwtMenu();
 
     // CTRL-C listener to copy selected rows into clipboard)
     table.addKeyListener(new KeyAdapter() {
@@ -1244,9 +1243,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           disposeMenuItem(item);
         }
       }
-
-      final boolean emptySelection = getSwtTableViewer().getSelection().isEmpty();
-      SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getEnvironment()), m_contextMenu, getEnvironment());
+      SwtMenuUtility.fillMenu(m_contextMenu, getScoutObject().getMenus(), getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {
@@ -1299,7 +1296,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       // grab the actions out of the job, when the actions are providden
       // within the scheduled time the popup will be handled.
 
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_headerMenu, getEnvironment());
+      SwtMenuUtility.fillMenu(m_headerMenu, scoutMenusRef.get(), getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {

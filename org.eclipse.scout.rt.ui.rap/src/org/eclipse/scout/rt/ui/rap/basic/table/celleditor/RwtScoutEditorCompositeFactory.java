@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
-import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTableForPatch;
+import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.basic.table.celleditor.RwtScoutTableCellEditor.IDeactivateListener;
 import org.eclipse.scout.rt.ui.rap.basic.table.celleditor.RwtScoutTableCellEditor.RwtCellEditor;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.TableColumn;
 public class RwtScoutEditorCompositeFactory {
 
   private final RwtScoutTableCellEditor m_tableCellEditor;
-  private final IRwtScoutTableForPatch m_uiTableComposite;
+  private final RwtScoutTable m_uiTableComposite;
 
-  public RwtScoutEditorCompositeFactory(RwtScoutTableCellEditor tableCellEditor, IRwtScoutTableForPatch uiTableComposite) {
+  public RwtScoutEditorCompositeFactory(RwtScoutTableCellEditor tableCellEditor, RwtScoutTable uiTableComposite) {
     m_tableCellEditor = tableCellEditor;
     m_uiTableComposite = uiTableComposite;
   }

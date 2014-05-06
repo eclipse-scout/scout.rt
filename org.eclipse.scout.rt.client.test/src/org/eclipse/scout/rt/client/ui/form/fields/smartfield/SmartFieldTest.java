@@ -88,6 +88,11 @@ public class SmartFieldTest {
         }
 
         @Override
+        protected boolean getConfiguredAutoAddDefaultMenus() {
+          return false;
+        }
+
+        @Override
         protected String getConfiguredTooltipText() {
           return "Default tooltip";
         }

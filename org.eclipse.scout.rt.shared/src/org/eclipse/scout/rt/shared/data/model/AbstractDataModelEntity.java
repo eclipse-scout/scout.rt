@@ -37,7 +37,6 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
-  private boolean m_visible;
   private boolean m_oneToMany;
   private String m_text;
   private String m_iconId;
@@ -215,7 +214,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public boolean isVisible() {
-    return m_visible;
+    return propertySupport.getPropertyBool(PROP_VISIBLE);
   }
 
   @Override
@@ -247,7 +246,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    */
   private void calculateVisible() {
     // access control
-    m_visible = m_visibleGranted && m_visibleProperty;
+    propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
   }
 
   @Override

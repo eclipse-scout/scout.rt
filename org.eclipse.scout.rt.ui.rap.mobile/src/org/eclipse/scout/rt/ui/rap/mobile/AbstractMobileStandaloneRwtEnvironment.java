@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.action.MenuFactory;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.mobile.busy.RwtMobileBusyHandler;
@@ -70,13 +69,6 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   @Override
   protected RwtScoutDesktop createUiDesktop() {
     return new RwtScoutMobileDesktop();
-  }
-
-  @Override
-  protected MenuFactory createMenuFactory() {
-    MenuFactory menuFactory = super.createMenuFactory();
-    menuFactory.setAddKeyStrokeTextEnabled(false);
-    return menuFactory;
   }
 
   @Override

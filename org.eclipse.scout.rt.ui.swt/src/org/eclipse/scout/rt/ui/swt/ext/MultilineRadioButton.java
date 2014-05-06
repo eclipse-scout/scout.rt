@@ -51,7 +51,7 @@ public class MultilineRadioButton extends MultilineButton {
         Event event = new Event();
         event.widget = m_btn;
         event.type = SWT.Selection;
-        m_btn.handleButtonSelection(event);
+        m_btn.notifyListeners(SWT.Selection, event);
       }
     }
 

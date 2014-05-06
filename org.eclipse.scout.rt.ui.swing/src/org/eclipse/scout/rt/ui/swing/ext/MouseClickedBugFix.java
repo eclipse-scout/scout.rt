@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,7 +71,7 @@ public class MouseClickedBugFix {
         Component c = e.getComponent();
         if (c == null || c.getBounds().contains(p)) {
           if (c instanceof JTree || c instanceof JTable) {
-            //only allow 8 pixel in order not to interfer with drag and drop
+            //only allow 8 pixel in order not to interfere with drag and drop
             if (Math.max(Math.abs(m_pressedLocation.x - p.x), Math.abs(m_pressedLocation.y - p.y)) <= 8) {
               generateClick = true;
             }

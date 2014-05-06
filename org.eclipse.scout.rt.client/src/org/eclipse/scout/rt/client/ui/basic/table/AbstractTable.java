@@ -46,18 +46,22 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
@@ -138,8 +142,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   //auto filter
   private final Object m_cachedFilteredRowsLock;
   private List<ITableRow> m_cachedFilteredRows;
-  private ITableColumnFilterManager m_columnFilterManager;
-  private ITableCustomizer m_tableCustomizer;
   private IEventHistory<TableEvent> m_eventHistory;
   // only do one action at a time
   private boolean m_actionRunning;
@@ -697,7 +699,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
   }
 
-  private List<? extends Class<? extends IMenu>> getConfiguredMenus() {
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
@@ -742,7 +744,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     createColumnsInternal();
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    List<? extends Class<? extends IMenu>> ma = getConfiguredMenus();
+    List<Class<? extends IMenu>> ma = getDeclaredMenus();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
     if (!replacements.isEmpty()) {
       m_menuReplacementMapping = replacements;
@@ -770,7 +772,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
     }
-    setMenus(menuList);
+    IContextMenu contextMenu = new TableContextMenu(this);
+    contextMenu.setChildActions(menuList);
+    setContextMenu(contextMenu);
 
     // key strokes
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
@@ -1623,26 +1627,50 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void setMenus(List<? extends IMenu> menus) {
-    setProperty(PROP_MENUS, CollectionUtility.<IMenu> arrayListWithoutNullElements(menus));
+    getContextMenu().setChildActions(menus);
   }
 
   @Override
   public void addMenu(IMenu menu) {
-    List<IMenu> menus = new ArrayList<IMenu>(getMenus());
+    List<IMenu> menus = getMenus();
     menus.add(menu);
     setMenus(menus);
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList((List<IMenu>) getProperty(PROP_MENUS));
+  protected void setContextMenu(IContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
-    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), menuType);
+  public IContextMenu getContextMenu() {
+    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenu(final Class<T> menuType) throws ProcessingException {
+    IContextMenu contextMenu = getContextMenu();
+    if (contextMenu != null) {
+      final Holder<T> resultHolder = new Holder<T>();
+      contextMenu.acceptVisitor(new IActionVisitor() {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public int visit(IAction action) {
+          if (menuType.isAssignableFrom(action.getClass())) {
+            resultHolder.setValue((T) action);
+            return CANCEL;
+          }
+          return CONTINUE;
+        }
+      });
+      return resultHolder.getValue();
+    }
+    return null;
   }
 
   @Override
@@ -2045,7 +2073,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     if (!CollectionUtility.equalsCollection(m_selectedRows, newSelection, true)) {
       m_selectedRows = new ArrayList<ITableRow>(newSelection);
-      fireRowsSelected(m_selectedRows);
+      // notify menus
+      List<ITableRow> notificationCopy = CollectionUtility.arrayList(m_selectedRows);
+
+      fireRowsSelected(notificationCopy);
     }
   }
 
@@ -2903,22 +2934,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableColumnFilterManager getColumnFilterManager() {
-    return m_columnFilterManager;
+    return (ITableColumnFilterManager) propertySupport.getProperty(PROP_COLUMN_FILTER_MANAGER);
   }
 
   @Override
   public void setColumnFilterManager(ITableColumnFilterManager m) {
-    m_columnFilterManager = m;
+    propertySupport.setProperty(PROP_COLUMN_FILTER_MANAGER, m);
   }
 
   @Override
   public ITableCustomizer getTableCustomizer() {
-    return m_tableCustomizer;
+    return (ITableCustomizer) propertySupport.getProperty(PROP_TABLE_CUSTOMIZER);
   }
 
   @Override
   public void setTableCustomizer(ITableCustomizer c) {
-    m_tableCustomizer = c;
+    propertySupport.setProperty(PROP_TABLE_CUSTOMIZER, c);
   }
 
   @Override
@@ -3859,41 +3890,44 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     for (IMenu menu : getMenus()) {
-      IMenu validMenu = null;
-      switch (e.getType()) {
-        case TableEvent.TYPE_HEADER_POPUP:
-        case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
-          if (menu.isEmptySpaceAction()) {
-            if ((!menu.isInheritAccessibility()) || (isEnabled())) {
-              validMenu = menu;
-            }
-          }
-          break;
-        }
-        case TableEvent.TYPE_ROW_POPUP: {
-          if (multiSelect) {
-            if (menu.isMultiSelectionAction()) {
-              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
-                validMenu = menu;
-              }
-            }
-          }
-          else if (singleSelect) {
-            if (menu.isSingleSelectionAction()) {
-              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
-                validMenu = menu;
-              }
-            }
-          }
-          break;
-        }
+      if (menu.isVisible() && allRowsEnabled) {
+        e.addPopupMenu(menu);
       }
-      if (validMenu != null) {
-        validMenu.prepareAction();
-        if (validMenu.isVisible()) {
-          e.addPopupMenu(validMenu);
-        }
-      }
+//      IMenu validMenu = null;
+//      switch (e.getType()) {
+//        case TableEvent.TYPE_HEADER_POPUP:
+//        case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
+//          if (menu.isEmptySpaceAction()) {
+//            if ((!menu.isInheritAccessibility()) || (isEnabled())) {
+//              validMenu = menu;
+//            }
+//          }
+//          break;
+//        }
+//        case TableEvent.TYPE_ROW_POPUP: {
+//          if (multiSelect) {
+//            if (menu.isMultiSelectionAction()) {
+//              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
+//                validMenu = menu;
+//              }
+//            }
+//          }
+//          else if (singleSelect) {
+//            if (menu.isSingleSelectionAction()) {
+//              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
+//                validMenu = menu;
+//              }
+//            }
+//          }
+//          break;
+//        }
+//      }
+//      if (validMenu != null) {
+//        validMenu.prepareAction();
+//        if (validMenu.isVisible()) {
+//          e.addPopupMenu(validMenu);
+//        }
+//      }
     }
   }
 
@@ -4424,16 +4458,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     @Override
     public void tableChanged(TableEvent e) {
       switch (e.getType()) {
-        case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
-          // single observer for table-defined menus
-          addLocalPopupMenus(e);
-          break;
-        }
-        case TableEvent.TYPE_HEADER_POPUP: {
-          // single observer for table-owned menus
-          addLocalPopupMenus(e);
-          break;
-        }
+        case TableEvent.TYPE_EMPTY_SPACE_POPUP:
+        case TableEvent.TYPE_HEADER_POPUP:
         case TableEvent.TYPE_ROW_POPUP: {
           // single observer for table-defined menus
           addLocalPopupMenus(e);

@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
@@ -31,14 +30,16 @@ import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 public class SwtScoutTimeField extends SwtScoutBasicFieldComposite<IDateField> implements ISwtScoutTimeField, IPopupSupport {
-  private ButtonEx m_timeChooserButton;
+  private Button m_timeChooserButton;
   private TextFieldEditableSupport m_editableSupport;
 
   private Set<IPopupSupportListener> m_popupEventListeners;
@@ -53,7 +54,7 @@ public class SwtScoutTimeField extends SwtScoutBasicFieldComposite<IDateField> i
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    Button timeChooserButton = getEnvironment().getFormToolkit().createButton(container, SWT.PUSH);
     timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
     // prevent the button from grabbing focus
     container.setTabList(new Control[]{textField});
@@ -62,7 +63,7 @@ public class SwtScoutTimeField extends SwtScoutBasicFieldComposite<IDateField> i
     getEnvironment().addKeyStroke(container, new P_TimeChooserOpenKeyStroke());
 
     // listener
-    timeChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_SwtBrowseButtonListener());
+    timeChooserButton.addSelectionListener(new P_SwtBrowseButtonListener());
     addModifyListenerForBasicField(textField);
     //
     setSwtContainer(container);
@@ -75,11 +76,11 @@ public class SwtScoutTimeField extends SwtScoutBasicFieldComposite<IDateField> i
   }
 
   @Override
-  public ButtonEx getTimeChooserButton() {
+  public Button getTimeChooserButton() {
     return m_timeChooserButton;
   }
 
-  public void setTimeChooserButton(ButtonEx timeChooserButton) {
+  public void setTimeChooserButton(Button timeChooserButton) {
     m_timeChooserButton = timeChooserButton;
   }
 
@@ -235,19 +236,10 @@ public class SwtScoutTimeField extends SwtScoutBasicFieldComposite<IDateField> i
     }
   }
 
-  private class P_SwtBrowseButtonListener implements Listener {
-    public P_SwtBrowseButtonListener() {
-    }
-
+  private class P_SwtBrowseButtonListener extends SelectionAdapter {
     @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case ButtonEx.SELECTION_ACTION:
-          handleSwtTimeChooserAction();
-          break;
-        default:
-          break;
-      }
+    public void widgetSelected(SelectionEvent e) {
+      handleSwtTimeChooserAction();
     }
   } // end class P_SwtBrowseButtonListener
 

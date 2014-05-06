@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.datefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Button;
 
 /**
  * <h3>ISwtScoutDateField</h3> ...
@@ -22,7 +22,7 @@ import org.eclipse.swt.custom.StyledText;
  */
 public interface ISwtScoutTimeField extends ISwtScoutFormField<IDateField> {
 
-  ButtonEx getTimeChooserButton();
+  Button getTimeChooserButton();
 
   @Override
   StyledText getSwtField();

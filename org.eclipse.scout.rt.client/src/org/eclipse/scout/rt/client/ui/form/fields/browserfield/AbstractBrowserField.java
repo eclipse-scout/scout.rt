@@ -45,6 +45,13 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     return false;
   }
 
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
+  }
+
   /**
    * This callback is invoked before the link is followed, it can be used as handler and vetoer. The default returns
    * true.<br>

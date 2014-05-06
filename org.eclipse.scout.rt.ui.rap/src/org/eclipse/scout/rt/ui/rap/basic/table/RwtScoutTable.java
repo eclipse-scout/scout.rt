@@ -96,7 +96,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
-public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTableForPatch {
+public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTable.class);
 
   private P_ScoutTableListener m_scoutTableListener;
@@ -196,12 +196,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return m_columnModel;
   }
 
-  @Override
   public TableColumnManager getUiColumnManager() {
     return m_uiColumnManager;
   }
 
-  @Override
   public void initializeUiColumns() {
     m_redrawHandler.pushControlChanging();
     try {
@@ -347,17 +345,14 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return m_uiViewer;
   }
 
-  @Override
   public void setUiTableViewer(TableViewer uiViewer) {
     m_uiViewer = uiViewer;
   }
 
-  @Override
   public ITableRow getUiSelectedRow() {
     return CollectionUtility.firstElement(getUiSelectedRows());
   }
 
-  @Override
   public List<ITableRow> getUiSelectedRows() {
     StructuredSelection uiSelection = (StructuredSelection) getUiTableViewer().getSelection();
     TreeSet<ITableRow> sortedRows = new TreeSet<ITableRow>(new RowIndexComparator());
@@ -1243,18 +1238,18 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
-
       List<IMenu> menus = null;
       if (m_header) {
         menus = collectHeaderMenus();
       }
       else {
-        final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
-        menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
+        menus = getScoutObject().getMenus();
+//        final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
+//        menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
       }
       if (menus != null) {
         Menu menu = ((Menu) e.getSource());
-        RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), menu);
+        RwtMenuUtility.fillMenu(menu, menus, getUiEnvironment());
       }
     }
 

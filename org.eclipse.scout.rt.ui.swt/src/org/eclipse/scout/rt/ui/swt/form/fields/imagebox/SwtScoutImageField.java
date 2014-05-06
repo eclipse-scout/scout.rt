@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.imagebox;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -21,16 +21,19 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
+import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
@@ -38,17 +41,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>SwtScoutImageBox</h3> ...
@@ -60,23 +59,34 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
   private Image m_image;
   private ImageViewer m_imageViewer;
   private ScrolledFormEx m_scrolledForm;
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private SwtScoutContextMenu m_contextMenu;
 
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment(), SWT.NONE);
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
 
     Composite body = null;
     // scrollable handling
     if (getScoutObject().isScrollBarEnabled()) {
-      m_scrolledForm = getEnvironment().getFormToolkit().createScrolledFormEx(container, SWT.H_SCROLL | SWT.V_SCROLL);
+      m_scrolledForm = getEnvironment().getFormToolkit().createScrolledFormEx(m_menuMarkerComposite, SWT.H_SCROLL | SWT.V_SCROLL);
       setSwtField(m_scrolledForm);
       m_scrolledForm.setBackground(m_scrolledForm.getDisplay().getSystemColor(SWT.COLOR_BLUE));
       body = m_scrolledForm.getBody();
       m_scrolledForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());
     }
     else {
-      body = getEnvironment().getFormToolkit().createComposite(container);
+      body = getEnvironment().getFormToolkit().createComposite(m_menuMarkerComposite);
       setSwtField(body);
     }
 
@@ -101,12 +111,36 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
         freeResources();
       }
     });
-    m_imageViewer.addMenuDetectListener(new P_RwtMenuDetectListener());
 
     // layout
-    body.setLayout(new FillLayout());
     LogicalGridLayout layout = new LogicalGridLayout(1, 0);
     getSwtContainer().setLayout(layout);
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    body.setLayout(new FillLayout());
+  }
+
+  @Override
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+
+    m_contextMenu = new SwtScoutContextMenu(getImageViewer().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+    getImageViewer().setMenu(m_contextMenu.getSwtMenu());
   }
 
   public ImageViewer getImageViewer() {
@@ -170,62 +204,6 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
       updateAutoFitFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);
-  }
-
-  private Menu createMenu() {
-    if (getSwtField().getMenu() != null) {
-      getSwtField().getMenu().dispose();
-      getSwtField().setMenu(null);
-    }
-
-    Menu contextMenu = new Menu(getSwtField().getShell(), SWT.POP_UP);
-    contextMenu.addMenuListener(new P_ContextMenuListener());
-    getSwtField().setMenu(contextMenu);
-
-    return contextMenu;
-  }
-
-  private void createAndShowMenu(Point location) {
-    Menu menu = createMenu();
-    menu.setLocation(location);
-    menu.setVisible(true);
-  }
-
-  private class P_ContextMenuListener extends MenuAdapter {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void menuShown(MenuEvent e) {
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          scoutMenusRef.set(getScoutObject().getUIFacade().firePopupFromUI());
-        }
-      };
-      JobEx job = SwtScoutImageField.this.getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-
-      // grab the actions out of the job, when the actions are provided within
-      // the scheduled time the popup will be handled.
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), ((Menu) e.getSource()), SwtScoutImageField.this.getEnvironment());
-    }
-  }
-
-  private class P_RwtMenuDetectListener implements MenuDetectListener {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void menuDetected(MenuDetectEvent e) {
-      createAndShowMenu(new Point(e.x, e.y));
-    }
-
   }
 
   private class P_DndSupport extends AbstractSwtScoutDndSupport {

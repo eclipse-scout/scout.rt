@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
  * Extracts the value for {@link IAction#isMultiSelectionAction()} and returns the text for
  * ({@link AbstractBooleanTextExtractor#DOC_ID_TRUE} or {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}.
  */
-public class MultiSelectionExtractor<T extends IAction> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
+public class MultiSelectionExtractor<T extends IMenu> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
 
   public MultiSelectionExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.action.multiSelection"));

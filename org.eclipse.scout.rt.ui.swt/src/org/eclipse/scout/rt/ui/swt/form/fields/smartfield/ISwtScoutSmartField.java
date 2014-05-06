@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
+import org.eclipse.swt.widgets.Button;
 
 public interface ISwtScoutSmartField extends ISwtScoutFormField<IContentAssistField<?, ?>> {
 
-  DropDownButton getSwtBrowseButton();
+  Button getSwtBrowseButton();
 
 }

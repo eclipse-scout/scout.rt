@@ -108,7 +108,7 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
-  public void setChildActions(List<IMenu> newList) {
+  public void setChildActions(List<? extends IMenu> newList) {
     m_menu.setChildActions(newList);
   }
 
@@ -262,31 +262,43 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
     m_menu.setVisibleGranted(b);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public boolean isSingleSelectionAction() {
     return m_menu.isSingleSelectionAction();
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setSingleSelectionAction(boolean b) {
     m_menu.setSingleSelectionAction(b);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public boolean isMultiSelectionAction() {
     return m_menu.isMultiSelectionAction();
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setMultiSelectionAction(boolean b) {
     m_menu.setMultiSelectionAction(b);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public boolean isEmptySpaceAction() {
     return m_menu.isEmptySpaceAction();
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setEmptySpaceAction(boolean b) {
     m_menu.setEmptySpaceAction(b);
@@ -307,6 +319,8 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
     return m_menu.getMnemonic();
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void prepareAction() {
     m_menu.prepareAction();
@@ -346,4 +360,10 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   public void setContainerInternal(ITypeWithClassId container) {
     m_menu.setContainerInternal(container);
   }
+
+  @Override
+  public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
+    m_menu.handleOwnerValueChanged(newValue);
+  }
+
 }

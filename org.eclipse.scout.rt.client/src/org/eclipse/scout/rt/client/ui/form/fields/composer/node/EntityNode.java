@@ -120,7 +120,7 @@ public class EntityNode extends AbstractComposerNode {
     }
 
     @Override
-    protected void execPrepareAction() throws ProcessingException {
+    protected void execInitAction() throws ProcessingException {
       List<IDataModelAttribute> atts = m_entity.getAttributes();
       List<IDataModelEntity> ents = m_entity.getEntities();
       setVisible(CollectionUtility.hasElements(atts) || CollectionUtility.hasElements(ents));

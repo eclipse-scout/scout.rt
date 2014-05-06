@@ -10,21 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public interface IFileChooserFieldUIFacade {
-
-  List<IMenu> firePopupFromUI();
-
-  /**
-   * Called from the UI to check whether there are valid menus defined in the model.
-   * 
-   * @return <code>true</code> if there is at least one valid menu. Otherwise, <code>false</code>.
-   * @since 4.0.0-M6
-   */
-  boolean hasValidMenusFromUI();
 
   boolean setTextFromUI(String newText);
 

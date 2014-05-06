@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -23,10 +21,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -45,7 +39,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   private boolean m_showDirectory;
   private boolean m_showFileName;
   private boolean m_showFileExtension;
-  private List<IMenu> m_menus;
   private IFileChooserFieldUIFacade m_uiFacade;
 
   public AbstractFileChooserField() {
@@ -122,18 +115,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return 4000;
   }
 
-  private List<Class<? extends IMenu>> getConfiguredMenus() {
-    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return MenuUtility.getKeyStrokesFromMenus(getMenus());
-  }
-
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
@@ -149,39 +130,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
     setFileIconId(getConfiguredFileIconId());
     setMaxLength(getConfiguredMaxLength());
-    // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
-      try {
-        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        LOG.warn(null, e);
-      }
-    }
-    try {
-      injectMenusInternal(menuList);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
-    m_menus = menuList;
-  }
-
-  @Override
-  protected void initFieldInternal() throws ProcessingException {
-    super.initFieldInternal();
-    ActionUtility.initActions(getMenus());
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
-   * 
-   * @param menuList
-   *          live and mutable list of configured menus
-   */
-  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   @Override
@@ -309,16 +257,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       len = 200;
     }
     return len;
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
-  }
-
-  @Override
-  public boolean hasMenus() {
-    return CollectionUtility.hasElements(m_menus);
   }
 
   @Override
@@ -480,26 +418,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
-
-    /**
-     * Uses {@link MenuUtility#filterValidMenus} to filter the given menus for valid menus.
-     * The method <code>prepareAction</code> on the menu objects are executed.
-     */
-    @Override
-    public List<IMenu> firePopupFromUI() {
-      return MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), true);
-    }
-
-    /**
-     * {@inheritDoc} Uses {@link MenuUtility#filterValidMenus} to check if there are valid menus. Does not execute the
-     * method <code>prepareAction</code> on the menu objects.
-     */
-    @Override
-    public boolean hasValidMenusFromUI() {
-      List<IMenu> validMenus = MenuUtility.filterValidMenus(AbstractFileChooserField.this, getMenus(), false);
-      return validMenus.size() > 0;
-    }
-
     @Override
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) {

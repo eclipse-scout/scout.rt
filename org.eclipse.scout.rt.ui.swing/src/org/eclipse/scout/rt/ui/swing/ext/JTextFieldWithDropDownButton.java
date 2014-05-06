@@ -37,7 +37,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   private int m_originalMarginRight = -1;
   private boolean m_dropDownButtonVisible;
 
-  private Collection<IDropDownButtonListener> m_listeners = new ArrayList<IDropDownButtonListener>();
+  private final Collection<IDropDownButtonListener> m_dropDownButtonListeners = new ArrayList<IDropDownButtonListener>();
 
   public JTextFieldWithDropDownButton(ISwingEnvironment env) {
     registerMouseMotionListener();
@@ -93,12 +93,12 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
           clickedMenu = true;
         }
         if (clickedMenu) {
-          for (IDropDownButtonListener l : m_listeners) {
+          for (IDropDownButtonListener l : m_dropDownButtonListeners) {
             l.menuClicked(e.getSource());
           }
         }
         else {
-          for (IDropDownButtonListener l : m_listeners) {
+          for (IDropDownButtonListener l : m_dropDownButtonListeners) {
             l.iconClicked(e.getSource());
           }
         }
@@ -211,11 +211,11 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   }
 
   public void addDropDownButtonListener(IDropDownButtonListener l) {
-    m_listeners.add(l);
+    m_dropDownButtonListeners.add(l);
   }
 
   public void removeDropDownButtonListener(IDropDownButtonListener l) {
-    m_listeners.remove(l);
+    m_dropDownButtonListeners.remove(l);
   }
 
   public boolean isDropDownButtonEnabled() {

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swing.basic.document;
 import javax.swing.JOptionPane;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -43,15 +42,7 @@ public class BasicDocumentFilter extends DocumentFilter {
     if (s == null) {
       s = "";
     }
-    //
-    Document doc = fb.getDocument();
-    if (m_maxLen > 0) {
-      int newLen = doc.getLength() + s.length();
-      if (newLen > m_maxLen) {
-        //value is too large
-        s = handleStringTooLong(s, Math.max(0, s.length() - (newLen - m_maxLen)));
-      }
-    }
+    checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length());
     fb.insertString(offset, s, a);
   }
 
@@ -60,16 +51,17 @@ public class BasicDocumentFilter extends DocumentFilter {
     if (s == null) {
       s = "";
     }
-    //
-    Document doc = fb.getDocument();
+    checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length() - length);
+    fb.replace(offset, length, s, a);
+  }
+
+  protected void checkStringTooLong(FilterBypass fb, String s, int newLen) throws BadLocationException {
     if (m_maxLen > 0) {
-      int newLen = doc.getLength() + s.length() - length;
       if (newLen > m_maxLen) {
         //value is too large
         s = handleStringTooLong(s, Math.max(0, s.length() - (newLen - m_maxLen)));
       }
     }
-    fb.replace(offset, length, s, a);
   }
 
   protected String handleStringTooLong(String s, int availableLength) throws BadLocationException {

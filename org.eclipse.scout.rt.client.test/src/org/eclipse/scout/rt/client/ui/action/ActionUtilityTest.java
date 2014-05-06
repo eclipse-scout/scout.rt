@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.easymock.EasyMock;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.junit.Test;
 
@@ -90,12 +90,7 @@ public class ActionUtilityTest {
   }
 
   private IMenu createMenu(String label, boolean separator, boolean visible) {
-    IMenu menu = mock(IMenu.class);
-    when(menu.isVisible()).thenReturn(visible);
-    when(menu.isSeparator()).thenReturn(separator);
-    when(menu.getText()).thenReturn(label);
-
-    return menu;
+    return new Menu(label, separator, visible);
   }
 
   private void setChildMenus(IMenu parentMenu, List<IMenu> childMenus) {
@@ -103,4 +98,37 @@ public class ActionUtilityTest {
     EasyMock.expect(parentMenu.getChildActionCount()).andReturn(childMenus.size());
   }
 
+  private static class Menu extends AbstractMenu {
+    private String m_label;
+    private boolean m_separator;
+    private boolean m_visible;
+
+    public Menu(String label, boolean separator, boolean visible) {
+      super(false);
+      m_label = label;
+      m_separator = separator;
+      m_visible = visible;
+      callInitializer();
+    }
+
+    @Override
+    protected boolean getConfiguredVisible() {
+      return m_visible;
+    }
+
+    @Override
+    protected boolean getConfiguredSeparator() {
+      return m_separator;
+    }
+
+    @Override
+    protected String getConfiguredText() {
+      return m_label;
+    }
+
+    @Override
+    protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+
+    }
+  }
 }

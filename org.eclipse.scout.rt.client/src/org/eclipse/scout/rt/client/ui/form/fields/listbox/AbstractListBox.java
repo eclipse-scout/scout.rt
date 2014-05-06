@@ -71,7 +71,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 
   private ITable m_table;
-  private IListBoxUIFacade m_uiFacade;
   private ILookupCall<T> m_lookupCall;
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private boolean m_valueTableSyncActive;
@@ -103,6 +102,13 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?, T>> getConfiguredCodeType() {
     return null;
+  }
+
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
   }
 
   @ConfigProperty(ConfigProperty.ICON_ID)
@@ -248,7 +254,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   protected void initConfig() {
-    m_uiFacade = createUIFacade();
     m_fields = CollectionUtility.emptyArrayList();
     super.initConfig();
     setFilterActiveRows(getConfiguredFilterActiveRows());
@@ -370,15 +375,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   public AbstractTableRowBuilder<T> getTableRowBuilder() {
     return new P_TableRowBuilder();
-  }
-
-  protected IListBoxUIFacade createUIFacade() {
-    return new P_ListBoxUIFacade();
-  }
-
-  @Override
-  public IListBoxUIFacade getUIFacade() {
-    return m_uiFacade;
   }
 
   @Override
@@ -990,12 +986,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
         return false;
       }
     }
-  }
-
-  /*
-   * UI Notifications
-   */
-  protected class P_ListBoxUIFacade implements IListBoxUIFacade {
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<T> {

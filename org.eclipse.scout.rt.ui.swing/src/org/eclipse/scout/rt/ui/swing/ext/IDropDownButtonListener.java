@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swing.ext;
 /**
  *
  */
-public interface IDropDownButtonListener{
+public interface IDropDownButtonListener {
 
   /**
    * Fired when icon has been left clicked.
@@ -24,5 +24,4 @@ public interface IDropDownButtonListener{
    * Fired when arrow has been left clicked, or icon has been clicked with right mouse button.
    */
   void menuClicked(Object source);
-
 }

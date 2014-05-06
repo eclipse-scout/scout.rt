@@ -17,6 +17,8 @@ import java.util.Date;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -46,6 +48,13 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   private Class<? extends ICalendar> getConfiguredCalendar() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClass(dca, ICalendar.class);
+  }
+
+  @Override
+  @Order(210)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoAddDefaultMenus() {
+    return false;
   }
 
   @Override
@@ -155,4 +164,5 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   public void reloadCalendarItems() {
     getCalendar().reloadCalendarItems();
   }
+
 }

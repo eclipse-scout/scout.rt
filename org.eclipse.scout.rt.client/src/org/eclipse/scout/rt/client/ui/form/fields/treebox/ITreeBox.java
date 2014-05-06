@@ -59,8 +59,6 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   ITree getTree();
 
-  ITreeBoxUIFacade getUIFacade();
-
   /**
    * true: a filter is added to the treebox tree that only accepts nodes that
    * are active or checked. Affects {@link ITreeNode#getFilteredChildNodes()}

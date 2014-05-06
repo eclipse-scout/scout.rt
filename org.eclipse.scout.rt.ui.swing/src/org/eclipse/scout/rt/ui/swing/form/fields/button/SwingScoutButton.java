@@ -88,7 +88,7 @@ public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposit
     // attach swing listeners
     swingFieldAsButton.addActionListener(new P_SwingActionListener());
     // check if button has menus
-    if (getScoutObject().hasMenus()) {
+    if (getScoutObject().getContextMenu().hasChildActions()) {
       JDropDownButton dropDownButton = new JDropDownButton(swingFieldAsButton);
       dropDownButton.getMenuButton().addActionListener(new ActionListener() {
         @Override
@@ -118,7 +118,7 @@ public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposit
 
   /**
    * Create the gridData for the Button
-   *
+   * 
    * @since 4.0.0-M7
    */
   protected void adaptButtonLayoutData(LogicalGridData gd) {

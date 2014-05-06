@@ -10,15 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public interface IContentAssistFieldUIFacade {
 
   boolean setTextFromUI(String newText);
-
-  List<IMenu> firePopupFromUI();
 
   /**
    * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
@@ -29,12 +24,4 @@ public interface IContentAssistFieldUIFacade {
   boolean acceptProposalFromUI();
 
   void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form);
-
-  /**
-   * Called from the UI to check whether there are valid menus defined in the model.
-   * 
-   * @return <code>true</code> if there is at least one valid menu. Otherwise, <code>false</code>.
-   * @since 4.0.0-M6
-   */
-  boolean hasValidMenusFromUI();
 }

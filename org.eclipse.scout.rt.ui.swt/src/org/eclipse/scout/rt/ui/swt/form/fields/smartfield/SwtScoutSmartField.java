@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,11 +27,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
+import org.eclipse.scout.rt.ui.swt.action.menu.text.StyledTextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
@@ -48,20 +49,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
@@ -74,17 +72,19 @@ import org.eclipse.swt.widgets.Widget;
 public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutSmartField.class);
 
-  private DropDownButton m_browseButton;
+  private Button m_browseButton;
   private P_PendingProposalJob m_pendingProposalJob;
-  private Object m_pendingProposalJobLock;
+  private final Object m_pendingProposalJobLock;
   // popup
   private SwtScoutDropDownPopup m_proposalPopup;
   private final Object m_popupLock = new Object();
-  private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
 
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
+
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private SwtScoutContextMenu m_contextMenu;
 
   public SwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -98,8 +98,20 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment());
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
+    StyledText textField = getEnvironment().getFormToolkit().createStyledText(m_menuMarkerComposite, SWT.SINGLE);
+    textField.setAlignment(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
+    textField.setMargins(2, 2, 2, 2);
+    textField.setWrapIndent(textField.getIndent());
+    m_browseButton = getEnvironment().getFormToolkit().createButton(container, "", SWT.PUSH);
     // to ensure the text is validated on a context menu call this mouse
     // listener is used.
     m_browseButton.addMouseListener(new MouseAdapter() {
@@ -107,13 +119,14 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       public void mouseDown(MouseEvent e) {
         handleSwtInputVerifier();
       }
-    });
-    setSwtContainer(container);
-    setSwtLabel(label);
-    setSwtField(textField);
 
-    // prevent the button from grabbing focus
-    container.setTabList(new Control[]{textField});
+      @Override
+      public void mouseUp(MouseEvent e) {
+        if (e.button == 1) {
+          handleSwtBrowseAction();
+        }
+      }
+    });
     m_browseButton.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
@@ -121,10 +134,12 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       }
     });
 
-    // context menu
-    m_contextMenu = new Menu(m_browseButton.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener());
-    m_browseButton.setMenu(m_contextMenu);
+    setSwtContainer(container);
+    setSwtLabel(label);
+    setSwtField(textField);
+
+    // prevent the button from grabbing focus
+    container.setTabList(new Control[]{m_menuMarkerComposite});
 
     // F2 key stroke
     getEnvironment().addKeyStroke(getSwtContainer(), new P_F2KeyStroke());
@@ -135,16 +150,42 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     getSwtField().addListener(SWT.Modify, listener);
     getSwtField().addListener(SWT.Traverse, listener);
 
-    P_SwtBrowseButtonListener swtBrowseButtonListener = new P_SwtBrowseButtonListener();
-    getSwtBrowseButton().addSelectionListener(swtBrowseButtonListener);
-
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
-    m_browseButton.setLayoutData(LogicalGridDataBuilder.createSmartButton());
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    m_browseButton.setLayoutData(LogicalGridDataBuilder.createButton1());
   }
 
   @Override
-  public DropDownButton getSwtBrowseButton() {
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+    getSwtBrowseButton().setMenu(m_contextMenu.getSwtMenu());
+
+    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+        getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
+    getSwtField().setMenu(fieldMenu.getSwtMenu());
+  }
+
+  @Override
+  public Button getSwtBrowseButton() {
     return m_browseButton;
   }
 
@@ -158,6 +199,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
     setProposalFormFromScout(getScoutObject().getProposalForm());
+
   }
 
   @Override
@@ -169,7 +211,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    getSwtBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (!CompareUtility.equals(s, getSwtField().getText())) {
       if (s == null) {
         s = "";
@@ -180,28 +221,10 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     }
   }
 
-  private boolean calculateDropDownButtonEnabled() {
-    final AtomicBoolean hasValidMenus = new AtomicBoolean(false);
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        hasValidMenus.set(getScoutObject().getUIFacade().hasValidMenusFromUI());
-      }
-    };
-    JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      //nop
-    }
-    return hasValidMenus.get();
-  }
-
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
-    m_browseButton.setButtonEnabled(b);
+    m_browseButton.setEnabled(b);
   }
 
   @Override
@@ -547,7 +570,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
         }
         break;
     }
-
   }
 
   private void notifyPopupEventListeners(int eventType) {
@@ -638,53 +660,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     }
   }
 
-  private class P_ContextMenuListener extends MenuAdapter {
-    @Override
-    public void menuShown(MenuEvent e) {
-      for (MenuItem item : m_contextMenu.getItems()) {
-        disposeMenuItem(item);
-      }
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
-          scoutMenusRef.set(scoutMenus);
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden within
-      // the scheduled time the popup will be handled.
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
-    }
-
-    private void disposeMenuItem(MenuItem item) {
-      Menu menu = item.getMenu();
-      if (menu != null) {
-        for (MenuItem childItem : menu.getItems()) {
-          disposeMenuItem(childItem);
-        }
-        menu.dispose();
-      }
-      item.dispose();
-    }
-
-  } // end class P_ContextMenuListener
-
-  private class P_SwtBrowseButtonListener extends SelectionAdapter {
-    @Override
-    public void widgetSelected(SelectionEvent e) {
-      handleSwtBrowseAction();
-    }
-
-  } // end class P_SwtBrowseButtonListener
-
   private class P_F2KeyStroke extends SwtKeyStroke {
     public P_F2KeyStroke() {
       super(SWT.F2);
@@ -695,4 +670,5 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       handleSwtBrowseAction();
     }
   } // end class P_F2KeyStroke
+
 }

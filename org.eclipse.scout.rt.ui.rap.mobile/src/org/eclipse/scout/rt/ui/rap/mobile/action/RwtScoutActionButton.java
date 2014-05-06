@@ -336,7 +336,7 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
       }
 
       Menu menu = ((Menu) e.getSource());
-      RwtMenuUtility.fillContextMenu(scoutMenus, getUiEnvironment(), menu);
+      RwtMenuUtility.fillMenu(menu, scoutMenus, getUiEnvironment());
     }
 
   }

@@ -69,7 +69,7 @@ public abstract class SwtScoutStringFieldComposite extends SwtScoutBasicFieldCom
   }
 
   protected int getSwtStyle(IStringField field) {
-    int style = SWT.BORDER;
+    int style = 0;//SWT.BORDER;
     if (field.isInputMasked()) {
       style |= SWT.PASSWORD;
     }

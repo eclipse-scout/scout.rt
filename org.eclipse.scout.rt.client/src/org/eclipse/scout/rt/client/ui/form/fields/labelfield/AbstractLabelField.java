@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 public abstract class AbstractLabelField extends AbstractValueField<String> implements ILabelField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLabelField.class);
 
-  private ILabelFieldUIFacade m_uiFacade;
-
   public AbstractLabelField() {
     this(true);
   }
@@ -51,7 +49,6 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
     super.initConfig();
     setWrapText(getConfiguredWrapText());
     setSelectable(getConfiguredSelectable());
@@ -88,11 +85,6 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return propertySupport.getPropertyBool(PROP_SELECTABLE);
   }
 
-  @Override
-  public ILabelFieldUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
-
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
@@ -100,9 +92,6 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
       text = null;
     }
     return text;
-  }
-
-  private class P_UIFacade implements ILabelFieldUIFacade {
   }
 
 }

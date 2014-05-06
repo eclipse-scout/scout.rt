@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -121,7 +124,21 @@ public class ResetColumnsMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execPrepareAction() throws ProcessingException {
+    protected void execInitAction() throws ProcessingException {
+      m_table.addPropertyChangeListener(new PropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if (ITable.PROP_COLUMN_FILTER_MANAGER.equals(evt.getPropertyName())) {
+            updateVisibility();
+          }
+        }
+
+      });
+      updateVisibility();
+    }
+
+    private void updateVisibility() {
       setVisible(m_table.getColumnFilterManager() != null);
     }
 

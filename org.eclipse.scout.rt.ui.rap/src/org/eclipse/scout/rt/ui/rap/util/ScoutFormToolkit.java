@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.rap.basic.comp.HyperlinkEx;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
-import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
-import org.eclipse.scout.rt.ui.rap.ext.IDropDownFileUploadForPatch;
+import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
+import org.eclipse.scout.rt.ui.rap.ext.DropDownFileUpload;
 import org.eclipse.scout.rt.ui.rap.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.rap.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.rap.ext.SectionContent;
@@ -31,8 +31,6 @@ import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.rap.ext.tree.TreeEx;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
-import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
-import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CTabFolder;
@@ -177,14 +175,14 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     return button;
   }
 
-  public IDropDownButtonForPatch createDropDownButton(Composite parent, int style) {
-    IDropDownButtonForPatch button = SERVICES.getService(IPatchedClassService.class).createDropDownButton(parent, style | kit.getOrientation());
+  public DropDownButton createDropDownButton(Composite parent, int style) {
+    DropDownButton button = new DropDownButton(parent, style | kit.getOrientation());
     adapt((Button) button, false, false);
     return button;
   }
 
-  public IDropDownFileUploadForPatch createDropDownFileUpload(Composite parent, int style) {
-    IDropDownFileUploadForPatch fileUpload = SERVICES.getService(IPatchedClassService.class).createDropDownFileUpload(parent, style | kit.getOrientation());
+  public DropDownFileUpload createDropDownFileUpload(Composite parent, int style) {
+    DropDownFileUpload fileUpload = new DropDownFileUpload(parent, style | kit.getOrientation());
     adapt((FileUpload) fileUpload, false, false);
     return fileUpload;
   }

@@ -10,39 +10,31 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.action.MenuSizeEstimator;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
-import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.forms.HyperlinkGroup;
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -60,7 +52,9 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
-  private List<IMenu> m_scoutActions;
+  private RwtContextMenuMarkerComposite m_contextMenuMarker;
+
+//  private RwtScoutMenuSupport m_menuSupport;
 
   public RwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -69,35 +63,47 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    setUiContainer(container);
+    m_contextMenuMarker = new RwtContextMenuMarkerComposite(container, getUiEnvironment(), SWT.NO_FOCUS);
+    getUiEnvironment().getFormToolkit().adapt(m_contextMenuMarker);
     ButtonEx uiFieldAsButton = null;
     Hyperlink uiFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        uiFieldAsButton = createSwtRadioButton(container, SWT.LEFT | SWT.RADIO | SWT.WRAP);
+        uiFieldAsButton = createSwtRadioButton(m_contextMenuMarker, SWT.LEFT | SWT.RADIO | SWT.WRAP);
         break;
       }
       case IButton.DISPLAY_STYLE_TOGGLE: {
-        uiFieldAsButton = createSwtToggleButton(container, SWT.CENTER | SWT.TOGGLE);
+        uiFieldAsButton = createSwtToggleButton(m_contextMenuMarker, SWT.CENTER | SWT.TOGGLE);
         break;
       }
       case IButton.DISPLAY_STYLE_LINK: {
-        uiFieldAsLink = createSwtHyperlink(container, "", SWT.CENTER);
+        uiFieldAsLink = createSwtHyperlink(m_contextMenuMarker, "", SWT.CENTER);
         break;
       }
       default: {
-        uiFieldAsButton = createSwtPushButton(container, SWT.CENTER | SWT.PUSH);
+        uiFieldAsButton = createSwtPushButton(m_contextMenuMarker, SWT.CENTER | SWT.PUSH);
       }
     }
     //
+    setUiContainer(container);
     setUiLabel(null);
     if (uiFieldAsButton != null) {
-
-      // attach rwt listeners
-      uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
-      uiFieldAsButton.addMenuDetectListener(new P_RwtMenuDetectListener());
-
       setUiField(uiFieldAsButton);
+//
+//      // attach rwt listeners
+//      uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
+//
+//      m_menuSupport = RwtScoutMenuSupport.install(getUiField(), getUiField().getParent(), new IMenuProvider() {
+//        @Override
+//        public List<IMenu> getValidMenus(MenuContext menuContext) {
+//          return getScoutObject().getUIFacade().fireButtonPopupFromUI();
+//        }
+//
+//        @Override
+//        public List<IMenu> getAllMenus() {
+//          return getScoutObject().getMenus();
+//        }
+//      }, getScoutObject(), getUiEnvironment(), getUiField());
 
       LogicalGridData gd = (LogicalGridData) getUiField().getLayoutData();
       adaptButtonLayoutData(gd);
@@ -110,10 +116,17 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
         }
       });
       setUiField(uiFieldAsLink);
-      getUiContainer().setTabList(new Control[]{uiFieldAsLink});
+      getUiContainer().setTabList(new Control[]{m_contextMenuMarker});
     }
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(0, 0));
+    m_contextMenuMarker.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+  }
+
+  @Override
+  protected void installContextMenu() {
+    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_contextMenuMarker, getUiEnvironment());
+    getUiField().setMenu(contextMenu.getUiMenu());
   }
 
   /**
@@ -144,9 +157,9 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
    * @since 4.0.0-M7
    */
   protected ButtonEx createSwtPushButton(Composite container, int style) {
-    if (getScoutObject().hasMenus()) {
-      style |= SWT.DROP_DOWN;
-    }
+//    if (getScoutObject().hasMenus()) {
+//      style |= SWT.DROP_DOWN;
+//    }
     ButtonEx swtButton = getUiEnvironment().getFormToolkit().createButtonEx(container, style);
     swtButton.setDropDownEnabled(true);
     return swtButton;
@@ -298,64 +311,11 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   protected void disarmButtonFromScout() {
   }
 
-  protected void requestPopupFromScout() {
-    Menu menu = createMenu();
-
-    m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
-    int menuHeight = new MenuSizeEstimator(menu).estimateMenuHeight(m_scoutActions);
-    Point menuPosition = null;
-    if (shouldMenuOpenOnTop(menuHeight)) {
-      menuPosition = computeMenuPositionForTop(menuHeight);
-    }
-    else {
-      menuPosition = computeMenuPositionForBottom();
-    }
-
-    showMenu(menu, menuPosition);
-  }
-
-  private Menu createMenu() {
-    if (getUiField().getMenu() != null) {
-      getUiField().getMenu().dispose();
-      getUiField().setMenu(null);
-    }
-    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
-    contextMenu.addMenuListener(new P_ContextMenuListener(getUiField(), getUiField().getParent()));
-    getUiField().setMenu(contextMenu);
-
-    return contextMenu;
-  }
-
-  private void createAndShowMenu(Point location) {
-    Menu menu = createMenu();
-    showMenu(menu, location);
-  }
-
-  private void showMenu(Menu menu, Point location) {
-    menu.setLocation(location);
-    menu.setVisible(true);
-  }
-
-  private boolean shouldMenuOpenOnTop(int menuHeight) {
-    Rectangle buttonBounds = getUiField().getBounds();
-    Point menuLocationAbsolute = getUiField().getParent().toDisplay(buttonBounds.x, buttonBounds.y);
-    int displayHeight = getUiEnvironment().getDisplay().getBounds().height;
-    return menuLocationAbsolute.y + buttonBounds.height + menuHeight > displayHeight;
-  }
-
-  private Point computeMenuPositionForTop(int menuHeight) {
-    Rectangle buttonBounds = getUiField().getBounds();
-    int menuLocationX = buttonBounds.x;
-    int menuLocationY = buttonBounds.y - menuHeight;
-    return getUiField().toDisplay(menuLocationX, menuLocationY);
-  }
-
-  private Point computeMenuPositionForBottom() {
-    Rectangle buttonBounds = getUiField().getBounds();
-    int menuLocationX = buttonBounds.x;
-    int menuLocationY = buttonBounds.y + buttonBounds.height;
-    return getUiField().toDisplay(menuLocationX, menuLocationY);
-  }
+//  protected void requestPopupFromScout() {
+//    if (m_menuSupport != null) {
+//      m_menuSupport.openMenu();
+//    }
+//  }
 
   /**
    * in rwt thread
@@ -412,52 +372,52 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
               });
           break;
         }
-        case ButtonEvent.TYPE_REQUEST_POPUP: {
-          getUiEnvironment().invokeUiLater(
-              new Runnable() {
-                @Override
-                public void run() {
-                  requestPopupFromScout();
-                }
-              });
-          break;
-        }
+//        case ButtonEvent.TYPE_REQUEST_POPUP: {
+//          getUiEnvironment().invokeUiLater(
+//              new Runnable() {
+//                @Override
+//                public void run() {
+//                  requestPopupFromScout();
+//                }
+//              });
+//          break;
+//        }
       }
     }
   } // end class P_ScoutButtonListener
 
-  private class P_ContextMenuListener extends MenuAdapterEx {
-    private static final long serialVersionUID = 1L;
-
-    public P_ContextMenuListener(Control menuControl, Control keyStrokeWidget) {
-      super(menuControl, keyStrokeWidget);
-    }
-
-    @Override
-    public void menuShown(MenuEvent e) {
-      super.menuShown(e);
-
-      try {
-        if (m_scoutActions == null) {
-          m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
-        }
-        Menu menu = ((Menu) e.getSource());
-        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), menu);
-      }
-      finally {
-        m_scoutActions = null;
-      }
-    }
-  } // end class P_ContextMenuListener
-
-  private class P_RwtMenuDetectListener implements MenuDetectListener {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void menuDetected(MenuDetectEvent e) {
-      createAndShowMenu(new Point(e.x, e.y));
-    }
-
-  }
+//  private class P_ContextMenuListener extends MenuAdapterEx {
+//    private static final long serialVersionUID = 1L;
+//
+//    public P_ContextMenuListener(Control menuControl, Control keyStrokeWidget) {
+//      super(menuControl, keyStrokeWidget);
+//    }
+//
+//    @Override
+//    public void menuShown(MenuEvent e) {
+//      super.menuShown(e);
+//
+//      try {
+//        if (m_scoutActions == null) {
+//          m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
+//        }
+//        Menu menu = ((Menu) e.getSource());
+//        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), menu);
+//      }
+//      finally {
+//        m_scoutActions = null;
+//      }
+//    }
+//  } // end class P_ContextMenuListener
+//
+//  private class P_RwtMenuDetectListener implements MenuDetectListener {
+//
+//    private static final long serialVersionUID = 1L;
+//
+//    @Override
+//    public void menuDetected(MenuDetectEvent e) {
+//      createAndShowMenu();
+//    }
+//
+//  }
 }

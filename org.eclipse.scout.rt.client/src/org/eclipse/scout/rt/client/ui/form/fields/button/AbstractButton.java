@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -28,6 +27,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.FormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -186,11 +187,11 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected void execToggleAction(boolean selected) throws ProcessingException {
   }
 
-  private List<? extends Class<? extends IMenu>> getConfiguredMenus() {
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> menuClasses = ConfigurationUtility.filterClasses(dca, IMenu.class);
     List<Class<? extends IMenu>> filteredMenuClasses = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(menuClasses, IMenu.class);
-    List<? extends Class<? extends IMenu>> a = ConfigurationUtility.removeReplacedClasses(filteredMenuClasses);
+    List<Class<? extends IMenu>> a = ConfigurationUtility.removeReplacedClasses(filteredMenuClasses);
     return a;
   }
 
@@ -208,7 +209,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setIconId(getConfiguredIconId());
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
+    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
       IMenu menu;
       try {
         menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
@@ -224,7 +225,10 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList;
+    IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this);
+    contextMenu.setContainerInternal(this);
+    contextMenu.setChildActions(menuList);
+    setContextMenu(contextMenu);
   }
 
   @Override
@@ -288,13 +292,17 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public boolean hasMenus() {
-    return m_menus.size() > 0;
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  protected void setContextMenu(IContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
+  public IContextMenu getContextMenu() {
+    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
 
   @Override

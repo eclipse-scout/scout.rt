@@ -10,47 +10,46 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.button;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineButton;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineRadioButton;
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * <h3>SwtScoutButton</h3> ...
- *
+ * 
  * @since 1.0.0 07.04.2008
  */
 public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T> implements ISwtScoutButton<T> {
@@ -61,7 +60,9 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
-  private Menu m_contextMenu;
+  private SwtScoutContextMenu m_contextMenu;
+
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
 
   public SwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -70,41 +71,67 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    setSwtContainer(container);
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment(), SWT.NONE);
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
     Control swtFieldAsButton = null;
     Hyperlink swtFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        swtFieldAsButton = createSwtRadioButton(container, SWT.NONE);
+        swtFieldAsButton = createSwtRadioButton(m_menuMarkerComposite, SWT.NONE);
+        m_menuMarkerComposite.setMarkerLabelTopMargin(4);
         break;
       }
       case IButton.DISPLAY_STYLE_TOGGLE: {
-        ButtonEx swtButton = createSwtToggleButton(container, SWT.CENTER | SWT.TOGGLE);
+        Button swtButton = createSwtToggleButton(m_menuMarkerComposite, SWT.CENTER | SWT.TOGGLE);
+        m_menuMarkerComposite.setMarkerLabelTopMargin(0);
         swtFieldAsButton = swtButton;
         break;
       }
       case IButton.DISPLAY_STYLE_LINK: {
-        Hyperlink swtLink = createSwtHyperlink(container, "", SWT.CENTER);
+        Hyperlink swtLink = createSwtHyperlink(m_menuMarkerComposite, "", SWT.CENTER);
+        m_menuMarkerComposite.setMarkerLabelTopMargin(3);
         swtFieldAsLink = swtLink;
         break;
       }
       default: {
-        swtFieldAsButton = createSwtPushButton(container, SWT.CENTER | SWT.PUSH);
+        swtFieldAsButton = createSwtPushButton(m_menuMarkerComposite, SWT.CENTER | SWT.PUSH);
+        m_menuMarkerComposite.setMarkerLabelTopMargin(0);
       }
     }
     //
+    setSwtContainer(container);
     setSwtLabel(null);
+    LogicalGridData contextMenuMarkerData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
     if (swtFieldAsButton != null) {
+
       // context menu
-      m_contextMenu = new Menu(swtFieldAsButton.getShell(), SWT.POP_UP);
-      m_contextMenu.addMenuListener(new P_ContextMenuListener());
-      swtFieldAsButton.setMenu(m_contextMenu);
+
+//      m_menuSupport = SwtScoutMenuSupport.install(swtFieldAsButton, new IMenuProvider() {
+//        @Override
+//        public List<IMenu> getValidMenus(MenuContext menuContext) {
+//          return getScoutObject().getUIFacade().fireButtonPopupFromUI();
+//        }
+//
+//        @Override
+//        public List<IMenu> getAllMenus() {
+//          return getScoutObject().getMenus();
+//        }
+//      }, getScoutObject(), getEnvironment());
+
       // attach swt listeners
-      swtFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_SwtSelectionListener());
+      swtFieldAsButton.addListener(SWT.Selection, new P_SwtSelectionListener());
       setSwtField(swtFieldAsButton);
       //auto process button height
-      LogicalGridData gd = (LogicalGridData) swtFieldAsButton.getLayoutData();
-      adaptButtonLayoutData(gd);
+
+//      LogicalGridData gd = (LogicalGridData) swtFieldAsButton.getLayoutData();
+      adaptButtonLayoutData(contextMenuMarkerData);
 
     }
     else if (swtFieldAsLink != null) {
@@ -116,10 +143,11 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
 
       });
       setSwtField(swtFieldAsLink);
-      getSwtContainer().setTabList(new Control[]{swtFieldAsLink});
     }
+    getSwtContainer().setTabList(new Control[]{m_menuMarkerComposite});
     // layout
     getSwtContainer().setLayout(new LogicalGridLayout(0, 0));
+    m_menuMarkerComposite.setLayoutData(contextMenuMarkerData);
   }
 
   /**
@@ -154,20 +182,38 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   /**
    * @since 4.0.0-M7
    */
-  protected ButtonEx createSwtToggleButton(Composite container, int style) {
-    return getEnvironment().getFormToolkit().createButtonEx(container, style);
+  protected Button createSwtToggleButton(Composite container, int style) {
+    return getEnvironment().getFormToolkit().createButton(container, style);
   }
 
   /**
    * @since 4.0.0-M7
    */
-  protected ButtonEx createSwtPushButton(Composite container, int style) {
-    if (getScoutObject().hasMenus()) {
-      style |= SWT.DROP_DOWN;
-    }
-    ButtonEx swtButton = getEnvironment().getFormToolkit().createButtonEx(container, style);
-    swtButton.setDropDownEnabled(true);
+  protected Button createSwtPushButton(Composite container, int style) {
+    Button swtButton = getEnvironment().getFormToolkit().createButton(container, style);
     return swtButton;
+  }
+
+  @Override
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+    getSwtField().setMenu(m_contextMenu.getSwtMenu());
   }
 
   @Override
@@ -198,9 +244,6 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   protected void applyScoutProperties() {
     super.applyScoutProperties();
     IButton b = getScoutObject();
-    if (b.hasMenus()) {
-      // XXX button menus
-    }
     setIconIdFromScout(b.getIconId());
     setImageFromScout(b.getImage());
     setSelectionFromScout(b.isSelected());
@@ -335,11 +378,11 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   protected void disarmButtonFromScout() {
   }
 
-  protected void requestPopupFromScout() {
-    if (m_contextMenu != null) {
-      m_contextMenu.setVisible(true);
-    }
-  }
+//  protected void requestPopupFromScout() {
+//    if (m_menuSupport != null) {
+//      m_menuSupport.openMenu();
+//    }
+//  }
 
   /**
    * in swt thread
@@ -361,25 +404,22 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   private class P_SwtSelectionListener implements Listener {
     @Override
     public void handleEvent(Event event) {
-      switch (event.type) {
-        case ButtonEx.SELECTION_ACTION: {
-          switch (getScoutObject().getDisplayStyle()) {
-            case IButton.DISPLAY_STYLE_RADIO:
-            case IButton.DISPLAY_STYLE_TOGGLE: {
-              if (getSwtField() instanceof Button) {
-                setSelectionFromSwt(((Button) getSwtField()).getSelection());
-              }
-              else if (getSwtField() instanceof MultilineRadioButton) {
-                setSelectionFromSwt(((MultilineRadioButton) getSwtField()).getSelection());
-              }
-              break;
+      if (event.type == SWT.Selection) {
+        switch (getScoutObject().getDisplayStyle()) {
+          case IButton.DISPLAY_STYLE_RADIO:
+          case IButton.DISPLAY_STYLE_TOGGLE: {
+            if (getSwtField() instanceof Button) {
+              setSelectionFromSwt(((Button) getSwtField()).getSelection());
             }
-            default: {
-              handleSwtAction();
-              break;
+            else if (getSwtField() instanceof MultilineRadioButton) {
+              setSelectionFromSwt(((MultilineRadioButton) getSwtField()).getSelection());
             }
+            break;
           }
-          break;
+          default: {
+            handleSwtAction();
+            break;
+          }
         }
       }
     }
@@ -404,7 +444,7 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
               new Runnable() {
                 @Override
                 public void run() {
-                  requestPopupFromScout();
+//                  requestPopupFromScout();
                 }
               });
           break;
@@ -412,42 +452,4 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
       }
     }
   } // end class P_ScoutButtonListener
-
-  private class P_ContextMenuListener extends MenuAdapter {
-    @Override
-    public void menuShown(MenuEvent e) {
-      for (MenuItem item : m_contextMenu.getItems()) {
-        disposeMenuItem(item);
-      }
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          scoutMenusRef.set(getScoutObject().getUIFacade().fireButtonPopupFromUI());
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden within
-      // the scheduled time the popup will be handled.
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
-    }
-
-    private void disposeMenuItem(MenuItem item) {
-      Menu menu = item.getMenu();
-      if (menu != null) {
-        for (MenuItem childItem : menu.getItems()) {
-          disposeMenuItem(childItem);
-        }
-        menu.dispose();
-      }
-      item.dispose();
-    }
-
-  } // end class P_ContextMenuListener
 }

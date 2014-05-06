@@ -10,13 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.textfield;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellingMonitor;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.spellchecker.ISwingSpellCheckerService;
 import org.eclipse.scout.rt.ui.swing.spellchecker.SwingFieldHolder;
 import org.eclipse.scout.service.SERVICES;
@@ -25,6 +34,9 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
 
   private ISpellingMonitor m_spellingMonitor;
 
+  private ContextMenuDecorationItem m_contextMenuMarker;
+  private SwingScoutContextMenu m_contextMenu;
+
   @Override
   protected void initializeSwing() {
     super.initializeSwing();
@@ -32,7 +44,15 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     container.setOpaque(false);
     JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
-    JTextFieldEx textField = new JTextFieldEx();
+    JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
+    m_contextMenuMarker.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+      }
+    });
+    textField.setDecorationIcon(m_contextMenuMarker);
     container.add(textField);
     //
     setSwingContainer(container);
@@ -40,6 +60,22 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     setSwingField(textField);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+  }
+
+  @Override
+  protected void installContextMenu() {
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+        }
+      }
+    });
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTextField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
   @Override
@@ -61,6 +97,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     if (spellCheckerService != null && spellCheckerService.isInstalled()) {
       m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextField()));
     }
+    updateContextMenuFromScout();
   }
 
   @Override
@@ -72,4 +109,5 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     }
     super.detachScout();
   }
+
 }

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
@@ -69,10 +68,6 @@ public interface IFileChooserField extends IValueField<String> {
   void setMaxLength(int len);
 
   int getMaxLength();
-
-  List<IMenu> getMenus();
-
-  boolean hasMenus();
 
   IFileChooser getFileChooser();
 

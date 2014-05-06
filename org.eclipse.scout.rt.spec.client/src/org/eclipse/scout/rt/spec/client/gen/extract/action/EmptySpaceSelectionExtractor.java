@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 /**
  *
  */
-public class EmptySpaceSelectionExtractor<T extends IAction> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
+public class EmptySpaceSelectionExtractor<T extends IMenu> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
 
   /**
    * @param name

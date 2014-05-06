@@ -118,7 +118,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
         //nop
       }
       // end notify
-      SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_popupMenu, getEnvironment());
+      SwtMenuUtility.fillMenu(m_popupMenu, scoutMenusRef.get(), getEnvironment());
     }
   }
 

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.datefield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -18,10 +20,14 @@ import java.util.Set;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
+import org.eclipse.scout.rt.ui.swt.action.menu.text.StyledTextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
@@ -30,27 +36,32 @@ import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.DateChooserDial
 import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.TimeChooserDialog;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> implements ISwtScoutDateField, IPopupSupport {
   public static final int TYPE_TIME_CHOOSER = 1;
   public static final int TYPE_DATE_CHOOSER = 2;
 
-  private ButtonEx m_dateChooserButton;
-  private ButtonEx m_timeChooserButton;
+  private Button m_dateChooserButton;
+  private Button m_timeChooserButton;
   private boolean m_hasTime;
   private TextFieldEditableSupport m_editableSupport;
 
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
+  private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private SwtScoutContextMenu m_contextMenu;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -60,13 +71,26 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    ButtonEx dateChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    m_menuMarkerComposite = new SwtContextMenuMarkerComposite(container, getEnvironment());
+    getEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getSwtField().setFocus();
+        m_contextMenu.getSwtMenu().setVisible(true);
+      }
+    });
+
+    StyledText textField = getEnvironment().getFormToolkit().createStyledText(m_menuMarkerComposite, SWT.SINGLE);
+    textField.setAlignment(SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
+    textField.setWrapIndent(textField.getWrapIndent());
+    textField.setMargins(2, 2, 2, 2);
+    Button dateChooserButton = getEnvironment().getFormToolkit().createButton(container, SWT.PUSH);
     dateChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldDate));
-    ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    Button timeChooserButton = getEnvironment().getFormToolkit().createButton(container, SWT.PUSH);
     timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
     timeChooserButton.setVisible(getScoutObject().isHasTime());
-    container.setTabList(new Control[]{textField});
+    container.setTabList(new Control[]{m_menuMarkerComposite});
 
     addModifyListenerForBasicField(textField);
 
@@ -76,8 +100,8 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
 
     // listener
     textField.addKeyListener(new P_ShiftDateListener());
-    dateChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_SwtBrowseButtonListener(TYPE_DATE_CHOOSER));
-    timeChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_SwtBrowseButtonListener(TYPE_TIME_CHOOSER));
+    dateChooserButton.addSelectionListener(new P_SwtBrowseButtonListener(TYPE_DATE_CHOOSER));
+    timeChooserButton.addSelectionListener(new P_SwtBrowseButtonListener(TYPE_TIME_CHOOSER));
     //
     setSwtContainer(container);
     setSwtLabel(label);
@@ -86,25 +110,59 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     setSwtField(textField);
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
     dateChooserButton.setLayoutData(LogicalGridDataBuilder.createButton1());
     timeChooserButton.setLayoutData(LogicalGridDataBuilder.createButton2());
   }
 
   @Override
-  public ButtonEx getDateChooserButton() {
+  protected void installContextMenu() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getEnvironment().invokeSwtLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
+    if (getDateChooserButton() != null) {
+      getDateChooserButton().setMenu(m_contextMenu.getSwtMenu());
+    }
+    if (getTimeChooserButton() != null) {
+      getTimeChooserButton().setMenu(m_contextMenu.getSwtMenu());
+    }
+
+    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+        getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
+    getSwtField().setMenu(fieldMenu.getSwtMenu());
+  }
+
+  @Override
+  public Button getDateChooserButton() {
     return m_dateChooserButton;
   }
 
-  public void setDateChooserButton(ButtonEx dateChooserButton) {
+  public void setDateChooserButton(Button dateChooserButton) {
     m_dateChooserButton = dateChooserButton;
   }
 
   @Override
-  public ButtonEx getTimeChooserButton() {
+  public Button getTimeChooserButton() {
     return m_timeChooserButton;
   }
 
-  public void setTimeChooserButton(ButtonEx timeChooserButton) {
+  public void setTimeChooserButton(Button timeChooserButton) {
     m_timeChooserButton = timeChooserButton;
   }
 
@@ -290,7 +348,7 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     }
   }
 
-  private class P_SwtBrowseButtonListener implements Listener {
+  private class P_SwtBrowseButtonListener extends SelectionAdapter {
     private int m_buttonId;
 
     public P_SwtBrowseButtonListener(int buttonId) {
@@ -298,18 +356,12 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     }
 
     @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case ButtonEx.SELECTION_ACTION:
-          if (m_buttonId == TYPE_DATE_CHOOSER) {
-            handleSwtDateChooserAction();
-          }
-          else if (m_buttonId == TYPE_TIME_CHOOSER) {
-            handleSwtTimeChooserAction();
-          }
-
-        default:
-          break;
+    public void widgetSelected(SelectionEvent e) {
+      if (m_buttonId == TYPE_DATE_CHOOSER) {
+        handleSwtDateChooserAction();
+      }
+      else if (m_buttonId == TYPE_TIME_CHOOSER) {
+        handleSwtTimeChooserAction();
       }
     }
   } // end class P_SwtBrowseButtonListener

@@ -18,17 +18,20 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
+import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
+import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * <h3>RwtScoutNumberField</h3>
@@ -41,6 +44,7 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
 
   private TextFieldEditableSupport m_editableSupport;
   private static volatile String clientVerifyScript;
+  private RwtContextMenuMarkerComposite m_markerComposite;
   private static final Object LOCK = new Object();
 
   // Constants must correspond to the keys used in org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
@@ -54,28 +58,34 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    int style = SWT.BORDER;
-    style |= RwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
-    style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
-    Text text = new StyledTextEx(container, style);
+    m_markerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
+    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
 
-    installClientScripting(text);
-    attachFocusListener(text, true);
+    int style = SWT.None;
+    style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
+    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_markerComposite, style);
+    installClientScripting(textField);
+    attachFocusListener(textField, true);
 
     setUiContainer(container);
     setUiLabel(label);
-    setUiField(text);
+    setUiField(textField);
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+    m_markerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+  }
+
+  @Override
+  public StyledText getUiField() {
+    return (StyledText) super.getUiField();
   }
 
   @SuppressWarnings("restriction")
-  protected void installClientScripting(Text text) {
+  protected void installClientScripting(StyledText text) {
     String js = getVerifyClientScript();
     if (js != null) {
       text.addListener(SWT.Verify, new ClientListener(js));
       org.eclipse.rap.rwt.internal.lifecycle.WidgetDataUtil.registerDataKeys(PROP_MAX_INTEGER_DIGITS, PROP_MAX_FRACTION_DIGITS, PROP_ZERO_DIGIT, PROP_DECIMAL_SEPARATOR);
-      handleDecimalFormatChanged(text, getScoutObject().getFormat());
     }
   }
 
@@ -87,7 +97,7 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     }
   }
 
-  protected void handleDecimalFormatChanged(Text text, DecimalFormat format) {
+  protected void handleDecimalFormatChanged(StyledText text, DecimalFormat format) {
     text.setData(PROP_MAX_INTEGER_DIGITS, format.getMaximumIntegerDigits());
     text.setData(PROP_MAX_FRACTION_DIGITS, format.getMaximumFractionDigits());
     text.setData(PROP_ZERO_DIGIT, "" + format.getDecimalFormatSymbols().getZeroDigit());
@@ -110,6 +120,11 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
       }
     }
     return clientVerifyScript;
+  }
+
+  protected void installContextMenu() {
+    new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
+
   }
 
   @Override

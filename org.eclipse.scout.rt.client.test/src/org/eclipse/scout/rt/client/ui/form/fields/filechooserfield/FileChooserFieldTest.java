@@ -67,6 +67,7 @@ public class FileChooserFieldTest {
           protected String getConfiguredText() {
             return "&Menu1";
           }
+
         }
 
         @Order(20.0)
@@ -86,6 +87,11 @@ public class FileChooserFieldTest {
         @Override
         protected List<String> getConfiguredFileExtensions() {
           return CollectionUtility.arrayList("png", "bmp", "jpg", "jpeg", "gif");
+        }
+
+        @Override
+        protected boolean getConfiguredAutoAddDefaultMenus() {
+          return false;
         }
 
         @Override

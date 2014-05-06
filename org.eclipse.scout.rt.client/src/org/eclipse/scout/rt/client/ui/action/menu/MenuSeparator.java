@@ -15,7 +15,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 
 public class MenuSeparator extends AbstractMenu {
-
   public MenuSeparator() {
     super();
   }

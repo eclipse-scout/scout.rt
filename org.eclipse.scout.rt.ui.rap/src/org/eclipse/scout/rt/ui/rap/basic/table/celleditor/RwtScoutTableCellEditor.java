@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTableForPatch;
+import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
@@ -51,11 +51,11 @@ import org.eclipse.swt.widgets.TableColumn;
  * @since 3.8.0, refactored 3.10.0-M5
  */
 public class RwtScoutTableCellEditor {
-  private final IRwtScoutTableForPatch m_uiTableComposite;
+  private final RwtScoutTable m_uiTableComposite;
   private final RwtScoutEditorCompositeFactory m_editorCompositeFactory;
   private final RwtScoutTableCellEditorEventHandler m_cellEditorEventHandler;
 
-  public RwtScoutTableCellEditor(IRwtScoutTableForPatch uiTableComposite) {
+  public RwtScoutTableCellEditor(RwtScoutTable uiTableComposite) {
     m_uiTableComposite = uiTableComposite;
     m_editorCompositeFactory = new RwtScoutEditorCompositeFactory(this, m_uiTableComposite);
     m_cellEditorEventHandler = new RwtScoutTableCellEditorEventHandler(this, uiTableComposite);
@@ -69,7 +69,7 @@ public class RwtScoutTableCellEditor {
     CellEditor[] newEditors = new CellEditor[columnPropertyNames.length];
     for (int i = 0; i < columnPropertyNames.length; i++) {
       TableColumn rwtCol = viewer.getTable().getColumn(i);
-      IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTableForPatch.KEY_SCOUT_COLUMN);
+      IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTable.KEY_SCOUT_COLUMN);
       if (scoutCol != null) {
         columnPropertyNames[i] = "" + scoutCol.getColumnIndex();
         if (scoutCol.isEditable()) {
@@ -372,7 +372,7 @@ public class RwtScoutTableCellEditor {
         ViewerCell cell = (ViewerCell) e.getSource();
         TableViewer viewer = m_uiTableComposite.getUiTableViewer();
         TableColumn rwtCol = viewer.getTable().getColumn(cell.getColumnIndex());
-        IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTableForPatch.KEY_SCOUT_COLUMN);
+        IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTable.KEY_SCOUT_COLUMN);
         ITableRow scoutRow = (ITableRow) cell.getElement();
         //no edit on boolean column when mouse was clicked
         if (e.sourceEvent instanceof MouseEvent) {

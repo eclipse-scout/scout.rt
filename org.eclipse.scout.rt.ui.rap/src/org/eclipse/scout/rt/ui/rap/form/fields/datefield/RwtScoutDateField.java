@@ -22,6 +22,8 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
+import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
@@ -63,6 +65,8 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
   private DateChooserDialog m_dateChooserDialog = null;
   private FocusAdapter m_textFieldFocusAdapter = null;
 
+  private RwtContextMenuMarkerComposite m_markerComposite;
+
   @Override
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
@@ -98,13 +102,15 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
-    StyledText textField = new StyledTextEx(m_dateContainer, SWT.SINGLE);
+    m_markerComposite = new RwtContextMenuMarkerComposite(m_dateContainer, getUiEnvironment(), SWT.NONE);
+    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+    StyledText textField = new StyledTextEx(m_markerComposite, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     textField.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     ButtonEx dateChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_dateContainer, SWT.PUSH | SWT.NO_FOCUS);
     dateChooserButton.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
-    m_dateContainer.setTabList(new Control[]{textField});
+    m_dateContainer.setTabList(new Control[]{m_markerComposite});
     container.setTabList(new Control[]{m_dateContainer});
 
     // key strokes
@@ -125,7 +131,9 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
 
       @Override
       public void mouseUp(MouseEvent e) {
-        handleUiDateChooserAction();
+        if (e.button == 1) {
+          handleUiDateChooserAction();
+        }
       }
     });
     //
@@ -141,12 +149,20 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     m_dateContainer.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(2, false));
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    textField.setLayoutData(textLayoutData);
+    m_markerComposite.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
     buttonLayoutData.heightHint = 20;
     buttonLayoutData.widthHint = 20;
     dateChooserButton.setLayoutData(buttonLayoutData);
+  }
+
+  @Override
+  protected void installContextMenu() {
+    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
+    if (getDropDownButton() != null) {
+      getDropDownButton().setMenu(contextMenu.getUiMenu());
+    }
   }
 
   @Override

@@ -18,7 +18,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTableForPatch;
+import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.basic.table.celleditor.RwtScoutTableCellEditor.RwtCellEditor;
 import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport.IPopupSupportListener;
@@ -44,7 +44,7 @@ public class RwtScoutTableCellEditorEventHandler {
   }
 
   private final RwtScoutTableCellEditor m_tableCellEditor;
-  private final IRwtScoutTableForPatch m_uiTableComposite;
+  private final RwtScoutTable m_uiTableComposite;
   private final P_FocusLostListener m_focusLostListener;
   private final P_PopupListener m_popupListener;
   private final P_TraverseListener m_traverseListener;
@@ -52,7 +52,7 @@ public class RwtScoutTableCellEditorEventHandler {
 
   private TraverseKey m_traverseKey = TraverseKey.NONE;
 
-  public RwtScoutTableCellEditorEventHandler(RwtScoutTableCellEditor tableCellEditor, IRwtScoutTableForPatch uiTableComposite) {
+  public RwtScoutTableCellEditorEventHandler(RwtScoutTableCellEditor tableCellEditor, RwtScoutTable uiTableComposite) {
     m_tableCellEditor = tableCellEditor;
     m_uiTableComposite = uiTableComposite;
     m_focusLostListener = new P_FocusLostListener();

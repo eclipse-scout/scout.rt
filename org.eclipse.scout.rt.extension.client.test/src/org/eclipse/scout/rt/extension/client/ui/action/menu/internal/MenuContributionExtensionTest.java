@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -94,10 +95,11 @@ public class MenuContributionExtensionTest {
     Field field = AbstractCalendar.class.getDeclaredField("m_providers");
     assertNotNull(field);
     field.setAccessible(true);
-    ICalendarItemProvider[] providers = (ICalendarItemProvider[]) field.get(calendar);
+    @SuppressWarnings("unchecked")
+    List<ICalendarItemProvider> providers = (List<ICalendarItemProvider>) field.get(calendar);
     assertNotNull(providers);
-    assertTrue(providers.length == 1);
-    assertCreateContribution(Constructor.CalendarFieldCalendarItemProvider, extension, calendarField, providers[0]);
+    assertTrue(providers.size() == 1);
+    assertCreateContribution(Constructor.CalendarFieldCalendarItemProvider, extension, calendarField, providers.get(0));
   }
 
   private static void assertCreateContribution(Constructor expectedConstructor, MenuContributionExtension extension, Object anchor) throws ProcessingException {

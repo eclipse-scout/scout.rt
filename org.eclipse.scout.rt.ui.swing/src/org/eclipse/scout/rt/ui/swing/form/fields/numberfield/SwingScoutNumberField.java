@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.numberfield;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
@@ -19,18 +24,24 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 
 public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumberField<?>> implements ISwingScoutNumberField {
   private static final long serialVersionUID = 1L;
+
+  private ContextMenuDecorationItem m_contextMenuMarker;
+  private SwingScoutContextMenu m_contextMenu;
 
   @Override
   protected void initializeSwing() {
@@ -38,7 +49,16 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     container.setOpaque(false);
     JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
-    JTextFieldEx textField = new JTextFieldEx();
+    JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
+    m_contextMenuMarker.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        m_contextMenu.showSwingPopup(e.getX(), e.getY(), false);
+      }
+    });
+    textField.setDecorationIcon(m_contextMenuMarker);
+
     Document doc = textField.getDocument();
     if (doc instanceof AbstractDocument) {
       ((AbstractDocument) doc).setDocumentFilter(new P_DocumentFilter());
@@ -52,6 +72,22 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     setSwingField(textField);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+  }
+
+  @Override
+  protected void installContextMenu() {
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+        }
+      }
+    });
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTextField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
   @Override

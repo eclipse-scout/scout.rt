@@ -284,9 +284,8 @@ public final class FileUtility {
   }
 
   /**
-   * Copies one file to another. source must exist and be readable cannot copy a
-   * directory to a file will not copy if timestamps and filesize match, will
-   * overwrite otherwise
+   * Copies one file to another. Source must exist and be readable. Cannot copy a directory to a file. Will not copy if
+   * time stamps and file size match, will overwrite otherwise.
    * 
    * @param source
    *          the source file

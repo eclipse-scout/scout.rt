@@ -35,8 +35,8 @@ public class ActionExtractorTest {
    */
   @Test
   public void testSingleSelectionExtractor() {
-    SingleSelectionExtractor<AbstractAction> ex = new SingleSelectionExtractor<AbstractAction>();
-    AbstractAction testAction = mock(AbstractAction.class);
+    SingleSelectionExtractor<AbstractMenu> ex = new SingleSelectionExtractor<AbstractMenu>();
+    AbstractMenu testAction = mock(AbstractMenu.class);
     when(testAction.isSingleSelectionAction()).thenReturn(true);
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
@@ -49,7 +49,7 @@ public class ActionExtractorTest {
    */
   @Test
   public void testSingleSelectionExtractorDefault() {
-    assertFalseTextForDefault(new SingleSelectionExtractor<AbstractAction>());
+    assertFalseTextForDefault(new SingleSelectionExtractor<AbstractMenu>());
   }
 
   /**
@@ -58,8 +58,8 @@ public class ActionExtractorTest {
    */
   @Test
   public void testMultiSelectionExtractor() {
-    MultiSelectionExtractor<AbstractAction> ex = new MultiSelectionExtractor<AbstractAction>();
-    AbstractAction testAction = mock(AbstractAction.class);
+    MultiSelectionExtractor<AbstractMenu> ex = new MultiSelectionExtractor<AbstractMenu>();
+    AbstractMenu testAction = mock(AbstractMenu.class);
     when(testAction.isMultiSelectionAction()).thenReturn(true);
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
@@ -72,7 +72,7 @@ public class ActionExtractorTest {
    */
   @Test
   public void testMultiSelectionExtractorDefault() {
-    assertFalseTextForDefault(new MultiSelectionExtractor<AbstractAction>());
+    assertFalseTextForDefault(new MultiSelectionExtractor<AbstractMenu>());
   }
 
   /**
@@ -81,8 +81,8 @@ public class ActionExtractorTest {
    */
   @Test
   public void testEmptySpaceSelectionExtractor() {
-    EmptySpaceSelectionExtractor<AbstractAction> ex = new EmptySpaceSelectionExtractor<AbstractAction>();
-    AbstractAction testAction = mock(AbstractAction.class);
+    EmptySpaceSelectionExtractor<AbstractMenu> ex = new EmptySpaceSelectionExtractor<AbstractMenu>();
+    AbstractMenu testAction = mock(AbstractMenu.class);
     when(testAction.isEmptySpaceAction()).thenReturn(true);
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
@@ -95,7 +95,7 @@ public class ActionExtractorTest {
    */
   @Test
   public void testEmptySpaceSelectionExtractorDefault() {
-    assertFalseTextForDefault(new EmptySpaceSelectionExtractor<AbstractAction>());
+    assertFalseTextForDefault(new EmptySpaceSelectionExtractor<AbstractMenu>());
   }
 
   /**
@@ -136,9 +136,9 @@ public class ActionExtractorTest {
    * @param ex
    *          {@link IDocTextExtractor}
    */
-  private void assertFalseTextForDefault(IDocTextExtractor<AbstractAction> ex) {
+  private void assertFalseTextForDefault(IDocTextExtractor<AbstractMenu> ex) {
     String defaultValue = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_FALSE);
-    AbstractAction a = mock(AbstractAction.class);
+    AbstractMenu a = mock(AbstractMenu.class);
     String text = ex.getText(a);
     assertEquals(defaultValue, text);
   }
