@@ -3,7 +3,7 @@
 <booleanAttribute key="append.args" value="true"/>
 <stringAttribute key="application" value="org.eclipse.pde.junit.runtime.coretestapplication"/>
 <booleanAttribute key="askclear" value="false"/>
-<booleanAttribute key="automaticAdd" value="true"/>
+<booleanAttribute key="automaticAdd" value="false"/>
 <booleanAttribute key="automaticValidate" value="false"/>
 <stringAttribute key="bad_container_name" value="\org.eclipse.scout.rt.ui.json.test\@RunWith(ScoutClientTestRunner.class)"/>
 <stringAttribute key="bootstrap" value=""/>
@@ -13,7 +13,6 @@
 <booleanAttribute key="clearwslog" value="false"/>
 <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
 <booleanAttribute key="default" value="false"/>
-<stringAttribute key="deselected_workspace_plugins" value="com.bsiag.widgets.client,com.bsiag.widgets.logger.fragment,com.bsiag.widgets.server,com.bsiag.widgets.shared,com.bsiag.widgets.ui.json,com.bsiag.widgets.ui.rap,com.bsiag.widgets.ui.swing,com.bsiag.widgets.ui.swt,org.eclipse.rap.rwt,org.eclipse.rap.ui.forms,org.eclipse.scout.commons.log4j.bridge.fragment,org.eclipse.scout.rt.ui.rap,org.eclipse.scout.rt.ui.rap.mobile,org.eclipse.scout.rt.ui.rap.theme.rayo,org.eclipse.scout.rt.ui.swt,org.eclipse.scout.svg.ui.swt"/>
 <booleanAttribute key="includeOptional" value="true"/>
 <stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
