@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -21,14 +25,27 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUser
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestAccessControlService;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestClientNotificationQueueListener;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
+import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.eclipse.scout.service.SERVICES;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractAccessControlService}
  */
+@RunWith(ScoutServerTestRunner.class)
 public class AbstractAccessControlServiceTest {
+  AbstractAccessControlService m_accessControlService;
+  TestClientNotificationQueueListener m_listener;
+
+  @Before
+  public void setup() {
+    m_accessControlService = new TestAccessControlService();
+    m_accessControlService.initializeService(null);
+    m_listener = new TestClientNotificationQueueListener();
+    SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(m_listener);
+  }
 
   /**
    * Tests that a client notification of {@link AccessControlChangedNotification} is sent when the cach is cleared:
@@ -36,31 +53,18 @@ public class AbstractAccessControlServiceTest {
    */
   @Test
   public void testClientNotificationSentForClearCache() {
-    AbstractAccessControlService accessControlService = new TestAccessControlService();
-    accessControlService.initializeService(null);
-
-    TestClientNotificationQueueListener listener = new TestClientNotificationQueueListener();
-    SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(listener);
     final String testUser = "testuser";
-    accessControlService.clearCacheOfUserIds(Collections.singleton(testUser));
+    Set<String> testUsers = Collections.singleton(testUser);
+    clearCache(testUsers);
 
-    List<ClientNotificationQueueEvent> eventList = listener.getEventList();
-    Assert.assertEquals("No client notification received.", eventList.size(), 1);
+    List<ClientNotificationQueueEvent> eventList = m_listener.getEventList();
+    assertEquals("No client notification received.", eventList.size(), 1);
+
     ClientNotificationQueueEvent clientNotificationQueueEvent = eventList.get(0);
-
-    Assert.assertEquals("Incorrect ClientNotification Type", AccessControlChangedNotification.class, clientNotificationQueueEvent.getNotification().getClass());
+    assertEquals("Incorrect ClientNotification Type", AccessControlChangedNotification.class, clientNotificationQueueEvent.getNotification().getClass());
     IClientNotificationFilter filter = clientNotificationQueueEvent.getFilter();
-    Assert.assertEquals("Incorrect Notification filter type", SingleUserFilter.class, filter.getClass());
-    Assert.assertEquals("UserId in client notification filter is incorrect", testUser, ((SingleUserFilter) filter).getUserId());
-  }
-
-  /**
-   * Tests that a client notification of {@link AccessControlChangedNotification} is sent when the cache is cleared
-   * (null users): {@link AbstractAccessControlService#clearCacheOfUserIds(String...)}
-   */
-  @Test
-  public void testClientNotificationSentForClearCacheNullUsers() {
-    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
+    assertEquals("Incorrect Notification filter type", SingleUserFilter.class, filter.getClass());
+    assertEquals("UserId in client notification filter is incorrect", testUser, ((SingleUserFilter) filter).getUserId());
   }
 
   /**
@@ -69,28 +73,17 @@ public class AbstractAccessControlServiceTest {
    */
   @Test
   public void testClientNotificationSentForClearCacheNoUsers() {
-    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
+    clearCache(Collections.<String> emptySet());
+    verifyNoNotificationsSent();
   }
 
-  /**
-   * Tests that a client notification of {@link AccessControlChangedNotification} is sent when the cache is cleared
-   * (null userId): {@link AbstractAccessControlService#clearCacheOfUserIds(String...)}
-   */
-  @Test
-  public void testClientNotificationSentForClearCacheEmptyUsers() {
-    verifyNoNotificationSentForClearCache(Collections.<String> emptySet());
+  private void clearCache(Collection<String> testUsers) {
+    m_accessControlService.clearCacheOfUserIds(testUsers);
+    ThreadContext.getTransaction().commitPhase2();
   }
 
-  private void verifyNoNotificationSentForClearCache(Collection<String> userIds) {
-    AbstractAccessControlService accessControlService = new TestAccessControlService();
-    accessControlService.initializeService(null);
-
-    TestClientNotificationQueueListener listener = new TestClientNotificationQueueListener();
-    SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(listener);
-    accessControlService.clearCacheOfUserIds(userIds);
-
-    List<ClientNotificationQueueEvent> eventList = listener.getEventList();
-    Assert.assertEquals("No client notification received.", eventList.size(), 0);
+  private void verifyNoNotificationsSent() {
+    assertEquals("No client notification received.", m_listener.getEventList().size(), 0);
   }
 
 }

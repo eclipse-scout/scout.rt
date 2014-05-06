@@ -242,6 +242,11 @@ public class OfflineStateSharedVariableNotificationTest {
     }
 
     @Override
+    public void putNonClusterDistributedNotification(IClientNotification notification, IClientNotificationFilter filter) {
+      m_notifications.add(notification);
+    }
+
+    @Override
     public void addClientNotificationQueueListener(IClientNotificationQueueListener listener) {
       throw new AssertionError("Should not be called during this test");
     }
@@ -261,6 +266,5 @@ public class OfflineStateSharedVariableNotificationTest {
         }
       }
     }
-
   }
 }
