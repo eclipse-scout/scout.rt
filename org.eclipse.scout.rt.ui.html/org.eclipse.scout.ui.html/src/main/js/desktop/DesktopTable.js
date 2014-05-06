@@ -25,7 +25,7 @@ scout.DesktopTable = function(session, model) {
 scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';
 scout.DesktopTable.EVENT_GRAPH_LOADED = 'graphLoaded';
 
-scout.DesktopTable.prototype.render = function($parent) {
+scout.DesktopTable.prototype._render = function($parent) {
   this._$parent = $parent;
   this.table.attach(this._$parent);
 
@@ -89,8 +89,8 @@ scout.DesktopTable.prototype.detach = function() {
 };
 
 scout.DesktopTable.prototype.attach = function($parent) {
-  if (!this.table) {
-    this.render($parent);
+  if (!this.table.$container) {
+    this._render($parent);
   } else {
     this.table.attach($parent);
   }

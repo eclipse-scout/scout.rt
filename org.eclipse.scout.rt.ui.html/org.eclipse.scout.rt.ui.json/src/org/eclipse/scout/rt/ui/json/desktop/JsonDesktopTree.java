@@ -27,9 +27,9 @@ import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.Activator;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
 import org.json.JSONArray;
@@ -48,7 +48,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
   public static final String PROP_SELECTION_MENUS = "selectionMenus";
   public static final String PROP_EMPTY_SPACE_MENUS = "emptySpaceMenus";
-  public static final String PROP_DETAIL_TABLE_ID = "detailTableId";
 
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
@@ -152,11 +151,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
       m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
       json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
-
-      JsonTable jsonTable = m_jsonTables.get(getModelObject().getDetailTable());
-      if (jsonTable != null) {
-        json.put(PROP_DETAIL_TABLE_ID, jsonTable.getId());
-      }
       return json;
     }
     catch (JSONException e) {
@@ -565,23 +559,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     }.runNow(new NullProgressMonitor());
 
     return menuList;
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String name, Object newValue) {
-    if (IOutline.PROP_DETAIL_TABLE.equals(name)) {
-      ITable table = (ITable) newValue;
-
-      JsonTable jsonTable = m_jsonTables.get(table);
-      String tableId = null;
-      if (jsonTable != null) {
-        tableId = jsonTable.getId();
-      }
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name + "Id", tableId);
-    }
-    else {
-      super.handleModelPropertyChange(name, newValue);
-    }
   }
 
   private class P_ModelTreeListener implements TreeListener {
