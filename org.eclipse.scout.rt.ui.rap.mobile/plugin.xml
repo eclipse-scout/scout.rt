@@ -55,8 +55,8 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
-            name="Mobile smart field"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField"
+            name="Content Assist Field"
             scope="global">
          <factory
                class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield.MobileSmartFieldFactory">

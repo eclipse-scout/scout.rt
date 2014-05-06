@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.extension.IFormFieldFactory;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
@@ -36,7 +36,7 @@ public class MobileSmartFieldFactory implements IFormFieldFactory {
       field = new RwtScoutSmartField();
     }
 
-    ISmartField<?> formField = (ISmartField<?>) model;
+    IContentAssistField<?, ?> formField = (IContentAssistField<?, ?>) model;
     field.createUiField(parent, formField, uiEnvironment);
 
     return field;
