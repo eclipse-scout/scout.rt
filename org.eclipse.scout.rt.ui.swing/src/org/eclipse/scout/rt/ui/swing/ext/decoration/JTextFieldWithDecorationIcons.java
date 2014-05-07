@@ -130,7 +130,7 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
 
   }
 
-  protected boolean isDecorationIconRegion(Point cursorPosition) {
+  public boolean isDecorationIconRegion(Point cursorPosition) {
     if (getDecorationIcon() == null) {
       return false;
     }

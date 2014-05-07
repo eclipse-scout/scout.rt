@@ -161,6 +161,16 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
    */
   protected JTextField createTimeField(JComponent container) {
     JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    textField.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        JTextFieldWithDecorationIcons text = (JTextFieldWithDecorationIcons) e.getComponent();
+        // ensure click not on decorations
+        if (!text.isDecorationIconRegion(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
+          handleSwingTimeChooserAction();
+        }
+      }
+    });
     container.add(textField);
     IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
     // context menu marker
