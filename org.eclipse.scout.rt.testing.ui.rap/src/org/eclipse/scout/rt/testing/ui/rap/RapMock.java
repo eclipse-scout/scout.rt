@@ -891,6 +891,7 @@ public class RapMock extends AbstractGuiMock {
     }
     // visibility
     state.visible = c.isVisible();
+    state.widget = c;
 
     return state;
   }

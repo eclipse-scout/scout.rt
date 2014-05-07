@@ -763,6 +763,7 @@ public class SwingMock extends AbstractGuiMock {
       //selection
       state.selected = button.isSelected();
     }
+    state.widget = c;
     return state;
   }
 

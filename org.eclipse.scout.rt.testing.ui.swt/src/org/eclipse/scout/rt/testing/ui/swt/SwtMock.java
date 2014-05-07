@@ -846,6 +846,7 @@ public class SwtMock extends AbstractGuiMock {
     }
     // visibility
     state.visible = c.isVisible();
+    state.widget = c;
 
     return state;
   }
@@ -1177,13 +1178,106 @@ public class SwtMock extends AbstractGuiMock {
 
   @Override
   public void clickLeftOnSmartFieldMagnifier(FieldState fieldState) {
-    gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
-    clickLeft();
+    final Control c = (Control) fieldState.widget;
+    if (c != null) {
+      try {
+        final AtomicReference<Point> buttonLocation = new AtomicReference<Point>();
+        final AtomicReference<Throwable> ex = new AtomicReference<Throwable>();
+        getDisplay().syncExec(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              Button button = getNextButton(c);
+              Point p = button.toDisplay(5, 5);
+              buttonLocation.set(p);
+            }
+            catch (Throwable t) {
+              ex.set(t);
+            }
+          }
+        });
+        if (ex.get() != null) {
+          throw ex.get();
+        }
+        Point p = buttonLocation.get();
+        gotoPoint(p.x, p.y);
+        clickLeft();
+      }
+      catch (Throwable t) {
+        throw new RuntimeException(t);
+      }
+    }
+    else {
+      gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
+      clickLeft();
+    }
   }
 
   @Override
   public void clickRightOnSmartFieldMagnifier(FieldState fieldState) {
-    gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
-    clickRight();
+    final Control c = (Control) fieldState.widget;
+    if (c != null) {
+      try {
+        final AtomicReference<Point> buttonLocation = new AtomicReference<Point>();
+        final AtomicReference<Throwable> ex = new AtomicReference<Throwable>();
+        getDisplay().syncExec(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              Button button = getNextButton(c);
+              Point p = button.toDisplay(5, 5);
+              buttonLocation.set(p);
+            }
+            catch (Throwable t) {
+              ex.set(t);
+            }
+          }
+        });
+        if (ex.get() != null) {
+          throw ex.get();
+        }
+        Point p = buttonLocation.get();
+        gotoPoint(p.x, p.y);
+        clickRight();
+      }
+      catch (Throwable t) {
+        throw new RuntimeException(t);
+      }
+    }
+    else {
+      gotoPoint(fieldState.x + fieldState.width + 10, fieldState.y + 10);
+      clickRight();
+    }
+  }
+
+  private Button getNextButton(Control c) {
+    if (c instanceof Button) {
+      return (Button) c;
+    }
+    if (c instanceof Composite) {
+      Button b = findButtonInComposite((Composite) c);
+      if (b != null) {
+        return b;
+      }
+      if (c.getParent() != null) {
+        return getNextButton(c.getParent());
+      }
+    }
+    return null;
+  }
+
+  private Button findButtonInComposite(Composite comp) {
+    for (Control c : comp.getChildren()) {
+      if (c instanceof Button) {
+        return (Button) c;
+      }
+      if (c instanceof Composite) {
+        Button b = findButtonInComposite((Composite) c);
+        if (b != null) {
+          return b;
+        }
+      }
+    }
+    return null;
   }
 }
