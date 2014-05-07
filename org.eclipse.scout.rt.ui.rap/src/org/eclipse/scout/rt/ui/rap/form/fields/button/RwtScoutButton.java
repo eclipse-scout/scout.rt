@@ -54,7 +54,7 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
 
   private RwtContextMenuMarkerComposite m_contextMenuMarker;
 
-//  private RwtScoutMenuSupport m_menuSupport;
+  private RwtScoutContextMenu m_contextMenu;
 
   public RwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -89,21 +89,9 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
     setUiLabel(null);
     if (uiFieldAsButton != null) {
       setUiField(uiFieldAsButton);
-//
-//      // attach rwt listeners
-//      uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
-//
-//      m_menuSupport = RwtScoutMenuSupport.install(getUiField(), getUiField().getParent(), new IMenuProvider() {
-//        @Override
-//        public List<IMenu> getValidMenus(MenuContext menuContext) {
-//          return getScoutObject().getUIFacade().fireButtonPopupFromUI();
-//        }
-//
-//        @Override
-//        public List<IMenu> getAllMenus() {
-//          return getScoutObject().getMenus();
-//        }
-//      }, getScoutObject(), getUiEnvironment(), getUiField());
+
+      // attach rwt listeners
+      uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
 
       LogicalGridData gd = (LogicalGridData) getUiField().getLayoutData();
       adaptButtonLayoutData(gd);
@@ -125,8 +113,8 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
 
   @Override
   protected void installContextMenu() {
-    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_contextMenuMarker, getUiEnvironment());
-    getUiField().setMenu(contextMenu.getUiMenu());
+    m_contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_contextMenuMarker, getUiEnvironment());
+    getUiField().setMenu(getContextMenu().getUiMenu());
   }
 
   /**
@@ -311,11 +299,11 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   protected void disarmButtonFromScout() {
   }
 
-//  protected void requestPopupFromScout() {
-//    if (m_menuSupport != null) {
-//      m_menuSupport.openMenu();
-//    }
-//  }
+  protected void requestPopupFromScout() {
+    if (getContextMenu() != null) {
+      getContextMenu().getUiMenu().setVisible(true);
+    }
+  }
 
   /**
    * in rwt thread
@@ -332,6 +320,10 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
     else if (name.equals(IButton.PROP_SELECTED)) {
       setSelectionFromScout(((Boolean) newValue).booleanValue());
     }
+  }
+
+  public RwtScoutContextMenu getContextMenu() {
+    return m_contextMenu;
   }
 
   private class P_RwtSelectionListener implements Listener {
@@ -372,52 +364,17 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
               });
           break;
         }
-//        case ButtonEvent.TYPE_REQUEST_POPUP: {
-//          getUiEnvironment().invokeUiLater(
-//              new Runnable() {
-//                @Override
-//                public void run() {
-//                  requestPopupFromScout();
-//                }
-//              });
-//          break;
-//        }
+        case ButtonEvent.TYPE_REQUEST_POPUP: {
+          getUiEnvironment().invokeUiLater(
+              new Runnable() {
+                @Override
+                public void run() {
+                  requestPopupFromScout();
+                }
+              });
+          break;
+        }
       }
     }
   } // end class P_ScoutButtonListener
-
-//  private class P_ContextMenuListener extends MenuAdapterEx {
-//    private static final long serialVersionUID = 1L;
-//
-//    public P_ContextMenuListener(Control menuControl, Control keyStrokeWidget) {
-//      super(menuControl, keyStrokeWidget);
-//    }
-//
-//    @Override
-//    public void menuShown(MenuEvent e) {
-//      super.menuShown(e);
-//
-//      try {
-//        if (m_scoutActions == null) {
-//          m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
-//        }
-//        Menu menu = ((Menu) e.getSource());
-//        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), menu);
-//      }
-//      finally {
-//        m_scoutActions = null;
-//      }
-//    }
-//  } // end class P_ContextMenuListener
-//
-//  private class P_RwtMenuDetectListener implements MenuDetectListener {
-//
-//    private static final long serialVersionUID = 1L;
-//
-//    @Override
-//    public void menuDetected(MenuDetectEvent e) {
-//      createAndShowMenu();
-//    }
-//
-//  }
 }
