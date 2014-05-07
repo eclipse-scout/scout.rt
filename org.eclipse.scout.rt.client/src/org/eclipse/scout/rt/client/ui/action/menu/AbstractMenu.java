@@ -108,7 +108,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     setVisible(visible);
   }
 
-  private Collection<ITableRow> convertToTableRows(Collection<?> input) {
+  /**
+   * converts a untyped collection into a type collection of table rows.
+   * 
+   * @param input
+   * @return null if the input is null or not all elements of the input are {@link ITableRow}s.
+   */
+  protected Collection<ITableRow> convertToTableRows(Collection<?> input) {
+    if (input == null) {
+      return null;
+    }
     List<ITableRow> rows = new ArrayList<ITableRow>(input.size());
     for (Object o : input) {
       if (o instanceof ITableRow) {

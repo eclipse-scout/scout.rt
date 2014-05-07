@@ -167,7 +167,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * @deprecated use {@link AbstractMenu#execOwnerValueChanged}
    */
   @Deprecated
-  @ConfigOperation
   @Order(20)
   protected void execPrepareAction() throws ProcessingException {
   }
