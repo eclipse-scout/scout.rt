@@ -240,6 +240,10 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
     return super.getSwtField();
   }
 
+  public SwtScoutContextMenu getContextMenu() {
+    return m_contextMenu;
+  }
+
   @Override
   protected void applyScoutProperties() {
     super.applyScoutProperties();
@@ -378,11 +382,11 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   protected void disarmButtonFromScout() {
   }
 
-//  protected void requestPopupFromScout() {
-//    if (m_menuSupport != null) {
-//      m_menuSupport.openMenu();
-//    }
-//  }
+  protected void requestPopupFromScout() {
+    if (getContextMenu() != null) {
+      getContextMenu().getSwtMenu().setVisible(true);
+    }
+  }
 
   /**
    * in swt thread
@@ -444,7 +448,7 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
               new Runnable() {
                 @Override
                 public void run() {
-//                  requestPopupFromScout();
+                  requestPopupFromScout();
                 }
               });
           break;

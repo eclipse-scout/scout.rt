@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 /**
  *
  */
-public class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
+public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
 
   private final T m_owner;
 
