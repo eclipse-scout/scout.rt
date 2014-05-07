@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
@@ -38,7 +37,7 @@ import org.osgi.framework.Bundle;
  * delegates to {@link CodeTypeStore}
  */
 @Priority(-1)
-public class CodeService extends AbstractService implements ICodeService {
+public class CodeService extends AbstractService implements IClusterSyncCodeService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeService.class);
 
   private CodeTypeStore m_codeTypeStore;
@@ -125,6 +124,15 @@ public class CodeService extends AbstractService implements ICodeService {
     }
     m_codeTypeStore.unloadCodeTypeCache(types);
     return getCodeTypeCache().reloadCodeTypes(types);
+  }
+
+  @Override
+  public List<ICodeType<?, ?>> reloadCodeTypesNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    if (types == null) {
+      return null;
+    }
+    m_codeTypeStore.unloadCodeTypeCacheNoFire(types);
+    return reloadCodeTypes(types);
   }
 
   @Override
@@ -270,4 +278,5 @@ public class CodeService extends AbstractService implements ICodeService {
     }
     return false;
   }
+
 }

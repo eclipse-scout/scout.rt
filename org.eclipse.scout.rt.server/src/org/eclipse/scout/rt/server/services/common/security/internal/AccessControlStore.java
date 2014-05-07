@@ -122,12 +122,35 @@ public class AccessControlStore {
   }
 
   /**
+   * clears the cache
+   */
+  public void clearCacheNoFire() {
+    clearCacheOfUserIdsNoFire(CollectionUtility.hashSet(m_store.keySet()));
+  }
+
+  /**
    * Clears the cache for a set of userIds and sends a notification for these users.
    * 
    * @param userIds
    *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
   public void clearCacheOfUserIds(Collection<String> userIds0) {
+    clearCacheOfUserIdsNoFire(userIds0);
+    //notify clients
+    for (String userId : userIds0) {
+      if (userId != null) {
+        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
+      }
+    }
+  }
+
+  /**
+   * Clears the cache for a set of userIds and sends a notification for these users.
+   * 
+   * @param userIds
+   *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
+   */
+  public void clearCacheOfUserIdsNoFire(Collection<String> userIds0) {
     Set<String> userIds = CollectionUtility.hashSetWithoutNullElements(userIds0);
     if (userIds.isEmpty()) {
       return;
@@ -137,12 +160,6 @@ public class AccessControlStore {
         if (userId != null) {
           m_store.remove(userId.toLowerCase());
         }
-      }
-    }
-    //notify clients
-    for (String userId : userIds) {
-      if (userId != null) {
-        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
       }
     }
   }

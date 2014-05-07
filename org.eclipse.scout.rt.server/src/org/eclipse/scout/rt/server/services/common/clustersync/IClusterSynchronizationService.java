@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.IService;
 
 /**
- * Service for synchronizing server nodes by sending messages.
+ * Service for synchronizing server nodes by sending messages and receiving messages.
  */
 public interface IClusterSynchronizationService extends IService {
 
@@ -27,5 +27,39 @@ public interface IClusterSynchronizationService extends IService {
    * @return the node of the currently connected cluster
    */
   String getNodeId();
+
+  /**
+   * Starts listening to notifications
+   * 
+   * @return <code>true</code>, if successful
+   */
+  boolean enable();
+
+  /**
+   * Stops listening to notifications
+   * 
+   * @return <code>true</code>, if successful
+   */
+  boolean disable();
+
+  /**
+   * @return <code>true</code>, if started and listening to cluster notifications
+   */
+  boolean isEnabled();
+
+  /**
+   * @param listener
+   *          {@link IClusterNotificationListener}
+   */
+  void addListener(IClusterNotificationListener listener);
+
+  /**
+   * @param listener
+   *          {@link IClusterNotificationListener}
+   */
+  void removeListener(IClusterNotificationListener listener);
+
+  /** TODO use callback instead */
+  void processNotification(IClusterNotificationMessage notification);
 
 }

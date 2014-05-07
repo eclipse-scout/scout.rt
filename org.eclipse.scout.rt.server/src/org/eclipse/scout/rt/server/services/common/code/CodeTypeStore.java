@@ -76,6 +76,12 @@ public class CodeTypeStore {
     unloadCodeTypeCache(codeTypeList);
   }
 
+  public void unloadCodeTypeCacheNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+    for (CodeTypeCache cache : m_store.values()) {
+      cache.unloadCodeTypes(types);
+    }
+  }
+
   public void unloadCodeTypeCache(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);

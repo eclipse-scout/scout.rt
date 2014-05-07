@@ -39,7 +39,7 @@ import org.osgi.framework.ServiceRegistration;
  * Implementations should override {@link #execLoadPermissions()}
  */
 @Priority(-1)
-public class AbstractAccessControlService extends AbstractService implements IAccessControlService {
+public class AbstractAccessControlService extends AbstractService implements IClusterSyncAccessControlService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;
@@ -233,5 +233,15 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   @Override
   public void clearCacheOfUserIds(Collection<String> userIds) {
     m_accessControlStore.clearCacheOfUserIds(userIds);
+  }
+
+  @Override
+  public void clearCacheNoFire() {
+    m_accessControlStore.clearCache();
+  }
+
+  @Override
+  public void clearCacheOfUserIdsNoFire(Collection<String> userIds) {
+    m_accessControlStore.clearCacheOfUserIdsNoFire(userIds);
   }
 }
