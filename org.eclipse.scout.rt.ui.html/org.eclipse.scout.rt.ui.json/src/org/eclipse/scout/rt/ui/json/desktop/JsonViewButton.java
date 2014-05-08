@@ -7,17 +7,14 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonEventType;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewButton> {
-  public static final String EVENT_CLICK = "click";
 
   public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession) {
     super(modelObject, jsonSession);
-
     delegateProperty(IViewButton.PROP_TEXT);
     delegateProperty(IViewButton.PROP_SELECTED);
   }
@@ -30,19 +27,14 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    try {
-      json.put(IViewButton.PROP_TEXT, getModelObject().getText());
-      json.put(IViewButton.PROP_SELECTED, getModelObject().isSelected());
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    putProperty(json, IViewButton.PROP_TEXT, getModelObject().getText());
+    putProperty(json, IViewButton.PROP_SELECTED, getModelObject().isSelected());
+    return json;
   }
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_CLICK.equals(event.getEventType())) {
+    if (JsonEventType.CLICK.matches(event)) {
       handleUiClick(event, res);
     }
     else {

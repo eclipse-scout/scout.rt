@@ -49,15 +49,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = super.toJson();
-
-    try {
-      json.put(ITableField.PROP_TABLE, m_jsonTables.get(getModelObject().getTable()).toJson());
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    return putProperty(super.toJson(), ITableField.PROP_TABLE, m_jsonTables.get(getModelObject().getTable()).toJson());
   }
 
   protected JsonTable createAndRegisterJsonTable(ITable table) {

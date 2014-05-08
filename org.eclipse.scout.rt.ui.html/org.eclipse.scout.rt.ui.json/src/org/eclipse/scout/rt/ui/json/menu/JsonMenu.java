@@ -18,8 +18,6 @@ import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
@@ -39,14 +37,9 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    try {
-      json.put(PROP_TEXT, getModelObject().getText());
-      json.put(PROP_ICON, getModelObject().getIconId());//FIXME how to handle resources?
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    putProperty(json, PROP_TEXT, getModelObject().getText());
+    putProperty(json, PROP_ICON, getModelObject().getIconId());//FIXME how to handle resources?
+    return json;
   }
 
   @Override

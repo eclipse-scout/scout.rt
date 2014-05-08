@@ -20,9 +20,7 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
@@ -59,24 +57,19 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
 
   @Override
   public JSONObject toJson() {
-    JSONObject jsonForm = super.toJson();
-    try {
-      jsonForm.put(PROP_TITLE, getModelObject().getTitle());
-      jsonForm.put(PROP_ICON_ID, getModelObject().getIconId());
-      jsonForm.put(PROP_MAXIMIZE_ENABLED, getModelObject().isMaximizeEnabled());
-      jsonForm.put(PROP_MINIMIZE_ENABLED, getModelObject().isMinimizeEnabled());
-      jsonForm.put(PROP_MAXIMIZED, getModelObject().isMaximized());
-      jsonForm.put(PROP_MINIMIZED, getModelObject().isMinimized());
-      jsonForm.put(PROP_MODAL, getModelObject().isModal());
-      jsonForm.put(PROP_DISPLAY_HINT, displayHintToJson(getModelObject().getDisplayHint()));
-      jsonForm.put(PROP_DISPLAY_VIEW_ID, getModelObject().getDisplayViewId());
-      jsonForm.put(PROP_ROOT_GROUP_BOX, m_rootGroupBox.toJson());
-      //FIXME return other props
-      return jsonForm;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    JSONObject json = super.toJson();
+    putProperty(json, PROP_TITLE, getModelObject().getTitle());
+    putProperty(json, PROP_ICON_ID, getModelObject().getIconId());
+    putProperty(json, PROP_MAXIMIZE_ENABLED, getModelObject().isMaximizeEnabled());
+    putProperty(json, PROP_MINIMIZE_ENABLED, getModelObject().isMinimizeEnabled());
+    putProperty(json, PROP_MAXIMIZED, getModelObject().isMaximized());
+    putProperty(json, PROP_MINIMIZED, getModelObject().isMinimized());
+    putProperty(json, PROP_MODAL, getModelObject().isModal());
+    putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(getModelObject().getDisplayHint()));
+    putProperty(json, PROP_DISPLAY_VIEW_ID, getModelObject().getDisplayViewId());
+    putProperty(json, PROP_ROOT_GROUP_BOX, m_rootGroupBox.toJson());
+    //FIXME return other props
+    return json;
   }
 
   protected String displayHintToJson(int displayHint) {

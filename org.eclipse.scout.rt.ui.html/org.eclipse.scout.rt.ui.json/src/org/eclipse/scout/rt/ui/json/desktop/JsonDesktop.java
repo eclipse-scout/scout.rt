@@ -162,7 +162,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
           viewButtons.put(jsonViewButton.toJson());
         }
         json.put("viewButtons", viewButtons);
-        json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME
+        json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME CGU (+ putProperty verwenden)
         JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
         if (jsonDesktopTree != null) {
           json.put("outline", jsonDesktopTree.toJson());

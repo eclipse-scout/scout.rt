@@ -84,15 +84,10 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
 
   @Override
   public JSONObject toJson() {
-    JSONObject jsonObject = super.toJson();
-    try {
-      jsonObject.put("desktop", m_jsonDesktop.toJson());
-      jsonObject.put("locale", localeToJson(getModelObject().getLocale()));
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
-    return jsonObject;
+    JSONObject json = super.toJson();
+    putProperty(json, "desktop", m_jsonDesktop.toJson());
+    putProperty(json, "locale", localeToJson(getModelObject().getLocale()));
+    return json;
   }
 
   @Override

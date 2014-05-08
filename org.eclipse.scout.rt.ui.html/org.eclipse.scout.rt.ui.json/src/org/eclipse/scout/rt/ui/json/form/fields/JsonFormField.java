@@ -15,8 +15,6 @@ import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField<T> {
@@ -32,15 +30,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    try {
-      json.put("label", getModelObject().getLabel());
-
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    return putProperty(super.toJson(), "label", getModelObject().getLabel());
   }
 
   @Override

@@ -17,11 +17,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonGroupBox extends JsonFormField<IGroupBox> {
@@ -40,7 +38,6 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   @Override
   protected void attachModel() {
     super.attachModel();
-
     for (IFormField field : getModelObject().getControlFields()) {
       IJsonFormField jsonFormField = JsonRendererFactory.get().createJsonFormField(field, getJsonSession());
       m_jsonFormFields.add(jsonFormField);
@@ -50,20 +47,14 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    try {
-      json.put("borderDecoration", getModelObject().getBorderDecoration());
-      json.put("borderVisible", getModelObject().isBorderVisible());
-      JSONArray formFields = new JSONArray();
-      for (IJsonFormField jsonFormField : m_jsonFormFields) {
-        formFields.put(jsonFormField.toJson());
-      }
-      json.put("formFields", formFields);
-
-      return json;
+    putProperty(json, "borderDecoration", getModelObject().getBorderDecoration());
+    putProperty(json, "borderVisible", getModelObject().isBorderVisible());
+    JSONArray formFields = new JSONArray();
+    for (IJsonFormField jsonFormField : m_jsonFormFields) {
+      formFields.put(jsonFormField.toJson());
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    putProperty(json, "formFields", formFields);
+    return json;
   }
 
 }

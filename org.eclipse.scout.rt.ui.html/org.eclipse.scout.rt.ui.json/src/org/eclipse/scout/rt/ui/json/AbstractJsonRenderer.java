@@ -78,15 +78,9 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    try {
-      json.put("objectType", getObjectType());
-      json.put("id", getId());
-
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    putProperty(json, "objectType", getObjectType());
+    putProperty(json, "id", getId());
+    return json;
   }
 
   /**

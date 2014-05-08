@@ -9,7 +9,7 @@ scout.ModelAdapter = function(session, model) {
   }
 };
 
-// TODO AWE/CGU: evtl. in render re-namen
+// TODO AWE/CGU: evtl. in render() re-namen
 scout.ModelAdapter.prototype.attach = function($parent) {
   if (!this.$container) {
     this._render($parent);
