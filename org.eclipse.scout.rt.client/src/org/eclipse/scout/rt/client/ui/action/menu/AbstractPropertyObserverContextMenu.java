@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
@@ -20,11 +21,9 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
  */
 public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
 
-  private final T m_owner;
-
   public AbstractPropertyObserverContextMenu(T owner) {
     super(false);
-    m_owner = owner;
+    setOwnerInternal(owner);
     callInitializer();
   }
 
@@ -34,8 +33,19 @@ public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObs
     getOwner().addPropertyChangeListener(new P_OwnerPropertyListener());
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
   public T getOwner() {
-    return m_owner;
+    return (T) super.getOwner();
+  }
+
+  @Override
+  protected void updateChildActions(List<? extends IMenu> newList) {
+    // set owner
+    for (IMenu m : newList) {
+      m.setOwnerInternal(getOwner());
+    }
+    super.updateChildActions(newList);
   }
 
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {

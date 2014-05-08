@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 
@@ -65,4 +66,8 @@ public interface IMenu extends IActionNode<IMenu> {
    * @throws ProcessingException
    */
   void handleOwnerValueChanged(Object newValue) throws ProcessingException;
+
+  void setOwnerInternal(IPropertyObserver menuOwner);
+
+  IPropertyObserver getOwner();
 }

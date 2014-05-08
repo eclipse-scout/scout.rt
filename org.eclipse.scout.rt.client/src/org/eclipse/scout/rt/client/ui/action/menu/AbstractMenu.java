@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -26,6 +27,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   private boolean m_singleSelectionAction;
   private boolean m_multiSelectionAction;
   private boolean m_emptySpaceAction;
+  private IPropertyObserver m_owner;
 
   public AbstractMenu() {
     super();
@@ -35,18 +37,36 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     super(callInitializer);
   }
 
+  /**
+   * @return
+   * @deprecated use {@link AbstractTableMenu} as superclass and
+   *             {@link AbstractTableMenu#getConfiguredSingleSelectionAction()} instead.
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   protected boolean getConfiguredSingleSelectionAction() {
     return true;
   }
 
+  /**
+   * @return
+   * @deprecated use {@link AbstractTableMenu} as superclass and
+   *             {@link AbstractTableMenu#getConfiguredMultiSelectionAction()} instead.
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected boolean getConfiguredMultiSelectionAction() {
     return false;
   }
 
+  /**
+   * @return
+   * @deprecated use {@link AbstractTableMenu} as superclass and
+   *             {@link AbstractTableMenu#getConfiguredEmptySpaceAction()} instead.
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   protected boolean getConfiguredEmptySpaceAction() {
@@ -88,7 +108,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
           if (isSingleSelectionAction() && allEnabled) {
             visible = collectionValue.size() == 1;
           }
-          if (isMultiSelectionAction() && allEnabled) {
+          if (!visible && isMultiSelectionAction() && allEnabled) {
             visible = collectionValue.size() > 1;
           }
         }
@@ -143,6 +163,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
       // legacy case of implicit new menu
       setEmptySpaceAction(true);
     }
+  }
+
+  @Override
+  public void setOwnerInternal(IPropertyObserver owner) {
+    m_owner = owner;
+  }
+
+  @Override
+  public IPropertyObserver getOwner() {
+    return m_owner;
   }
 
   @SuppressWarnings("deprecation")

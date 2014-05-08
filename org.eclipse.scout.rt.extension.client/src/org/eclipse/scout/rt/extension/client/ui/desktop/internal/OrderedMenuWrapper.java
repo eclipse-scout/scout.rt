@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
@@ -85,6 +86,16 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_menu.removePropertyChangeListener(propertyName, listener);
+  }
+
+  @Override
+  public IPropertyObserver getOwner() {
+    return m_menu.getOwner();
+  }
+
+  @Override
+  public void setOwnerInternal(IPropertyObserver menuOwner) {
+    m_menu.setOwnerInternal(menuOwner);
   }
 
   @Override
