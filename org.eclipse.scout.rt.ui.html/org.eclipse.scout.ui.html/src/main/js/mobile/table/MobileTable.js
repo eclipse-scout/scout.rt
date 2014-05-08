@@ -7,7 +7,7 @@ scout.MobileTable = function(session, model) {
   this.config.contextMenuEnabled = false;
 
   //FIXME should be done by server, or should we add gui only property to control it? model may set it to true at any time later
-  this.model.table.headerVisible = false;
+  this.model.headerVisible = false;
 
   this._headerColumns = [];
 };
@@ -26,18 +26,18 @@ scout.MobileTable.prototype._drawData = function(startRow) {
  * @override
  */
 scout.MobileTable.prototype._buildRowDiv = function(row, index) {
-  var rowClass = 'table-row table-row-mobile ',
-    table = this.model.table,
+  var rowClass = 'table-row ',
+    table = this.model,
     column, value, headerText = "";
 
-  if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
+  if (this.model.selectedRowIds && this.model.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'row-selected ';
   }
 
   var cellContent = "";
-  var columns = this.model.table.columns;
+  var columns = this.model.columns;
   for (var c = 0; c < row.cells.length; c++) {
-    column = table.columns[c];
+    column = this.model.columns[c];
     value = this.getText(c, index);
 
     if (c === 0) {
@@ -68,7 +68,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
 };
 
 scout.MobileTable.prototype._computeHeaderColumns = function() {
-  var columns = this.model.table.columns,
+  var columns = this.model.columns,
     column,
     headerColumns = [], i;
 

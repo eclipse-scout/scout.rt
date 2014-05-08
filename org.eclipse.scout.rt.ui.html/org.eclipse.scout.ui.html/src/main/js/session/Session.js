@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Session = function($entryPoint, sessionPartId) {
+scout.Session = function($entryPoint, sessionPartId, userAgent) {
   this.widgetMap = {};
   this.locale;
   this.$entryPoint = $entryPoint;
@@ -10,21 +10,26 @@ scout.Session = function($entryPoint, sessionPartId) {
   this._sessionPartId = sessionPartId;
   this._deferred;
   this._startup;
-  this.userAgent;
+  this.userAgent = userAgent;
+  if (!userAgent) {
+    this.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  }
   this.objectFactory = new scout.ObjectFactory(this);
 
-  //FIXME do we really want to have multiple requests pending?
+  // FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
 
-  //FIXME maybe better separate session object from event processing, create ClientSession.js?
+  // FIXME maybe better separate session object from event processing, create
+  // ClientSession.js?
   this.widgetMap[sessionPartId] = this;
 };
 
 /**
  *
  * Sends the request asynchronously and processes the response later.<br>
- * Furthermore, the request is sent delayed. If send is called multiple times during the same user interaction,
- * the events are collected and sent in one request at the end of the user interaction
+ * Furthermore, the request is sent delayed. If send is called multiple times
+ * during the same user interaction, the events are collected and sent in one
+ * request at the end of the user interaction
  *
  */
 scout.Session.prototype.send = function(type, id, data) {
@@ -43,28 +48,28 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
-    events: events,
-    sessionPartId: this._sessionPartId
+    events : events,
+    sessionPartId : this._sessionPartId
   };
 
   if (this._startup) {
     request.startup = true;
     this._startup = false;
   }
-  if (this.userAgent) {
+  if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
     request.userAgent = this.userAgent;
   }
 
   var that = this;
   this._requestsPendingCounter++;
   $.ajax({
-    async: true,
-    type: "POST",
-    dataType: "json",
-    cache: false,
-    url: 'json',
-    data: JSON.stringify(request),
-    success: function(message) {
+    async : true,
+    type : "POST",
+    dataType : "json",
+    cache : false,
+    url : 'json',
+    data : JSON.stringify(request),
+    success : function(message) {
       that._requestsPendingCounter--;
 
       if (message.errorMessage) {
@@ -109,12 +114,12 @@ scout.Session.prototype.areRequestsPending = function() {
 scout.Session.prototype._processEvents = function(events) {
   var session = this;
   for (var i = 0; i < events.length; i++) {
-    var event = events[i],
-      widgetId;
+    var event = events[i], widgetId;
 
     if (event.type_ == "create") {
       widgetId = event.parentId;
-    } else {
+    }
+    else {
       widgetId = event.id;
     }
 
@@ -127,19 +132,21 @@ scout.Session.prototype._processEvents = function(events) {
     try {
       if (event.type_ == "create") {
         widget.onModelCreate(event);
-      } else if (event.type_ == "property") {
+      }
+      else if (event.type_ == "property") {
         widget.onModelPropertyChange(event);
-      } else {
+      }
+      else {
         widget.onModelAction(event);
       }
-    } finally {
+    }
+    finally {
       widget.updateFromModelInProgress = null;
     }
   }
 };
 
-scout.Session.prototype.init = function(userAgent) {
-  // create all widgets for entry point
+scout.Session.prototype.init = function() {
   this._startup = true;
   this._sendNow();
 };
@@ -152,6 +159,6 @@ scout.Session.prototype.onModelCreate = function(event) {
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type_ == 'localeChanged') {
     this.locale = new scout.Locale(event);
-    //FIXME inform components to reformat display text?
+    // FIXME inform components to reformat display text?
   }
 };

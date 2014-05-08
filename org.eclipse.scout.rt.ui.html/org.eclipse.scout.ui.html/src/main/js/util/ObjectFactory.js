@@ -1,55 +1,82 @@
 scout.ObjectFactory = function(session) {
   this.session = session;
   this._factories = {};
-
-  this._init();
+  this.defaultDeviceType = scout.UserAgent.DEVICE_TYPE_DESKTOP;
 };
 
-scout.ObjectFactory.prototype._init = function() {
-  /*jshint sub:true*/
-  var that = this;
-  this._factories['Table'] = {
-    create : function(model) {
-      return new scout.Table(that.session, model);
-    }
-  };
-  this._factories['Form'] = {
-    create : function(model) {
-      return new scout.Form(that.session, model);
-    }
-  };
-  this._factories['FormField'] = {
-    create : function(model) {
-      return new scout.FormField(that.session, model);
-    }
-  };
-  this._factories['CheckBoxField'] = {
-      create : function(model) {
-        return new scout.CheckBoxField(that.session, model);
-      }
-    };
-  this._factories['TableField'] = {
-    create : function(model) {
-      return new scout.TableField(that.session, model);
-    }
-  };
-  this._factories['GroupBox'] = {
-    create : function(model) {
-      return new scout.GroupBox(that.session, model);
-    }
-  };
-
-};
-
+/**
+ * @param model needs to contain property objectType
+ */
 scout.ObjectFactory.prototype.create = function(model) {
-  var factory = this._factories[model.objectType];
+  var currentDeviceType = this.session.userAgent.deviceType,
+    factories, factory;
+
+  factories = this._factories[currentDeviceType] || {};
+  factory = factories[model.objectType];
+  if (!factory && currentDeviceType !== this.defaultDeviceType) {
+    factories = this._factories[this.defaultDeviceType] || {};
+    factory = factories[model.objectType];
+  }
   if (!factory) {
     throw 'No factory registered for objectType ' + model.objectType;
   }
 
-  return factory.create(model);
+  return factory.create(this.session, model);
 };
 
-scout.ObjectFactory.prototype.register = function(objectType, factory) {
-  this._factories[objectType] = factory;
+/**
+ * @param single factory or array of factories with objectType and optional deviceType.
+ */
+scout.ObjectFactory.prototype.register = function(factories) {
+  if (!factories) {
+    return;
+  }
+
+  if (!Array.isArray(factories)) {
+    factories = [ factories ];
+  }
+
+  var i, factory;
+  for (i = 0; i < factories.length; i++) {
+    factory = factories[i];
+    if (!factory.deviceType) {
+      factory.deviceType = this.defaultDeviceType;
+    }
+    if(!this._factories[factory.deviceType]) {
+      this._factories[factory.deviceType] = {};
+    }
+    this._factories[factory.deviceType][factory.objectType] = factory;
+  }
 };
+
+scout.defaultObjectFactories = [ {
+  objectType : 'Table',
+  create : function(session, model) {
+    return new scout.Table(session, model);
+  }
+}, {
+  objectType : 'Form',
+  create : function(session, model) {
+    return new scout.Form(session, model);
+  }
+}, {
+  objectType : 'FormField',
+  create : function(session, model) {
+    return new scout.FormField(session, model);
+  }
+}, {
+  objectType : 'CheckBoxField',
+  create : function(session, model) {
+    return new scout.CheckBoxField(session, model);
+  }
+}, {
+  objectType : 'TableField',
+  create : function(session, model) {
+    return new scout.TableField(session, model);
+  }
+}, {
+  objectType : 'GroupBox',
+  create : function(session, model) {
+    return new scout.GroupBox(session, model);
+  }
+} ];

@@ -1335,6 +1335,10 @@ width: 32px;
 .table .key-box.bottom3 { bottom: 10px;}
 .table .key-box.char { bottom: 8px; }
 
+.form, .group-box {
+  height: 100%;
+}
+
 .form-field {
   background-color: yellow;
   height: 25px;
@@ -1345,4 +1349,8 @@ width: 32px;
 .form-field > label{
   height: 100%;
   width: 100px;
+}
+
+.table-field {
+  height: 100%;
 }

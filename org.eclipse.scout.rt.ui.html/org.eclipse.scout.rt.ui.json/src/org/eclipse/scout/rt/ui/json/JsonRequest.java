@@ -67,12 +67,7 @@ public class JsonRequest {
   /**
    * Only set on startup requests
    */
-  public String getUserAgent() {
-    try {
-      return m_request.getString(PROP_USER_AGENT);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+  public JSONObject getUserAgent() {
+    return m_request.optJSONObject(PROP_USER_AGENT);
   }
 }

@@ -16,7 +16,7 @@
 
     <script>
       $(document).ready(function() {
-        scout.init('MOBILE');
+        scout.init(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE), scout.mobileObjectFactories);
       });
     </script>
   </head>

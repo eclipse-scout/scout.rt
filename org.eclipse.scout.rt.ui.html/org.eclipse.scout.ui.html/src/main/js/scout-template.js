@@ -7,8 +7,6 @@
 
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
-//@include("src/main/js/main.js");
-
 //@include("src/main/js/util/arrays.js");
 //@include("src/main/js/util/EventSupport.js");
 //@include("src/main/js/util/KeystrokeManager.js");
@@ -17,6 +15,7 @@
 //@include("src/main/js/session/Session.js");
 //@include("src/main/js/session/Event.js");
 //@include("src/main/js/session/Locale.js");
+//@include("src/main/js/session/UserAgent.js");
 //@include("src/main/js/desktop/Desktop.js");
 //@include("src/main/js/desktop/DesktopBench.js");
 //@include("src/main/js/desktop/DesktopChartMatrix.js");
@@ -46,4 +45,6 @@
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");
+  
+//@include("src/main/js/main.js");
 }(window.scout = window.scout || {}, jQuery));

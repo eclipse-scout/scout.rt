@@ -30,9 +30,12 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
 
@@ -71,20 +74,23 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected UserAgent createUserAgent(JsonRequest jsonReq) {
+    //FIXME create UiLayer.HTML
+    IUiLayer uiLayer = UiLayer.RAP;
+    IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = m_currentHttpRequest.getHeader("User-Agent");
-    String userAgent = jsonReq.getRequestObject().optString("userAgent", null);
-    if (userAgent == null) {
-      //FIXME create UiLayer.HTML
-      return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, browserId);
-    }
-    else {
+    JSONObject userAgent = jsonReq.getUserAgent();
+    if (userAgent != null) {
       //FIXME it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
-      if (!userAgent.contains("|")) {
-        userAgent = UiLayer.RAP.getIdentifier() + "|" + userAgent;
+      String uiDeviceTypeStr = userAgent.optString("deviceType", null);
+      if (uiDeviceTypeStr != null) {
+        uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
       }
-      userAgent += "|" + browserId;
-      return UserAgent.createByIdentifier(userAgent);
+      String uiLayerStr = userAgent.optString("uiLayer", null);
+      if (uiLayerStr != null) {
+        uiLayer = UiLayer.createByIdentifier(uiLayerStr);
+      }
     }
+    return UserAgent.create(uiLayer, uiDeviceType, browserId);
   }
 
   protected Subject initSubject() {

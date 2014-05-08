@@ -7,7 +7,7 @@ scout.TableField = function(session, model) {
 scout.TableField.inheritsFrom(scout.ModelAdapter);
 
 scout.TableField.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv();
+  this.$container = $parent.appendDiv(undefined, 'table-field');
   if (this.model.label) {
     this.$label = $container.makeDiv(undefined, 'label');
   }

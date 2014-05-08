@@ -4,7 +4,7 @@ scout.Form = function(session, model) {
 scout.Form.inheritsFrom(scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv();
+  this.$container = $parent.appendDiv(undefined, 'form');
 
   var rootGroupBox = this.session.widgetMap[this.model.rootGroupBox];
   if (!rootGroupBox) {
