@@ -6,6 +6,7 @@ scout.ObjectFactory = function(session) {
 };
 
 scout.ObjectFactory.prototype._init = function() {
+  /*jshint sub:true*/
   var that = this;
   this._factories['Table'] = {
     create : function(model) {
@@ -22,6 +23,11 @@ scout.ObjectFactory.prototype._init = function() {
       return new scout.FormField(that.session, model);
     }
   };
+  this._factories['CheckBoxField'] = {
+      create : function(model) {
+        return new scout.CheckBoxField(that.session, model);
+      }
+    };
   this._factories['TableField'] = {
     create : function(model) {
       return new scout.TableField(that.session, model);

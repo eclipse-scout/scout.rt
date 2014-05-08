@@ -39,6 +39,7 @@
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
 //@include("src/main/js/form/Form.js");
 //@include("src/main/js/form/fields/FormField.js");
+//@include("src/main/js/form/fields/checkbox/CheckBoxField.js");
 //@include("src/main/js/form/fields/tablefield/TableField.js");
 //@include("src/main/js/form/fields/groupbox/GroupBox.js");
 //@include("src/main/js/menu/Menu.js");

@@ -8,17 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.form.fields;
+package org.eclipse.scout.rt.ui.json.form.fields.checkbox;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.json.IJsonRenderer;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.ui.json.IJsonSession;
+import org.eclipse.scout.rt.ui.json.form.fields.JsonValueField;
 
 /**
- * Creates JSON output for a Scout form-field object.
- * 
- * @param <T>
- *            Type of Scout form-field
+ * @author awe
  */
-public interface IJsonFormField<T extends IFormField> extends IJsonRenderer<T> {
+public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
+
+	public JsonCheckBoxField(IBooleanField model, IJsonSession session) {
+		super(model, session);
+	}
+
+	@Override
+	public String getObjectType() {
+		return "CheckBoxField";
+	}
 
 }

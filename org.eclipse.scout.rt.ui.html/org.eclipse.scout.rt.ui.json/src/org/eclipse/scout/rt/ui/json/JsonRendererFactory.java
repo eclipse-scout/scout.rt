@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.ui.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
@@ -33,77 +36,83 @@ import org.eclipse.scout.rt.ui.json.table.JsonTable;
 
 public class JsonRendererFactory {
 
-  private static JsonRendererFactory m_instance;
+	private static JsonRendererFactory m_instance;
 
-  public static JsonRendererFactory get() {
-    return m_instance;
-  }
+	public static JsonRendererFactory get() {
+		return m_instance;
+	}
 
-  public static void init(JsonRendererFactory rendererFactory) {
-    if (m_instance != null) {
-      throw new IllegalArgumentException("JsonRendererFactory is already initialized.");
-    }
-    m_instance = rendererFactory;
-  }
+	public static void init(JsonRendererFactory rendererFactory) {
+		if (m_instance != null) {
+			throw new IllegalArgumentException(
+					"JsonRendererFactory is already initialized.");
+		}
+		m_instance = rendererFactory;
+	}
 
-  public static void init() {
-    if (m_instance == null) {
-      m_instance = new JsonRendererFactory();
-    }
-  }
+	public static void init() {
+		if (m_instance == null) {
+			m_instance = new JsonRendererFactory();
+		}
+	}
 
-  public JsonClientSession createJsonClientSession(IClientSession model, IJsonSession session, String id) {
-    return new JsonClientSession(model, session, id);
-  }
+	public JsonClientSession createJsonClientSession(IClientSession model,
+			IJsonSession session, String id) {
+		return new JsonClientSession(model, session, id);
+	}
 
-  public JsonDesktop createJsonDesktop(IDesktop model, IJsonSession session) {
-    JsonDesktop renderer = new JsonDesktop(model, session);
-    renderer.init();
+	public JsonDesktop createJsonDesktop(IDesktop model, IJsonSession session) {
+		JsonDesktop renderer = new JsonDesktop(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
-  public JsonTable createJsonTable(ITable model, IJsonSession session) {
-    JsonTable renderer = new JsonTable(model, session);
-    renderer.init();
+	public JsonTable createJsonTable(ITable model, IJsonSession session) {
+		JsonTable renderer = new JsonTable(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
-  public JsonDesktopTree createJsonDesktopTree(IOutline model, IJsonSession session) {
-    JsonDesktopTree renderer = new JsonDesktopTree(model, session);
-    renderer.init();
+	public JsonDesktopTree createJsonDesktopTree(IOutline model,
+			IJsonSession session) {
+		JsonDesktopTree renderer = new JsonDesktopTree(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
-  public JsonViewButton createJsonViewButton(IViewButton model, IJsonSession session) {
-    JsonViewButton renderer = new JsonViewButton(model, session);
-    renderer.init();
+	public JsonViewButton createJsonViewButton(IViewButton model,
+			IJsonSession session) {
+		JsonViewButton renderer = new JsonViewButton(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
-  public JsonForm createJsonForm(IForm model, IJsonSession session) {
-    JsonForm renderer = new JsonForm(model, session);
-    renderer.init();
+	public JsonForm createJsonForm(IForm model, IJsonSession session) {
+		JsonForm renderer = new JsonForm(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
-  public JsonMenu createJsonMenu(IMenu model, IJsonSession session) {
-    JsonMenu renderer = new JsonMenu(model, session);
-    renderer.init();
+	public JsonMenu createJsonMenu(IMenu model, IJsonSession session) {
+		JsonMenu renderer = new JsonMenu(model, session);
+		renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 
   @SuppressWarnings("unchecked")
   public <T extends IJsonFormField> T createJsonFormField(IFormField model, IJsonSession session) {
     T renderer = null;
     if (model instanceof IGroupBox) {
       renderer = (T) new JsonGroupBox((IGroupBox) model, session);
-    }
+    } else if (model instanceof ICheckBox) {
+			renderer = (T) new JsonCheckBoxField((IBooleanField) model, session);
+	}
     else if (model instanceof ITableField<?>) {
       renderer = (T) new JsonTableField((ITableField) model, session);
     }
@@ -115,6 +124,6 @@ public class JsonRendererFactory {
     }
     renderer.init();
 
-    return renderer;
-  }
+		return renderer;
+	}
 }
