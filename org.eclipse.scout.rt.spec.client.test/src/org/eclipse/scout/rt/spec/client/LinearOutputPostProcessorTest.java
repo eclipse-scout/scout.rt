@@ -16,7 +16,9 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.After;
 import org.junit.Assert;
@@ -33,14 +35,14 @@ public class LinearOutputPostProcessorTest {
 
   @Before
   public void setup() {
-    m_originalConfig = SpecIOUtility.getSpecFileConfigInstance();
-    SpecIOUtility.setSpecFileConfig(new SpecFileConfig("org.eclipse.scout.rt.spec.client.test"));
+    m_originalConfig = ConfigRegistry.getSpecFileConfigInstance();
+    ConfigRegistry.setSpecFileConfig(new SpecFileConfig("org.eclipse.scout.rt.spec.client.test"));
   }
 
   @After
   public void tearDown() throws ProcessingException {
-    IOUtility.deleteDirectory(SpecIOUtility.getSpecFileConfigInstance().getSpecDir());
-    SpecIOUtility.setSpecFileConfig(m_originalConfig);
+    IOUtility.deleteDirectory(ConfigRegistry.getSpecFileConfigInstance().getSpecDir());
+    ConfigRegistry.setSpecFileConfig(m_originalConfig);
   }
 
   @Test
@@ -76,8 +78,8 @@ public class LinearOutputPostProcessorTest {
   }
 
   private File copyFile(String relativeSourcePath) throws ProcessingException {
-    File expectedFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), new File(relativeSourcePath).getName());
-    SpecIOUtility.copyFile(SpecIOUtility.getSpecFileConfigInstance().getBundle(), relativeSourcePath, expectedFile);
+    File expectedFile = new File(ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir(), new File(relativeSourcePath).getName());
+    SpecIOUtility.copyFile(ConfigRegistry.getSpecFileConfigInstance().getBundle(), relativeSourcePath, expectedFile);
     return expectedFile;
   }
 

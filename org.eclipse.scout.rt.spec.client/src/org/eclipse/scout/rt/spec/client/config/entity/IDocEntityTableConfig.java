@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.spec.client.config.entity;
 import java.util.List;
 
 import org.eclipse.scout.commons.ArrayComparator;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  * Configuration for the documentation of scout entities in a table (e.g. a table containing all fields in a form)

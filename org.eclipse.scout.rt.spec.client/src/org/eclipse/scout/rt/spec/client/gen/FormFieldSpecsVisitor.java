@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
+import org.eclipse.scout.rt.spec.client.filter.FilterUtility;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.internal.DocTable;
@@ -40,7 +41,7 @@ public class FormFieldSpecsVisitor implements IDocFormFieldVisitor {
    */
   @Override
   public boolean visitField(IFormField field, int level, int fieldIndex) {
-    if (DocGenUtility.isAccepted(field, m_config.getFormFieldTableConfig().getFilters())) {
+    if (FilterUtility.isAccepted(field, m_config.getFormFieldTableConfig().getFilters())) {
       String[] row = DocGenUtility.getTexts(field, m_config.getFormFieldTableConfig().getTextExtractors());
       m_rows.add(row);
     }

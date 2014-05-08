@@ -22,9 +22,11 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
-import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.out.html.HtmlConverter;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * A post processor for mediawiki files which performs the following tasks:
@@ -38,7 +40,7 @@ public class MediawikiPostProcessor implements ISpecProcessor {
   protected HashMap<String, String> m_classIdTargets = new HashMap<String, String>();
 
   public MediawikiPostProcessor() throws ProcessingException {
-    for (Class c : DocGenUtility.getAllDocEntityClasses()) {
+    for (Class c : SpecUtility.getAllDocEntityClasses()) {
       m_classIdTargets.put(c.getSimpleName(), SpecUtility.createAnchorId(ConfigurationUtility.getAnnotatedClassIdWithFallback(c)));
       m_classIdTargets.put(c.getName(), SpecUtility.createAnchorId(ConfigurationUtility.getAnnotatedClassIdWithFallback(c)));
     }
@@ -46,20 +48,20 @@ public class MediawikiPostProcessor implements ISpecProcessor {
 
   @Override
   public void process() throws ProcessingException {
-    if (!SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().exists()) {
-      LOG.warn("MediawikiDir does not exists! (" + SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().getPath() + ")");
+    if (!ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().exists()) {
+      LOG.warn("MediawikiDir does not exists! (" + ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().getPath() + ")");
       return;
     }
 
-    SpecIOUtility.copyFilesFromAllSourceBundles(SpecIOUtility.getSpecFileConfigInstance().getHtmlDir(), SpecIOUtility.getSpecFileConfigInstance().getRelativeCssDirPath(), new FilenameFilter() {
+    SpecIOUtility.copyFilesFromAllSourceBundles(ConfigRegistry.getSpecFileConfigInstance().getHtmlDir(), ConfigRegistry.getSpecFileConfigInstance().getRelativeCssDirPath(), new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
-        return SpecIOUtility.getSpecFileConfigInstance().getDefaultCssFileName().equals(name);
+        return ConfigRegistry.getSpecFileConfigInstance().getDefaultCssFileName().equals(name);
       }
     });
-    File cssFile = new File(SpecIOUtility.getSpecFileConfigInstance().getHtmlDir(), SpecIOUtility.getSpecFileConfigInstance().getDefaultCssFileName());
+    File cssFile = new File(ConfigRegistry.getSpecFileConfigInstance().getHtmlDir(), ConfigRegistry.getSpecFileConfigInstance().getDefaultCssFileName());
 
-    for (File wiki : SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles()) {
+    for (File wiki : ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().listFiles()) {
       replaceLinks(wiki);
       File html = convertToHTML(wiki, cssFile);
       replaceWikiFileLinks(html);
@@ -159,7 +161,7 @@ public class MediawikiPostProcessor implements ISpecProcessor {
   }
 
   protected File convertToHTML(File mediaWiki, File cssFile) throws ProcessingException {
-    File htmlDir = SpecIOUtility.getSpecFileConfigInstance().getHtmlDir();
+    File htmlDir = ConfigRegistry.getSpecFileConfigInstance().getHtmlDir();
     File htmlFile = SpecIOUtility.createNewFile(htmlDir, mediaWiki.getName().replace(".mediawiki", ""), ".html");
     HtmlConverter htmlConverter = new HtmlConverter(cssFile);
     htmlConverter.convertWikiToHtml(mediaWiki, htmlFile);

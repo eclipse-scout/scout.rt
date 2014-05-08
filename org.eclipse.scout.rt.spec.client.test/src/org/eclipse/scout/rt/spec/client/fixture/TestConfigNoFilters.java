@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.spec.client.config.entity.DefaultEntityConfig;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  *

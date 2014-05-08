@@ -19,10 +19,12 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.link.LinkTarget;
 import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiLinkTargetManager;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility.IStringProcessor;
 
 // TODO ASA javadoc MediawikiAnchorPostProcessor
 public class MediawikiAnchorPostProcessor implements ISpecProcessor {
@@ -30,11 +32,11 @@ public class MediawikiAnchorPostProcessor implements ISpecProcessor {
 
   @Override
   public void process() throws ProcessingException {
-    if (!SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().exists()) {
-      LOG.warn("MediawikiDir does not exists! (" + SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().getPath() + ")");
+    if (!ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().exists()) {
+      LOG.warn("MediawikiDir does not exists! (" + ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().getPath() + ")");
       return;
     }
-    for (File wiki : SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles()) {
+    for (File wiki : ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().listFiles()) {
       replaceScoutAnchors(wiki);
     }
   }
@@ -43,7 +45,7 @@ public class MediawikiAnchorPostProcessor implements ISpecProcessor {
   private void replaceScoutAnchors(File wiki) throws ProcessingException {
     P_ScoutAnchorProcessor anchorProcessor = new P_ScoutAnchorProcessor();
     SpecIOUtility.process(wiki, anchorProcessor);
-    MediawikiLinkTargetManager w = new MediawikiLinkTargetManager(SpecIOUtility.getSpecFileConfigInstance().getLinksFile());
+    MediawikiLinkTargetManager w = new MediawikiLinkTargetManager(ConfigRegistry.getSpecFileConfigInstance().getLinksFile());
     ArrayList<ILinkTarget> targets = new ArrayList<ILinkTarget>();
     for (String id : anchorProcessor.getAnchorsIds()) {
       targets.add(new LinkTarget(id, wiki.getName()));

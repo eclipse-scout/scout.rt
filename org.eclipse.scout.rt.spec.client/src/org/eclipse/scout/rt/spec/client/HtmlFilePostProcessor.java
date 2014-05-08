@@ -18,7 +18,9 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility.IStringProcessor;
 
 // TODO ASA javadoc unittest
 public class HtmlFilePostProcessor implements ISpecProcessor {
@@ -35,7 +37,7 @@ public class HtmlFilePostProcessor implements ISpecProcessor {
   @Override
   public void process() throws ProcessingException {
     for (final String filename : m_filenames) {
-      File file = new File(SpecIOUtility.getSpecFileConfigInstance().getHtmlDir(), filename);
+      File file = new File(ConfigRegistry.getSpecFileConfigInstance().getHtmlDir(), filename);
       if (file.exists()) {
         P_FirstProcessor firstProcessor = new P_FirstProcessor(filename);
         SpecIOUtility.process(file, firstProcessor);

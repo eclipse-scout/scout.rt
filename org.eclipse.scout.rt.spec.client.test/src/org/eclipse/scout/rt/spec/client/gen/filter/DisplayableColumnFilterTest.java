@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.spec.client.gen.filter.column.DisplayableColumnFilter;
+import org.eclipse.scout.rt.spec.client.filter.column.DisplayableColumnFilter;
 import org.junit.Test;
 
 /**

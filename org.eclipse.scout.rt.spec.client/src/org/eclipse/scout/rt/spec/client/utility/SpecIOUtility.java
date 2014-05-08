@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client;
+package org.eclipse.scout.rt.spec.client.utility;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,7 +44,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.osgi.framework.Bundle;
 
 /**
@@ -53,8 +53,6 @@ import org.osgi.framework.Bundle;
 public final class SpecIOUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecIOUtility.class);
   public static final String ENCODING = "utf-8";
-  private static SpecFileConfig s_specFileConfig;
-
   private SpecIOUtility() {
   }
 
@@ -423,30 +421,13 @@ public final class SpecIOUtility {
   }
 
   /**
-   * @return the {@link SpecFileConfig} instance
-   */
-  public static SpecFileConfig getSpecFileConfigInstance() {
-    if (s_specFileConfig == null) {
-      s_specFileConfig = new SpecFileConfig();
-    }
-    return s_specFileConfig;
-  }
-
-  // TODO ASA The only property, that really can be customized in SpecFileConfig is the output dir. All source dirs need to be the in the same
-  // structure in all bundles (rt and project) because of hierarchic copying.
-  // --> Create a configuration possibility for the output dir and remove this setter.
-  public static void setSpecFileConfig(SpecFileConfig specFileConfig) {
-    SpecIOUtility.s_specFileConfig = specFileConfig;
-  }
-
-  /**
    * @return
    * @throws ProcessingException
    */
   public static Properties loadLinkPropertiesFile() throws ProcessingException {
     Properties p = new Properties();
     try {
-      p.load(new FileReader(getSpecFileConfigInstance().getLinksFile()));
+      p.load(new FileReader(ConfigRegistry.getSpecFileConfigInstance().getLinksFile()));
     }
     catch (FileNotFoundException e) {
       throw new ProcessingException("Error loading links file", e);
@@ -469,7 +450,7 @@ public final class SpecIOUtility {
    * @throws ProcessingException
    */
   public static void copyFilesFromAllSourceBundles(File destDir, String bundleRelativeSourceDirPath, FilenameFilter filenameFilter) throws ProcessingException {
-    for (Bundle bundle : getSpecFileConfigInstance().getSourceBundles()) {
+    for (Bundle bundle : ConfigRegistry.getSpecFileConfigInstance().getSourceBundles()) {
       for (String file : listFiles(bundle, bundleRelativeSourceDirPath, filenameFilter)) {
         File destFile = new File(destDir, file);
         copyFile(bundle, bundleRelativeSourceDirPath + File.separator + file, destFile);

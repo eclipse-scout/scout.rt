@@ -19,10 +19,10 @@ import java.util.Properties;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
 import org.eclipse.scout.rt.spec.client.link.LinkTarget;
 import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

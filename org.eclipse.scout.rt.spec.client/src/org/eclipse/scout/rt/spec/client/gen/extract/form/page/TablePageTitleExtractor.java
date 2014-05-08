@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.page;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  *

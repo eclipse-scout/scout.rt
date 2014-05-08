@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.internal.Section;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * A visitor for {@link ITableField}s that collects information according to configurations for {@link ITableField},

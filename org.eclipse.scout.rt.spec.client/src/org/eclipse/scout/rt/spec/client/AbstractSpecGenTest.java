@@ -14,9 +14,11 @@ import java.io.File;
 import java.io.Writer;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiWriter;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientGUITestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +38,7 @@ public abstract class AbstractSpecGenTest {
   abstract public void generateSpec() throws ProcessingException;
 
   protected IDocConfig getConfiguration() {
-    return SpecUtility.getDocConfigInstance();
+    return ConfigRegistry.getDocConfigInstance();
   }
 
   /**
@@ -47,7 +49,7 @@ public abstract class AbstractSpecGenTest {
    * @throws ProcessingException
    */
   protected void writeMediawikiFile(IDocSection section, String fileBaseName, String[] imagePaths) throws ProcessingException {
-    File wiki = SpecIOUtility.createNewFile(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), fileBaseName, ".mediawiki");
+    File wiki = SpecIOUtility.createNewFile(ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir(), fileBaseName, ".mediawiki");
     Writer fileWriter = SpecIOUtility.createWriter(wiki);
     MediawikiWriter w = new MediawikiWriter(fileWriter, section, imagePaths);
     w.write(getTopHeadingLevel());

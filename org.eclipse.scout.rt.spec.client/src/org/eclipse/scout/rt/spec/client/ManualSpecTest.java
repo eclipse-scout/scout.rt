@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 
 /**
  * Copy manually written mediawiki and image files from source bundles to output directory
@@ -27,17 +29,17 @@ public class ManualSpecTest extends AbstractSpecGenTest {
   }
 
   protected void copyImages() throws ProcessingException {
-    File dest = SpecIOUtility.getSpecFileConfigInstance().getImageDir();
+    File dest = ConfigRegistry.getSpecFileConfigInstance().getImageDir();
     dest.mkdirs();
-    String bundleRelativeSourceDirPath = SpecIOUtility.getSpecFileConfigInstance().getRelativeImagesSourceDirPath();
+    String bundleRelativeSourceDirPath = ConfigRegistry.getSpecFileConfigInstance().getRelativeImagesSourceDirPath();
     FilenameFilter filenameFilter = getFilter();
     SpecIOUtility.copyFilesFromAllSourceBundles(dest, bundleRelativeSourceDirPath, filenameFilter);
   }
 
   protected void copyMediawikiFiles() throws ProcessingException {
-    File dest = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir();
+    File dest = ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir();
     dest.mkdirs();
-    String bundleRelativeSourceDirPath = SpecIOUtility.getSpecFileConfigInstance().getRelativeMediawikiSourceDirPath();
+    String bundleRelativeSourceDirPath = ConfigRegistry.getSpecFileConfigInstance().getRelativeMediawikiSourceDirPath();
     FilenameFilter filenameFilter = getFilter();
     SpecIOUtility.copyFilesFromAllSourceBundles(dest, bundleRelativeSourceDirPath, filenameFilter);
   }

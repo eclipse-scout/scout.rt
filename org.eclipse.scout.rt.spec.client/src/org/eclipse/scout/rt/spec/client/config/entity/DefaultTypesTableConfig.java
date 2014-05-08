@@ -16,11 +16,11 @@ import java.util.List;
 import org.eclipse.scout.commons.ArrayComparator;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
 /**

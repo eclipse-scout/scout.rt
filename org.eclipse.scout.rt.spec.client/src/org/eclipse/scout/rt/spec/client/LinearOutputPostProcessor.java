@@ -27,9 +27,11 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
-import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility.IStringProcessor;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 import org.osgi.framework.Bundle;
 
 /**
@@ -52,13 +54,13 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
    * @throws ProcessingException
    */
   public LinearOutputPostProcessor(String configFile) throws ProcessingException {
-    List<Bundle> sourceBundles = SpecIOUtility.getSpecFileConfigInstance().getSourceBundles();
+    List<Bundle> sourceBundles = ConfigRegistry.getSpecFileConfigInstance().getSourceBundles();
     Collections.reverse(sourceBundles);
     for (Bundle bundle : sourceBundles) {
-      List<String> fileList = SpecIOUtility.listFiles(bundle, SpecIOUtility.getSpecFileConfigInstance().getRelativeSourceDirPath(), getConfigFileFilter(configFile));
+      List<String> fileList = SpecIOUtility.listFiles(bundle, ConfigRegistry.getSpecFileConfigInstance().getRelativeSourceDirPath(), getConfigFileFilter(configFile));
       if (fileList.size() > 0) {
-        m_configFile = new File(SpecIOUtility.getSpecFileConfigInstance().getSpecDir(), configFile);
-        SpecIOUtility.copyFile(bundle, SpecIOUtility.getSpecFileConfigInstance().getRelativeSourceDirPath() + File.separator + configFile, m_configFile);
+        m_configFile = new File(ConfigRegistry.getSpecFileConfigInstance().getSpecDir(), configFile);
+        SpecIOUtility.copyFile(bundle, ConfigRegistry.getSpecFileConfigInstance().getRelativeSourceDirPath() + File.separator + configFile, m_configFile);
         break;
       }
     }
@@ -126,7 +128,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
     List<String> configEntries = IOUtility.readLines(m_configFile, "UTF-8");
     List<String> referencedFileNames = new ArrayList<String>();
     PrintWriter writer = null;
-    outputFile = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), m_outputFileName);
+    outputFile = new File(ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir(), m_outputFileName);
     outputFile.delete();
     try {
       outputFile.createNewFile();
@@ -165,7 +167,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
    */
   protected void logMissingEntries(List<String> referencedFilenames) throws ProcessingException {
     final String suffix = ".mediawiki";
-    String[] fileList = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().list(new FilenameFilter() {
+    String[] fileList = ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().list(new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
         return name.endsWith(suffix);
@@ -186,12 +188,12 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
 
   protected File findFileForConfigEntry(String configEntry) throws ProcessingException {
     // priority 1: try if entry is a file base name
-    File file = new File(SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir(), configEntry + ".mediawiki");
+    File file = new File(ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir(), configEntry + ".mediawiki");
     if (file.exists()) {
       return file;
     }
     // priority 2: try doc entity class name
-    Set<Class<?>> allClasses = DocGenUtility.getAllDocEntityClasses();
+    Set<Class<?>> allClasses = SpecUtility.getAllDocEntityClasses();
     for (Class<?> c : allClasses) {
       if (configEntry.equals(c.getSimpleName()) || configEntry.equals(c.getName())) {
         File fileForClass = findFileForClass(c);
@@ -251,7 +253,7 @@ public class LinearOutputPostProcessor implements ISpecProcessor {
   }
 
   protected File findFileForClass(Class c) throws ProcessingException {
-    File[] mediawikiFiles = SpecIOUtility.getSpecFileConfigInstance().getMediawikiDir().listFiles();
+    File[] mediawikiFiles = ConfigRegistry.getSpecFileConfigInstance().getMediawikiDir().listFiles();
     for (File file : mediawikiFiles) {
       if (file.getName().startsWith(c.getSimpleName() + "_")) {
         return file;

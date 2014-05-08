@@ -19,8 +19,8 @@ import java.util.Properties;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.spec.client.SpecIOUtility;
 import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 
 /**
  * Responsible for persisting links to a property file

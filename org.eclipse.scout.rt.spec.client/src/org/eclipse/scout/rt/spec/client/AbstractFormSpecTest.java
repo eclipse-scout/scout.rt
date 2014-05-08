@@ -19,10 +19,13 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.gen.FormSpecGenerator;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
 import org.eclipse.scout.rt.spec.client.screenshot.FormScreenshotPrinter;
 import org.eclipse.scout.rt.spec.client.screenshot.PrintScreenshotsFormListener;
+import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
 
@@ -43,7 +46,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
 
   protected List<File> printScreenshots() throws ProcessingException {
     ArrayList<FormListener> formListeners = new ArrayList<FormListener>();
-    PrintScreenshotsFormListener listener = new PrintScreenshotsFormListener(new FormScreenshotPrinter(SpecIOUtility.getSpecFileConfigInstance().getImageDir()));
+    PrintScreenshotsFormListener listener = new PrintScreenshotsFormListener(new FormScreenshotPrinter(ConfigRegistry.getSpecFileConfigInstance().getImageDir()));
     formListeners.add(listener);
     IForm form = createAndStartForm(formListeners);
     form.activate();
@@ -75,7 +78,7 @@ public abstract class AbstractFormSpecTest extends AbstractSpecGenTest {
    */
   protected String[] getImagePaths(List<File> screenshots) throws ProcessingException {
     File[] files = CollectionUtility.toArray(screenshots, File.class);
-    return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(files, SpecIOUtility.getSpecFileConfigInstance().getSpecDir()), "../");
+    return SpecIOUtility.addPrefix(SpecIOUtility.getRelativePaths(files, ConfigRegistry.getSpecFileConfigInstance().getSpecDir()), "../");
   }
 
   @Override

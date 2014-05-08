@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.scout.commons.annotations.Doc;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.spec.client.filter.DefaultDocFilter;
 import org.junit.Test;
 
 /**

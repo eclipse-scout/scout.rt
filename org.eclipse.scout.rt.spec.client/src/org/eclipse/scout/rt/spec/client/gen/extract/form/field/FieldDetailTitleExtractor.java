@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.spec.client.gen.extract.form.field;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.LinkableTypeExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * Extracts the title with anchor (using {@link #createAnchorId(IFormField)}) for the field's detail section

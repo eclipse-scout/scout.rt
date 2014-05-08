@@ -8,22 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client;
+package org.eclipse.scout.rt.spec.client.utility;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.spec.client.config.DefaultDocConfig;
-import org.eclipse.scout.rt.spec.client.config.IDocConfig;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 
 /**
  * General utilities for the spec plugin
@@ -31,8 +34,6 @@ import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 public final class SpecUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecUtility.class);
   private static Set<Class<?>> s_allClasses;
-  private static IDocConfig s_docConfigInstance;
-
   private SpecUtility() {
   }
 
@@ -70,20 +71,6 @@ public final class SpecUtility {
       }
     }
     return filteredClasses;
-  }
-
-  /**
-   * @return the {@link IDocConfig} instance
-   */
-  public static IDocConfig getDocConfigInstance() {
-    if (s_docConfigInstance == null) {
-      s_docConfigInstance = new DefaultDocConfig();
-    }
-    return s_docConfigInstance;
-  }
-
-  public static void setDocConfig(IDocConfig specFileConfig) {
-    SpecUtility.s_docConfigInstance = specFileConfig;
   }
 
   /**
@@ -128,6 +115,43 @@ public final class SpecUtility {
     for (IMenu subMenu : menu.getChildActions()) {
       addMenuRecursive(menuList, subMenu);
     }
+  }
+
+  /**
+   * @return all doc entity classes (forms, pages, ...) in all available bundles
+   * @throws ProcessingException
+   */
+  public static Set<Class<?>> getAllDocEntityClasses() throws ProcessingException {
+    return getAllClasses(new IClassFilter() {
+      // TODO ASA accept other types that needs to be linked like [[CompanyForm|Company]
+      @Override
+      public boolean accept(Class c) {
+        return IForm.class.isAssignableFrom(c) || IPage.class.isAssignableFrom(c);
+      }
+    });
+  }
+
+  /**
+   * A <code>type</code> is considered a documented type if the following criterias are met:
+   * <p>
+   * <li>Instances of the type can be assigned to the <code>supertype</code>.
+   * <li>Either the type is annotated with a {@link ClassId} annotation for which a doc-text with key
+   * <code>[classid]_name</code> is available or <code>listTypesWithoutDoc</code> is set to true.
+   * 
+   * @param type
+   * @param supertype
+   * @param listTypesWithoutDoc
+   * @return
+   */
+  public static boolean isDocType(Class type, Class<?> supertype, boolean listTypesWithoutDoc) {
+    if (type == null || !supertype.isAssignableFrom(type)) {
+      return false;
+    }
+    if (listTypesWithoutDoc) {
+      return !type.isInterface() && !Modifier.isAbstract(type.getModifiers());
+    }
+    String typeDescription = new SpecialDescriptionExtractor(null, "_name").getText(type);
+    return typeDescription != null;
   }
 
 }

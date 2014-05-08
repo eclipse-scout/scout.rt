@@ -10,21 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client;
 
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
-import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
+import org.eclipse.scout.rt.spec.client.filter.FilterUtility;
 import org.eclipse.scout.rt.spec.client.gen.TypeSpecGenerator;
-import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * Abstract spec test for creating a spec file with a table describing types (eg. form fields, columns, ...)
@@ -74,30 +72,7 @@ public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
   }
 
   protected boolean acceptClass(Class c) {
-    return DocGenUtility.isAccepted(c, getEntityListConfig().getFilters()) && isDocType(c, m_supertype, m_listTypesWithoutDoc);
-  }
-
-  /**
-   * A <code>type</code> is considered a documented type if the following criterias are met:
-   * <p>
-   * <li>Instances of the type can be assigned to the <code>supertype</code>.
-   * <li>Either the type is annotated with a {@link ClassId} annotation for which a doc-text with key
-   * <code>[classid]_name</code> is available or <code>listTypesWithoutDoc</code> is set to true.
-   * 
-   * @param type
-   * @param supertype
-   * @param listTypesWithoutDoc
-   * @return
-   */
-  public static boolean isDocType(Class type, Class<?> supertype, boolean listTypesWithoutDoc) {
-    if (type == null || !supertype.isAssignableFrom(type)) {
-      return false;
-    }
-    if (listTypesWithoutDoc) {
-      return !type.isInterface() && !Modifier.isAbstract(type.getModifiers());
-    }
-    String typeDescription = new SpecialDescriptionExtractor(null, "_name").getText(type);
-    return typeDescription != null;
+    return FilterUtility.isAccepted(c, getEntityListConfig().getFilters()) && SpecUtility.isDocType(c, m_supertype, m_listTypesWithoutDoc);
   }
 
   protected IDocSection generate(Collection<Class<?>> fieldTypes) {

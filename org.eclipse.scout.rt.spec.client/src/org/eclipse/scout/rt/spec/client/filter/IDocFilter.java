@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client.gen.filter;
+package org.eclipse.scout.rt.spec.client.filter;
 
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
 

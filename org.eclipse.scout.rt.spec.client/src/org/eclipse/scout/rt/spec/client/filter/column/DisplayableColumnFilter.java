@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.spec.client.gen.filter.column;
+package org.eclipse.scout.rt.spec.client.filter.column;
 
 import org.eclipse.scout.commons.annotations.Doc.Filtering;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 
 /**
  * A filter accepting only displayable columns.

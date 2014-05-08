@@ -17,12 +17,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
-import org.eclipse.scout.rt.spec.client.gen.DocGenUtility;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
+import org.eclipse.scout.rt.spec.client.filter.FilterUtility;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * Extracts the label of a field
@@ -132,7 +133,7 @@ public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormFie
     StringBuilder sb = new StringBuilder();
     if (m_hierarchicLabels) {
       int level = getLevel(field);
-      sb.append(StringUtility.repeat(SpecUtility.getDocConfigInstance().getIndent(), level));
+      sb.append(StringUtility.repeat(ConfigRegistry.getDocConfigInstance().getIndent(), level));
     }
     return sb.toString();
   }
@@ -147,7 +148,7 @@ public class FormFieldLabelExtractor extends AbstractNamedTextExtractor<IFormFie
     IFormField parentField = field.getParentField();
     int level = 0;
     while (parentField != null) {
-      if (DocGenUtility.isAccepted(parentField, m_docFilters)) {
+      if (FilterUtility.isAccepted(parentField, m_docFilters)) {
         ++level;
       }
       parentField = parentField.getParentField();

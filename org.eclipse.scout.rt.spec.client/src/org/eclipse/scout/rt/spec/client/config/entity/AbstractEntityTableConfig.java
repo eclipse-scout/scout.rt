@@ -15,11 +15,11 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ArrayComparator.ColumnComparator;
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.rt.spec.client.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
-import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
 
 /**
  *

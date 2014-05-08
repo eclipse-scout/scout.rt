@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
@@ -34,7 +34,7 @@ public class HierarchicActionNodeLabelExtractor<T extends IActionNode<?>> extend
     do {
       node = node.getParent();
       if (node != null) {
-        sb.append(SpecUtility.getDocConfigInstance().getIndent());
+        sb.append(ConfigRegistry.getDocConfigInstance().getIndent());
       }
     }
     while (node != null);

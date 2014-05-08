@@ -22,9 +22,9 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.spec.client.SpecUtility;
-import org.eclipse.scout.rt.spec.client.gen.filter.DefaultDocFilter;
-import org.eclipse.scout.rt.spec.client.gen.filter.IDocFilter;
+import org.eclipse.scout.rt.spec.client.config.ConfigRegistry;
+import org.eclipse.scout.rt.spec.client.filter.DefaultDocFilter;
+import org.eclipse.scout.rt.spec.client.filter.IDocFilter;
 import org.junit.Test;
 
 /**
@@ -32,7 +32,7 @@ import org.junit.Test;
  */
 public class FormFieldLabelExtractorTest {
 
-  private String m_indent = SpecUtility.getDocConfigInstance().getIndent();
+  private String m_indent = ConfigRegistry.getDocConfigInstance().getIndent();
 
   @Test
   public void testGetTextFlat() {
