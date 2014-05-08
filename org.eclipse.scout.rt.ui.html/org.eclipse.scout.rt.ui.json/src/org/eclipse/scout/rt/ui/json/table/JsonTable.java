@@ -80,7 +80,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   @Override
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
     super.attachModel();
     if (m_modelTableListener == null) {
       m_modelTableListener = new P_ModelTableListener();
@@ -89,7 +89,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   @Override
-  protected void detachModel() throws JsonException {
+  protected void detachModel() {
     super.detachModel();
     if (m_modelTableListener != null) {
       getModelObject().removeTableListener(m_modelTableListener);
@@ -102,7 +102,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       JSONArray jsonColumns = new JSONArray();
@@ -135,7 +135,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (EVENT_ROW_CLICKED.equals(event.getEventType())) {
       handleUiRowClicked(event, res);
     }
@@ -147,7 +147,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleUiRowClicked(JsonEvent event, JsonResponse res) throws JsonException {
+  protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
     try {
       final ITableRow tableRow = extractTableRow(event.getEventObject());
 
@@ -163,7 +163,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) throws JsonException {
+  protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
     try {
       final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
 
@@ -187,7 +187,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleUiRowAction(JsonEvent event, JsonResponse res) throws JsonException {
+  protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
     try {
       final ITableRow tableRow = extractTableRow(event.getEventObject());
 
@@ -227,7 +227,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     return menuList;
   }
 
-  protected JSONObject tableRowToJson(ITableRow row) throws JsonException {
+  protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
     for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
       IColumn column = row.getTable().getColumnSet().getColumn(colIndex);
@@ -248,7 +248,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     return jsonRow;
   }
 
-  protected Object cellToJson(ICell cell, IColumn column) throws JsonException {
+  protected Object cellToJson(ICell cell, IColumn column) {
     JSONObject jsonCell = new JSONObject();
     try {
       jsonCell.put("value", getCellValue(cell, column));
@@ -294,7 +294,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     return null;
   }
 
-  protected JSONObject columnToJson(IColumn column) throws JsonException {
+  protected JSONObject columnToJson(IColumn column) {
     try {
       JSONObject json = new JSONObject();
       json.put("id", column.getColumnId());
@@ -380,7 +380,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  private ITableRow getTableRowForRowId(String rowId) throws JsonException {
+  private ITableRow getTableRowForRowId(String rowId) {
     ITableRow row = m_tableRows.get(rowId);
     if (row == null) {
       throw new JsonException("No row found for id " + rowId);
@@ -388,13 +388,13 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     return row;
   }
 
-  protected void handleModelTableEventBatch(List<? extends TableEvent> events) throws JsonException {
+  protected void handleModelTableEventBatch(List<? extends TableEvent> events) {
     for (TableEvent event : events) {
       handleModelTableEvent(event); //FIXME sufficient?
     }
   }
 
-  protected void handleModelTableEvent(TableEvent event) throws JsonException {
+  protected void handleModelTableEvent(TableEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_SELECTED: {
         handleModelSelectionMenusChanged(event.getRows());
@@ -426,7 +426,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleModelRowsInserted(TableEvent event) throws JsonException {
+  protected void handleModelRowsInserted(TableEvent event) {
     try {
       JSONObject jsonEvent = new JSONObject();
 
@@ -444,7 +444,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) throws JsonException {
+  protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
@@ -465,7 +465,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleModelRowsSelected(Collection<ITableRow> modelRows) throws JsonException {
+  protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
@@ -476,7 +476,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) throws JsonException {
+  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
@@ -494,7 +494,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     }
   }
 
-  protected void handleModelSelectionMenusChanged(Collection<ITableRow> modelRows) throws JsonException {
+  protected void handleModelSelectionMenusChanged(Collection<ITableRow> modelRows) {
     try {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));

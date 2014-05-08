@@ -37,7 +37,7 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       json.put(PROP_TEXT, getModelObject().getText());
@@ -50,13 +50,13 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (EVENT_MENU_ACTION.equals(event.getEventType())) {
       handleUiMenuAction(event, res);
     }
   }
 
-  public void handleUiMenuAction(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiMenuAction(JsonEvent event, JsonResponse res) {
     new ClientSyncJob("Menu action", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {

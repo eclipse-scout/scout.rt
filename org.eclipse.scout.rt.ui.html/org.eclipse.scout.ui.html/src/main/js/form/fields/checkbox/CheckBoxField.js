@@ -12,5 +12,6 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv();
   this._$label = this.$container.appendDiv(undefined, undefined, this.model.displayText);
   this._$checkBox = this.$container.appendDiv(undefined, undefined, '<input type="checkbox" />');
+  this._$checkBox.prop('checked', this.model.checked);
 };
 

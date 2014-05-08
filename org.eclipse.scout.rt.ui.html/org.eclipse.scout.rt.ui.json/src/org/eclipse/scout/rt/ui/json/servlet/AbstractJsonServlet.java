@@ -40,7 +40,7 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
     JsonRendererFactory.init(createJsonRendererFactory());
   }
 
-  public JsonRendererFactory createJsonRendererFactory() throws JsonException {
+  public JsonRendererFactory createJsonRendererFactory() {
     return new JsonRendererFactory();
   }
 

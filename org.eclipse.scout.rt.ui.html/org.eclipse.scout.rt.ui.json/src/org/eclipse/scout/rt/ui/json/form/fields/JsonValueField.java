@@ -12,11 +12,16 @@ package org.eclipse.scout.rt.ui.json.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Base class used to create JSON output for Scout form-fields with a value. Sub classes should overwrite the toJson()
+ * method and add their own properties to the JSON string. Only properties required to render the UI should be added.
+ * 
+ * @param <T>
+ */
 public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
+
   public static final String PROP_VALUE = IValueField.PROP_VALUE;
   public static final String PROP_DISPLAY_TEXT = IValueField.PROP_DISPLAY_TEXT;
 
@@ -30,16 +35,8 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
-    JSONObject json = super.toJson();
-    try {
-//      json.put(PROP_VALUE, valueToJson()); //FIXME
-      json.put(PROP_DISPLAY_TEXT, getModelObject().getDisplayText());
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+  public JSONObject toJson() {
+    return putProperty(super.toJson(), PROP_DISPLAY_TEXT, getModelObject().getDisplayText());
   }
 
 }

@@ -51,14 +51,14 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   @Override
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
     super.attachModel();
 
     m_rootGroupBox = JsonRendererFactory.get().createJsonFormField(getModelObject().getRootGroupBox(), getJsonSession());
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject jsonForm = super.toJson();
     try {
       jsonForm.put(PROP_TITLE, getModelObject().getTitle());
@@ -94,13 +94,13 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (EVENT_FORM_CLOSING.equals(event.getEventType())) {
       handleUiFormClosing(event, res);
     }
   }
 
-  public void handleUiFormClosing(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiFormClosing(JsonEvent event, JsonResponse res) {
 
     new ClientSyncJob("Form closing", getJsonSession().getClientSession()) {
       @Override

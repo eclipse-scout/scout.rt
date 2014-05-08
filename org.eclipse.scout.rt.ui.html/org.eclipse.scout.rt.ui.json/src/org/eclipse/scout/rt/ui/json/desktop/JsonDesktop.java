@@ -87,7 +87,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
     new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -127,7 +127,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  protected void detachModel() throws JsonException {
+  protected void detachModel() {
     super.detachModel();
 
     if (m_desktopListener != null) {
@@ -141,7 +141,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       JSONArray forms = new JSONArray();
@@ -200,7 +200,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     return jsonForm.getId();
   }
 
-  protected void handleModelDesktopEvent(DesktopEvent event) throws JsonException {
+  protected void handleModelDesktopEvent(DesktopEvent event) {
     switch (event.getType()) {
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
@@ -224,7 +224,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     }
   }
 
-  protected void handleModelFormChanged(FormEvent event) throws JsonException {
+  protected void handleModelFormChanged(FormEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED: {
         handleModelFormClosed(event.getForm());
@@ -335,7 +335,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
   }
 
   protected class P_DesktopListener implements DesktopListener {

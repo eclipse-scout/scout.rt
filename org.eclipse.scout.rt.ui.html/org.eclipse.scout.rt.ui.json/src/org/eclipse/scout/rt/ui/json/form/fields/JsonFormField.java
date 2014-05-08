@@ -31,7 +31,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       json.put("label", getModelObject().getLabel());
@@ -44,7 +44,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
   }
 
 }

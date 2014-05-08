@@ -50,17 +50,17 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   }
 
   @Override
-  public final void init() throws JsonException {
+  public final void init() {
     getJsonSession().registerJsonRenderer(getId(), this);
     attachModel();
     m_initialized = true;
   }
 
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
   }
 
   @Override
-  public void dispose() throws JsonException {
+  public void dispose() {
     if (!m_initialized) {
       return;
     }
@@ -68,7 +68,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
     getJsonSession().unregisterJsonRenderer(getId());
   }
 
-  protected void detachModel() throws JsonException {
+  protected void detachModel() {
   }
 
   public boolean isInitialized() {
@@ -76,12 +76,30 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = new JSONObject();
     try {
       json.put("objectType", getObjectType());
       json.put("id", getId());
 
+      return json;
+    }
+    catch (JSONException e) {
+      throw new JsonException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Adds a property to the given JSON object and deals with exceptions.
+   * 
+   * @param json
+   * @param key
+   * @param value
+   * @return
+   */
+  protected final JSONObject putProperty(JSONObject json, String key, Object value) {
+    try {
+      json.put(key, value);
       return json;
     }
     catch (JSONException e) {

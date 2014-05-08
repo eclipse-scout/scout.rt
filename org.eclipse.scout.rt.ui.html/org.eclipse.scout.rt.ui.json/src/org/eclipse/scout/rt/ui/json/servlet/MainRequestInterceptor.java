@@ -111,7 +111,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     LOG.debug("Returned: " + jsonText);
   }
 
-  protected JSONObject toJSON(HttpServletRequest req) throws JsonException {
+  protected JSONObject toJSON(HttpServletRequest req) {
     try {
       String jsonData = IOUtility.getContent(req.getReader());
       LOG.debug("Received: " + jsonData);

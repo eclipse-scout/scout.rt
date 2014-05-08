@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.json.JsonException;
 public class JsonSessionMock extends AbstractJsonSession {
 
   @Override
-  public void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException {
+  public void init(HttpServletRequest request, JsonRequest jsonReq) {
     // nop
     // For a fully initialized jsonSession use TestEnvironmentJsonSession
   }

@@ -38,7 +38,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
     super.attachModel();
 
     for (IFormField field : getModelObject().getControlFields()) {
@@ -48,7 +48,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       json.put("borderDecoration", getModelObject().getBorderDecoration());

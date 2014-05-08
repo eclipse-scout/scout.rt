@@ -50,7 +50,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException {
+  public void init(HttpServletRequest request, JsonRequest jsonReq) {
     m_currentHttpRequest = request;
     UserAgent userAgent = createUserAgent(jsonReq);
     Subject subject = initSubject();
@@ -122,7 +122,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  public void dispose() throws JsonException {
+  public void dispose() {
     for (IJsonRenderer renderer : CollectionUtility.arrayList(m_jsonRenderers.values())) {
       renderer.dispose();
     }
@@ -165,7 +165,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException {
+  public JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) {
     m_currentHttpRequest = httpReq;
 
     //FIXME should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet

@@ -28,7 +28,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
     try {
       json.put(IViewButton.PROP_TEXT, getModelObject().getText());
@@ -41,7 +41,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (EVENT_CLICK.equals(event.getEventType())) {
       handleUiClick(event, res);
     }

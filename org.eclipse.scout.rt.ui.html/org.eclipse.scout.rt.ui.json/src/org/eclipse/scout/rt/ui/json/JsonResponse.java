@@ -42,7 +42,7 @@ public class JsonResponse {
    * @param object
    *          must have an 'id' and a 'objectType'
    */
-  public void addCreateEvent(String parentId, JSONObject object) throws JsonException {
+  public void addCreateEvent(String parentId, JSONObject object) {
     if (object == null) {
       return;
     }
@@ -69,7 +69,7 @@ public class JsonResponse {
   /**
    * event must have an 'id'
    */
-  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) throws JsonException {
+  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     try {
       if (id == null) {
         throw new JsonException("id is null");
@@ -95,7 +95,7 @@ public class JsonResponse {
   /**
    * event must have an 'id'
    */
-  public void addActionEvent(String eventType, String id, JSONObject eventData) throws JsonException {
+  public void addActionEvent(String eventType, String id, JSONObject eventData) {
     try {
       if (id == null) {
         throw new JSONException("id is null");

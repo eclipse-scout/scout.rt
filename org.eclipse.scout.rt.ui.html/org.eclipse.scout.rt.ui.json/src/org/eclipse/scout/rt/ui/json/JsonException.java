@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.ui.json;
 
 /**
- *
+ * Runtime exception used to handle JSON errors. Typically this exception is thrown by code that must try/catch the
+ * checked <code>org.json.JSONException</code>.
  */
 public class JsonException extends RuntimeException {
+
   private static final long serialVersionUID = 1L;
 
   public JsonException(String message) {

@@ -39,7 +39,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  protected void attachModel() throws JsonException {
+  protected void attachModel() {
     super.attachModel();
 
     //FIXME Hold JsonTable globally? and share with other elements like desktop? generally hold every model object globally? when to dispose? only on model dispose?
@@ -48,7 +48,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject json = super.toJson();
 
     try {

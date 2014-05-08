@@ -83,7 +83,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   }
 
   @Override
-  public JSONObject toJson() throws JsonException {
+  public JSONObject toJson() {
     JSONObject jsonObject = super.toJson();
     try {
       jsonObject.put("desktop", m_jsonDesktop.toJson());
@@ -96,7 +96,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) throws JsonException {
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
   }
 
   protected void processRequestLocale(final Locale locale) {
@@ -113,7 +113,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     }.runNow(new NullProgressMonitor());
   }
 
-  protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) throws JsonException {
+  protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("digit", String.valueOf(symbols.getDigit()));
@@ -129,7 +129,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     return jsonObject;
   }
 
-  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) throws JsonException {
+  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("months", new JSONArray(symbols.getMonths()));
@@ -145,7 +145,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     return jsonObject;
   }
 
-  protected JSONObject localeToJson(Locale locale) throws JsonException {
+  protected JSONObject localeToJson(Locale locale) {
     JSONObject jsonObject = new JSONObject();
     try {
       DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
