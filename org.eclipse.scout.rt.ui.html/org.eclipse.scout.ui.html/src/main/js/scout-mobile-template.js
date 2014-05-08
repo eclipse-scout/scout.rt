@@ -12,6 +12,8 @@
 //@include("src/main/js/util/arrays.js");
 //@include("src/main/js/util/EventSupport.js");
 //@include("src/main/js/util/KeystrokeManager.js");
+//@include("src/main/js/util/ModelAdapter.js");
+//@include("src/main/js/util/ObjectFactory.js");
 //@include("src/main/js/session/Session.js");
 //@include("src/main/js/session/Event.js");
 //@include("src/main/js/session/Locale.js");
@@ -36,6 +38,8 @@
 //@include("src/main/js/desktop/DesktopViewButtonBar.js");
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
 //@include("src/main/js/form/Form.js");
+//@include("src/main/js/form/fields/FormField.js");
+//@include("src/main/js/form/fields/groupbox/GroupBox.js");
 //@include("src/main/js/form/fields/tablefield/TableField.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");

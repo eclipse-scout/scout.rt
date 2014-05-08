@@ -39,11 +39,11 @@ scout.Desktop.prototype.onModelCreate = function(event) {
   if (event.objectType == "Outline") {
     this.tree.onOutlineCreated(event);
   } else if (event.objectType == "Form") {
+    var form = this.session.objectFactory.create(event);
     if (event.displayHint == "view") {
-      //FIXME separate into View and Dialog which use Form?
-      new scout.Form(this.session, this._bench.$container, event);
+      form.attach(this._bench.$container);
     } else if (event.displayHint == "dialog") {
-      new scout.Form(this.session, this._$parent, event);
+      form.attach(this._$parent);
     } else {
       $.log("Form displayHint not handled: '" + event.displayHint + "'.");
     }
@@ -58,7 +58,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else if (event.type_ == 'formRemoved') {
     var form = this.session.widgetMap[event.formId];
     if (form) {
-      form.hide();
+      form.detach();
     }
   } else {
     $.log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");

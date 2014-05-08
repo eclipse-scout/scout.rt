@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -35,9 +36,9 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -178,6 +179,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected JsonForm createAndRegisterJsonForm(IForm form) {
+    if (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTableForm)) {
+      return null; //FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+    }
     JsonForm jsonForm = JsonRendererFactory.get().createJsonForm(form, getJsonSession());
     m_jsonForms.put(form, jsonForm);
     attachFormListener(form);
@@ -186,6 +190,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected String disposeAndUnregisterJsonForm(IForm form) {
+    if (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTableForm)) {
+      return null;//FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+    }
     JsonForm jsonForm = m_jsonForms.remove(form);
     jsonForm.dispose();
     detachFormListener(form);
@@ -250,8 +257,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       JsonForm jsonForm = m_jsonForms.get(form);
       if (jsonForm == null) {
         jsonForm = createAndRegisterJsonForm(form);
-
-        getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonForm.toJson());
+        if (jsonForm != null) {
+          getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonForm.toJson());
+        }
       }
       else {
         JSONObject jsonEvent = new JSONObject();
@@ -285,10 +293,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
     try {
       String formId = disposeAndUnregisterJsonForm(form);
-
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_FORM_ID, formId);
-      getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
+      if (formId != null) {
+        JSONObject jsonEvent = new JSONObject();
+        jsonEvent.put(PROP_FORM_ID, formId);
+        getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
+      }
     }
     catch (JSONException e) {
       throw new JsonException(e.getMessage(), e);

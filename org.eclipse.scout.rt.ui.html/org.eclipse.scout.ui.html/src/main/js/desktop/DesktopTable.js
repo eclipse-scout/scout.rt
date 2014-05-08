@@ -19,7 +19,7 @@ scout.DesktopTable = function(session, model) {
     this.session.widgetMap[model.id] = this;
   }
 
-  this.table = new scout.Table(this.session, this.model.table);
+  this.table = this.session.objectFactory.create(this.model.table);
 };
 
 scout.DesktopTable.EVENT_MAP_LOADED = 'mapLoaded';

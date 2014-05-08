@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.json.desktop.JsonViewButton;
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
-import org.eclipse.scout.rt.ui.json.form.fields.stringfield.JsonStringField;
+import org.eclipse.scout.rt.ui.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 
@@ -101,12 +101,15 @@ public class JsonRendererFactory {
   @SuppressWarnings("unchecked")
   public <T extends IJsonFormField> T createJsonFormField(IFormField model, IJsonSession session) {
     T renderer = null;
-    if (model instanceof IStringField) {
-      renderer = (T) new JsonStringField((IStringField) model, session);
-    }
-    else if (model instanceof IGroupBox) {
+    if (model instanceof IGroupBox) {
       renderer = (T) new JsonGroupBox((IGroupBox) model, session);
     }
+    else if (model instanceof ITableField<?>) {
+      renderer = (T) new JsonTableField((ITableField) model, session);
+    }
+    //    else if (model instanceof IStringField) {
+//      renderer = (T) new JsonStringField((IStringField) model, session);
+//    }
     else {
       renderer = (T) new JsonFormField(model, session);
     }

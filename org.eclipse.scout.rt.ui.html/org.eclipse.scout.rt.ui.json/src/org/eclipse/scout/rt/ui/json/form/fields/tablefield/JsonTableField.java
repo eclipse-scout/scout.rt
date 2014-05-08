@@ -16,8 +16,8 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonException;
+import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.json.JSONException;
@@ -31,6 +31,11 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   public JsonTableField(ITableField<? extends ITable> model, IJsonSession session) {
     super(model, session);
     m_jsonTables = new HashMap<>();
+  }
+
+  @Override
+  public String getObjectType() {
+    return "TableField";
   }
 
   @Override

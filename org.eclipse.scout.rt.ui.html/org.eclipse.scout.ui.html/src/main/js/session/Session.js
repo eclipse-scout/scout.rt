@@ -11,6 +11,7 @@ scout.Session = function($entryPoint, sessionPartId) {
   this._deferred;
   this._startup;
   this.userAgent;
+  this.objectFactory = new scout.ObjectFactory(this);
 
   //FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;

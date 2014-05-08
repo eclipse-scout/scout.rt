@@ -1335,3 +1335,14 @@ width: 32px;
 .table .key-box.bottom3 { bottom: 10px;}
 .table .key-box.char { bottom: 8px; }
 
+.form-field {
+  background-color: yellow;
+  height: 25px;
+  width: 100%;
+  border: 1px solid black;
+}
+
+.form-field > label{
+  height: 100%;
+  width: 100px;
+}
