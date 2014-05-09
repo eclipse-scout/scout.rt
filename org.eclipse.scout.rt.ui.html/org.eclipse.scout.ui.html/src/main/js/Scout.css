@@ -46,6 +46,27 @@ body.row-resize *, body.row-resize {
 cursor:row-resize !important;
 }
 
+
+.layout-west {
+position:relative;
+width: 300px;
+height: calc(100% - 58px);
+}
+
+.layout-center {
+position: absolute;
+left: 300px;
+top: 58px;
+height: calc(100% - 58px);
+width: calc(100% - 300px);
+}
+
+.layout-north {
+width: 100%;
+height: 57px;
+}
+
+
 /* desktop */
 
 #Desktop {
@@ -53,16 +74,16 @@ width: 100%;
 height: 100%;
 }
 
+
 /* views */
 
 #DesktopViews {
-width: 100%;
-height: 57px;
 white-space: nowrap;
 border-bottom: 1px solid #CCC;
 background: #FFF;
 overflow: hidden;
 }
+
 
 .view-item {
 position: relative;
@@ -200,11 +221,9 @@ z-index: 11;
 /* tree */
 
 #DesktopTree{
-position: relative;
-width: 300px;
-height: calc(100% - 58px);
 overflow:hidden;
-min-height: 100px;}
+min-height: 100px;
+}
 
 #DesktopTree > .scrollbar{
 right: 18px;
@@ -220,7 +239,7 @@ height: 100%;
 padding: 12px 0px 0px 10px;
 }
 
-#DesktopTreeResize{
+.splitter-vertical{
 position: absolute;
 top: 0px;
 right: 0px;
@@ -297,15 +316,6 @@ color:#9C9C9C !important;
 #TreeItemAnimate{
 width: 100%;}
 
-/* bench: form and table */
-
-#DesktopBench{
-position: absolute;
-left: 300px;
-top: 58px;
-height: calc(100% - 58px);
-width: calc(100% - 380px);
-}
 
 .table {
 height: 100%;

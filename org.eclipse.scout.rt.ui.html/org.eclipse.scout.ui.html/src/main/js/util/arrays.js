@@ -1,4 +1,20 @@
 scout.arrays = {
+  create: function(args) {
+    if (!Array.isArray(args)) {
+      args = Array.prototype.slice.call(arguments);
+    }
+    var length = args[0] || 0;
+    var array = new Array(length);
+
+    if (args.length > 1) {
+      var lengths = args.slice(1);
+      for (var j = 0; j < array.length; j++) {
+        array[j] = scout.arrays.create(lengths);
+      }
+    }
+
+    return array;
+  },
   remove: function(arr, element) {
     var index = arr.indexOf(element);
     if (index >= 0) {

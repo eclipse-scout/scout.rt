@@ -117,3 +117,16 @@ Plugin-Struktur
   - pom.xml von ui.html generiert files für ui.json? Muss das WebContent im ui.json drin sein?
   - ScriptProcessor ist im Html-Plugin drin, processing wird aber im json plugin gemacht
   -> eigentlich sind beide voneinander abhängig, was ein bisschen komisch ist.
+
+
+Styling / Farben
+- Wie wollen wir mit Custom Styling umgehen? Soll es die Properties setBackgroundColor / setFont etc weiterhin geben?
+  Gedanken: Styling könnte komplett im CSS gemacht werden. Beispiele:
+    .text-field: background-color: blue;
+    .person-form > text-field: background-color: blue; -> Möglichkeit für eigene Klassen muss gegeben sein
+    .classId: background-color: blue -> scout classId als css class hinzufügen, eindeutig stylebar
+  Problem dabei: Dynamisches Anpassen des Styles ist nicht möglich. Beispiel: Zelle (3,4) in einer Tabelle soll rot werden, wenn Zelle (2,3) leer ist.
+  Könnte man lösen, indem jedes Scout-Objekt ein Property css-styles bekommt, oder weiterhin über setBackgroundColor.
+  Problem dabei: Die verwendeten Farben müssen zum aktuellen Scout-CSS passen.
+  -> Das CRM darf keine fixen Farben verwenden, weil wenn das Projekt ein eigenes CSS hat diese Farben nicht mehr passen.
+  Besser wäre es vermutlich, eine Farb-Palette zu definieren. Das CRM könnte dann Konstanten aus dieser Palette verwenden.

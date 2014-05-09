@@ -214,12 +214,13 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
   var rowClass = 'table-row ',
-    table = this.model;
+    table = this.model,
+    rowWidth = this._header.totalWidth + 4;
 
   if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'row-selected ';
   }
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + '>';
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px">';
   for (var c = 0; c < row.cells.length; c++) {
     var column = table.columns[c],
       width = column.width,
@@ -253,7 +254,6 @@ scout.Table.prototype._drawData = function(startRow) {
       .appendTo(this._$dataScroll)
       .on('mousedown', '', onMouseDown)
       .on('clicks', '', onClicks)
-      .width(this._header.totalWidth + 4)
       .on('contextmenu', function(e) {
         e.preventDefault();
       });
@@ -719,7 +719,7 @@ scout.Table.prototype.insertRows = function(rows) {
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
-  if(!Array.isArray(rowIds)) {
+  if (!Array.isArray(rowIds)) {
     rowIds = [rowIds];
   }
 
@@ -946,7 +946,6 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   }
 
 };
-
 
 scout.Table.prototype._triggerRowsDrawn = function(numRows) {
   var type = scout.Table.GUI_EVENT_ROWS_DRAWN;

@@ -11,30 +11,40 @@ scout.Desktop = function(session, $parent, model) {
   // maybe better change to class to support multiple session divs with multiple
   // desktops
 
-  var view, tool, tree;
+
+  var view, tool, tree,
+    marginTop=0, marginRight=0;
+
   // create all 4 containers
   if (model.viewButtons) {
     view = new scout.DesktopViewButtonBar(this.session, $parent, model.viewButtons);
+    marginTop = view.$div.outerHeight();
   }
   if (model.toolButtons) {
     tool = new scout.DesktopToolButton(this.session, $parent, model.toolButtons);
+    marginRight = tool.$div.outerWidth();
   }
+
+  var layout = new scout.BorderLayout(marginTop, marginRight);
   if (model.outline) {
     tree = new scout.DesktopTreeContainer(this.session, $parent, model.outline);
-  }
-  if (view || tool || tree) {
-    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(view, tool, tree));
+    layout.position(tree.$div, 'west', true);
   }
 
   var bench = new scout.DesktopBench(this.session, $parent);
+  layout.position(bench.$container, 'center');
   this._bench = bench;
+
+  if (view || tool || tree) {
+    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(view, tool, tree));
+  }
 
   if (tree) {
     this.tree = tree;
     this.tree.attachModel();
   }
 
-  var form, i;
+  var form, i, formModel;
   for (i = 0; i < model.forms.length; i++) {
     formModel = model.forms[i];
     form = this.session.widgetMap[formModel.id];

@@ -3,30 +3,6 @@ scout.DesktopTreeContainer = function(session, $parent, model) {
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
   this.desktopTree = new scout.DesktopTree(this.session, this._$desktopTree, model);
-
-  this._$desktopTree.appendDiv('DesktopTreeResize')
-    .on('mousedown', '', resizeTree);
-
-  var that = this;
-
-  function resizeTree() {
-    $('body').addClass('col-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
-
-    function resizeMove(event) {
-      var w = event.pageX + 11;
-      that._$desktopTree.width(w);
-      that._$desktopTree.next().width('calc(100% - ' + (w + 80) + 'px)')
-        .css('left', w);
-    }
-
-    function resizeEnd() {
-      $('body').off('mousemove')
-        .removeClass('col-resize');
-    }
-    return false;
-  }
 };
 
 scout.DesktopTreeContainer.prototype.onOutlineCreated = function(event) {
