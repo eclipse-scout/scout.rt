@@ -79,4 +79,9 @@ scout.defaultObjectFactories = [ {
   create : function(session, model) {
     return new scout.GroupBox(session, model);
   }
+}, {
+  objectType : 'SequenceBox',
+  create : function(session, model) {
+    return new scout.SequenceBox(session, model);
+  }
 } ];

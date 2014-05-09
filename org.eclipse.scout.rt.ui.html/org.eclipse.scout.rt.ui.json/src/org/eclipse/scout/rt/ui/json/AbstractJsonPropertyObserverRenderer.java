@@ -18,7 +18,9 @@ import java.util.Set;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
 public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
+
   private P_PropertyChangeListener m_propertyChangeListener;
+
   private Set<String> m_propertiesToDelegate;
 
   public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession) {
@@ -26,6 +28,11 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
     m_propertiesToDelegate = new HashSet<>();
   }
 
+  /**
+   * Adds a delegated property. For these properties this class will create JSON property change events automatically.
+   * 
+   * @param name
+   */
   protected void delegateProperty(String name) {
     m_propertiesToDelegate.add(name);
   }

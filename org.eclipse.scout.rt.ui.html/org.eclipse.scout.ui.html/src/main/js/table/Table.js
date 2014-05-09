@@ -988,7 +988,7 @@ scout.Table.prototype._handleModelHeaderVisibleChange = function(headerVisible) 
 };
 
 scout.Table.prototype.onModelPropertyChange = function(event) {
-  if (event.headerVisible !== undefined) {
+  if (event.hasOwnProperty('headerVisible')) {
     this._handleModelHeaderVisibleChange(event.headerVisible);
   }
 };

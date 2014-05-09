@@ -8,36 +8,43 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.form.fields.groupbox;
+package org.eclipse.scout.rt.ui.json.form.fields.rangebox;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
-public class JsonGroupBox extends JsonFormField<IGroupBox> {
+/**
+ * This class creates JSON output for an <code>ISequenceBox</code>.
+ * 
+ * @author awe
+ */
+public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
   private List<IJsonFormField> m_jsonFormFields = new ArrayList<>();
 
-  public JsonGroupBox(IGroupBox model, IJsonSession session) {
+  public JsonSequenceBox(ISequenceBox model, IJsonSession session) {
     super(model, session);
   }
 
   @Override
   public String getObjectType() {
-    return "GroupBox";
+    return "SequenceBox";
   }
+
+  // TODO AWE: copy/paste from JsonGroupBox -> improve
 
   @Override
   protected void attachModel() {
     super.attachModel();
-    for (IFormField field : getModelObject().getControlFields()) {
+    for (IFormField field : getModelObject().getFields()) {
       IJsonFormField jsonFormField = JsonRendererFactory.get().createJsonFormField(field, getJsonSession());
       m_jsonFormFields.add(jsonFormField);
     }
@@ -46,8 +53,6 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, "borderDecoration", getModelObject().getBorderDecoration());
-    putProperty(json, "borderVisible", getModelObject().isBorderVisible());
     putFormFields(json, m_jsonFormFields);
     return json;
   }

@@ -112,11 +112,12 @@ scout.Session.prototype.areRequestsPending = function() {
 };
 
 scout.Session.prototype._processEvents = function(events) {
+  // TODO AWE: convert plain JS event object in Event class
   var session = this;
   for (var i = 0; i < events.length; i++) {
     var event = events[i], widgetId;
 
-    if (event.type_ == "create") {
+    if (event.type_ == 'create') {
       widgetId = event.parentId;
     }
     else {
@@ -130,10 +131,10 @@ scout.Session.prototype._processEvents = function(events) {
 
     widget.updateFromModelInProgress = true;
     try {
-      if (event.type_ == "create") {
+      if (event.type_ == 'create') {
         widget.onModelCreate(event);
       }
-      else if (event.type_ == "property") {
+      else if (event.type_ == 'property') {
         widget.onModelPropertyChange(event);
       }
       else {

@@ -1368,8 +1368,19 @@ width: 32px;
   position: absolute;
 }
 
+div[disabled="disabled"] {
+  border: 1px solid #999;
+  color: #666;
+  background-color: #ccc;
+}
+
 .checkbox_checked:before {
   content:"X";
   margin-left:3px;
 }
 
+.status-label {
+  height: 16px;
+  width: 16px;
+  background-color:orange;
+}
