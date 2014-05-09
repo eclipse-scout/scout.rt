@@ -136,6 +136,8 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
   }
 
   private void handleSwingAction() {
+    // runInputVerifier() must be called in order to validate the FormField and to write its value into the scout model.
+    // This is necessary here because the FormField may not has lost its focus (e.g. on a KeyStroke)
     if (SwingUtility.runInputVerifier()) {
       if (!m_handleActionPending) {
         m_handleActionPending = true;
