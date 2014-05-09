@@ -287,7 +287,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
   @Order(170)
-  protected int getConfiguredToobarLocation() {
+  protected int getConfiguredToolbarLocation() {
     return TOOLBAR_FORM_HEADER;
   }
 
@@ -476,7 +476,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_uiFacade = new P_UIFacade();
     m_scoutTimerMap = new HashMap<String, P_Timer>();
     m_autoRegisterInDesktopOnStart = true;
-    setToolbarLocation(getConfiguredToobarLocation());
+    setToolbarLocation(getConfiguredToolbarLocation());
     // toolbuttons
     List<IToolButton> toolButtonList = new ArrayList<IToolButton>();
     for (Class<? extends IToolButton> clazz : getConfiguredToolButtons()) {
