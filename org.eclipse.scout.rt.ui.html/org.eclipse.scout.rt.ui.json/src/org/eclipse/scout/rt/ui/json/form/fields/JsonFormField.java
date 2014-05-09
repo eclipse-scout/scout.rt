@@ -73,7 +73,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
   private Object toJson(IProcessingStatus scoutStatus) {
     // TODO AWE: (ask C.GU) wie "löschen" wir eine property? Siehe fix-me in addPropertyChangeEvent()
     if (scoutStatus == null) {
-      return "null";
+      return "";
     }
     else {
       return new JsonProcessingStatus(scoutStatus).toJson();

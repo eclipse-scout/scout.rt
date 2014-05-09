@@ -47,7 +47,7 @@ scout.CheckBoxField.prototype._setChecked = function(checked) {
 };
 
 scout.CheckBoxField.prototype._setErrorStatus = function(errorStatus) {
-  if (errorStatus != "null") {
+  if (errorStatus) {
     // TODO AWE: (ask C.RU) schauen wie tooltips angezeigt werden sollen
     this._$statusLabel.
       css('display', 'block').
