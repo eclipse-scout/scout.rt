@@ -74,7 +74,7 @@ public class PageModificationExtension extends AbstractPageExtension {
       return (IPageModifier<T>) m_pageModifier.newInstance();
     }
     catch (Exception e) {
-      throw new ProcessingException("Error while instantiating page modifier", e);
+      throw new ProcessingException("Error while instantiating page modifier '" + m_pageModifier + "'.", e);
     }
   }
 }

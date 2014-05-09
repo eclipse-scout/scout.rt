@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
 public class BookmarkViewForm extends AbstractForm {
@@ -229,7 +230,7 @@ public class BookmarkViewForm extends AbstractForm {
                   form = getConfiguredBookmarkForm().newInstance();
                 }
                 catch (Exception e) {
-                  LOG.warn(null, e);
+                  SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
                 }
               }
               if (form == null) {

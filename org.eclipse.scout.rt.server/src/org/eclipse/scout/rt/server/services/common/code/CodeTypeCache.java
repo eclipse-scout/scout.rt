@@ -62,7 +62,7 @@ public class CodeTypeCache {
           m_cache.put(type, instance);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("create " + type.getName(), t));
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
         }
       }
       return instance;
@@ -96,7 +96,7 @@ public class CodeTypeCache {
         declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
       }
       catch (Throwable t) {
-        LOG.error("find code " + type, t);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
       }
     }
     ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);

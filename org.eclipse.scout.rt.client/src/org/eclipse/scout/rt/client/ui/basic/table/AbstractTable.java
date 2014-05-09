@@ -759,7 +759,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        LOG.error("create " + className, t);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", t));
       }
     }
     try {
@@ -789,7 +789,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        LOG.error("create " + className, t);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", t));
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
@@ -900,7 +900,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        LOG.error("create " + className, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
     try {
@@ -3880,8 +3880,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void addLocalPopupMenus(TableEvent e) {
-    boolean singleSelect = getSelectedRowCount() == 1;
-    boolean multiSelect = getSelectedRowCount() >= 2;
     boolean allRowsEnabled = true;
     for (ITableRow row : getSelectedRows()) {
       if (!row.isEnabled()) {
@@ -3893,41 +3891,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (menu.isVisible() && allRowsEnabled) {
         e.addPopupMenu(menu);
       }
-//      IMenu validMenu = null;
-//      switch (e.getType()) {
-//        case TableEvent.TYPE_HEADER_POPUP:
-//        case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
-//          if (menu.isEmptySpaceAction()) {
-//            if ((!menu.isInheritAccessibility()) || (isEnabled())) {
-//              validMenu = menu;
-//            }
-//          }
-//          break;
-//        }
-//        case TableEvent.TYPE_ROW_POPUP: {
-//          if (multiSelect) {
-//            if (menu.isMultiSelectionAction()) {
-//              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
-//                validMenu = menu;
-//              }
-//            }
-//          }
-//          else if (singleSelect) {
-//            if (menu.isSingleSelectionAction()) {
-//              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
-//                validMenu = menu;
-//              }
-//            }
-//          }
-//          break;
-//        }
-//      }
-//      if (validMenu != null) {
-//        validMenu.prepareAction();
-//        if (validMenu.isVisible()) {
-//          e.addPopupMenu(validMenu);
-//        }
-//      }
     }
   }
 

@@ -166,7 +166,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
         m_resourceTable.setEnabled(isEnabled());
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredResourceTable().getName() + "'.", e));
       }
       for (IColumn c : getResourceTable().getColumnSet().getKeyColumns()) {
         m_resourceIdColumn = c;
@@ -181,7 +181,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
         m_activityMap = (P) ConfigurationUtility.newInnerInstance(this, getConfiguredActivityMap());
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredActivityMap().getName() + "'.", e));
       }
       if (m_activityMap instanceof AbstractActivityMap) {
         ((AbstractActivityMap) m_activityMap).setContainerInternal(this);

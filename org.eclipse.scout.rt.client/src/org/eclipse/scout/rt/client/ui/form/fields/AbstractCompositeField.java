@@ -98,7 +98,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
           fieldList.add(f);
         }// end try
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + clazz.getName() + "'.", t));
         }
       }
       injectFieldsInternal(fieldList);

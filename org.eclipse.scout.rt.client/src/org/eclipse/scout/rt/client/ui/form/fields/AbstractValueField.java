@@ -107,7 +107,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     try {

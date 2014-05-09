@@ -423,7 +423,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         m_table.initTable();
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + tableClass + "'.", e));
       }
     }
     // legacy-support for searchform-inner classes
@@ -436,7 +436,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           setSearchForm(ConfigurationUtility.newInnerInstance(this, searchFormClass));
         }
         catch (Exception e) {
-          LOG.warn(null, e);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + searchFormClass.getName() + "'.", e));
         }
       }
     }
@@ -473,7 +473,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return getConfiguredSearchForm().newInstance();
     }
     catch (Exception e) {
-      LOG.warn("creation of searchForm " + getConfiguredSearchForm() + " failed", e);
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredSearchForm().getName() + "'.", e));
     }
     return null;
   }

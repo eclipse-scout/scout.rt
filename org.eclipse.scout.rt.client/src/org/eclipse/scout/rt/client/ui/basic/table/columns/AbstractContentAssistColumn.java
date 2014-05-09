@@ -19,8 +19,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> extends AbstractColumn<VALUE_TYPE> implements IContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContentAssistColumn.class);
@@ -134,11 +136,8 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
         call = lookupCallClass.newInstance();
         setLookupCall(call);
       }
-      catch (InstantiationException e) {
-        LOG.warn(null, e);
-      }
-      catch (IllegalAccessException e) {
-        LOG.warn(null, e);
+      catch (Exception e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
   }

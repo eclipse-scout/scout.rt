@@ -216,7 +216,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         menuList.add(menu);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("menu: " + menuClazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", t));
       }
     }
     try {

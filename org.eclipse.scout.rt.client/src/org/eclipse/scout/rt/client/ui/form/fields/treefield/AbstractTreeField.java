@@ -150,7 +150,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
         setTreeInternal(ConfigurationUtility.newInnerInstance(this, getConfiguredTree()));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
       }
     }
     // local enabled listener

@@ -161,7 +161,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         menuList.add(menu);
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 

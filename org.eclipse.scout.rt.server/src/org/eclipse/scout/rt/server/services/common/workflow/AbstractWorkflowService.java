@@ -346,7 +346,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
         m_stepMap.put(c, step);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("create instance of " + c, e));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
   }

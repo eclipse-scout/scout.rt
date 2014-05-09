@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -127,7 +128,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         attributes.add(ConfigurationUtility.newInnerInstance(this, c));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
     injectAttributesInternal(attributes);
@@ -327,7 +328,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           entities.add(e);
         }
         catch (Exception ex) {
-          LOG.warn(null, ex);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
         }
       }
       injectEntitiesInternal(entities);

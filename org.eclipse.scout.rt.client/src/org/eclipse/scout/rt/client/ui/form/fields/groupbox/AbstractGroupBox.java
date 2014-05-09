@@ -31,6 +31,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
@@ -244,11 +246,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         bodyGrid = bodyGridClazz.newInstance();
         setBodyGrid(bodyGrid);
       }
-      catch (InstantiationException e) {
-        LOG.warn(null, e);
-      }
-      catch (IllegalAccessException e) {
-        LOG.warn(null, e);
+      catch (Exception e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + bodyGridClazz.getName() + "'.", e));
       }
     }
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);

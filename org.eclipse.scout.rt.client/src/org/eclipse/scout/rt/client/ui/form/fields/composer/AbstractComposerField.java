@@ -62,6 +62,8 @@ import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 @ClassId("8e7f7eb8-be18-48e5-9efe-8a5b3459e247")
 @SuppressWarnings("deprecation")
@@ -329,7 +331,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
             );
       }
       catch (Exception e) {
-        throw new RuntimeException(e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
       }
     }
     else {

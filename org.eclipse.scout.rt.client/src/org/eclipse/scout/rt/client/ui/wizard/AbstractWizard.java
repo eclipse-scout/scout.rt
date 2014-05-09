@@ -342,7 +342,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         list.add(step);
       }
       catch (Exception e) {
-        LOG.error("failed creating " + element, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
       }
     }
     injectStepsInternal(list);

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,7 +82,6 @@ public final class SwtMenuUtility {
     }
 
   }
-
 
   public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();

@@ -1724,7 +1724,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             outlines.add(o);
           }
           catch (Throwable t) {
-            LOG.error("adding outline " + element, t);
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
           }
         }
       }
@@ -1737,7 +1737,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));
         }
         catch (Exception e) {
-          LOG.error("adding action " + actionClazz, e);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
         }
       }
     }

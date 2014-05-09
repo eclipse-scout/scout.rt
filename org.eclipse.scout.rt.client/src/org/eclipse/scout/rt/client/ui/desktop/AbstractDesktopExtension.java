@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * base implementation of {@link IDesktopExtension}
@@ -117,7 +119,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
         outlines.add(o);
       }
       catch (Throwable t) {
-        LOG.error(null, t);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
       }
     }
   }
@@ -129,7 +131,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
         actions.add(ConfigurationUtility.newInnerInstance(this, actionClazz));
       }
       catch (Exception e) {
-        LOG.error(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
       }
     }
   }

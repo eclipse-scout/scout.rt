@@ -23,10 +23,13 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * Default implementation that inserts new fields at the right place based on their {@link Order} annotation and that
@@ -243,7 +246,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       list.add(f);
     }
     catch (Exception e) {
-      LOG.error("exception while injecting a field", e);
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));
     }
   }
 

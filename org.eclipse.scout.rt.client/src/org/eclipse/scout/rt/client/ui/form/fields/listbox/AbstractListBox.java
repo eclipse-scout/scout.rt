@@ -293,7 +293,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
       m_table.setEnabled(isEnabled());
     }
     catch (Exception e) {
-      LOG.warn(null, e);
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
     }
     // lookup call
     if (getConfiguredLookupCall() != null) {
@@ -302,7 +302,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
         setLookupCall(call);
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
       }
     }
     // code type
@@ -337,7 +337,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
         fieldList.add(f);
       }// end try
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldClazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
     for (IFormField f : fieldList) {

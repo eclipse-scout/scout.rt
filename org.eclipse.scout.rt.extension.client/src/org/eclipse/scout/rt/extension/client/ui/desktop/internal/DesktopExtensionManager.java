@@ -17,11 +17,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension;
 import org.eclipse.scout.rt.extension.client.internal.AbstractExtensionManager;
 import org.eclipse.scout.rt.extension.client.internal.IExtensionProcessor;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
 /**
@@ -52,7 +55,7 @@ public class DesktopExtensionManager extends AbstractExtensionManager {
           desktopExtensions.add(desktopExtension);
         }
         catch (Exception e) {
-          LOG.warn("Exception while instantiating new object of type [" + type.getName() + "]", e);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", e));
         }
       }
       return desktopExtensions;

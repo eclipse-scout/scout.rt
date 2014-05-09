@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter.WhereToken;
@@ -370,7 +371,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("getLevel of permission '" + permissionClass + "'", e);
+      throw new ProcessingException("getLevel of permission '" + permissionClass.getName() + "'.", e);
     }
   }
 
@@ -412,7 +413,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         setSqlStyle(styleClass.newInstance());
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
       }
     }
     else {

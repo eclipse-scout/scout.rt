@@ -757,7 +757,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             form = getConfiguredBookmarkForm().newInstance();
           }
           catch (Exception e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
           }
         }
         if (form == null) {

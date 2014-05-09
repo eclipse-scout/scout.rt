@@ -38,7 +38,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableF
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTableForm.MainBox.ResultTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.service.SERVICES;
 
 public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistFieldProposalForm<KEY_TYPE> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ContentAssistTableForm.class);
@@ -287,7 +289,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
             return (IContentAssistFieldTable<KEY_TYPE>) ConfigurationUtility.newInnerInstance(getContentAssistField(), contentAssistFieldTableClazz);
           }
           catch (Exception e) {
-            LOG.warn(null, e);
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + contentAssistFieldTableClazz.getName() + "'.", e));
           }
         }
         return null;

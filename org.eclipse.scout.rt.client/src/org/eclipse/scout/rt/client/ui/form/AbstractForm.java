@@ -507,7 +507,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           m_mainBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
         }
         catch (Throwable t) {
-          throw new ProcessingException("mainBox: " + ((mainBoxClass == null) ? "not defined." : mainBoxClass.getName()), t);
+          String mainBoxName = null;
+          if (mainBoxClass == null) {
+            mainBoxName = "null";
+          }
+          else {
+            mainBoxName = mainBoxClass.getName();
+          }
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + mainBoxName + "'.", t));
         }
         rootBox = getRootGroupBox();
       }
@@ -799,7 +806,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         formHandler = ConfigurationUtility.newInnerInstance(this, handlerType);
       }
       catch (Exception e) {
-        throw new ProcessingException("" + handlerType + " is not an internal form handler", e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + handlerType.getName() + "'.", e));
       }
     }
     m_wizardStep = wizardStep;

@@ -1767,7 +1767,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + keystrokeClazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
       }
     }
     return CollectionUtility.arrayList(ksMap.values());

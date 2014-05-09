@@ -17,8 +17,11 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractDataModel implements IDataModel, Serializable {
   private static final long serialVersionUID = 1L;
@@ -56,7 +59,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
         attributes.add(ConfigurationUtility.newInnerInstance(this, attributeClazz));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + attributeClazz.getName() + "'.", e));
       }
     }
     return attributes;
@@ -72,7 +75,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
         entities.add(ConfigurationUtility.newInnerInstance(this, dataModelEntityClazz));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + dataModelEntityClazz.getName() + "'.", e));
       }
     }
     return entities;

@@ -14,11 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * create a data model based on inner classes of the composer field
@@ -47,7 +50,7 @@ public class ComposerFieldDataModel extends AbstractDataModel {
         attributes.add(a);
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
     return attributes;
@@ -64,7 +67,7 @@ public class ComposerFieldDataModel extends AbstractDataModel {
         entities.add(ConfigurationUtility.newInnerInstance(m_field, entityClazz));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + entityClazz.getName() + "'.", e));
       }
     }
     return entities;

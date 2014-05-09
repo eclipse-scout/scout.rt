@@ -26,6 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractFormData implements Serializable, Cloneable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormData.class);
@@ -60,7 +62,7 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
         m_propertyMap.put(p.getClass(), p);
       }// end try
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
       }
     }// end for
      // add fields
@@ -77,7 +79,7 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
         m_fieldMap.put(f.getClass(), f);
       }// end try
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
       }
     }// end for
   }

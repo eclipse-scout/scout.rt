@@ -145,17 +145,18 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
     // add fields
-    List<IFormField> fieldList = new ArrayList<IFormField>();
-    for (Class<? extends IFormField> fieldClazz : getConfiguredFields()) {
+    List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
+    List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size());
+    for (Class<? extends IFormField> fieldClazz : configuredFields) {
       try {
         fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
-      }// end try
+      }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldClazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
     injectFieldsInternal(fieldList);

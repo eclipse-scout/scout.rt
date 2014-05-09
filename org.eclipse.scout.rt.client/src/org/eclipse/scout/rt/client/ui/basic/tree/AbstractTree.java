@@ -424,7 +424,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("keyStroke: " + keystrokeClazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
       }
     }
     //ticket 87370: add ENTER key stroke when execNodeAction has an override
@@ -446,7 +446,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         menuList.add(menu);
       }
       catch (Exception e) {
-        LOG.error("Exception occured while creating a new instance of " + menuClazz.getName(), e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     try {

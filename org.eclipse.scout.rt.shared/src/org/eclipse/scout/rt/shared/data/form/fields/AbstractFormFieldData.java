@@ -17,10 +17,13 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractFormFieldData implements Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormFieldData.class);
@@ -56,7 +59,7 @@ public abstract class AbstractFormFieldData implements Serializable {
         m_propertyMap.put(p.getClass(), p);
       }// end try
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
       }
 
     }
@@ -70,7 +73,7 @@ public abstract class AbstractFormFieldData implements Serializable {
         map.put(f.getClass(), f);
       }// end try
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
       }
     }
     if (map.size() > 0) {

@@ -425,7 +425,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
       }
     }
   }

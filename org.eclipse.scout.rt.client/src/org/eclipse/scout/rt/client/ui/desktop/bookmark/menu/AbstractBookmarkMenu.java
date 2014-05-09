@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -89,7 +90,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
           form = getConfiguredBookmarkForm().newInstance();
         }
         catch (Exception e) {
-          LOG.warn(null, e);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
         }
       }
       if (form == null) {

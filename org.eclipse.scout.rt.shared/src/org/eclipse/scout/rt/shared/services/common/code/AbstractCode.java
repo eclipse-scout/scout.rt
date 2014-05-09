@@ -21,9 +21,12 @@ import java.util.Map;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCode.class);
@@ -150,7 +153,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         codes.add(code);
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + codeClazz.getName() + "'.", e));
       }
     }
     return codes;

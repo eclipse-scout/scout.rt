@@ -192,7 +192,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         menuList.add(menu);
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     try {
@@ -210,7 +210,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         producerList.add(ConfigurationUtility.newInnerInstance(this, itemProviderClazz));
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
       }
     }
     m_providers = producerList;

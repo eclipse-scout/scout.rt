@@ -62,7 +62,7 @@ public class MenuModificationExtension extends AbstractMenuExtension {
       return (IMenuModifier<T>) m_menuModifier.newInstance();
     }
     catch (Exception e) {
-      throw new ProcessingException("Error while instantiating menu modifier", e);
+      throw new ProcessingException("Error while instantiating menu modifier '" + m_menuModifier.getName() + "'.", e);
     }
   }
 }

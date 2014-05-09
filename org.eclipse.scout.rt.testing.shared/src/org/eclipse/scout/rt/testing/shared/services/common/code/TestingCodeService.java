@@ -28,7 +28,9 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -150,7 +152,7 @@ public class TestingCodeService extends AbstractService implements ICodeService 
           declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
         }
         catch (Throwable t) {
-          LOG.error("find code " + type, t);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
         }
       }
       ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);
