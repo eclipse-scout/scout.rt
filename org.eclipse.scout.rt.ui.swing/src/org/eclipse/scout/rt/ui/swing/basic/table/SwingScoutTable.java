@@ -791,7 +791,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           // reset selection
 
           if (e.getID() == MouseEvent.MOUSE_PRESSED) {
-            System.out.println("reset selction " + e.getModifiers());
             getScoutObject().getUIFacade().setSelectedRowsFromUI(new ArrayList<ITableRow>(0));
           }
           if (e.isPopupTrigger()) {
@@ -1661,7 +1660,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

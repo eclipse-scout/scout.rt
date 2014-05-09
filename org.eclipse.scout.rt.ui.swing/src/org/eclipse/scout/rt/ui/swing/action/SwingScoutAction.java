@@ -136,20 +136,22 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
   }
 
   private void handleSwingAction() {
-    if (!m_handleActionPending) {
-      m_handleActionPending = true;
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            getScoutObject().getUIFacade().fireActionFromUI();
+    if (SwingUtility.runInputVerifier()) {
+      if (!m_handleActionPending) {
+        m_handleActionPending = true;
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              getScoutObject().getUIFacade().fireActionFromUI();
+            }
+            finally {
+              m_handleActionPending = false;
+            }
           }
-          finally {
-            m_handleActionPending = false;
-          }
-        }
-      };
-      getSwingEnvironment().invokeScoutLater(t, 0);
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
+      }
     }
   }
 
