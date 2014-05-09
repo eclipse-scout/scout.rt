@@ -20,13 +20,13 @@ public interface IJsonSession {
 
   IClientSession getClientSession();
 
-  String createUniqueIdFor(IJsonRenderer renderer);
+  String createUniqueIdFor(IJsonRenderer<?> renderer);
 
-  void registerJsonRenderer(String id, IJsonRenderer renderer);
+  void registerJsonRenderer(String id, IJsonRenderer<?> renderer);
 
   void unregisterJsonRenderer(String id);
 
-  IJsonRenderer getJsonRenderer(String id);
+  IJsonRenderer<?> getJsonRenderer(String id);
 
   /**
    * @return the current ui response that is collecting changes for the next

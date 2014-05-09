@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.service.SERVICES;
 
 /**

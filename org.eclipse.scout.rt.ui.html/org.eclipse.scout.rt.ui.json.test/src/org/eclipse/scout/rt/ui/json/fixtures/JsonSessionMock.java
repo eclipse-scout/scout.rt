@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonRequest;
-import org.eclipse.scout.rt.ui.json.JsonException;
 
 public class JsonSessionMock extends AbstractJsonSession {
 

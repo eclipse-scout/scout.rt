@@ -156,7 +156,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public IJsonRenderer getJsonRenderer(String id) {
+  public IJsonRenderer<?> getJsonRenderer(String id) {
     return m_jsonRenderers.get(id);
   }
 

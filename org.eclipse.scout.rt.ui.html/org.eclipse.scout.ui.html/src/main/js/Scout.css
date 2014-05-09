@@ -1340,17 +1340,36 @@ width: 32px;
 }
 
 .form-field {
-  background-color: yellow;
+  background-color: #eaeaea;
   height: 25px;
   width: 100%;
-  border: 1px solid black;
+  border: 1px solid #999;
 }
 
-.form-field > label{
-  height: 100%;
-  width: 100px;
+.form-field > .label {
+  color: #5D5D5D;
+  float: left;
+  position: relative;
+  top: 8px;
+  width: 130px;
 }
 
 .table-field {
   height: 100%;
 }
+
+.checkbox {
+  border: 1px solid black;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  left: 138px;
+  margin-top: 4px;
+  position: absolute;
+}
+
+.checkbox_checked:before {
+  content:"X";
+  margin-left:3px;
+}
+
