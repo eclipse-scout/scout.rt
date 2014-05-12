@@ -32,6 +32,9 @@ public class TreeHtmlLinkDetector extends AbstractHtmlLinkDetector<JTree> {
     if (found) {
       m_treePath = getPath(p);
     }
+    else {
+      m_treePath = null;
+    }
     return found;
   }
 

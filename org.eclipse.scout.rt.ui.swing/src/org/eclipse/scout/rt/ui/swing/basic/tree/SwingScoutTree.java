@@ -67,6 +67,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
+import org.eclipse.scout.rt.ui.swing.basic.SwingLinkDetectorMouseMotionListener;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.dnd.TransferHandlerEx;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
@@ -101,6 +102,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     // renderers
     tree.setCellRenderer(new SwingTreeCellRenderer(getSwingEnvironment(), tree.getCellRenderer(), this));
     // listeners
+    tree.addMouseMotionListener(new SwingLinkDetectorMouseMotionListener<JTree>(new TreeHtmlLinkDetector()));
     tree.addMouseListener(new P_SwingMouseListener());
     tree.addTreeSelectionListener(new P_SwingSelectionListener());
     tree.addTreeExpansionListener(new P_SwingExpansionListener());
@@ -719,7 +721,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * update the given node
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -890,7 +892,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   * 
+   *
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -1094,7 +1096,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {
