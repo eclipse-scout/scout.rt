@@ -186,7 +186,6 @@ public class CsvHelper {
    * @throws ProcessingException
    */
   public void importData(IDataConsumer dataConsumer, Reader reader, boolean readNameHeader, boolean readTypeHeader, int headerRowCount, int rowCount, boolean allowVariableColumnCount) throws ProcessingException {
-    String line = null;
     String cell = null;
     int colIndex = 0;
     int lineNr = -1;
@@ -225,7 +224,12 @@ public class CsvHelper {
         for (colIndex = 0; colIndex < cellList.size(); colIndex++) {
           if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || !m_ignoredColumns[colIndex]) {
             cell = cellList.get(colIndex);
-            objList.add(importCell(cell, getColumnFormat(colIndex)));
+            try {
+              objList.add(importCell(cell, getColumnFormat(colIndex)));
+            }
+            catch (ProcessingException e) {
+              throw new ProcessingException("colIndex=" + colIndex + " cell=" + cell, e);
+            }
           }
         }
         // add row to data
@@ -234,7 +238,8 @@ public class CsvHelper {
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " cell=" + cell, e);
+      String previousMessage = (!StringUtility.isNullOrEmpty(e.getMessage())) ? " " + e.getMessage() : "";
+      throw new ProcessingException("lineNr=" + lineNr + previousMessage, e);
     }
   }
 
