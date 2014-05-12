@@ -113,7 +113,14 @@ Mobile
     - Man muss mobile Komponentent nicht mit eigenen CSS-Klassen bestücken (z.B. braucht es table-row-mobile nicht)
     - man kann CSS / JS für nicht verwendete Komponenten weglassen
     -> scout.js sowies scout-mobile.js sind so schlank wie möglich
+  Damit wir den Source-Code nicht duplizieren müssen, sollten wir versuchen, unsere Widgets möglichst flexibel zu machen, also dass einzelne Komponenten ausgetauscht oder komplett weggelassen werden können.
+  Z.B: Footer/Header bei der Tabelle oder Keystroke-Handling. Diese Komponenten können wir dann fürs scout-mobile.js einfach weglassen.
 - Eventuell css eigenschaften mittels @Override verändern, damit das mobile css nicht unnötig aufgeblasen wird?
+- Damit die mobilen CSS und JS-Dateien geladen werden, gibt es auch ein index-mobile.html. Dieses Html wird zurückgegeben, wenn es ein mobiler Browser ist und man auf / verbindet.
+  Man kann aber auch direkt auf die mobile Version wechseln, indem man direkt /index-mobile.html ansteuert.
+- Auf der Session.js gibt es ein UserAgent-Objekt (analog zur ClientSession auf dem Server), dort steht der deviceType drin.
+  Das index-mobile.html initialisiert den UserAgent mit dem DeviceType „Mobile“. Bei einem Tablet sollte an dieser Stelle mit Tablet initialisiert werden, es gibt KEIN index-tablet.html.
+  Wir erhoffen uns damit, dass wir dann live (responsive) zwischen mobile und tablet wechseln können.
 
 Plugin-Struktur
 - Aufteilung html / json ok, aber zur Zeit ist es nicht optimal.

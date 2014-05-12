@@ -61,12 +61,6 @@ height: calc(100% - 58px);
 width: calc(100% - 300px);
 }
 
-.layout-north {
-width: 100%;
-height: 57px;
-}
-
-
 /* desktop */
 
 #Desktop {
@@ -78,6 +72,8 @@ height: 100%;
 /* views */
 
 #DesktopViews {
+width: 100%;
+height: 57px;
 white-space: nowrap;
 border-bottom: 1px solid #CCC;
 background: #FFF;
@@ -418,7 +414,7 @@ margin-bottom: 10px;
 height: calc(100% - 23px);
 }
 
-.table-data-scroll {
+.table-data > .scrollable {
 position: absolute;
 top: 0px;
 height: 100%;

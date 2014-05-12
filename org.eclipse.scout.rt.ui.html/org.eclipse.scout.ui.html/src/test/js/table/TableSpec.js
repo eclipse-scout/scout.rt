@@ -1,9 +1,12 @@
+/* global TableSpecHelper */
 describe("Table", function() {
   var session;
+  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.installMock();
     jasmine.clock().install();
   });
@@ -15,93 +18,12 @@ describe("Table", function() {
     jasmine.clock().uninstall();
   });
 
-  function createModel(id, columns, rows) {
-    return {
-      "id": id,
-      "columns": columns,
-      "rows": rows
-    };
-  }
-
-  function createModelRow(id, cells) {
-    return {
-      "id": id,
-      "cells": cells
-    };
-  }
-
-  function createModelColumn(id, text) {
-    return {
-      "id": id,
-      "text": text
-    };
-  }
-
-  function createModelCell(text) {
-    return {
-      "text": text
-    };
-  }
-
-  function createModelColumns(count) {
-    if (!count) {
-      return;
-    }
-
-    var columns = [];
-    for (var i = 0; i < count; i++) {
-      columns[i] = createModelColumn(i, 'col' + i);
-    }
-    return columns;
-  }
-
-  function createModelCells(count) {
-    var cells = [];
-    for (var i = 0; i < count; i++) {
-      cells[i] = createModelCell(i, 'cell' + i);
-    }
-    return cells;
-  }
-
-  function createModelRows(colCount, rowCount) {
-    if (!rowCount) {
-      return;
-    }
-
-    var rows = [];
-    for (var i = 0; i < rowCount; i++) {
-      rows[i] = createModelRow(i, createModelCells(colCount));
-    }
-    return rows;
-  }
-
-  function createModelFixture(colCount, rowCount) {
-    return createModel('1', createModelColumns(colCount), createModelRows(colCount, rowCount));
-  }
-
-  function createTable(model) {
-    return new scout.Table(session, model);
-  }
-
-  function selectRowsAndAssert(table, rowIds) {
-    table.selectRowsByIds(rowIds);
-
-    var $selectedRows = table.findSelectedRows();
-    expect($selectedRows.length).toBe(rowIds.length);
-
-    var selectedRowIds = [];
-    $selectedRows.each(function() {
-      selectedRowIds.push($(this).attr('id'));
-    });
-
-    expect(scout.arrays.equalsIgnoreOrder(rowIds, selectedRowIds)).toBeTruthy();
-  }
 
   describe("attach", function() {
 
     it("draws a table header", function() {
-      var model = createModelFixture(2);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       expect(table._header).not.toBeUndefined();
@@ -112,21 +34,21 @@ describe("Table", function() {
   describe("insertRows", function() {
 
     it("inserts rows at the end of the table", function() {
-      var model = createModelFixture(2);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      expect(table._$dataScroll.children().length).toBe(0);
+      expect(table.$dataScroll.children().length).toBe(0);
 
-      var rows = createModelRows(2, 5);
+      var rows = helper.createModelRows(2, 5);
       table.insertRows(rows);
 
-      expect(table._$dataScroll.children().length).toBe(5);
+      expect(table.$dataScroll.children().length).toBe(5);
 
-      rows = createModelRows(2, 8);
+      rows = helper.createModelRows(2, 8);
       table.insertRows(rows);
 
-      expect(table._$dataScroll.children().length).toBe(5 + 8);
+      expect(table.$dataScroll.children().length).toBe(5 + 8);
     });
 
   });
@@ -134,20 +56,20 @@ describe("Table", function() {
   describe("selectRowsByIds", function() {
 
     it("selects rows and unselects others", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       var $selectedRows = table.findSelectedRows();
       expect($selectedRows.length).toBe(0);
 
-      selectRowsAndAssert(table, ['0', '4']);
-      selectRowsAndAssert(table, ['2']);
+      helper.selectRowsAndAssert(table, ['0', '4']);
+      helper.selectRowsAndAssert(table, ['2']);
     });
 
     it("sends selection event containing rowIds", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       var rowIds = ['0', '4'];
@@ -164,8 +86,8 @@ describe("Table", function() {
     });
 
     it("updates cached model", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       var rowIds = ['0', '4'];
@@ -192,27 +114,27 @@ describe("Table", function() {
     }
 
     it("selects row and unselects others", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       var $selectedRows = table.findSelectedRows();
       expect($selectedRows.length).toBe(0);
 
-      var $rows = table._$dataScroll.children();
+      var $rows = table.$dataScroll.children();
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
-      selectRowsAndAssert(table, ['0', '4']);
+      helper.selectRowsAndAssert(table, ['0', '4']);
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
     it("sends click and selection events", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var $row = table._$dataScroll.children().first();
+      var $row = table.$dataScroll.children().first();
       $row.click();
 
       jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME + 1);
@@ -221,11 +143,11 @@ describe("Table", function() {
     });
 
     it("sends only click if row already is selected", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var $row = table._$dataScroll.children().first();
+      var $row = table.$dataScroll.children().first();
       clickRowAndAssertSelection(table, $row);
       jasmine.clock().tick(0);
 
@@ -242,11 +164,11 @@ describe("Table", function() {
 
   describe("row double click", function() {
     it("sends selection and row action events", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var $row = table._$dataScroll.children().first();
+      var $row = table.$dataScroll.children().first();
       $row.click();
       $row.click();
 
@@ -256,14 +178,31 @@ describe("Table", function() {
     });
   });
 
+  describe("right click on row", function() {
+
+    it("opens context menu", function() {
+      var model = helper.createModelFixture(2,2);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      model.selectionMenus = [helper.createMenu('1','menu')];
+      var $row0 = table.$dataScroll.children().eq(0);
+      $row0.triggerRightClick();
+
+      var $menu = helper.getDisplayingRowMenu(table);
+      expect($menu.length).toBeTruthy();
+    });
+
+  });
+
   describe("row mouse down / move / up", function() {
 
     it("selects multiple rows", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var $rows = table._$dataScroll.children();
+      var $rows = table.$dataScroll.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -285,11 +224,11 @@ describe("Table", function() {
     });
 
     it("only sends selection event, no click", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var $rows = table._$dataScroll.children();
+      var $rows = table.$dataScroll.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -312,18 +251,52 @@ describe("Table", function() {
       expect(requestData).toContainEvents(event);
     });
 
+    it("only selects first row if mouse move selection is disabled", function() {
+      var model = helper.createModelFixture(2, 4);
+      var table = helper.createTable(model);
+      table.selectionHandler.mouseMoveSelectionEnabled = false;
+
+      table.attach(session.$entryPoint);
+
+      var $rows = table.$dataScroll.children();
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+      var $row2 = $rows.eq(2);
+      var $row3 = $rows.eq(3);
+
+      expect($rows).not.toHaveClass('row-selected');
+
+      $row0.mousedown();
+      $row1.trigger('mousemove');
+      $row2.trigger('mousemove');
+      $row2.mouseup();
+
+      expect($row0).toHaveClass('row-selected');
+      expect($row1).not.toHaveClass('row-selected');
+      expect($row2).not.toHaveClass('row-selected');
+      expect($row3).not.toHaveClass('row-selected');
+
+      jasmine.clock().tick(0);
+
+      var requestData = mostRecentJsonRequest();
+      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
+        "rowIds": ['0',]
+      });
+      expect(requestData).toContainEvents(event);
+    });
+
   });
 
   describe("onModelAction", function() {
 
     it("processes insertion events from model", function() {
-      var model = createModelFixture(2);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       spyOn(table, 'insertRows');
 
-      var rows = createModelRows(2, 5);
+      var rows = helper.createModelRows(2, 5);
       var event = new scout.Event(scout.Table.EVENT_ROWS_INSERTED, '1', {
         "rows": rows
       });
@@ -333,8 +306,8 @@ describe("Table", function() {
     });
 
     it("processes selection events from model", function() {
-      var model = createModelFixture(2, 5);
-      var table = createTable(model);
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
       spyOn(table, 'selectRowsByIds');

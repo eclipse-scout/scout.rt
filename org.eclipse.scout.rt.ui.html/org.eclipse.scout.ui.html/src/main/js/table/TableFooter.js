@@ -149,7 +149,7 @@ scout.TableFooter.prototype.addControl = function(control) {
         function() {
           $(this).css('height', 'calc(100% - 85px');
         },
-        that._table.scrollbar.initThumb.bind(that._table.scrollbar),
+        that._table.updateScrollbar.bind(that._table),
         500);
 
       // visual: reset label and close control
@@ -174,7 +174,7 @@ scout.TableFooter.prototype.openTableControl = function() {
     function() {
       $(this).css('height', 'calc(100% - 430px');
     },
-    this._table.scrollbar.initThumb.bind(this._table.scrollbar),
+    this._table.updateScrollbar.bind(this._table),
     500);
 
   // visual: update label, size container and control
@@ -205,7 +205,7 @@ scout.TableFooter.prototype.openTableControl = function() {
       that._$tableControl.height(h);
       that._table.$data.height('calc(100% - ' + (h + 30) + 'px)');
       that.$controlContainer.height(h - 60);
-      that._table.scrollbar.initThumb();
+      that._table.updateScrollbar();
     }
 
     function resizeEnd() {

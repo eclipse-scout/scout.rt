@@ -25,11 +25,14 @@
 //@include("src/main/js/desktop/DesktopGraph.js");
 //@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");
 //@include("src/main/js/table/Table.js");
+//@include("src/main/js/table/TableConfigurator.js");
 //@include("src/main/js/table/TableHeader.js");
 //@include("src/main/js/table/TableFooter.js");
 //@include("src/main/js/table/TableColumnHeaderMenu.js");
 //@include("src/main/js/table/TableOrganizeMenu.js");
 //@include("src/main/js/table/TableKeystrokeAdapter.js");
+//@include("src/main/js/table/TableRowMenuHandler.js");
+//@include("src/main/js/table/TableSelectionHandler.js");
 //@include("src/main/js/desktop/DesktopMap.js");
 //@include("src/main/js/desktop/DesktopToolButton.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");

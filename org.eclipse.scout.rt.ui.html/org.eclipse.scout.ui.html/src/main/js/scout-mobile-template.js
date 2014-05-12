@@ -30,6 +30,7 @@
 //@include("src/main/js/table/TableColumnHeaderMenu.js");
 //@include("src/main/js/table/TableOrganizeMenu.js");
 //@include("src/main/js/table/TableKeystrokeAdapter.js");
+//@include("src/main/js/table/TableSelectionHandler.js");
 //@include("src/main/js/desktop/DesktopMap.js");
 //@include("src/main/js/desktop/DesktopToolButton.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");
@@ -47,7 +48,8 @@
 //@include("src/main/js/text/DateFormat.js");
 
 
-///@include("src/main/js/mobile/table/MobileTable.js");
+///@include("src/main/js/table/MobileTable.js");
+//@include("src/main/js/table/MobileTableConfigurator.js");
 //@include("src/main/js/util/mobileObjectFactories.js");
 
 //@include("src/main/js/main.js");

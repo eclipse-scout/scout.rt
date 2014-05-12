@@ -5,22 +5,29 @@ scout.Table = function(session, model) {
   this.model = model;
   this.session = session;
 
-  this.config = {
-    contextMenuEnabled: true
-  };
   this.$container;
   this.$data;
-  this._$dataScroll;
+  this.$dataScroll;
   this._header;
   this.scrollbar;
+  this.selectionHandler;
+  this.rowMenuHandler;
 
   if (session && model) {
     this.session.widgetMap[model.id] = this;
   }
 
-  this.events = new scout.EventSupport();
-  this._filterMap = {};
-  this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+  //non inheritance based initialization
+  if(arguments.length>0) {
+    this.events = new scout.EventSupport();
+    this._filterMap = {};
+
+    this.configurator = this._createTableConfigurator();
+    if (this.configurator) {
+      this.configurator.configure(this);
+    }
+    this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+  }
 };
 
 scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -33,6 +40,10 @@ scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
+
+scout.Table.prototype._createTableConfigurator = function () {
+  return new scout.TableConfigurator(this);
+};
 
 scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
@@ -47,12 +58,14 @@ scout.Table.prototype._render = function($parent) {
   }
   this._header = new scout.TableHeader(this.session, this, this._$header);
 
-  this.$data = this.$container.appendDiv(this.model.id + '_data', 'table-data'); //FIXME maybe create TableData.js
-  this._$dataScroll = this.$data.appendDiv(this.model.id + '_dataScroll', 'table-data-scroll');
-  this.scrollbar = new scout.Scrollbar(this._$dataScroll, 'y');
+  this.$data = this.$container.appendDiv(this.model.id + '_data', 'table-data');
 
   this._$footer = this.$container.appendDiv(this.model.id + '_footer');
   this.footer = new scout.TableFooter(this.session, this, this._$footer);
+
+  if (this.configurator && this.configurator.render) {
+    this.configurator.render();
+  }
 
   // load data and create rows
   this.drawData();
@@ -73,41 +86,28 @@ scout.Table.prototype.attach = function($container) {
 };
 
 scout.Table.prototype.drawSelection = function() {
-  // remove nice border
-  $('.select-middle, .select-top, .select-bottom, .select-single')
-    .removeClass('select-middle select-top select-bottom select-single');
-
-  // draw nice border
-  var $selectedRows = $('.row-selected');
-  $selectedRows.each(function() {
-    var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
-      hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
-
-    if (hasPrev && hasNext) $(this).addClass('select-middle');
-    if (!hasPrev && hasNext) $(this).addClass('select-top');
-    if (hasPrev && !hasNext) $(this).addClass('select-bottom');
-    if (!hasPrev && !hasNext) $(this).addClass('select-single');
-  });
-
-  // show count
-  var rowCount = 0;
-  if (this.model.rows) {
-    rowCount = this.model.rows.length;
+  if(this.selectionHandler) {
+    this.selectionHandler.drawSelection();
   }
-  this._triggerRowsSelected($selectedRows, $selectedRows.length == rowCount);
 };
 
-scout.Table.prototype._resetSelection = function() {
-  $('.row-selected', this.$data).removeClass('row-selected');
-  this.drawSelection();
-  $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
+scout.Table.prototype.resetSelection = function() {
+  if(this.selectionHandler) {
+    this.selectionHandler.resetSelection();
+  }
+};
+
+scout.Table.prototype.updateScrollbar = function() {
+  if (this.scrollbar) {
+    this.scrollbar.initThumb();
+  }
 };
 
 scout.Table.prototype._sort = function() {
   var sortColumns = [];
 
   // remove selection
-  this._resetSelection();
+  this.resetSelection();
 
   // find all sort columns
   for (var c = 0; c < this.model.columns.length; c++) {
@@ -152,7 +152,7 @@ scout.Table.prototype._sort = function() {
 
   // change order in dom
   $rows = $rows.sort(compare);
-  this._$dataScroll.prepend($rows);
+  this.$dataScroll.prepend($rows);
 
   // for less than 100 rows: move to old position and then animate
   if ($rows.length < 100) {
@@ -237,11 +237,12 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
 
 scout.Table.prototype._drawData = function(startRow) {
   // this function has to be fast
-  var rowString = '';
-  var table = this.model,
-    that = this;
+  var rowString = '',
+    table = this.model,
+    that = this,
+    numRowsLoaded = startRow,
+    $rows;
 
-  var numRowsLoaded = startRow;
   if (table.rows && table.rows.length > 0) {
     for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
       var row = table.rows[r];
@@ -250,19 +251,15 @@ scout.Table.prototype._drawData = function(startRow) {
     numRowsLoaded = r;
 
     // append block of rows
-    $(rowString)
-      .appendTo(this._$dataScroll)
-      .on('mousedown', '', onMouseDown)
-      .on('clicks', '', onClicks)
-      .on('contextmenu', function(e) {
-        e.preventDefault();
-      });
 
+    $rows = $(rowString);
+    $rows.appendTo(this.$dataScroll)
+      .on('clicks', '', onClicks);
   }
 
   // update info and scrollbar
-  this._triggerRowsDrawn(numRowsLoaded);
-  this.scrollbar.initThumb();
+  this._triggerRowsDrawn($rows, numRowsLoaded);
+  this.updateScrollbar();
 
   // repaint and append next block
   if (table.rows && table.rows.length > 0) {
@@ -273,107 +270,12 @@ scout.Table.prototype._drawData = function(startRow) {
     }
   }
 
-  function onMouseDown(event) {
-    var $row = $(event.delegateTarget),
-      add = true,
-      first,
-      $selectedRows = $('.row-selected'),
-      selectionChanged = false;
-
-    // click without ctrl always starts new selection, with ctrl toggle
-    if (event.shiftKey) {
-      first = $selectedRows.first().index();
-    } else if (event.ctrlKey) {
-      add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
-    } else {
-      //Click on the already selected row must not reselect it
-      if ($selectedRows.length == 1 && $row.hasClass('row-selected')) {
-        return;
-      } else {
-        $selectedRows.removeClass('row-selected');
-      }
-    }
-
-    $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
-
-    // just a click...
-    selectData(event);
-
-    // ...or movement with held mouse button
-    $(".table-row").one("mousemove", function(event) {
-      selectData(event);
-    });
-
-    $(".table-row").one("mouseup", function(event) {
-      onMouseUp(event);
-    });
-
-    // action for all affected rows
-    function selectData(event) {
-      // affected rows between $row and Target
-      var firstIndex = first || $row.index(),
-        lastIndex = $(event.delegateTarget).index();
-
-      var startIndex = Math.min(firstIndex, lastIndex),
-        endIndex = Math.max(firstIndex, lastIndex) + 1;
-
-      var $actionRow = $('.table-row', that.$data).slice(startIndex, endIndex);
-
-      // set/remove selection
-      if (add) {
-        $actionRow.addClass('row-selected');
-      } else {
-        $actionRow.removeClass('row-selected');
-      }
-
-      // draw nice border
-      that.drawSelection();
-
-      //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
-      selectionChanged = true;
-    }
-
-    function onMouseUp(event) {
-      $(".table-row").unbind("mousemove");
-      $(".table-row").unbind("mouseup");
-
-      //Handle mouse move selection. Single row selections are handled by onClicks
-      if ($row.get(0) != event.delegateTarget) {
-        sendRowsSelected();
-      }
-
-      if (that.config.contextMenuEnabled) {
-        showSelectionMenu(event.pageX, event.pageY, event.button);
-      }
-    }
-  }
-
-  function sendRowsSelected() {
-    var rowIds = [],
-      $selectedRows = $('.row-selected');
-
-    $selectedRows.each(function() {
-      rowIds.push($(this).attr('id'));
-    });
-
-    if (scout.arrays.equalsIgnoreOrder(rowIds, that.model.selectedRowIds)) {
-      return;
-    }
-
-    that.model.selectedRowIds = rowIds;
-    if (that.model.selectedRowIds) {
-      that.session.send(scout.Table.EVENT_ROWS_SELECTED, that.model.id, {
-        "rowIds": rowIds
-      });
-    }
-  }
-
   function onClicks(event) {
     if (event.type == 'singleClick') {
       onClick(event);
     }
 
-    sendRowsSelected();
+    that.sendRowsSelected();
 
     if (event.type == 'doubleClick') {
       onDoubleClick(event);
@@ -390,145 +292,35 @@ scout.Table.prototype._drawData = function(startRow) {
 
   function onDoubleClick(event) {
     var $row = $(event.delegateTarget);
-    sendRowAction($row);
+    that.sendRowAction($row);
   }
 
-  function sendRowAction($row) {
-    that.session.send(scout.Table.EVENT_ROW_ACTION, that.model.id, {
-      "rowId": $row.attr('id')
+};
+
+scout.Table.prototype.sendRowsSelected = function() {
+  var rowIds = [],
+    $selectedRows = $('.row-selected');
+
+  $selectedRows.each(function() {
+    rowIds.push($(this).attr('id'));
+  });
+
+  if (scout.arrays.equalsIgnoreOrder(rowIds, this.model.selectedRowIds)) {
+    return;
+  }
+
+  this.model.selectedRowIds = rowIds;
+  if (this.model.selectedRowIds) {
+    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.model.id, {
+      "rowIds": rowIds
     });
   }
+};
 
-  function showSelectionMenu(x, y, button) {
-    // selection
-    var $selectedRows = $('.row-selected'),
-      $firstRow = $selectedRows.first();
-
-    // make menu - if not already there
-    var $RowDrill = $('#RowDrill');
-    if ($RowDrill.length === 0) {
-      $RowDrill = that._$dataScroll.appendDiv('RowDrill')
-        .on('click', '', function() {
-          sendRowAction($firstRow);
-        });
-
-      var h1 = $RowDrill.outerHeight();
-      $RowDrill.height(0).animateAVCSD('height', h1, null, null, 75);
-    }
-    var $RowMenu = $('#RowMenu');
-    if ($RowMenu.length === 0) {
-      $RowMenu = that._$dataScroll.appendDiv('RowMenu')
-        .on('click', '', clickRowMenu);
-
-      var h2 = $RowMenu.outerHeight();
-      $RowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
-    }
-
-    // place menu
-    // TODO cru: place on top if mouse movement goes up?
-    var top = $selectedRows.last().offset().top - that._$dataScroll.offset().top + 32,
-      left = Math.max(25, Math.min($firstRow.outerWidth() - 164, x - that._$dataScroll.offset().left - 13));
-
-    $RowDrill.css('left', left - 16).css('top', top);
-    $RowMenu.css('left', left + 16).css('top', top);
-
-    // mouse over effect
-    var $showMenu = $selectedRows
-      .add($selectedRows.first().prev())
-      .add($selectedRows.last().next())
-      .add($selectedRows.last().next().next())
-      .add($RowDrill)
-      .add($RowMenu);
-
-    $showMenu
-      .on('mouseenter', '', enterSelection)
-      .on('mouseleave', '', leaveSelection);
-
-    if (button == 2) {
-      clickRowMenu();
-    }
-
-    // TODO cru: remove events?
-
-    function enterSelection(event) {
-      $RowDrill.animateAVCSD('height', h1, null, null, 75);
-      $RowMenu.animateAVCSD('height', h2, null, null, 75);
-    }
-
-    function leaveSelection(event) {
-      if (!$(event.toElement).is($showMenu) && !$('#RowMenuContainer').length) {
-        $RowDrill.animateAVCSD('height', 6, null, null, 75);
-        $RowMenu.animateAVCSD('height', 6, null, null, 75);
-      }
-    }
-
-    function clickRowMenu() {
-      if ($('#RowMenuContainer').length) {
-        removeMenu();
-        return;
-      }
-
-      var menus = that.model.selectionMenus;
-      if (menus && menus.length > 0) {
-        // create 2 container, animate do not allow overflow
-        var $RowMenuContainer = $RowMenu.beforeDiv('RowMenuContainer')
-          .css('left', left + 16).css('top', top);
-
-        $showMenu = $showMenu.add($RowMenuContainer);
-
-        // create menu-item and menu-button
-        for (var i = 0; i < menus.length; i++) {
-          if (menus[i].iconId) {
-            $RowMenuContainer.appendDiv('', 'menu-button')
-              .attr('id', menus[i].id)
-              .attr('data-icon', menus[i].iconId)
-              .attr('data-label', menus[i].text)
-              .on('click', '', onMenuItemClicked)
-              .hover(onHoverIn, onHoverOut);
-          } else {
-            $RowMenuContainer.appendDiv('', 'menu-item', menus[i].text)
-              .attr('id', menus[i].id)
-              .on('click', '', onMenuItemClicked);
-          }
-        }
-
-        // wrap menu-buttons and add one div for label
-        $('.menu-button', $RowMenuContainer).wrapAll('<div id="MenuButtons"></div>');
-        $('#MenuButtons', $RowMenuContainer).appendDiv('MenuButtonsLabel');
-        $RowMenuContainer.append($('#MenuButtons', $RowMenuContainer));
-
-        // animated opening
-        var h = $RowMenuContainer.outerHeight();
-        $RowMenuContainer.css('height', 0).animateAVCSD('height', h);
-
-        var t = parseInt($RowMenu.css('top'), 0);
-        $RowMenu.css('top', t).animateAVCSD('top', t + h - 2);
-
-        // TODO cru; every user action will close menu
-        //$('*').one('mousedown keydown mousewheel', removeMenu);
-      }
-
-      function onHoverIn() {
-        $('#MenuButtonsLabel').text($(this).data('label'));
-      }
-
-      function onHoverOut() {
-        $('#MenuButtonsLabel').text('');
-      }
-
-      function onMenuItemClicked() {}
-
-      function removeMenu() {
-        var $RowMenuContainer = $('#RowMenuContainer'),
-          h = $RowMenuContainer.outerHeight();
-
-        $RowMenuContainer.animateAVCSD('height', 0, $.removeThis);
-
-        var t = parseInt($RowMenu.css('top'), 0);
-        $RowMenu.css('top', t).animateAVCSD('top', t - h + 2);
-      }
-    }
-  }
+scout.Table.prototype.sendRowAction = function ($row) {
+  this.session.send(scout.Table.EVENT_ROW_ACTION, this.model.id, {
+    "rowId": $row.attr('id')
+  });
 };
 
 scout.Table.prototype.getValue = function(col, row) {
@@ -566,7 +358,7 @@ scout.Table.prototype._group = function() {
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
-  $('.table-row-sum', this._$dataScroll).animateAVCSD('height', 0, $.removeThis, that.scrollbar.initThumb.bind(that.scrollbar));
+  $('.table-row-sum', this.$dataScroll).animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
 
   // find group type
   if ($('.group-all', this.$container).length) {
@@ -578,7 +370,7 @@ scout.Table.prototype._group = function() {
   }
 
   // prepare data
-  var $rows = $('.table-row:visible', this._$dataScroll),
+  var $rows = $('.table-row:visible', this.$dataScroll),
     $cols = $('.header-item', this.$container),
     $sumRow = $.makeDiv('', 'table-row-sum'),
     sum = [];
@@ -618,7 +410,7 @@ scout.Table.prototype._group = function() {
       $sumRow.insertAfter($rows.eq(r))
         .width(this._header.totalWidth + 4)
         .css('height', 0)
-        .animateAVCSD('height', 34, null, that.scrollbar.initThumb.bind(that.scrollbar));
+        .animateAVCSD('height', 34, null, that.updateScrollbar.bind(that));
 
       $sumRow = $.makeDiv('', 'table-row-sum');
       sum = [];
@@ -689,7 +481,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
       cell.css('background-color', '#fff');
     };
 
-  var $rows = $('.table-row:visible', this._$dataScroll),
+  var $rows = $('.table-row:visible', this.$dataScroll),
     c;
 
   $('.header-item', this.$container).each(function(i) {
@@ -726,8 +518,8 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   var table = this.model;
   table.selectedRowIds = rowIds;
 
-  if (this._$dataScroll) {
-    this._resetSelection();
+  if (this.$dataScroll) {
+    this.resetSelection();
 
     //select rows
     for (var i = 0; i < rowIds.length; i++) {
@@ -750,7 +542,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 };
 
 scout.Table.prototype.findSelectedRows = function() {
-  return this._$dataScroll.find('.row-selected');
+  return this.$dataScroll.find('.row-selected');
 };
 
 scout.Table.prototype._onSelectionMenusChanged = function(selectedRowIds, menus) {
@@ -758,16 +550,21 @@ scout.Table.prototype._onSelectionMenusChanged = function(selectedRowIds, menus)
 
   var $selectedRows = this.findSelectedRows();
   //FIXME see tree for reference
+
+  //delgate to handler
+  if (this.rowMenuHandler) {
+//  this.rowMenuHandler.xxx
+  }
 };
 
 scout.Table.prototype.filter = function() {
   var that = this,
     rowCount = 0,
     origin = [],
-    $allRows = $('.table-row', that._$dataScroll);
+    $allRows = $('.table-row', that.$dataScroll);
 
-  that._resetSelection();
-  $('.table-row-sum', this._$dataScroll).hide();
+  that.resetSelection();
+  $('.table-row-sum', this.$dataScroll).hide();
 
   $allRows.each(function() {
     var $row = $(this),
@@ -808,18 +605,18 @@ scout.Table.prototype.filter = function() {
 
   this._triggerRowsFiltered(rowCount, origin);
 
-  $(':animated', that._$dataScroll).promise().done(function() {
+  $(':animated', that.$dataScroll).promise().done(function() {
     that._group();
   });
 
 };
 
 scout.Table.prototype.resetFilter = function() {
-  this._resetSelection();
+  this.resetSelection();
 
   // reset rows
   var that = this;
-  $('.table-row', that._$dataScroll).each(function() {
+  $('.table-row', that.$dataScroll).each(function() {
     that.showRow($(this));
   });
   this._group();
@@ -872,7 +669,7 @@ scout.Table.prototype.showRow = function($row) {
         'padding-bottom': '2'
       }, {
         complete: function() {
-          that.scrollbar.initThumb();
+          that.updateScrollbar();
         }
       });
   }
@@ -891,7 +688,7 @@ scout.Table.prototype.hideRow = function($row) {
       }, {
         complete: function() {
           $(this).hide();
-          that.scrollbar.initThumb();
+          that.updateScrollbar();
         }
       });
   }
@@ -947,15 +744,16 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
 
 };
 
-scout.Table.prototype._triggerRowsDrawn = function(numRows) {
+scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
   var type = scout.Table.GUI_EVENT_ROWS_DRAWN;
   var event = {
+    $rows: $rows,
     numRows: numRows
   };
   this.events.trigger(type, event);
 };
 
-scout.Table.prototype._triggerRowsSelected = function($rows, allSelected) {
+scout.Table.prototype.triggerRowsSelected = function($rows, allSelected) {
   var type = scout.Table.GUI_EVENT_ROWS_SELECTED;
   var event = {
     $rows: $rows,

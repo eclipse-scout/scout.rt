@@ -4,14 +4,19 @@
 scout.MobileTable = function(session, model) {
   this.base(session, model);
 
-  this.config.contextMenuEnabled = false;
-
   //FIXME should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   this.model.headerVisible = false;
 
   this._headerColumns = [];
 };
 scout.MobileTable.inheritsFrom(scout.Table);
+
+/**
+ * @override
+ */
+scout.MobileTable.prototype._createTableConfigurator = function() {
+  return new scout.MobileTableConfigurator(this);
+};
 
 /**
  * @override

@@ -1,6 +1,9 @@
 /* exported mostRecentJsonRequest */
 function mostRecentJsonRequest() {
-  return $.parseJSON(mostRecentAjaxRequest().params);
+  var req = mostRecentAjaxRequest();
+  if (req) {
+    return $.parseJSON(req.params);
+  }
 }
 
 var jasmineScoutMatchers = {
@@ -17,11 +20,13 @@ var jasmineScoutMatchers = {
         if (!Array.isArray(expected)) {
           expected = [expected];
         }
-        var result = {};
+        var result = {},i;
 
         var actualEvents = [];
-        for (var i = 0; i < actual.events.length; i++) {
-          actualEvents.push(actual.events[i]);
+        if (actual) {
+          for (i = 0; i < actual.events.length; i++) {
+            actualEvents.push(actual.events[i]);
+          }
         }
 
         result.pass = true;
@@ -57,8 +62,10 @@ var jasmineScoutMatchers = {
         var result = {};
 
         var actualEventTypes = [];
-        for (var i = 0; i < actual.events.length; i++) {
-          actualEventTypes.push(actual.events[i].type_);
+        if (actual) {
+          for (var i = 0; i < actual.events.length; i++) {
+            actualEventTypes.push(actual.events[i].type_);
+          }
         }
 
         result.pass = util.equals(actualEventTypes, expected, customEqualityTesters);
@@ -75,3 +82,16 @@ var jasmineScoutMatchers = {
 beforeEach(function() {
   jasmine.addMatchers(jasmineScoutMatchers);
 });
+
+//JQuery extensions for testing purpose
+$.fn.triggerRightClick = function() {
+  $(this).trigger({
+    type: 'mousedown',
+    which: 3
+  });
+  $(this).trigger({
+    type: 'mouseup',
+    which: 3
+  });
+  return $(this);
+};
