@@ -110,9 +110,6 @@ scout.DesktopTable.prototype.onModelAction = function(event) {
     //enrich with label
     $.extend(event.graph, this.model.graph);
 
-    if (this._graph) {
-      this._graph.dispose();
-    }
     this._graph = new scout.DesktopGraph(this.table.footer.$controlContainer, event.graph);
     this.table.footer.openTableControl();
   } else {
