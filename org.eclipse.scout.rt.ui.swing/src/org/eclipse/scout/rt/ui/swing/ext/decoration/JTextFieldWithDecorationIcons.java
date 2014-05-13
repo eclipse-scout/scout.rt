@@ -34,6 +34,8 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
 
   private Cursor m_defaultCursor;
 
+  private Insets m_cachedInsets;
+
   public JTextFieldWithDecorationIcons() {
     registerMouseMotionListener();
     m_defaultCursor = getCursor();
@@ -154,6 +156,12 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
     if (getDecorationIcon() != null) {
       iconWidth = getDecorationIcon().getWidth();
     }
-    setMargin(new Insets(0, 0, 0, m_originalMarginRight + iconWidth));
+
+    Insets calculatedInsets = new Insets(0, 0, 0, m_originalMarginRight + iconWidth);
+    //setMargin(Insets) causes a redraw of the component. Therefore, only repaint if the values have changed.
+    if (m_cachedInsets == null || !m_cachedInsets.equals(calculatedInsets)) {
+      m_cachedInsets = calculatedInsets;
+      setMargin(calculatedInsets);
+    }
   }
 }
