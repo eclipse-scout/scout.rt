@@ -1,0 +1,19 @@
+#DesktopTree{
+overflow:hidden;
+min-height: 100px;
+}
+
+#DesktopTree > .scrollbar{
+right: 18px;
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+#DesktopTreeScroll{
+position: absolute;
+top: 0px;
+width: calc(100% - 11px);
+height: 100%;
+padding: 12px 0px 0px 10px;
+}
+

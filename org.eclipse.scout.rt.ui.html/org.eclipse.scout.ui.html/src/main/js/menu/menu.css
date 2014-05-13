@@ -1,0 +1,71 @@
+#MenuControl{
+position: fixed;
+height: 37px;
+width: 37px;
+z-index: 104;
+border-top: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-bottom: 2px solid #0082A1;
+background-color: white;
+cursor: pointer;
+padding-left: 8px;
+}
+
+#MenuControl:before{
+font-family: fontAwesome;
+font-size: 24px;
+content:"\F0C9";
+line-height: 34px;
+color: #0082A1; }
+
+#MenuControl:hover:before{
+color: #FE9915;
+}
+
+#MenuSelect{
+position: fixed;
+z-index: 103;
+border: 2px solid #0082A1;
+background-color:white;
+white-space: nowrap;
+padding: 3px;}
+
+.menu-item{
+color: #0082A1;
+cursor: pointer;
+line-height: 23px;
+padding: 4px 8px 0px 9px;
+}
+
+.menu-item:hover {
+text-decoration: underline;
+color: #FE9915;
+}
+
+#MenuButtons{
+height: 53px;
+}
+
+#MenuButtonsLabel{
+color: #FE9915;
+padding: 0px 8px 0px 9px;
+line-height: 20px;
+}
+
+.menu-button{
+display:inline-block;
+cursor: pointer;
+padding: 0px 10px 0px 10px;
+}
+
+.menu-button:before{
+font-family: fontAwesome;
+font-size: 24px;
+line-height: 31px;
+color:#0082A1;
+content: attr(data-icon) '\A';
+}
+
+.menu-button:hover:before{
+color: #FE9915;
+}

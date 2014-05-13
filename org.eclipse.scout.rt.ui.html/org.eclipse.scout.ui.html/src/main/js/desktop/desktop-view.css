@@ -1,0 +1,84 @@
+#DesktopViews {
+width: 100%;
+height: 57px;
+white-space: nowrap;
+border-bottom: 1px solid #CCC;
+background: #FFF;
+overflow: hidden;
+}
+
+.view-item {
+position: relative;
+float: left;
+margin: 18px 0px 0px 40px;
+padding-bottom: 10px;
+font-size: 18px;
+line-height: 26px;
+color: #9C9C9C;
+cursor: pointer;
+white-space: nowrap;}
+
+.view-item:hover{
+color: #595959;
+border-bottom: 2px solid #595959;
+}
+
+.view-item.selected {
+color: #FE9915 !important;
+border-bottom: 2px solid #FE9915;
+}
+
+#ViewAdd {
+float: left;
+height: 57px;
+width: 45px;
+padding: 22px 0px 0px 20px;
+margin-left: 15px;
+cursor: pointer;
+}
+
+#ViewAdd:before{
+font-family: fontAwesome;
+font-size: 14px;
+color: #0082A1;
+content: "\f067";
+}
+
+#ViewAdd:hover:before{
+color:#FE9915;
+}
+
+.view-remove{
+position: absolute;
+top: -10px;
+right: -10px;
+height: 25px;
+width: 10px;
+padding-left: 5px;
+}
+
+.view-item:hover .view-remove:after{
+font-family: fontAwesome;
+font-size: 9px;
+color: #0082A1;
+content: "\f00d";
+}
+
+.view-remove:hover:after {
+color:#FE9915 !important;
+}
+
+#ViewLogo {
+float: right;
+margin-top: 13px;
+width: 225px; /*animate to 57px;*/
+height: 33px;
+background: url("logo.png");
+background-size: cover;
+}
+
+.view-item .key-box {
+left: -18px;
+top: -8px;
+width: 14px;
+}

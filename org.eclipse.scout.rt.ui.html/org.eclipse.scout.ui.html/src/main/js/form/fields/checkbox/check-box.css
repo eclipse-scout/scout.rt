@@ -1,0 +1,14 @@
+.checkbox {
+  border: 1px solid black;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  left: 138px;
+  margin-top: 4px;
+  position: absolute;
+}
+
+.checkbox_checked:before {
+  content:"X";
+  margin-left:3px;
+}

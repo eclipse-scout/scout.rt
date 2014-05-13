@@ -9,7 +9,7 @@ scout.TableField.inheritsFrom(scout.ModelAdapter);
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');
   if (this.model.label) {
-    this.$label = $container.makeDiv(undefined, 'label');
+    this.$label = this.$container.makeDiv(undefined, 'label');
   }
 
   this.table = this.session.widgetMap[this.model.table];

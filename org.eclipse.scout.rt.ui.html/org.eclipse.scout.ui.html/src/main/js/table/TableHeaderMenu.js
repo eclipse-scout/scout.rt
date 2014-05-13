@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableColumnHeaderMenu = function(session, table, $header, x, y) {
+scout.TableHeaderMenu = function(session, table, $header, x, y) {
   $('.header-menu').remove();
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');
@@ -11,7 +11,7 @@ scout.TableColumnHeaderMenu = function(session, table, $header, x, y) {
     column = table.model.columns[id];
 
   // create titel
-  var $menuHeaderTitle = $('body').appendDiv('TableColumnHeaderMenuTitle', 'header-menu')
+  var $menuHeaderTitle = $('body').appendDiv('TableHeaderMenuTitle', 'header-menu')
     .css('left', x - 12).css('top', y - 4)
     .css('width', $header.width() + 18)
     .css('height', $header.parent().height() + 1)
@@ -20,7 +20,7 @@ scout.TableColumnHeaderMenu = function(session, table, $header, x, y) {
   if (column.type == 'number') $menuHeaderTitle.css('text-align', 'right');
 
   // create container
-  var $menuHeader = $('body').appendDiv('TableColumnHeaderMenu', 'header-menu')
+  var $menuHeader = $('body').appendDiv('TableHeaderMenu', 'header-menu')
     .css('left', x - 12).css('top', y + $header.parent().height() - 5);
 
   var $headerCommand = $menuHeader.appendDiv('HeaderCommand'),

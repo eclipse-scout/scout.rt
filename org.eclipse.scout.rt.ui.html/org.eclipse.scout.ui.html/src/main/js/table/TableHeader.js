@@ -39,7 +39,7 @@ scout.TableHeader = function(session, table, $tableHeader, filterCallback) {
     } else {
       var x = $header.offset().left,
         y = $header.offset().top;
-      new scout.TableColumnHeaderMenu(session, table, $header, x, y);
+      new scout.TableHeaderMenu(session, table, $header, x, y);
     }
 
     return false;

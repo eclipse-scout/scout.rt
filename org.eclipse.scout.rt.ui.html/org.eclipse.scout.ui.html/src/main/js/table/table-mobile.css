@@ -1,7 +1,13 @@
+.table-data {
+  padding: 0px;
+}
+
 .table-row, .table-row-sum {
-  padding: 4px 0px 4px 0px;
+  padding: 4px 8px 4px 12px;
   margin-bottom: 0px;
   border-bottom: 1px solid #EEE;
+  border-right: 0px;
+  border-left: 0px;
 }
 
 .table-row > h3 {
@@ -11,19 +17,21 @@
 
 .table-row > p {
   margin: 0 0;
+  line-height: 24px;
 }
+
 
 .table-row > p:after {
   font-family: fontAwesome;
   content: "\F054";
-  color: grey;
+  color: #D4D4D4;
   position: absolute;
   display: block;
   width: 22px;
   height: 22px;
   top: 50%;
   margin-top: -11px;
-  right: 10px;
+  right: 0px;
 }
 
 
@@ -34,7 +42,7 @@
   border: 0px;
   border-radius: 0px;
 
-  padding: 4px 0px 4px 0px !important;
+  padding: 4px 8px 4px 12px !important;
   background-color: #fe9915;
   color: white;
 }

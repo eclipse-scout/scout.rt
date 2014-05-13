@@ -121,6 +121,7 @@ Mobile
 - Auf der Session.js gibt es ein UserAgent-Objekt (analog zur ClientSession auf dem Server), dort steht der deviceType drin.
   Das index-mobile.html initialisiert den UserAgent mit dem DeviceType „Mobile“. Bei einem Tablet sollte an dieser Stelle mit Tablet initialisiert werden, es gibt KEIN index-tablet.html.
   Wir erhoffen uns damit, dass wir dann live (responsive) zwischen mobile und tablet wechseln können.
+- Template-Mechanismus für Tables? Damit man pro Table das Layout selber vorgeben kann (z.B. Datumsspalte rechts oben)
 
 Plugin-Struktur
 - Aufteilung html / json ok, aber zur Zeit ist es nicht optimal.

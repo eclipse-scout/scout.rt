@@ -1,0 +1,15 @@
+.key-box {
+position: absolute;
+height: 14px;
+z-index: 100;
+padding-top: 3px;
+color: #FFF;
+font-size: 11px;
+line-height: 11px;
+text-align:center;
+background-color:#FE9915;
+}
+
+.key-box.large{
+font-size: 20px;
+}

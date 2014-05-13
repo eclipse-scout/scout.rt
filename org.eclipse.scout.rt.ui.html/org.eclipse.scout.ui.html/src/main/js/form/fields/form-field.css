@@ -1,0 +1,20 @@
+.form-field {
+  background-color: #eaeaea;
+  height: 25px;
+  width: 100%;
+  border: 1px solid #999;
+}
+
+.form-field > .label {
+  color: #5D5D5D;
+  float: left;
+  position: relative;
+  top: 8px;
+  width: 130px;
+}
+
+.status-label {
+  height: 16px;
+  width: 16px;
+  background-color:orange;
+}

@@ -1,0 +1,242 @@
+
+
+.table {
+height: 100%;
+width: 100%;
+overflow: hidden;
+padding-top: 12px;
+}
+
+/* main table header */
+
+.table-header {
+position: relative;
+border-bottom: 1px solid #EEE;
+border-left: 2px solid #FFF;
+white-space: nowrap;
+padding: 0px 0px 0px 10px;
+}
+
+
+.header-item {
+position: relative;
+display: inline-block;
+padding: 7px 0px 0px 0px;
+font-weight: bold;
+cursor:pointer;
+overflow: hidden;
+text-overflow: ellipsis;
+line-height: 14px;
+}
+
+.header-item.sort-up,
+.header-item.sort-down,
+.header-item.filter,
+.header-item.group-all,
+.header-item.group-sort {
+color:#0082A1;
+}
+
+.header-item:hover, .header-move{
+color:#FE9915
+}
+
+.header-resize {
+display: inline-block;
+position: relative;
+top: 0px;
+cursor: col-resize;
+height: 25px;
+width: 17px;
+background-color: #FFF;
+border-left: 8px solid #FFF;
+border-right: 8px solid #FFF;
+}
+
+.header-item:hover + .header-resize, .header-resize:hover {
+background-color: #EEE;
+}
+
+.header-item.header-move + .header-resize{
+background-color: #FFF ! important;
+}
+
+
+#HeaderOrganize{
+position: absolute;
+bottom: 6px;
+right: 0px;
+width: 20px;
+heigth: 20px;
+cursor: pointer;
+font-family: fontAwesome;
+font-size: 17px;
+line-height: 17px;
+color:#D4D4D4;
+}
+
+#HeaderOrganize:before {
+content:"\F013";
+}
+
+#HeaderOrganize:hover{
+color:#FE9915
+}
+
+
+/* main table data */
+
+.table-data {
+position: relative;
+height: calc(100% - 85px);
+width: 100%;
+overflow: hidden;
+padding-left: 4px;
+}
+
+.table-data > .scrollbar {
+right: 7px;
+margin-top: 10px;
+margin-bottom: 10px;
+height: calc(100% - 23px);
+}
+
+.table-data > .scrollable {
+position: absolute;
+top: 0px;
+height: 100%;
+width: calc(100% - 11px);
+}
+
+
+.table-row, .table-row-sum {
+position:relative;
+overflow: hidden;
+border-right: 2px solid #FFF;
+border-left: 2px solid #FFF;
+line-height: 26px;
+padding: 2px 0px 2px 0px;
+margin-bottom: -2px;
+}
+
+.table-row > div, .table-row-sum > div {
+display: inline-block;
+padding: 3px 6px 0px 6px;
+background-color: #FFF;
+white-space: nowrap;
+border-bottom: 1px solid #EEE;
+overflow: hidden;
+text-overflow: ellipsis;
+vertical-align: top;
+}
+
+.table-row-sum > div {
+font-weight: bold;
+}
+
+.table-row-sum:last-child > div {
+border-bottom: none;
+}
+
+.table-row.select-top {
+padding: 0px 0px 2px 0px !important;
+border-top: 2px solid #0082a1;
+border-left: 2px solid #0082a1;
+border-right: 2px solid #0082a1;
+border-top-left-radius: 7px;
+border-top-right-radius: 7px;
+}
+
+.table-row.select-middle {
+border-left: 2px solid #0082a1;
+border-right: 2px solid #0082a1;
+}
+
+.table-row.select-bottom {
+padding: 2px 0px 0px 0px !important;
+border-bottom: 2px solid #0082a1;
+border-left: 2px solid #0082a1;
+border-right: 2px solid #0082a1;
+border-bottom-left-radius: 7px;
+border-bottom-right-radius: 7px;
+}
+
+.table-row.select-single {
+padding: 0px 0px 0px 0px !important;
+border-top: 2px solid #0082a1;
+border-bottom: 2px solid #0082a1;
+border-left: 2px solid #0082a1;
+border-right: 2px solid #0082a1;
+border-radius: 7px;
+}
+
+.table-row.row-selected > div{
+border-bottom: 1px solid #FFF;
+}
+
+#RowMenu, #RowDrill {
+position: absolute;
+left: -25px;
+top: 0px;
+background-color: #FFF;
+width: 29px;
+height: 27px;
+padding: 3px 5px 0px 5px;
+cursor: pointer;
+overflow: hidden;
+border-bottom: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-right: 2px solid #0082A1;
+border-bottom-left-radius: 7px;
+border-bottom-right-radius: 7px;
+}
+
+#RowMenu:before, #RowDrill:before  {
+font-family: fontAwesome;
+font-size: 18px;
+line-height: 18px;
+color: #0082a1;
+}
+
+#RowMenu:hover:before, #RowDrill:hover:before {
+color:#fe9915;
+}
+
+#RowMenu:before {
+content:"\F0C9";
+}
+
+#RowDrill:before {
+content:"\F063";
+}
+
+
+#RowMenuContainer{
+position: absolute;
+border-bottom: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-right: 2px solid #0082A1;
+background-color: #FFF;
+white-space: nowrap;
+padding: 2px;
+min-width: 140px;
+}
+
+#RowMenuContainer ~ #RowMenu:hover:before {
+content: "\f00d";
+}
+
+
+.table .key-box{
+right: 24px;
+width: 32px;
+}
+
+.table .key-box.top3 { top: 10px;}
+.table .key-box.top2 { top: 32px;}
+.table .key-box.top1 { top: 54px;}
+.table .key-box.bottom1 { bottom: 54px;}
+.table .key-box.bottom2 { bottom: 32px;}
+.table .key-box.bottom3 { bottom: 10px;}
+.table .key-box.char { bottom: 8px; }
+

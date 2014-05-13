@@ -1,0 +1,67 @@
+#DesktopTools{
+position: absolute;
+right: 0px;
+top: 58px;
+z-index: 10;
+height: calc(100% - 58px);
+width: 80px;
+border-left: 1px solid #CCC;
+background-color: #FFF;
+overflow: hidden;
+}
+
+.tool-item{
+position: relative;
+float: right;
+height: 58px;
+width: 80px;
+padding: 15px 15px 15px 15px;
+text-align: center;
+cursor: pointer;
+color:#FFF;}
+
+.tool-item:before{
+font-family: fontAwesome;
+font-size: 30px;
+color:#0082A1;
+content: attr(data-icon) '\A';
+}
+
+.tool-item:hover{
+color:#0082A1;
+}
+
+.tool-item.selected, .tool-item.selected:before{
+color:#FE9915 !important;
+}
+
+.tool-item.selected:hover:before{
+content: "\f00d" '\A';
+}
+
+.tool-item.disabled:hover, .tool-item.disabled:before{
+cursor: default;
+color:#CCC;
+}
+
+.tool-open{
+position: absolute;
+right: 80px;
+top: 58px;
+width: 0px;  /*animate to 300px;*/
+height: calc(100% - 58px);
+border-left:1px solid #CCC;
+background-color: rgba(255, 255, 255, 0.95);
+overflow: hidden;
+z-index: 11;
+}
+
+.tool-item .key-box {
+left: 4px;
+top: 8px;
+width: 22px;
+}
+
+.tool-item.disabled .key-box{
+background-color:#CCC;
+}

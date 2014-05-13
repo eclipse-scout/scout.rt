@@ -1,0 +1,63 @@
+/* (c) Copyright 2013-2014, BSI Business Systems Integration AG */
+/* position, size, look, others */
+
+/* font definition */
+
+@font-face {
+font-family: fontAwesome;
+src: url('awesome.woff') format('woff');
+}
+
+@font-face {
+font-family: fontDax;
+src: url('dax.woff') format('woff');
+}
+
+/* global section, narrow to .scout for usage as portlet*/
+
+*, *:before, *:after {
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+box-sizing: border-box;
+}
+
+html, body {
+height: 100%;
+width: 100%;
+margin: 0px;
+overflow: hidden;
+font-family: fontDax, Arial, sans-serif;
+font-size: 14px;
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+cursor: default;
+}
+
+body.col-resize *, body.col-resize {
+cursor:col-resize !important;
+}
+
+body.row-resize *, body.row-resize {
+cursor:row-resize !important;
+}
+
+.splitter-vertical{
+position: absolute;
+top: 0px;
+right: 0px;
+height: 100%;
+width:21px;
+background-color: #CCC;
+border: 10px solid #FFF;
+cursor: col-resize;
+}
+
+//FIXME CGU ask AWE: gilt das generell oder nur für checkbox? eventuell
+div[disabled="disabled"] {
+  border: 1px solid #999;
+  color: #666;
+  background-color: #ccc;
+}

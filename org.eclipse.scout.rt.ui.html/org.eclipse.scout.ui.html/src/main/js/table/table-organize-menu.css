@@ -1,0 +1,43 @@
+#TableOrganizeMenuTitle {
+position: fixed;
+z-index: 104;
+border-top: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-right: 2px solid #0082A1;
+padding: 6px 5px 9px 6px;
+font-family: fontAwesome;
+font-size: 17px;
+line-height: 17px;
+cursor:pointer;
+background-color: #FFF;
+color:#FE9915
+}
+
+#TableOrganizeMenuTitle:before {
+content:"\F013";
+}
+
+#TableOrganizeMenu {
+position: fixed;
+z-index: 103;
+padding: 10px 1px 0px 10px;
+border: 2px solid #0082A1;
+background-color: #FFF;
+}
+
+#FilterInput{
+width: 241px;
+border: 1px solid #CCC;
+min-height: 30px;
+font-size: 14px;
+font-family: fontDax;
+padding-left: 6px;
+}
+
+#FilterInput:hover{
+border: 1px solid #AAA;
+}
+
+#FilterInput:focus{
+border-color: #0082A1;
+}

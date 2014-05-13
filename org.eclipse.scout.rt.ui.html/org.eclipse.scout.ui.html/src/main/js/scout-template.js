@@ -28,7 +28,7 @@
 //@include("src/main/js/table/TableConfigurator.js");
 //@include("src/main/js/table/TableHeader.js");
 //@include("src/main/js/table/TableFooter.js");
-//@include("src/main/js/table/TableColumnHeaderMenu.js");
+//@include("src/main/js/table/TableHeaderMenu.js");
 //@include("src/main/js/table/TableOrganizeMenu.js");
 //@include("src/main/js/table/TableKeystrokeAdapter.js");
 //@include("src/main/js/table/TableRowMenuHandler.js");
@@ -44,7 +44,7 @@
 //@include("src/main/js/form/fields/FormField.js");
 //@include("src/main/js/form/fields/checkbox/CheckBoxField.js");
 //@include("src/main/js/form/fields/groupbox/GroupBox.js");
-//@include("src/main/js/form/fields/rangebox/SequenceBox.js");
+//@include("src/main/js/form/fields/sequencebox/SequenceBox.js");
 //@include("src/main/js/form/fields/tablefield/TableField.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
