@@ -51,7 +51,6 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   @Override
   protected void attachModel() {
     super.attachModel();
-
     m_rootGroupBox = JsonRendererFactory.get().createJsonFormField(getModelObject().getRootGroupBox(), getJsonSession());
   }
 
@@ -67,8 +66,9 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
     putProperty(json, PROP_MODAL, getModelObject().isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(getModelObject().getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, getModelObject().getDisplayViewId());
-    putProperty(json, PROP_ROOT_GROUP_BOX, m_rootGroupBox.toJson());
-    //FIXME return other props
+    // we do not send the root group box itself to the UI
+    putFormFields(json, toJsonFormField(m_rootGroupBox.getModelObject().getFields()));
+    // FIXME CGU: return other props
     return json;
   }
 
@@ -94,14 +94,12 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   public void handleUiFormClosing(JsonEvent event, JsonResponse res) {
-
     new ClientSyncJob("Form closing", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         getModelObject().getUIFacade().fireFormClosingFromUI();
       }
     }.runNow(new NullProgressMonitor());
-
   }
 
 }

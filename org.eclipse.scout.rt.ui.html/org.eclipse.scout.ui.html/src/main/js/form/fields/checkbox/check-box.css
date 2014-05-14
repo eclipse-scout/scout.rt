@@ -1,3 +1,10 @@
+/* TODO AWE: evtl. können wir das auch für andere fields brauchen */
+div[disabled="disabled"] {
+  border: 1px solid #999;
+  color: #666;
+  background-color: #ccc;
+}
+
 .checkbox {
   border: 1px solid black;
   height: 16px;

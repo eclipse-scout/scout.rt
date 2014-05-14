@@ -13,10 +13,8 @@ package org.eclipse.scout.rt.ui.json.form.fields.rangebox;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.json.JSONObject;
@@ -28,7 +26,7 @@ import org.json.JSONObject;
  */
 public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
-  private List<IJsonFormField> m_jsonFormFields = new ArrayList<>();
+  private List<IJsonFormField<?>> m_jsonFormFields = new ArrayList<>();
 
   public JsonSequenceBox(ISequenceBox model, IJsonSession session) {
     super(model, session);
@@ -39,15 +37,10 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
     return "SequenceBox";
   }
 
-  // TODO AWE: copy/paste from JsonGroupBox -> improve
-
   @Override
   protected void attachModel() {
     super.attachModel();
-    for (IFormField field : getModelObject().getFields()) {
-      IJsonFormField jsonFormField = JsonRendererFactory.get().createJsonFormField(field, getJsonSession());
-      m_jsonFormFields.add(jsonFormField);
-    }
+    m_jsonFormFields = toJsonFormField(getModelObject().getFields());
   }
 
   @Override

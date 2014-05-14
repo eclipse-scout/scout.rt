@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json.form.fields;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
@@ -19,7 +17,6 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField<T> {
@@ -78,15 +75,6 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
     else {
       return new JsonProcessingStatus(scoutStatus).toJson();
     }
-  }
-
-  protected final JSONObject putFormFields(JSONObject json, List<IJsonFormField> formFields) {
-    JSONArray array = new JSONArray();
-    for (IJsonFormField jsonFormField : formFields) {
-      array.put(jsonFormField.toJson());
-    }
-    putProperty(json, "formFields", array);
-    return json;
   }
 
 }

@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -99,6 +105,38 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
     catch (JSONException e) {
       throw new JsonException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * Create a JSONArray from the given list of <code>IJsonFormField</code>s. For each field the <code>toJson()</code>
+   * method is called and added to the array.
+   * 
+   * @param json
+   * @param formFields
+   * @return
+   */
+  protected final JSONObject putFormFields(JSONObject json, List<IJsonFormField<?>> formFields) {
+    JSONArray array = new JSONArray();
+    for (IJsonFormField jsonFormField : formFields) {
+      array.put(jsonFormField.toJson());
+    }
+    putProperty(json, "formFields", array);
+    return json;
+  }
+
+  /**
+   * Converts the given list of Scout form fields into <code>IJsonFormField</code>s by using the JsonRendererFactory.
+   * 
+   * @param formFields
+   * @return
+   */
+  protected final List<IJsonFormField<?>> toJsonFormField(List<IFormField> formFields) {
+    List<IJsonFormField<?>> jsonList = new ArrayList<>();
+    for (IFormField field : formFields) {
+      IJsonFormField jsonFormField = JsonRendererFactory.get().createJsonFormField(field, getJsonSession());
+      jsonList.add(jsonFormField);
+    }
+    return jsonList;
   }
 
 }

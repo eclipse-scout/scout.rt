@@ -54,10 +54,3 @@ background-color: #CCC;
 border: 10px solid #FFF;
 cursor: col-resize;
 }
-
-//FIXME CGU ask AWE: gilt das generell oder nur für checkbox? eventuell
-div[disabled="disabled"] {
-  border: 1px solid #999;
-  color: #666;
-  background-color: #ccc;
-}

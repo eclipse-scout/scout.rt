@@ -1,3 +1,22 @@
 .group-box {
-  height: 100%;
+  /*height: 100%;*/
+  /*background-color: yellow;*/
+}
+
+.group-box-title {
+  clear: both;
+  color: #5D5D5D;
+  font-weight: bold;
+  height: auto;
+  margin: /*145px*/ auto auto;
+  position: relative;
+  text-shadow: 6px 1px 0 #FFFFFF, 2px -2px 0 #FFFFFF, -2px 2px 0 #FFFFFF, 2px 2px 0 #FFFFFF;
+  /*width: 749px;*/
+}
+
+.group-box-title-border {
+  border-top: 1px solid #CCCCCC;
+  display: block;
+  height: 8px;
+  margin-top: -8px;
 }
