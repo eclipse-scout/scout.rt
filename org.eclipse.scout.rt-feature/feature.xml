@@ -4,7 +4,9 @@
       label="%featureName"
       version="4.0.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.scout.rt.feature.about">
+      plugin="org.eclipse.scout.rt.feature.about"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
 
    <description url="http://www.eclipse.org/scout/">
       %description

@@ -114,8 +114,15 @@
     </location>
 
     <location includeAllPlatforms="true" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="scout_testing" location="http://download.eclipse.org/scout/releases/4.0/testing"/>
+
       <unit id="org.mockito.mockito-all" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/scout/releases/4.0/testing"/>
+    </location>
+
+    <location includeAllPlatforms="true" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="cbi_license" location="http://download.eclipse.org/cbi/updates/license"/>
+
+      <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
     </location>
   </locations>
 </target>
