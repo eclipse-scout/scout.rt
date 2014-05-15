@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
-import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +38,6 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
 
   private ILocaleListener m_localeListener;
   private boolean m_localeManagedByModel;
-  private JsonDesktop m_jsonDesktop;
 
   public JsonClientSession(IClientSession modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
@@ -69,9 +67,6 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
       //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
       job.runNow(new NullProgressMonitor());
     }
-
-    //FIXME where to put the initialization stuff?
-    m_jsonDesktop = JsonRendererFactory.get().createJsonDesktop(getModelObject().getDesktop(), getJsonSession());
   }
 
   @Override
@@ -85,7 +80,7 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, "desktop", m_jsonDesktop.toJson());
+    putProperty(json, "desktop", modelObjectToJson(getModelObject().getDesktop()));
     putProperty(json, "locale", localeToJson(getModelObject().getLocale()));
     return json;
   }

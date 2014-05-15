@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.menu.JsonMenu;
 import org.json.JSONArray;
 
@@ -43,7 +42,7 @@ public class MenuManager {
 
   public void createEmptySpaceMenus(List<IMenu> menus) {
     for (IMenu menu : menus) {
-      JsonMenu jsonMenu = JsonRendererFactory.get().createJsonMenu(menu, getJsonSession());
+      JsonMenu jsonMenu = (JsonMenu) getJsonSession().getOrCreateJsonRenderer(menu);
       m_jsonEmptySpaceMenus.add(jsonMenu);
     }
   }
@@ -71,7 +70,7 @@ public class MenuManager {
 
   public void createSelectionMenus(List<IMenu> menus) {
     for (IMenu menu : menus) {
-      JsonMenu jsonMenu = JsonRendererFactory.get().createJsonMenu(menu, getJsonSession());
+      JsonMenu jsonMenu = (JsonMenu) getJsonSession().getOrCreateJsonRenderer(menu);
       m_jsonSelectionMenus.add(jsonMenu);
     }
   }

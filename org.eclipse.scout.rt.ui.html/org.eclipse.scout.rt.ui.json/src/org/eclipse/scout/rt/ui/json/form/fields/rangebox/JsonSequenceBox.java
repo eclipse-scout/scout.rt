@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json.form.fields.rangebox;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
@@ -25,8 +21,6 @@ import org.json.JSONObject;
  * @author awe
  */
 public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
-
-  private List<IJsonFormField<?>> m_jsonFormFields = new ArrayList<>();
 
   public JsonSequenceBox(ISequenceBox model, IJsonSession session) {
     super(model, session);
@@ -38,16 +32,8 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    m_jsonFormFields = toJsonFormField(getModelObject().getFields());
-  }
-
-  @Override
   public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putFormFields(json, m_jsonFormFields);
-    return json;
+    return putProperty(super.toJson(), "formFields", modelObjectsToJson(getModelObject().getFields()));
   }
 
 }

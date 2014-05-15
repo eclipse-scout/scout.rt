@@ -18,9 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
 import org.json.JSONObject;
 
 public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
@@ -37,7 +35,6 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
 
   private FormListener m_modelFormListener;
-  private JsonGroupBox m_rootGroupBox;
 
   public JsonForm(IForm form, IJsonSession session) {
     super(form, session);
@@ -49,26 +46,22 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    m_rootGroupBox = JsonRendererFactory.get().createJsonFormField(getModelObject().getRootGroupBox(), getJsonSession());
-  }
-
-  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_TITLE, getModelObject().getTitle());
-    putProperty(json, PROP_ICON_ID, getModelObject().getIconId());
-    putProperty(json, PROP_MAXIMIZE_ENABLED, getModelObject().isMaximizeEnabled());
-    putProperty(json, PROP_MINIMIZE_ENABLED, getModelObject().isMinimizeEnabled());
-    putProperty(json, PROP_MAXIMIZED, getModelObject().isMaximized());
-    putProperty(json, PROP_MINIMIZED, getModelObject().isMinimized());
-    putProperty(json, PROP_MODAL, getModelObject().isModal());
-    putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(getModelObject().getDisplayHint()));
-    putProperty(json, PROP_DISPLAY_VIEW_ID, getModelObject().getDisplayViewId());
+    IForm model = getModelObject();
+    putProperty(json, PROP_TITLE, model.getTitle());
+    putProperty(json, PROP_ICON_ID, model.getIconId());
+    putProperty(json, PROP_MAXIMIZE_ENABLED, model.isMaximizeEnabled());
+    putProperty(json, PROP_MINIMIZE_ENABLED, model.isMinimizeEnabled());
+    putProperty(json, PROP_MAXIMIZED, model.isMaximized());
+    putProperty(json, PROP_MINIMIZED, model.isMinimized());
+    putProperty(json, PROP_MODAL, model.isModal());
+    putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
+    putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     // we do not send the root group box itself to the UI
-    putFormFields(json, toJsonFormField(m_rootGroupBox.getModelObject().getFields()));
-    // FIXME CGU: return other props
+    putProperty(json, "formFields", modelObjectsToJson(model.getRootGroupBox().getControlFields()));
+    // TODO AWE: check controlFields VS fields --> guess fields is more appropriate
+    // TODO AWE: return other props
     return json;
   }
 

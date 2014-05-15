@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.ui.json.Activator;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonException;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.json.tree.TreeEventFilter;
@@ -328,7 +327,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         if (table != null) {
           JsonTable jsonTable = m_jsonTables.get(table);
           if (jsonTable == null) {
-            jsonTable = JsonRendererFactory.get().createJsonTable(table, getJsonSession());
+            jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
             m_jsonTables.put(table, jsonTable);
           }
           json.put("table", m_jsonTables.get(table).toJson());

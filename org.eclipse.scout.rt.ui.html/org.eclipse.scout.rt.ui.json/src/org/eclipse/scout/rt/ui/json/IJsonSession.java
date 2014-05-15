@@ -22,11 +22,30 @@ public interface IJsonSession {
 
   String createUniqueIdFor(IJsonRenderer<?> renderer);
 
-  void registerJsonRenderer(String id, IJsonRenderer<?> renderer);
+  /**
+   * Registers the IJsonRenderer instance and model object with the given renderer ID.
+   */
+  void registerJsonRenderer(String id, Object scoutObject, IJsonRenderer<?> renderer);
 
+  /**
+   * Unregisters the IJsonRenderer instance with the given renderer ID.
+   */
   void unregisterJsonRenderer(String id);
 
+  /**
+   * Returns an IJsonRenderer instance for the given renderer ID.
+   */
   IJsonRenderer<?> getJsonRenderer(String id);
+
+  /**
+   * Returns an IJsonRenderer instance for the given model object.
+   */
+  IJsonRenderer<?> getJsonRenderer(Object modelObject);
+
+  /**
+   * Creates a new IJsonRenderer instance for the given modelObject, or returns an existing instance.
+   */
+  IJsonRenderer<?> getOrCreateJsonRenderer(Object modelObject);
 
   /**
    * @return the current ui response that is collecting changes for the next
@@ -37,4 +56,5 @@ public interface IJsonSession {
   HttpServletRequest currentHttpRequest();
 
   JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException;
+
 }

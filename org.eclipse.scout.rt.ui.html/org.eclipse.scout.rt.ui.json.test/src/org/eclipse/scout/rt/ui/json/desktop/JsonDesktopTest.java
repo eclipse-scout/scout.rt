@@ -6,23 +6,16 @@ package org.eclipse.scout.rt.ui.json.desktop;
 import java.lang.ref.WeakReference;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.DesktopWithOneOutline;
 import org.eclipse.scout.rt.ui.json.desktop.fixtures.DesktopWithOutlineForms;
 import org.eclipse.scout.rt.ui.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonDesktopTest {
-
-  @BeforeClass
-  public static void beforeClass() {
-    JsonRendererFactory.init();
-  }
 
   @Test
   public void testDisposeWithoutForms() {
@@ -48,10 +41,8 @@ public class JsonDesktopTest {
 
   public static JsonDesktop createJsonDesktopWithMocks(IDesktop desktop) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-
     JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession);
     jsonDesktop.init();
-
     return jsonDesktop;
   }
 }

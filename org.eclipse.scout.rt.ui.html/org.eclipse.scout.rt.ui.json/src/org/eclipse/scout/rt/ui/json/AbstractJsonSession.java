@@ -42,14 +42,29 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
   private JsonClientSession m_jsonClientSession;
-  private final Map<String, IJsonRenderer> m_jsonRenderers;
+
+  /**
+   * Maps the JsonRenderer ID to an IJsonRenderer instance (wrapped by a composite).
+   */
+  private final Map<String, ModelRendererComposite> m_idRendererMap;
+
+  /**
+   * Maps a Scout model instance to an IJsonRenderer instance (wrapped by a composite).
+   */
+  private final Map<Object, ModelRendererComposite> m_modelRendererMap;
+
+  // TODO AWE: JsonRendererFactory überschreibbar machen, via Scout-service
+  private final JsonRendererFactory m_jsonRendererFactory;
+
   private long m_jsonRendererSeq;
   private JsonResponse m_currentJsonResponse;
   private HttpServletRequest m_currentHttpRequest;
 
   public AbstractJsonSession() {
-    m_jsonRenderers = new HashMap<>();
+    m_idRendererMap = new HashMap<>();
+    m_modelRendererMap = new HashMap<>();
     m_currentJsonResponse = new JsonResponse();
+    m_jsonRendererFactory = new JsonRendererFactory();
   }
 
   @Override
@@ -62,7 +77,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
 
-    m_jsonClientSession = JsonRendererFactory.get().createJsonClientSession(clientSession, this, jsonReq.getSessionPartId()); //FIXME use sessionId or use createUniqueIdFor? duplicates possible?
+    m_jsonClientSession = m_jsonRendererFactory.createJsonClientSession(clientSession, this, jsonReq.getSessionPartId()); //FIXME use sessionId or use createUniqueIdFor? duplicates possible?
     m_jsonClientSession.init();
 
     if (!clientSession.isActive()) {
@@ -74,13 +89,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected UserAgent createUserAgent(JsonRequest jsonReq) {
-    //FIXME create UiLayer.HTML
+    // FIXME CGU create UiLayer.HTML
     IUiLayer uiLayer = UiLayer.RAP;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = m_currentHttpRequest.getHeader("User-Agent");
     JSONObject userAgent = jsonReq.getUserAgent();
     if (userAgent != null) {
-      //FIXME it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      // FIXME CGU it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
       if (uiDeviceTypeStr != null) {
         uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
@@ -103,7 +118,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     LocaleThreadLocal.set(locale);
     try {
       return createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
-      //FIXME session must be started later, see JsonClientSession
+      //FIXME CGU session must be started later, see JsonClientSession
       //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
     }
     finally {
@@ -129,8 +144,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   public void dispose() {
-    for (IJsonRenderer renderer : CollectionUtility.arrayList(m_jsonRenderers.values())) {
-      renderer.dispose();
+    for (ModelRendererComposite comp : CollectionUtility.arrayList(m_idRendererMap.values())) {
+      comp.getJsonRenderer().dispose();
     }
   }
 
@@ -141,23 +156,47 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public String createUniqueIdFor(IJsonRenderer renderer) {
-    //FIXME create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
+    //FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
     return "" + (++m_jsonRendererSeq);
   }
 
   @Override
-  public void registerJsonRenderer(String id, IJsonRenderer renderer) {
-    m_jsonRenderers.put(id, renderer);
+  public IJsonRenderer<?> getOrCreateJsonRenderer(Object modelObject) {
+    IJsonRenderer<?> jsonRenderer = getJsonRenderer(modelObject);
+    if (jsonRenderer != null) {
+      return jsonRenderer;
+    }
+    return m_jsonRendererFactory.createJsonRenderer(modelObject, this);
+  }
+
+  @Override
+  public void registerJsonRenderer(String id, Object modelObject, IJsonRenderer jsonRenderer) {
+    ModelRendererComposite comp = new ModelRendererComposite(id, modelObject, jsonRenderer);
+    // TODO AWE: move theses map to a Registry class
+    m_idRendererMap.put(id, comp);
+    m_modelRendererMap.put(modelObject, comp);
   }
 
   @Override
   public void unregisterJsonRenderer(String id) {
-    m_jsonRenderers.remove(id);
+    ModelRendererComposite comp = m_idRendererMap.remove(id);
+    m_modelRendererMap.remove(comp.getModelObject());
   }
 
   @Override
   public IJsonRenderer<?> getJsonRenderer(String id) {
-    return m_jsonRenderers.get(id);
+    return m_idRendererMap.get(id).getJsonRenderer();
+  }
+
+  @Override
+  public IJsonRenderer<?> getJsonRenderer(Object modelObject) {
+    ModelRendererComposite comp = m_modelRendererMap.get(modelObject);
+    if (comp == null) {
+      return null;
+    }
+    else {
+      return comp.getJsonRenderer();
+    }
   }
 
   @Override
@@ -174,7 +213,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) {
     m_currentHttpRequest = httpReq;
 
-    //FIXME should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
+    //FIXME CGU should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
     m_jsonClientSession.processRequestLocale(httpReq.getLocale());
 
     final JsonResponse res = currentJsonResponse();

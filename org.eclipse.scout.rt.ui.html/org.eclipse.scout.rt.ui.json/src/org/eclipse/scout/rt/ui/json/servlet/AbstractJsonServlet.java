@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -36,11 +35,6 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
 
   protected AbstractJsonServlet() {
-    JsonRendererFactory.init(createJsonRendererFactory());
-  }
-
-  public JsonRendererFactory createJsonRendererFactory() {
-    return new JsonRendererFactory();
   }
 
   public abstract IJsonSession createJsonSession();

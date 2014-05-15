@@ -16,14 +16,16 @@ scout.GroupBox.prototype._render = function($parent) {
     this._$label = this.$container.appendDiv(undefined, 'group-box-title', this.model.label + span);
   }
 
-  var formField, i, formFieldModel;
-  for (i = 0; i < this.model.formFields.length; i++) {
-    formFieldModel = this.model.formFields[i];
-    formField = this.session.widgetMap[formFieldModel.id];
-    if (!formField) {
-      formField = this.session.objectFactory.create(formFieldModel);
+  if (this.model.formFields) {
+    var formField, i, formFieldModel;
+    for (i = 0; i < this.model.formFields.length; i++) {
+      formFieldModel = this.model.formFields[i];
+      formField = this.session.widgetMap[formFieldModel.id];
+      if (!formField) {
+        formField = this.session.objectFactory.create(formFieldModel);
+      }
+      formField.attach(this.$container);
     }
-    formField.attach(this.$container);
   }
 };
 

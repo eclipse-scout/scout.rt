@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.json.desktop;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -38,7 +36,6 @@ import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonException;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
 import org.json.JSONArray;
@@ -68,7 +65,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession) {
     super(desktop, jsonSession);
-    m_jsonViewButtons = new LinkedList<JsonViewButton>();
     m_jsonOutlines = new HashMap<>();
     m_jsonForms = new HashMap<>();
   }
@@ -110,12 +106,8 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
     if (!isFormBased()) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
-      for (IViewButton viewButton : getDesktop().getViewButtons()) {
-        JsonViewButton button = JsonRendererFactory.get().createJsonViewButton(viewButton, getJsonSession());
-        m_jsonViewButtons.add(button);
-      }
       if (getDesktop().getOutline() != null) {
-        JsonDesktopTree jsonOutline = JsonRendererFactory.get().createJsonDesktopTree(getDesktop().getOutline(), getJsonSession());
+        JsonDesktopTree jsonOutline = (JsonDesktopTree) getJsonSession().getOrCreateJsonRenderer(getDesktop().getOutline());
         m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
       }
     }
@@ -155,13 +147,8 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
       boolean formBased = isFormBased();
       if (!formBased) {
-
         //FIXME view and tool buttons should be removed from desktop by device transformer
-        JSONArray viewButtons = new JSONArray();
-        for (JsonViewButton jsonViewButton : m_jsonViewButtons) {
-          viewButtons.put(jsonViewButton.toJson());
-        }
-        json.put("viewButtons", viewButtons);
+        json.put("viewButtons", modelObjectsToJson(getDesktop().getViewButtons()));
         json.put("toolButtons", new JSONArray(TOOL_BUTTONS)); //FIXME CGU (+ putProperty verwenden)
         JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
         if (jsonDesktopTree != null) {
@@ -185,7 +172,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     if (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm)) {
       return null; //FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
     }
-    JsonForm jsonForm = JsonRendererFactory.get().createJsonForm(form, getJsonSession());
+    JsonForm jsonForm = (JsonForm) getJsonSession().getOrCreateJsonRenderer(form);
     m_jsonForms.put(form, jsonForm);
     attachFormListener(form);
 
@@ -243,7 +230,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     try {
       JsonDesktopTree jsonOutline = m_jsonOutlines.get(outline);
       if (jsonOutline == null) {
-        jsonOutline = JsonRendererFactory.get().createJsonDesktopTree(outline, getJsonSession());
+        jsonOutline = (JsonDesktopTree) getJsonSession().getOrCreateJsonRenderer(outline);
         m_jsonOutlines.put(outline, jsonOutline);
         getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());
       }

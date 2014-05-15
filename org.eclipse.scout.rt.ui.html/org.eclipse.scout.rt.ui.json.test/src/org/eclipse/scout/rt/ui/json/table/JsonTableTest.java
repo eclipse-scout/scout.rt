@@ -11,6 +11,10 @@
 package org.eclipse.scout.rt.ui.json.table;
 
 import static org.eclipse.scout.rt.ui.json.testing.JsonTestUtility.extractEventsFromResponse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -27,7 +31,6 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,7 +45,7 @@ public class JsonTableTest {
     Table table = new Table();
     table.fill(5);
 
-    Assert.assertNull(table.getSelectedRow());
+    assertNull(table.getSelectedRow());
 
     ITableRow row = table.getRow(2);
     JsonTable jsonTable = createJsonTableWithMocks(table);
@@ -50,7 +53,7 @@ public class JsonTableTest {
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event, new JsonResponse());
 
-    Assert.assertTrue(row.isSelected());
+    assertTrue(row.isSelected());
   }
 
   /**
@@ -68,7 +71,7 @@ public class JsonTableTest {
     jsonTable.handleUiEvent(event, new JsonResponse());
 
     List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
-    Assert.assertTrue(responseEvents.size() == 0);
+    assertTrue(responseEvents.size() == 0);
   }
 
   /**
@@ -90,19 +93,19 @@ public class JsonTableTest {
     JsonTable jsonTable = createJsonTableWithMocks(table);
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
-    Assert.assertFalse(row2.isSelected());
-    Assert.assertFalse(row4.isSelected());
+    assertFalse(row2.isSelected());
+    assertFalse(row4.isSelected());
 
     jsonTable.handleUiEvent(event, new JsonResponse());
 
-    Assert.assertFalse(row2.isSelected());
-    Assert.assertTrue(row4.isSelected());
+    assertFalse(row2.isSelected());
+    assertTrue(row4.isSelected());
 
     List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
-    Assert.assertTrue(responseEvents.size() == 1);
+    assertTrue(responseEvents.size() == 1);
 
     List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0));
-    Assert.assertEquals(row4, tableRows.get(0));
+    assertEquals(row4, tableRows.get(0));
   }
 
   @Test

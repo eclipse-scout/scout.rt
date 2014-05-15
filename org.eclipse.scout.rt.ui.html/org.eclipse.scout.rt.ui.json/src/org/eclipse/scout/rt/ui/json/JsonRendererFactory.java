@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.ui.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.json.form.JsonForm;
-import org.eclipse.scout.rt.ui.json.form.fields.IJsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.json.form.fields.groupbox.JsonGroupBox;
@@ -38,97 +37,54 @@ import org.eclipse.scout.rt.ui.json.table.JsonTable;
 
 public class JsonRendererFactory {
 
-  private static JsonRendererFactory m_instance;
-
-  public static JsonRendererFactory get() {
-    return m_instance;
-  }
-
-  public static void init(JsonRendererFactory rendererFactory) {
-    if (m_instance != null) {
-      throw new IllegalArgumentException(
-          "JsonRendererFactory is already initialized.");
-    }
-    m_instance = rendererFactory;
-  }
-
-  public static void init() {
-    if (m_instance == null) {
-      m_instance = new JsonRendererFactory();
-    }
-  }
-
-  public JsonClientSession createJsonClientSession(IClientSession model,
-      IJsonSession session, String id) {
+  public JsonClientSession createJsonClientSession(IClientSession model, IJsonSession session, String id) {
     return new JsonClientSession(model, session, id);
   }
 
-  public JsonDesktop createJsonDesktop(IDesktop model, IJsonSession session) {
-    JsonDesktop renderer = new JsonDesktop(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
-  public JsonTable createJsonTable(ITable model, IJsonSession session) {
-    JsonTable renderer = new JsonTable(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
-  public JsonDesktopTree createJsonDesktopTree(IOutline model,
-      IJsonSession session) {
-    JsonDesktopTree renderer = new JsonDesktopTree(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
-  public JsonViewButton createJsonViewButton(IViewButton model,
-      IJsonSession session) {
-    JsonViewButton renderer = new JsonViewButton(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
-  public JsonForm createJsonForm(IForm model, IJsonSession session) {
-    JsonForm renderer = new JsonForm(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
-  public JsonMenu createJsonMenu(IMenu model, IJsonSession session) {
-    JsonMenu renderer = new JsonMenu(model, session);
-    renderer.init();
-
-    return renderer;
-  }
-
   @SuppressWarnings("unchecked")
-  public <T extends IJsonFormField> T createJsonFormField(IFormField model, IJsonSession session) {
-    T renderer = null;
-    if (model instanceof IGroupBox) {
-      renderer = (T) new JsonGroupBox((IGroupBox) model, session);
+  public IJsonRenderer createJsonRenderer(Object modelObject, IJsonSession session) {
+    // form fields
+    if (modelObject instanceof IGroupBox) {
+      return init(new JsonGroupBox((IGroupBox) modelObject, session));
     }
-    else if (model instanceof ISequenceBox) {
-      renderer = (T) new JsonSequenceBox((ISequenceBox) model, session);
+    else if (modelObject instanceof ISequenceBox) {
+      return init(new JsonSequenceBox((ISequenceBox) modelObject, session));
     }
-    else if (model instanceof ICheckBox) {
-      renderer = (T) new JsonCheckBoxField((IBooleanField) model, session);
+    else if (modelObject instanceof ICheckBox) {
+      return init(new JsonCheckBoxField((IBooleanField) modelObject, session));
     }
-    else if (model instanceof ITableField<?>) {
-      renderer = (T) new JsonTableField((ITableField) model, session);
+    else if (modelObject instanceof ITableField<?>) {
+      return init(new JsonTableField((ITableField) modelObject, session));
     }
-    // else if (model instanceof IStringField) {
-    //   renderer = (T) new JsonStringField((IStringField) model, session);
-    // }
-    else {
-      renderer = (T) new JsonFormField(model, session);
+    else if (modelObject instanceof IFormField) {
+      // TODO AWE: direktes instanzieren von form-field verbieten
+      return init(new JsonFormField((IFormField) modelObject, session));
     }
-    renderer.init();
-    return renderer;
+    // other model objects
+    else if (modelObject instanceof IMenu) {
+      return init(new JsonMenu((IMenu) modelObject, session));
+    }
+    else if (modelObject instanceof IForm) {
+      return init(new JsonForm((IForm) modelObject, session));
+    }
+    else if (modelObject instanceof IViewButton) {
+      return init(new JsonViewButton((IViewButton) modelObject, session));
+    }
+    else if (modelObject instanceof IOutline) {
+      return init(new JsonDesktopTree((IOutline) modelObject, session));
+    }
+    else if (modelObject instanceof ITable) {
+      return init(new JsonTable((ITable) modelObject, session));
+    }
+    else if (modelObject instanceof IDesktop) {
+      return init(new JsonDesktop((IDesktop) modelObject, session));
+    }
+    throw new IllegalArgumentException("Cannot create JSON-renderer for model-object " + modelObject);
   }
+
+  private <T extends IJsonRenderer> T init(T jsonRenderer) {
+    jsonRenderer.init();
+    return jsonRenderer;
+  }
+
 }

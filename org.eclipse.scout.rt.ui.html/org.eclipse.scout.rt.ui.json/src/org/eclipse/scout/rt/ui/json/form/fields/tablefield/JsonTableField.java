@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonException;
-import org.eclipse.scout.rt.ui.json.JsonRendererFactory;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
 import org.json.JSONException;
@@ -41,7 +40,6 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   @Override
   protected void attachModel() {
     super.attachModel();
-
     //FIXME Hold JsonTable globally? and share with other elements like desktop? generally hold every model object globally? when to dispose? only on model dispose?
     //-> incremental creation of the model -> improves offline, maybe introduce dispose flag for table fields -> dont dispose for outlineTables, dispose otherwise
     createAndRegisterJsonTable(getModelObject().getTable());
@@ -53,16 +51,14 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   protected JsonTable createAndRegisterJsonTable(ITable table) {
-    JsonTable jsonTable = JsonRendererFactory.get().createJsonTable(table, getJsonSession());
+    JsonTable jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
     m_jsonTables.put(table, jsonTable);
-
     return jsonTable;
   }
 
   protected String disposeAndUnregisterJsonTable(ITable table) {
     JsonTable jsonTable = m_jsonTables.remove(table);
     jsonTable.dispose();
-
     return jsonTable.getId();
   }
 
@@ -71,7 +67,6 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
       JsonTable jsonTable = m_jsonTables.get(table);
       if (jsonTable == null) {
         jsonTable = createAndRegisterJsonTable(table);
-
         getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
       }
       else {
