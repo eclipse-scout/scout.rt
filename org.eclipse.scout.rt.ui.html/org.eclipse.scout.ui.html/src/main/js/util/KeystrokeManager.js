@@ -18,7 +18,7 @@ scout.KeystrokeManager = function() {
     }
   });
 
-  $(document).blur(function() {
+  $(window).blur(function() {
     removeKeyBox();
   });
 

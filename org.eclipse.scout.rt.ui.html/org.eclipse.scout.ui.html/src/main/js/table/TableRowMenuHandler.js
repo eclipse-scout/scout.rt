@@ -92,8 +92,6 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         clickRowMenu();
       }
 
-      // TODO cru: remove events?
-
       function enterSelection(event) {
         $RowDrill.animateAVCSD('height', h1, null, null, 75);
         $RowMenu.animateAVCSD('height', h2, null, null, 75);
@@ -109,7 +107,6 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
       function clickRowMenu() {
         if ($('#RowMenuContainer').length) {
           removeMenu();
-          return;
         }
 
         var menus = that.table.model.selectionMenus;
@@ -148,8 +145,8 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
           var t = parseInt($RowMenu.css('top'), 0);
           $RowMenu.css('top', t).animateAVCSD('top', t + h - 2);
 
-          // TODO cru; every user action will close menu
-          //$('*').one('mousedown keydown mousewheel', removeMenu);
+          // every user action will close menu
+          $('*').one('mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu', removeMenu);
         }
 
         function onHoverIn() {
@@ -163,6 +160,7 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         function onMenuItemClicked() {}
 
         function removeMenu() {
+          $.log('remove')
           var $RowMenuContainer = $('#RowMenuContainer'),
             h = $RowMenuContainer.outerHeight();
 
@@ -170,6 +168,7 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
 
           var t = parseInt($RowMenu.css('top'), 0);
           $RowMenu.css('top', t).animateAVCSD('top', t - h + 2);
+          $('*').off('.rowMenu');
         }
       }
     }

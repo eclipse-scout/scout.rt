@@ -3,11 +3,13 @@
 position: relative;
 float: left;
 width: 100%;
-line-height: 32px;
-padding-left: 30px;
+line-height: 30px;
 white-space: nowrap;
 cursor: pointer;
 overflow: hidden;
+padding-top: 2px;
+padding-bottom: 2px;
+padding-left: 30px;
 }
 
 .tree-item-control{
@@ -22,13 +24,14 @@ padding: 4px 4px 4px 4px;
 
 .tree-item-control:before{
 font-family: fontAwesome;
-font-size: 24px;
-content: "\F111";
+font-size: 18px;
 color: #CCC;
+line-height: 24px;
+padding: 4px 4px 4px 4px;
 }
 
 .tree-item.can-expand > .tree-item-control:before{
-content:"\F0A9";
+content:"\F067";
 }
 
 .tree-item:hover > .tree-item-control:before{
@@ -36,34 +39,64 @@ color:#9C9C9C;
 }
 
 .tree-item.selected > .tree-item-control:before{
-color:#FE9915 !important;
+color:#0082a1 !important;
 }
 
-.tree-item.expanded > .tree-item-control:hover:before{
-content:"\F057" !important;
+.tree-item.selected {
+border: 2px solid #0082a1;
+border-radius: 7px;
+padding-top: 0px !important;
+padding-bottom: 0px !important;
+padding-left: 28px !important;;
+}
+
+.tree-item.expanded > .tree-item-control:hover:before, 
+.tree-item.selected > .tree-item-control:hover:before{
+color:#FE9915 !important;
 }
 
 .tree-item-menu{
 position: absolute;
-right: 1px;
-top: -1px;
+right: 0px;
+top: 0px;
+background-color: #FFF;
+padding-right: 4px;
 }
 
-.selected > .tree-item-menu:before{
+.tree-item.selected > .tree-item-menu:before{
 font-family: fontAwesome;
-font-size: 24px;
+font-size: 18px;
 content:"\F0C9";
-color: #CCC;
+color: #0082a1;
 background-color: #fff;
 padding: 3px 3px 3px 3px;
 }
 
+.tree-item.selected.menu-open {
+border-bottom-right-radius: 0;
+}
+
+.tree-item.selected.menu-open > .tree-item-menu:hover:before{
+content: "\f00d";
+}
+
 .tree-item-menu:hover:before{
-color:#9C9C9C !important;
+color:#FE9915 !important;
 }
 
 #TreeItemAnimate{
 width: 100%;
+}
+
+#TreeMenuContainer{
+position: absolute;
+border-bottom: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-right: 2px solid #0082A1;
+background-color: #FFF;
+white-space: nowrap;
+padding: 2px;
+min-width: 140px;
 }
 
 
@@ -72,3 +105,5 @@ left: 3px;
 top: 7px;
 width: 20px;
 }
+
+

@@ -36,7 +36,6 @@ scout.DesktopTree.prototype.attachModel = function() {
     selectedNode = this._selectedNodes[0];
     this.setNodeSelectedById(selectedNode.id);
 
-
     if (selectedNode.type === 'table' && !this._desktopTable) {
       this._desktopTable = this.session.widgetMap[selectedNode.id];
       this._desktopTable.attach($('#DesktopBench'));
@@ -110,7 +109,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
         };
 
         $control.css('borderSpacing', 0)
-          .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl);
+          .animateAVCSD('borderSpacing', 135, addExpanded, rotateControl);
       }
     }
   } else {
@@ -128,7 +127,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
     rotateControl = function(now /*, fx*/ ) {
       $control.css('transform', 'rotate(' + now + 'deg)');
     };
-    $control.css('borderSpacing', 90)
+    $control.css('borderSpacing', 135)
       .animateAVCSD('borderSpacing', 0, null, rotateControl);
   }
 };
@@ -244,7 +243,8 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       .data('node', node)
       .attr('data-level', level)
       .css('margin-left', level * 20)
-      .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)');
+      .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)')
+      .on('contextmenu', onNodeContextClick);
 
     // decorate with (close) control
     var $control = $node.appendDiv('', 'tree-item-control')
@@ -252,7 +252,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
 
     // rotate control if expanded
     if ($node.hasClass('expanded')) {
-      $control.css('transform', 'rotate(90deg)');
+      $control.css('transform', 'rotate(270deg)');
     }
 
     // append first node and successors
@@ -296,6 +296,13 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
 
   function onNodeControlClicked(event) {
     return that._onNodeControlClicked(event, $(this));
+  }
+
+  function onNodeContextClick(e) {
+    $(this).click();
+    //TODO cgu: geht nicht beim ertsen klick?
+    $('.tree-item-menu', $(this)).click();
+    e.preventDefault();
   }
 
   // return all created nodes
@@ -343,21 +350,73 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
   }
 
   function openNodeMenu() {
-    var nodeId = $clicked.parent().attr('id'),
-      x = $clicked.offset().left,
-      y = $clicked.offset().top,
-      emptySpace = !nodeId;
+    var $node = $clicked.parent(),
+      nodeId = $node.attr('id'),
+      y = $clicked.offset().top - that._$desktopTreeScroll.offset().top + 30,
+      menus = that.model.selectionMenus;
 
-    var menus = that.model.selectionMenus;
-    if (emptySpace) {
-      menus = that.model.emptySpaceMenus;
+    if ($('#TreeMenuContainer').length) {
+      removeMenu();
+      return;
     }
 
     if (menus && menus.length > 0) {
-      new scout.Menu(that.session, menus, x, y);
+      var $TreeMenuContainer = $node.parent().appendDiv('TreeMenuContainer')
+        .css('right', 24).css('top', y);
+
+      $node.addClass('menu-open');
+
+      // create menu-item and menu-button
+      for (var i = 0; i < menus.length; i++) {
+        if (menus[i].iconId) {
+          $TreeMenuContainer.appendDiv('', 'menu-button')
+            .attr('id', menus[i].id)
+            .attr('data-icon', menus[i].iconId)
+            .attr('data-label', menus[i].text)
+            .on('click', '', onMenuItemClicked)
+            .hover(onHoverIn, onHoverOut);
+        } else {
+          $TreeMenuContainer.appendDiv('', 'menu-item', menus[i].text)
+            .attr('id', menus[i].id)
+            .on('click', '', onMenuItemClicked);
+        }
+      }
+
+      // wrap menu-buttons and add one div for label
+      $('.menu-button', $TreeMenuContainer).wrapAll('<div id="MenuButtons"></div>');
+      $('#MenuButtons', $TreeMenuContainer).appendDiv('MenuButtonsLabel');
+      $TreeMenuContainer.append($('#MenuButtons', $TreeMenuContainer));
+
+      // animated opening
+      var h = $TreeMenuContainer.outerHeight();
+      $TreeMenuContainer.css('height', 0).animateAVCSD('height', h);
+
+      // every user action will close menu
+      $('*').one('mousedown.treeMenu keydown.treeMenu mousewheel.treeMenu', removeMenu);
     }
 
-    return false;
+    function onHoverIn() {
+      $('#MenuButtonsLabel').text($(this).data('label'));
+    }
+
+    function onHoverOut() {
+      $('#MenuButtonsLabel').text('');
+    }
+
+    function onMenuItemClicked() {}
+
+    function removeMenu() {
+      var $TreeMenuContainer = $('#TreeMenuContainer'),
+        h = $TreeMenuContainer.outerHeight();
+
+      $TreeMenuContainer.animateAVCSD('height', 0,
+        function() {
+          $(this).remove();
+          $node.removeClass('menu-open');
+        });
+
+      $('*').off('.treeMenu');
+    }
   }
 };
 
