@@ -301,6 +301,16 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, b);
   }
 
+  private void setLoadInProgressInSyncJob(final boolean b) {
+    ClientSyncJob job = new ClientSyncJob(getClass().getSimpleName() + " prepare", ClientSyncJob.getCurrentSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        setLoadInProgress(b);
+      }
+    };
+    job.schedule();
+  }
+
   @Override
   public long getRefreshIntervalMillis() {
     return propertySupport.getPropertyLong(PROP_REFRESH_INTERVAL_MILLIS);
@@ -377,19 +387,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    protected IStatus runStatus(IProgressMonitor monitor) {
-      try {
-        // set loading property in scout
-        ClientSyncJob job = new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " prepare", ClientSyncJob.getCurrentSession()) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor2) throws Throwable {
-            setLoadInProgress(true);
-          }
-        };
-        job.schedule();
-        if (monitor != null && monitor.isCanceled()) {
-          return Status.OK_STATUS;
-        }
+    protected IStatus runStatus(final IProgressMonitor monitor) {
+      // set loading property in scout
+      setLoadInProgressInSyncJob(true);
+      if (!monitor.isCanceled()) {
         // call user code
         try {
           execLoadItemsInBackground(ClientSyncJob.getCurrentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
@@ -398,55 +399,39 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           if (!e.isInterruption()) {
             LOG.error(null, e);
           }
-          return Status.OK_STATUS;
         }
-        // wait for result
-        while (true) {
-          if (monitor != null && monitor.isCanceled()) {
-            return Status.OK_STATUS;
-          }
-          synchronized (m_result) {
-            if (m_result != null) {
-              break;
-            }
-            try {
-              m_result.wait(2000L);
-            }
-            catch (InterruptedException e) {
-              return Status.OK_STATUS;
-            }
-          }
-        }
-        if (monitor != null && monitor.isCanceled()) {
-          return Status.OK_STATUS;
-        }
-        if (m_result != null) {
-          new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems", ClientSyncJob.getCurrentSession()) {
+        if (!m_result.isEmpty()) {
+          ClientSyncJob setItemsJob = new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems", ClientSyncJob.getCurrentSession()) {
             @Override
             protected void runVoid(IProgressMonitor monitor2) throws Throwable {
-              setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
+              synchronized (AbstractCalendarItemProvider.this) {
+                if (!monitor.isCanceled()) {
+                  setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
+                  reschedule(monitor);
+                }
+              }
             }
-          }.schedule();
-        }
-        return Status.OK_STATUS;
-      }
-      finally {
-        // reset loading property in scout
-        new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " complete", ClientSyncJob.getCurrentSession()) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor2) throws Throwable {
-            setLoadInProgress(false);
+
+            private void reschedule(final IProgressMonitor monitor2) {
+              long n = getRefreshIntervalMillis();
+              if (n > 0 && !monitor2.isCanceled()) {
+                //-> Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items
+                //    AND loading dates are still consistent with ui (If they are not consistent, monitor is cancled during setItemsInternal(...))
+                loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_loadingMinDate, m_loadingMaxDate, n);
+              }
+            }
+          };
+          setItemsJob.schedule();
+          try {
+            setItemsJob.join();
           }
-        }.schedule();
-        // re-schedule
-        long n = getRefreshIntervalMillis();
-        if (n > 0 && m_minDateLoaded != null && m_maxDateLoaded != null) {
-          //m_minDateLoaded and m_maxDateLoaded might not have been set yet.
-          //-> Rescheduling (and cancelling a currently running job) should only happen,
-          //   if a previous job actually succeeded in loading the calendar items.
-          loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_minDateLoaded, m_maxDateLoaded, n);
+          catch (InterruptedException e) {
+            // nop
+          }
         }
+        setLoadInProgressInSyncJob(false);
       }
+      return Status.OK_STATUS;
     }
   }
 
