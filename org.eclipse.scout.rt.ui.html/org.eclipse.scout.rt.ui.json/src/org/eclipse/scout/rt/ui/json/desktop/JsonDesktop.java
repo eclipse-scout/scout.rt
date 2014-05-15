@@ -135,11 +135,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       forms.put(jsonForm.toJson());
     }
     putProperty(json, "forms", forms);
+    putProperty(json, "toolButtons", newJSONArray(TOOL_BUTTONS));
     boolean formBased = isFormBased();
     if (!formBased) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
       putProperty(json, "viewButtons", modelObjectsToJson(getDesktop().getViewButtons()));
-      putProperty(json, "toolButtons", newJSONArray(TOOL_BUTTONS));
       JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
       if (jsonDesktopTree != null) {
         putProperty(json, "outline", jsonDesktopTree.toJson());

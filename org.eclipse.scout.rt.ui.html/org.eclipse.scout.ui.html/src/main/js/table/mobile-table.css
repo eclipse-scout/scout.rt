@@ -7,7 +7,7 @@ overflow: hidden;
 
 .table-data {
 position: relative;
-height: calc(100% - 85px); /*85px is table footer/control*/
+height: calc(100% - 95px); /*85px is table footer/control*/
 }
 
 .table-row {

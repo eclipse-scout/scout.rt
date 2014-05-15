@@ -1,13 +1,14 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopToolButton = function(session, toolButtons) {
+scout.MobileDesktopToolButtons = function(session, toolButtons) {
   this.$div;
+  this.$parent;
   this.toolButtons = toolButtons;
 };
 
-scout.DesktopToolButton.prototype.render = function($desktop) {
-  // create container
+scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
+  this.$parent = $desktop;
   var $desktopTools = $desktop.appendDiv('DesktopTools');
   this.$div = $desktopTools;
 
@@ -18,8 +19,9 @@ scout.DesktopToolButton.prototype.render = function($desktop) {
       shortcut = this.toolButtons[i].shortcut || '';
 
     var $tool = $desktopTools
-      .appendDiv(this.toolButtons[i].id, 'tool-item ' + state, this.toolButtons[i].label)
+      .appendDiv(this.toolButtons[i].id, 'tool-item ' + state)
       .attr('data-icon', icon).attr('data-shortcut', shortcut);
+
 
     if (!$tool.hasClass('disabled')) {
       $tool.on('click', '', clickTool);
@@ -35,14 +37,14 @@ scout.DesktopToolButton.prototype.render = function($desktop) {
   }
 };
 
-scout.DesktopToolButton.prototype.open = function($tool) {
-  $('.tool-open').animateAVCSD('width', 0, $.removeThis, null, 500);
+scout.MobileDesktopToolButtons.prototype.open = function($tool) {
+  $('.tool-open').animateAVCSD('height', 0, $.removeThis, null, 500);
 
   if ($tool.hasClass("selected")) {
     $tool.removeClass("selected");
   } else {
     $tool.selectOne();
     $('#DesktopTools').beforeDiv('', 'tool-open')
-      .animateAVCSD('width', 300, null, null, 500);
+      .animateAVCSD('height', this.$parent.height(), null, null, 500);
   }
 };

@@ -1,16 +1,47 @@
-scout.BorderLayout = function(marginTop, marginRight) {
-  this.marginTop=marginTop;
-  this.marginRight=marginRight;
+scout.BorderLayout = function(marginTop, marginRight, cssClassPrefix) {
+  this.marginTop = marginTop;
+  this.marginRight = marginRight;
+  this.cssClassPrefix = cssClassPrefix;
+  this.$fixedElements = [];
+  this.$dynamicElements = [];
 };
 
-scout.BorderLayout.prototype.position = function($element, position, splitterVertical) {
-  $element.css('position', 'absolute');
-  if (position === 'west' || position === 'center' || position === 'east') {
-    $element.attr('data-row', 1);
+scout.BorderLayout.prototype.register = function($element, position, splitterVertical) {
+  $element.data('position', position);
+  $element.addClass(this.cssClassPrefix + '-' + position);
+  if (position === 'C') {
+    this.$dynamicElements.push($element);
+  } else {
+    this.$fixedElements.push($element);
+  }
 
-    if (splitterVertical) {
-      this._addSplitterVertical($element);
-    }
+  if (splitterVertical && (position === 'W' || position === 'C' || position === 'E')) {
+    this._addSplitterVertical($element);
+  }
+};
+
+scout.BorderLayout.prototype.unregister = function($element, position, splitterVertical) {
+  $element.data('position', null);
+  $element.removeClass(this.cssClassPrefix + '-' + position);
+  scout.arrays.remove(this.$dynamicElements, $element);
+  scout.arrays.remove(this.$fixedElements, $element);
+};
+
+scout.BorderLayout.prototype.layout = function() {
+  var i;
+  for (i = 0; i < this.$fixedElements.length; i++) {
+    this.layoutElement(this.$fixedElements[i]);
+  }
+  for (i = 0; i < this.$dynamicElements.length; i++) {
+    this.layoutElement(this.$dynamicElements[i]);
+  }
+};
+
+scout.BorderLayout.prototype.layoutElement = function($element) {
+  var position = $element.data('position');
+  $element.css('position', 'absolute');
+  if (position === 'W' || position === 'C' || position === 'E') {
+    $element.attr('data-row', 1);
 
     $element.css('top', this.marginTop);
 
@@ -21,7 +52,7 @@ scout.BorderLayout.prototype.position = function($element, position, splitterVer
     }
   }
 
-  if (position === 'center') {
+  if (position === 'C') {
     var siblingWidth = 0,
       leftWidth = 0,
       rightWidth = 0;
@@ -42,14 +73,11 @@ scout.BorderLayout.prototype.position = function($element, position, splitterVer
     }
   }
 
-  if (position === 'north') {
+  if (position === 'N') {
     $element.data('row', 0);
     this.$top = $element;
   }
-
-  $element.addClass('layout-' + position);
 };
-
 
 scout.BorderLayout.prototype._addSplitterVertical = function($div) {
   $div.appendDiv(undefined, 'splitter-vertical')

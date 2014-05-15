@@ -207,7 +207,7 @@ scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
 };
 
 scout.Table.prototype.drawData = function() {
-  $('.table-row').remove();
+  $('.table-row', this.$data).remove();
   this._drawData(0);
   this.drawSelection();
 };

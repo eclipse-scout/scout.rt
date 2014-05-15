@@ -108,7 +108,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_modelTreeListener == null) {
+    if (m_modelTreeListener == null) { //FIXME CGU illegal state when null
       m_modelTreeListener = new P_ModelTreeListener();
       getModelObject().addUITreeListener(m_modelTreeListener);
     }

@@ -154,7 +154,8 @@ scout.Session.prototype.init = function() {
 
 scout.Session.prototype.onModelCreate = function(event) {
   this.locale = new scout.Locale(event.locale);
-  new scout.Desktop(this, this.$entryPoint, event.desktop);
+  var desktop = this.objectFactory.create(event.desktop);
+  desktop.attach(this.$entryPoint);
 };
 
 scout.Session.prototype.onModelAction = function(event) {
