@@ -95,6 +95,7 @@ import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
+import org.eclipse.scout.rt.ui.swing.basic.SwingLinkDetectorMouseMotionListener;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.celleditor.SwingScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swing.dnd.TransferHandlerEx;
@@ -189,6 +190,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       }
     });
+    table.addMouseMotionListener(new SwingLinkDetectorMouseMotionListener<JTable>(new TableHtmlLinkDetector()));
     m_swingScrollPane.getViewport().addMouseListener(new P_SwingEmptySpaceMouseListener());
     //ticket 87030, bug 365161
     m_swingScrollPane.addComponentListener(new ComponentAdapter() {

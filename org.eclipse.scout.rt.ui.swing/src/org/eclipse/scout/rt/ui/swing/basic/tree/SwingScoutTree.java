@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
+import org.eclipse.scout.rt.ui.swing.basic.SwingLinkDetectorMouseMotionListener;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.dnd.TransferHandlerEx;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
@@ -95,6 +96,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     // renderers
     tree.setCellRenderer(new SwingTreeCellRenderer(getSwingEnvironment(), tree.getCellRenderer(), this));
     // listeners
+    tree.addMouseMotionListener(new SwingLinkDetectorMouseMotionListener<JTree>(new TreeHtmlLinkDetector()));
     tree.addMouseListener(new P_SwingMouseListener());
     tree.addTreeSelectionListener(new P_SwingSelectionListener());
     tree.addTreeExpansionListener(new P_SwingExpansionListener());

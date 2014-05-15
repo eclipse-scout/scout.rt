@@ -32,6 +32,10 @@ public class TableHtmlLinkDetector extends AbstractHtmlLinkDetector<JTable> {
       m_rowIndex = getRow(p);
       m_columnIndex = getColumn(p);
     }
+    else {
+      m_rowIndex = -1;
+      m_columnIndex = -1;
+    }
     return found;
   }
 
