@@ -9,15 +9,30 @@
 
     <link rel="apple-touch-icon" href="res/ios_homescreen_icon_144x144.png"/>
     <link rel="shortcut icon" type="image/x-icon" href="res/favicon.ico">
-    <link rel="stylesheet" type="text/css" href="res/scout-mobile-5.0.0-min.css">
+    <link rel="stylesheet" type="text/css" href="res/scout-mobile-5.0.0.min.css">
 
     <script src="res/jquery-2.1.0.min.js"></script>
-    <script src="res/scout-mobile-5.0.0-min.js"></script>
+    <script src="res/scout-mobile-5.0.0.min.js"></script>
 
     <script>
-      $(document).ready(function() {
+    $(document).ready(function() {
+      if (scout.device.isIos()) {
+        //We use fastscript to prevent the 300ms delay when touching an element.
+        //With Chrome 32 the issue is solved, so no need to load the script for other devices than ios
+        $.getCachedScript("res/fastclickmod-1.0.1.min.js")
+        .done(function(script, textStatus) {
+          FastClick.attach(document.body);
+          init();
+        });
+      }
+      else {
+        init();
+      }
+
+      function init() {
         scout.init(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE), scout.mobileObjectFactories);
-      });
+      }
+    });
     </script>
   </head>
   <body>

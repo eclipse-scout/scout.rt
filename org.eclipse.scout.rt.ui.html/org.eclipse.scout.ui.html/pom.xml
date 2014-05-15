@@ -111,10 +111,28 @@
           </configuration>
         </execution>
       </executions>
+
     </plugin>
-
-   <plugin>
-
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-antrun-plugin</artifactId>
+      <version>1.7</version>
+      <executions>
+        <execution>
+          <id>copy</id>
+          <phase>package</phase>
+          <configuration>
+            <target name="copy fastclick to process_script for minimizing">
+              <copy file="${project.basedir}/libjs/fastclickmod-1.0.1.js" tofile="${project.build.directory}/process_script/fastclickmod-1.0.1.js" />
+            </target>
+          </configuration>
+          <goals>
+            <goal>run</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+    <plugin>
       <!-- Loads phantomjs executable, necessary for jasmine plugin -->
       <groupId>com.github.klieber</groupId>
       <artifactId>phantomjs-maven-plugin</artifactId>
@@ -129,7 +147,7 @@
       <configuration>
         <version>1.9.2</version>
       </configuration>
-      </plugin>
+    </plugin>
 
     <!-- JS testing with Jasmine -->
       <plugin>
@@ -180,7 +198,7 @@
       </executions>
       <configuration>
         <nosuffix>false</nosuffix>
-        <suffix>-min</suffix>
+        <suffix>.min</suffix>
         <force>true</force>
         <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
         <outputDirectory>${script.output.dir}</outputDirectory>

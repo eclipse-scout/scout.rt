@@ -1,2 +1,3 @@
-/WebContent/res/scout*-min.css
-/WebContent/res/scout*-min.js
+/WebContent/res/scout*.min.css
+/WebContent/res/scout*.min.js
+/WebContent/res/fastclickmod*.min.js

@@ -13,6 +13,7 @@
 //@include("src/main/js/util/ModelAdapter.js");
 //@include("src/main/js/util/ObjectFactory.js");
 //@include("src/main/js/util/BorderLayout.js");
+//@include("src/main/js/util/Device.js");
 //@include("src/main/js/session/Session.js");
 //@include("src/main/js/session/Event.js");
 //@include("src/main/js/session/Locale.js");

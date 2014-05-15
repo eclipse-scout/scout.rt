@@ -31,16 +31,13 @@ scout.MobileTable.prototype._drawData = function(startRow) {
  * @override
  */
 scout.MobileTable.prototype._buildRowDiv = function(row, index) {
-  var rowClass = 'table-row ',
+  var rowClass,
+    cellContent = "",
+    columns = this.model.columns,
+    numColumnsUsed = 0,
     table = this.model,
     column, value, headerText = "";
 
-  if (this.model.selectedRowIds && this.model.selectedRowIds.indexOf(row.id) > -1) {
-    rowClass += 'row-selected ';
-  }
-
-  var cellContent = "";
-  var columns = this.model.columns;
   for (var c = 0; c < row.cells.length; c++) {
     column = this.model.columns[c];
     value = this.getText(c, index);
@@ -51,11 +48,13 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
 
     if (this._headerColumns.indexOf(column) >= 0) {
       headerText += value;
+      numColumnsUsed++;
     } else {
       if (this._isColumnNameNecessary(columns[c])) {
         cellContent += columns[c].text + ": ";
       }
       cellContent += value;
+      numColumnsUsed++;
       if (c < row.cells.length - 1) {
         cellContent += '<br/>';
       }
@@ -69,13 +68,22 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
     cellContent = '<h3>' + headerText + '</h3>' + cellContent;
   }
 
+  rowClass = 'table-row ';
+  if (numColumnsUsed === 1) {
+    rowClass += 'table-row-single ';
+  }
+  if (this.model.selectedRowIds && this.model.selectedRowIds.indexOf(row.id) > -1) {
+    rowClass += 'row-selected ';
+  }
+
   return '<div id="' + row.id + '" class="' + rowClass + '">' + cellContent + '</div>';
 };
 
 scout.MobileTable.prototype._computeHeaderColumns = function() {
   var columns = this.model.columns,
     column,
-    headerColumns = [], i;
+    headerColumns = [],
+    i;
 
   for (i = 0; i < columns.length; i++) {
     column = columns[i];
@@ -92,7 +100,7 @@ scout.MobileTable.prototype._computeHeaderColumns = function() {
   for (i = 0; i < columns.length; i++) {
     column = columns[i];
 
-    if (column.visible) {//FIXME also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
+    if (column.visible) { //FIXME also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
       headerColumns.push(column);
       return headerColumns;
     }

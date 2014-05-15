@@ -67,6 +67,20 @@
     }
   };
 
+  /**
+   * from http://api.jquery.com/jquery.getscript/
+   */
+  $.getCachedScript = function( url, options ) {
+
+    options = $.extend( options || {}, {
+      dataType: "script",
+      cache: true,
+      url: url
+    });
+
+    return jQuery.ajax( options );
+  };
+
   //== $.prototype extensions
 
   // prepend - and return new div for chaining

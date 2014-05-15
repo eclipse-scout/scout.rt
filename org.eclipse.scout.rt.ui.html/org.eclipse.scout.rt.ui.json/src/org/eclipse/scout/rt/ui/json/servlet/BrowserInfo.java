@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.osgi.framework.Version;
 
-//FIXME copied from rap, move to scout.commons?
+//FIXME copied from rap, move to scout.commons? maybe better let client do it
 public class BrowserInfo {
   public enum Type {
     ANDROID, GOOGLE_CHROME, APPLE_SAFARI,
@@ -26,7 +26,7 @@ public class BrowserInfo {
   }
 
   public enum System {
-    WINDOWS, UNIX, OSX, IOS, IPHONE, IPOD, ANDROID, UNKNOWN
+    WINDOWS, UNIX, OSX, IOS, ANDROID, UNKNOWN
   }
 
   private String m_userAgent = "";

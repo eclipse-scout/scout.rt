@@ -122,6 +122,11 @@ Mobile
   Das index-mobile.html initialisiert den UserAgent mit dem DeviceType „Mobile“. Bei einem Tablet sollte an dieser Stelle mit Tablet initialisiert werden, es gibt KEIN index-tablet.html.
   Wir erhoffen uns damit, dass wir dann live (responsive) zwischen mobile und tablet wechseln können.
 - Template-Mechanismus für Tables? Damit man pro Table das Layout selber vorgeben kann (z.B. Datumsspalte rechts oben)
+- User-Feedback:
+  Browser haben ein 300ms delay, siehe auch index-mobile.html
+  Touch-Feedback kann man mittels den Pseudeselektor :active steuern. MouseDown kommt nicht bei TouchStart, da man nicht weiss, ob TouchStart zu einem Tab oder Scroll führt
+
+
 
 Plugin-Struktur
 - Aufteilung html / json ok, aber zur Zeit ist es nicht optimal.

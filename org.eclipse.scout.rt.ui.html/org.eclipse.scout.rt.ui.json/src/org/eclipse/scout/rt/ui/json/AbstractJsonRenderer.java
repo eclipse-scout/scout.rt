@@ -91,11 +91,6 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
 
   /**
    * Adds a property to the given JSON object and deals with exceptions.
-   * 
-   * @param json
-   * @param key
-   * @param value
-   * @return
    */
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
     try {

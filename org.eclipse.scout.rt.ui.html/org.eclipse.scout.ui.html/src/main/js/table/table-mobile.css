@@ -1,13 +1,48 @@
-.table-data {
-  padding: 0px;
+/* Replaces table.css */
+
+.table {
+height: 100%;
+overflow: hidden;
 }
 
-.table-row, .table-row-sum {
+.table-data {
+position: relative;
+height: calc(100% - 85px); /*85px is table footer/control*/
+}
+
+.table-row {
+  position:relative;
   padding: 4px 8px 4px 12px;
-  margin-bottom: 0px;
   border-bottom: 1px solid #EEE;
-  border-right: 0px;
-  border-left: 0px;
+}
+
+.table-row-single {
+  height: 45px;
+
+  /* center vertically */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: start;
+  -webkit-box-align: center;
+
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-pack: start;
+  -moz-box-align: center;
+
+  display: box;
+  box-orient: horizontal;
+  box-pack: start;
+  box-align: center;
+}
+
+.table-row:active {
+  /* touch feedback */
+  background-color: #eee;
+}
+
+.table-row.row-selected {
+  background-color: #eee;
 }
 
 .table-row > h3 {
@@ -20,7 +55,6 @@
   line-height: 24px;
 }
 
-
 .table-row > p:after {
   font-family: fontAwesome;
   content: "\F054";
@@ -32,17 +66,4 @@
   top: 50%;
   margin-top: -11px;
   right: 0px;
-}
-
-
-.table-row.select-top,
-.table-row.select-middle,
-.table-row.select-bottom,
-.table-row.select-single {
-  border: 0px;
-  border-radius: 0px;
-
-  padding: 4px 8px 4px 12px !important;
-  background-color: #fe9915;
-  color: white;
 }
