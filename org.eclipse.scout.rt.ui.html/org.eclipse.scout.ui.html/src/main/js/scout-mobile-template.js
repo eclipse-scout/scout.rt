@@ -45,7 +45,6 @@
 //@include("src/main/js/form/fields/groupbox/GroupBox.js");
 //@include("src/main/js/form/fields/sequencebox/SequenceBox.js");
 //@include("src/main/js/form/fields/tablefield/TableField.js");
-//@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");
