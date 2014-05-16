@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>RwtScoutNumberField</h3>
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
@@ -80,6 +80,12 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     return (StyledText) super.getUiField();
   }
 
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    handleDecimalFormatChanged(getScoutObject().getFormat());
+  }
+
   @SuppressWarnings("restriction")
   protected void installClientScripting(StyledText text) {
     String js = getVerifyClientScript();
@@ -93,15 +99,15 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
     if (INumberField.PROP_DECIMAL_FORMAT.equals(name)) {
-      handleDecimalFormatChanged(getUiField(), (DecimalFormat) newValue);
+      handleDecimalFormatChanged((DecimalFormat) newValue);
     }
   }
 
-  protected void handleDecimalFormatChanged(StyledText text, DecimalFormat format) {
-    text.setData(PROP_MAX_INTEGER_DIGITS, format.getMaximumIntegerDigits());
-    text.setData(PROP_MAX_FRACTION_DIGITS, format.getMaximumFractionDigits());
-    text.setData(PROP_ZERO_DIGIT, "" + format.getDecimalFormatSymbols().getZeroDigit());
-    text.setData(PROP_DECIMAL_SEPARATOR, "" + format.getDecimalFormatSymbols().getDecimalSeparator());
+  protected void handleDecimalFormatChanged(DecimalFormat format) {
+    getUiField().setData(PROP_MAX_INTEGER_DIGITS, format.getMaximumIntegerDigits());
+    getUiField().setData(PROP_MAX_FRACTION_DIGITS, format.getMaximumFractionDigits());
+    getUiField().setData(PROP_ZERO_DIGIT, "" + format.getDecimalFormatSymbols().getZeroDigit());
+    getUiField().setData(PROP_DECIMAL_SEPARATOR, "" + format.getDecimalFormatSymbols().getDecimalSeparator());
   }
 
   private static String getVerifyClientScript() {
