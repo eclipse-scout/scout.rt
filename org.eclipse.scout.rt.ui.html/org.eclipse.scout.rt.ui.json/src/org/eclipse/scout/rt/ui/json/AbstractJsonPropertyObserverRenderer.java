@@ -12,29 +12,34 @@ package org.eclipse.scout.rt.ui.json;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.ui.json.form.fields.JsonProperty;
+import org.json.JSONObject;
 
 public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
 
   private P_PropertyChangeListener m_propertyChangeListener;
 
-  private Set<String> m_propertiesToDelegate;
+  /**
+   * Key = propertyName.
+   */
+  private Map<String, JsonProperty> m_jsonProperties;
 
   public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
-    m_propertiesToDelegate = new HashSet<>();
+    m_jsonProperties = new HashMap<>();
   }
 
   /**
-   * Adds a delegated property. For these properties this class will create JSON property change events automatically.
-   * 
-   * @param name
+   * Adds a property to the list of JSON properties. These properties are automatically managed by the JsonRenderer,
+   * which means they're automatically included in the object returned by the <code>toJson()</code> method and also
+   * are propagated to the browser-side client when a property change event occurs.
    */
-  protected void delegateProperty(String name) {
-    m_propertiesToDelegate.add(name);
+  protected void putJsonProperty(JsonProperty jsonProperty) {
+    m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }
 
   @Override
@@ -55,9 +60,19 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
     }
   }
 
-  protected void handleModelPropertyChange(String name, Object newValue) {
-    if (m_propertiesToDelegate.contains(name)) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), name, newValue);
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    for (JsonProperty<?, ?> prop : m_jsonProperties.values()) {
+      putProperty(json, prop.getPropertyName(), prop.getValueAsJson());
+    }
+    return json;
+  }
+
+  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+    if (m_jsonProperties.containsKey(propertyName)) {
+      JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, jsonProperty.valueToJson(newValue));
     }
   }
 
@@ -67,4 +82,5 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
       handleModelPropertyChange(e.getPropertyName(), e.getNewValue());
     }
   }
+
 }

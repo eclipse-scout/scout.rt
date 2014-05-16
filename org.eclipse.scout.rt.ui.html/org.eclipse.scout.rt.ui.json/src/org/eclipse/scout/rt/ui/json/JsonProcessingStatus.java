@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.json;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -31,15 +30,10 @@ public class JsonProcessingStatus {
   }
 
   public JSONObject toJson() {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("message", getMessage());
-      json.put("iconName", getIconUrl());
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    JSONObject json = new JSONObject();
+    JsonObjectUtility.putProperty(json, "message", getMessage());
+    JsonObjectUtility.putProperty(json, "iconName", getIconUrl());
+    return json;
   }
 
   private String getIconUrl() {

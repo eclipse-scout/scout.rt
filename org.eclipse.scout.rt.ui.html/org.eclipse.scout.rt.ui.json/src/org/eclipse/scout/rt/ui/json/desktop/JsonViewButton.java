@@ -9,27 +9,29 @@ import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonEventType;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.json.form.fields.JsonProperty;
 
 public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewButton> {
 
   public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
-    delegateProperty(IViewButton.PROP_TEXT);
-    delegateProperty(IViewButton.PROP_SELECTED);
+    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_TEXT, modelObject) {
+      @Override
+      protected String getValueImpl(IViewButton button) {
+        return button.getText();
+      }
+    });
+    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_SELECTED, modelObject) {
+      @Override
+      protected Boolean getValueImpl(IViewButton button) {
+        return button.isSelected();
+      }
+    });
   }
 
   @Override
   public String getObjectType() {
     return "ViewButton";
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, IViewButton.PROP_TEXT, getModelObject().getText());
-    putProperty(json, IViewButton.PROP_SELECTED, getModelObject().isSelected());
-    return json;
   }
 
   @Override
@@ -43,13 +45,12 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   protected void handleUiClick(JsonEvent event, JsonResponse res) {
-    ClientSyncJob syncJob = new ClientSyncJob("button click", getJsonSession().getClientSession()) {
+    new ClientSyncJob("button click", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         getModelObject().getUIFacade().fireActionFromUI();
       }
-    };
-    syncJob.runNow(new NullProgressMonitor());
+    }.runNow(new NullProgressMonitor());
   }
 
 }

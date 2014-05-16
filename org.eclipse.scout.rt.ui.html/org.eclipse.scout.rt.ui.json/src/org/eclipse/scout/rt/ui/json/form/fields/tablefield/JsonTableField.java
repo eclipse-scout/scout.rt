@@ -16,10 +16,8 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
-import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.json.table.JsonTable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTableField extends JsonFormField<ITableField<? extends ITable>> {
@@ -63,28 +61,22 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   protected void handleModelTableChanged(ITable table) {
-    try {
-      JsonTable jsonTable = m_jsonTables.get(table);
-      if (jsonTable == null) {
-        jsonTable = createAndRegisterJsonTable(table);
-        getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
-      }
-      else {
-        JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(PROP_TABLE_ID, jsonTable.getId());
-        getJsonSession().currentJsonResponse().addActionEvent("tableChanged", getId(), jsonEvent);
-      }
+    JsonTable jsonTable = m_jsonTables.get(table);
+    if (jsonTable == null) {
+      jsonTable = createAndRegisterJsonTable(table);
+      getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
+    else {
+      JSONObject jsonEvent = new JSONObject();
+      putProperty(jsonEvent, PROP_TABLE_ID, jsonTable.getId());
+      getJsonSession().currentJsonResponse().addActionEvent("tableChanged", getId(), jsonEvent);
     }
   }
 
   @Override
-  protected void handleModelPropertyChange(String name, Object newValue) {
-    super.handleModelPropertyChange(name, newValue);
-
-    if (name.equals(ITableField.PROP_TABLE)) {
+  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+    super.handleModelPropertyChange(propertyName, newValue);
+    if (ITableField.PROP_TABLE.equals(propertyName)) {
       handleModelTableChanged((ITable) newValue);
     }
   }

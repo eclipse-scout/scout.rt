@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonEventType;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.form.fields.JsonValueField;
-import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an IBooleanField used as a check-box.
@@ -25,8 +24,6 @@ import org.json.JSONObject;
  */
 public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
 
-  public static final String PROP_CHECKED = "checked";
-
   public JsonCheckBoxField(IBooleanField model, IJsonSession session, String id) {
     super(model, session, id);
   }
@@ -34,21 +31,6 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
   @Override
   public String getObjectType() {
     return "CheckBoxField";
-  }
-
-  @Override
-  public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_CHECKED, getModelObject().isChecked());
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String name, Object newValue) {
-    super.handleModelPropertyChange(name, newValue);
-    // TODO AWE: (ask C.GU) doch besser value verwenden, weil das BooleanField checked intern doch auf value mapped
-    // so ist es ein bisschen hackig
-    if (IBooleanField.PROP_VALUE.matches(name)) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_CHECKED, newValue);
-    }
   }
 
   @Override

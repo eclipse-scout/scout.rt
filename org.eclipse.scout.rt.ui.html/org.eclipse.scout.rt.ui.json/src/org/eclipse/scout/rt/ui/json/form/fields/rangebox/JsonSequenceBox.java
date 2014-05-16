@@ -17,10 +17,10 @@ import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an <code>ISequenceBox</code>.
- * 
- * @author awe
  */
 public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
+
+  public static final String PROP_FIELDS = "fields";
 
   public JsonSequenceBox(ISequenceBox model, IJsonSession session, String id) {
     super(model, session, id);
@@ -33,7 +33,7 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), "formFields", modelObjectsToJson(getModelObject().getFields()));
+    return putProperty(super.toJson(), PROP_FIELDS, modelObjectsToJson(getModelObject().getFields()));
   }
 
 }

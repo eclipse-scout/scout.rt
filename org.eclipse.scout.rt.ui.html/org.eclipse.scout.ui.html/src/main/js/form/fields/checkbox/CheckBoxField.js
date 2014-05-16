@@ -18,7 +18,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this._$checkBox = this.$container.appendDiv(undefined, 'field checkbox', ' ');
 
   this._setEnabled(this.model.enabled);
-  this._setChecked(this.model.checked);
+  this._setValue(this.model.value);
   this._setErrorStatus(this.model.errorStatus);
 
   var that = this;
@@ -38,8 +38,8 @@ scout.CheckBoxField.prototype._setEnabled = function(enabled) {
   }
 };
 
-scout.CheckBoxField.prototype._setChecked = function(checked) {
-  if (checked) {
+scout.CheckBoxField.prototype._setValue = function(value) {
+  if (value) {
     this._$checkBox.addClass('checkbox_checked');
   } else {
     this._$checkBox.removeClass('checkbox_checked');
@@ -58,8 +58,8 @@ scout.CheckBoxField.prototype._setErrorStatus = function(errorStatus) {
 };
 
 scout.CheckBoxField.prototype.onModelPropertyChange = function(event) {
-  if (event.hasOwnProperty('checked')) {
-    this._setChecked(event.checked);
+  if (event.hasOwnProperty('value')) {
+    this._setValue(event.value);
   } else if (event.hasOwnProperty('enabled')) {
     this._setEnabled(event.enabled);
   } else if (event.hasOwnProperty('errorStatus')) {

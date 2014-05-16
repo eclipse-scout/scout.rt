@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.json;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
@@ -87,13 +86,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
    * Adds a property to the given JSON object and deals with exceptions.
    */
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
-    try {
-      json.put(key, value);
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    return JsonObjectUtility.putProperty(json, key, value);
   }
 
   /**

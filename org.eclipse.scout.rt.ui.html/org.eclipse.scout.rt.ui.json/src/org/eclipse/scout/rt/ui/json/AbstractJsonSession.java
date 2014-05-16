@@ -211,12 +211,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  //FIXME AWE/CGU: wozu brauchen wir diese beiden methoden, scheint nur für tests verwendet zu werden?
-
   @Override
   public void valueBound(HttpSessionBindingEvent event) {
 
   }
+
+  // TODO AWE: (ask C.GU) wann wird das hier aufgerufen?
 
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {

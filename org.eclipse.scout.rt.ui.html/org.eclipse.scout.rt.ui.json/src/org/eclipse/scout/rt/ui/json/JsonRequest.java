@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonRequest {
@@ -31,29 +30,19 @@ public class JsonRequest {
   }
 
   public String getSessionPartId() {
-    try {
-      return m_request.getString(PROP_SESSION_PART_ID);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    return JsonObjectUtility.getString(m_request, PROP_SESSION_PART_ID);
   }
 
   public List<JsonEvent> getEvents() {
-    try {
-      JSONArray events = m_request.optJSONArray(PROP_EVENTS);
-      if (events == null) {
-        return new ArrayList<>(0);
-      }
-      List<JsonEvent> actionList = new ArrayList<>(events.length());
-      for (int i = 0; i < events.length(); i++) {
-        actionList.add(new JsonEvent(events.getJSONObject(i)));
-      }
-      return actionList;
+    JSONArray events = m_request.optJSONArray(PROP_EVENTS);
+    if (events == null) {
+      return new ArrayList<>(0);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
+    List<JsonEvent> actionList = new ArrayList<>(events.length());
+    for (int i = 0; i < events.length(); i++) {
+      actionList.add(new JsonEvent(JsonObjectUtility.getJSONObject(events, i)));
     }
+    return actionList;
   }
 
   public JSONObject getRequestObject() {

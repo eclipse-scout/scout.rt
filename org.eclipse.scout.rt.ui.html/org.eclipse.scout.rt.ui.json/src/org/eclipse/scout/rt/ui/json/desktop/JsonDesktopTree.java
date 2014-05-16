@@ -1,5 +1,11 @@
 package org.eclipse.scout.rt.ui.json.desktop;
 
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.get;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.getBoolean;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.getJSONArray;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.getString;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.newJSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -132,29 +138,24 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    try {
-      JSONArray jsonPages = new JSONArray();
-      if (getModelObject().isRootNodeVisible()) {
-        IPage rootPage = getModelObject().getRootPage();
-        jsonPages.put(pageToJson(rootPage));
+    JSONArray jsonPages = new JSONArray();
+    if (getModelObject().isRootNodeVisible()) {
+      IPage rootPage = getModelObject().getRootPage();
+      jsonPages.put(pageToJson(rootPage));
+    }
+    else {
+      for (IPage childPage : getModelObject().getRootPage().getChildPages()) {
+        jsonPages.put(pageToJson(childPage));
       }
-      else {
-        for (IPage childPage : getModelObject().getRootPage().getChildPages()) {
-          jsonPages.put(pageToJson(childPage));
-        }
-      }
-      json.put(PROP_NODES, jsonPages);
-      json.put(PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModelObject().getSelectedNodes()));
+    }
+    putProperty(json, PROP_NODES, jsonPages);
+    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModelObject().getSelectedNodes()));
 
-      m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
-      json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
-      m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
-      json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
-      return json;
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
+    putProperty(json, PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
+    m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
+    putProperty(json, PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
+    return json;
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {
@@ -195,84 +196,53 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleModelNodeExpanded(ITreeNode modelNode) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_NODE_ID, m_treeNodeIds.get(modelNode));
-      jsonEvent.put("expanded", modelNode.isExpanded());
-      getJsonSession().currentJsonResponse().addActionEvent("nodeExpanded", getId(), jsonEvent);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(modelNode));
+    putProperty(jsonEvent, "expanded", modelNode.isExpanded());
+    getJsonSession().currentJsonResponse().addActionEvent("nodeExpanded", getId(), jsonEvent);
   }
 
   protected void handleModelNodesInserted(TreeEvent event) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-
-      JSONArray jsonPages = new JSONArray();
-      for (ITreeNode node : event.getNodes()) {
-        JSONObject jsonPage = pageToJson((IPage) node);
-        jsonPages.put(jsonPage);
-      }
-      jsonEvent.put("nodes", jsonPages);
-      jsonEvent.put("commonParentNodeId", m_treeNodeIds.get(event.getCommonParentNode()));
-      getJsonSession().currentJsonResponse().addActionEvent("nodesInserted", getId(), jsonEvent);
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonPages = new JSONArray();
+    for (ITreeNode node : event.getNodes()) {
+      JSONObject jsonPage = pageToJson((IPage) node);
+      jsonPages.put(jsonPage);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    putProperty(jsonEvent, "nodes", jsonPages);
+    putProperty(jsonEvent, "commonParentNodeId", m_treeNodeIds.get(event.getCommonParentNode()));
+    getJsonSession().currentJsonResponse().addActionEvent("nodesInserted", getId(), jsonEvent);
   }
 
   protected void handleModelNodesDeleted(Collection<ITreeNode> modelNodes) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-
-      JSONArray jsonNodeIds = new JSONArray();
-      for (ITreeNode node : modelNodes) {
-        String nodeId = m_treeNodeIds.get(node);
-        jsonNodeIds.put(nodeId);
-
-        m_treeNodeIds.remove(node);
-        m_treeNodes.remove(nodeId);
-        JsonTable table = m_jsonTables.remove(node);
-        if (table != null) {
-          table.dispose();
-        }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
+    JSONArray jsonNodeIds = new JSONArray();
+    for (ITreeNode node : modelNodes) {
+      String nodeId = m_treeNodeIds.get(node);
+      jsonNodeIds.put(nodeId);
+      m_treeNodeIds.remove(node);
+      m_treeNodes.remove(nodeId);
+      JsonTable table = m_jsonTables.remove(node);
+      if (table != null) {
+        table.dispose();
       }
-
-      getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
+    getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
   }
 
   protected void handleModelSelectedNodeMenusChanged(Collection<ITreeNode> modelNodes) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-
-      if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
-        jsonEvent.put(PROP_MENUS, m_menuManager.getJsonSelectionMenus());
-        getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
-      }
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
+    if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
+      putProperty(jsonEvent, PROP_MENUS, m_menuManager.getJsonSelectionMenus());
+      getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
     }
   }
 
@@ -301,41 +271,39 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected JSONObject pageToJson(IPage page) {
-    try {
-      String id = getOrCreatedNodeId(page);
-      String parentNodeId = getOrCreatedNodeId(page.getParentPage());
-
-      JSONObject json = new JSONObject();
-      json.put("id", id);
-      json.put("parentNodeId", parentNodeId);
-      json.put("text", page.getCell().getText());
-      json.put("expanded", page.isExpanded());
-      json.put("leaf", page.isLeaf());
-      JSONArray jsonChildPages = new JSONArray();
-      if (page.getChildNodeCount() > 0) {
-        for (IPage childPage : page.getChildPages()) {
-          jsonChildPages.put(pageToJson(childPage));
-        }
+    String id = getOrCreatedNodeId(page);
+    String parentNodeId = getOrCreatedNodeId(page.getParentPage());
+    JSONObject json = new JSONObject();
+    putProperty(json, "id", id);
+    putProperty(json, "parentNodeId", parentNodeId);
+    putProperty(json, "text", page.getCell().getText());
+    putProperty(json, "expanded", page.isExpanded());
+    putProperty(json, "leaf", page.isLeaf());
+    JSONArray jsonChildPages = new JSONArray();
+    if (page.getChildNodeCount() > 0) {
+      for (IPage childPage : page.getChildPages()) {
+        jsonChildPages.put(pageToJson(childPage));
       }
-      json.put("childNodes", jsonChildPages);
+    }
+    putProperty(json, "childNodes", jsonChildPages);
 
-      String pageType = "";
-      if (page instanceof IPageWithTable) {
-        pageType = "table";
-        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-        ITable table = pageWithTable.getTable();
-        if (table != null) {
-          JsonTable jsonTable = m_jsonTables.get(table);
-          if (jsonTable == null) {
-            jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
-            m_jsonTables.put(table, jsonTable);
-          }
-          json.put("table", m_jsonTables.get(table).toJson());
+    String pageType = "";
+    if (page instanceof IPageWithTable) {
+      pageType = "table";
+      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+      ITable table = pageWithTable.getTable();
+      if (table != null) {
+        JsonTable jsonTable = m_jsonTables.get(table);
+        if (jsonTable == null) {
+          jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
+          m_jsonTables.put(table, jsonTable);
         }
+        putProperty(json, "table", m_jsonTables.get(table).toJson());
       }
-      else {
-        pageType = "node";
-        //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
+    }
+    else {
+      pageType = "node";
+      //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
 //        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
 //        ITable table = pageWithNodes.getInternalTable();
 //        if (table != null) {
@@ -347,26 +315,21 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 //          }
 //          json.put("table", m_jsonTables.get(table).toJson());
 //        }
-      }
-      json.put("type", pageType);
-      json.put("graph", getCustomJson(page.getNodeId() + "_graph"));
-      json.put("chart", getCustomJson(page.getNodeId() + "_chart"));
-      json.put("map", getCustomJson(page.getNodeId() + "_map"));
-
-      return json;
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    putProperty(json, "type", pageType);
+    putProperty(json, "graph", getCustomJson(page.getNodeId() + "_graph"));
+    putProperty(json, "chart", getCustomJson(page.getNodeId() + "_chart"));
+    putProperty(json, "map", getCustomJson(page.getNodeId() + "_map"));
+    return json;
   }
 
-  protected JSONObject getCustomJson(String propName) throws JSONException {
+  protected JSONObject getCustomJson(String propName) {
     @SuppressWarnings("unchecked")
     Map<String, String> map = (Map<String, String>) getModelObject().getProperty(PROP_CUSTOM_JSON);
     if (map != null) {
       String propValue = map.get(propName);
       if (propValue != null) {
-        return new JSONObject(propValue);
+        return newJSONObject(propValue);
       }
     }
     return null;
@@ -380,21 +343,16 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     return node;
   }
 
-  public List<ITreeNode> extractTreeNodes(JSONObject jsonObject) throws JSONException {
-    return jsonToTreeNodes(jsonObject.getJSONArray(PROP_NODE_IDS));
+  public List<ITreeNode> extractTreeNodes(JSONObject json) {
+    return jsonToTreeNodes(getJSONArray(json, PROP_NODE_IDS));
   }
 
   public List<ITreeNode> jsonToTreeNodes(JSONArray nodeIds) {
-    try {
-      List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
-      for (int i = 0; i < nodeIds.length(); i++) {
-        nodes.add(m_treeNodes.get(nodeIds.get(i)));
-      }
-      return nodes;
+    List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
+    for (int i = 0; i < nodeIds.length(); i++) {
+      nodes.add(m_treeNodes.get(get(nodeIds, i)));
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    return nodes;
   }
 
   @Override
@@ -423,98 +381,66 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
-    try {
-      final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString(PROP_NODE_ID));
-
-      new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getModelObject().getUIFacade().fireNodeClickFromUI(node);
-        }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    final ITreeNode node = getTreeNodeForNodeId(getString(event.getEventObject(), PROP_NODE_ID));
+    new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        getModelObject().getUIFacade().fireNodeClickFromUI(node);
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
-    try {
-      final List<ITreeNode> nodes = extractTreeNodes(event.getEventObject());
+    final List<ITreeNode> nodes = extractTreeNodes(event.getEventObject());
+    new ClientSyncJob(EVENT_NODES_SELECTED, getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
+        getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
-      new ClientSyncJob(EVENT_NODES_SELECTED, getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
-          getTreeEventFilter().addIgnorableModelEvent(treeEvent);
-
-          try {
-            getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
-          }
-          finally {
-            getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
-          }
+        try {
+          getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
         }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+        finally {
+          getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
+        }
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
-    try {
-      final ITreeNode node = getTreeNodeForNodeId(event.getEventObject().getString(PROP_NODE_ID));
-      final boolean expanded = event.getEventObject().getBoolean("expanded");
-      if (node.isExpanded() == expanded) {
-        return;
-      }
+    final ITreeNode node = getTreeNodeForNodeId(getString(event.getEventObject(), PROP_NODE_ID));
+    final boolean expanded = getBoolean(event.getEventObject(), "expanded");
+    if (node.isExpanded() == expanded) {
+      return;
+    }
+    new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
+        getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
-      new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
-          getTreeEventFilter().addIgnorableModelEvent(treeEvent);
-
-          try {
-            getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
-          }
-          finally {
-            getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
-          }
+        try {
+          getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
         }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+        finally {
+          getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
+        }
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected void handleUiGraph(JsonEvent event, JsonResponse res) {
-    JSONObject responseEvent;
-    String nodeId;
-    try {
-      responseEvent = new JSONObject();
-      responseEvent.put("graph", new JSONObject(GRAPH));
-      nodeId = event.getEventObject().getString(PROP_NODE_ID);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    JSONObject responseEvent = new JSONObject();
+    putProperty(responseEvent, "graph", newJSONObject(GRAPH));
+    String nodeId = getString(event.getEventObject(), PROP_NODE_ID);
     getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", nodeId, responseEvent);
   }
 
   protected void handleUiMap(JsonEvent event, JsonResponse res) {
-    JSONObject responseEvent;
-    String nodeId;
-    try {
-      responseEvent = new JSONObject();
-      responseEvent.put("map", new JSONObject(MAP));
-      nodeId = event.getEventObject().getString(PROP_NODE_ID);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    JSONObject responseEvent = new JSONObject();
+    putProperty(responseEvent, "map", newJSONObject(MAP));
+    String nodeId = getString(event.getEventObject(), PROP_NODE_ID);
     getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", nodeId, responseEvent);
   }
 
@@ -544,7 +470,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
       }
     }.runNow(new NullProgressMonitor());
-
     return menuList;
   }
 
@@ -556,7 +481,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
         menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
       }
     }.runNow(new NullProgressMonitor());
-
     return menuList;
   }
 

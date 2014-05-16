@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonEvent {
+
   public static final String TYPE = "type_";
   public static final String ID = "id";
 
@@ -24,21 +24,11 @@ public class JsonEvent {
   }
 
   public String getEventType() {
-    try {
-      return m_event.getString(TYPE);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    return JsonObjectUtility.getString(m_event, TYPE);
   }
 
   public String getEventId() {
-    try {
-      return m_event.getString(ID);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    return JsonObjectUtility.getString(m_event, ID);
   }
 
   public JSONObject getEventObject() {

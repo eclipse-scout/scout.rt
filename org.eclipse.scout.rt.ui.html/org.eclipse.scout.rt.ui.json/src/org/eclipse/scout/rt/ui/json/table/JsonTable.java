@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json.table;
 
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.get;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.getJSONArray;
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.getString;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -42,6 +46,7 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonException;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.desktop.MenuManager;
+import org.eclipse.scout.rt.ui.json.form.fields.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,8 +75,13 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     m_tableEventFilter = new TableEventFilter(modelObject);
     m_menuManager = new MenuManager(getJsonSession());
 
-    delegateProperty(ITable.PROP_HEADER_VISIBLE);
-    //FIXME add missing
+    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_HEADER_VISIBLE, modelObject) {
+      @Override
+      protected Boolean getValueImpl(ITable model) {
+        return model.isHeaderVisible();
+      }
+    });
+    //FIXME CGU add missing
   }
 
   @Override
@@ -104,34 +114,24 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    try {
-      JSONArray jsonColumns = new JSONArray();
-      for (IColumn<?> column : getModelObject().getColumns()) {
-        if (column.isDisplayable()) {
-          jsonColumns.put(columnToJson(column));
-        }
+    JSONArray jsonColumns = new JSONArray();
+    for (IColumn<?> column : getModelObject().getColumns()) {
+      if (column.isDisplayable()) {
+        jsonColumns.put(columnToJson(column));
       }
-      json.put("columns", jsonColumns);
-
-      JSONArray jsonRows = new JSONArray();
-      for (ITableRow row : getModelObject().getRows()) {
-        JSONObject jsonRow = tableRowToJson(row);
-        jsonRows.put(jsonRow);
-      }
-      json.put("rows", jsonRows);
-
-      m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
-      json.put(PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
-      m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
-      json.put(PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
-
-      json.put(ITable.PROP_HEADER_VISIBLE, getModelObject().isHeaderVisible());
-
-      return json;
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
+    putProperty(json, "columns", jsonColumns);
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : getModelObject().getRows()) {
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
     }
+    putProperty(json, "rows", jsonRows);
+    m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
+    putProperty(json, PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
+    m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
+    putProperty(json, PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
+    return json;
   }
 
   @Override
@@ -148,59 +148,41 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
-    try {
-      final ITableRow tableRow = extractTableRow(event.getEventObject());
-
-      new ClientSyncJob("Row clicked", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getModelObject().getUIFacade().fireRowClickFromUI(tableRow);
-        }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    final ITableRow tableRow = extractTableRow(event.getEventObject());
+    new ClientSyncJob("Row clicked", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        getModelObject().getUIFacade().fireRowClickFromUI(tableRow);
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
-    try {
-      final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
+    final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
+    new ClientSyncJob("Rows selected", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        TableEvent tableEvent = new TableEvent(getModelObject(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
+        getTableEventFilter().addIgnorableModelEvent(tableEvent);
 
-      new ClientSyncJob("Rows selected", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          TableEvent tableEvent = new TableEvent(getModelObject(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
-          getTableEventFilter().addIgnorableModelEvent(tableEvent);
-
-          try {
-            getModelObject().getUIFacade().setSelectedRowsFromUI(tableRows);
-          }
-          finally {
-            getTableEventFilter().removeIgnorableModelEvent(tableEvent);
-          }
+        try {
+          getModelObject().getUIFacade().setSelectedRowsFromUI(tableRows);
         }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+        finally {
+          getTableEventFilter().removeIgnorableModelEvent(tableEvent);
+        }
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
-    try {
-      final ITableRow tableRow = extractTableRow(event.getEventObject());
-
-      new ClientSyncJob("Row action", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
-        }
-      }.runNow(new NullProgressMonitor());
-    }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    final ITableRow tableRow = extractTableRow(event.getEventObject());
+    new ClientSyncJob("Row action", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
+      }
+    }.runNow(new NullProgressMonitor());
   }
 
   protected List<IMenu> fetchMenusForSelection() {
@@ -235,38 +217,25 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
         jsonCells.put(cellToJson(row.getCell(colIndex), column));
       }
     }
-
     JSONObject jsonRow = new JSONObject();
-    try {
-      jsonRow.put("id", getOrCreatedRowId(row));
-      jsonRow.put("cells", jsonCells);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
-
+    putProperty(jsonRow, "id", getOrCreatedRowId(row));
+    putProperty(jsonRow, "cells", jsonCells);
     return jsonRow;
   }
 
   protected Object cellToJson(ICell cell, IColumn column) {
     JSONObject jsonCell = new JSONObject();
-    try {
-      jsonCell.put("value", getCellValue(cell, column));
-      jsonCell.put("foregroundColor", cell.getForegroundColor());
-      jsonCell.put("backgroundColor", cell.getBackgroundColor());
-      //FIXME implement missing
-
-      if (jsonCell.length() > 0) {
-        jsonCell.put("text", cell.getText());
-        return jsonCell;
-      }
-      else {
-        //Don't generate an object if only the text is returned to reduce the amount of data
-        return cell.getText();
-      }
+    putProperty(jsonCell, "value", getCellValue(cell, column));
+    putProperty(jsonCell, "foregroundColor", cell.getForegroundColor());
+    putProperty(jsonCell, "backgroundColor", cell.getBackgroundColor());
+    //FIXME implement missing
+    if (jsonCell.length() > 0) {
+      putProperty(jsonCell, "text", cell.getText());
+      return jsonCell;
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
+    else {
+      //Don't generate an object if only the text is returned to reduce the amount of data
+      return cell.getText();
     }
   }
 
@@ -359,25 +328,20 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     return jsonRowIds;
   }
 
-  public List<ITableRow> extractTableRows(JSONObject jsonObject) throws JSONException {
-    return jsonToTableRows(jsonObject.getJSONArray(PROP_ROW_IDS));
+  public List<ITableRow> extractTableRows(JSONObject json) {
+    return jsonToTableRows(getJSONArray(json, PROP_ROW_IDS));
   }
 
-  public ITableRow extractTableRow(JSONObject jsonObject) throws JSONException {
-    return getTableRowForRowId(jsonObject.getString(PROP_ROW_ID));
+  public ITableRow extractTableRow(JSONObject json) {
+    return getTableRowForRowId(getString(json, PROP_ROW_ID));
   }
 
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
-    try {
-      List<ITableRow> rows = new ArrayList<>(rowIds.length());
-      for (int i = 0; i < rowIds.length(); i++) {
-        rows.add(m_tableRows.get(rowIds.get(i)));
-      }
-      return rows;
+    List<ITableRow> rows = new ArrayList<>(rowIds.length());
+    for (int i = 0; i < rowIds.length(); i++) {
+      rows.add(m_tableRows.get(get(rowIds, i)));
     }
-    catch (JSONException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
+    return rows;
   }
 
   private ITableRow getTableRowForRowId(String rowId) {
@@ -427,86 +391,53 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   protected void handleModelRowsInserted(TableEvent event) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-
-      JSONArray jsonRows = new JSONArray();
-      for (ITableRow row : event.getRows()) {
-        JSONObject jsonRow = tableRowToJson(row);
-        jsonRows.put(jsonRow);
-      }
-      jsonEvent.put("rows", jsonRows);
-
-      getJsonSession().currentJsonResponse().addActionEvent("rowsInserted", getId(), jsonEvent);
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : event.getRows()) {
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    putProperty(jsonEvent, "rows", jsonRows);
+    getJsonSession().currentJsonResponse().addActionEvent("rowsInserted", getId(), jsonEvent);
   }
 
   protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
+    JSONArray jsonRowIds = new JSONArray();
+    for (ITableRow row : modelRows) {
+      String rowId = m_tableRowIds.get(row);
+      jsonRowIds.put(rowId);
 
-      JSONArray jsonRowIds = new JSONArray();
-      for (ITableRow row : modelRows) {
-        String rowId = m_tableRowIds.get(row);
-        jsonRowIds.put(rowId);
-
-        m_tableRowIds.remove(row);
-        m_tableRows.remove(rowId);
-      }
-
-      getJsonSession().currentJsonResponse().addActionEvent("rowsDeleted", getId(), jsonEvent);
+      m_tableRowIds.remove(row);
+      m_tableRows.remove(rowId);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    getJsonSession().currentJsonResponse().addActionEvent("rowsDeleted", getId(), jsonEvent);
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_ROWS_SELECTED, getId(), jsonEvent);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
+    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ROWS_SELECTED, getId(), jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
-
-      JSONArray jsonRowIds = new JSONArray();
-      for (ITableRow row : modelRows) {
-        String rowId = m_tableRowIds.get(row);
-        jsonRowIds.put(rowId);
-      }
-
-      getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
+    JSONArray jsonRowIds = new JSONArray();
+    for (ITableRow row : modelRows) {
+      String rowId = m_tableRowIds.get(row);
+      jsonRowIds.put(rowId);
     }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
+    getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
   }
 
   protected void handleModelSelectionMenusChanged(Collection<ITableRow> modelRows) {
-    try {
-      JSONObject jsonEvent = new JSONObject();
-      jsonEvent.put(PROP_ROW_IDS, rowIdsToJson(modelRows));
-
-      if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
-        jsonEvent.put(PROP_MENUS, m_menuManager.getJsonSelectionMenus());
-
-        getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
-      }
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
+    if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
+      putProperty(jsonEvent, PROP_MENUS, m_menuManager.getJsonSelectionMenus());
+      getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
     }
   }
 

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.newJSONArray;
+
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
@@ -29,8 +31,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
@@ -104,51 +104,36 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
   }
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
-    JSONObject jsonObject = new JSONObject();
-    try {
-      jsonObject.put("digit", String.valueOf(symbols.getDigit()));
-      jsonObject.put("zeroDigit", String.valueOf(symbols.getZeroDigit()));
-      jsonObject.put("decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
-      jsonObject.put("groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
-      jsonObject.put("minusSign", String.valueOf(symbols.getMinusSign()));
-      jsonObject.put("patternSeparator", String.valueOf(symbols.getPatternSeparator()));
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
-    return jsonObject;
+    JSONObject json = new JSONObject();
+    putProperty(json, "digit", String.valueOf(symbols.getDigit()));
+    putProperty(json, "zeroDigit", String.valueOf(symbols.getZeroDigit()));
+    putProperty(json, "decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
+    putProperty(json, "groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
+    putProperty(json, "minusSign", String.valueOf(symbols.getMinusSign()));
+    putProperty(json, "patternSeparator", String.valueOf(symbols.getPatternSeparator()));
+    return json;
   }
 
   protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
-    JSONObject jsonObject = new JSONObject();
-    try {
-      jsonObject.put("months", new JSONArray(symbols.getMonths()));
-      jsonObject.put("monthsShort", new JSONArray(symbols.getShortMonths()));
-      jsonObject.put("weekdays", new JSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
-      jsonObject.put("weekdaysShort", new JSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
-      jsonObject.put("am", symbols.getAmPmStrings()[Calendar.AM]);
-      jsonObject.put("pm", symbols.getAmPmStrings()[Calendar.PM]);
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
-    return jsonObject;
+    JSONObject json = new JSONObject();
+    putProperty(json, "months", newJSONArray(symbols.getMonths()));
+    putProperty(json, "monthsShort", newJSONArray(symbols.getShortMonths()));
+    putProperty(json, "weekdays", newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
+    putProperty(json, "weekdaysShort", newJSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
+    putProperty(json, "am", symbols.getAmPmStrings()[Calendar.AM]);
+    putProperty(json, "pm", symbols.getAmPmStrings()[Calendar.PM]);
+    return json;
   }
 
   protected JSONObject localeToJson(Locale locale) {
-    JSONObject jsonObject = new JSONObject();
-    try {
-      DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
-      SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
-      jsonObject.put("decimalFormatPatternDefault", defaultDecimalFormat.toLocalizedPattern());
-      jsonObject.put("dateFormatPatternDefault", defaultDateFormat.toPattern());
-      jsonObject.put("decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
-      jsonObject.put("dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
-    }
-    catch (JSONException e) {
-      throw new JsonException(e);
-    }
-    return jsonObject;
+    JSONObject json = new JSONObject();
+    DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
+    SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
+    putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toLocalizedPattern());
+    putProperty(json, "dateFormatPatternDefault", defaultDateFormat.toPattern());
+    putProperty(json, "decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
+    putProperty(json, "dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
+    return json;
   }
 
   private static DecimalFormat getDefaultDecimalFormat(Locale locale) {
@@ -156,7 +141,6 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     if (numberFormat instanceof DecimalFormat) {
       return (DecimalFormat) numberFormat;
     }
-
     LOG.info("No locale specific decimal format available, using default locale");
     return new DecimalFormat();
   }
@@ -166,7 +150,6 @@ public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
     if (format instanceof SimpleDateFormat) {
       return (SimpleDateFormat) format;
     }
-
     LOG.info("No locale specific date format available, using default locale");
     return new SimpleDateFormat();
   }

@@ -17,14 +17,14 @@ scout.GroupBox.prototype._render = function($parent) {
   }
 
   if (this.model.formFields) {
-    var formField, i, formFieldModel;
+    var i, formFieldModel, formFieldWidget;
     for (i = 0; i < this.model.formFields.length; i++) {
       formFieldModel = this.model.formFields[i];
-      formField = this.session.widgetMap[formFieldModel.id];
-      if (!formField) {
-        formField = this.session.objectFactory.create(formFieldModel);
+      formFieldWidget = this.session.widgetMap[formFieldModel.id];
+      if (!formFieldWidget) {
+        formFieldWidget = this.session.objectFactory.create(formFieldModel);
       }
-      formField.attach(this.$container);
+      formFieldWidget.attach(this.$container);
     }
   }
 };
@@ -34,7 +34,7 @@ scout.GroupBox.prototype._onModelBorderVisibleChanged = function(borderVisible) 
 };
 
 scout.GroupBox.prototype.onModelPropertyChange = function(event) {
-  if (event.borderVisible !== undefined) {
+  if (event.hasOwnProperty('borderVisible')) {
     this._onModelBorderVisibleChanged(event.borderVisible);
   }
 };
