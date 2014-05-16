@@ -17,23 +17,8 @@ height: calc(100% - 95px); /*85px is table footer/control*/
 }
 
 .table-row-single {
-  height: 45px;
-
-  /* center vertically */
-  display: -webkit-box;
-  -webkit-box-orient: horizontal;
-  -webkit-box-pack: start;
-  -webkit-box-align: center;
-
-  display: -moz-box;
-  -moz-box-orient: horizontal;
-  -moz-box-pack: start;
-  -moz-box-align: center;
-
-  display: box;
-  box-orient: horizontal;
-  box-pack: start;
-  box-align: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .table-row:active {
