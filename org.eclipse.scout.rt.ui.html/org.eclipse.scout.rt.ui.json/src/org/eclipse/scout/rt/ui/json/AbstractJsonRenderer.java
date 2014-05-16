@@ -17,14 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
+
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
   private final String m_id;
   private boolean m_initialized;
-
-  public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession) {
-    this(modelObject, jsonSession, null);
-  }
 
   public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession, String id) {
     if (modelObject == null) {
@@ -32,14 +29,11 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
     }
     m_modelObject = modelObject;
     m_jsonSession = jsonSession;
-    if (id == null) {
-      id = jsonSession.createUniqueIdFor(this);
-    }
     m_id = id;
   }
 
   @Override
-  public String getId() {
+  public final String getId() {
     return m_id;
   }
 
@@ -54,7 +48,6 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
 
   @Override
   public final void init() {
-    getJsonSession().registerJsonRenderer(getId(), m_modelObject, this);
     attachModel();
     m_initialized = true;
   }
@@ -70,10 +63,9 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   @Override
   public void dispose() {
     if (!m_initialized) {
-      return;
+      return; // TODO AWE: (ask C.GU) das wäre auch eher IllegalState, nicht?
     }
     detachModel();
-    getJsonSession().unregisterJsonRenderer(getId());
   }
 
   protected void detachModel() {
@@ -104,11 +96,18 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
     }
   }
 
+  /**
+   * Calls <code>jsonSession.getOrCreateJsonRenderer(Object)</code> and returns <code>toJson()</code>.
+   */
   protected final JSONObject modelObjectToJson(Object modelObject) {
     IJsonRenderer<?> jsonRenderer = getJsonSession().getOrCreateJsonRenderer(modelObject);
     return jsonRenderer.toJson();
   }
 
+  /**
+   * Calls <code>jsonSession.getOrCreateJsonRenderer(Object)</code> for each object in the model objects List and adds
+   * the return values of <code>toJson()</code> to the JSONArray.
+   */
   protected final JSONArray modelObjectsToJson(List<?> modelObjects) {
     JSONArray array = new JSONArray();
     for (Object modelObject : modelObjects) {

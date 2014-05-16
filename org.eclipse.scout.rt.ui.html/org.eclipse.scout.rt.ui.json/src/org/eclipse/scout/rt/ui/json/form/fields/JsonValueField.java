@@ -25,8 +25,8 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   public static final String PROP_VALUE = IValueField.PROP_VALUE;
   public static final String PROP_DISPLAY_TEXT = IValueField.PROP_DISPLAY_TEXT;
 
-  public JsonValueField(T model, IJsonSession session) {
-    super(model, session);
+  public JsonValueField(T model, IJsonSession session, String id) {
+    super(model, session, id);
   }
 
   @Override

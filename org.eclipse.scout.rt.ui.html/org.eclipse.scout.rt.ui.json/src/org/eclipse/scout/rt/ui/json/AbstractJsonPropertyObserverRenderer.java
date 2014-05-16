@@ -23,8 +23,8 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
 
   private Set<String> m_propertiesToDelegate;
 
-  public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession, String id) {
+    super(modelObject, jsonSession, id);
     m_propertiesToDelegate = new HashSet<>();
   }
 

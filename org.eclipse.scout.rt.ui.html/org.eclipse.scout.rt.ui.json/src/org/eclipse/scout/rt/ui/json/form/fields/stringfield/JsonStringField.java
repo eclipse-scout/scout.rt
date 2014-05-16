@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.ui.json.form.fields.JsonValueField;
 
 public class JsonStringField extends JsonValueField<IStringField> {
 
-  public JsonStringField(IStringField model, IJsonSession session) {
-    super(model, session);
+  public JsonStringField(IStringField model, IJsonSession session, String id) {
+    super(model, session, id);
   }
 
   @Override

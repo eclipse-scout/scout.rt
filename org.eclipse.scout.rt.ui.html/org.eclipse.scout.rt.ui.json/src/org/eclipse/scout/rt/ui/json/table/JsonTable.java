@@ -39,8 +39,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
-import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.JsonException;
+import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.eclipse.scout.rt.ui.json.desktop.MenuManager;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,8 +63,8 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   private TableEventFilter m_tableEventFilter;
   private MenuManager m_menuManager;
 
-  public JsonTable(ITable modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public JsonTable(ITable modelObject, IJsonSession jsonSession, String id) {
+    super(modelObject, jsonSession, id);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(modelObject);

@@ -22,6 +22,11 @@ import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.json.JSONObject;
 
 public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
+
+  public JsonForm(IForm modelObject, IJsonSession jsonSession, String id) {
+    super(modelObject, jsonSession, id);
+  }
+
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_TITLE = IForm.PROP_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
@@ -35,10 +40,6 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
 
   private FormListener m_modelFormListener;
-
-  public JsonForm(IForm form, IJsonSession session) {
-    super(form, session);
-  }
 
   @Override
   public String getObjectType() {

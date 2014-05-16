@@ -21,12 +21,13 @@ import org.eclipse.scout.rt.ui.json.JsonResponse;
 import org.json.JSONObject;
 
 public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
+
   public static final String EVENT_MENU_ACTION = "menuAction";
   public static final String PROP_TEXT = IMenu.PROP_TEXT;
   public static final String PROP_ICON = IMenu.PROP_ICON_ID;
 
-  public JsonMenu(IMenu modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public JsonMenu(IMenu modelObject, IJsonSession jsonSession, String id) {
+    super(modelObject, jsonSession, id);
   }
 
   @Override

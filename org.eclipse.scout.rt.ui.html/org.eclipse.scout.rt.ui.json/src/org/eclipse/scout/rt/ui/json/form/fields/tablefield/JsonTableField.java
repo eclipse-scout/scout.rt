@@ -27,8 +27,8 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
 
   private Map<ITable, JsonTable> m_jsonTables;
 
-  public JsonTableField(ITableField<? extends ITable> model, IJsonSession session) {
-    super(model, session);
+  public JsonTableField(ITableField<? extends ITable> model, IJsonSession session, String id) {
+    super(model, session, id);
     m_jsonTables = new HashMap<>();
   }
 

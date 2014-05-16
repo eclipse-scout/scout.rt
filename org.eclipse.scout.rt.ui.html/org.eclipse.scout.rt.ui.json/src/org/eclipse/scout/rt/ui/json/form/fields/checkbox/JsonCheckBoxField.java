@@ -27,8 +27,8 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
 
   public static final String PROP_CHECKED = "checked";
 
-  public JsonCheckBoxField(IBooleanField model, IJsonSession session) {
-    super(model, session);
+  public JsonCheckBoxField(IBooleanField model, IJsonSession session, String id) {
+    super(model, session, id);
   }
 
   @Override

@@ -22,8 +22,8 @@ import org.json.JSONObject;
  */
 public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
-  public JsonSequenceBox(ISequenceBox model, IJsonSession session) {
-    super(model, session);
+  public JsonSequenceBox(ISequenceBox model, IJsonSession session, String id) {
+    super(model, session, id);
   }
 
   @Override

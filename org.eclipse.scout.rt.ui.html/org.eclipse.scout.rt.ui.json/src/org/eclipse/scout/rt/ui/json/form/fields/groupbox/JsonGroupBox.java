@@ -17,8 +17,8 @@ import org.json.JSONObject;
 
 public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
-  public JsonGroupBox(IGroupBox model, IJsonSession session) {
-    super(model, session);
+  public JsonGroupBox(IGroupBox model, IJsonSession session, String id) {
+    super(model, session, id);
   }
 
   @Override

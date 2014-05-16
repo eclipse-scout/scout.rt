@@ -13,8 +13,8 @@ import org.json.JSONObject;
 
 public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewButton> {
 
-  public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession) {
-    super(modelObject, jsonSession);
+  public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession, String id) {
+    super(modelObject, jsonSession, id);
     delegateProperty(IViewButton.PROP_TEXT);
     delegateProperty(IViewButton.PROP_SELECTED);
   }

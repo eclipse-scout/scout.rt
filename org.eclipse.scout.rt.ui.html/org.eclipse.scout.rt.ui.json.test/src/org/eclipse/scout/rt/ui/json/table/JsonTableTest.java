@@ -122,7 +122,7 @@ public class JsonTableTest {
   public static JsonTable createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
 
-    JsonTable jsonTable = new JsonTable(table, jsonSession);
+    JsonTable jsonTable = new JsonTable(table, jsonSession, "1");
     jsonTable.init();
 
     //init treeNode map

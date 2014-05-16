@@ -121,13 +121,11 @@ public class JsonDesktopTreeTest {
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-
-    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession);
+    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession, "1");
     jsonDesktopTree.init();
 
-    //init treeNode map
+    // init treeNode map
     jsonDesktopTree.toJson();
-
     return jsonDesktopTree;
   }
 

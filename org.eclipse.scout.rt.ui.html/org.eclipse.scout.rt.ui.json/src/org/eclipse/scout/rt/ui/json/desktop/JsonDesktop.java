@@ -44,7 +44,6 @@ import org.json.JSONObject;
 
 public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
-  private static final String WIDGET_ID = "Desktop";
 
   public static final String PROP_FORM_ID = "formId";
   public static final String PROP_OUTLINE_ID = "outlineId";
@@ -63,8 +62,8 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       "          {\"id\": \"t6\", \"label\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
       "          {\"id\": \"t7\", \"label\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
 
-  public JsonDesktop(IDesktop desktop, IJsonSession jsonSession) {
-    super(desktop, jsonSession);
+  public JsonDesktop(IDesktop desktop, IJsonSession jsonSession, String id) {
+    super(desktop, jsonSession, id);
     m_jsonOutlines = new HashMap<>();
     m_jsonForms = new HashMap<>();
   }
@@ -76,11 +75,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
   public IDesktop getDesktop() {
     return getModelObject();
-  }
-
-  @Override
-  public String getId() {
-    return WIDGET_ID;
   }
 
   @Override

@@ -23,16 +23,6 @@ public interface IJsonSession {
   String createUniqueIdFor(IJsonRenderer<?> renderer);
 
   /**
-   * Registers the IJsonRenderer instance and model object with the given renderer ID.
-   */
-  void registerJsonRenderer(String id, Object scoutObject, IJsonRenderer<?> renderer);
-
-  /**
-   * Unregisters the IJsonRenderer instance with the given renderer ID.
-   */
-  void unregisterJsonRenderer(String id);
-
-  /**
    * Returns an IJsonRenderer instance for the given renderer ID.
    */
   IJsonRenderer<?> getJsonRenderer(String id);

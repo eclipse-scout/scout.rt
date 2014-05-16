@@ -41,7 +41,7 @@ public class JsonDesktopTest {
 
   public static JsonDesktop createJsonDesktopWithMocks(IDesktop desktop) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession);
+    JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession, "1");
     jsonDesktop.init();
     return jsonDesktop;
   }

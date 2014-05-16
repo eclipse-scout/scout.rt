@@ -21,8 +21,8 @@ import org.json.JSONObject;
 
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField<T> {
 
-  public JsonFormField(T model, IJsonSession session) {
-    super(model, session);
+  public JsonFormField(T model, IJsonSession session, String id) {
+    super(model, session, id);
     delegateProperty(IFormField.PROP_LABEL);
     delegateProperty(IFormField.PROP_ENABLED);
     delegateProperty(IFormField.PROP_VISIBLE);

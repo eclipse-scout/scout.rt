@@ -12,9 +12,7 @@ package org.eclipse.scout.rt.ui.json;
 
 import java.security.AccessController;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -24,7 +22,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -43,28 +40,19 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private JsonClientSession m_jsonClientSession;
 
-  /**
-   * Maps the JsonRenderer ID to an IJsonRenderer instance (wrapped by a composite).
-   */
-  private final Map<String, ModelRendererComposite> m_idRendererMap;
-
-  /**
-   * Maps a Scout model instance to an IJsonRenderer instance (wrapped by a composite).
-   */
-  private final Map<Object, ModelRendererComposite> m_modelRendererMap;
-
   // TODO AWE: JsonRendererFactory überschreibbar machen, via Scout-service
   private final JsonRendererFactory m_jsonRendererFactory;
+
+  private final JsonRendererRegistry m_jsonRendererRegistry;
 
   private long m_jsonRendererSeq;
   private JsonResponse m_currentJsonResponse;
   private HttpServletRequest m_currentHttpRequest;
 
   public AbstractJsonSession() {
-    m_idRendererMap = new HashMap<>();
-    m_modelRendererMap = new HashMap<>();
     m_currentJsonResponse = new JsonResponse();
     m_jsonRendererFactory = new JsonRendererFactory();
+    m_jsonRendererRegistry = new JsonRendererRegistry();
   }
 
   @Override
@@ -76,14 +64,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
-
-    m_jsonClientSession = m_jsonRendererFactory.createJsonClientSession(clientSession, this, jsonReq.getSessionPartId()); //FIXME use sessionId or use createUniqueIdFor? duplicates possible?
-    m_jsonClientSession.init();
-
+    // FIXME AWE/CGU: use sessionId or use createUniqueIdFor? duplicates possible?
+    // was <<jsonReq.getSessionPartId()>> before, now createUniqueIdFor is used again
+    m_jsonClientSession = (JsonClientSession) getOrCreateJsonRenderer(clientSession);
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
     }
-
     m_currentJsonResponse.addCreateEvent(jsonReq.getSessionPartId(), m_jsonClientSession.toJson());
     LOG.info("JsonSession initialized.");
   }
@@ -144,9 +130,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   public void dispose() {
-    for (ModelRendererComposite comp : CollectionUtility.arrayList(m_idRendererMap.values())) {
-      comp.getJsonRenderer().dispose();
-    }
+    m_jsonRendererRegistry.dispose();
   }
 
   @Override
@@ -155,7 +139,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public String createUniqueIdFor(IJsonRenderer renderer) {
+  public String createUniqueIdFor(IJsonRenderer jsonRenderer) {
     //FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
     return "" + (++m_jsonRendererSeq);
   }
@@ -166,37 +150,21 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     if (jsonRenderer != null) {
       return jsonRenderer;
     }
-    return m_jsonRendererFactory.createJsonRenderer(modelObject, this);
-  }
-
-  @Override
-  public void registerJsonRenderer(String id, Object modelObject, IJsonRenderer jsonRenderer) {
-    ModelRendererComposite comp = new ModelRendererComposite(id, modelObject, jsonRenderer);
-    // TODO AWE: move theses map to a Registry class
-    m_idRendererMap.put(id, comp);
-    m_modelRendererMap.put(modelObject, comp);
-  }
-
-  @Override
-  public void unregisterJsonRenderer(String id) {
-    ModelRendererComposite comp = m_idRendererMap.remove(id);
-    m_modelRendererMap.remove(comp.getModelObject());
+    String id = createUniqueIdFor(jsonRenderer);
+    jsonRenderer = m_jsonRendererFactory.createJsonRenderer(modelObject, this, id);
+    jsonRenderer.init();
+    m_jsonRendererRegistry.addJsonRenderer(id, modelObject, jsonRenderer);
+    return jsonRenderer;
   }
 
   @Override
   public IJsonRenderer<?> getJsonRenderer(String id) {
-    return m_idRendererMap.get(id).getJsonRenderer();
+    return m_jsonRendererRegistry.getJsonRenderer(id);
   }
 
   @Override
   public IJsonRenderer<?> getJsonRenderer(Object modelObject) {
-    ModelRendererComposite comp = m_modelRendererMap.get(modelObject);
-    if (comp == null) {
-      return null;
-    }
-    else {
-      return comp.getJsonRenderer();
-    }
+    return m_jsonRendererRegistry.getJsonRenderer(modelObject);
   }
 
   @Override
@@ -243,8 +211,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
+  //FIXME AWE/CGU: wozu brauchen wir diese beiden methoden, scheint nur für tests verwendet zu werden?
+
   @Override
   public void valueBound(HttpSessionBindingEvent event) {
+
   }
 
   @Override
