@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.ui.json;
 
-import org.json.JSONObject;
+// TODO CGU: re-name to IJsonAdapter when merging the two projects (also AbstractJsonRenderer)
 
 /**
  * Creates JSON output for a Scout model object.
@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * @param <T>
  *          Type of Scout model
  */
-public interface IJsonRenderer<T extends Object> {
+public interface IJsonRenderer<T extends Object> extends IJsonMapper {
 
   String getId();
 
@@ -30,8 +30,6 @@ public interface IJsonRenderer<T extends Object> {
   void init();
 
   void dispose();
-
-  JSONObject toJson();
 
   void handleUiEvent(JsonEvent event, JsonResponse res);
 

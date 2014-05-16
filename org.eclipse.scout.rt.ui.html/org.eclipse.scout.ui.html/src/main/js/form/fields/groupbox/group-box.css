@@ -1,4 +1,10 @@
 .group-box {
+  clear: both;
+  float: left;
+  margin-top: 16px;
+  padding: 19px 20px;
+  position: relative;
+  width: 750px;
   height: 100%;
 }
 

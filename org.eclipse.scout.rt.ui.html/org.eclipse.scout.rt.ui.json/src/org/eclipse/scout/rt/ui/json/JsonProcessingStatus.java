@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.json;
 
+import static org.eclipse.scout.rt.ui.json.JsonObjectUtility.putProperty;
+
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.json.JSONObject;
@@ -17,7 +19,7 @@ import org.json.JSONObject;
 /**
  * @author awe
  */
-public class JsonProcessingStatus {
+public class JsonProcessingStatus implements IJsonMapper {
 
   private final IProcessingStatus processingStatus;
 
@@ -29,10 +31,11 @@ public class JsonProcessingStatus {
     return processingStatus;
   }
 
+  @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "message", getMessage());
-    JsonObjectUtility.putProperty(json, "iconName", getIconUrl());
+    putProperty(json, "message", getMessage());
+    putProperty(json, "iconName", getIconUrl());
     return json;
   }
 

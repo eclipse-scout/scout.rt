@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.ui.json.form.fields;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.json.IJsonSession;
 import org.eclipse.scout.rt.ui.json.JsonEvent;
+import org.eclipse.scout.rt.ui.json.JsonGridData;
 import org.eclipse.scout.rt.ui.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 
@@ -61,6 +63,18 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         else {
           return new JsonProcessingStatus((IProcessingStatus) value).toJson();
         }
+      }
+    });
+    putJsonProperty(new JsonProperty<T, GridData>(IJsonFormField.PROP_GRID_DATA, model) {
+      @Override
+      protected GridData getValueImpl(T modelObject) {
+        return modelObject.getGridData();
+      }
+
+      @Override
+      public Object valueToJson(Object value) {
+        // TODO AWE: (layout) prüfen ob das immer != null ist
+        return new JsonGridData((GridData) value).toJson();
       }
     });
   }

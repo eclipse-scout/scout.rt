@@ -8,19 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.json.form.fields;
+package org.eclipse.scout.rt.ui.json;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.json.IJsonRenderer;
+import org.json.JSONObject;
 
 /**
- * Creates JSON output for a Scout form-field object.
- * 
- * @param <T>
- *          Type of Scout form-field
+ * Implementations of this interface transform a model object into a JSONObject.
  */
-public interface IJsonFormField<T extends IFormField> extends IJsonRenderer<T> {
+public interface IJsonMapper {
 
-  String PROP_GRID_DATA = "gridData";
+  JSONObject toJson();
 
 }

@@ -11,6 +11,15 @@ scout.CheckBoxField.prototype._render = function($parent) {
   // TODO AWE: definitiven HTML aufbau / styles mit C.RU besprechen (vergleiche mit bsicrm.rusche.ch)
   // das normale status-label von Scout ist ein composite mit Icon. Siehe JStatusLabelEx.
   this.$container = $parent.appendDiv(undefined, 'form-field', undefined);
+
+  var gridData = this.model.gridData;
+
+  this.$container.addClass('inbox').
+    addClass('w1').
+    addClass('h1').
+    addClass('x' + (gridData.x + 1)).
+    addClass('y' + (gridData.y + 1));
+
   this._$label = this.$container.appendDiv(undefined, 'label', this.model.label);
   // TODO AWE: (ask C.GU) vermutlich wäre es besser, das statusLabel nur bei Bedarf zu erzeugen und
   // dann wieder wegzuwerfen

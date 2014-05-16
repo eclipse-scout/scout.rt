@@ -1,7 +1,50 @@
+div.inbox {
+  position: absolute;
+}
+.x1 {
+    left: 20px;
+}
+.x2 {
+    left: 415px;
+}
+.x3 {
+    left: 810px;
+}
+.y1 {
+    top: 0;
+}
+.y2 {
+    top: 35px;
+}
+.y3 {
+    top: 70px;
+}
+.y4 {
+    top: 105px;
+}
+.w1 {
+    width: 355px;
+}
+.w2 {
+    width: 750px;
+}
+.h1 {
+    height: 21px;
+}
+.h2 {
+    height: 50px;
+}
+.h3 {
+    height: 79px;
+}
+.h4 {
+    height: 108px;
+}
+
 .form-field {
   background-color: #eaeaea;
   height: 25px;
-  width: 100%;
+  /*width: 100%;*/
   border: 1px solid #999;
 }
 
