@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.json.JsonEvent;
 import org.eclipse.scout.rt.ui.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.json.JsonResponse;
 
+// TODO AWE: make JsonFormField abstract (later)
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverRenderer<T> implements IJsonFormField<T> {
 
   public JsonFormField(T model, IJsonSession session, String id) {

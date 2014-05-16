@@ -216,8 +216,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   }
 
-  // TODO AWE: (ask C.GU) wann wird das hier aufgerufen?
-
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
     LOG.info("Terminating json session " + event.getName() + "...");

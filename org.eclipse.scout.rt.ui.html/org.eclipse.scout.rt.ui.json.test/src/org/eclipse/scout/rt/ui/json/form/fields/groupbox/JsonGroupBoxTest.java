@@ -28,7 +28,6 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
 
   @Before
   public void setUp() {
-    model.setLabel("fooBar");
     model.setBorderDecoration("x");
     model.setBorderVisible(true);
   }
@@ -36,7 +35,6 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   @Test
   public void testToJson() throws JSONException {
     JSONObject json = groupBox.toJson();
-    assertEquals("fooBar", json.get("label"));
     assertEquals("x", json.get("borderDecoration"));
     assertEquals(Boolean.TRUE, json.get("borderVisible"));
   }
