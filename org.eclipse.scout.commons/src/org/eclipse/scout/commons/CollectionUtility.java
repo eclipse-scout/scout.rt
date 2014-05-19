@@ -604,6 +604,17 @@ public final class CollectionUtility {
   }
 
   /**
+   * Returns a new empty {@link HashSet}.<br>
+   * This method differs to {@link Collections#emptyList()} in that way that the {@link HashSet} returned by this
+   * method can be modified hence is no shared instance.
+   * 
+   * @return An empty but modifiable {@link HashSet} with an initial capacity of <code>0</code>.
+   */
+  public static <T> HashSet<T> emptyHashSet() {
+    return new HashSet<T>(0);
+  }
+
+  /**
    * combine all lists into one list containing all elements. the order of the
    * items is preserved
    */

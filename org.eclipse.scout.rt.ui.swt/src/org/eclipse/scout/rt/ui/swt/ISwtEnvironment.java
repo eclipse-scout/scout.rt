@@ -16,6 +16,7 @@ import java.util.Collection;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -211,7 +212,7 @@ public interface ISwtEnvironment {
 
   ISwtScoutFormField createFormField(Composite parent, IFormField model);
 
-  ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu);
+  ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu, IActionFilter filter);
 
   ISwtScoutTray getTrayComposite();
 

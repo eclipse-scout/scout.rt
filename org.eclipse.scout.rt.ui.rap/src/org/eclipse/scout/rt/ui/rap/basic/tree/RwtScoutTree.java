@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.ui.rap.basic.tree;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -34,12 +36,16 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -851,12 +857,35 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         return;
       }
 
-      final boolean emptySpace = (getUiField().getContextItem() == null);
-      List<IMenu> menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getUiEnvironment());
-
-      Menu menu = ((Menu) e.getSource());
-
-      RwtMenuUtility.fillMenu(menu, menus, getUiEnvironment());
+      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+      Runnable t = new Runnable() {
+        @SuppressWarnings("deprecation")
+        @Override
+        public void run() {
+          IContextMenu contextMenu = getScoutObject().getContextMenu();
+          // manually call about to show
+          contextMenu.aboutToShow();
+          contextMenu.prepareAction();
+          scoutMenusRef.set(contextMenu);
+        }
+      };
+      JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
+      try {
+        job.join(1200);
+      }
+      catch (InterruptedException ex) {
+        //nop
+      }
+      if (scoutMenusRef.get() != null) {
+        IActionFilter filter = null;
+        if ((getUiField().getContextItem() == null)) {
+          filter = ActionUtility.createTreeMenuFilterVisibleAndMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.EmptySpace));
+        }
+        else {
+          filter = ActionUtility.createMenuFilterVisibleAvailable();
+        }
+        RwtMenuUtility.fillMenu(((Menu) e.getSource()), scoutMenusRef.get().getChildActions(), filter, getUiEnvironment());
+      }
     }
 
   } // end class P_ContextMenuListener

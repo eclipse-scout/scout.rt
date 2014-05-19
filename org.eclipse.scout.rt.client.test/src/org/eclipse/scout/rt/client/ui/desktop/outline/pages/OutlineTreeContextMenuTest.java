@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -70,13 +71,13 @@ public class OutlineTreeContextMenuTest {
     outline.selectFirstNode();
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
+    List<IMenu> menus = selectedNode.getTree().getMenus();
 
     @SuppressWarnings("unchecked")
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableEmptySpaceMenu.class, PageWithTableEmptySpace2Menu.class);
 
-    assertTrue(menus.containsAll(requiredMenus));
-    assertTrue(menus.size() == (requiredMenus.size()));
+    assertTrue(OutlineTreeContextMenuNestedPageWithTablesTest.containsAllMenus(menus, requiredMenus));
+    assertEquals(OutlineTreeContextMenuNestedPageWithTablesTest.sizeMenuListWithoutSeparators(menus), requiredMenus.size());
   }
 
   private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
@@ -88,10 +89,10 @@ public class OutlineTreeContextMenuTest {
     outline.selectNextChildNode();
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
+    List<IMenu> menus = selectedNode.getTree().getMenus();
 
-    assertTrue(menus.containsAll(requiredMenus));
-    assertTrue(menus.size() == (requiredMenus.size()));
+    assertTrue(OutlineTreeContextMenuNestedPageWithTablesTest.containsAllMenus(menus, requiredMenus));
+    assertEquals(OutlineTreeContextMenuNestedPageWithTablesTest.sizeMenuListWithoutSeparators(menus), requiredMenus.size());
   }
 
   private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {

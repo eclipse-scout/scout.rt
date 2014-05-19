@@ -27,6 +27,7 @@ import javax.swing.UIDefaults;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -278,13 +279,13 @@ public interface ISwingEnvironment {
    *          must not be null, typically a {@link javax.swing.JPopupMenu JPopupMenu}, a {@link javax.swing.JMenu JMenu}
    *          or a {@link javax.swing.JMenuBar JMenuBar}
    */
-  void appendActions(JComponent parent, List<? extends IAction> actions);
+  void appendActions(JComponent parent, List<? extends IAction> actions, IActionFilter filter);
 
   /**
    * create a gui for an action, recursively creates and attaches child actions on
    * {@link org.eclipse.scout.rt.client.ui.action.tree.IActionNode IActionNode}s and menus
    */
-  ISwingScoutAction createAction(JComponent parent, IAction action);
+  ISwingScoutAction createAction(JComponent parent, IAction action, IActionFilter filter);
 
   /**
    * Called from scout job/thread to post an immediate swing job into the waiting queue.

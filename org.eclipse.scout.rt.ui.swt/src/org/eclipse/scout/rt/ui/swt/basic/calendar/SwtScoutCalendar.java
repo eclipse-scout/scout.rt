@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
@@ -94,13 +95,12 @@ public class SwtScoutCalendar extends SwtCalendar {
 
   @Override
   public void showGeneralContextMenu(Menu manager) {
-    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), m_field.getEnvironment());
-    //SwtMenuUtility.fillContextMenu(SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), manager, m_field.getEnvironment());
+    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment()), ActionUtility.createVisibleFilter(), m_field.getEnvironment());
   }
 
   @Override
   public void showItemContextMenu(Menu manager, Object item) {
-    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment()), m_field.getEnvironment());
+    SwtMenuUtility.fillMenu(manager, SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment()), ActionUtility.createVisibleFilter(), m_field.getEnvironment());
   }
 
   @Override

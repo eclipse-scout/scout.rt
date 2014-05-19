@@ -17,7 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
@@ -30,7 +29,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -361,9 +359,8 @@ public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposit
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        List<IMenu> scoutMenus = getScoutButton().getUIFacade().fireButtonPopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), source, point, scoutMenus).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), source, point, getScoutButton().getContextMenu()).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);

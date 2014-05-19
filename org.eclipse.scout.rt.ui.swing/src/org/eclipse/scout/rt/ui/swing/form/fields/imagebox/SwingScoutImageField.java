@@ -32,11 +32,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldEvent;
@@ -261,9 +259,8 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        List<IMenu> a = getScoutImageField().getUIFacade().firePopupFromUI();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), target, point, a).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), target, point, getScoutImageField().getContextMenu()).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);

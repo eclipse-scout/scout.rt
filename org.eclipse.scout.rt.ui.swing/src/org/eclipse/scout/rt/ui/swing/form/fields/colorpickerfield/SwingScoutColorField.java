@@ -159,6 +159,7 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
 
   @Override
   protected void installContextMenu() {
+    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
     getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
 
       @Override
@@ -169,7 +170,6 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
         }
       }
     });
-    m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 

@@ -12,14 +12,16 @@ package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.EnumSet;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public class ColumnFilterMenu extends AbstractMenu {
+public class ColumnFilterMenu extends AbstractTableMenu {
   private final ITable m_table;
 
   public ColumnFilterMenu(ITable table) {
@@ -29,6 +31,11 @@ public class ColumnFilterMenu extends AbstractMenu {
   @Override
   protected String getConfiguredText() {
     return ScoutTexts.get("ColumnFilterMenu");
+  }
+
+  @Override
+  protected EnumSet<TableMenuType> getConfiguredMenuType() {
+    return EnumSet.of(ITableMenu.TableMenuType.Header);
   }
 
   @Override

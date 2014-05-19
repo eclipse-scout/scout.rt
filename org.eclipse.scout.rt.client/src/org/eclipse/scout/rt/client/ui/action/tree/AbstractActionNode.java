@@ -91,12 +91,16 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   public void setContainerInternal(ITypeWithClassId container) {
     super.setContainerInternal(container);
     // children
-    updateContaineronChildren();
+    setContainerOnActions(getChildActionsInternal());
   }
 
-  protected void updateContaineronChildren() {
-    for (T childAction : getChildActions()) {
-      childAction.setContainerInternal(getContainer());
+  protected void setContainerOnActions(List<? extends T> actions) {
+    if (actions != null) {
+      for (T childAction : actions) {
+        if (childAction != null) {
+          childAction.setContainerInternal(getContainer());
+        }
+      }
     }
   }
 
@@ -123,8 +127,10 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   protected void prepareActionInternal() throws ProcessingException {
     super.prepareActionInternal();
     // child menus
-    for (T node : getChildActionsInternal()) {
-      node.prepareAction();
+    if (hasChildActions()) {
+      for (T node : getChildActionsInternal()) {
+        node.prepareAction();
+      }
     }
   }
 
@@ -134,12 +140,12 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
   @Override
   public boolean hasChildActions() {
-    return getChildActionsInternal().size() > 0;
+    return CollectionUtility.hasElements(getChildActionsInternal());
   }
 
   @Override
   public int getChildActionCount() {
-    return getChildActionsInternal().size();
+    return CollectionUtility.size(getChildActionsInternal());
   }
 
   @Override
@@ -149,8 +155,52 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
   @Override
   public void setChildActions(List<? extends T> newList) {
-    propertySupport.setPropertyList(PROP_CHILD_ACTIONS, CollectionUtility.<T> arrayList(newList));
-    updateContaineronChildren();
+    // remove old
+    removeChildActions(getChildActionsInternal());
+    // add new
+    addChildActions(newList);
+  }
+
+  @Override
+  public void addChildAction(T action) {
+    addChildActions(CollectionUtility.arrayList(action));
+  }
+
+  @Override
+  public void addChildActions(List<? extends T> actionList) {
+    List<T> normalizedList = CollectionUtility.arrayListWithoutNullElements(actionList);
+    if (!normalizedList.isEmpty()) {
+      setContainerOnActions(normalizedList);
+      List<T> childList = getChildActionsInternal();
+      if (childList == null) {
+        childList = new ArrayList<T>(normalizedList.size());
+      }
+      childList.addAll(normalizedList);
+      propertySupport.setPropertyAlwaysFire(PROP_CHILD_ACTIONS, childList);
+    }
+  }
+
+  @Override
+  public void removeChildAction(T action) {
+    removeChildActions(CollectionUtility.arrayList(action));
+  }
+
+  @Override
+  public void removeChildActions(List<? extends T> actionList) {
+    List<T> normalizedList = CollectionUtility.arrayListWithoutNullElements(actionList);
+    if (!normalizedList.isEmpty()) {
+      List<T> childList = getChildActionsInternal();
+      boolean listChanged = false;
+      for (T a : normalizedList) {
+        if (childList.remove(a)) {
+          listChanged = true;
+          a.setContainerInternal(null);
+        }
+      }
+      if (listChanged) {
+        propertySupport.setPropertyAlwaysFire(PROP_CHILD_ACTIONS, childList);
+      }
+    }
   }
 
   @Override

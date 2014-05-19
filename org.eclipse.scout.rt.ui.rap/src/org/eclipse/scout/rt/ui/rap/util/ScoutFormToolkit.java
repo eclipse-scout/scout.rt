@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.rap.basic.comp.HyperlinkEx;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.rap.ext.DropDownFileUpload;
+import org.eclipse.scout.rt.ui.rap.ext.IconCssStyledButton;
 import org.eclipse.scout.rt.ui.rap.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.rap.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.rap.ext.SectionContent;
@@ -172,6 +173,12 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   public ButtonEx createButtonEx(Composite parent, int style) {
     ButtonEx button = new ButtonEx(parent, style | kit.getOrientation());
     adapt(button, false, false);
+    return button;
+  }
+
+  public IconCssStyledButton createIconCssStyledButton(Composite parent, int style) {
+    IconCssStyledButton button = new IconCssStyledButton(parent, style | kit.getOrientation());
+    adapt((Button) button, false, false);
     return button;
   }
 

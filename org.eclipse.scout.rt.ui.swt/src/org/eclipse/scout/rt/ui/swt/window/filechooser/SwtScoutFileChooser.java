@@ -102,6 +102,9 @@ public class SwtScoutFileChooser {
     String filterPath = dialog.getFilterPath();
     String[] fileNames = dialog.getFileNames();
     List<File> result = new ArrayList<File>();
+    if (filterPath.endsWith(":")) {
+      filterPath += "/";
+    }
     for (String fileName : fileNames) {
       result.add(new Path(filterPath).append(fileName).toFile());
     }

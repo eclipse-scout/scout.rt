@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.stringfield;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -60,7 +62,7 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   private TextFieldEditableSupport m_editableSupport;
   private P_UpperLowerCaseVerifyListener m_upperLowerCaseVerifyListener;
 
-  private RwtContextMenuMarkerComposite m_markerComposite;
+  private RwtContextMenuMarkerComposite m_menuMarkerComposite;
 
   public RwtScoutStringField() {
   }
@@ -70,8 +72,8 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    m_markerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
-    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+    m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
+    getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
 
     int style = SWT.None;// SWT.BORDER;
     //Password
@@ -91,7 +93,7 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
       style |= SWT.WRAP;
     }
     style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
-    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_markerComposite, style);
+    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_menuMarkerComposite, style);
 
     setUiContainer(container);
     setUiLabel(label);
@@ -102,12 +104,29 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     // layout
     LogicalGridLayout layout = new LogicalGridLayout(1, 0);
     getUiContainer().setLayout(layout);
-    m_markerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
   }
 
   @Override
   protected void installContextMenu() {
-    new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getUiEnvironment().invokeUiLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+    new RwtScoutContextMenu(m_menuMarkerComposite.getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
   }
 
   protected void addDefaultUiListeners(StyledText textField) {

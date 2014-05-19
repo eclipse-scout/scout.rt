@@ -10,11 +10,15 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
@@ -52,7 +56,7 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
-  private RwtContextMenuMarkerComposite m_contextMenuMarker;
+  private RwtContextMenuMarkerComposite m_menuMarkerComposite;
 
   private RwtScoutContextMenu m_contextMenu;
 
@@ -63,25 +67,25 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    m_contextMenuMarker = new RwtContextMenuMarkerComposite(container, getUiEnvironment(), SWT.NO_FOCUS);
-    getUiEnvironment().getFormToolkit().adapt(m_contextMenuMarker);
+    m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment(), SWT.NO_FOCUS);
+    getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
     ButtonEx uiFieldAsButton = null;
     Hyperlink uiFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
       case IButton.DISPLAY_STYLE_RADIO: {
-        uiFieldAsButton = createSwtRadioButton(m_contextMenuMarker, SWT.LEFT | SWT.RADIO | SWT.WRAP);
+        uiFieldAsButton = createSwtRadioButton(m_menuMarkerComposite, SWT.LEFT | SWT.RADIO | SWT.WRAP);
         break;
       }
       case IButton.DISPLAY_STYLE_TOGGLE: {
-        uiFieldAsButton = createSwtToggleButton(m_contextMenuMarker, SWT.CENTER | SWT.TOGGLE);
+        uiFieldAsButton = createSwtToggleButton(m_menuMarkerComposite, SWT.CENTER | SWT.TOGGLE);
         break;
       }
       case IButton.DISPLAY_STYLE_LINK: {
-        uiFieldAsLink = createSwtHyperlink(m_contextMenuMarker, "", SWT.CENTER);
+        uiFieldAsLink = createSwtHyperlink(m_menuMarkerComposite, "", SWT.CENTER);
         break;
       }
       default: {
-        uiFieldAsButton = createSwtPushButton(m_contextMenuMarker, SWT.CENTER | SWT.PUSH);
+        uiFieldAsButton = createSwtPushButton(m_menuMarkerComposite, SWT.CENTER | SWT.PUSH);
       }
     }
     //
@@ -104,16 +108,33 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
         }
       });
       setUiField(uiFieldAsLink);
-      getUiContainer().setTabList(new Control[]{m_contextMenuMarker});
+      getUiContainer().setTabList(new Control[]{m_menuMarkerComposite});
     }
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(0, 0));
-    m_contextMenuMarker.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
   }
 
   @Override
   protected void installContextMenu() {
-    m_contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_contextMenuMarker, getUiEnvironment());
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getUiEnvironment().invokeUiLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+    m_contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
     getUiField().setMenu(getContextMenu().getUiMenu());
   }
 
@@ -145,9 +166,6 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
    * @since 4.0.0-M7
    */
   protected ButtonEx createSwtPushButton(Composite container, int style) {
-//    if (getScoutObject().hasMenus()) {
-//      style |= SWT.DROP_DOWN;
-//    }
     ButtonEx swtButton = getUiEnvironment().getFormToolkit().createButtonEx(container, style);
     swtButton.setDropDownEnabled(true);
     return swtButton;

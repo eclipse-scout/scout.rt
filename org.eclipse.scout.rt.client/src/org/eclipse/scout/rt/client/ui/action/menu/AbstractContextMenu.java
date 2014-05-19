@@ -45,51 +45,69 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   }
 
   @Override
-  public void setChildActions(List<? extends IMenu> newList) {
-    updateChildActions(newList);
+  public void addChildActions(List<? extends IMenu> actionList) {
+    super.addChildActions(actionList);
   }
 
-  protected void updateChildActions(List<? extends IMenu> newList) {
-    updatePropertyListeners(newList);
-    super.setChildActions(newList);
+  @Override
+  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+    super.afterChildMenusAdd(newChildMenus);
+    addScoutMenuVisibilityListenerRec(newChildMenus);
     calculateVisibility();
   }
 
-  private void updatePropertyListeners(List<? extends IMenu> newList) {
-    // remove old
-    removeScoutMenuVisibilityListenerRec(getChildActions());
-    // add new
-    if (newList != null) {
-      addScoutMenuVisibilityListenerRec(newList);
-    }
+  @Override
+  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+    super.afterChildMenusRemove(childMenusToRemove);
+    removeScoutMenuVisibilityListenerRec(childMenusToRemove);
+    calculateVisibility();
+  }
+
+  /**
+   * @param oldValue
+   * @param newValue
+   */
+  protected void handleChildActionsChanged(List<IMenu> oldValue, List<IMenu> newValue) {
+    removeScoutMenuVisibilityListenerRec(oldValue);
+    addScoutMenuVisibilityListenerRec(newValue);
   }
 
   protected void addScoutMenuVisibilityListenerRec(List<? extends IMenu> menus) {
-    for (IMenu m : menus) {
-      m.addPropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
-      addScoutMenuVisibilityListenerRec(m.getChildActions());
+    if (menus != null) {
+      for (IMenu m : menus) {
+        m.addPropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);
+        m.addPropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
+        m.addPropertyChangeListener(IMenu.PROP_AVAILABLE, m_menuVisibilityListener);
+        addScoutMenuVisibilityListenerRec(m.getChildActions());
+      }
     }
   }
 
   protected void removeScoutMenuVisibilityListenerRec(List<? extends IMenu> menus) {
-    for (IMenu m : menus) {
-      m.removePropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
-      removeScoutMenuVisibilityListenerRec(m.getChildActions());
+    if (menus != null) {
+      for (IMenu m : menus) {
+        m.removePropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);
+        m.removePropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
+        m.removePropertyChangeListener(IMenu.PROP_AVAILABLE, m_menuVisibilityListener);
+        removeScoutMenuVisibilityListenerRec(m.getChildActions());
+      }
     }
   }
 
   private void calculateVisibility() {
-    List<IMenu> visibleChildMenus = ActionUtility.visibleNormalizedActions(getChildActions());
+    List<IMenu> visibleChildMenus = ActionUtility.visibleNormalizedActions(getChildActions(), ActionUtility.createMenuFilterVisibleAvailable());
     setVisible(CollectionUtility.hasElements(visibleChildMenus));
   }
 
   private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
+    @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
-      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-        calculateVisibility();
+      if (IMenu.PROP_CHILD_ACTIONS.equals(evt.getPropertyName())) {
+        handleChildActionsChanged((List<IMenu>) evt.getOldValue(), (List<IMenu>) evt.getNewValue());
       }
+      calculateVisibility();
     }
-
   }
+
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.action.menu;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
@@ -38,11 +39,14 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   private Listener m_swtSelectionListener;
   private Listener m_swtMenuDisposeListener;
 
-  public SwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, ISwtEnvironment environment) {
-    this(scoutMenu, parentMenu, environment, true);
+  private IActionFilter m_filter;
+
+  public SwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IActionFilter filter, ISwtEnvironment environment) {
+    this(scoutMenu, parentMenu, filter, environment, true);
   }
 
-  public SwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, ISwtEnvironment environment, boolean callInitializer) {
+  public SwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IActionFilter filter, ISwtEnvironment environment, boolean callInitializer) {
+    m_filter = filter;
     m_environment = environment;
     m_scoutMenu = scoutMenu;
     m_parentMenu = parentMenu;
@@ -52,12 +56,8 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   }
 
   protected void createMenu(IMenu scoutMenu, Menu parentMenu, ISwtEnvironment environment) {
-    m_swtMenuItem = SwtMenuUtility.createSwtMenuItem(parentMenu, scoutMenu, environment);
+    m_swtMenuItem = SwtMenuUtility.createSwtMenuItem(parentMenu, scoutMenu, getFilter(), environment);
     m_swtMenuItem.setData(getScoutMenu());
-    if (scoutMenu.hasChildActions()) {
-      // create child actions
-
-    }
     m_swtSelectionListener = new P_SwtMenuListener();
     m_swtMenuItem.addListener(SWT.Selection, m_swtSelectionListener);
     m_swtMenuDisposeListener = new P_SwtMenuDisposeListener();
@@ -69,7 +69,7 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   protected void createChildMenu() {
     if (getScoutMenu().hasChildActions()) {
       Menu menu = new Menu(m_swtMenuItem);
-      SwtMenuUtility.fillMenu(menu, getScoutMenu().getChildActions(), getEnvironment());
+      SwtMenuUtility.fillMenu(menu, getScoutMenu().getChildActions(), getFilter(), getEnvironment());
       m_swtMenuItem.setMenu(menu);
     }
   }
@@ -111,6 +111,10 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   @Override
   public MenuItem getSwtMenuItem() {
     return m_swtMenuItem;
+  }
+
+  public IActionFilter getFilter() {
+    return m_filter;
   }
 
   private boolean isHandleScoutPropertyChange(String propertyName, Object newValue) {

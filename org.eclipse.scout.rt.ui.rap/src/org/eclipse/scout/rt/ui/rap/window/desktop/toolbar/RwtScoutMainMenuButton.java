@@ -14,6 +14,7 @@ import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -80,7 +81,7 @@ public class RwtScoutMainMenuButton extends RwtScoutComposite<IDesktop> implemen
     });
     m_menuButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_MENU_BUTTON);
     Menu contextMenu = new Menu(m_menuButton.getShell(), SWT.POP_UP);
-    RwtMenuUtility.fillMenu(contextMenu, getScoutObject().getMenus(), getUiEnvironment());
+    RwtMenuUtility.fillMenu(contextMenu, getScoutObject().getMenus(), ActionUtility.createVisibleFilter(), getUiEnvironment());
     m_menuButton.setMenu(contextMenu);
 
     return m_menuButton;

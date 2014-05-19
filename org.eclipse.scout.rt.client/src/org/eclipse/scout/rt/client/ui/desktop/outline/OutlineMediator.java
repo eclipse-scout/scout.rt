@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -73,34 +72,6 @@ public class OutlineMediator {
        */
       table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
       table.getUIFacade().fireRowActionFromUI(row);
-    }
-  }
-
-  public void fetchTableRowMenus(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-    if (!pageWithTable.isShowTableRowMenus()) {
-      return;
-    }
-
-    ITableRow row = pageWithTable.getTableRowFor(e.getNode());
-    ITable table = pageWithTable.getTable();
-    if (row != null) {
-      table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-      List<IMenu> menus = table.getUIFacade().fireRowPopupFromUI();
-      if (menus != null) {
-        e.addPopupMenus(menus);
-      }
-    }
-  }
-
-  public void fetchTableEmptySpaceMenus(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-    ITable table = pageWithTable.getTable();
-    if (!pageWithTable.isShowEmptySpaceMenus()) {
-      return;
-    }
-
-    List<IMenu> menus = table.getUIFacade().fireEmptySpacePopupFromUI();
-    if (menus != null) {
-      e.addPopupMenus(menus);
     }
   }
 
@@ -182,21 +153,4 @@ public class OutlineMediator {
     }
   }
 
-  public void mediateTableRowPopup(TableEvent e, IPageWithNodes pageWithNodes) {
-    ITreeNode node = pageWithNodes.getTreeNodeFor(e.getFirstRow());
-    if (node instanceof IPageWithTable<?>) {
-      IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-      List<ITableRow> emptyList = CollectionUtility.emptyArrayList();
-      List<IMenu> menus = tablePage.getTable().fetchMenusForRowsInternal(emptyList);
-      if (menus != null) {
-        e.addPopupMenus(menus);
-      }
-    }
-    else if (node instanceof IPageWithNodes) {
-      List<IMenu> menus = pageWithNodes.getTree().fetchMenusForNodesInternal(CollectionUtility.arrayList(node));
-      if (menus != null) {
-        e.addPopupMenus(menus);
-      }
-    }
-  }
 }

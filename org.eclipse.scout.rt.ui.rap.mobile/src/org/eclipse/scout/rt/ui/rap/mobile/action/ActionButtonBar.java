@@ -224,7 +224,9 @@ public class ActionButtonBar extends Composite {
     }
 
     for (IMenu menu : actions) {
-      createButton(buttonBar, menu);
+      if (menu.isVisible()) {
+        createButton(buttonBar, menu);
+      }
     }
   }
 

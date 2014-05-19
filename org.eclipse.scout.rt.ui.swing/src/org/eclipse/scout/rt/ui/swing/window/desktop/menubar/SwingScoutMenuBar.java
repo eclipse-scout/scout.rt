@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.JMenuBar;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -47,6 +48,6 @@ public class SwingScoutMenuBar extends SwingScoutComposite<IDesktop> {
     List<IMenu> toplevelMenus = getScoutObject().getMenus();
     JMenuBar menuBar = getSwingMenuBar();
     menuBar.removeAll();
-    getSwingEnvironment().appendActions(menuBar, toplevelMenus);
+    getSwingEnvironment().appendActions(menuBar, toplevelMenus, ActionUtility.createVisibleFilter());
   }
 }

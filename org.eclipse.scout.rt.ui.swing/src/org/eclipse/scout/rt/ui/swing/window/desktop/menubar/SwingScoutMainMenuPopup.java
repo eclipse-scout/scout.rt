@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.JPopupMenu;
 
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -26,6 +27,12 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 public class SwingScoutMainMenuPopup extends SwingScoutComposite<IDesktop> {
 
   private static final long serialVersionUID = 1L;
+  private IActionFilter m_filter;
+
+  public SwingScoutMainMenuPopup(IActionFilter filter) {
+    m_filter = filter;
+
+  }
 
   @Override
   protected void initializeSwing() {
@@ -42,7 +49,7 @@ public class SwingScoutMainMenuPopup extends SwingScoutComposite<IDesktop> {
     List<IMenu> toplevelMenus = getScoutObject().getMenus();
     JPopupMenu popupMenu = getSwingPopupMenu();
     popupMenu.removeAll();
-    getSwingEnvironment().appendActions(popupMenu, toplevelMenus);
+    getSwingEnvironment().appendActions(popupMenu, toplevelMenus, m_filter);
   }
 
 }

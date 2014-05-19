@@ -39,9 +39,15 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField> {
   }
 
   @Override
-  protected void updateChildActions(List<? extends IMenu> newList) {
-    super.updateChildActions(newList);
-    handleOwnerValueChanged();
+  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+    super.afterChildMenusAdd(newChildMenus);
+    handleOwnerEnabledChanged();
+  }
+
+  @Override
+  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+    super.afterChildMenusRemove(childMenusToRemove);
+    handleOwnerEnabledChanged();
   }
 
   protected void handleOwnerValueChanged() {

@@ -260,11 +260,21 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
 
   protected void updateIconIdFromScout() {
     String iconId = getScoutObject().getIconId();
-    if (m_colorPickButton.getLayoutData() instanceof GridData) {
-      GridData layoutData = (GridData) m_colorPickButton.getLayoutData();
-      layoutData.exclude = StringUtility.isNullOrEmpty(iconId);
-    }
     m_colorPickButton.setData(RWT.CUSTOM_VARIANT, iconId);
+    if (StringUtility.isNullOrEmpty(iconId)) {
+      if (m_colorPickButton.getLayoutData() instanceof GridData) {
+        GridData layoutData = (GridData) m_colorPickButton.getLayoutData();
+        layoutData.exclude = true;
+      }
+      m_colorPickButton.setVisible(false);
+    }
+    else {
+      if (m_colorPickButton.getLayoutData() instanceof GridData) {
+        GridData layoutData = (GridData) m_colorPickButton.getLayoutData();
+        layoutData.exclude = false;
+      }
+      m_colorPickButton.setVisible(true);
+    }
   }
 
   @Override

@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
@@ -58,6 +59,11 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    */
   String PROP_CONTAINER = "container";
 
+  /**
+   * {@link ITreeContextMenu}
+   */
+  String PROP_CONTEXT_MENU = "contextMenu";
+
   void initTree() throws ProcessingException;
 
   void disposeTree();
@@ -71,9 +77,15 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
 
   void requestFocus();
 
+  /**
+   * @return
+   */
   List<IMenu> getMenus();
 
-  void setMenus(List<? extends IMenu> a);
+  /**
+   * @return
+   */
+  ITreeContextMenu getContextMenu();
 
   /**
    * Convenience to find a menu, uses {@link ActionFinder}
@@ -462,17 +474,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    */
   void importTreeData(AbstractTreeFieldData source) throws ProcessingException;
 
-  /**
-   * To obtain the menus that passed checks such as visibility, empty space action, ... for the given nodes.
-   * Please be cautious as depending on the given nodes, there might be a node mismatch among the selected tree nodes
-   * and the menu context node.
-   * This method is not part of the public API.
-   * 
-   * @param nodes
-   *          the nodes whose menus should be returned
-   * @return
-   */
-  List<IMenu> fetchMenusForNodesInternal(Collection<? extends ITreeNode> nodes);
 
   /*
    * UI Processes

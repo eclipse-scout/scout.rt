@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -91,7 +94,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
 
-  private RwtContextMenuMarkerComposite m_contextMenuMarker;
+  private RwtContextMenuMarkerComposite m_menuMarkerComposite;
 
   public RwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -108,21 +111,21 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.NONE);
     m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
-    m_contextMenuMarker = new RwtContextMenuMarkerComposite(m_smartContainer, getUiEnvironment(), SWT.NONE);
-    getUiEnvironment().getFormToolkit().adapt(m_contextMenuMarker);
+    m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_smartContainer, getUiEnvironment(), SWT.NONE);
+    getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
 
-    StyledText textField = new StyledTextEx(m_contextMenuMarker, SWT.SINGLE);
+    StyledText textField = new StyledTextEx(m_menuMarkerComposite, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
     textField.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
 
-    m_browseButton = getUiEnvironment().getFormToolkit().createButton(m_smartContainer, "", SWT.NO_FOCUS);
+    m_browseButton = getUiEnvironment().getFormToolkit().createButton(m_smartContainer, "", SWT.PUSH | SWT.NO_FOCUS);
 
     setUiContainer(container);
     setUiLabel(label);
     setUiField(textField);
     // prevent the button from grabbing focus
-    m_smartContainer.setTabList(new Control[]{m_contextMenuMarker});
+    m_smartContainer.setTabList(new Control[]{m_menuMarkerComposite});
 
     m_browseButton.addFocusListener(new FocusAdapter() {
       private static final long serialVersionUID = 1L;
@@ -158,7 +161,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     m_smartContainer.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(2, false));
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    m_contextMenuMarker.setLayoutData(textLayoutData);
+    m_menuMarkerComposite.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
     buttonLayoutData.heightHint = 20;
@@ -168,9 +171,25 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
   @Override
   protected void installContextMenu() {
-    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiBrowseButton().getShell(), getScoutObject().getContextMenu(), m_contextMenuMarker, getUiEnvironment());
-    getUiBrowseButton().setMenu(contextMenu.getUiMenu());
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
 
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
+          getUiEnvironment().invokeUiLater(new Runnable() {
+            @Override
+            public void run() {
+              m_menuMarkerComposite.setMarkerVisible(markerVisible);
+            }
+          });
+        }
+      }
+    });
+    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiBrowseButton().getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
+    getUiBrowseButton().setMenu(contextMenu.getUiMenu());
   }
 
   protected String getSmartfieldVariant() {
@@ -240,7 +259,9 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
+    // button
     m_browseButton.setEnabled(b);
+    // field
     getUiField().setEnabled(b);
     if (b) {
       m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());

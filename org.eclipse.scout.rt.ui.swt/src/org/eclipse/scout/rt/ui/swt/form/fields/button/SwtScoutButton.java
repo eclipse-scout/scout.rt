@@ -111,26 +111,10 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
     LogicalGridData contextMenuMarkerData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
     if (swtFieldAsButton != null) {
 
-      // context menu
-
-//      m_menuSupport = SwtScoutMenuSupport.install(swtFieldAsButton, new IMenuProvider() {
-//        @Override
-//        public List<IMenu> getValidMenus(MenuContext menuContext) {
-//          return getScoutObject().getUIFacade().fireButtonPopupFromUI();
-//        }
-//
-//        @Override
-//        public List<IMenu> getAllMenus() {
-//          return getScoutObject().getMenus();
-//        }
-//      }, getScoutObject(), getEnvironment());
-
       // attach swt listeners
       swtFieldAsButton.addListener(SWT.Selection, new P_SwtSelectionListener());
       setSwtField(swtFieldAsButton);
       //auto process button height
-
-//      LogicalGridData gd = (LogicalGridData) swtFieldAsButton.getLayoutData();
       adaptButtonLayoutData(contextMenuMarkerData);
 
     }

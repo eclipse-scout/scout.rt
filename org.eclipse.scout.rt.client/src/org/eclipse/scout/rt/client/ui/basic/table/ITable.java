@@ -851,18 +851,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void decorateCell(ITableRow row, IColumn<?> col);
 
-  /**
-   * To obtain the menus that passed checks such as visibility, empty space action, ... for the given rows.
-   * Please be cautious as depending on the given rows, there might be a row mismatch among the selected table rows and
-   * the menu context row.
-   * This method is not part of the public API.
-   * 
-   * @param rows
-   *          the rows whose menus should be returned
-   * @return
-   */
-  List<IMenu> fetchMenusForRowsInternal(List<? extends ITableRow> rows);
-
   /*
    * UI interface
    */

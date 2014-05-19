@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TooManyListenersException;
@@ -57,9 +58,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -161,9 +164,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
             Runnable t = new Runnable() {
               @Override
               public void run() {
-                List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireNodePopupFromUI();
                 // call swing menu
-                new SwingPopupWorker(getSwingEnvironment(), source, p, scoutMenus).enqueue();
+                new SwingPopupWorker(getSwingEnvironment(), source, p, getScoutObject().getContextMenu()).enqueue();
               }
             };
             getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -839,15 +841,15 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          List<IMenu> scoutMenus;
-          if (node != null) {
-            scoutMenus = getScoutObject().getUIFacade().fireNodePopupFromUI();
+          IActionFilter filter;
+          if (node == null) {
+            filter = ActionUtility.createTreeMenuFilterVisibleAndMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.EmptySpace));
           }
           else {
-            scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
+            filter = ActionUtility.createMenuFilterVisibleAvailable();
           }
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(), filter, false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);

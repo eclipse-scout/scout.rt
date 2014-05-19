@@ -124,6 +124,26 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
+  public void addChildAction(IMenu action) {
+    m_menu.addChildAction(action);
+  }
+
+  @Override
+  public void addChildActions(List<? extends IMenu> actionList) {
+    m_menu.addChildActions(actionList);
+  }
+
+  @Override
+  public void removeChildAction(IMenu action) {
+    m_menu.removeChildAction(action);
+  }
+
+  @Override
+  public void removeChildActions(List<? extends IMenu> actionList) {
+    m_menu.removeChildActions(actionList);
+  }
+
+  @Override
   public void doAction() throws ProcessingException {
     m_menu.doAction();
   }
@@ -377,4 +397,13 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
     m_menu.handleOwnerValueChanged(newValue);
   }
 
+  @Override
+  public boolean isAvailable() {
+    return m_menu.isAvailable();
+  }
+
+  @Override
+  public void aboutToShow() {
+    m_menu.aboutToShow();
+  }
 }

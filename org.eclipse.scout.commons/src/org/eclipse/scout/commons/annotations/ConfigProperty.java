@@ -14,6 +14,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.EnumSet;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -163,6 +164,21 @@ public @interface ConfigProperty {
    * Class&lt;? extends IColumn&gt;
    */
   String TABLE_COLUMN = "TABLE_COLUMN";
+
+  /**
+   * An {@link EnumSet} of ITableMenu.TableMenuType
+   */
+  String TABLE_MENU_TYPE = "TABLE_MENU_TYPE";
+
+  /**
+   * An {@link EnumSet} of ITreeMenu.TreeMenuType
+   */
+  String TREE_MENU_TYPE = "TREE_MENU_TYPE";
+
+  /**
+   * An {@link EnumSet} of AbstractValueFieldMenu.ValueFieldMenuType
+   */
+  String VALUE_FIELD_MENU_TYPE = "VALUE_FIELD_MENU_TYPE";
   /**
    * an String representing an SQL statement
    */

@@ -46,10 +46,13 @@ public class MobileScoutFormToolkit extends ScoutFormToolkit {
    * <li>displaying a tooltip is not common on mobile devices</li>
    * </ul>
    */
+  @SuppressWarnings("deprecation")
   public ActionButtonBar createActionButtonBar(Composite parent, IMenu[] menus, int style) {
     if (menus != null) {
       for (IMenu menu : menus) {
         menu.setTooltipText(null);
+        menu.prepareAction();
+        menu.aboutToShow();
       }
     }
 

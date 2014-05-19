@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
@@ -21,53 +25,67 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
  */
 public class AbstractValueFieldMenu extends AbstractMenu implements IValueFieldMenu {
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected final boolean getConfiguredSingleSelectionAction() {
-    return super.getConfiguredSingleSelectionAction();
+  private boolean m_skipCalculateAvailability;
+
+  public AbstractValueFieldMenu() {
+    super();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected final boolean getConfiguredMultiSelectionAction() {
-    return super.getConfiguredMultiSelectionAction();
+  public AbstractValueFieldMenu(boolean callInitializer) {
+    super(callInitializer);
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected final boolean getConfiguredEmptySpaceAction() {
-    return super.getConfiguredEmptySpaceAction();
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(100)
-  protected boolean getConfiguredNullValueMenu() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(110)
-  protected boolean getConfiguredNotNullValueMenu() {
-    return true;
+  @ConfigProperty(ConfigProperty.VALUE_FIELD_MENU_TYPE)
+  @Order(140)
+  protected EnumSet<ValueFieldMenuType> getConfiguredMenuType() {
+    return EnumSet.<ValueFieldMenuType> of(ValueFieldMenuType.NotEmpty);
   }
 
   @Override
-  protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
-    boolean visible = false;
-    if (isNullValueMenu()) {
-      visible = newOwnerValue == null;
+  protected void calculateAvailability(Object newOwnerValue) {
+    if (m_skipCalculateAvailability) {
+      return;
     }
-    if (!visible && isNotNullValueMenu()) {
-      visible = newOwnerValue != null;
+    if (hasChildActions()) {
+      setAvailableInternal(true);
+      return;
     }
-    setVisible(visible);
+    boolean available = false;
+    available |= newOwnerValue == null && getMenuType().contains(ValueFieldMenuType.Empty);
+    available |= newOwnerValue != null && getMenuType().contains(ValueFieldMenuType.NotEmpty);
+    setAvailableInternal(available);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void initConfig() {
-    super.initConfig();
-    setNotNullValueMenu(getConfiguredNotNullValueMenu());
-    setNullValueMenu(getConfiguredNullValueMenu());
+    // guard to ensure calculate availability is not called when only  legacy from super type is initialized
+    try {
+      m_skipCalculateAvailability = true;
+      super.initConfig();
+    }
+    finally {
+      m_skipCalculateAvailability = false;
+    }
+    if (!ConfigurationUtility.isMethodOverwrite(AbstractValueFieldMenu.class, "getConfiguredMenuType", new Class[0], this.getClass())) {
+      // legacy
+      Set<ValueFieldMenuType> menuType = new HashSet<ValueFieldMenuType>();
+      if (isSingleSelectionAction()) {
+        menuType.add(ValueFieldMenuType.NotEmpty);
+      }
+      if (isMultiSelectionAction()) {
+        menuType.add(ValueFieldMenuType.NotEmpty);
+      }
+      if (isEmptySpaceAction()) {
+        menuType.add(ValueFieldMenuType.Empty);
+      }
+      EnumSet<ValueFieldMenuType> menuTypeEnumSet = EnumSet.<ValueFieldMenuType> copyOf(menuType);
+      setMenuType(menuTypeEnumSet);
+    }
+    else {
+      setMenuType(getConfiguredMenuType());
+    }
+    calculateAvailability(null);
   }
 
   @Override
@@ -77,7 +95,7 @@ public class AbstractValueFieldMenu extends AbstractMenu implements IValueFieldM
 
   @Override
   public void setOwnerInternal(IPropertyObserver owner) {
-    if (owner instanceof IValueField<?>) {
+    if (owner == null || owner instanceof IValueField<?>) {
       super.setOwnerInternal(owner);
     }
     else {
@@ -85,24 +103,14 @@ public class AbstractValueFieldMenu extends AbstractMenu implements IValueFieldM
     }
   }
 
-  @Override
-  public void setNotNullValueMenu(boolean notNullValueMenu) {
-    propertySupport.setPropertyBool(PROP_NOT_NULL_VALUE_MENU, notNullValueMenu);
+  public void setMenuType(EnumSet<ValueFieldMenuType> menuType) {
+    propertySupport.setProperty(PROP_MENU_TYPE, menuType);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public boolean isNotNullValueMenu() {
-    return propertySupport.getPropertyBool(PROP_NOT_NULL_VALUE_MENU);
-  }
-
-  @Override
-  public void setNullValueMenu(boolean nullValueMenu) {
-    propertySupport.setPropertyBool(PROP_NULL_VALUE_MENU, nullValueMenu);
-  }
-
-  @Override
-  public boolean isNullValueMenu() {
-    return propertySupport.getPropertyBool(PROP_NULL_VALUE_MENU);
+  public EnumSet<ValueFieldMenuType> getMenuType() {
+    return (EnumSet<ValueFieldMenuType>) propertySupport.getProperty(PROP_MENU_TYPE);
   }
 
 }

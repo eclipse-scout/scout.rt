@@ -40,7 +40,8 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.ITreeContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
@@ -78,6 +79,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private boolean m_actionRunning;
   private boolean m_saveAndRestoreScrollbars;
   private ITreeNode m_lastSeenDropNode;
+
+  private List<IMenu> m_currentNodeMenus;
 
   public AbstractTree() {
     this(true);
@@ -192,7 +195,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   * 
+   *
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -211,7 +214,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -245,7 +248,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -261,7 +264,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   * 
+   *
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -273,7 +276,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   * 
+   *
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -293,7 +296,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   * 
+   *
    * @since 4.0-M7
    */
   @ConfigOperation
@@ -418,7 +421,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     });
     // key shortcuts
-    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
+    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
     for (Class<? extends IKeyStroke> keystrokeClazz : getConfiguredKeyStrokes()) {
       try {
         ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
@@ -455,7 +458,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     catch (Exception e) {
       LOG.error("Error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList;
+    TreeContextMenu contextMenu = new TreeContextMenu(this);
+    contextMenu.setChildActions(menuList);
+    setContextMenuInternal(contextMenu);
+
   }
 
   /*
@@ -488,7 +494,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -496,13 +502,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
+  public ITreeContextMenu getContextMenu() {
+    return (ITreeContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  protected void setContextMenuInternal(ITreeContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public void setMenus(List<? extends IMenu> menues) {
-    m_menus = CollectionUtility.arrayList(menues);
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
   }
 
   @Override
@@ -763,15 +773,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private void rebuildKeyStrokesInternal() {
     //Get the menus for the selected nodes
-    List<IMenu> menus;
-    try {
-      Collection<ITreeNode> nodes = resolveVirtualNodes(getSelectedNodes());
-      menus = fetchMenusForNodesInternal(nodes);
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      menus = CollectionUtility.emptyArrayList();
-    }
+    List<IMenu> menus = ActionUtility.getActions(getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
 
     //Compute the Keystrokes: base + keyStroke for the current Menus.
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(m_baseKeyStrokes);
@@ -1910,7 +1912,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   * 
+   *
    * @param nodes
    * @return
    */
@@ -2005,12 +2007,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     // fire
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODES_SELECTED, newSelection);
-    HashSet<ITreeNode> deselectedNodes = new HashSet<ITreeNode>(oldSelection);
+    Set<ITreeNode> deselectedNodes = new HashSet<ITreeNode>(oldSelection);
     deselectedNodes.removeAll(newSelection);
     e.setDeselectedNodes(deselectedNodes);
-    HashSet<ITreeNode> newSelectedNodes = new HashSet<ITreeNode>(newSelection);
+    Set<ITreeNode> newSelectedNodes = new HashSet<ITreeNode>(newSelection);
     newSelectedNodes.removeAll(oldSelection);
     e.setNewSelectedNodes(newSelectedNodes);
+    // update node menus
+    updateNodeMenus(newSelectedNodes);
     //single observer
     try {
       execNodesSelected(e);
@@ -2025,6 +2029,25 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     fireTreeEventInternal(e);
   }
 
+  /**
+   * @param newSelectedNodes
+   */
+  protected void updateNodeMenus(Set<ITreeNode> newSelectedNodes) {
+    // remove old
+    if (m_currentNodeMenus != null) {
+      getContextMenu().removeChildActions(m_currentNodeMenus);
+      m_currentNodeMenus = null;
+    }
+    if (newSelectedNodes != null) {
+      List<IMenu> nodeMenus = new ArrayList<IMenu>();
+      for (ITreeNode node : newSelectedNodes) {
+        nodeMenus.addAll(node.getMenus());
+      }
+      m_currentNodeMenus = nodeMenus;
+      getContextMenu().addChildActions(nodeMenus);
+    }
+  }
+
   private void fireNodeExpanded(ITreeNode node, boolean b) {
     if (node != null) {
       if (b) {
@@ -2034,33 +2057,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_COLLAPSED, node));
       }
     }
-  }
-
-  @Override
-  public List<IMenu> fetchMenusForNodesInternal(Collection<? extends ITreeNode> nodes) {
-    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_POPUP, nodes);
-    // single observer for tree-owned menus
-    addLocalPopupMenus(e);
-    fireTreeEventInternal(e);
-    //separate node menus and empty space actions
-    List<IMenu> popupMenus = e.getPopupMenus();
-    ArrayList<IMenu> nodeMenus = new ArrayList<IMenu>(popupMenus.size());
-    ArrayList<IMenu> emptySpaceMenus = new ArrayList<IMenu>();
-    for (IMenu menu : popupMenus) {
-      if (menu.isVisible()) {
-        if (menu.isEmptySpaceAction()) {
-          emptySpaceMenus.add(menu);
-        }
-        else {
-          nodeMenus.add(menu);
-        }
-      }
-    }
-    if (nodeMenus.size() > 0 && emptySpaceMenus.size() > 0) {
-      nodeMenus.add(0, new MenuSeparator());
-    }
-    nodeMenus.addAll(0, emptySpaceMenus);
-    return nodeMenus;
   }
 
   private void fireNodeClick(ITreeNode node) {
@@ -2113,40 +2109,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     fireTreeEventInternal(e);
   }
 
-  private void addLocalPopupMenus(TreeEvent e) {
-    int selectionCount = e.getNodes().size();
-    ArrayList<IMenu> list = new ArrayList<IMenu>();
-    for (IMenu m : this.getMenus()) {
-      if ((!m.isInheritAccessibility()) || (isEnabled())) {
-        m.prepareAction();
-        if (m.isVisible()) {
-          list.add(m);
-        }
-      }
-    }
-    if (e.getNode() != null) {
-      for (IMenu m : e.getNode().getMenus()) {
-        if ((!m.isInheritAccessibility()) || (e.getNode().isEnabled() && isEnabled())) {
-          m.prepareAction();
-          if (m.isVisible()) {
-            list.add(m);
-          }
-        }
-      }
-    }
-    //check single/multi select
-    for (IMenu menu : list) {
-      if (selectionCount > 1 && menu.isMultiSelectionAction()) {
-        e.addPopupMenu(menu);
-      }
-      else if (selectionCount == 1 && menu.isSingleSelectionAction()) {
-        e.addPopupMenu(menu);
-      }
-      else if (selectionCount == 0 && menu.isEmptySpaceAction()) {
-        e.addPopupMenu(menu);
-      }
-    }
-  }
 
   private TransferObject fireNodesDragRequest(Collection<ITreeNode> nodes) {
     if (CollectionUtility.hasElements(nodes)) {
@@ -2168,7 +2130,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   * 
+   *
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
@@ -2178,7 +2140,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * This method gets called after the drag action has been finished.
-   * 
+   *
    * @since 4.0-M7
    */
   public void fireDragFinished() {
@@ -2596,34 +2558,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       catch (ProcessingException se) {
         se.addContextMessage(nodes.toString());
         SERVICES.getService(IExceptionHandlerService.class).handleException(se);
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public List<IMenu> fireNodePopupFromUI() {
-      try {
-        pushUIProcessor();
-        Collection<ITreeNode> nodes = resolveVirtualNodes(getSelectedNodes());
-        return fetchMenusForNodesInternal(nodes);
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        return CollectionUtility.emptyArrayList();
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public List<IMenu> fireEmptySpacePopupFromUI() {
-      try {
-        pushUIProcessor();
-        Set<ITreeNode> emptySet = CollectionUtility.hashSet();
-        return fetchMenusForNodesInternal(emptySet);
       }
       finally {
         popUIProcessor();

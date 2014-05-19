@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,8 +44,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -1238,28 +1242,16 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
-      List<IMenu> menus = null;
-      if (m_header) {
-        menus = collectHeaderMenus();
-      }
-      else {
-        menus = getScoutObject().getMenus();
-//        final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
-//        menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
-      }
-      if (menus != null) {
-        Menu menu = ((Menu) e.getSource());
-        RwtMenuUtility.fillMenu(menu, menus, getUiEnvironment());
-      }
-    }
-
-    private List<IMenu> collectHeaderMenus() {
-      final AtomicReference<List<IMenu>> scoutMenusRef = new AtomicReference<List<IMenu>>();
+      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
       Runnable t = new Runnable() {
+        @SuppressWarnings("deprecation")
         @Override
         public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
-          scoutMenusRef.set(scoutMenus);
+          IContextMenu contextMenu = getScoutObject().getContextMenu();
+          // manually call about to show
+          contextMenu.aboutToShow();
+          contextMenu.prepareAction();
+          scoutMenusRef.set(contextMenu);
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -1269,13 +1261,16 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       catch (InterruptedException ex) {
         //nop
       }
-      // grab the actions out of the job, when the actions are providden
-      // within the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
-        return scoutMenusRef.get();
+        IActionFilter filter = null;
+        if (m_header) {
+          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.of(ITableMenu.TableMenuType.EmptySpace, ITableMenu.TableMenuType.Header));
+        }
+        else {
+          filter = ActionUtility.createMenuFilterVisibleAvailable();
+        }
+        RwtMenuUtility.fillMenu((Menu) e.getSource(), scoutMenusRef.get().getChildActions(), filter, getUiEnvironment());
       }
-
-      return CollectionUtility.emptyArrayList();
     }
   }
 

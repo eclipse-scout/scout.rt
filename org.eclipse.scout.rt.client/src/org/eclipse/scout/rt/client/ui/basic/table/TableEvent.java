@@ -72,23 +72,7 @@ public class TableEvent extends java.util.EventObject {
    * Filter has changed
    */
   public static final int TYPE_ROW_FILTER_CHANGED = 210;
-  /**
-   * Broadcast request to add actions for popup on selected rows valid
-   * properties: rows, firstRow, lastRow add actions to: popupActions
-   */
-  public static final int TYPE_ROW_POPUP = 700;
-  /**
-   * Broadcast request to add actions for popup on empty space (not on rows)
-   * <p>
-   * valid properties: add actions to: popupActions
-   */
-  public static final int TYPE_EMPTY_SPACE_POPUP = 701;
-  /**
-   * Broadcast request to add actions for header popup
-   * <p>
-   * valid properties: add actions to: popupActions
-   */
-  public static final int TYPE_HEADER_POPUP = 750;
+
   /**
    * Broadcast request to get drag object
    * <p>

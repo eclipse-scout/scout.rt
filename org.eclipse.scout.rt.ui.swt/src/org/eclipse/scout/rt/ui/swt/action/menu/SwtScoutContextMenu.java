@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
@@ -123,34 +124,13 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
     }
   }
 
-//  protected void removeScoutMenuVisibilityListenerToAllChildren(IMenu menuContainer) {
-//    if (m_visibilityObservees != null) {
-//      for (IMenu m : m_visibilityObservees) {
-//        m.removePropertyChangeListener(IMenu.PROP_VISIBLE, m_scoutMenuVisibilityListener);
-//        removeScoutMenuVisibilityListenerToAllChildren(m);
-//      }
-//      m_visibilityObservees = null;
-//    }
-//  }
-
-//  protected void addScoutMenuVisibilityListenerToAllChildren(IMenu menuContainer) {
-//    if (m_visibilityObservees == null) {
-//      m_visibilityObservees = new ArrayList<IMenu>();
-//    }
-//    for (IMenu m : menuContainer.getChildActions()) {
-//      m_visibilityObservees.add(m);
-//      m.addPropertyChangeListener(IMenu.PROP_VISIBLE, m_scoutMenuVisibilityListener);
-//      addScoutMenuVisibilityListenerToAllChildren(m);
-//    }
-//  }
-
   protected void updateUiMenu() {
     for (MenuItem item : getSwtMenu().getItems()) {
       if (item.getData(DATA_SYSTEM_MENU) == null) {
         item.dispose();
       }
     }
-    SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), getEnvironment(), getSwtMenu().getItemCount() > 0);
+    SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment(), getSwtMenu().getItemCount() > 0);
   }
 
   protected void ensureChildrenLoaded() {
@@ -196,21 +176,23 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
   *
   */
   protected void handleSwtMenuShow() {
-    updateUiMenu();
 
     Runnable t = new Runnable() {
+      @SuppressWarnings("deprecation")
       @Override
       public void run() {
         getScoutContextMenu().prepareAction();
+        getScoutContextMenu().aboutToShow();
       }
     };
     JobEx prepareJob = getEnvironment().invokeScoutLater(t, 0);
     try {
-      prepareJob.join(800);
+      prepareJob.join(1200);
     }
     catch (InterruptedException e) {
       LOG.error("error during prepare menus.", e);
     }
+    updateUiMenu();
     //end notify
   }
 
@@ -240,21 +222,4 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
 
   } // end P_UiMenuListener
 
-//  private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
-//    @Override
-//    public void propertyChange(final PropertyChangeEvent evt) {
-//      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-//        // sync to ui
-//        Runnable r = new Runnable() {
-//
-//          @Override
-//          public void run() {
-//            updateMenusFromScout();
-//          }
-//
-//        };
-//        getEnvironment().invokeSwtLater(r);
-//      }
-//    }
-//  }
 }

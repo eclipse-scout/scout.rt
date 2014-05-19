@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -1548,8 +1549,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   @Override
-  public ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu) {
-    SwtScoutMenuItem swtScoutMenuItem = new SwtScoutMenuItem(scoutMenu, uiMenu, this);
+  public ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu, IActionFilter filter) {
+    SwtScoutMenuItem swtScoutMenuItem = new SwtScoutMenuItem(scoutMenu, uiMenu, filter, this);
     assignWidgetId(scoutMenu, swtScoutMenuItem.getSwtMenuItem(), swtScoutMenuItem.getParentMenu());
     return swtScoutMenuItem;
   }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -28,8 +29,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -56,6 +62,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
+
+//  // internal usage of menus temporarily added to the tree.
+  private List<IMenu> m_inheritedMenusOfPage;
 
   public AbstractOutline() {
     super();
@@ -174,7 +183,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (pageTypes == null || pageTypes.length < 1) {
       return;
     }
-    ArrayList<Class<? extends IPage>> list = new ArrayList<Class<? extends IPage>>(pageTypes.length);
+    List<Class<? extends IPage>> list = new ArrayList<Class<? extends IPage>>(pageTypes.length);
     for (Class<?> c : pageTypes) {
       if (IPage.class.isAssignableFrom(c)) {
         list.add((Class<? extends IPage>) c);
@@ -406,15 +415,68 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (activePage != null && m_contextPage != activePage) {
       m_contextPage = activePage;
       activePage.pageActivatedNotify();
+      addMenusOfActivePageToContextMenu(activePage);
     }
+  }
+
+  protected void addMenusOfActivePageToContextMenu(IPage activePage) {
+    if (activePage instanceof IPageWithTable<?>) {
+      // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
+      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
+      if (pageWithTable.isShowEmptySpaceMenus()) {
+        ITable table = pageWithTable.getTable();
+        List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
+            ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.EmptySpace)));
+        if (emptySpaceMenus.size() > 0) {
+          List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+          wrappedMenus.add(new MenuSeparator());
+          for (IMenu menu : emptySpaceMenus) {
+            wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
+          }
+          m_inheritedMenusOfPage = wrappedMenus;
+          getContextMenu().addChildActions(m_inheritedMenusOfPage);
+        }
+      }
+    }
+
+    // in case of a page with nodes add the single selection menus of its parent table for the current node/row.
+    IPage parentPage = activePage.getParentPage();
+    if (parentPage instanceof IPageWithTable<?>) {
+      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) parentPage;
+      ITableRow row = pageWithTable.getTableRowFor(activePage);
+      ITable table = pageWithTable.getTable();
+      if (row != null) {
+        table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
+        List<IMenu> menus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.SingleSelection)));
+        if (menus.size() > 0) {
+          List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+          wrappedMenus.add(new MenuSeparator());
+          for (IMenu menu : menus) {
+            wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
+          }
+          m_inheritedMenusOfPage = wrappedMenus;
+          getContextMenu().addChildActions(m_inheritedMenusOfPage);
+        }
+      }
+    }
+
   }
 
   @Override
   public void clearContextPage() {
     IPage page = m_contextPage;
     if (page != null) {
+      // remove menus of the active page
+      removeMenusOfActivePageToContextMenu();
       m_contextPage = null;
       page.pageDeactivatedNotify();
+    }
+  }
+
+  protected void removeMenusOfActivePageToContextMenu() {
+    if (m_inheritedMenusOfPage != null) {
+      getContextMenu().removeChildActions(m_inheritedMenusOfPage);
+      m_inheritedMenusOfPage = null;
     }
   }
 
@@ -464,15 +526,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           handleActivePageChanged((IPage) e.getDeselectedNode(), (IPage) e.getNewSelectedNode());
           break;
         }
-        case TreeEvent.TYPE_NODE_POPUP: {
-          if (e.getNode() instanceof IPageWithTable<?>) {
-            if (getOutlineMediator() != null) {
-              IPageWithTable<? extends ITable> pageWithTable = (IPageWithTable<?>) e.getNode();
-              getOutlineMediator().fetchTableEmptySpaceMenus(e, pageWithTable);
-            }
-          }
-          break;
-        }
       }
 
       ITreeNode commonParentNode = e.getCommonParentNode();
@@ -508,10 +561,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
 
       switch (e.getType()) {
-        case TreeEvent.TYPE_NODE_POPUP: {
-          outlineMediator.fetchTableRowMenus(e, pageWithTable);
-          break;
-        }
         case TreeEvent.TYPE_NODE_ACTION: {
           outlineMediator.mediateTreeNodeAction(e, pageWithTable);
           break;

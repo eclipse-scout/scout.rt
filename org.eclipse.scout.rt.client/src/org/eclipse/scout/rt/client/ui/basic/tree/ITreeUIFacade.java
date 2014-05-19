@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public interface ITreeUIFacade {
 
@@ -25,10 +24,6 @@ public interface ITreeUIFacade {
   void setNodeSelectedAndExpandedFromUI(ITreeNode node);
 
   void setNodesSelectedFromUI(List<ITreeNode> nodes);
-
-  List<IMenu> fireNodePopupFromUI();
-
-  List<IMenu> fireEmptySpacePopupFromUI();
 
   /**
    * Single mouse click on a node or (for checkable trees) the space key

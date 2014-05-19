@@ -34,6 +34,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
@@ -76,9 +77,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ISortOrderColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -241,9 +244,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
               // call swing menu
-              new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, scoutMenus).enqueue();
+              new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, getScoutObject().getContextMenu(),
+                  ActionUtility.createMenuFilterVisibleAvailable()).enqueue();
             }
           };
           getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -796,9 +799,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             getScoutObject().getUIFacade().setSelectedRowsFromUI(new ArrayList<ITableRow>(0));
           }
           if (e.isPopupTrigger()) {
-            List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireEmptySpacePopupFromUI();
             // call swing menu
-            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), scoutMenus).enqueue();
+            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), getScoutObject().getContextMenu(), ActionUtility.createMenuFilterVisibleAvailable()).enqueue();
           }
         }
       };
@@ -841,9 +843,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireRowPopupFromUI();
+          // about to show
+          IContextMenu contextMenu = getScoutObject().getContextMenu();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, ActionUtility.createMenuFilterVisibleAvailable(), false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -953,8 +956,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         @Override
         public void run() {
           // call swing menu
-          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireHeaderPopupFromUI();
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(),
+              ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.of(ITableMenu.TableMenuType.EmptySpace, ITableMenu.TableMenuType.Header)), false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -1662,7 +1665,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   *
+   * 
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -107,7 +109,12 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     IMenu m = m_testForm.getSmartField().getMenus().get(0);
-    ISwtScoutMenuItem menuItem = env.createMenuItem(new Menu(new Shell()), m);
+    ISwtScoutMenuItem menuItem = env.createMenuItem(new Menu(new Shell()), m, new IActionFilter() {
+      @Override
+      public boolean accept(IAction action) {
+        return true;
+      }
+    });
     Object expectedId = getWidgetId(menuItem.getSwtMenuItem());
     assertTrue(((String) expectedId).contains(TEST_CLASS_ID));
   }

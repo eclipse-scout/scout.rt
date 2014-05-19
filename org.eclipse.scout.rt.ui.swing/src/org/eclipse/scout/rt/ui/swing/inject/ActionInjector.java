@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -37,7 +38,7 @@ public class ActionInjector {
   public ActionInjector() {
   }
 
-  public ISwingScoutAction<?> inject(ISwingEnvironment env, JComponent parent, IAction action) {
+  public ISwingScoutAction<?> inject(ISwingEnvironment env, JComponent parent, IAction action, IActionFilter filter) {
     if (action instanceof IToolButton) {
       return createSwingScoutToolButton((IToolButton) action, env);
     }
@@ -52,7 +53,7 @@ public class ActionInjector {
     else if (action instanceof IActionNode) {
       IActionNode node = (IActionNode) action;
       if (node.hasChildActions()) {
-        ISwingScoutAction<IActionNode> ui = new SwingScoutMenu<IActionNode>();
+        ISwingScoutAction<IActionNode> ui = new SwingScoutMenu<IActionNode>(filter);
         ui.createField((IActionNode) action, env);
         //no recursion
         return ui;

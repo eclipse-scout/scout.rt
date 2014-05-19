@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.FormHeaderActionFetcher;
 import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -40,7 +41,7 @@ public class TableRowFormHeaderActionFetcher extends FormHeaderActionFetcher {
   public List<IMenu> fetch() {
     List<IMenu> headerActions = super.fetch();
 
-    List<IMenu> tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
+    List<IMenu> tableRowActions = ActionUtility.getActions(getTable().getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
     for (IMenu action : tableRowActions) {
       AbstractMobileAction.setHorizontalAlignment(action, IMobileAction.HORIZONTAL_ALIGNMENT_RIGHT);
     }

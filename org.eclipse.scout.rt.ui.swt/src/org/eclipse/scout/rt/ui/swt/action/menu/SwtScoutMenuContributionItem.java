@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.action.menu;
 
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.widgets.Menu;
@@ -43,7 +44,7 @@ public class SwtScoutMenuContributionItem extends ContributionItem {
 
   @Override
   public void fill(Menu menu, int index) {
-    m_swtMenuItem = getEnvironment().createMenuItem(menu, getScoutMenu());
+    m_swtMenuItem = getEnvironment().createMenuItem(menu, getScoutMenu(), ActionUtility.createVisibleFilter());
 
   }
 }

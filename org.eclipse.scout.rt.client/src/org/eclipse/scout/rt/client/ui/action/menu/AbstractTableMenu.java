@@ -10,8 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -20,35 +28,48 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 /**
  *
  */
-public class AbstractTableMenu extends AbstractMenu {
+public class AbstractTableMenu extends AbstractMenu implements ITableMenu {
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected boolean getConfiguredSingleSelectionAction() {
-    return super.getConfiguredSingleSelectionAction();
+  private boolean m_skipCalculateAvailability;
+
+  public AbstractTableMenu() {
+    super();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected boolean getConfiguredMultiSelectionAction() {
-    return super.getConfiguredMultiSelectionAction();
+  public AbstractTableMenu(boolean callInitializer) {
+    super(callInitializer);
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected boolean getConfiguredEmptySpaceAction() {
-    return super.getConfiguredEmptySpaceAction();
+  @ConfigProperty(ConfigProperty.TABLE_MENU_TYPE)
+  @Order(140)
+  protected EnumSet<TableMenuType> getConfiguredMenuType() {
+    return EnumSet.<TableMenuType> of(TableMenuType.SingleSelection);
   }
 
   @Override
   protected final void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
-    execTableSelectionChanged(getOwner().getSelectedRows());
+    if (getOwner() != null) {
+      List<ITableRow> newSelection = CollectionUtility.arrayList(getOwner().getSelectedRows());
+      execTableSelectionChanged(newSelection);
+    }
   }
 
-  protected void execTableSelectionChanged(List<ITableRow> newSelection) {
-    boolean visible = false;
-    if (isEmptySpaceAction()) {
-      visible = newSelection.isEmpty();
+  @Override
+  protected void calculateAvailability(Object newOwnerValue) {
+    if (m_skipCalculateAvailability) {
+      return;
+    }
+    if (hasChildActions()) {
+      setAvailableInternal(true);
+      return;
+    }
+    List<ITableRow> newSelection = CollectionUtility.emptyArrayList();
+    if (getOwner() != null) {
+      newSelection = getOwner().getSelectedRows();
+    }
+    boolean available = false;
+    if (newSelection.isEmpty()) {
+      available = getMenuType().contains(TableMenuType.EmptySpace);
     }
     else {
       boolean allEnabled = true;
@@ -59,15 +80,56 @@ public class AbstractTableMenu extends AbstractMenu {
         }
       }
       if (allEnabled) {
-        if (isSingleSelectionAction()) {
-          visible = newSelection.size() == 1;
-        }
-        if (!visible && isMultiSelectionAction()) {
-          visible = newSelection.size() > 1;
-        }
+        available |= (newSelection.size() == 1 && getMenuType().contains(TableMenuType.SingleSelection));
+        available |= (newSelection.size() > 1 && getMenuType().contains(TableMenuType.MultiSelection));
       }
     }
-    setVisible(visible);
+    setAvailableInternal(available);
+
+  }
+
+  /**
+   * selection of the owner table changed. Might be used to call {@link #setVisible(boolean)},
+   * {@link #setEnabled(boolean)}, etc.
+   * 
+   * @param newSelection
+   *          the current selection of the table
+   */
+  @ConfigOperation
+  @Order(70.0)
+  protected void execTableSelectionChanged(List<ITableRow> newSelection) {
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  protected void initConfig() {
+    // guard to ensure calculate availability is not called when only  legacy from super type is initialized
+    try {
+      m_skipCalculateAvailability = true;
+      super.initConfig();
+    }
+    finally {
+      m_skipCalculateAvailability = false;
+    }
+    if (!ConfigurationUtility.isMethodOverwrite(AbstractTableMenu.class, "getConfiguredMenuType", new Class[0], this.getClass())) {
+      // legacy
+      Set<TableMenuType> menuType = new HashSet<AbstractTableMenu.TableMenuType>();
+      if (isSingleSelectionAction()) {
+        menuType.add(TableMenuType.SingleSelection);
+      }
+      if (isMultiSelectionAction()) {
+        menuType.add(TableMenuType.MultiSelection);
+      }
+      if (isEmptySpaceAction()) {
+        menuType.add(TableMenuType.EmptySpace);
+      }
+      EnumSet<TableMenuType> menuTypeEnumSet = EnumSet.<TableMenuType> copyOf(menuType);
+      setMenuType(menuTypeEnumSet);
+    }
+    else {
+      setMenuType(getConfiguredMenuType());
+    }
+    calculateAvailability(null);
   }
 
   @Override
@@ -77,7 +139,7 @@ public class AbstractTableMenu extends AbstractMenu {
 
   @Override
   public void setOwnerInternal(IPropertyObserver owner) {
-    if (owner instanceof ITable) {
+    if (owner == null || owner instanceof ITable) {
       super.setOwnerInternal(owner);
     }
     else {
@@ -85,39 +147,14 @@ public class AbstractTableMenu extends AbstractMenu {
     }
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isSingleSelectionAction() {
-    return super.isSingleSelectionAction();
+  public void setMenuType(EnumSet<TableMenuType> menuType) {
+    propertySupport.setProperty(PROP_MENU_TYPE, menuType);
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("unchecked")
   @Override
-  public void setSingleSelectionAction(boolean b) {
-    super.setSingleSelectionAction(b);
+  public EnumSet<TableMenuType> getMenuType() {
+    return (EnumSet<TableMenuType>) propertySupport.getProperty(PROP_MENU_TYPE);
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isMultiSelectionAction() {
-    return super.isMultiSelectionAction();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setMultiSelectionAction(boolean b) {
-    super.setMultiSelectionAction(b);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isEmptySpaceAction() {
-    return super.isEmptySpaceAction();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setEmptySpaceAction(boolean b) {
-    super.setEmptySpaceAction(b);
-  }
 }

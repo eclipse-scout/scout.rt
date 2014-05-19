@@ -10,17 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
+import java.util.EnumSet;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class CopyWidthsOfColumnsMenu extends AbstractMenu {
+public class CopyWidthsOfColumnsMenu extends AbstractTableMenu {
 
   public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
   private final ITable m_table;
@@ -32,6 +35,11 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
   @Override
   protected String getConfiguredText() {
     return ScoutTexts.get("CopyWidthsOfColumnsMenu");
+  }
+
+  @Override
+  protected EnumSet<TableMenuType> getConfiguredMenuType() {
+    return EnumSet.of(ITableMenu.TableMenuType.Header);
   }
 
   @Override

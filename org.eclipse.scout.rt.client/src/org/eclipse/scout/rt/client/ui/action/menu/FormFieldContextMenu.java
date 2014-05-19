@@ -36,8 +36,14 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractProperty
   }
 
   @Override
-  protected void updateChildActions(List<? extends IMenu> newList) {
-    super.updateChildActions(newList);
+  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+    super.afterChildMenusAdd(newChildMenus);
+    handleOwnerEnabledChanged();
+  }
+
+  @Override
+  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+    super.afterChildMenusRemove(childMenusToRemove);
     handleOwnerEnabledChanged();
   }
 

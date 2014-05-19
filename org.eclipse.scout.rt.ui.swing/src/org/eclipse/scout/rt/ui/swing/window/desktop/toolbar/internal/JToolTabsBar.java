@@ -23,6 +23,7 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -124,6 +125,6 @@ public class JToolTabsBar extends AbstractJToolTabsBar {
 
   @SuppressWarnings("unchecked")
   private ISwingScoutAction<IToolButton> createSwingScoutToolButton(IToolButton scoutToolButton) {
-    return m_env.createAction(this, scoutToolButton);
+    return m_env.createAction(this, scoutToolButton, ActionUtility.createVisibleFilter());
   }
 }

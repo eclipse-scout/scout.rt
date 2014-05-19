@@ -497,7 +497,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        List<IMenu> scoutMenus = CollectionUtility.arrayList((IMenu) new P_AttachmentPopupMenu(target.getAttachment().getFile()));
+        List<IMenu> scoutMenus = CollectionUtility.<IMenu> arrayList(new P_AttachmentPopupMenu(target.getAttachment().getFile()));
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), target, new Point(0, target.getHeight()), scoutMenus).enqueue();
       }

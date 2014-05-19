@@ -15,11 +15,13 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -72,9 +74,9 @@ public class PageWithTable6Test {
   }
 
   private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
-    ArrayList<String> actualMenus = new ArrayList<String>();
-    for (IMenu m : table.getContextMenu().getChildActions()) {
-      if (m.isVisible() && m.isEnabled()) {
+    List<String> actualMenus = new ArrayList<String>();
+    for (IMenu m : ActionUtility.visibleNormalizedActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable())) {
+      if (m.isEnabled()) {
         actualMenus.add(m.getText());
       }
     }

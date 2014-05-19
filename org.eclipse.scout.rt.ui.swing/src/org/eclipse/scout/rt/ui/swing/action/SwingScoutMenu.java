@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,11 +17,19 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 
 public class SwingScoutMenu<T extends IActionNode<?>> extends SwingScoutComposite<T> implements ISwingScoutAction<T> {
   private SwingScoutAction<T> m_actionComposite;
+  private IActionFilter m_filter;
+
+  public SwingScoutMenu(IActionFilter filter) {
+    super();
+    m_filter = filter;
+
+  }
 
   @Override
   protected void initializeSwing() {
@@ -73,7 +81,7 @@ public class SwingScoutMenu<T extends IActionNode<?>> extends SwingScoutComposit
     JComponent c = getSwingField();
     if (c != null) {
       c.removeAll();
-      getSwingEnvironment().appendActions(c, getScoutObject().getChildActions());
+      getSwingEnvironment().appendActions(c, getScoutObject().getChildActions(), m_filter);
     }
   }
 

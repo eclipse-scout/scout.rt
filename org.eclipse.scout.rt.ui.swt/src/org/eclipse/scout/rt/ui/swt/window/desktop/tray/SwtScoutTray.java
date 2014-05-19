@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swt.Activator;
@@ -118,7 +119,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
         //nop
       }
       // end notify
-      SwtMenuUtility.fillMenu(m_popupMenu, scoutMenusRef.get(), getEnvironment());
+      SwtMenuUtility.fillMenu(m_popupMenu, scoutMenusRef.get(), ActionUtility.createVisibleFilter(), getEnvironment());
     }
   }
 

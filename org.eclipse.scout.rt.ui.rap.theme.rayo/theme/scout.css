@@ -807,9 +807,6 @@ FileUpload {
   cursor: pointer;
   padding: 4px 5px;
 }
-Button[PUSH] {
-  margin-top: 3px;
-}
 Button[PUSH]:disabled,
 Button[TOGGLE]:disabled,
 FileUpload:disabled {
@@ -899,7 +896,7 @@ Button-FocusIndicator.colorpicker_browse {
   background-color: transparent;
   border: none;
 }
-Button.colorpicker_browse_disabled {
+Button.colorpicker_browse:disabled {
   background-image: url(theme/img/button/smartfield_browse_disabled.png );
   cursor: default;
 }
@@ -1454,6 +1451,10 @@ Button.smartfield_browse:hover {
 Button-FocusIndicator.smartfield_browse {
   background-color: transparent;
   border: none;
+}
+Button.smartfield_browse:disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png );
+  cursor: default;
 }
 Button.smartfield_browse_disabled {
   background-image: url(theme/img/button/smartfield_browse_disabled.png );

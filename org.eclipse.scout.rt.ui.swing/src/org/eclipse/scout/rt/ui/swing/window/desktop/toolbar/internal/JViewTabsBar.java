@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
@@ -101,6 +102,6 @@ public class JViewTabsBar extends AbstractJViewTabsBar {
 
   @SuppressWarnings("unchecked")
   private ISwingScoutAction<IViewButton> createSwingScoutViewButton(IViewButton scoutViewButton) {
-    return getSwingEnvironment().createAction(this, scoutViewButton);
+    return getSwingEnvironment().createAction(this, scoutViewButton, ActionUtility.createVisibleFilter());
   }
 }

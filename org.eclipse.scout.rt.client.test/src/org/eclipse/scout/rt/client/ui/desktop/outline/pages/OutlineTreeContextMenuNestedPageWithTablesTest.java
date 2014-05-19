@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -76,13 +79,18 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
     SubPageWithTable subTablePage = outline.findPage(SubPageWithTable.class);
     requiredMenus.addAll(resolveMenusOfPageWithTable(subTablePage, SubPageWithTableEmptySpaceMenu.class));
+    for (IMenu iMenu : requiredMenus) {
+      System.out.println(" r- " + iMenu);
+    }
 
     ITreeNode selectedNode = outline.getSelectedNode();
-    List<IMenu> menus = selectedNode.getTree().getUIFacade().fireNodePopupFromUI();
+    List<IMenu> menus = selectedNode.getTree().getMenus();
+    for (IMenu iMenu : menus) {
+      System.out.println(" m- " + iMenu);
+    }
+    assertTrue(containsAllMenus(menus, requiredMenus));
 
-    assertTrue(menus.containsAll(requiredMenus));
-
-    assertTrue(menus.size() == (requiredMenus.size() + 1)); // + 1 stands for menu separator
+    assertEquals(sizeMenuListWithoutSeparators(menus), requiredMenus.size()); // + 1 stands for menu separator
 
     boolean hasMenuSeparator = false;
     for (IMenu menu : menus) {
@@ -92,6 +100,39 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     }
 
     assertTrue(hasMenuSeparator);
+  }
+
+  public static boolean containsAllMenus(Collection<IMenu> reference, Collection<IMenu> menus) {
+    // normalize reference
+    List<IMenu> refNormalized = new ArrayList<IMenu>(reference.size());
+    for (IMenu m : reference) {
+      if (m instanceof TablePageTreeMenuWrapper) {
+        refNormalized.add(((TablePageTreeMenuWrapper) m).getWrappedMenu());
+      }
+      else {
+        refNormalized.add(m);
+      }
+    }
+    List<IMenu> menusNormalized = new ArrayList<IMenu>(menus.size());
+    for (IMenu m : menus) {
+      if (m instanceof TablePageTreeMenuWrapper) {
+        menusNormalized.add(((TablePageTreeMenuWrapper) m).getWrappedMenu());
+      }
+      else {
+        menusNormalized.add(m);
+      }
+    }
+    return refNormalized.containsAll(menusNormalized);
+  }
+
+  public static int sizeMenuListWithoutSeparators(Collection<IMenu> menus) {
+    int i = 0;
+    for (IMenu m : menus) {
+      if (!m.isSeparator()) {
+        i++;
+      }
+    }
+    return i;
   }
 
   private static List<IMenu> resolveMenusOfPageWithTable(IPageWithTable<?> page, Class<? extends IMenu>... menuClasses) throws Exception {

@@ -19,12 +19,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.rap.action.MenuSizeEstimator;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutMenuItem;
 import org.eclipse.swt.SWT;
@@ -89,9 +88,9 @@ public final class RwtMenuUtility {
    * @param swtMenuItem
    * @param childActions
    */
-  public static void fillMenu(Menu menu, List<IMenu> childActions, IRwtEnvironment environment) {
-    for (IMenu childMenu : ActionUtility.visibleNormalizedActions(childActions)) {
-      new RwtScoutMenuItem(childMenu, menu, environment);
+  public static void fillMenu(Menu menu, List<IMenu> childActions, IActionFilter filter, IRwtEnvironment environment) {
+    for (IMenu childMenu : ActionUtility.visibleNormalizedActions(childActions, filter)) {
+      new RwtScoutMenuItem(childMenu, menu, filter, environment);
     }
   }
 
@@ -101,14 +100,14 @@ public final class RwtMenuUtility {
    * @param parentMenu
    * @return
    */
-  public static MenuItem createRwtMenuItem(Menu parentMenu, IMenu scoutMenu, IRwtEnvironment environment) {
+  public static MenuItem createRwtMenuItem(Menu parentMenu, IMenu scoutMenu, IActionFilter filter, IRwtEnvironment environment) {
     MenuItem swtMenuItem = null;
     if (scoutMenu.isSeparator()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.SEPARATOR);
     }
     else if (scoutMenu.hasChildActions()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
-      createChildMenu(swtMenuItem, scoutMenu.getChildActions(), environment);
+      createChildMenu(swtMenuItem, scoutMenu.getChildActions(), filter, environment);
     }
     else if (scoutMenu.isToggleAction()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.CHECK);
@@ -125,77 +124,11 @@ public final class RwtMenuUtility {
    * @param swtMenuItem
    * @param childActions
    */
-  public static Menu createChildMenu(MenuItem swtMenuItem, List<IMenu> childActions, IRwtEnvironment environment) {
+  public static Menu createChildMenu(MenuItem swtMenuItem, List<IMenu> childActions, IActionFilter filter, IRwtEnvironment environment) {
     Menu menu = new Menu(swtMenuItem);
-    fillMenu(menu, childActions, environment);
+    fillMenu(menu, childActions, filter, environment);
     swtMenuItem.setMenu(menu);
     return menu;
-  }
-
-  public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        if (emptySpaceActions) {
-          menuList.addAll(tree.getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (nodeActions) {
-          menuList.addAll(tree.getUIFacade().fireNodePopupFromUI());
-        }
-      }
-    };
-
-    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      LOG.warn("Exception occured while collecting menus.", ex);
-    }
-
-    return menuList;
-  }
-
-  public static List<IMenu> collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        if (emptySpaceActions) {
-          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (rowActions) {
-          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
-        }
-      }
-    };
-
-    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      LOG.warn("Exception occured while collecting menus.", ex);
-    }
-
-    return menuList;
-  }
-
-  public static List<IMenu> collectRowMenus(final ITable table, IRwtEnvironment uiEnvironment) {
-    return collectMenus(table, false, true, uiEnvironment);
-  }
-
-  public static List<IMenu> collectEmptySpaceMenus(final ITable table, IRwtEnvironment uiEnvironment) {
-    return collectMenus(table, true, false, uiEnvironment);
-  }
-
-  public static List<IMenu> collectNodeMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
-    return collectMenus(tree, false, true, uiEnvironment);
-  }
-
-  public static List<IMenu> collectEmptySpaceMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
-    return collectMenus(tree, true, false, uiEnvironment);
   }
 
   /**

@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -414,20 +413,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   protected class P_DispatchingMobileTableUIFacade extends P_MobileTableUIFacade {
 
     //------------- pass events only to original table -------------
-    @Override
-    public List<IMenu> fireRowPopupFromUI() {
-      return getOriginalTable().getUIFacade().fireRowPopupFromUI();
-    }
-
-    @Override
-    public List<IMenu> fireEmptySpacePopupFromUI() {
-      return getOriginalTable().getUIFacade().fireEmptySpacePopupFromUI();
-    }
-
-    @Override
-    public List<IMenu> fireHeaderPopupFromUI() {
-      return getOriginalTable().getUIFacade().fireHeaderPopupFromUI();
-    }
 
     @Override
     public TransferObject fireRowsDragRequestFromUI() {

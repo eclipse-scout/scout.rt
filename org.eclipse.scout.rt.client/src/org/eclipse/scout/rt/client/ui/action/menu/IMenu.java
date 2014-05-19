@@ -20,6 +20,11 @@ import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 public interface IMenu extends IActionNode<IMenu> {
 
   /**
+   * property-type: {@link Boolean} depending on the menu type an its compatibility to the current selection
+   */
+  String PROP_AVAILABLE = "available";
+
+  /**
    * action is chosen on a single selected item
    * 
    * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
@@ -67,7 +72,14 @@ public interface IMenu extends IActionNode<IMenu> {
    */
   void handleOwnerValueChanged(Object newValue) throws ProcessingException;
 
-  void setOwnerInternal(IPropertyObserver menuOwner);
-
   IPropertyObserver getOwner();
+
+  boolean isAvailable();
+
+  void aboutToShow();
+
+  /**
+   * @param owner
+   */
+  void setOwnerInternal(IPropertyObserver owner);
 }

@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -36,18 +35,6 @@ public interface ITableUIFacade {
    * A mouse double click on a row triggers this action
    */
   void fireRowActionFromUI(ITableRow row);
-
-  /**
-   * Popup on selected row(s)
-   */
-  List<IMenu> fireRowPopupFromUI();
-
-  /**
-   * Popup on empty space
-   */
-  List<IMenu> fireEmptySpacePopupFromUI();
-
-  List<IMenu> fireHeaderPopupFromUI();
 
   void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex);
 

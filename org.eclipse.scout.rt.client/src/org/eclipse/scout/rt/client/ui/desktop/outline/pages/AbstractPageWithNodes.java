@@ -384,10 +384,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
           outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
           break;
         }
-        case TableEvent.TYPE_ROW_POPUP: {
-          outlineMediator.mediateTableRowPopup(e, AbstractPageWithNodes.this);
-          break;
-        }
         case TableEvent.TYPE_ROW_DROP_ACTION: {
           outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
           break;

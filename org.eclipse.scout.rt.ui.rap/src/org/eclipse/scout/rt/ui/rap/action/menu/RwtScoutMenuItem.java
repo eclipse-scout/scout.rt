@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.action.menu;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
@@ -37,11 +38,14 @@ public class RwtScoutMenuItem {
   private Listener m_swtSelectionListener;
   private Listener m_swtMenuDisposeListener;
 
-  public RwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IRwtEnvironment environment) {
-    this(scoutMenu, parentMenu, environment, true);
+  private IActionFilter m_filter;
+
+  public RwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IActionFilter filter, IRwtEnvironment environment) {
+    this(scoutMenu, parentMenu, filter, environment, true);
   }
 
-  public RwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IRwtEnvironment environment, boolean callInitializer) {
+  public RwtScoutMenuItem(IMenu scoutMenu, Menu parentMenu, IActionFilter filter, IRwtEnvironment environment, boolean callInitializer) {
+    m_filter = filter;
     m_environment = environment;
     m_scoutMenu = scoutMenu;
     m_parentMenu = parentMenu;
@@ -51,7 +55,7 @@ public class RwtScoutMenuItem {
   }
 
   protected void createMenu(IMenu scoutMenu, Menu parentMenu, IRwtEnvironment environment) {
-    m_swtMenuItem = RwtMenuUtility.createRwtMenuItem(parentMenu, scoutMenu, environment);
+    m_swtMenuItem = RwtMenuUtility.createRwtMenuItem(parentMenu, scoutMenu, getFilter(), environment);
     m_swtMenuItem.setData(getScoutMenu());
     m_swtSelectionListener = new P_SwtMenuListener();
     m_swtMenuItem.addListener(SWT.Selection, m_swtSelectionListener);
@@ -78,6 +82,10 @@ public class RwtScoutMenuItem {
 
   protected void dettachScout() {
     getScoutMenu().removePropertyChangeListener(m_scoutPropertyChangeListener);
+  }
+
+  public IActionFilter getFilter() {
+    return m_filter;
   }
 
   public IRwtEnvironment getEnvironment() {

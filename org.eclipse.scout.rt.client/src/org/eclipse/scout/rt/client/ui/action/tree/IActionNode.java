@@ -48,5 +48,13 @@ public interface IActionNode<T extends IActionNode> extends IAction {
    */
   List<T> getChildActions();
 
-  void setChildActions(List<? extends T> newList);
+  void setChildActions(List<? extends T> actionList);
+
+  void addChildAction(T action);
+
+  void addChildActions(List<? extends T> actionList);
+
+  void removeChildAction(T action);
+
+  void removeChildActions(List<? extends T> actionList);
 }

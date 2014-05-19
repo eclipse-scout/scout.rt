@@ -12,14 +12,16 @@ package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.EnumSet;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 
-public class AddCustomColumnMenu extends AbstractMenu {
+public class AddCustomColumnMenu extends AbstractTableMenu {
   private final ITable m_table;
 
   public AddCustomColumnMenu(ITable table) {
@@ -29,6 +31,11 @@ public class AddCustomColumnMenu extends AbstractMenu {
   @Override
   protected String getConfiguredText() {
     return ScoutTexts.get("AddCustomColumnMenu");
+  }
+
+  @Override
+  protected EnumSet<TableMenuType> getConfiguredMenuType() {
+    return EnumSet.of(ITableMenu.TableMenuType.Header);
   }
 
   @Override

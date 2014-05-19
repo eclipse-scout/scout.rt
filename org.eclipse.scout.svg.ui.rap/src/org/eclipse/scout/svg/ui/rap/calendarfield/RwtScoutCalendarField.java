@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
@@ -279,7 +280,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       super.menuShown(e);
 
       Menu menu = ((Menu) e.getSource());
-      RwtMenuUtility.fillMenu(menu, getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment());
+      RwtMenuUtility.fillMenu(menu, getContextMenusFromScout(), ActionUtility.createVisibleFilter(), RwtScoutCalendarField.this.getUiEnvironment());
     }
   } // end class P_ContextMenuListener
 

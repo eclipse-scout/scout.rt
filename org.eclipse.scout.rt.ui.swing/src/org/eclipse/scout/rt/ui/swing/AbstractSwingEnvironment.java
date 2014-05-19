@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -1048,13 +1049,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   @Override
-  public void appendActions(JComponent parent, List<? extends IAction> actions) {
-    new AppendActionsInjector().inject(this, parent, actions);
+  public void appendActions(JComponent parent, List<? extends IAction> actions, IActionFilter filter) {
+    new AppendActionsInjector().inject(this, parent, actions, filter);
   }
 
   @Override
-  public ISwingScoutAction createAction(JComponent parent, IAction action) {
-    ISwingScoutAction ui = new ActionInjector().inject(this, parent, action);
+  public ISwingScoutAction createAction(JComponent parent, IAction action, IActionFilter filter) {
+    ISwingScoutAction ui = new ActionInjector().inject(this, parent, action, filter);
     decorate(action, ui);
     return ui;
   }

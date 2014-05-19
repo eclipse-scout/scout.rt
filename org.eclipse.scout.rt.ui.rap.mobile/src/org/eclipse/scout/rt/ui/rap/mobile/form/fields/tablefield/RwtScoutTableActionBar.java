@@ -11,17 +11,19 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
-import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
 import org.eclipse.swt.SWT;
@@ -79,18 +81,17 @@ public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableFiel
       return;
     }
 
-    List<IMenu> emptySpaceMenus = RwtMenuUtility.collectEmptySpaceMenus(table, getUiEnvironment());
+    List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
+        ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.EmptySpace)));
     if (emptySpaceMenus != null) {
       menuList.addAll(emptySpaceMenus);
     }
 
     if (table.getSelectedRowCount() > 0) {
-      List<IMenu> rowMenus = RwtMenuUtility.collectRowMenus(table, getUiEnvironment());
+      List<IMenu> rowMenus = ActionUtility.getActions(table.getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
       if (rowMenus != null) {
         List<IMenu> editableRowMenus = new ArrayList<IMenu>(rowMenus);
-
         ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, editableRowMenus);
-
         //Add remaining row menus
         menuList.addAll(editableRowMenus);
       }

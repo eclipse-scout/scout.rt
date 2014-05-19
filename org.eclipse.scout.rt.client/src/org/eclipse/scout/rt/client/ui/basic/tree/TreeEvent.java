@@ -62,11 +62,6 @@ public class TreeEvent extends EventObject {
    */
   public static final int TYPE_NODE_COLLAPSED = 101;
   /**
-   * valid attributes are node contribute to menus using the addPopupMenu
-   * methods
-   */
-  public static final int TYPE_NODE_POPUP = 700;
-  /**
    * valid attributes are node
    */
   public static final int TYPE_NODE_ACTION = 705;

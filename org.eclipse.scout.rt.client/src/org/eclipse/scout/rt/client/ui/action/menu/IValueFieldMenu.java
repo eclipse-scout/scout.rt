@@ -10,23 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.util.EnumSet;
+
 /**
  *
  */
 public interface IValueFieldMenu extends IMenu {
+  enum ValueFieldMenuType {
+    Empty,
+    NotEmpty
+
+  }
 
   /**
-   * {@link Boolean}
+   * property-type: {@link EnumSet} of {@link ValueFieldMenuType}
    */
-  static String PROP_NULL_VALUE_MENU = "nullValueMenu";
+  String PROP_MENU_TYPE = "menuType";
 
-  static String PROP_NOT_NULL_VALUE_MENU = "notNullValueMenu";
+  /**
+   * @return
+   */
+  EnumSet<ValueFieldMenuType> getMenuType();
 
-  boolean isNullValueMenu();
-
-  void setNullValueMenu(boolean nullValueMenu);
-
-  boolean isNotNullValueMenu();
-
-  void setNotNullValueMenu(boolean notNullValueMenu);
 }

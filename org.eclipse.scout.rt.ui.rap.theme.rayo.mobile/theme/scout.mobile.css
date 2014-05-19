@@ -788,7 +788,6 @@ Button[PUSH] {
   border-radius:5px;
   cursor:pointer;
   padding:4px 5px;
-  margin-top:3px;
   font:bold 12px Arial,Helvetica,sans-serif;
   border:1px solid #3a7597;
 }
@@ -935,7 +934,7 @@ Button-FocusIndicator.colorpicker_browse {
   border:none;
 }
 
-Button.colorpicker_browse_disabled {
+Button.colorpicker_browse:disabled {
   background-image:url(theme/img/button/smartfield_browse_disabled.png);
   cursor:default;
 }
@@ -1509,6 +1508,11 @@ Button.smartfield_browse:hover { background-image:url(theme/img/button/smartfiel
 Button-FocusIndicator.smartfield_browse {
   background-color:transparent;
   border:none;
+}
+
+Button.smartfield_browse:disabled {
+  background-image:url(theme/img/button/smartfield_browse_disabled.png);
+  cursor:default;
 }
 
 Button.smartfield_browse_disabled {

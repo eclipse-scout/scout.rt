@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Random;
 
@@ -148,12 +148,13 @@ public final class NumberUtility {
    * @param numbers
    * @return the sum of all numbers passt in the given list. Null elements are not considered.
    */
-  public static double sum(List<? extends Number> numbers) {
-    double sum = 0;
+  public static BigDecimal sum(Collection<? extends Number> numbers) {
+    BigDecimal sum = BigDecimal.ZERO;
     if (CollectionUtility.hasElements(numbers)) {
       for (Number number : numbers) {
         if (number != null) {
-          sum += number.doubleValue();
+          BigDecimal augend = numberToBigDecimal(number);
+          sum = sum.add(augend == null ? BigDecimal.ZERO : augend);
         }
       }
     }

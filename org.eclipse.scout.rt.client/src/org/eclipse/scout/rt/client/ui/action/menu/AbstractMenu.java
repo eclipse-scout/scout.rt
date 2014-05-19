@@ -14,23 +14,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMenu.class);
 
   private boolean m_singleSelectionAction;
   private boolean m_multiSelectionAction;
   private boolean m_emptySpaceAction;
+  private boolean m_visibleProperty;
   private IPropertyObserver m_owner;
+  private Object m_ownerValue;
 
   public AbstractMenu() {
-    super();
+    this(true);
   }
 
   public AbstractMenu(boolean callInitializer) {
@@ -74,8 +84,70 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   @Override
-  public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
-    execOwnerValueChanged(newValue);
+  public final void handleOwnerValueChanged(Object newValue) throws ProcessingException {
+    if (!CompareUtility.equals(m_ownerValue, newValue)) {
+      m_ownerValue = newValue;
+      execOwnerValueChanged(newValue);
+      calculateAvailability(newValue);
+    }
+  }
+
+  /**
+   * @param newValue
+   */
+  protected void calculateAvailability(Object newOwnerValue) {
+    if (hasChildActions()) {
+      setAvailableInternal(true);
+      return;
+    }
+    // lagacy support
+    boolean available = false;
+    if (newOwnerValue instanceof Collection) {
+
+      Collection collectionValue = (Collection) newOwnerValue;
+      if (isEmptySpaceAction()) {
+        available = collectionValue.isEmpty();
+      }
+      else {
+        Collection<ITableRow> rows = convertToTableRows(collectionValue);
+        if (rows != null) {
+          boolean allEnabled = true;
+          for (ITableRow r : rows) {
+            if (!r.isEnabled()) {
+              allEnabled = false;
+              break;
+            }
+          }
+          if (allEnabled) {
+            available |= isSingleSelectionAction() && collectionValue.size() == 1;
+            available |= isMultiSelectionAction() && collectionValue.size() > 1;
+          }
+        }
+        else {
+          // try tree
+          Collection<ITreeNode> treeNodes = convertToTreeNodes(collectionValue);
+          if (treeNodes != null) {
+            boolean allEnabled = true;
+            for (ITreeNode node : treeNodes) {
+              if (!node.isEnabled()) {
+                allEnabled = false;
+                break;
+              }
+            }
+            if (allEnabled) {
+              available |= isSingleSelectionAction() && collectionValue.size() == 1;
+              available |= isMultiSelectionAction() && collectionValue.size() > 1;
+            }
+          }
+        }
+      }
+    }
+    else {
+      available |= isSingleSelectionAction() && newOwnerValue != null;
+      available |= isMultiSelectionAction() && newOwnerValue != null;
+      available |= isEmptySpaceAction() && newOwnerValue == null;
+    }
+    setAvailableInternal(available);
   }
 
   /**
@@ -84,48 +156,34 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @ConfigOperation
   @Order(50.0)
   protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
-    if (hasChildActions()) {
-      return;
-    }
-    // lagacy support
-    boolean visible = false;
-    if (newOwnerValue instanceof Collection) {
 
-      Collection collectionValue = (Collection) newOwnerValue;
-      if (isEmptySpaceAction()) {
-        visible = collectionValue.isEmpty();
-      }
-      else {
-        Collection<ITableRow> rows = convertToTableRows(collectionValue);
-        boolean allEnabled = true;
-        if (rows != null) {
-          for (ITableRow r : rows) {
-            if (!r.isEnabled()) {
-              allEnabled = false;
-              break;
-            }
-          }
-          if (isSingleSelectionAction() && allEnabled) {
-            visible = collectionValue.size() == 1;
-          }
-          if (!visible && isMultiSelectionAction() && allEnabled) {
-            visible = collectionValue.size() > 1;
-          }
-        }
+  }
+
+  @ConfigOperation
+  @Order(60.0)
+  protected void execAboutToShow() throws ProcessingException {
+
+  }
+
+  @Override
+  public final void aboutToShow() {
+    try {
+      aboutToShowInternal();
+      execAboutToShow();
+      // children
+      for (IMenu m : getChildActions()) {
+        m.aboutToShow();
       }
     }
-    else {
-      if (isSingleSelectionAction()) {
-        visible = newOwnerValue != null;
-      }
-      if (isMultiSelectionAction()) {
-        visible = newOwnerValue != null;
-      }
-      if (isEmptySpaceAction()) {
-        visible = newOwnerValue == null;
-      }
+    catch (Throwable t) {
+      LOG.warn("Action " + getClass().getName(), t);
     }
-    setVisible(visible);
+  }
+
+  /**
+   * do not use this method, it is used internally by subclasses
+   */
+  protected void aboutToShowInternal() {
   }
 
   /**
@@ -150,9 +208,32 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     return null;
   }
 
+  /**
+   * converts a untyped collection into a type collection of tree nodes.
+   * 
+   * @param input
+   * @return null if the input is null or not all elements of the input are {@link ITreeNode}s.
+   */
+  protected Collection<ITreeNode> convertToTreeNodes(Collection<?> input) {
+    if (input == null) {
+      return null;
+    }
+    List<ITreeNode> rows = new ArrayList<ITreeNode>(input.size());
+    for (Object o : input) {
+      if (o instanceof ITreeNode) {
+        rows.add((ITreeNode) o);
+      }
+    }
+    if (rows.size() == input.size()) {
+      return rows;
+    }
+    return null;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
+    // default
     setSingleSelectionAction(getConfiguredSingleSelectionAction());
     setMultiSelectionAction(getConfiguredMultiSelectionAction());
     setEmptySpaceAction(getConfiguredEmptySpaceAction());
@@ -162,6 +243,70 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     else {
       // legacy case of implicit new menu
       setEmptySpaceAction(true);
+    }
+    // calculate initial availability (emtpySpace = true, multi = false, single = false)
+    calculateAvailability(null);
+  }
+
+  @Override
+  public void addChildActions(List<? extends IMenu> actionList) {
+    super.addChildActions(actionList);
+    afterChildMenusAdd(actionList);
+  }
+
+  @Override
+  public void removeChildActions(List<? extends IMenu> actionList) {
+    super.removeChildActions(actionList);
+    afterChildMenusRemove(actionList);
+  }
+
+  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+    if (CollectionUtility.hasElements(newChildMenus)) {
+      final IPropertyObserver owner = getOwner();
+      final Object ownerValue = m_ownerValue;
+      IActionVisitor visitor = new IActionVisitor() {
+        @Override
+        public int visit(IAction action) {
+          if (action instanceof IMenu) {
+            IMenu menu = (IMenu) action;
+            menu.setOwnerInternal(owner);
+            try {
+              menu.handleOwnerValueChanged(ownerValue);
+            }
+            catch (ProcessingException e) {
+              LOG.error("error during handle owner value changed.", e);
+            }
+          }
+          return CONTINUE;
+        }
+      };
+      for (IMenu m : newChildMenus) {
+        m.acceptVisitor(visitor);
+      }
+    }
+  }
+
+  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+    if (CollectionUtility.hasElements(childMenusToRemove)) {
+      IActionVisitor visitor = new IActionVisitor() {
+        @Override
+        public int visit(IAction action) {
+          if (action instanceof IMenu) {
+            IMenu menu = (IMenu) action;
+            menu.setOwnerInternal(null);
+            try {
+              menu.handleOwnerValueChanged(null);
+            }
+            catch (ProcessingException e) {
+              LOG.error("error during handle owner value changed.", e);
+            }
+          }
+          return CONTINUE;
+        }
+      };
+      for (IMenu m : childMenusToRemove) {
+        m.acceptVisitor(visitor);
+      }
     }
   }
 
@@ -215,6 +360,15 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   public void setEmptySpaceAction(boolean b) {
     m_emptySpaceAction = b;
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return propertySupport.getPropertyBool(PROP_AVAILABLE);
+  }
+
+  protected void setAvailableInternal(boolean available) {
+    propertySupport.setPropertyBool(PROP_AVAILABLE, available);
   }
 
 }

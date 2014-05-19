@@ -17,10 +17,9 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -35,14 +34,14 @@ public final class SwtMenuUtility {
    * @param parentMenu
    * @return
    */
-  public static MenuItem createSwtMenuItem(Menu parentMenu, IMenu scoutMenu, ISwtEnvironment environment) {
+  public static MenuItem createSwtMenuItem(Menu parentMenu, IMenu scoutMenu, IActionFilter filter, ISwtEnvironment environment) {
     MenuItem swtMenuItem = null;
     if (scoutMenu.isSeparator()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.SEPARATOR);
     }
     else if (scoutMenu.hasChildActions()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.CASCADE);
-      createChildMenu(swtMenuItem, scoutMenu.getChildActions(), environment);
+      createChildMenu(swtMenuItem, scoutMenu.getChildActions(), filter, environment);
     }
     else if (scoutMenu.isToggleAction()) {
       swtMenuItem = new MenuItem(parentMenu, SWT.CHECK);
@@ -57,9 +56,9 @@ public final class SwtMenuUtility {
    * @param swtMenuItem
    * @param childActions
    */
-  public static Menu createChildMenu(MenuItem swtMenuItem, List<IMenu> childActions, ISwtEnvironment environment) {
+  public static Menu createChildMenu(MenuItem swtMenuItem, List<IMenu> childActions, IActionFilter filter, ISwtEnvironment environment) {
     Menu menu = new Menu(swtMenuItem);
-    fillMenu(menu, childActions, environment);
+    fillMenu(menu, childActions, filter, environment);
     swtMenuItem.setMenu(menu);
     return menu;
   }
@@ -68,70 +67,21 @@ public final class SwtMenuUtility {
    * @param swtMenuItem
    * @param childActions
    */
-  public static void fillMenu(Menu menu, List<IMenu> childActions, ISwtEnvironment environment) {
-    fillMenu(menu, childActions, environment, false);
+  public static void fillMenu(Menu menu, List<IMenu> childActions, IActionFilter filter, ISwtEnvironment environment) {
+    fillMenu(menu, childActions, filter, environment, false);
   }
 
-  public static void fillMenu(Menu menu, List<IMenu> childActions, ISwtEnvironment environment, boolean separatorFirstIfHasMenus) {
-    List<IMenu> visibleNormalizedActions = ActionUtility.visibleNormalizedActions(childActions);
+  public static void fillMenu(Menu menu, List<IMenu> childActions, IActionFilter filter, ISwtEnvironment environment, boolean separatorFirstIfHasMenus) {
+    List<IMenu> visibleNormalizedActions = ActionUtility.visibleNormalizedActions(childActions, filter);
     if (separatorFirstIfHasMenus && visibleNormalizedActions.size() > 0) {
       new MenuItem(menu, SWT.SEPARATOR);
     }
     for (IMenu childMenu : visibleNormalizedActions) {
-      environment.createMenuItem(menu, childMenu);
+      environment.createMenuItem(menu, childMenu, filter);
     }
 
   }
 
-  public static List<IMenu> collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        if (emptySpaceActions) {
-          menuList.addAll(tree.getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (nodeActions) {
-          menuList.addAll(tree.getUIFacade().fireNodePopupFromUI());
-        }
-      }
-    };
-
-    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      LOG.warn("Exception occured while collecting menus.", ex);
-    }
-
-    return menuList;
-  }
-
-  public static List<IMenu> collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, ISwtEnvironment uiEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        if (emptySpaceActions) {
-          menuList.addAll(table.getUIFacade().fireEmptySpacePopupFromUI());
-        }
-        if (rowActions) {
-          menuList.addAll(table.getUIFacade().fireRowPopupFromUI());
-        }
-      }
-    };
-
-    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      LOG.warn("Exception occured while collecting menus.", ex);
-    }
-
-    return menuList;
-  }
 
   public static List<IMenu> collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, ISwtEnvironment swtEnvironment) {
     final List<IMenu> menuList = new LinkedList<IMenu>();
@@ -156,22 +106,6 @@ public final class SwtMenuUtility {
     }
 
     return menuList;
-  }
-
-  public static List<IMenu> collectRowMenus(final ITable table, ISwtEnvironment uiEnvironment) {
-    return collectMenus(table, false, true, uiEnvironment);
-  }
-
-  public static List<IMenu> collectEmptySpaceMenus(final ITable table, ISwtEnvironment uiEnvironment) {
-    return collectMenus(table, true, false, uiEnvironment);
-  }
-
-  public static List<IMenu> collectNodeMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
-    return collectMenus(tree, false, true, uiEnvironment);
-  }
-
-  public static List<IMenu> collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
-    return collectMenus(tree, true, false, uiEnvironment);
   }
 
   public static List<IMenu> collectComponentMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {

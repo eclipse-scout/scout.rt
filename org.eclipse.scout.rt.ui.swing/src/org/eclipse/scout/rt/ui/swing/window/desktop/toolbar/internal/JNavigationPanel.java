@@ -27,6 +27,7 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -201,14 +202,14 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
     Graphics g = img.createGraphics();
     g.setColor(UIManager.getColor("controlDkShadow"));
     g.fillPolygon(new int[]{0, arrowWidth / 2, arrowWidth},
-                  new int[]{0, arrowHeight, 0},
-                  3);
+        new int[]{0, arrowHeight, 0},
+        3);
 
     return new ImageIcon(img);
   }
 
   @SuppressWarnings("unchecked")
   private ISwingScoutAction<IToolButton> createSwingScoutToolButton(IToolButton scoutToolButton) {
-    return getSwingEnvironment().createAction(this, scoutToolButton);
+    return getSwingEnvironment().createAction(this, scoutToolButton, ActionUtility.createVisibleFilter());
   }
 }

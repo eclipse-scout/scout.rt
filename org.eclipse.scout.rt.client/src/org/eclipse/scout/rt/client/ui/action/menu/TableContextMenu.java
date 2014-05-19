@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -26,7 +28,8 @@ import org.eclipse.scout.service.SERVICES;
 /**
  *
  */
-public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> {
+public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableContextMenu.class);
 
   /**
    * @param owner
@@ -39,15 +42,18 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   protected void initConfig() {
     super.initConfig();
     getOwner().addTableListener(new P_OwnerTableListener());
-    handleOwnerEnabledChanged();
-    handleOwnerValueChanged();
   }
 
   @Override
-  protected void updateChildActions(List<? extends IMenu> newList) {
-    super.updateChildActions(newList);
+  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+    super.afterChildMenusAdd(newChildMenus);
     handleOwnerEnabledChanged();
-    handleOwnerValueChanged();
+  }
+
+  @Override
+  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+    super.afterChildMenusRemove(childMenusToRemove);
+    handleOwnerEnabledChanged();
   }
 
   /**

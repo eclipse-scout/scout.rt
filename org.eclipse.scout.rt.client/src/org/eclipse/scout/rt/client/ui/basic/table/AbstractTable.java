@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -699,6 +700,31 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
   }
 
+  /**
+   * This method is called during initializing the table and is thought to add header menus to the given list of menus.
+   * Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}
+   * 
+   * @param menuList
+   *          a live list of the menus. Add additional header menus to this list optionally add some separators at the
+   *          end.
+   */
+  protected void execCreateHeaderMenus(List<IMenu> menuList) {
+    // header menus
+    if (getTableCustomizer() != null) {
+      menuList.add(new AddCustomColumnMenu(this));
+      menuList.add(new ModifyCustomColumnMenu(this));
+      menuList.add(new RemoveCustomColumnMenu(this));
+    }
+    if (menuList.size() > 0) {
+      menuList.add(new MenuSeparator());
+    }
+    menuList.add(new ResetColumnsMenu(this));
+    menuList.add(new OrganizeColumnsMenu(this));
+    menuList.add(new ColumnFilterMenu(this));
+    menuList.add(new CopyWidthsOfColumnsMenu(this));
+    menuList.add(new MenuSeparator());
+  }
+
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
@@ -744,6 +770,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     createColumnsInternal();
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
+    execCreateHeaderMenus(menuList);
+
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
     if (!replacements.isEmpty()) {
@@ -3354,18 +3382,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               sortedCoalescedMap.put(110, subList.get(lastIndex));// use last
               break;
             }
-            case TableEvent.TYPE_HEADER_POPUP: {
-              sortedCoalescedMap.put(130, subList.get(lastIndex));// use last
-              break;
-            }
-            case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
-              sortedCoalescedMap.put(140, subList.get(lastIndex));// use last
-              break;
-            }
-            case TableEvent.TYPE_ROW_POPUP: {
-              sortedCoalescedMap.put(150, subList.get(lastIndex));// use last
-              break;
-            }
             case TableEvent.TYPE_ROW_ACTION: {
               sortedCoalescedMap.put(160, subList.get(lastIndex));// use last
               break;
@@ -3694,19 +3710,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return m_eventHistory;
   }
 
-  @Override
-  public List<IMenu> fetchMenusForRowsInternal(List<? extends ITableRow> rows) {
-    TableEvent e;
-    if (CollectionUtility.hasElements(rows)) {
-      e = new TableEvent(this, TableEvent.TYPE_ROW_POPUP, rows);
-    }
-    else {
-      e = new TableEvent(this, TableEvent.TYPE_EMPTY_SPACE_POPUP);
-    }
-    fireTableEventInternal(e);
-    return e.getPopupMenus();
-  }
-
   private void fireRowsInserted(List<? extends ITableRow> rows) {
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
@@ -3867,32 +3870,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private List<IMenu> fireEmptySpacePopup() {
-    TableEvent e = new TableEvent(this, TableEvent.TYPE_EMPTY_SPACE_POPUP);
-    fireTableEventInternal(e);
-    return e.getPopupMenus();
-  }
-
-  private List<IMenu> fireRowPopup() {
-    TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_POPUP, getSelectedRows());
-    fireTableEventInternal(e);
-    return e.getPopupMenus();
-  }
-
-  private void addLocalPopupMenus(TableEvent e) {
-    boolean allRowsEnabled = true;
-    for (ITableRow row : getSelectedRows()) {
-      if (!row.isEnabled()) {
-        allRowsEnabled = false;
-        break;
-      }
-    }
-    for (IMenu menu : getMenus()) {
-      if (menu.isVisible() && allRowsEnabled) {
-        e.addPopupMenu(menu);
-      }
-    }
-  }
 
   /**
    * Called before the header menus are displayed.
@@ -3903,9 +3880,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * @param e
    *          Table event of type {@link TableEvent#TYPE_HEADER_POPUP}.
    * @throws ProcessingException
+   * @Deprecated use {@link #execCreateHeaderMenus(List)} instead.
    */
+  @SuppressWarnings("deprecation")
   @ConfigOperation
   @Order(100)
+  @Deprecated
   protected void execAddHeaderMenus(TableEvent e) throws ProcessingException {
     if (getTableCustomizer() != null) {
       if (e.getPopupMenuCount() > 0) {
@@ -3929,17 +3909,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private List<IMenu> fireHeaderPopup() {
-    TableEvent e = new TableEvent(this, TableEvent.TYPE_HEADER_POPUP);
-    fireTableEventInternal(e);
-    try {
-      execAddHeaderMenus(e);
-    }
-    catch (ProcessingException ex) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-    }
-    return e.getPopupMenus();
-  }
 
   // main handler
   protected void fireTableEventInternal(TableEvent e) {
@@ -4111,42 +4080,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (row != null) {
           fireRowAction(row);
         }
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public List<IMenu> fireRowPopupFromUI() {
-      try {
-        pushUIProcessor();
-        //
-        return fireRowPopup();
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public List<IMenu> fireEmptySpacePopupFromUI() {
-      try {
-        pushUIProcessor();
-        //
-        return fireEmptySpacePopup();
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public List<IMenu> fireHeaderPopupFromUI() {
-      try {
-        pushUIProcessor();
-        //
-        return fireHeaderPopup();
       }
       finally {
         popUIProcessor();
@@ -4421,13 +4354,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     @Override
     public void tableChanged(TableEvent e) {
       switch (e.getType()) {
-        case TableEvent.TYPE_EMPTY_SPACE_POPUP:
-        case TableEvent.TYPE_HEADER_POPUP:
-        case TableEvent.TYPE_ROW_POPUP: {
-          // single observer for table-defined menus
-          addLocalPopupMenus(e);
-          break;
-        }
         case TableEvent.TYPE_ROWS_SELECTED: {
           // single observer exec
           try {
