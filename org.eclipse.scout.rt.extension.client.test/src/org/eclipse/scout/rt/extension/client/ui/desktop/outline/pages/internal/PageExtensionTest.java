@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
@@ -61,10 +63,9 @@ public class PageExtensionTest {
 
   @Test
   public void testAcceptWithFilter() {
-    IPageExtensionFilter filter = EasyMock.createMock(IPageExtensionFilter.class);
-    EasyMock.expect(filter.accept(EasyMock.<IOutline> anyObject(), EasyMock.<IPage> anyObject(), EasyMock.<IPage> anyObject())).andStubReturn(true);
+    IPageExtensionFilter filter = mock(IPageExtensionFilter.class);
+    when(filter.accept(any(IOutline.class), any(IPage.class), any(IPage.class))).thenReturn(true);
     P_PageExtension contrib = new P_PageExtension(filter);
-    EasyMock.replay(filter);
 
     assertTrue(contrib.accept(null, null, null));
     assertTrue(contrib.accept(m_outline, null, null));
@@ -73,10 +74,9 @@ public class PageExtensionTest {
 
   @Test
   public void testRejectWithFilter() {
-    IPageExtensionFilter filter = EasyMock.createMock(IPageExtensionFilter.class);
-    EasyMock.expect(filter.accept(EasyMock.<IOutline> anyObject(), EasyMock.<IPage> anyObject(), EasyMock.<IPage> anyObject())).andStubReturn(false);
+    IPageExtensionFilter filter = mock(IPageExtensionFilter.class);
+    when(filter.accept(any(IOutline.class), any(IPage.class), any(IPage.class))).thenReturn(false);
     P_PageExtension contrib = new P_PageExtension(filter);
-    EasyMock.replay(filter);
 
     assertFalse(contrib.accept(null, null, null));
     assertFalse(contrib.accept(m_outline, null, null));

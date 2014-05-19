@@ -4,17 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.stringfield;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.swt.SWT;
 import org.junit.Test;
@@ -29,9 +28,8 @@ public class SwtScoutStringFieldTest {
    */
   @Test
   public void testSwtStylePassword() {
-    IStringField mockFieldWithMask = EasyMock.createNiceMock(IStringField.class);
-    expect(mockFieldWithMask.isInputMasked()).andReturn(true);
-    replay(mockFieldWithMask);
+    IStringField mockFieldWithMask = mock(IStringField.class);
+    when(mockFieldWithMask.isInputMasked()).thenReturn(true);
     SwtScoutStringField swtField = new SwtScoutStringField();
     assertContainsSwtStyle(SWT.PASSWORD, swtField.getSwtStyle(mockFieldWithMask));
   }
@@ -41,9 +39,8 @@ public class SwtScoutStringFieldTest {
    */
   @Test
   public void testNoSwtStylePassword() {
-    IStringField mockFieldWithMask = EasyMock.createNiceMock(IStringField.class);
-    expect(mockFieldWithMask.isInputMasked()).andReturn(false);
-    replay(mockFieldWithMask);
+    IStringField mockFieldWithMask = mock(IStringField.class);
+    when(mockFieldWithMask.isInputMasked()).thenReturn(false);
     SwtScoutStringField swtField = new SwtScoutStringField();
     assertNotContainsSwtStyle(SWT.PASSWORD, swtField.getSwtStyle(mockFieldWithMask));
   }

@@ -857,7 +857,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_formFieldFactory = new FormFieldFactory();
     }
     ISwingScoutFormField ui = m_formFieldFactory.createFormField(parent, field, this);
-    assignWidgetId(ui, field);
+    assignWidgetId(field, ui);
     decorate(field, ui);
     return ui;
   }
@@ -1012,7 +1012,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(JComponent parent, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, model);
     ui.createField(model, this);
-    assignWidgetId(ui, model);
+    assignWidgetId(model, ui);
     decorate(model, ui);
     return ui;
   }
@@ -1021,12 +1021,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public ISwingScoutForm createForm(ISwingScoutView targetViewComposite, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, targetViewComposite, model);
     ui.createField(model, this);
-    assignWidgetId(ui, model);
+    assignWidgetId(model, ui);
     decorate(model, ui);
     return ui;
   }
 
-  protected void assignWidgetId(ISwingScoutComposite uiField, ITypeWithClassId model) {
+  protected void assignWidgetId(ITypeWithClassId model, ISwingScoutComposite uiField) {
     if (isWidgetIdsEnabled()) {
       JComponent swingField = uiField.getSwingField();
       if (swingField != null) {

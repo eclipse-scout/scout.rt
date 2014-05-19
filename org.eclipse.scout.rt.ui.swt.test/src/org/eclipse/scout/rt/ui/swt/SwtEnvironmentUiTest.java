@@ -12,16 +12,22 @@ package org.eclipse.scout.rt.ui.swt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.SwtEnvironmentUiTest.TestForm.MainBox.SmartField;
 import org.eclipse.scout.rt.ui.swt.SwtEnvironmentUiTest.TestForm.MainBox.StringField;
+import org.eclipse.scout.rt.ui.swt.action.menu.ISwtScoutMenuItem;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
@@ -31,8 +37,9 @@ import org.eclipse.scout.rt.ui.swt.util.ColorFactory;
 import org.eclipse.scout.rt.ui.swt.util.FontRegistry;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.junit.After;
@@ -67,7 +74,7 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
-    assertEquals(TEST_CLASS_ID, getTestId(f));
+    assertEquals(TEST_CLASS_ID, getWidgetId(f));
   }
 
   /**
@@ -78,7 +85,7 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutFormField f = env.createFormField(new Shell(), m_testForm.getStringField());
-    assertEquals(TEST_CLASS_ID, getTestId(f));
+    assertEquals(TEST_CLASS_ID, getWidgetId(f));
   }
 
   /**
@@ -89,7 +96,20 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutFormField f = env.createFormField(new Shell(), m_testForm.getRootGroupBox());
-    assertEquals(TEST_MAIN_BOX_CLASS_ID, getTestId(f));
+    assertEquals(TEST_MAIN_BOX_CLASS_ID, getWidgetId(f));
+  }
+
+  /**
+   * Test for {@link AbstractSwtEnvironment#assignTestId}
+   */
+  @Test
+  public void testClassIdAssignedMenu() {
+    System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
+    AbstractSwtEnvironment env = createEnvironment();
+    IMenu m = m_testForm.getSmartField().getMenus().get(0);
+    ISwtScoutMenuItem menuItem = env.createMenuItem(new Menu(new Shell()), m);
+    Object expectedId = getWidgetId(menuItem.getSwtMenuItem());
+    assertTrue(((String) expectedId).contains(TEST_CLASS_ID));
   }
 
   /**
@@ -100,7 +120,7 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "false");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
-    assertNull(getTestId(f));
+    assertNull(getWidgetId(f));
   }
 
   /**
@@ -110,7 +130,7 @@ public class SwtEnvironmentUiTest {
   public void testClassIdNotAssignedByDefault() throws Exception {
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
-    assertNull(getTestId(f));
+    assertNull(getWidgetId(f));
   }
 
   private AbstractSwtEnvironment createEnvironment() {
@@ -118,6 +138,11 @@ public class SwtEnvironmentUiTest {
       @Override
       public Color getColor(String scoutColor) {
         return new ColorFactory(Display.getCurrent()).getColor(scoutColor);
+      }
+
+      @Override
+      public Image getIcon(String name, int iconDecoration) {
+        return new Image(getDisplay(), 10, 10);
       }
 
       @Override
@@ -142,21 +167,31 @@ public class SwtEnvironmentUiTest {
     };
   }
 
-  private Object getTestId(ISwtScoutComposite c) {
-    Control swtField = c.getSwtField();
-    if (swtField != null) {
-      return swtField.getData(AbstractSwtEnvironment.WIDGET_ID_KEY);
+  private Object getWidgetId(ISwtScoutComposite c) {
+    Object testId = getWidgetId(c.getSwtField());
+    if (testId == null && c.getSwtContainer() != null) {
+      return getWidgetId(c.getSwtContainer());
     }
-    else if (c.getSwtContainer() != null) {
-      return c.getSwtContainer().getData(AbstractSwtEnvironment.WIDGET_ID_KEY);
+    return testId;
+  }
+
+  private Object getWidgetId(Widget w) {
+    if (w != null) {
+      return w.getData(AbstractSwtEnvironment.WIDGET_ID_KEY);
     }
-    return null;
+    else {
+      return null;
+    }
   }
 
   class TestForm extends AbstractForm {
 
     public StringField getStringField() {
       return getFieldByClass(StringField.class);
+    }
+
+    public SmartField getSmartField() {
+      return getFieldByClass(SmartField.class);
     }
 
     public TestForm() throws ProcessingException {
@@ -170,6 +205,15 @@ public class SwtEnvironmentUiTest {
       @Order(10.0)
       @ClassId(TEST_CLASS_ID)
       public class StringField extends AbstractStringField {
+      }
+
+      @Order(20.0)
+      public class SmartField extends AbstractSmartField<Long> {
+
+        @Order(20.0)
+        @ClassId(TEST_CLASS_ID)
+        public class TestMenu extends AbstractMenu {
+        }
       }
     }
   }

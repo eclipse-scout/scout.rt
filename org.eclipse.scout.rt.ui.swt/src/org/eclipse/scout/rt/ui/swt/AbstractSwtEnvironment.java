@@ -65,7 +65,6 @@ import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.swt.action.menu.ISwtScoutMenuItem;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutMenuItem;
-import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
@@ -1515,21 +1514,22 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   public ISwtScoutForm createForm(Composite parent, IForm scoutForm) {
     SwtScoutForm uiForm = new SwtScoutForm();
     uiForm.createField(parent, scoutForm, this);
-    assignWidgetId(uiForm, scoutForm);
+    assignWidgetId(scoutForm, uiForm.getSwtField(), uiForm.getSwtContainer());
     return uiForm;
   }
 
-  protected void assignWidgetId(ISwtScoutComposite<?> uiField, ITypeWithClassId model) {
-    if (isWidgetIdsEnabled()) {
-      Control swtField = uiField.getSwtField();
-      if (swtField != null) {
-        swtField.setData(WIDGET_ID_KEY, model.classId());
-      }
-      else if (uiField.getSwtContainer() != null) {
-        Composite swtContainer = uiField.getSwtContainer();
-        swtContainer.setData(WIDGET_ID_KEY, model.classId());
-      }
+  protected void assignWidgetId(ITypeWithClassId model, Widget swtField, Widget swtContainer) {
+    if (swtField != null) {
+      assignWidgetId(model, swtField);
+    }
+    else {
+      assignWidgetId(model, swtContainer);
+    }
+  }
 
+  protected void assignWidgetId(ITypeWithClassId model, Widget widget) {
+    if (isWidgetIdsEnabled() && widget != null) {
+      widget.setData(WIDGET_ID_KEY, model.classId());
     }
   }
 
@@ -1543,13 +1543,15 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_formFieldFactory = new FormFieldFactory(m_applicationBundle);
     }
     ISwtScoutFormField<IFormField> uiField = m_formFieldFactory.createFormField(parent, model, this);
-    assignWidgetId(uiField, model);
+    assignWidgetId(model, uiField.getSwtField(), uiField.getSwtContainer());
     return uiField;
   }
 
   @Override
   public ISwtScoutMenuItem createMenuItem(Menu uiMenu, IMenu scoutMenu) {
-    return new SwtScoutMenuItem(scoutMenu, uiMenu, this);
+    SwtScoutMenuItem swtScoutMenuItem = new SwtScoutMenuItem(scoutMenu, uiMenu, this);
+    assignWidgetId(scoutMenu, swtScoutMenuItem.getSwtMenuItem(), swtScoutMenuItem.getParentMenu());
+    return swtScoutMenuItem;
   }
 
   @Override
