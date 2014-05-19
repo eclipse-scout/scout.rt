@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.tablefield;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -23,11 +20,8 @@ import org.json.JSONObject;
 public class JsonTableField extends JsonFormField<ITableField<? extends ITable>> {
   private static final String PROP_TABLE_ID = "tableId";
 
-  private Map<ITable, JsonTable> m_jsonTables;
-
   public JsonTableField(ITableField<? extends ITable> model, IJsonSession session, String id) {
     super(model, session, id);
-    m_jsonTables = new HashMap<>();
   }
 
   @Override
@@ -38,32 +32,18 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   @Override
   protected void attachModel() {
     super.attachModel();
-    //FIXME Hold JsonTable globally? and share with other elements like desktop? generally hold every model object globally? when to dispose? only on model dispose?
-    //-> incremental creation of the model -> improves offline, maybe introduce dispose flag for table fields -> dont dispose for outlineTables, dispose otherwise
-    createAndRegisterJsonTable(getModelObject().getTable());
   }
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), ITableField.PROP_TABLE, m_jsonTables.get(getModelObject().getTable()).toJson());
-  }
-
-  protected JsonTable createAndRegisterJsonTable(ITable table) {
-    JsonTable jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
-    m_jsonTables.put(table, jsonTable);
-    return jsonTable;
-  }
-
-  protected String disposeAndUnregisterJsonTable(ITable table) {
-    JsonTable jsonTable = m_jsonTables.remove(table);
-    jsonTable.dispose();
-    return jsonTable.getId();
+    //FIXME when to dispose table? maybe introduce dispose event for table fields -> dont dispose for outlineTables, dispose otherwise
+    return putProperty(super.toJson(), ITableField.PROP_TABLE, modelObjectToJson(getModelObject().getTable()));
   }
 
   protected void handleModelTableChanged(ITable table) {
-    JsonTable jsonTable = m_jsonTables.get(table);
+    JsonTable jsonTable = (JsonTable) getJsonSession().getJsonRenderer(table);
     if (jsonTable == null) {
-      jsonTable = createAndRegisterJsonTable(table);
+      jsonTable = (JsonTable) getJsonSession().createJsonRenderer(table);
       getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
     }
     else {

@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MobileDesktopToolButtons = function(session, toolButtons) {
+scout.MobileDesktopToolButtons = function(toolButtons, session) {
   this.$div;
   this.$parent;
   this.toolButtons = toolButtons;

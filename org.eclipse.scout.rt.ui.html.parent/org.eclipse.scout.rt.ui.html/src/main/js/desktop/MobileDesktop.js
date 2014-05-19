@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MobileDesktop = function(session, model) {
-  this.base(session, model);
+scout.MobileDesktop = function(model, session) {
+  this.base(model, session);
   this.areas = {};
 };
 scout.MobileDesktop.inheritsFrom(scout.BaseDesktop);
@@ -15,7 +15,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$parent = $parent;
 
   if (this.model.toolButtons) {
-    tools = new scout.MobileDesktopToolButtons(this.session, this.model.toolButtons);
+    tools = new scout.MobileDesktopToolButtons(this.model.toolButtons, this.session);
     tools.render($parent);
     marginTop = tools.$div.outerHeight();
   }

@@ -1,4 +1,4 @@
-scout.ModelAdapter = function(session, model) {
+scout.ModelAdapter = function(model, session) {
   this.model = model;
   this.session = session;
   this.$container;

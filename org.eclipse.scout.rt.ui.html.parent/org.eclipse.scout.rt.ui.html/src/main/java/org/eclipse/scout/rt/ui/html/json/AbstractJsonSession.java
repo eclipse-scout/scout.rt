@@ -150,8 +150,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     if (jsonRenderer != null) {
       return jsonRenderer;
     }
-    String id = createUniqueIdFor(jsonRenderer);
-    jsonRenderer = m_jsonRendererFactory.createJsonRenderer(modelObject, this, id);
+    jsonRenderer = createJsonRenderer(modelObject);
+    return jsonRenderer;
+  }
+
+  @Override
+  public IJsonRenderer<?> createJsonRenderer(Object modelObject) {
+    String id = createUniqueIdFor(null); //FIXME cgu
+    IJsonRenderer<?> jsonRenderer = m_jsonRendererFactory.createJsonRenderer(modelObject, this, id);
     jsonRenderer.init();
     m_jsonRendererRegistry.addJsonRenderer(id, modelObject, jsonRenderer);
     return jsonRenderer;
@@ -165,6 +171,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public IJsonRenderer<?> getJsonRenderer(Object modelObject) {
     return m_jsonRendererRegistry.getJsonRenderer(modelObject);
+  }
+
+  @Override
+  public void unregisterJsonRenderer(String id) {
+    m_jsonRendererRegistry.removeJsonRenderer(id);
   }
 
   @Override

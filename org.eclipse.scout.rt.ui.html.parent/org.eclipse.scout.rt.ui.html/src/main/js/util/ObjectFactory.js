@@ -27,7 +27,7 @@ scout.ObjectFactory.prototype.create = function(model) {
     throw 'No factory registered for objectType ' + model.objectType;
   }
 
-  return factory.create(this.session, model);
+  return factory.create(model, this.session);
 };
 
 /**
@@ -57,42 +57,42 @@ scout.ObjectFactory.prototype.register = function(factories) {
 
 scout.defaultObjectFactories = [{
   objectType: 'Desktop',
-  create: function(session, model) {
-    return new scout.Desktop(session, model);
+  create: function(model, session) {
+    return new scout.Desktop(model, session);
   }
 }, {
   objectType: 'Table',
-  create: function(session, model) {
-    return new scout.Table(session, model);
+  create: function(model, session) {
+    return new scout.Table(model, session);
   }
 }, {
   objectType: 'Form',
-  create: function(session, model) {
-    return new scout.Form(session, model);
+  create: function(model, session) {
+    return new scout.Form(model, session);
   }
 }, {
   objectType: 'FormField',
-  create: function(session, model) {
-    return new scout.FormField(session, model);
+  create: function(model, session) {
+    return new scout.FormField(model, session);
   }
 }, {
   objectType: 'CheckBoxField',
-  create: function(session, model) {
-    return new scout.CheckBoxField(session, model);
+  create: function(model, session) {
+    return new scout.CheckBoxField(model, session);
   }
 }, {
   objectType: 'TableField',
-  create: function(session, model) {
-    return new scout.TableField(session, model);
+  create: function(model, session) {
+    return new scout.TableField(model, session);
   }
 }, {
   objectType: 'GroupBox',
-  create: function(session, model) {
-    return new scout.GroupBox(session, model);
+  create: function(model, session) {
+    return new scout.GroupBox(model, session);
   }
 }, {
   objectType: 'SequenceBox',
-  create: function(session, model) {
-    return new scout.SequenceBox(session, model);
+  create: function(model, session) {
+    return new scout.SequenceBox(model, session);
   }
 }];

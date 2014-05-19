@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopToolButton = function(session, toolButtons) {
+scout.DesktopToolButton = function(toolButtons, session) {
   this.$div;
   this.toolButtons = toolButtons;
 };

@@ -1,4 +1,4 @@
-scout.TableFooter = function(session, table, $parent) {
+scout.TableFooter = function(table, $parent, session) {
   this._table = table;
 
   this._$tableControl = $parent.appendDiv('TableControl');

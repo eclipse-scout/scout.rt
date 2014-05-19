@@ -1,5 +1,5 @@
-scout.Form = function(session, model) {
-  this.base(session, model);
+scout.Form = function(model, session) {
+  this.base(model, session);
   this._$title;
 };
 

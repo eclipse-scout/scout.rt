@@ -12,26 +12,20 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONArray;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
@@ -39,7 +33,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> {
@@ -49,10 +42,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   public static final String PROP_OUTLINE_ID = "outlineId";
 
   private DesktopListener m_desktopListener;
-  private FormListener m_modelFormListener;
-  private List<JsonViewButton> m_jsonViewButtons;
-  private Map<IOutline, JsonDesktopTree> m_jsonOutlines;
-  private Map<IForm, JsonForm> m_jsonForms;
 
   private String TOOL_BUTTONS = "[{\"id\": \"t1\", \"label\": \"Suche\", \"icon\": \"\uf002\", \"shortcut\": \"F3\"}," +
       "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
@@ -64,8 +53,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession, String id) {
     super(desktop, jsonSession, id);
-    m_jsonOutlines = new HashMap<>();
-    m_jsonForms = new HashMap<>();
   }
 
   @Override
@@ -91,21 +78,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       }
     }.runNow(new NullProgressMonitor());
 
-    for (IForm form : getDesktop().getDialogStack()) {
-      createAndRegisterJsonForm(form);
-    }
-    for (IForm form : getDesktop().getViewStack()) {
-      createAndRegisterJsonForm(form);
-    }
-
-    if (!isFormBased()) {
-      //FIXME view and tool buttons should be removed from desktop by device transformer
-      if (getDesktop().getOutline() != null) {
-        JsonDesktopTree jsonOutline = (JsonDesktopTree) getJsonSession().getOrCreateJsonRenderer(getDesktop().getOutline());
-        m_jsonOutlines.put(getDesktop().getOutline(), jsonOutline);
-      }
-    }
-
     //FIXME add listener afterwards -> don't handle events, refactor
     super.attachModel();
 
@@ -122,28 +94,21 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       getDesktop().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
     }
-    for (JsonForm form : CollectionUtility.arrayList(m_jsonForms.values())) {
-      disposeAndUnregisterJsonForm(form.getModelObject());
-    }
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JSONArray forms = new JSONArray();
-    for (JsonForm jsonForm : m_jsonForms.values()) {
-      forms.put(jsonForm.toJson());
-    }
-    putProperty(json, "forms", forms);
+
+    List<IForm> modelForms = getForms();
+    putProperty(json, "forms", modelObjectsToJson(modelForms));
     putProperty(json, "toolButtons", newJSONArray(TOOL_BUTTONS));
+
     boolean formBased = isFormBased();
     if (!formBased) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
       putProperty(json, "viewButtons", modelObjectsToJson(getDesktop().getViewButtons()));
-      JsonDesktopTree jsonDesktopTree = m_jsonOutlines.get(getDesktop().getOutline());
-      if (jsonDesktopTree != null) {
-        putProperty(json, "outline", jsonDesktopTree.toJson());
-      }
+      putProperty(json, "outline", modelObjectToJson(getDesktop().getOutline()));
     }
     return json;
   }
@@ -153,24 +118,25 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     return getJsonSession().getClientSession().getUserAgent().getUiDeviceType().isTouchDevice();
   }
 
-  protected JsonForm createAndRegisterJsonForm(IForm form) {
-    if (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm)) {
-      return null; //FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+  protected List<IForm> getForms() {
+    List<IForm> forms = new ArrayList<>();
+    for (IForm form : getDesktop().getViewStack()) {
+      if (!isFormBlocked(form)) {
+        forms.add(form);
+      }
     }
-    JsonForm jsonForm = (JsonForm) getJsonSession().getOrCreateJsonRenderer(form);
-    m_jsonForms.put(form, jsonForm);
-    attachFormListener(form);
-    return jsonForm;
+    for (IForm form : getDesktop().getDialogStack()) {
+      if (!isFormBlocked(form)) {
+        forms.add(form);
+      }
+    }
+
+    return forms;
   }
 
-  protected String disposeAndUnregisterJsonForm(IForm form) {
-    if (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm)) {
-      return null;//FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
-    }
-    JsonForm jsonForm = m_jsonForms.remove(form);
-    jsonForm.dispose();
-    detachFormListener(form);
-    return jsonForm.getId();
+  protected boolean isFormBlocked(IForm form) {
+    //FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+    return (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
   }
 
   protected void handleModelDesktopEvent(DesktopEvent event) {
@@ -197,23 +163,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     }
   }
 
-  protected void handleModelFormChanged(FormEvent event) {
-    switch (event.getType()) {
-      case TableEvent.TYPE_ROWS_INSERTED: {
-        handleModelFormClosed(event.getForm());
-        break;
-      }
-    }
-  }
-
   protected void handleModelOutlineChanged(IOutline outline) {
     if (isFormBased()) {
       return;
     }
-    JsonDesktopTree jsonOutline = m_jsonOutlines.get(outline);
+    JsonDesktopTree jsonOutline = (JsonDesktopTree) getJsonSession().getJsonRenderer(outline);
     if (jsonOutline == null) {
-      jsonOutline = (JsonDesktopTree) getJsonSession().getOrCreateJsonRenderer(outline);
-      m_jsonOutlines.put(outline, jsonOutline);
+      jsonOutline = (JsonDesktopTree) getJsonSession().createJsonRenderer(outline);
       getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());
     }
     else {
@@ -224,11 +180,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected void handleModelFormAdded(IForm form) {
-    JsonForm jsonForm = m_jsonForms.get(form);
+    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(form);
     if (jsonForm == null) {
-      jsonForm = createAndRegisterJsonForm(form);
-      if (jsonForm != null) {
-        getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonForm.toJson());
+      if (!isFormBlocked(form)) {
+        jsonForm = (JsonForm) getJsonSession().createJsonRenderer(form);
+        if (jsonForm != null) {
+          getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonForm.toJson());
+        }
       }
     }
     else {
@@ -239,25 +197,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    JsonForm jsonForm = m_jsonForms.get(form);
+    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(form);
     if (jsonForm != null) {
       JSONObject jsonEvent = new JSONObject();
       putProperty(jsonEvent, PROP_FORM_ID, jsonForm.getId());
       getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), jsonEvent);
-    }
-  }
-
-  protected void handleModelFormClosed(IForm form) {
-    //FIXME what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
-    if (getDesktop().isShowing(form)) {
-      LOG.error("Form closed but is still showing on desktop.");
-//      handleModelFormRemoved(form);
-    }
-    String formId = disposeAndUnregisterJsonForm(form);
-    if (formId != null) {
-      JSONObject jsonEvent = new JSONObject();
-      putProperty(jsonEvent, PROP_FORM_ID, formId);
-      getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
     }
   }
 
@@ -274,21 +218,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
   protected void handleModelDesktopClosed() {
     LOG.info("Desktop closed.");
+    dispose();
     //FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done for all, logout is done for all as well, gmail does the same).
     //Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
-  }
-
-  protected void attachFormListener(IForm form) {
-    if (m_modelFormListener == null) {
-      m_modelFormListener = new P_ModelFormListener();
-    }
-    form.addFormListener(m_modelFormListener);
-  }
-
-  protected void detachFormListener(IForm form) {
-    if (m_modelFormListener != null) {
-      form.removeFormListener(m_modelFormListener);
-    }
   }
 
   @Override
@@ -302,14 +234,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       handleModelDesktopEvent(e);
     }
 
-  }
-
-  protected class P_ModelFormListener implements FormListener {
-
-    @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
-      handleModelFormChanged(e);
-    }
   }
 
 }

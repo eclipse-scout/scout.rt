@@ -65,6 +65,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
       return; // TODO AWE: (ask C.GU) das wäre auch eher IllegalState, nicht?
     }
     detachModel();
+    getJsonSession().unregisterJsonRenderer(getId()); //FIXME CGU unregistering here, but registering not?
   }
 
   protected void detachModel() {
@@ -93,6 +94,9 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
    * Calls <code>jsonSession.getOrCreateJsonRenderer(Object)</code> and returns <code>toJson()</code>.
    */
   protected final JSONObject modelObjectToJson(Object modelObject) {
+    if (modelObject == null) {
+      return null;
+    }
     IJsonRenderer<?> jsonRenderer = getJsonSession().getOrCreateJsonRenderer(modelObject);
     return jsonRenderer.toJson();
   }

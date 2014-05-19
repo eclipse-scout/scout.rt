@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableField = function(session, model) {
-  this.base(session, model);
+scout.TableField = function(model, session) {
+  this.base(model, session);
 };
 scout.TableField.inheritsFrom(scout.ModelAdapter);
 
@@ -24,7 +24,7 @@ scout.TableField.prototype.onModelCreate = function(event) {
     if (this.table) {
       this.table.detach();
     }
-    this.table = this.session.objectFactory.create(this.session, event);
+    this.table = this.session.objectFactory.create(event);
     this.table.attach();
   }
   else {

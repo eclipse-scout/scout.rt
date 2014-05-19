@@ -12,7 +12,11 @@ package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
@@ -22,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
 
 public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public JsonForm(IForm modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
@@ -44,6 +49,26 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   @Override
   public String getObjectType() {
     return "Form";
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+
+    if (m_modelFormListener == null) {
+      m_modelFormListener = new P_ModelFormListener();
+      getModelObject().addFormListener(m_modelFormListener);
+    }
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+
+    if (m_modelFormListener != null) {
+      getModelObject().removeFormListener(m_modelFormListener);
+      m_modelFormListener = null;
+    }
   }
 
   @Override
@@ -80,6 +105,27 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
     return null;
   }
 
+  protected void handleModelFormChanged(FormEvent event) {
+    switch (event.getType()) {
+      case FormEvent.TYPE_CLOSED: {
+        handleModelFormClosed(event.getForm());
+        break;
+      }
+    }
+  }
+
+  protected void handleModelFormClosed(IForm form) {
+    //FIXME what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
+    if (ClientSyncJob.getCurrentSession().getDesktop().isShowing(form)) {
+      LOG.error("Form closed but is still showing on desktop.");
+//      handleModelFormRemoved(form);
+    }
+    dispose();
+
+    JSONObject jsonEvent = new JSONObject();
+    getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
+  }
+
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (EVENT_FORM_CLOSING.equals(event.getEventType())) {
@@ -94,6 +140,14 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
         getModelObject().getUIFacade().fireFormClosingFromUI();
       }
     }.runNow(new NullProgressMonitor());
+  }
+
+  protected class P_ModelFormListener implements FormListener {
+
+    @Override
+    public void formChanged(FormEvent e) throws ProcessingException {
+      handleModelFormChanged(e);
+    }
   }
 
 }

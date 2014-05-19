@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.GroupBox = function(session, model) {
-  this.base(session, model);
+scout.GroupBox = function(model, session) {
+  this.base(model, session);
   this._$label;
 };
 scout.GroupBox.inheritsFrom(scout.ModelAdapter);

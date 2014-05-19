@@ -1,5 +1,5 @@
-scout.SequenceBox = function(session, model) {
-  this.base(session, model);
+scout.SequenceBox = function(model, session) {
+  this.base(model, session);
 };
 
 scout.SequenceBox.inheritsFrom(scout.ModelAdapter);

@@ -29,7 +29,7 @@ describe("DesktopTree", function() {
   }
 
   function createDesktopTree(model) {
-    return new scout.DesktopTree(session, session.$entryPoint, model);
+    return new scout.DesktopTree(session.$entryPoint, model, session);
   }
 
   describe("constructor", function() {

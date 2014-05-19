@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableHeader = function(session, table, $tableHeader, filterCallback) {
+scout.TableHeader = function(table, $tableHeader, session) {
   var that = this,
     columns = table.model.columns;
 
@@ -39,7 +39,7 @@ scout.TableHeader = function(session, table, $tableHeader, filterCallback) {
     } else {
       var x = $header.offset().left,
         y = $header.offset().top;
-      new scout.TableHeaderMenu(session, table, $header, x, y);
+      new scout.TableHeaderMenu(table, $header, x, y, session);
     }
 
     return false;

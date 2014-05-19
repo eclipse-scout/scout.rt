@@ -57,7 +57,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
-  private Map<ITable, JsonTable> m_jsonTables;
   private TreeEventFilter m_treeEventFilter;
   private MenuManager m_menuManager;
 
@@ -95,7 +94,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     super(modelObject, jsonSession, id);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
-    m_jsonTables = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModelObject());
     m_menuManager = new MenuManager(getJsonSession());
   }
@@ -223,9 +221,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       jsonNodeIds.put(nodeId);
       m_treeNodeIds.remove(node);
       m_treeNodes.remove(nodeId);
-      JsonTable table = m_jsonTables.remove(node);
-      if (table != null) {
-        table.dispose();
+
+      //FIXME CGU really dispose? Or better keep for offline? Memory issue?
+      if (node instanceof IPageWithTable) {
+        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) node;
+        JsonTable table = (JsonTable) getJsonSession().getJsonRenderer(pageWithTable.getTable());
+        if (table != null) {
+          table.dispose();
+        }
       }
     }
     getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
@@ -292,14 +295,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       pageType = "table";
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       ITable table = pageWithTable.getTable();
-      if (table != null) {
-        JsonTable jsonTable = m_jsonTables.get(table);
-        if (jsonTable == null) {
-          jsonTable = (JsonTable) getJsonSession().getOrCreateJsonRenderer(table);
-          m_jsonTables.put(table, jsonTable);
-        }
-        putProperty(json, "table", m_jsonTables.get(table).toJson());
-      }
+      putProperty(json, "table", modelObjectToJson(table));
     }
     else {
       pageType = "node";

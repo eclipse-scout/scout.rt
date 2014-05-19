@@ -4,7 +4,7 @@
 /**
  * @param model represents a node page of an outline
  */
-scout.DesktopTable = function(session, model) {
+scout.DesktopTable = function(model, session) {
   this.model = model;
   this.session = session;
 
@@ -65,7 +65,7 @@ scout.DesktopTable.prototype._render = function($parent) {
     if (that._chart) { //FIXME filter selection should be restored when changing from map to chart and back, maybe don't dispose every time?
       that._chart.dispose();
     }
-    that._chart = new scout.DesktopChart(that.session, that.table.footer.$controlContainer, that.table, that.model.chart);
+    that._chart = new scout.DesktopChart(that.table.footer.$controlContainer, that.table, that.model.chart, that.session);
 
     that.table.footer.openTableControl();
   }

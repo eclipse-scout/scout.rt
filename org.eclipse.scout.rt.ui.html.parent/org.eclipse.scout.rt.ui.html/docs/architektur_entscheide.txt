@@ -29,6 +29,12 @@ Naming
 Protokoll
 - Jetzt schicken Client und Server events, sollte man das eventuell unterscheiden? Client->actions, Server->events? Ist nur ein Naming-Ding
 
+RendererRegistry
+- Die Objekte werden bei Bedarf erstellt. Der Client erhält die Notifikation mittels create event, oder über die initialisierung des Parent (toJson)
+  - Offene Frage: Was passiert, wenn das Objekt im toJson bereits initialisiert wurde und erneut geschickt wird? Zur Zeit wird das Objekt auf dem Client neu erstellt. -> Leak?
+- Dies führt zu einer inkrementellen Erstellung des Modells auf dem Client.
+- Wann sollen die Objekte aufgeräumt werden? Bei From passiert es zur Zeit beim Close, jedoch nicht rekursiv -> Felder bleiben bestehen -> Leak
+
 Auftrennung DesktopTree/DesktopTable
 - Da es im Modell TableField und TreeField gibt, sollten wir die Tree bzw. Tabellen-Logik von der Desktop-Logik trennen. Ansonsten müssten wir die Anzeige-Logik duplizieren
 - Chart, Graph, Map etc gehen zur Zeit fix auf DesktopTable, vorläufig vermutlich ok wenn diese Dinge nur in der Outline angezeigt werden können.

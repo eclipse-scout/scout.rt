@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Desktop = function(session, model) {
-  this.base(session, model);
+scout.Desktop = function(model, session) {
+  this.base(model, session);
 };
 scout.Desktop.inheritsFrom(scout.BaseDesktop);
 
@@ -15,22 +15,22 @@ scout.Desktop.prototype._render = function($parent) {
 
   // create all 4 containers
   if (this.model.viewButtons) {
-    views = new scout.DesktopViewButtonBar(this.session, $parent, this.model.viewButtons);
+    views = new scout.DesktopViewButtonBar($parent, this.model.viewButtons, this.session);
     marginTop = views.$div.outerHeight();
   }
   if (this.model.toolButtons) {
-    tools = new scout.DesktopToolButton(this.session, this.model.toolButtons);
+    tools = new scout.DesktopToolButton(this.model.toolButtons, this.session);
     tools.render($parent);
     marginRight = tools.$div.outerWidth();
   }
 
   var layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.model.outline) {
-    tree = new scout.DesktopTreeContainer(this.session, $parent, this.model.outline);
+    tree = new scout.DesktopTreeContainer($parent, this.model.outline, this.session);
     layout.register(tree.$div, 'W', true);
   }
 
-  var bench = new scout.DesktopBench(this.session, $parent);
+  var bench = new scout.DesktopBench($parent, this.session);
   layout.register(bench.$container, 'C');
 
   layout.layout();

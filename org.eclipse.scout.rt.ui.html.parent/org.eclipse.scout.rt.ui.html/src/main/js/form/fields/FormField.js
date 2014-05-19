@@ -1,5 +1,5 @@
-scout.FormField = function(session, model) {
-  this.base(session, model);
+scout.FormField = function(model, session) {
+  this.base(model, session);
 };
 
 scout.FormField.inheritsFrom(scout.ModelAdapter);

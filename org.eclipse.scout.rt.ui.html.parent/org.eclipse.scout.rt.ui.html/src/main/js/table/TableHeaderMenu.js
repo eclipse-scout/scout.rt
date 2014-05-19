@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableHeaderMenu = function(session, table, $header, x, y) {
+scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $('.header-menu').remove();
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');
@@ -130,7 +130,7 @@ scout.TableHeaderMenu = function(session, table, $header, x, y) {
     .data('label', 'Filtern nach');
 
   var group = (column.type === 'date') ?  3 : -1,
-    matrix = new scout.DesktopChartMatrix(session, table),
+    matrix = new scout.DesktopChartMatrix(table, session),
     xAxis = matrix.addAxis(id, group),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();

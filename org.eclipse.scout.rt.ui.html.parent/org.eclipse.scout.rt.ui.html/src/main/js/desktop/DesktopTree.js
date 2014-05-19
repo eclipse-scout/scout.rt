@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTree = function(session, $parent, model) {
+scout.DesktopTree = function($parent, model, session) {
   this.model = model;
   this._selectedNodes = [];
   this.session = session;
@@ -268,7 +268,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       var desktopTable = this.session.widgetMap[node.id];
       if (!desktopTable) {
         node.outlineId = this.model.id;
-        new scout.DesktopTable(this.session, node);
+        new scout.DesktopTable(node, this.session);
       }
     }
 

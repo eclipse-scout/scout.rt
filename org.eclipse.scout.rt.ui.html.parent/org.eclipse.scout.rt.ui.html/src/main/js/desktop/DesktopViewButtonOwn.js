@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopViewButtonOwn = function(session, $parent, viewButton) {
+scout.DesktopViewButtonOwn = function($parent, viewButton, session) {
 
   session.widgetMap[viewButton.id] = this;
 

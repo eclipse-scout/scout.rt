@@ -76,11 +76,11 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 };
 
 TableSpecHelper.prototype.createTable = function(model) {
-  return new scout.Table(this.session, model);
+  return new scout.Table(model, this.session);
 };
 
 TableSpecHelper.prototype.createMobileTable = function(model) {
-  return new scout.MobileTable(this.session, model);
+  return new scout.MobileTable(model, this.session);
 };
 
 TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {

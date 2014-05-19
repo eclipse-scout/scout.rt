@@ -57,9 +57,12 @@ class JsonRendererRegistry {
     m_modelRendererMap.put(modelObject, value);
   }
 
-  private void removeJsonRenderer(String id) {
+  void removeJsonRenderer(String id) {
     P_RegistryValue value = m_idRendererMap.remove(id);
-    m_modelRendererMap.remove(value.m_modelObject);
+    if (value != null) {
+      //FIXME CGU not null check necessary for tests, check with awe
+      m_modelRendererMap.remove(value.m_modelObject);
+    }
   }
 
   IJsonRenderer<?> getJsonRenderer(String id) {

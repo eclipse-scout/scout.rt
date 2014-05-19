@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopChartMatrix = function(session, table) {
+scout.DesktopChartMatrix = function(table, session) {
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];

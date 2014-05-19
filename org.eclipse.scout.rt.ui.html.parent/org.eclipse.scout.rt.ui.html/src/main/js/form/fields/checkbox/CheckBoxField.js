@@ -1,5 +1,5 @@
-scout.CheckBoxField = function(session, model) {
-  this.base(session, model);
+scout.CheckBoxField = function(model, session) {
+  this.base(model, session);
   this._$label;
   this._$checkBox;
   this._$statusLabel;

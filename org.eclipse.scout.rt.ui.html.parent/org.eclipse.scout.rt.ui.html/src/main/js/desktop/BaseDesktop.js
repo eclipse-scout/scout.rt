@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.BaseDesktop = function(session, model) {
+scout.BaseDesktop = function(model, session) {
   this.session = session;
   this.model = model;
   this.tree;

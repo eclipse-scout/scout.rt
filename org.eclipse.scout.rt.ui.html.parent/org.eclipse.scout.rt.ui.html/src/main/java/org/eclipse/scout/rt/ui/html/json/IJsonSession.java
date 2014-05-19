@@ -38,6 +38,13 @@ public interface IJsonSession {
   IJsonRenderer<?> getOrCreateJsonRenderer(Object modelObject);
 
   /**
+   * Creates a new IJsonRenderer instance for the given modelObject.
+   */
+  IJsonRenderer<?> createJsonRenderer(Object modelObject);
+
+  void unregisterJsonRenderer(String id);
+
+  /**
    * @return the current ui response that is collecting changes for the next
    *         {@link #processRequest(HttpServletRequest, JsonRequest)} cycle
    */

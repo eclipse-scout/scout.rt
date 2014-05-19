@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Table = function(session, model) {
+scout.Table = function(model, session) {
   this.model = model;
   this.session = session;
 
@@ -56,12 +56,12 @@ scout.Table.prototype._render = function($parent) {
     //FIXME maybe better to not create at all?
     this._$header.hide();
   }
-  this._header = new scout.TableHeader(this.session, this, this._$header);
+  this._header = new scout.TableHeader(this, this._$header, this.session);
 
   this.$data = this.$container.appendDiv(this.model.id + '_data', 'table-data');
 
   this._$footer = this.$container.appendDiv(this.model.id + '_footer');
-  this.footer = new scout.TableFooter(this.session, this, this._$footer);
+  this.footer = new scout.TableFooter(this, this._$footer, this.session);
 
   if (this.configurator && this.configurator.render) {
     this.configurator.render();
