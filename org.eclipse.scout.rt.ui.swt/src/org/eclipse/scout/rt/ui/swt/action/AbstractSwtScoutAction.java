@@ -34,6 +34,7 @@ public abstract class AbstractSwtScoutAction extends Action {
   private ISwtEnvironment m_swtEnvironment;
   private final OptimisticLock m_updateSwtFromScoutLock;
   private boolean m_updateUi = true;
+  private boolean m_handleSelectionPending;
 
   private P_ScoutPropertyChangeListener m_scoutPropertyListener;
 
@@ -170,13 +171,24 @@ public abstract class AbstractSwtScoutAction extends Action {
           updateSelectedFromScout();
         }
         else {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              getScoutObject().getUIFacade().fireActionFromUI();
+          //run inputVerifier since there might not be a focus lost event
+          if (SwtUtility.runSwtInputVerifier()) {
+            if (!m_handleSelectionPending) {
+              m_handleSelectionPending = true;
+              Runnable t = new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    getScoutObject().getUIFacade().fireActionFromUI();
+                  }
+                  finally {
+                    m_handleSelectionPending = false;
+                  }
+                }
+              };
+              getEnvironment().invokeScoutLater(t, 0);
             }
-          };
-          getEnvironment().invokeScoutLater(t, 0);
+          }
         }
       }
     }

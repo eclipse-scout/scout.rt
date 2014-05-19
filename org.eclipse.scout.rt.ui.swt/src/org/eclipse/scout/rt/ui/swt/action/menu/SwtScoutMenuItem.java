@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -192,22 +193,25 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   }
 
   protected void handleSwtMenuSelection() {
-    if (!m_handleSelectionPending) {
-      m_handleSelectionPending = true;
-      //notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            getScoutMenu().getUIFacade().fireActionFromUI();
+    //run inputVerifier since there might not be a focus lost event
+    if (SwtUtility.runSwtInputVerifier()) {
+      if (!m_handleSelectionPending) {
+        m_handleSelectionPending = true;
+        //notify Scout
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              getScoutMenu().getUIFacade().fireActionFromUI();
+            }
+            finally {
+              m_handleSelectionPending = false;
+            }
           }
-          finally {
-            m_handleSelectionPending = false;
-          }
-        }
-      };
-      getEnvironment().invokeScoutLater(t, 0);
-      //end notify
+        };
+        getEnvironment().invokeScoutLater(t, 0);
+        //end notify
+      }
     }
   }
 
