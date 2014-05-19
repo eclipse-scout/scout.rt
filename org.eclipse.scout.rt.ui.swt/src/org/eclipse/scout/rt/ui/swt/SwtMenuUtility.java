@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutCheckboxMenu;
-import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuAction;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuGroup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
@@ -158,7 +157,7 @@ public final class SwtMenuUtility {
       }
     }
     else {
-      new SwtScoutMenuAction(menu, scoutActionNode, environment);
+      environment.createMenuItem(menu, scoutActionNode);
     }
   }
 

@@ -17,6 +17,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuAction;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
@@ -45,6 +47,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
@@ -224,6 +227,8 @@ public interface ISwtEnvironment {
   ISwtScoutForm createForm(Composite parent, IForm scoutForm);
 
   ISwtScoutFormField createFormField(Composite parent, IFormField model);
+
+  SwtScoutMenuAction createMenuItem(Menu uiMenu, IActionNode<?> scoutMenu);
 
   ISwtScoutTray getTrayComposite();
 

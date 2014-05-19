@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -60,6 +62,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuAction;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
@@ -105,6 +108,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -134,6 +138,8 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
+  public static final String WIDGET_ID_KEY = "TEST_COMP_NAME";
+  public static final String PROP_WIDGET_IDS_ENABLED = "org.eclipse.scout.rt.widgetIdsEnabled";
 
   private final Bundle m_applicationBundle;
 
@@ -1428,7 +1434,27 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   public ISwtScoutForm createForm(Composite parent, IForm scoutForm) {
     SwtScoutForm uiForm = new SwtScoutForm();
     uiForm.createField(parent, scoutForm, this);
+    assignWidgetId(scoutForm, uiForm.getSwtField(), uiForm.getSwtContainer());
     return uiForm;
+  }
+
+  protected void assignWidgetId(ITypeWithClassId model, Widget swtField, Widget swtContainer) {
+    if (swtField != null) {
+      assignWidgetId(model, swtField);
+    }
+    else {
+      assignWidgetId(model, swtContainer);
+    }
+  }
+
+  protected void assignWidgetId(ITypeWithClassId model, Widget widget) {
+    if (isWidgetIdsEnabled() && widget != null) {
+      widget.setData(WIDGET_ID_KEY, model.classId());
+    }
+  }
+
+  protected boolean isWidgetIdsEnabled() {
+    return StringUtility.parseBoolean(System.getProperty(PROP_WIDGET_IDS_ENABLED));
   }
 
   @Override
@@ -1437,7 +1463,15 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_formFieldFactory = new FormFieldFactory(m_applicationBundle);
     }
     ISwtScoutFormField<IFormField> uiField = m_formFieldFactory.createFormField(parent, model, this);
+    assignWidgetId(model, uiField.getSwtField(), uiField.getSwtContainer());
     return uiField;
+  }
+
+  @Override
+  public SwtScoutMenuAction createMenuItem(Menu uiMenu, IActionNode<?> scoutMenu) {
+    SwtScoutMenuAction swtScoutMenuItem = new SwtScoutMenuAction(uiMenu, scoutMenu, this);
+    assignWidgetId(scoutMenu, swtScoutMenuItem.getSwtMenuItem(), null);
+    return swtScoutMenuItem;
   }
 
   @Override
