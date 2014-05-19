@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  This spec runner is used by the maven build.
+  You can use it too while developing by executing
+  mvn jasmine:bdd and connecting to http://localhost:8234/ with your browser.
+  When using mvn verify, the server is started on http://localhost:64600/.
+  //FIXME we need to find a better way to manage dependencies. At the moment we have to include the files at 3 different places.
+ -->
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset="UTF-8">
+  $if(autoRefresh)$
+  <meta http-equiv="refresh" content="$autoRefreshInterval$">
+  $endif$
+  <title>Jasmine Spec Runner</title>
+  <script type="text/javascript">
+    window.onerror = function(msg,url,line) {
+      if (document.head) {
+        var jserror = document.head.getAttribute('jmp_jserror') || '';
+        if (jserror) {
+          jserror += ':!:';
+        }
+        jserror += msg;
+        document.head.setAttribute('jmp_jserror',jserror);
+      }
+    };
+  </script>
+  <link rel="shortcut icon" type="image/png" href="../../../libjs/jasmine-2.0.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="../../../libjs/jasmine-2.0.0/jasmine.css">
+
+  <script type="text/javascript" src="libjs/jquery-2.1.0.js"></script>
+  <script type="text/javascript" src="libjs/jasmine-2.0.0/jasmine.js"></script>
+  <script type="text/javascript" src="libjs/jasmine-2.0.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="libjs/jasmine-2.0.0/boot.js"></script>
+  <script type="text/javascript" src="libjs/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
+  <script type="text/javascript" src="libjs/jasmine-2.0.0/plugins/mock-ajax.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineScout.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
+  $preloadScriptTags$
+
+  <script type="text/javascript" src="src/main/js/js-extensions.js"></script>
+  <script type="text/javascript" src="src/main/js/jquery-scout.js"></script>
+  <script type="text/javascript" src="src/main/js/util/EventSupport.js"></script>
+  <script type="text/javascript" src="src/main/js/util/arrays.js"></script>
+  <script type="text/javascript" src="src/main/js/util/KeystrokeManager.js"></script>
+  <script type="text/javascript" src="src/main/js/util/ModelAdapter.js"></script>
+  <script type="text/javascript" src="src/main/js/util/ObjectFactory.js"></script>
+  <script type="text/javascript" src="src/main/js/util/Device.js"></script>
+  <script type="text/javascript" src="src/main/js/session/Session.js"></script>
+  <script type="text/javascript" src="src/main/js/session/Event.js"></script>
+  <script type="text/javascript" src="src/main/js/session/Locale.js"></script>
+  <script type="text/javascript" src="src/main/js/session/UserAgent.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/BaseDesktop.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/Desktop.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/MobileDesktop.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopBench.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopChart.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopChartMatrix.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopGraph.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopMap.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopTable.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopToolButton.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopTreeContainer.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopTree.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopViewButton.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopViewButtonBar.js"></script>
+  <script type="text/javascript" src="src/main/js/desktop/DesktopKeystrokeAdapter.js"></script>
+  <script type="text/javascript" src="src/main/js/table/Table.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableConfigurator.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableHeader.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableFooter.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableRowMenuHandler.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableSelectionHandler.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableHeaderMenu.js"></script>
+  <script type="text/javascript" src="src/main/js/table/TableKeystrokeAdapter.js"></script>
+  <script type="text/javascript" src="src/main/js/form/Form.js"></script>
+  <script type="text/javascript" src="src/main/js/form/fields/FormField.js"></script>
+  <script type="text/javascript" src="src/main/js/form/fields/checkbox/CheckBoxField.js"></script>
+  <script type="text/javascript" src="src/main/js/form/fields/tablefield/TableField.js"></script>
+  <script type="text/javascript" src="src/main/js/form/fields/groupbox/GroupBox.js"></script>
+  <script type="text/javascript" src="src/main/js/form/fields/sequencebox/SequenceBox.js"></script>
+  <script type="text/javascript" src="src/main/js/menu/Menu.js"></script>
+  <script type="text/javascript" src="src/main/js/scrollbar/Scrollbar.js"></script>
+  <script type="text/javascript" src="src/main/js/text/DateFormat.js"></script>
+  <script type="text/javascript" src="src/main/js/text/DecimalFormat.js"></script>
+  <script type="text/javascript" src="src/main/js/table/MobileTable.js"></script>
+  <script type="text/javascript" src="src/main/js/table/MobileTableConfigurator.js"></script>
+  <script type="text/javascript" src="src/main/js/util/mobileObjectFactories.js"></script>
+
+  $specScriptTags$
+</head>
+<body>
+  <script type="text/javascript">
+  if(window.location.href.indexOf("ManualSpecRunner.html") !== -1) {
+    document.body.appendChild(document.createTextNode("Warning: opening this HTML file directly from the file system is deprecated. You should instead try running `mvn jasmine:bdd` from the command line, and then visit `http://localhost:8234` in your browser. "))
+  }
+  </script>
+</body>
+</html>

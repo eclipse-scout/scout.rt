@@ -1,0 +1,110 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.html.json;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * This class catches the checked JSONException used on classes of org.json.* and converts them into
+ * our JsonException runtime exception.
+ */
+public final class JsonObjectUtility {
+
+  private JsonObjectUtility() {
+  }
+
+  /**
+   * Adds a property to the given JSON object and deals with exceptions.
+   */
+  public static final JSONObject putProperty(JSONObject json, String key, Object value) {
+    try {
+      json.put(key, value);
+      return json;
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  private static JsonException toRuntimeException(JSONException e) {
+    return new JsonException(e.getMessage(), e);
+  }
+
+  public static String getString(JSONObject json, String key) {
+    try {
+      return json.getString(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static boolean getBoolean(JSONObject json, String key) {
+    try {
+      return json.getBoolean(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static JSONObject getJSONObject(JSONArray json, int index) {
+    try {
+      return json.getJSONObject(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static JSONArray getJSONArray(JSONObject json, String key) {
+    try {
+      return json.getJSONArray(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static JSONArray newJSONArray(String source) {
+    try {
+      return new JSONArray(source);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static Object newJSONArray(String[] copyOfRange) {
+    return null;
+  }
+
+  public static JSONObject newJSONObject(String source) {
+    try {
+      return new JSONObject(source);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static Object get(JSONArray json, int index) {
+    try {
+      return json.get(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+}
