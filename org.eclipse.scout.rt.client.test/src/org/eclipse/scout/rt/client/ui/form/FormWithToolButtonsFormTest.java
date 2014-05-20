@@ -35,6 +35,9 @@ public class FormWithToolButtonsFormTest {
     assertEquals(2, form.getToolButtons().size());
     assertEquals(ToolButton01.class.getSimpleName(), form.getToolButtons().get(0).getClass().getSimpleName());
     assertEquals(ToolButton02.class.getSimpleName(), form.getToolButtons().get(1).getClass().getSimpleName());
+
+    ToolButton01 toolButton = form.getToolButtonByClass(ToolButton01.class);
+    assertEquals(ToolButton01.class.getSimpleName(), toolButton);
   }
 
   public class FormWithToolButtonsForm extends AbstractForm {

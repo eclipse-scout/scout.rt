@@ -663,10 +663,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public IToolButton getToolButtonByClass(Class<? extends IToolButton> clazz) {
+  public <T extends IToolButton> T getToolButtonByClass(Class<T> clazz) {
     for (IToolButton b : m_toolbuttons) {
       if (b.getClass() == clazz) {
-        return b;
+        @SuppressWarnings("unchecked")
+        T button = (T) b;
+        return button;
       }
     }
     return null;

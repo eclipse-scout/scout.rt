@@ -547,7 +547,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    * @return toolbutton
    * @since Scout 4.0.0-M7
    */
-  IToolButton getToolButtonByClass(Class<? extends IToolButton> clazz);
+  <T extends IToolButton> T getToolButtonByClass(Class<T> clazz);
 
   Object getProperty(String name);
 
