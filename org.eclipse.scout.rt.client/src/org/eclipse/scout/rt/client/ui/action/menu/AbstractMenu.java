@@ -26,8 +26,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMenu.class);
@@ -101,30 +104,48 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
       return;
     }
     // lagacy support
-    boolean available = false;
-    if (newOwnerValue instanceof Collection) {
 
-      Collection collectionValue = (Collection) newOwnerValue;
-      if (isEmptySpaceAction()) {
-        available = collectionValue.isEmpty();
-      }
-      else {
-        Collection<ITableRow> rows = convertToTableRows(collectionValue);
-        if (rows != null) {
-          boolean allEnabled = true;
-          for (ITableRow r : rows) {
-            if (!r.isEnabled()) {
-              allEnabled = false;
-              break;
-            }
-          }
-          if (allEnabled) {
-            available |= isSingleSelectionAction() && collectionValue.size() == 1;
-            available |= isMultiSelectionAction() && collectionValue.size() > 1;
-          }
+    boolean available = false;
+    if (getOwner() instanceof IValueField<?>) {
+      available |= isSingleSelectionAction() && newOwnerValue != null;
+      available |= isMultiSelectionAction() && newOwnerValue != null;
+      available |= isEmptySpaceAction() && newOwnerValue == null;
+    }
+    else if (getOwner() instanceof ITable) {
+      if (newOwnerValue instanceof Collection) {
+        Collection collectionValue = (Collection) newOwnerValue;
+        if (isEmptySpaceAction()) {
+          available = collectionValue.isEmpty();
         }
         else {
-          // try tree
+          Collection<ITableRow> rows = convertToTableRows(collectionValue);
+          if (rows != null) {
+            boolean allEnabled = true;
+            for (ITableRow r : rows) {
+              if (!r.isEnabled()) {
+                allEnabled = false;
+                break;
+              }
+            }
+            if (allEnabled) {
+              available |= isSingleSelectionAction() && collectionValue.size() == 1;
+              available |= isMultiSelectionAction() && collectionValue.size() > 1;
+            }
+          }
+        }
+      }
+      else {
+        available = isEmptySpaceAction() && newOwnerValue == null;
+      }
+    }
+    else if (getOwner() instanceof ITree) {
+      // try tree
+      if (newOwnerValue instanceof Collection) {
+        Collection collectionValue = (Collection) newOwnerValue;
+        if (isEmptySpaceAction()) {
+          available = collectionValue.isEmpty();
+        }
+        else {
           Collection<ITreeNode> treeNodes = convertToTreeNodes(collectionValue);
           if (treeNodes != null) {
             boolean allEnabled = true;
@@ -141,11 +162,13 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
           }
         }
       }
+      else {
+        available = isEmptySpaceAction() && newOwnerValue == null;
+      }
     }
     else {
-      available |= isSingleSelectionAction() && newOwnerValue != null;
-      available |= isMultiSelectionAction() && newOwnerValue != null;
-      available |= isEmptySpaceAction() && newOwnerValue == null;
+      // always available for not value fields
+      available = true;
     }
     setAvailableInternal(available);
   }
@@ -312,7 +335,11 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   public void setOwnerInternal(IPropertyObserver owner) {
-    m_owner = owner;
+    if (!CompareUtility.equals(m_owner, owner)) {
+      m_owner = owner;
+      calculateAvailability(m_ownerValue);
+    }
+
   }
 
   @Override

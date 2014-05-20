@@ -45,15 +45,9 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
   private final Shell m_parentShell;
   private Menu m_swtMenu;
 
-  // children
-//  private List<IMenu> m_scoutChildMenus;
   private IContextMenu m_scoutContextMenu;
   private Listener m_uiMenuListener;
   private Boolean m_childrenCreated = Boolean.valueOf(false);
-
-  // all children
-//  private final PropertyChangeListener m_scoutMenuVisibilityListener;
-//  private List<IMenu> m_visibilityObservees;
 
   private final ITextAccess m_systemMenuOwner;
   private final StyledText m_undoRedoMenuOwner;
@@ -77,8 +71,6 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
     m_undoRedoMenuOwner = undoRedoMenuOwner;
     m_environment = environment;
     m_propertySupport = new BasicPropertySupport(this);
-//    m_scoutMenuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
-//    m_visibilityObservees = new ArrayList<IMenu>();
     if (callInitializer) {
       initMenu();
     }
@@ -88,25 +80,12 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
     m_swtMenu = new Menu(getParentShell().getShell(), SWT.POP_UP);
     // scout menus
     createSystemMenuItems(m_swtMenu);
-//    addScoutMenuVisibilityListenerToAllChildren(getScoutContextMenu());
     // listeners
     m_uiMenuListener = new P_UiMenuListener();
     m_swtMenu.addListener(SWT.Show, m_uiMenuListener);
     m_swtMenu.addListener(SWT.Hide, m_uiMenuListener);
     m_swtMenu.addListener(SWT.Dispose, m_uiMenuListener);
   }
-
-//  private void addVisiblePropertyListenerRec(IMenu menu) {
-//    for (IMenu m : m_visibilityObservees) {
-//      m.removePropertyChangeListener(IMenu.PROP_VISIBLE, m_scoutMenuVisibilityListener);
-//    }
-//    m_visibilityObservees.clear();
-//    for (IMenu m : menu.getChildActions()) {
-//      m.addPropertyChangeListener(IMenu.PROP_VISIBLE, m_scoutMenuVisibilityListener);
-//      m_visibilityObservees.add(m);
-//      addVisiblePropertyListenerRec(m);
-//    }
-//  }
 
   /**
    * @param swtMenu
