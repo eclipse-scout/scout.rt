@@ -10,10 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
 
+/**
+ * Extractor for the name of CodeTypes prefixed with an anchor with the format: c_[classId]
+ * <p>
+ * The name of CodeTypes corresponds to the return value of a {@link AbstractCodeType#getText()}. If
+ * {@link AbstractCodeType#getText()} returns null or an empty String the CodeType's simple class name is extract.
+ */
 public class CodeTypeNameExtractor extends AbstractNamedTextExtractor<Class<?>> {
 
   public CodeTypeNameExtractor() {
@@ -27,6 +37,10 @@ public class CodeTypeNameExtractor extends AbstractNamedTextExtractor<Class<?>> 
       // TODO ASA scout 4.0: can generic param be further typed Class<? extends ICodeType>?
       return null;
     }
-    return CODES.getCodeType((Class<ICodeType<?,?>>) c).getText();
+    String text = CODES.getCodeType((Class<ICodeType<?, ?>>) c).getText();
+    if (StringUtility.isNullOrEmpty(text)) {
+      text = c.getSimpleName();
+    }
+    return MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(c)) + text;
   }
 }
