@@ -1776,7 +1776,8 @@ public final class StringUtility {
     }
 
     Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
-    String[] parts = futureText.split(StringUtility.toRegExPattern("" + format.getDecimalFormatSymbols().getDecimalSeparator()));
+	String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
+    String[] parts = futureText.split(Pattern.quote(decimalSeparator));
     if (parts.length >= 1) {
       String intPartDigits = pat.matcher(parts[0]).replaceAll("");
       boolean intPartValid = StringUtility.length(intPartDigits) <= format.getMaximumIntegerDigits();

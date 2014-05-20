@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.junit.Test;
 
@@ -282,7 +283,7 @@ public class StringUtilityTest {
 
   /**
    * Tests if the result string is equal to the original after applying encode and decode.
-   * 
+   *
    * @param original
    *          the original String
    */
@@ -292,7 +293,7 @@ public class StringUtilityTest {
 
   /**
    * Tests if the result string is equal to the original after applying encode and decode.
-   * 
+   *
    * @param original
    *          the original String
    * @param replaceSpace
@@ -401,7 +402,7 @@ public class StringUtilityTest {
 
   /**
    * Test for {@link StringUtility#parseBoolean(String)}
-   * 
+   *
    * @since 3.10.0-M4
    */
   @Test
@@ -473,20 +474,23 @@ public class StringUtilityTest {
 
   @Test
   public void testIsWithinNumberFormatLimits() {
-    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance();
-    format.setMaximumIntegerDigits(3);
-    format.setMaximumFractionDigits(2);
+    for (Locale locale : Locale.getAvailableLocales()) {
+      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
+      format.setMaximumIntegerDigits(3);
+      format.setMaximumFractionDigits(2);
+      char decimalSeparator = format.getDecimalFormatSymbols().getDecimalSeparator();
 
-    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, "45"));
-    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, "23"));
+      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, "45"));
+      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, "23"));
 
-    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, ".456"));
-    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, ".23"));
+      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, decimalSeparator + "456"));
+      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, decimalSeparator + "23"));
 
-    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567"));
-    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56"));
+      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567"));
+      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56"));
 
-    assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567.7"));
-    assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56.78"));
+      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567" + decimalSeparator + "7"));
+      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56" + decimalSeparator + "78"));
+    }
   }
 }
