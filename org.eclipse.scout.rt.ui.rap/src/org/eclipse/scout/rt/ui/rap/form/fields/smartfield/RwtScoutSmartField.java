@@ -709,7 +709,9 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
         default:
           if (m_proposalPopup == null) {
-            requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+            if (getUiField().getEditable() && getUiField().isVisible()) {
+              requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+            }
             e.doit = false;
           }
           else {

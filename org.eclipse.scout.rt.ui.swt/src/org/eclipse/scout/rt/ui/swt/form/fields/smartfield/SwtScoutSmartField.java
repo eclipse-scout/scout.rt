@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutSmartField</h3> ...
- * 
+ *
  * @since 1.0.0 10.04.2008
  */
 public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwtScoutSmartField, IPopupSupport {
@@ -254,7 +254,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     if (m_proposalPopup == null) {
       scheduleSelectAll();
     }
-    if (getScoutObject().getErrorStatus() != null) {
+    if (getScoutObject().getErrorStatus() != null && getSwtField().getEditable() && getSwtField().isVisible()) {
       requestProposalSupportFromSwt(getScoutObject().getDisplayText(), false);
     }
   }
