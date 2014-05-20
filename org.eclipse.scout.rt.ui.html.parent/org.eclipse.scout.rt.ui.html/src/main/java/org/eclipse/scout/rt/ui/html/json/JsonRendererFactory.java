@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
@@ -81,6 +83,9 @@ public class JsonRendererFactory {
     }
     else if (modelObject instanceof IClientSession) {
       return new JsonClientSession((IClientSession) modelObject, session, id);
+    }
+    else if (modelObject instanceof IBreadCrumbsNavigation) {
+      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) modelObject, session, id);
     }
     throw new IllegalArgumentException("Cannot create JSON-renderer for model-object " + modelObject);
   }

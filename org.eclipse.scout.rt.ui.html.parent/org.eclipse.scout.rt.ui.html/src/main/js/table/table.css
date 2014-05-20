@@ -101,7 +101,7 @@ margin-bottom: 10px;
 height: calc(100% - 23px);
 }
 
-.table-data > .scrollable {
+.table-data > .scrollable-y {
 position: absolute;
 top: 0px;
 height: 100%;

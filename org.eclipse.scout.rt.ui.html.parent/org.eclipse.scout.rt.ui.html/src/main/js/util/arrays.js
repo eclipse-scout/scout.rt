@@ -38,6 +38,17 @@ scout.arrays = {
       return false;
     }
     return scout.arrays.containsAll(arr, arr2);
-  }
+  },
+  greater: function(arr, arr2) {
+    var arrLength = 0,
+      arr2Length = 0;
+    if (arr) {
+      arrLength = arr.length;
+    }
+    if (arr2) {
+      arr2Length = arr2.length;
+    }
+    return arrLength > arr2Length;
+  },
 
 };

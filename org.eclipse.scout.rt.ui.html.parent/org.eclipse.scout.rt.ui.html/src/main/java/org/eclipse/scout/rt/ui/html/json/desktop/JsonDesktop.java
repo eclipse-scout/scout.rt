@@ -17,9 +17,13 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -33,12 +37,12 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
+import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
 public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
-  public static final String PROP_FORM_ID = "formId";
   public static final String PROP_OUTLINE_ID = "outlineId";
 
   private DesktopListener m_desktopListener;
@@ -109,6 +113,20 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
       //FIXME view and tool buttons should be removed from desktop by device transformer
       putProperty(json, "viewButtons", modelObjectsToJson(getDesktop().getViewButtons()));
       putProperty(json, "outline", modelObjectToJson(getDesktop().getOutline()));
+    }
+
+    final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
+    new ClientSyncJob("Bread crumbs", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
+        if (service != null) {
+          breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
+        }
+      }
+    }.runNow(new NullProgressMonitor());
+    if (breadCrumbsNavigation.getValue() != null) {
+      putProperty(json, "breadCrumbsNavigation", modelObjectToJson(breadCrumbsNavigation.getValue()));
     }
     return json;
   }
@@ -191,7 +209,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     }
     else {
       JSONObject jsonEvent = new JSONObject();
-      putProperty(jsonEvent, PROP_FORM_ID, jsonForm.getId());
+      putProperty(jsonEvent, JsonForm.PROP_FORM_ID, jsonForm.getId());
       getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), jsonEvent);
     }
   }
@@ -200,7 +218,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(form);
     if (jsonForm != null) {
       JSONObject jsonEvent = new JSONObject();
-      putProperty(jsonEvent, PROP_FORM_ID, jsonForm.getId());
+      putProperty(jsonEvent, JsonForm.PROP_FORM_ID, jsonForm.getId());
       getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), jsonEvent);
     }
   }

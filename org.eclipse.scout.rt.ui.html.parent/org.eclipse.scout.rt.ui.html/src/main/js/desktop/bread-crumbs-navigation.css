@@ -1,0 +1,38 @@
+.breadcrumbs {
+  white-space: nowrap;
+  padding: 10px;
+  color: #9C9C9C;
+}
+
+.breadcrumbs > .scrollable-x {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.breadcrumb {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  padding-right: 5px;
+  padding-left: 5px;
+  line-height: 35px;
+  font-size: 16px;
+}
+
+.breadcrumb:before {
+  font-family: fontAwesome;
+  font-size: 14px;
+  content: "\f053";
+  padding-right: 5px;
+}
+
+.breadcrumb-home {
+}
+
+.breadcrumb-home:before {
+  font-family: fontAwesome;
+  font-size: 22px;
+  content: "\f052";
+  padding: 0px;
+}

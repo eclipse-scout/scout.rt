@@ -1,4 +1,9 @@
-.scrollable {
+.scrollable-y {
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollable-x {
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }

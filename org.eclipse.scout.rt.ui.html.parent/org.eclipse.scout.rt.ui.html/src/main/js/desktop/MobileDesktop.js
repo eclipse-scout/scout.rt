@@ -11,15 +11,20 @@ scout.MobileDesktop.inheritsFrom(scout.BaseDesktop);
  * @override
  */
 scout.MobileDesktop.prototype._render = function($parent) {
-  var tools, marginTop;
+  var tools, marginTop=0;
   this.$parent = $parent;
 
-  if (this.model.toolButtons) {
-    tools = new scout.MobileDesktopToolButtons(this.model.toolButtons, this.session);
-    tools.render($parent);
-    marginTop = tools.$div.outerHeight();
-  }
+  //FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
+  //  if (this.model.toolButtons) {
+  //    tools = new scout.MobileDesktopToolButtons(this.model.toolButtons, this.session);
+  //    tools.render($parent);
+  //    marginTop = tools.$div.outerHeight();
+  //  }
+
   this.layout = new scout.BorderLayout(marginTop, 0, 'desktop-area');
+  if (this.model.breadCrumbsNavigation) {
+    this.breadCrumbs = new scout.BreadCrumbsNavigation(this.model.breadCrumbsNavigation, this.session);
+  }
 
   this.base.prototype._render.call(this, $parent);
 };
@@ -38,12 +43,16 @@ scout.MobileDesktop.prototype._attachForm = function(form) {
   var layoutDirty = false;
   if (form.model.displayHint == "view") {
     var position = form.model.displayViewId;
-    if(position !== 'C' && position !== 'E') {
+    if (position !== 'C' && position !== 'E') {
       position = 'C';
     }
     var $area = this.areas[position];
     if (!$area) {
-      $area = this.$parent.appendDiv();
+      if (position === 'C') {
+        $area = this._createMainArea();
+      } else {
+        $area = this.$parent.appendDiv();
+      }
       $area.data('forms', []);
       this.layout.register($area, position);
       this.areas[position] = $area;
@@ -58,6 +67,14 @@ scout.MobileDesktop.prototype._attachForm = function(form) {
   this.base.prototype._attachForm.call(this, form);
 };
 
+scout.MobileDesktop.prototype._createMainArea = function() {
+  var $area = this.$parent.appendDiv();
+  if (this.breadCrumbs) {
+    this.breadCrumbs.attach($area);
+  }
+  return $area;
+};
+
 /**
  * @override
  */
@@ -66,20 +83,19 @@ scout.MobileDesktop.prototype._removeForm = function(form) {
 
   if (form.model.displayHint == "view") {
     var position = form.model.displayViewId;
-    if(position !== 'C' && position !== 'E') {
+    if (position !== 'C' && position !== 'E') {
       position = 'C';
     }
     var $area = this.areas[position];
     var forms = $area.data('forms');
     scout.arrays.remove(forms, form);
 
-    if(forms.length == 0) {
+    if (forms.length === 0) {
       $area.remove();
       this.areas[position] = null;
       this.layout.unregister($area);
       this.layout.layout();
-    }
-    else {
+    } else {
       $area.data('forms', forms);
     }
   }

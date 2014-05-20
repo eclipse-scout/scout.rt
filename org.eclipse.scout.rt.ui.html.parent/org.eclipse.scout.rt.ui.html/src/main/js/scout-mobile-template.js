@@ -34,6 +34,7 @@
 //@include("src/main/js/desktop/DesktopViewButton.js");
 //@include("src/main/js/desktop/DesktopViewButtonBar.js");
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
+//@include("src/main/js/desktop/BreadCrumbsNavigation.js");
 //@include("src/main/js/table/Table.js");
 //@include("src/main/js/table/TableHeader.js");
 //@include("src/main/js/table/TableFooter.js");
