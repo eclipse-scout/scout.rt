@@ -463,7 +463,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
           getModelObject().setTreeChanging(false);
         }
 
-        menuList.addAll(getModelObject().getUIFacade().fireNodePopupFromUI());
+        List<IMenu> menus = getModelObject().getMenus();
+        menuList.addAll(menus);
       }
     }.runNow(new NullProgressMonitor());
     return menuList;
@@ -474,7 +475,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+        menuList.addAll(getModelObject().getMenus());
       }
     }.runNow(new NullProgressMonitor());
     return menuList;

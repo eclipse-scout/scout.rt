@@ -190,7 +190,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getUIFacade().fireRowPopupFromUI());
+        menuList.addAll(getModelObject().getMenus());
       }
     }.runNow(new NullProgressMonitor());
 
@@ -202,7 +202,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
     new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getUIFacade().fireEmptySpacePopupFromUI());
+        menuList.addAll(getModelObject().getMenus());
       }
     }.runNow(new NullProgressMonitor());
 
