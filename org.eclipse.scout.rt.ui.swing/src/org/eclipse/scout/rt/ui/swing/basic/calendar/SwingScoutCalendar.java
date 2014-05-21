@@ -66,18 +66,6 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   @Override
   protected void attachScout() {
     super.attachScout();
-    // init swing->scout properties
-    final Date minDate = m_dateChooser.getViewDateStart();
-    final Date maxDate = m_dateChooser.getViewDateEnd();
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        getScoutObject().getUIFacade().setVisibleRangeFromUI(minDate, maxDate);
-      }
-    };
-    getSwingEnvironment().invokeScoutLater(t, 0);
-    // end notify
     setSetupFromScout(getScoutObject().getDisplayMode(), getScoutObject().isDisplayCondensed());
     updateCalendarComponentsFromScout();
     setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
@@ -85,6 +73,15 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     setShowDisplayModeSelectionPanel(getScoutObject().getShowDisplayModeSelection());
     setMarkNoonHour(getScoutObject().getMarkNoonHour());
     setMarkOutOfMonthDays(getScoutObject().getMarkOutOfMonthDays());
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().setVisibleRangeFromUI(m_dateChooser.getViewDateStart(), m_dateChooser.getViewDateEnd());
+      }
+    };
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 
   private void setWorkHours(int startHour, int endHour, boolean useOverflowCells) {
