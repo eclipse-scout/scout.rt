@@ -7,14 +7,13 @@ describe("MobileTable", function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     helper = new TableSpecHelper(session);
-    jasmine.Ajax.installMock();
+    jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
   afterEach(function() {
     session = null;
-    jasmine.Ajax.uninstallMock();
-    clearAjaxRequests();
+    jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 

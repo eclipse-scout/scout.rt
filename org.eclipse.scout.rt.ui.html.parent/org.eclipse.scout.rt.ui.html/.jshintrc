@@ -6,7 +6,6 @@
   "browser": true,
   "globals": {
     "scout": false,
-
     "jQuery": false,
     "$": false,
     "jasmine": false,
@@ -18,9 +17,6 @@
     "sandbox": false,
     "expect": false,
     "spyOn": false,
-    "ajaxRequests": false,
     "mostRecentJsonRequest": false,
-    "mostRecentAjaxRequest": false,
-    "clearAjaxRequests": false
   }
 }

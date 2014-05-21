@@ -4,14 +4,13 @@ describe("DesktopTree", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    jasmine.Ajax.installMock();
+    jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
   afterEach(function() {
     session = null;
-    jasmine.Ajax.uninstallMock();
-    clearAjaxRequests();
+    jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
@@ -67,7 +66,7 @@ describe("DesktopTree", function() {
 
       jasmine.clock().tick(0);
 
-      expect(ajaxRequests.length).toBe(1);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeExpanded']);

@@ -1,6 +1,6 @@
 /* exported mostRecentJsonRequest */
 function mostRecentJsonRequest() {
-  var req = mostRecentAjaxRequest();
+  var req = jasmine.Ajax.requests.mostRecent();
   if (req) {
     return $.parseJSON(req.params);
   }

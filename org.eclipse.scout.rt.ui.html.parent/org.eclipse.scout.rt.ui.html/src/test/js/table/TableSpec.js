@@ -7,17 +7,15 @@ describe("Table", function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     helper = new TableSpecHelper(session);
-    jasmine.Ajax.installMock();
+    jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
   afterEach(function() {
     session = null;
-    jasmine.Ajax.uninstallMock();
-    clearAjaxRequests();
+    jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
-
 
   describe("attach", function() {
 
@@ -77,7 +75,7 @@ describe("Table", function() {
 
       jasmine.clock().tick(0);
 
-      expect(ajaxRequests.length).toBe(1);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
         "rowIds": rowIds
@@ -153,7 +151,7 @@ describe("Table", function() {
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED]);
 
-      clearAjaxRequests();
+      jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       jasmine.clock().tick(0);
 
@@ -181,11 +179,11 @@ describe("Table", function() {
   describe("right click on row", function() {
 
     it("opens context menu", function() {
-      var model = helper.createModelFixture(2,2);
+      var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      model.selectionMenus = [helper.createMenu('1','menu')];
+      model.selectionMenus = [helper.createMenu('1', 'menu')];
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerRightClick();
 
@@ -280,7 +278,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
-        "rowIds": ['0',]
+        "rowIds": ['0', ]
       });
       expect(requestData).toContainEvents(event);
     });
@@ -319,6 +317,27 @@ describe("Table", function() {
       table.onModelAction(event);
 
       expect(table.selectRowsByIds).toHaveBeenCalledWith(rowIds);
+    });
+
+  });
+
+  describe("onModelPropertyChange", function() {
+
+    it("hide the table header from model", function() {
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      expect(table._header).toBeDefined();
+      expect(table._$header.is(':visible')).toBe(true);
+
+      var event = new scout.Event('property', '1', {
+        "headerVisible": false
+      });
+      table.onModelPropertyChange(event);
+
+      expect(table._header).toBeDefined();
+      expect(table._$header.is(':visible')).toBe(false);
     });
 
   });

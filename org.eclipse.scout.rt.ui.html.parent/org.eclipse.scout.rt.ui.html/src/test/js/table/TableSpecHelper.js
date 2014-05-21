@@ -6,7 +6,8 @@ TableSpecHelper.prototype.createModel = function(id, columns, rows) {
   return {
     "id": id,
     "columns": columns,
-    "rows": rows
+    "rows": rows,
+    "headerVisible": true
   };
 };
 
