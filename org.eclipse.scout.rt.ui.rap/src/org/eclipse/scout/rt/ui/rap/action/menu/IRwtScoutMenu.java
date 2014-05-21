@@ -34,9 +34,4 @@ public interface IRwtScoutMenu {
    */
   IRwtEnvironment getEnvironment();
 
-  /**
-   * @return
-   */
-  IRwtContextMenuMarker getMenuMarker();
-
 }

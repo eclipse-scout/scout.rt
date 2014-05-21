@@ -11,15 +11,14 @@
 package org.eclipse.scout.rt.ui.rap.action.menu;
 
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -30,8 +29,8 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class RwtScoutContextMenu implements IRwtScoutMenu {
-
   public static final String DATA_SYSTEM_MENU = "dataSystemMenu";
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutContextMenu.class);
 
   protected final BasicPropertySupport m_propertySupport;
   private final IRwtEnvironment m_environment;
@@ -42,30 +41,17 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
   private Listener m_uiMenuListener;
   private Boolean m_childrenCreated = Boolean.valueOf(false);
 
-  private final IRwtContextMenuMarker m_menuMarker;
+//  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtContextMenuMarker marker, IRwtEnvironment environment) {
+//    this(parentShell, scoutContextMenu, environment);
+//  }
 
-  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtContextMenuMarker menuMarker, IRwtEnvironment environment) {
-    this(parentShell, scoutContextMenu, menuMarker, environment, true);
+  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtEnvironment environment) {
+    this(parentShell, scoutContextMenu, environment, true);
   }
 
-  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtContextMenuMarker menuMarker, IRwtEnvironment environment, boolean callInitializer) {
+  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtEnvironment environment, boolean callInitializer) {
     m_parentShell = parentShell;
     m_scoutContextMenu = scoutContextMenu;
-    m_menuMarker = menuMarker;
-    if (m_menuMarker != null) {
-      m_menuMarker.addSelectionListener(new SelectionAdapter() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          if (e.widget instanceof Control) {
-            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
-            m_uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutContextMenu().getChildActions(), m_uiMenu, loc, getEnvironment()));
-          }
-          m_uiMenu.setVisible(true);
-        }
-      });
-    }
     m_environment = environment;
     m_propertySupport = new BasicPropertySupport(this);
     if (callInitializer) {
@@ -80,6 +66,12 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
     m_uiMenu.addListener(SWT.Show, m_uiMenuListener);
     m_uiMenu.addListener(SWT.Hide, m_uiMenuListener);
     m_uiMenu.addListener(SWT.Dispose, m_uiMenuListener);
+  }
+
+  public void dispose() {
+    if (getUiMenu() != null) {
+      getUiMenu().dispose();
+    }
   }
 
   protected void disposeChildren() {
@@ -99,28 +91,18 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
     }
   }
 
-  protected void ensureChildrenLoaded() {
-    synchronized (m_childrenCreated) {
-      if (!m_childrenCreated) {
-        try {
-          RwtMenuUtility.fillMenu(getUiMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment());
-
-        }
-        finally {
-          m_childrenCreated = Boolean.valueOf(true);
-        }
+  protected void updateUiMenu() {
+    for (MenuItem item : getUiMenu().getItems()) {
+      if (item.getData(DATA_SYSTEM_MENU) == null) {
+        item.dispose();
       }
     }
+    RwtMenuUtility.fillMenu(getUiMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment());
   }
 
   @Override
   public IRwtEnvironment getEnvironment() {
     return m_environment;
-  }
-
-  @Override
-  public IRwtContextMenuMarker getMenuMarker() {
-    return m_menuMarker;
   }
 
   public Shell getParentShell() {
@@ -137,23 +119,30 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
     return m_uiMenu;
   }
 
-  protected void handleSwtMenuHide() {
-  }
-
   /**
   *
   */
   protected void handleSwtMenuShow() {
-    ensureChildrenLoaded();
     Runnable t = new Runnable() {
       @SuppressWarnings("deprecation")
       @Override
       public void run() {
         getScoutContextMenu().prepareAction();
+        getScoutContextMenu().aboutToShow();
       }
     };
-    getEnvironment().invokeScoutLater(t, 0);
+    JobEx prepareJob = getEnvironment().invokeScoutLater(t, 0);
+    try {
+      prepareJob.join(1200);
+    }
+    catch (InterruptedException e) {
+      LOG.error("error during prepare menus.", e);
+    }
+    updateUiMenu();
     //end notify
+  }
+
+  protected void handleSwtMenuHide() {
   }
 
   protected void handleSwtMenuDispose() {

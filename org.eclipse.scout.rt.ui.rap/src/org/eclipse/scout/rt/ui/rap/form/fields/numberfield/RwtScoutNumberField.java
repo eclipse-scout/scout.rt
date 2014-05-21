@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.numberfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 
@@ -18,9 +20,11 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -30,12 +34,16 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>RwtScoutNumberField</h3>
- *
+ * 
  * @since 3.7.0 June 2011
  */
 public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
@@ -44,8 +52,11 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
 
   private TextFieldEditableSupport m_editableSupport;
   private static volatile String clientVerifyScript;
-  private RwtContextMenuMarkerComposite m_markerComposite;
   private static final Object LOCK = new Object();
+
+  private RwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private RwtScoutContextMenu m_uiContextMenu;
+  private P_ContextMenuPropertyListener m_contextMenuPropertyListener;
 
   // Constants must correspond to the keys used in org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
   public static final String PROP_MAX_INTEGER_DIGITS = "RwtScoutNumberField.maxInt";
@@ -58,12 +69,27 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    m_markerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
-    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+    m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
+    getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (getUiContextMenu() != null) {
+          Menu uiMenu = getUiContextMenu().getUiMenu();
+          if (e.widget instanceof Control) {
+            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
+            uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+          }
+          uiMenu.setVisible(true);
+        }
+      }
+    });
 
     int style = SWT.None;
     style |= RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
-    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_markerComposite, style);
+    StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(m_menuMarkerComposite, style);
     installClientScripting(textField);
     attachFocusListener(textField, true);
 
@@ -72,7 +98,7 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     setUiField(textField);
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
-    m_markerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
   }
 
   @Override
@@ -80,10 +106,30 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     return (StyledText) super.getUiField();
   }
 
+  public RwtScoutContextMenu getUiContextMenu() {
+    return m_uiContextMenu;
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
     handleDecimalFormatChanged(getScoutObject().getFormat());
+    // context menu
+    updateContextMenuVisibilityFromScout();
+    if (getScoutObject().getContextMenu() != null && m_contextMenuPropertyListener == null) {
+      m_contextMenuPropertyListener = new P_ContextMenuPropertyListener();
+      getScoutObject().getContextMenu().addPropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+    }
+  }
+
+  @Override
+  protected void detachScout() {
+    // context menu listener
+    if (m_contextMenuPropertyListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+      m_contextMenuPropertyListener = null;
+    }
+    super.detachScout();
   }
 
   @SuppressWarnings("restriction")
@@ -92,6 +138,21 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     if (js != null) {
       text.addListener(SWT.Verify, new ClientListener(js));
       org.eclipse.rap.rwt.internal.lifecycle.WidgetDataUtil.registerDataKeys(PROP_MAX_INTEGER_DIGITS, PROP_MAX_FRACTION_DIGITS, PROP_ZERO_DIGIT, PROP_DECIMAL_SEPARATOR);
+    }
+  }
+
+  protected void updateContextMenuVisibilityFromScout() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    if (getScoutObject().getContextMenu().isVisible()) {
+      if (m_uiContextMenu == null) {
+        m_uiContextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), getUiEnvironment());
+      }
+    }
+    else {
+      if (m_uiContextMenu != null) {
+        m_uiContextMenu.dispose();
+      }
+      m_uiContextMenu = null;
     }
   }
 
@@ -128,11 +189,6 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     return clientVerifyScript;
   }
 
-  protected void installContextMenu() {
-    new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
-
-  }
-
   @Override
   protected void setFieldEnabled(Control field, boolean enabled) {
     if (m_editableSupport == null) {
@@ -145,5 +201,20 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     getUiField().setEnabled(b);
+  }
+
+  private class P_ContextMenuPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IContextMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        // synchronize
+        getUiEnvironment().invokeUiLater(new Runnable() {
+          @Override
+          public void run() {
+            updateContextMenuVisibilityFromScout();
+          }
+        });
+      }
+    }
   }
 }

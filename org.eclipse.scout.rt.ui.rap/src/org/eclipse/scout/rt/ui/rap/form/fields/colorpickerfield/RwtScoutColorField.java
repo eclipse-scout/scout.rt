@@ -11,16 +11,21 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.colorpickerfield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.ColorUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -38,7 +43,10 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -47,6 +55,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 
 public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField> implements IRwtScoutColorField {
   private Label m_colorPreviewLabel;
@@ -55,7 +64,10 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
 
   private TextFieldEditableSupport m_editableSupport;
   private Color m_previewColor;
-  private RwtContextMenuMarkerComposite m_markerComposite;
+
+  private RwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private RwtScoutContextMenu m_uiContextMenu;
+  private P_ContextMenuPropertyListener m_contextMenuPropertyListener;
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -82,10 +94,25 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     Label splitLabel = getUiEnvironment().getFormToolkit().createLabel(m_colorPickerContainer, "");
     splitLabel.setData(RWT.CUSTOM_VARIANT, "colorpickerfield_splitLabel");
 
-    m_markerComposite = new RwtContextMenuMarkerComposite(m_colorPickerContainer, getUiEnvironment(), SWT.NONE);
-    getUiEnvironment().getFormToolkit().adapt(m_markerComposite);
+    m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_colorPickerContainer, getUiEnvironment(), SWT.NONE);
+    getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      private static final long serialVersionUID = 1L;
 
-    StyledText textField = new StyledTextEx(m_markerComposite, SWT.SINGLE);
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (getUiContextMenu() != null) {
+          Menu uiMenu = getUiContextMenu().getUiMenu();
+          if (e.widget instanceof Control) {
+            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
+            uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+          }
+          uiMenu.setVisible(true);
+        }
+      }
+    });
+
+    StyledText textField = new StyledTextEx(m_menuMarkerComposite, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
     textField.setData(RWT.CUSTOM_VARIANT, getColorPickerFieldVariant());
@@ -106,7 +133,7 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
       }
     });
 
-    m_colorPickerContainer.setTabList(new Control[]{m_markerComposite});
+    m_colorPickerContainer.setTabList(new Control[]{m_menuMarkerComposite});
     m_colorPickButton.addFocusListener(new FocusAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -138,7 +165,7 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     splitLabel.setLayoutData(splitLabelData);
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    m_markerComposite.setLayoutData(textLayoutData);
+    m_menuMarkerComposite.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
     buttonLayoutData.heightHint = 20;
@@ -146,11 +173,8 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     m_colorPickButton.setLayoutData(buttonLayoutData);
   }
 
-  @Override
-  protected void installContextMenu() {
-    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(m_markerComposite.getShell(), getScoutObject().getContextMenu(), m_markerComposite, getUiEnvironment());
-    m_colorPickButton.setMenu(contextMenu.getUiMenu());
-    m_colorPreviewLabel.setMenu(contextMenu.getUiMenu());
+  public RwtScoutContextMenu getUiContextMenu() {
+    return m_uiContextMenu;
   }
 
   protected String getColorPickerFieldVariant() {
@@ -165,6 +189,22 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
   protected void attachScout() {
     super.attachScout();
     updateIconIdFromScout();
+    // context menu
+    updateContextMenuVisibilityFromScout();
+    if (getScoutObject().getContextMenu() != null && m_contextMenuPropertyListener == null) {
+      m_contextMenuPropertyListener = new P_ContextMenuPropertyListener();
+      getScoutObject().getContextMenu().addPropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+    }
+  }
+
+  @Override
+  protected void detachScout() {
+    // context menu listener
+    if (m_contextMenuPropertyListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+      m_contextMenuPropertyListener = null;
+    }
+    super.detachScout();
   }
 
   @Override
@@ -277,6 +317,25 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     }
   }
 
+  protected void updateContextMenuVisibilityFromScout() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    if (getScoutObject().getContextMenu().isVisible()) {
+      if (m_uiContextMenu == null) {
+        m_uiContextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), getUiEnvironment());
+        m_colorPickButton.setMenu(m_uiContextMenu.getUiMenu());
+        m_colorPreviewLabel.setMenu(m_uiContextMenu.getUiMenu());
+      }
+    }
+    else {
+      m_colorPickButton.setMenu(null);
+      m_colorPreviewLabel.setMenu(null);
+      if (m_uiContextMenu != null) {
+        m_uiContextMenu.dispose();
+      }
+      m_uiContextMenu = null;
+    }
+  }
+
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     if (IColorField.PROP_ICON_ID.equals(name)) {
@@ -304,6 +363,21 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     @Override
     public void handleUiAction(Event e) {
       handleUiPickColor();
+    }
+  }
+
+  private class P_ContextMenuPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IContextMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        // synchronize
+        getUiEnvironment().invokeUiLater(new Runnable() {
+          @Override
+          public void run() {
+            updateContextMenuVisibilityFromScout();
+          }
+        });
+      }
     }
   }
 }

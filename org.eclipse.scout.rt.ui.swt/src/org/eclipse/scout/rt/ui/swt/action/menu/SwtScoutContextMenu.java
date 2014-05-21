@@ -112,18 +112,6 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
     SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment(), getSwtMenu().getItemCount() > 0);
   }
 
-  protected void ensureChildrenLoaded() {
-    synchronized (m_childrenCreated) {
-      if (!m_childrenCreated) {
-        try {
-        }
-        finally {
-          m_childrenCreated = Boolean.valueOf(true);
-        }
-      }
-    }
-  }
-
   public ISwtEnvironment getEnvironment() {
     return m_environment;
   }

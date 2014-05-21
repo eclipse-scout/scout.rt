@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -69,6 +70,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
@@ -95,6 +97,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
   private Object m_popupEventListenerLock;
 
   private RwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private RwtScoutContextMenu m_uiContextMenu;
+  private P_ContextMenuPropertyListener m_contextMenuPropertyListener;
 
   public RwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -113,6 +117,21 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_smartContainer, getUiEnvironment(), SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (getUiContextMenu() != null) {
+          Menu uiMenu = getUiContextMenu().getUiMenu();
+          if (e.widget instanceof Control) {
+            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
+            uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+          }
+          uiMenu.setVisible(true);
+        }
+      }
+    });
 
     StyledText textField = new StyledTextEx(m_menuMarkerComposite, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
@@ -169,29 +188,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     m_browseButton.setLayoutData(buttonLayoutData);
   }
 
-  @Override
-  protected void installContextMenu() {
-    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-
-        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
-          getUiEnvironment().invokeUiLater(new Runnable() {
-            @Override
-            public void run() {
-              m_menuMarkerComposite.setMarkerVisible(markerVisible);
-            }
-          });
-        }
-      }
-    });
-    RwtScoutContextMenu contextMenu = new RwtScoutContextMenu(getUiBrowseButton().getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
-    getUiBrowseButton().setMenu(contextMenu.getUiMenu());
-  }
-
   protected String getSmartfieldVariant() {
     return VARIANT_SMARTFIELD;
   }
@@ -209,43 +205,38 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     return (StyledText) super.getUiField();
   }
 
+  public RwtScoutContextMenu getUiContextMenu() {
+    return m_uiContextMenu;
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
-//    getUiBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     setProposalFormFromScout(getScoutObject().getProposalForm());
+    // context menu
+    updateContextMenuVisibilityFromScout();
+    if (getScoutObject().getContextMenu() != null && m_contextMenuPropertyListener == null) {
+      m_contextMenuPropertyListener = new P_ContextMenuPropertyListener();
+      getScoutObject().getContextMenu().addPropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+    }
   }
 
-//  private boolean calculateDropDownButtonEnabled() {
-//    final LinkedList<IMenu> list = new LinkedList<IMenu>();
-//    final MenuContext menuContext = RwtMenuUtility.getMenuContext(getUiField(), getScoutObject());
-//    Runnable t = new Runnable() {
-//      @Override
-//      public void run() {
-//        list.addAll(getScoutObject().getUIFacade().getValidMenusFromUI(menuContext));
-//      }
-//    };
-//    JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
-//    try {
-//      job.join(1200);
-//    }
-//    catch (InterruptedException ex) {
-//      //nop
-//    }
-//    return RwtMenuUtility.cleanup(list).size() > 0;
-//  }
 
   @Override
   protected void detachScout() {
     // workaround since disposeFieldInternal in AbstractSmartField is never called.
     hideProposalPopup();
+    // context menu listener
+    if (m_contextMenuPropertyListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+      m_contextMenuPropertyListener = null;
+    }
     super.detachScout();
   }
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-//    getUiBrowseButton().setDropdownEnabled(calculateDropDownButtonEnabled());
     if (!CompareUtility.equals(s, getUiField().getText())) {
       if (s == null) {
         s = "";
@@ -316,6 +307,23 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     }
     else {
       hideProposalPopup();
+    }
+  }
+
+  protected void updateContextMenuVisibilityFromScout() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    if (getScoutObject().getContextMenu().isVisible()) {
+      if (m_uiContextMenu == null) {
+        m_uiContextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), getUiEnvironment());
+        getUiBrowseButton().setMenu(m_uiContextMenu.getUiMenu());
+      }
+    }
+    else {
+      getUiBrowseButton().setMenu(null);
+      if (m_uiContextMenu != null) {
+        m_uiContextMenu.dispose();
+      }
+      m_uiContextMenu = null;
     }
   }
 
@@ -801,4 +809,19 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
       handleUiBrowseAction();
     }
   } // end class P_F2KeyStroke
+
+  private class P_ContextMenuPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IContextMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        // synchronize
+        getUiEnvironment().invokeUiLater(new Runnable() {
+          @Override
+          public void run() {
+            updateContextMenuVisibilityFromScout();
+          }
+        });
+      }
+    }
+  }
 }

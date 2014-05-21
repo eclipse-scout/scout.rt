@@ -18,10 +18,11 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -44,9 +45,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 
 public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringField> implements IRwtScoutStringField {
 
@@ -63,6 +66,8 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   private P_UpperLowerCaseVerifyListener m_upperLowerCaseVerifyListener;
 
   private RwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private RwtScoutContextMenu m_uiContextMenu;
+  private P_ContextMenuPropertyListener m_contextMenuPropertyListener;
 
   public RwtScoutStringField() {
   }
@@ -74,6 +79,21 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (getUiContextMenu() != null) {
+          Menu uiMenu = getUiContextMenu().getUiMenu();
+          if (e.widget instanceof Control) {
+            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
+            uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+          }
+          uiMenu.setVisible(true);
+        }
+      }
+    });
 
     int style = SWT.None;// SWT.BORDER;
     //Password
@@ -107,28 +127,6 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
   }
 
-  @Override
-  protected void installContextMenu() {
-    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-
-        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
-          getUiEnvironment().invokeUiLater(new Runnable() {
-            @Override
-            public void run() {
-              m_menuMarkerComposite.setMarkerVisible(markerVisible);
-            }
-          });
-        }
-      }
-    });
-    new RwtScoutContextMenu(m_menuMarkerComposite.getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
-  }
-
   protected void addDefaultUiListeners(StyledText textField) {
     textField.addSelectionListener(new P_RwtTextSelectionListener());
     attachFocusListener(textField, true);
@@ -145,6 +143,13 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     setTextWrapFromScout(f.isWrapText());
 
     attachDndSupport();
+
+    // context menu
+    updateContextMenuVisibilityFromScout();
+    if (getScoutObject().getContextMenu() != null && m_contextMenuPropertyListener == null) {
+      m_contextMenuPropertyListener = new P_ContextMenuPropertyListener();
+      getScoutObject().getContextMenu().addPropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+    }
   }
 
   protected void attachDndSupport() {
@@ -154,8 +159,22 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   }
 
   @Override
+  protected void detachScout() {
+    // context menu listener
+    if (m_contextMenuPropertyListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+      m_contextMenuPropertyListener = null;
+    }
+    super.detachScout();
+  }
+
+  @Override
   public StyledTextEx getUiField() {
     return (StyledTextEx) super.getUiField();
+  }
+
+  public RwtScoutContextMenu getUiContextMenu() {
+    return m_uiContextMenu;
   }
 
   @Override
@@ -282,6 +301,21 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   protected void setTextWrapFromScout(boolean booleanValue) {
     if (getScoutObject().isMultilineText()) {
       //XXX rap       getUiField().setWordWrap(booleanValue);
+    }
+  }
+
+  protected void updateContextMenuVisibilityFromScout() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    if (getScoutObject().getContextMenu().isVisible()) {
+      if (m_uiContextMenu == null) {
+        m_uiContextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), getUiEnvironment());
+      }
+    }
+    else {
+      if (m_uiContextMenu != null) {
+        m_uiContextMenu.dispose();
+      }
+      m_uiContextMenu = null;
     }
   }
 
@@ -427,4 +461,18 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
     }
   }// end class P_DndSupport
 
+  private class P_ContextMenuPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IContextMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        // synchronize
+        getUiEnvironment().invokeUiLater(new Runnable() {
+          @Override
+          public void run() {
+            updateContextMenuVisibilityFromScout();
+          }
+        });
+      }
+    }
+  }
 }

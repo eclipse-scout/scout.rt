@@ -18,13 +18,14 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
@@ -33,12 +34,16 @@ import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.forms.HyperlinkGroup;
 import org.eclipse.ui.forms.HyperlinkSettings;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -57,8 +62,9 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   private boolean m_handleActionPending;
 
   private RwtContextMenuMarkerComposite m_menuMarkerComposite;
-
   private RwtScoutContextMenu m_contextMenu;
+
+  private P_ContextMenuPropertyListener m_contextMenuPropertyListener;
 
   public RwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -69,6 +75,21 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment(), SWT.NO_FOCUS);
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (getContextMenu() != null) {
+          Menu uiMenu = getContextMenu().getUiMenu();
+          if (e.widget instanceof Control) {
+            Point loc = ((Control) e.widget).toDisplay(e.x, e.y);
+            uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+          }
+          uiMenu.setVisible(true);
+        }
+      }
+    });
     ButtonEx uiFieldAsButton = null;
     Hyperlink uiFieldAsLink = null;
     switch (getScoutObject().getDisplayStyle()) {
@@ -113,29 +134,6 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(0, 0));
     m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
-  }
-
-  @Override
-  protected void installContextMenu() {
-    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-
-        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
-          getUiEnvironment().invokeUiLater(new Runnable() {
-            @Override
-            public void run() {
-              m_menuMarkerComposite.setMarkerVisible(markerVisible);
-            }
-          });
-        }
-      }
-    });
-    m_contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), m_menuMarkerComposite, getUiEnvironment());
-    getUiField().setMenu(getContextMenu().getUiMenu());
   }
 
   /**
@@ -183,11 +181,6 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   }
 
   @Override
-  protected void setBackgroundFromScout(String scoutColor) {
-    // XXX hstaudacher We need to override this method because when not it overrides RWT theme
-  }
-
-  @Override
   protected void attachScout() {
     super.attachScout();
     IButton b = getScoutObject();
@@ -199,6 +192,12 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
       m_scoutButtonListener = new P_ScoutButtonListener();
       getScoutObject().addButtonListener(m_scoutButtonListener);
     }
+    // context menu
+    updateContextMenuVisibilityFromScout();
+    if (getScoutObject().getContextMenu() != null && m_contextMenuPropertyListener == null) {
+      m_contextMenuPropertyListener = new P_ContextMenuPropertyListener();
+      getScoutObject().getContextMenu().addPropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+    }
   }
 
   @Override
@@ -207,7 +206,17 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
       getScoutObject().removeButtonListener(m_scoutButtonListener);
       m_scoutButtonListener = null;
     }
+    // context menu listener
+    if (m_contextMenuPropertyListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(IContextMenu.PROP_VISIBLE, m_contextMenuPropertyListener);
+      m_contextMenuPropertyListener = null;
+    }
     super.detachScout();
+  }
+
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    // XXX hstaudacher We need to override this method because when not it overrides RWT theme
   }
 
   protected void setIconIdFromScout(String s) {
@@ -317,6 +326,23 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
   protected void disarmButtonFromScout() {
   }
 
+  protected void updateContextMenuVisibilityFromScout() {
+    m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
+    if (getScoutObject().getContextMenu().isVisible()) {
+      if (m_contextMenu == null) {
+        m_contextMenu = new RwtScoutContextMenu(getUiField().getShell(), getScoutObject().getContextMenu(), getUiEnvironment());
+        getUiField().setMenu(getContextMenu().getUiMenu());
+      }
+    }
+    else {
+      getUiField().setMenu(null);
+      if (m_contextMenu != null) {
+        m_contextMenu.dispose();
+      }
+      m_contextMenu = null;
+    }
+  }
+
   protected void requestPopupFromScout() {
     if (getContextMenu() != null) {
       getContextMenu().getUiMenu().setVisible(true);
@@ -395,4 +421,19 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
       }
     }
   } // end class P_ScoutButtonListener
+
+  private class P_ContextMenuPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IContextMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        // synchronize
+        getUiEnvironment().invokeUiLater(new Runnable() {
+          @Override
+          public void run() {
+            updateContextMenuVisibilityFromScout();
+          }
+        });
+      }
+    }
+  }
 }
