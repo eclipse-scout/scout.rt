@@ -109,21 +109,21 @@ public class AbstractDesktopTest {
     }
 
     @Order(10.0)
-    @ClassId("7c89cc91-2c09-472b-af3b-ee93b50caaad")
+    @ClassId("d8a4cad3-4f85-4baa-993a-87a04d444e40")
     public class MainBox extends AbstractGroupBox {
 
       @Order(10.0)
-      @ClassId("84f2a9cf-bce5-4379-aede-11d07b21d3fb")
+      @ClassId("6a3f206c-c51b-4274-9dc3-959bf05e74da")
       public class MessageField extends AbstractStringField {
       }
 
       @Order(20.0)
-      @ClassId("caca3d68-b8cc-4cb0-a35c-5b8ccbcc3745")
+      @ClassId("c7310b71-1d1a-482e-80ee-45af9b3eb4a4")
       public class OkButton extends AbstractOkButton {
       }
 
       @Order(30.0)
-      @ClassId("50c8526a-333f-4878-9876-b48f2b583d88")
+      @ClassId("7016864a-e34a-49b1-a387-37bab208b458")
       public class CancelButton extends AbstractCancelButton {
       }
     }
