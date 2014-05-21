@@ -30,6 +30,7 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -56,7 +57,6 @@ public class SwingPopupWorker implements Runnable {
   private final JTextComponent m_systemMenuOwner;
 
   private IActionFilter m_actionFilter;
-
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IContextMenu contextMenu) {
     this(env, target, point, contextMenu.getChildActions());
@@ -117,16 +117,30 @@ public class SwingPopupWorker implements Runnable {
   @Override
   public void run() {
     // about to show
-    if (m_contextMenu != null) {
-      m_contextMenu.aboutToShow();
-      m_contextMenu.prepareAction();
-    }
-    else {
-      for (IMenu m : m_scoutMenus) {
-        m.aboutToShow();
-        m.prepareAction();
+    Runnable t = new Runnable() {
+      @SuppressWarnings("deprecation")
+      @Override
+      public void run() {
+        if (m_contextMenu != null) {
+          m_contextMenu.aboutToShow();
+          m_contextMenu.prepareAction();
+        }
+        else {
+          for (IMenu m : m_scoutMenus) {
+            m.aboutToShow();
+            m.prepareAction();
+          }
+        }
       }
+    };
+    JobEx prepareJob = m_env.invokeScoutLater(t, 0);
+    try {
+      prepareJob.join(1200);
     }
+    catch (InterruptedException e) {
+      LOG.error("error during prepare menus.", e);
+    }
+
     List<? extends IMenu> normalizedMenus = ActionUtility.visibleNormalizedActions(m_scoutMenus, m_actionFilter);
     if (!CollectionUtility.hasElements(normalizedMenus) && m_systemMenuOwner == null) {
       return;
