@@ -591,7 +591,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       swingField.setCaretPosition(swingField.getDocument().getLength());
       swingField.moveCaretPosition(0);
     }
-    if (getScoutObject().getErrorStatus() != null) {
+    if (getScoutObject().getErrorStatus() != null && getSwingTextField().isEditable() && getSwingTextField().isVisible()) {
       requestProposalSupportFromSwing(getScoutObject().getDisplayText(), false, 0);
     }
   }
