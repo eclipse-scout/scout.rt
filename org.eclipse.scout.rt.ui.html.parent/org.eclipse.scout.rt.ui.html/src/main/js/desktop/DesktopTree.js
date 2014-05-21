@@ -403,7 +403,9 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
       $('#MenuButtonsLabel').text('');
     }
 
-    function onMenuItemClicked() {}
+    function onMenuItemClicked() {
+      that.session.send('menuAction', $(this).attr('id'));
+    }
 
     function removeMenu() {
       var $TreeMenuContainer = $('#TreeMenuContainer'),

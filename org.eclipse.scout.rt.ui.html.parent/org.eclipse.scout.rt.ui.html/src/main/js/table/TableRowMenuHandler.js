@@ -157,7 +157,9 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
           $('#MenuButtonsLabel').text('');
         }
 
-        function onMenuItemClicked() {}
+        function onMenuItemClicked() {
+          that.table.session.send('menuAction', $(this).attr('id'));
+        }
 
         function removeMenu() {
           $.log('remove')

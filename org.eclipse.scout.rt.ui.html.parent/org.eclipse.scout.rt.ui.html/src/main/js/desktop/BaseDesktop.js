@@ -37,7 +37,7 @@ scout.BaseDesktop.prototype._attachForm = function(form) {
   if (form.model.displayHint == "view") {
     form.attach(this._resolveViewContainer(form));
   } else if (form.model.displayHint == "dialog") {
-    form.attach(this._$parent);
+    form.attach(this.$parent);
   } else {
     $.log("Form displayHint not handled: '" + form.model.displayHint + "'.");
   }
