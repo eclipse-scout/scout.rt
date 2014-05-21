@@ -201,7 +201,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     if (m_proposalPopup == null) {
       scheduleSelectAll();
     }
-    if (getScoutObject().getErrorStatus() != null) {
+    if (getScoutObject().getErrorStatus() != null && getSwtField().getEditable() && getSwtField().isVisible()) {
       requestProposalSupportFromSwt(getScoutObject().getDisplayText(), false);
     }
   }
