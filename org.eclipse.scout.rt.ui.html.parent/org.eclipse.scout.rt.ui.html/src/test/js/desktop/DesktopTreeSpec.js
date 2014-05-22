@@ -28,7 +28,9 @@ describe("DesktopTree", function() {
   }
 
   function createDesktopTree(model) {
-    return new scout.DesktopTree(session.$entryPoint, model, session);
+    var tree = new scout.DesktopTree(model, session);
+    tree.attach(session.$entryPoint);
+    return tree;
   }
 
   describe("constructor", function() {
