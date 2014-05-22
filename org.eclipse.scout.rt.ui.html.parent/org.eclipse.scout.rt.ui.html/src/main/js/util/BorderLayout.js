@@ -72,5 +72,53 @@ scout.BorderLayout.prototype.layoutElement = function($element) {
   if (position === 'N') {
     $element.data('row', 0);
     this.$top = $element;
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
+=======
+  }
+};
+
+scout.BorderLayout.prototype._addSplitterVertical = function($div) {
+  $div.appendDiv(undefined, 'splitter-vertical')
+    .on('mousedown', '', resize);
+
+  function resize() {
+    var w;
+
+    $('body').addClass('col-resize')
+      .on('mousemove', '', resizeMove)
+      .one('mouseup', '', resizeEnd);
+
+    function resizeMove(event) {
+      w = event.pageX + 11;
+
+      if (w <= 90 && $div.attr('id') === 'DesktopTree') return;
+
+      $div.width(w);
+      $div.next().width('calc(100% - ' + (w + 80) + 'px)')
+        .css('left', w);
+
+      // TODO cgu: sollte nicht sein, gell? aber ich wollte  ein desktop widget ;)
+      if (w <= 180 && $div.attr('id') === 'DesktopTree') {
+        $div.addClass('bread-crum');
+      } else {
+        $div.removeClass('bread-crum');
+      }
+
+    }
+
+    function resizeEnd() {
+      $('body').off('mousemove')
+        .removeClass('col-resize');
+
+      // TODO cgu: sollte nicht sein, gell? und ich wollte  ein desktop widget ;)
+      if (w < 180 && $div.attr('id') === 'DesktopTree') {
+        w = 180;
+        $div.animateAVCSD('width', w, null,
+            function(i){$div.next().css('width', 'calc(100% - ' + (i + 80) + 'px)'); });
+        $div.next().animateAVCSD('left', w);
+      }
+    }
+    return false;
+>>>>>>> d56ca98 html ui: bread crum, second version
   }
 };

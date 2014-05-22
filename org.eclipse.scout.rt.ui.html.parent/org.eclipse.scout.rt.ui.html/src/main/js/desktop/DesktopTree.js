@@ -16,6 +16,18 @@ scout.DesktopTree.prototype._render = function($parent) {
   this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.model.nodes);
+
+  // home node for bread crum
+  this._$desktopTreeScroll.prependDiv('-1', 'tree-home', '')
+    .attr('data-level', -1)
+    .on('click', '', onHomeClick
+  );
+
+  var that = this;
+  function onHomeClick (event) {
+    $(this).selectOne();
+    that._updateBreadCrum();
+  }
 };
 
 /**
@@ -279,6 +291,8 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       var desktopTable = this.session.widgetMap[node.id];
       if (!desktopTable) {
         node.outlineId = this.model.id;
+
+        //TODO cgu: performance issue:
         new scout.DesktopTable(node, this.session);
       }
     }
@@ -328,8 +342,6 @@ scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
 
   this._setNodeSelected($clicked);
   this._setNodeExpanded($clicked, true);
-
-  //TODO cru: update after loading all nodes
   this._updateBreadCrum();
 };
 
@@ -461,7 +473,6 @@ scout.DesktopTree.prototype._updateBreadCrum = function() {
   var $start = $selected.next();
   while ($start.length > 0) {
     var l = parseFloat($start.attr("data-level"));
-    $.log($start.text(), level, l);
     if (l === level + 1) {
       $start.addClass('bread-children');
     } else  if (l === level) {
