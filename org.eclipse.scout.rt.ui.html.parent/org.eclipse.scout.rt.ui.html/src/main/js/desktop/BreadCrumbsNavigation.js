@@ -1,7 +1,7 @@
 scout.BreadCrumbsNavigation = function(model, session) {
-  this.base(model, session);
+  scout.BreadCrumbsNavigation.parent.call(this, model, session);
 };
-scout.BreadCrumbsNavigation.inheritsFrom(scout.ModelAdapter);
+scout.inherits(scout.BreadCrumbsNavigation, scout.ModelAdapter);
 
 scout.BreadCrumbsNavigation.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'breadcrumbs');

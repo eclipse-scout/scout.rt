@@ -3,7 +3,6 @@
 //
 
 //@include("src/main/js/jquery-scout.js");
-//@include("src/main/js/js-extensions.js");
 
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {

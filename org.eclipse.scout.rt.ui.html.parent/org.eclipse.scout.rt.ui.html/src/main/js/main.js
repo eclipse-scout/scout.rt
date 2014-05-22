@@ -10,3 +10,12 @@ scout.init = function(userAgent, objectFactories) {
     session.objectFactory.register(objectFactories);
   });
 };
+
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
+ */
+scout.inherits = function(childCtor, parentCtor) {
+  childCtor.prototype = Object.create(parentCtor.prototype);
+  childCtor.prototype.constructor = childCtor;
+  childCtor.parent = parentCtor;
+};

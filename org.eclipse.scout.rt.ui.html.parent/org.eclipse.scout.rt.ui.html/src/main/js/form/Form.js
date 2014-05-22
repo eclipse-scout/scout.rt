@@ -1,9 +1,9 @@
 scout.Form = function(model, session) {
-  this.base(model, session);
+  scout.Form.parent.call(this, model, session);
   this._$title;
 };
 
-scout.Form.inheritsFrom(scout.ModelAdapter);
+scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form');

@@ -1,14 +1,12 @@
 scout.CheckBoxField = function(model, session) {
-  scout.FormField.call(this, model, session);
+  scout.CheckBoxField.parent.call(this, model, session);
   this._$checkBox;
 };
-
-scout.CheckBoxField.prototype = Object.create(scout.FormField.prototype);
-scout.CheckBoxField.constructor = scout.CheckBoxField;
+scout.inherits(scout.CheckBoxField, scout.ModelAdapter);
 
 
 scout.CheckBoxField.prototype._render = function($parent) {
-  scout.FormField.prototype._render.call(this, $parent);
+  scout.CheckBoxField.parent.prototype._render.call(this, $parent);
   this._$checkBox = this.$container.appendDiv(undefined, 'field checkbox', ' ');
   var that = this;
   this._$checkBox.on('click', function() {

@@ -2,10 +2,10 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.MobileDesktop = function(model, session) {
-  this.base(model, session);
+  scout.MobileDesktop.parent.call(this, model, session);
   this.areas = {};
 };
-scout.MobileDesktop.inheritsFrom(scout.BaseDesktop);
+scout.inherits(scout.MobileDesktop, scout.BaseDesktop);
 
 /**
  * @override
@@ -26,7 +26,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
     this.breadCrumbs = new scout.BreadCrumbsNavigation(this.model.breadCrumbsNavigation, this.session);
   }
 
-  this.base.prototype._render.call(this, $parent);
+  scout.MobileDesktop.parent.prototype._render.call(this, $parent);
 };
 
 /**
@@ -64,7 +64,7 @@ scout.MobileDesktop.prototype._attachForm = function(form) {
   if (layoutDirty) {
     this.layout.layout();
   }
-  this.base.prototype._attachForm.call(this, form);
+  scout.MobileDesktop.parent.prototype._attachForm.call(this, form);
 };
 
 scout.MobileDesktop.prototype._createMainArea = function() {
@@ -79,7 +79,7 @@ scout.MobileDesktop.prototype._createMainArea = function() {
  * @override
  */
 scout.MobileDesktop.prototype._removeForm = function(form) {
-  this.base.prototype._removeForm.call(this, form);
+  scout.MobileDesktop.parent.prototype._removeForm.call(this, form);
 
   if (form.model.displayHint == "view") {
     var position = form.model.displayViewId;

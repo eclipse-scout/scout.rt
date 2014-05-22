@@ -2,10 +2,10 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.GroupBox = function(model, session) {
-  this.base(model, session);
+  scout.GroupBox.parent.call(this, model, session);
   this._$label;
 };
-scout.GroupBox.inheritsFrom(scout.ModelAdapter);
+scout.inherits(scout.GroupBox, scout.ModelAdapter);
 
 scout.GroupBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'group-box');

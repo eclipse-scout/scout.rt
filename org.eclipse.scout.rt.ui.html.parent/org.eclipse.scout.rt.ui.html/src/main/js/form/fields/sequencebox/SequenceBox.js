@@ -1,8 +1,8 @@
 scout.SequenceBox = function(model, session) {
-  this.base(model, session);
+  scout.SequenceBox.parent.call(this, model, session);
 };
 
-scout.SequenceBox.inheritsFrom(scout.ModelAdapter);
+scout.inherits(scout.SequenceBox, scout.ModelAdapter);
 
 scout.SequenceBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'sequence-box');

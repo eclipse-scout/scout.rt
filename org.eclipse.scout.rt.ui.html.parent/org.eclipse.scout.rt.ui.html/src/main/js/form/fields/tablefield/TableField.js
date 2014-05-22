@@ -2,9 +2,9 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableField = function(model, session) {
-  this.base(model, session);
+  scout.TableField.parent.call(this, model, session);
 };
-scout.TableField.inheritsFrom(scout.ModelAdapter);
+scout.inherits(scout.TableField, scout.ModelAdapter);
 
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');

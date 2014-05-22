@@ -2,14 +2,14 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.MobileTable = function(model, session) {
-  this.base(model, session);
+  scout.MobileTable.parent.call(this, model, session);
 
   //FIXME should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   this.model.headerVisible = false;
 
   this._headerColumns = [];
 };
-scout.MobileTable.inheritsFrom(scout.Table);
+scout.inherits(scout.MobileTable, scout.Table);
 
 /**
  * @override
@@ -24,7 +24,7 @@ scout.MobileTable.prototype._createTableConfigurator = function() {
 scout.MobileTable.prototype._drawData = function(startRow) {
   this._headerColumns = this._computeHeaderColumns();
 
-  this.base.prototype._drawData.call(this, startRow);
+  scout.MobileTable.parent.prototype._drawData.call(this, startRow);
 };
 
 /**

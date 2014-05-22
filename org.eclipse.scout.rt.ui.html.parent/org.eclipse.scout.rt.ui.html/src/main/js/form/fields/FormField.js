@@ -1,11 +1,9 @@
 scout.FormField = function(model, session) {
-  scout.ModelAdapter.call(this, model, session);
+  scout.FormField.parent.call(this, model, session);
   this._$label;
   this._$statusLabel;
 };
-
-scout.FormField.prototype = Object.create(scout.ModelAdapter.prototype);
-scout.FormField.constructor = scout.FormField;
+scout.inherits(scout.FormField, scout.ModelAdapter);
 
 /**
  * The _render method creates the UI through DOM manipulation. At this point we should not apply model

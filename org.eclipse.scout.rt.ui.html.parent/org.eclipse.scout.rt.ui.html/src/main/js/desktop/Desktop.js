@@ -2,9 +2,9 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Desktop = function(model, session) {
-  this.base(model, session);
+  scout.Desktop.parent.call(this, model, session);
 };
-scout.Desktop.inheritsFrom(scout.BaseDesktop);
+scout.inherits(scout.Desktop, scout.BaseDesktop);
 
 /**
  * @override
@@ -46,7 +46,7 @@ scout.Desktop.prototype._render = function($parent) {
     this.tree.attachModel();
   }
 
-  this.base.prototype._render.call(this, $parent);
+  scout.Desktop.parent.prototype._render.call(this, $parent);
 };
 
 /**
