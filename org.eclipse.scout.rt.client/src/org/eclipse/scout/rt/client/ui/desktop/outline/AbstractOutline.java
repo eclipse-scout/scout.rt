@@ -420,6 +420,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   protected void addMenusOfActivePageToContextMenu(IPage activePage) {
+    List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+
     if (activePage instanceof IPageWithTable<?>) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
@@ -428,13 +430,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
             ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.EmptySpace)));
         if (emptySpaceMenus.size() > 0) {
-          List<IMenu> wrappedMenus = new ArrayList<IMenu>();
           wrappedMenus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
             wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
           }
-          m_inheritedMenusOfPage = wrappedMenus;
-          getContextMenu().addChildActions(m_inheritedMenusOfPage);
         }
       }
     }
@@ -449,17 +448,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
         List<IMenu> menus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.SingleSelection)));
         if (menus.size() > 0) {
-          List<IMenu> wrappedMenus = new ArrayList<IMenu>();
           wrappedMenus.add(new MenuSeparator());
           for (IMenu menu : menus) {
             wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
           }
-          m_inheritedMenusOfPage = wrappedMenus;
-          getContextMenu().addChildActions(m_inheritedMenusOfPage);
         }
       }
     }
-
+    m_inheritedMenusOfPage = wrappedMenus;
+    getContextMenu().addChildActions(m_inheritedMenusOfPage);
   }
 
   @Override
