@@ -168,6 +168,7 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
     this._desktopTable.attach($('#DesktopBench'));
   }
 
+
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
     this.session.send('nodesSelected', this.model.id, {
@@ -239,6 +240,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     var level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
+      .addClass('bread-children')
       .on('click', '', onNodeClicked)
       .data('node', node)
       .attr('data-level', level)
@@ -317,6 +319,9 @@ scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
 
   this._setNodeSelected($clicked);
   this._setNodeExpanded($clicked, true);
+
+  //TODO cru: update after loading all nodes
+  this._updateBreadCrum();
 };
 
 scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
@@ -431,6 +436,40 @@ scout.DesktopTree.prototype._onSelectionMenusChanged = function(selectedNodeIds,
     var $selectedNode = this._findSelectedNodes();
 
     this._showSelectionMenuAndHideOthers($selectedNode);
+  }
+};
+
+scout.DesktopTree.prototype._updateBreadCrum = function() {
+  var $selected = $('.selected', this._$desktopTreeScroll),
+    $allNodes = this._$desktopTreeScroll.children(),
+    level = parseFloat($selected.attr('data-level'));
+
+  // first remove and select selected
+  $allNodes.removeClass('bread-parent bread-selected bread-children');
+  $selected.addClass('bread-selected');
+
+  // find all parents
+  var $start = $selected.next();
+  while ($start.length > 0) {
+    var l = parseFloat($start.attr("data-level"));
+    $.log($start.text(), level, l);
+    if (l === level + 1) {
+      $start.addClass('bread-children');
+    } else  if (l === level) {
+      break;
+    }
+    $start = $start.next();
+  }
+
+  // find direct children
+  $start = $selected.prev();
+  while ($start.length > 0) {
+    var k = $start.attr("data-level");
+    if (k < level) {
+      $start.addClass('bread-parent');
+      level = k;
+    }
+    $start = $start.prev();
   }
 };
 

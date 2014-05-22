@@ -5,11 +5,7 @@
 (function($) {
 
   //== $ extensions
-  $.log = function(text) {
-    if (console) {
-      console.log(text);
-    }
-  };
+  $.log = console.log.bind(console);
 
   // session uses only divs...
   $.makeDiv = function(i, c, h) {

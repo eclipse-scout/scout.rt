@@ -89,23 +89,23 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
       } else {
         $node.appendDiv('', 'key-box large', '+');
       }
-      $node.children('.tree-item-control').hide();
+      $node.children('.tree-item-control').css('display', 'none');
     }
 
     if ($prev.length) {
       $prev.appendDiv('', 'key-box', '←');
-      $prev.children('.tree-item-control').hide();
+      $prev.children('.tree-item-control').css('display', 'none');
     }
 
     if ($next.length) {
       $next.appendDiv('', 'key-box', '→');
-      $next.children('.tree-item-control').hide();
+      $next.children('.tree-item-control').css('display', 'none');
     }
   }
 };
 
 scout.DesktopKeystrokeAdapter.prototype.removeKeyBox = function() {
-  $('.tree-item-control').show();
+  $('.tree-item-control').css('display', '');
 };
 
 scout.DesktopKeystrokeAdapter.prototype.accept = function(keycode) {

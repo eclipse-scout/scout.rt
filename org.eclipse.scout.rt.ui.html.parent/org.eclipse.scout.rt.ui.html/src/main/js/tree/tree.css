@@ -5,11 +5,15 @@ float: left;
 width: 100%;
 line-height: 30px;
 white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
 cursor: pointer;
 overflow: hidden;
-padding-top: 2px;
-padding-bottom: 2px;
-padding-left: 30px;
+padding-top: 0px;
+padding-bottom: 0px;
+padding-left: 28px;
+border: 2px solid #fff;
+
 }
 
 .tree-item-control{
@@ -45,9 +49,6 @@ color:#0082a1 !important;
 .tree-item.selected {
 border: 2px solid #0082a1;
 border-radius: 7px;
-padding-top: 0px !important;
-padding-bottom: 0px !important;
-padding-left: 28px !important;;
 }
 
 .tree-item.expanded > .tree-item-control:hover:before, 

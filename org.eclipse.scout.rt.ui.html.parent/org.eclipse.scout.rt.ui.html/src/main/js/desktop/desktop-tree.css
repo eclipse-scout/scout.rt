@@ -12,8 +12,67 @@ margin-bottom: 10px;
 #DesktopTreeScroll{
 position: absolute;
 top: 0px;
-width: calc(100% - 11px);
+width: calc(100% - 18px);
 height: 100%;
-padding: 12px 4px 0px 16px;
+padding: 12px 0px 0px 16px;
 }
 
+ /* bread crum mode */
+#DesktopTree.bread-crum .tree-item{
+display:none;
+height: 0px;
+} 
+
+#DesktopTree.bread-crum .tree-item.bread-parent,
+#DesktopTree.bread-crum .tree-item.bread-selected,
+#DesktopTree.bread-crum .tree-item.bread-children{
+display: block;
+margin-left: 0px !important;
+padding: 10px 5px 10px 5px !important;
+width: calc(100% - 20px) !important;
+text-align: center !important;
+margin-bottom: 30px;
+white-space: normal;
+overflow: visible;
+height: auto;
+vertical-align: middle !important;
+line-height: 18px;
+}
+
+#DesktopTree.bread-crum .tree-item.bread-parent{
+border: 2px solid #0082a1;
+border-radius: 7px;
+}
+
+#DesktopTree.bread-crum .tree-item.bread-selected{
+border: 2px solid #FE9915;
+border-radius: 7px;
+}
+
+
+#DesktopTree.bread-crum .tree-item.bread-parent:after,
+#DesktopTree.bread-crum .tree-item.bread-selected:after{
+content:"";
+position: absolute;
+bottom: -12px;	
+left: 50%;
+width:0px;
+height:0px;
+
+border-left: 10px solid #fff;
+border-right: 10px solid #fff;
+border-top: 10px solid  #0082a1;
+}
+
+#DesktopTree.bread-crum .tree-item.bread-selected:after{
+border-top: 10px solid  #FE9915;
+}
+
+#DesktopTree.bread-crum .tree-item.bread-children{
+color: #666;
+}
+
+#DesktopTree.bread-crum .tree-item-control,
+#DesktopTree.bread-crum .tree-item-menu{
+display:none;
+}

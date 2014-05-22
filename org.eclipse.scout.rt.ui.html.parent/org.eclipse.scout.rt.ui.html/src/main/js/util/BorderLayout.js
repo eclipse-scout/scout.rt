@@ -84,20 +84,39 @@ scout.BorderLayout.prototype._addSplitterVertical = function($div) {
     .on('mousedown', '', resize);
 
   function resize() {
+    var w;
+
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
 
     function resizeMove(event) {
-      var w = event.pageX + 11;
+      w = event.pageX + 11;
+
       $div.width(w);
       $div.next().width('calc(100% - ' + (w + 80) + 'px)')
         .css('left', w);
+
+      // TODO cgu: sollte nicht sein, gell? aber ich wollte  ein desktop widget ;)
+      if (w <= 180 && $div.attr('id') === 'DesktopTree') {
+        $div.addClass('bread-crum');
+      } else {
+        $div.removeClass('bread-crum');
+      }
+
     }
 
     function resizeEnd() {
       $('body').off('mousemove')
         .removeClass('col-resize');
+
+      // TODO cgu: sollte nicht sein, gell? und ich wollte  ein desktop widget ;)
+      if (w < 180 && $div.attr('id') === 'DesktopTree') {
+        w = 180;
+        $div.animateAVCSD('width', w, null,
+            function(i){$div.next().css('width', 'calc(100% - ' + (i + 80) + 'px)'); });
+        $div.next().animateAVCSD('left', w);
+      }
     }
     return false;
   }
