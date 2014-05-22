@@ -52,9 +52,7 @@ scout.BaseDesktop.prototype._removeForm = function(form) {
 scout.BaseDesktop.prototype.onModelPropertyChange = function() {};
 
 scout.BaseDesktop.prototype.onModelCreate = function(event) {
-  if (event.objectType == "Outline") {
-    this.tree.onOutlineCreated(event);
-  } else if (event.objectType == "Form") {
+  if (event.objectType == "Form") {
     var form = this.session.objectFactory.create(event);
     this._attachForm(form);
   } else {
@@ -65,9 +63,7 @@ scout.BaseDesktop.prototype.onModelCreate = function(event) {
 scout.BaseDesktop.prototype.onModelAction = function(event) {
   var form;
 
-  if (event.type_ == 'outlineChanged') {
-    this.tree.onOutlineChanged(event.outlineId);
-  } else if (event.type_ == 'formAdded') {
+  if (event.type_ == 'formAdded') {
     form = this.session.widgetMap[event.formId];
     this._attachForm(form);
   } else if (event.type_ == 'formRemoved') {

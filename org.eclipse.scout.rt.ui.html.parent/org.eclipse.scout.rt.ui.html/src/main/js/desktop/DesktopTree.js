@@ -1,29 +1,38 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTree = function($parent, model, session) {
-  this.model = model;
-  this._selectedNodes = [];
-  this.session = session;
-  this._desktopTable;
+scout.DesktopTree = function(model, session) {
+  scout.DesktopTree.parent.call(this, model, session);
 
-  this.session.widgetMap[model.id] = this;
-  this._$desktopTreeScroll = $parent.appendDiv('DesktopTreeScroll');
+  this._selectedNodes = [];
+  this._desktopTable;
+};
+scout.inherits(scout.DesktopTree, scout.ModelAdapter);
+
+scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
+
+scout.DesktopTree.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv(undefined, 'tree');
+  this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.model.nodes);
 };
 
-scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
-
+/**
+ * @override
+ */
 scout.DesktopTree.prototype.detach = function() {
-  this._$desktopTreeScroll.detach();
+  scout.DesktopTree.parent.prototype.detach.call(this);
   if (this._desktopTable) {
     this._desktopTable.detach();
   }
 };
 
-scout.DesktopTree.prototype.attach = function($container) {
-  this._$desktopTreeScroll.appendTo($container);
+/**
+ * @override
+ */
+scout.DesktopTree.prototype.attach = function($parent) {
+  scout.DesktopTree.parent.prototype.attach.call(this, $parent);
   if (this._desktopTable) {
     this._desktopTable.attach($('#DesktopBench'));
   }

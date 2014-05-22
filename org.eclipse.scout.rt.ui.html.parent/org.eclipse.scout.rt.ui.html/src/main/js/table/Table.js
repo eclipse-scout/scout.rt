@@ -48,7 +48,6 @@ scout.Table.prototype._createTableConfigurator = function () {
 scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
 
-  //create container
   this.$container = this._$parent.appendDiv(this.model.id, 'table');
 
   this._$header = this.$container.appendDiv(this.model.id + '_header', 'table-header');

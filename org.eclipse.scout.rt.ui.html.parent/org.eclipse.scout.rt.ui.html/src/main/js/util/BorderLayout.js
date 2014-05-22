@@ -6,7 +6,7 @@ scout.BorderLayout = function(marginTop, marginRight, cssClassPrefix) {
   this.$dynamicElements = [];
 };
 
-scout.BorderLayout.prototype.register = function($element, position, splitterVertical) {
+scout.BorderLayout.prototype.register = function($element, position) {
   $element.data('position', position);
   $element.addClass(this.cssClassPrefix + '-' + position);
   if (position === 'C') {
@@ -14,13 +14,9 @@ scout.BorderLayout.prototype.register = function($element, position, splitterVer
   } else {
     this.$fixedElements.push($element);
   }
-
-  if (splitterVertical && (position === 'W' || position === 'C' || position === 'E')) {
-    this._addSplitterVertical($element);
-  }
 };
 
-scout.BorderLayout.prototype.unregister = function($element, position, splitterVertical) {
+scout.BorderLayout.prototype.unregister = function($element, position) {
   $element.data('position', null);
   $element.removeClass(this.cssClassPrefix + '-' + position);
   scout.arrays.remove(this.$dynamicElements, $element);
@@ -76,48 +72,5 @@ scout.BorderLayout.prototype.layoutElement = function($element) {
   if (position === 'N') {
     $element.data('row', 0);
     this.$top = $element;
-  }
-};
-
-scout.BorderLayout.prototype._addSplitterVertical = function($div) {
-  $div.appendDiv(undefined, 'splitter-vertical')
-    .on('mousedown', '', resize);
-
-  function resize() {
-    var w;
-
-    $('body').addClass('col-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
-
-    function resizeMove(event) {
-      w = event.pageX + 11;
-
-      $div.width(w);
-      $div.next().width('calc(100% - ' + (w + 80) + 'px)')
-        .css('left', w);
-
-      // TODO cgu: sollte nicht sein, gell? aber ich wollte  ein desktop widget ;)
-      if (w <= 180 && $div.attr('id') === 'DesktopTree') {
-        $div.addClass('bread-crum');
-      } else {
-        $div.removeClass('bread-crum');
-      }
-
-    }
-
-    function resizeEnd() {
-      $('body').off('mousemove')
-        .removeClass('col-resize');
-
-      // TODO cgu: sollte nicht sein, gell? und ich wollte  ein desktop widget ;)
-      if (w < 180 && $div.attr('id') === 'DesktopTree') {
-        w = 180;
-        $div.animateAVCSD('width', w, null,
-            function(i){$div.next().css('width', 'calc(100% - ' + (i + 80) + 'px)'); });
-        $div.next().animateAVCSD('left', w);
-      }
-    }
-    return false;
   }
 };
