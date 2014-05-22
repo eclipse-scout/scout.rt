@@ -14,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,8 +46,8 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -1253,15 +1252,16 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       catch (InterruptedException ex) {
         //nop
       }
-      if (scoutMenusRef.get() != null) {
+      IContextMenu contextMenu = scoutMenusRef.get();
+      if (contextMenu != null) {
         IActionFilter filter = null;
         if (m_header) {
-          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.of(ITableMenu.TableMenuType.EmptySpace, ITableMenu.TableMenuType.Header));
+          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header);
         }
         else {
-          filter = ActionUtility.createMenuFilterVisibleAvailable();
+          filter = contextMenu.getActiveFilter();
         }
-        RwtMenuUtility.fillMenu((Menu) e.getSource(), scoutMenusRef.get().getChildActions(), filter, getUiEnvironment());
+        RwtMenuUtility.fillMenu((Menu) e.getSource(), contextMenu.getChildActions(), filter, getUiEnvironment());
       }
     }
   }

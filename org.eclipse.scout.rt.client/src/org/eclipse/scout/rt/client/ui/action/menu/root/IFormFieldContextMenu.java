@@ -8,30 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import java.util.EnumSet;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-/**
- *
- */
-public interface ITableMenu extends IMenu {
+public interface IFormFieldContextMenu extends IContextMenu {
 
-  enum TableMenuType {
-    EmptySpace,
-    SingleSelection,
-    MultiSelection,
-    Header
-  }
-
-  /**
-   * property-type: {@link EnumSet} of {@link TableMenuType}
-   */
-  String PROP_MENU_TYPE = "menuType";
-
-  /**
-   * @return
-   */
-  EnumSet<TableMenuType> getMenuType();
-
+  @Override
+  public IFormField getOwner();
 }

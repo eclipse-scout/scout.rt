@@ -294,6 +294,7 @@ public final class FileUtility {
    * @throws IOException
    *           if an error occurs during the copy operation
    */
+  @SuppressWarnings("resource")
   public static void copyFile(File source, File dest) throws IOException {
     if (!source.exists()) {
       throw new FileNotFoundException(source.getAbsolutePath());

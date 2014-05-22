@@ -26,7 +26,6 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TooManyListenersException;
@@ -62,7 +61,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -723,7 +722,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * update the given node
-   *
+   * 
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -843,10 +842,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         public void run() {
           IActionFilter filter;
           if (node == null) {
-            filter = ActionUtility.createTreeMenuFilterVisibleAndMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.EmptySpace));
+            filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TreeMenuType.EmptySpace);
           }
           else {
-            filter = ActionUtility.createMenuFilterVisibleAvailable();
+            filter = getScoutObject().getContextMenu().getActiveFilter();
           }
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(), filter, false).enqueue();
@@ -894,7 +893,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   *
+   * 
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -1098,7 +1097,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   *
+   * 
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {

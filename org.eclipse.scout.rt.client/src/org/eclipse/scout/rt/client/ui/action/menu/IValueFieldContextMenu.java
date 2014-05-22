@@ -10,26 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.EnumSet;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  *
  */
-public interface IValueFieldMenu extends IMenu {
-  enum ValueFieldMenuType {
-    Empty,
-    NotEmpty
+public interface IValueFieldContextMenu extends IFormFieldContextMenu {
 
-  }
-
-  /**
-   * property-type: {@link EnumSet} of {@link ValueFieldMenuType}
-   */
-  String PROP_MENU_TYPE = "menuType";
-
-  /**
-   * @return
-   */
-  EnumSet<ValueFieldMenuType> getMenuType();
-
+  @Override
+  public IValueField<?> getOwner();
 }

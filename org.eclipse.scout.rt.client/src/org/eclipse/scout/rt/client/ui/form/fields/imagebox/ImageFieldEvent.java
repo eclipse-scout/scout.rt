@@ -27,7 +27,6 @@ public class ImageFieldEvent extends EventObject {
 
   public static final int TYPE_ZOOM_RECTANGLE = 10;
   public static final int TYPE_AUTO_FIT = 20;
-  public static final int TYPE_POPUP = 30;
 
   public ImageFieldEvent(IImageField source, int type) {
     super(source);

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.action.menu;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.swt.widgets.Menu;
 

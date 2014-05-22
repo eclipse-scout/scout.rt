@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
@@ -76,11 +76,11 @@ public class RootNode extends AbstractComposerNode {
   }
 
   @Order(30)
-  public class Separator1Menu extends MenuSeparator {
+  public class Separator1Menu extends AbstractMenuSeparator {
   }
 
   @Order(40)
-  public class AddEntityPlaceholderOnRootMenu extends MenuSeparator {
+  public class AddEntityPlaceholderOnRootMenu extends AbstractMenuSeparator {
   }
 
 }

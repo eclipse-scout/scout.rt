@@ -10,27 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.EnumSet;
-
 /**
- *
+ * The menu type describes the scope of a menu. This interface is the common base of all available menu types.
+ * 
+ * @see TableMenuType
+ * @see TreeMenuType
+ * @see ValueFieldMenuType
  */
-public interface ITreeMenu extends IMenu {
-
-  enum TreeMenuType {
-    EmptySpace,
-    SingleSelection,
-    MultiSelection
-  }
-
-  /**
-   * property-type: {@link EnumSet} of {@link TreeMenuType}
-   */
-  String PROP_MENU_TYPE = "menuType";
-
-  /**
-   * @return
-   */
-  EnumSet<TreeMenuType> getMenuType();
+public interface IMenuType {
 
 }

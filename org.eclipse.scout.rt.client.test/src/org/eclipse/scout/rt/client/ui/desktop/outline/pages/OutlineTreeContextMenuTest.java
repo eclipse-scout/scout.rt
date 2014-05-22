@@ -19,12 +19,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -134,18 +138,13 @@ public class OutlineTreeContextMenuTest {
       public class PageWithTableEmptySpaceMenu extends AbstractMenu {
 
         @Override
-        protected boolean getConfiguredEmptySpaceAction() {
-          return true;
-        }
-
-        @Override
-        protected boolean getConfiguredSingleSelectionAction() {
-          return false;
-        }
-
-        @Override
         protected String getConfiguredText() {
           return "EmptySpace";
+        }
+
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
 
       }
@@ -154,30 +153,28 @@ public class OutlineTreeContextMenuTest {
       public class PageWithTableEmptySpace2Menu extends AbstractMenu {
 
         @Override
-        protected boolean getConfiguredSingleSelectionAction() {
-          return false;
+        protected String getConfiguredText() {
+          return "EmptySpace 2";
         }
 
         @Override
-        protected String getConfiguredText() {
-          return "EmptySpace 2";
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
 
       }
 
       @Order(20.0)
       public class PageWithTableRowMenu extends AbstractMenu {
-
-        @Override
-        protected boolean getConfiguredSingleSelectionAction() {
-          return true;
-        }
-
         @Override
         protected String getConfiguredText() {
           return "Edit";
         }
 
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        }
       }
 
       @Order(10)

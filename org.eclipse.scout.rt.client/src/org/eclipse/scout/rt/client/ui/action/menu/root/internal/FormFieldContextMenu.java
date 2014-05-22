@@ -8,40 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
-import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
  *
  */
-public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableContextMenu.class);
+public class FormFieldContextMenu<T extends IFormField> extends AbstractPropertyObserverContextMenu<T> implements IFormFieldContextMenu {
 
   /**
    * @param owner
    */
-  public TableContextMenu(ITable owner) {
+  public FormFieldContextMenu(T owner) {
     super(owner);
   }
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    getOwner().addTableListener(new P_OwnerTableListener());
+    handleOwnerEnabledChanged();
   }
 
   @Override
@@ -56,9 +50,6 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     handleOwnerEnabledChanged();
   }
 
-  /**
-  *
-  */
   protected void handleOwnerEnabledChanged() {
     if (getOwner() != null) {
       final boolean enabled = getOwner().isEnabled();
@@ -77,43 +68,11 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     }
   }
 
-  /**
-  *
-  */
-  protected void handleOwnerValueChanged() {
-    if (getOwner() != null) {
-      final List<ITableRow> ownerValue = getOwner().getSelectedRows();
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            try {
-              menu.handleOwnerValueChanged(ownerValue);
-            }
-            catch (ProcessingException ex) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-            }
-          }
-          return CONTINUE;
-        }
-      });
-    }
-  }
-
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
+    super.handleOwnerPropertyChanged(evt);
+    if (IFormField.PROP_ENABLED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
-    }
-  }
-
-  private class P_OwnerTableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      if (e.getType() == TableEvent.TYPE_ROWS_SELECTED) {
-        handleOwnerValueChanged();
-      }
     }
   }
 }

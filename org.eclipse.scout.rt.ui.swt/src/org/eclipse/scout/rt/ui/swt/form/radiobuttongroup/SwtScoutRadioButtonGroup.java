@@ -119,7 +119,7 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
     }
 
     private void handleSelectionChanged(MultilineRadioButton selectedButton) {
-      getSwtField().setTabList(new Control[]{selectedButton.getParent()});
+      getSwtField().setTabList(new Control[]{selectedButton.getParent().getParent()});
     }
 
     private void handleKeyDown(Event event) {

@@ -10,19 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
+import java.util.Set;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  * Interface for menus that normally appear in the gui on the menubar
  */
 public interface IMenu extends IActionNode<IMenu> {
+  static String PROP_MENU_TYPES = "propMenuTypes";
 
   /**
-   * property-type: {@link Boolean} depending on the menu type an its compatibility to the current selection
+   * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
+   * {@link ITable}, {@link ITree}, {@link IValueField} ) of the menu.
+   * 
+   * @return all menu types for this menu.
    */
-  String PROP_AVAILABLE = "available";
+  Set<IMenuType> getMenuTypes();
+
+  /**
+   * called from the UI before the menu is displayed.
+   * 
+   * @see AbstractMenu#execAboutToShow()
+   */
+  void aboutToShow();
+
+  /**
+   * @param newValue
+   * @throws ProcessingException
+   */
+  void handleOwnerValueChanged(Object newValue) throws ProcessingException;
 
   /**
    * action is chosen on a single selected item
@@ -66,20 +87,4 @@ public interface IMenu extends IActionNode<IMenu> {
   @Deprecated
   void setEmptySpaceAction(boolean b);
 
-  /**
-   * @param newValue
-   * @throws ProcessingException
-   */
-  void handleOwnerValueChanged(Object newValue) throws ProcessingException;
-
-  IPropertyObserver getOwner();
-
-  boolean isAvailable();
-
-  void aboutToShow();
-
-  /**
-   * @param owner
-   */
-  void setOwnerInternal(IPropertyObserver owner);
 }

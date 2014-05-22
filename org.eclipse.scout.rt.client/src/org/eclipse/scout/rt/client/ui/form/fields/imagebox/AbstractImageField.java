@@ -26,10 +26,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.FormFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -232,19 +232,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   private void fireAutoFit() {
     fireImageBoxEventInternal(new ImageFieldEvent(this, ImageFieldEvent.TYPE_AUTO_FIT));
-  }
-
-  private List<IMenu> firePopup() {
-    ImageFieldEvent e = new ImageFieldEvent(this, ImageFieldEvent.TYPE_POPUP);
-    // single observer for table-owned menus
-    for (IMenu menu : getMenus()) {
-      menu.prepareAction();
-      if (menu.isVisible()) {
-        e.addPopupMenu(menu);
-      }
-    }
-    fireImageBoxEventInternal(e);
-    return e.getPopupMenus();
   }
 
   private void fireImageBoxEventInternal(ImageFieldEvent e) {
@@ -477,11 +464,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     @Override
     public void setImageTransformFromUI(AffineTransformSpec t) {
       setImageTransform(t);
-    }
-
-    @Override
-    public List<IMenu> firePopupFromUI() {
-      return firePopup();
     }
 
     @Override

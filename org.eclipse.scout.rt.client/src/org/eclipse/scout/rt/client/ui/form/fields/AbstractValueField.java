@@ -39,10 +39,10 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -117,7 +117,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     //set container on menus
-    IContextMenu contextMenu = new ValueFieldContextMenu(this);
+    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this);
     contextMenu.setContainerInternal(this);
     contextMenu.setChildActions(menuList);
     setContextMenu(contextMenu);
@@ -133,13 +133,13 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
-  protected void setContextMenu(IContextMenu contextMenu) {
+  protected void setContextMenu(IValueFieldContextMenu contextMenu) {
     propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public IContextMenu getContextMenu() {
-    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  public IValueFieldContextMenu getContextMenu() {
+    return (IValueFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
 
   @Override

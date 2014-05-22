@@ -11,13 +11,12 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.treefield;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -69,14 +68,12 @@ public class RwtScoutTreeActionBar extends AbstractRwtScoutActionBar<ITreeField>
       return;
     }
 
-    List<IMenu> emptySpaceMenus = ActionUtility.getActions(tree.getMenus(),
-        ActionUtility.createTreeMenuFilterMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.EmptySpace)));
+    List<IMenu> emptySpaceMenus = ActionUtility.getActions(tree.getMenus(), ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace));
     if (emptySpaceMenus != null) {
       menuList.addAll(emptySpaceMenus);
     }
 
-    List<IMenu> rowMenus = ActionUtility.getActions(tree.getMenus(),
-        ActionUtility.createTreeMenuFilterMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.SingleSelection)));
+    List<IMenu> rowMenus = ActionUtility.getActions(tree.getMenus(), ActionUtility.createMenuFilterMenuTypes(TreeMenuType.SingleSelection));
     if (rowMenus != null) {
       List<IMenu> rowMenuList = new ArrayList<IMenu>(rowMenus);
 

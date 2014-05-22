@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.client.ui.basic.table.internal;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -26,23 +24,22 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu.TableMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
 /**
  *
  */
-public class TablePageTreeMenuWrapper implements ITreeMenu {
+public class TablePageTreeMenuWrapper implements IMenu {
 
   private IMenu m_wrappedMenu;
   private IPropertyObserver m_menuOwner;
-  private EnumSet<TreeMenuType> m_menuType;
   private List<IMenu> m_childMenus;
   private boolean m_localEnabled;
+  private Set<IMenuType> m_menuTypes;
 
-  public TablePageTreeMenuWrapper(IMenu wrappedMenu) {
+  public TablePageTreeMenuWrapper(IMenu wrappedMenu, IMenuType... menuTypes) {
     m_wrappedMenu = wrappedMenu;
+    m_menuTypes = CollectionUtility.hashSet(menuTypes);
     setup();
   }
 
@@ -102,21 +99,6 @@ public class TablePageTreeMenuWrapper implements ITreeMenu {
   @Override
   public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
     // void
-  }
-
-  @Override
-  public void setOwnerInternal(IPropertyObserver menuOwner) {
-    m_menuOwner = menuOwner;
-  }
-
-  @Override
-  public IPropertyObserver getOwner() {
-    return m_menuOwner;
-  }
-
-  @Override
-  public boolean isAvailable() {
-    return true;
   }
 
   @Override
@@ -436,51 +418,8 @@ public class TablePageTreeMenuWrapper implements ITreeMenu {
   }
 
   @Override
-  public EnumSet<TreeMenuType> getMenuType() {
-    if (m_menuType == null) {
-      computeMenutType();
-    }
-    return m_menuType;
-  }
-
-  /**
-   *
-   */
-  @SuppressWarnings("deprecation")
-  private void computeMenutType() {
-    if (m_wrappedMenu instanceof ITableMenu) {
-      EnumSet<TableMenuType> tableMenuTypes = ((ITableMenu) m_wrappedMenu).getMenuType();
-      Iterator<TableMenuType> it = tableMenuTypes.iterator();
-      Set<TreeMenuType> treeMenuTypes = new HashSet<ITreeMenu.TreeMenuType>();
-      while (it.hasNext()) {
-        switch (it.next()) {
-          case EmptySpace:
-            treeMenuTypes.add(TreeMenuType.EmptySpace);
-            break;
-          case SingleSelection:
-            treeMenuTypes.add(TreeMenuType.SingleSelection);
-            break;
-          case MultiSelection:
-            treeMenuTypes.add(TreeMenuType.MultiSelection);
-            break;
-        }
-      }
-      m_menuType = EnumSet.<ITreeMenu.TreeMenuType> copyOf(treeMenuTypes);
-    }
-    else {
-      // legacy support
-      Set<TreeMenuType> treeMenuTypes = new HashSet<ITreeMenu.TreeMenuType>();
-      if (m_wrappedMenu.isEmptySpaceAction()) {
-        treeMenuTypes.add(TreeMenuType.EmptySpace);
-      }
-      if (m_wrappedMenu.isSingleSelectionAction()) {
-        treeMenuTypes.add(TreeMenuType.SingleSelection);
-      }
-      if (m_wrappedMenu.isMultiSelectionAction()) {
-        treeMenuTypes.add(TreeMenuType.MultiSelection);
-      }
-      m_menuType = EnumSet.<ITreeMenu.TreeMenuType> copyOf(treeMenuTypes);
-    }
+  public Set<IMenuType> getMenuTypes() {
+    return CollectionUtility.hashSet(m_menuTypes);
   }
 
   @Override

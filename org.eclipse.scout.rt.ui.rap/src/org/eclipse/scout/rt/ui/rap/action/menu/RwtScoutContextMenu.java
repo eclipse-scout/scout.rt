@@ -14,8 +14,7 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.swt.SWT;
@@ -41,9 +40,6 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
   private Listener m_uiMenuListener;
   private Boolean m_childrenCreated = Boolean.valueOf(false);
 
-//  public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtContextMenuMarker marker, IRwtEnvironment environment) {
-//    this(parentShell, scoutContextMenu, environment);
-//  }
 
   public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtEnvironment environment) {
     this(parentShell, scoutContextMenu, environment, true);
@@ -97,7 +93,7 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
         item.dispose();
       }
     }
-    RwtMenuUtility.fillMenu(getUiMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment());
+    RwtMenuUtility.fillMenu(getUiMenu(), getScoutContextMenu().getChildActions(), getScoutContextMenu().getActiveFilter(), getEnvironment());
   }
 
   @Override

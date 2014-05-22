@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -35,8 +40,11 @@ public class MultiSelectionExtractor<T extends IMenu> extends AbstractBooleanTex
    *         {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}
    */
   @Override
-  public String getText(T object) {
-    return getBooleanText(object.isMultiSelectionAction());
+  public String getText(T action) {
+    Set<IMenuType> menuTypes = action.getMenuTypes();
+    boolean multiSelection = menuTypes.contains(TableMenuType.MultiSelection);
+    multiSelection |= menuTypes.contains(TreeMenuType.MultiSelection);
+    return getBooleanText(multiSelection);
   }
 
 }

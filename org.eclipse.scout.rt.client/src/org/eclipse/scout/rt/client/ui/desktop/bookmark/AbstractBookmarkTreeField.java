@@ -33,7 +33,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -484,13 +487,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return false;
-      }
-
-      @Override
-      protected boolean getConfiguredEmptySpaceAction() {
-        return true;
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
       }
 
       @Override
@@ -512,10 +510,14 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
+      protected void execInitAction() throws ProcessingException {
+        setVisiblePermission(getUpdatePermission());
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         ITreeNode node = getSelectedNode();
         setVisible(!isBookmarkNode(node));
-        setVisiblePermission(getUpdatePermission());
       }
 
       @Override
@@ -525,14 +527,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(20)
-    public class Separator1Menu extends MenuSeparator {
-
-      @Override
-      protected void execPrepareAction() throws ProcessingException {
-        ITreeNode node = getSelectedNode();
-        setVisible(!isBookmarkNode(node));
-        setVisiblePermission(getUpdatePermission());
-      }
+    public class Separator1Menu extends AbstractMenuSeparator {
 
     }
   }
@@ -557,9 +552,13 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
-        setEnabled(!isProtected());
+      protected void execInitAction() throws ProcessingException {
         setVisiblePermission(getUpdatePermission());
+      }
+
+      @Override
+      protected void execAboutToShow() throws ProcessingException {
+        setEnabled(!isProtected());
       }
 
       @Override
@@ -591,14 +590,18 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return true;
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TreeMenuType.SingleSelection, TreeMenuType.MultiSelection);
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
-        setEnabled(!isProtected());
+      protected void execInitAction() throws ProcessingException {
         setVisiblePermission(getDeletePermission());
+      }
+
+      @Override
+      protected void execAboutToShow() throws ProcessingException {
+        setEnabled(!isProtected());
         setText(getConfiguredText());
         for (ITreeNode node : getTree().getSelectedNodes()) {
           if (!(node instanceof FolderNode)) {
@@ -736,8 +739,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
-        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+      protected void execAboutToShow() throws ProcessingException {
+        List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
@@ -816,7 +819,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
+      protected void execAboutToShow() throws ProcessingException {
         // The permission to use the "update bookmark" function
         // is the same as to delete one:
         ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
@@ -853,12 +856,12 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return true;
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return CollectionUtility.hashSet(TreeMenuType.SingleSelection, TreeMenuType.MultiSelection);
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
+      protected void execAboutToShow() throws ProcessingException {
         List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
@@ -890,7 +893,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(80)
-    public class SeparatorMenu1 extends MenuSeparator {
+    public class SeparatorMenu1 extends AbstractMenuSeparator {
     }
 
     @Order(90)
@@ -901,7 +904,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() throws ProcessingException {
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         Bookmark bookmark = null;
         ITreeNode selectedNode = getTree().getSelectedNode();
         if (isBookmarkNode(selectedNode)) {

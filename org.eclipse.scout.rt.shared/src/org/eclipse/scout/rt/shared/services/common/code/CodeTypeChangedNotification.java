@@ -39,6 +39,7 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
     m_codeTypes = CollectionUtility.arrayList(types);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean coalesce(IClientNotification existingNotification) {
     CodeTypeChangedNotification n = (CodeTypeChangedNotification) existingNotification;

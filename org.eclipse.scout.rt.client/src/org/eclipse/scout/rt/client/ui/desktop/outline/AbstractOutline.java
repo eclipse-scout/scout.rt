@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -31,8 +30,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
@@ -428,11 +428,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       if (pageWithTable.isShowEmptySpaceMenus()) {
         ITable table = pageWithTable.getTable();
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-            ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.EmptySpace)));
+            ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace));
         if (emptySpaceMenus.size() > 0) {
           wrappedMenus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
-            wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
+            wrappedMenus.add(new TablePageTreeMenuWrapper(menu, TreeMenuType.SingleSelection));
           }
         }
       }
@@ -446,11 +446,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       ITable table = pageWithTable.getTable();
       if (row != null) {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-        List<IMenu> menus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.SingleSelection)));
+        List<IMenu> menus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(TableMenuType.SingleSelection));
         if (menus.size() > 0) {
           wrappedMenus.add(new MenuSeparator());
           for (IMenu menu : menus) {
-            wrappedMenus.add(new TablePageTreeMenuWrapper(menu));
+            wrappedMenus.add(new TablePageTreeMenuWrapper(menu, TreeMenuType.SingleSelection));
           }
         }
       }

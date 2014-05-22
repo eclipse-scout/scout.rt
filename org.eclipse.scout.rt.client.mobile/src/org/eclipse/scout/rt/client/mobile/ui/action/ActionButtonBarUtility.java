@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.AutoLeafPageWithNodes;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
@@ -76,11 +77,12 @@ public class ActionButtonBarUtility {
   public static List<IMenu> fetchPageActions(IPage page) {
     List<IMenu> pageActions = new LinkedList<IMenu>();
     if (page.getTree() != null) {
-      pageActions.addAll(ActionUtility.getActions(page.getTree().getContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable()));
+      ITreeContextMenu contextMenu = page.getTree().getContextMenu();
+      pageActions.addAll(ActionUtility.getActions(contextMenu.getChildActions(), contextMenu.getActiveFilter()));
       if (page instanceof AutoLeafPageWithNodes) {
         //AutoLeafPage has no parent so the table row actions are not fetched by the regular way (see AbstractOutline#P_OutlineListener).
         //Instead we directly fetch the table row actions
-        pageActions.addAll(ActionUtility.getActions(((AutoLeafPageWithNodes) page).getTableRow().getTable().getMenus(), ActionUtility.createMenuFilterVisibleAvailable()));
+        pageActions.addAll(ActionUtility.getActions(((AutoLeafPageWithNodes) page).getTableRow().getTable().getMenus(), contextMenu.getActiveFilter()));
       }
     }
 

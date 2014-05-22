@@ -41,7 +41,7 @@ public class TableRowFormHeaderActionFetcher extends FormHeaderActionFetcher {
   public List<IMenu> fetch() {
     List<IMenu> headerActions = super.fetch();
 
-    List<IMenu> tableRowActions = ActionUtility.getActions(getTable().getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
+    List<IMenu> tableRowActions = ActionUtility.getActions(getTable().getMenus(), getTable().getContextMenu().getActiveFilter());
     for (IMenu action : tableRowActions) {
       AbstractMobileAction.setHorizontalAlignment(action, IMobileAction.HORIZONTAL_ALIGNMENT_RIGHT);
     }

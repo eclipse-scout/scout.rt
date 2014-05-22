@@ -8,22 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.button;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
 /**
- * A Button has 2 aspects
- * <ol>
- * <li>System-button / NonSystem-button is marked by getSystemType()<br>
- * System buttons in a dialog have a pre-defined action handling
- * <li>Process-button / NonProcess-button is marked by isProcessButton()<br>
- * Process buttons are normally placed on dialogs button bar on the lower dialog bar
- * </ol>
+ * The table menu container is the invisible root container for all context menus on a table.
  */
-public interface IButtonUIFacade {
+public interface ITableContextMenu extends IContextMenu {
 
-  void fireButtonClickedFromUI();
-
-  void setSelectedFromUI(boolean b);
-
+  @Override
+  public ITable getOwner();
 }

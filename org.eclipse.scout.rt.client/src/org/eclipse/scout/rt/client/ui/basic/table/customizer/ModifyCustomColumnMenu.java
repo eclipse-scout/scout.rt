@@ -12,17 +12,19 @@ package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EnumSet;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 
-public class ModifyCustomColumnMenu extends AbstractTableMenu {
+public class ModifyCustomColumnMenu extends AbstractMenu {
   private final ITable m_table;
 
   public ModifyCustomColumnMenu(ITable table) {
@@ -35,8 +37,8 @@ public class ModifyCustomColumnMenu extends AbstractTableMenu {
   }
 
   @Override
-  protected EnumSet<TableMenuType> getConfiguredMenuType() {
-    return EnumSet.of(ITableMenu.TableMenuType.Header);
+  protected Set<IMenuType> getConfiguredMenuTypes() {
+    return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
   }
 
   @Override
