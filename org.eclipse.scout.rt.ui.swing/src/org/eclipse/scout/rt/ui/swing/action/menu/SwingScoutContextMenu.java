@@ -25,9 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 
@@ -41,16 +39,14 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
   private final JComponent m_target;
   private Set<JTextComponent> m_copyPasteMenuOwner;
   private IContextMenu m_scoutContextMenu;
-  private final IActionFilter m_menuFilter;
 
-  public SwingScoutContextMenu(JComponent target, IContextMenu scoutContextMenu, IActionFilter menuFilter, ISwingEnvironment environment) {
-    this(target, scoutContextMenu, menuFilter, environment, true);
+  public SwingScoutContextMenu(JComponent target, IContextMenu scoutContextMenu, ISwingEnvironment environment) {
+    this(target, scoutContextMenu, environment, true);
   }
 
-  public SwingScoutContextMenu(JComponent target, IContextMenu scoutContextMenu, IActionFilter menuFilter, ISwingEnvironment environment, boolean callInitializer) {
+  public SwingScoutContextMenu(JComponent target, IContextMenu scoutContextMenu, ISwingEnvironment environment, boolean callInitializer) {
     m_target = target;
     m_scoutContextMenu = scoutContextMenu;
-    m_menuFilter = menuFilter;
     m_environment = environment;
     m_propertySupport = new BasicPropertySupport(this);
     m_copyPasteMenuOwner = new HashSet<JTextComponent>();
@@ -66,10 +62,6 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
 
   public IContextMenu getScoutContextMenu() {
     return m_scoutContextMenu;
-  }
-
-  public IActionFilter getMenuFilter() {
-    return m_menuFilter;
   }
 
   @Override
@@ -126,8 +118,7 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
     }
 
     comp.requestFocus();
-    new SwingPopupWorker(getEnvironment(), getTarget(), systemMenuOwner, new Point(x, y), getScoutContextMenu(),
-        getMenuFilter()).run();
+    new SwingPopupWorker(getEnvironment(), getTarget(), systemMenuOwner, new Point(x, y), getScoutContextMenu(), getScoutContextMenu().getActiveFilter()).run();
   }
 
   public void addCopyPasteMenuOwner(JTextComponent target) {
@@ -145,12 +136,7 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
   }
 
   public static SwingScoutContextMenu installContextMenu(final JComponent target, IContextMenu scoutContextMenu, ISwingEnvironment environment) {
-    return installContextMenu(target, scoutContextMenu, ActionUtility.createMenuFilterVisibleAvailable(), environment);
-
-  }
-
-  public static SwingScoutContextMenu installContextMenu(final JComponent target, IContextMenu scoutContextMenu, IActionFilter menuFilter, ISwingEnvironment environment) {
-    final SwingScoutContextMenu contextMenu = new SwingScoutContextMenu(target, scoutContextMenu, menuFilter, environment);
+    final SwingScoutContextMenu contextMenu = new SwingScoutContextMenu(target, scoutContextMenu, environment);
     target.addMouseListener(contextMenu);
     target.addFocusListener(contextMenu);
     target.addKeyListener(new KeyAdapter() {

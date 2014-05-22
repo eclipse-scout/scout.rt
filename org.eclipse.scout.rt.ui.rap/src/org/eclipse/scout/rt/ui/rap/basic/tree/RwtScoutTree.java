@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap.basic.tree;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -44,8 +43,8 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -876,15 +875,16 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       catch (InterruptedException ex) {
         //nop
       }
-      if (scoutMenusRef.get() != null) {
+      IContextMenu contextMenu = scoutMenusRef.get();
+      if (contextMenu != null) {
         IActionFilter filter = null;
         if ((getUiField().getContextItem() == null)) {
-          filter = ActionUtility.createTreeMenuFilterVisibleAndMenuTypes(EnumSet.<ITreeMenu.TreeMenuType> of(ITreeMenu.TreeMenuType.EmptySpace));
+          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TreeMenuType.EmptySpace);
         }
         else {
-          filter = ActionUtility.createMenuFilterVisibleAvailable();
+          filter = contextMenu.getActiveFilter();
         }
-        RwtMenuUtility.fillMenu(((Menu) e.getSource()), scoutMenusRef.get().getChildActions(), filter, getUiEnvironment());
+        RwtMenuUtility.fillMenu(((Menu) e.getSource()), contextMenu.getChildActions(), filter, getUiEnvironment());
       }
     }
 

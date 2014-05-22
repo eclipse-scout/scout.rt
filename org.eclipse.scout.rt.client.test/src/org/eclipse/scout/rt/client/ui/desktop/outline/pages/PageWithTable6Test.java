@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -24,6 +25,8 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -75,7 +78,7 @@ public class PageWithTable6Test {
 
   private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
     List<String> actualMenus = new ArrayList<String>();
-    for (IMenu m : ActionUtility.visibleNormalizedActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable())) {
+    for (IMenu m : ActionUtility.visibleNormalizedActions(table.getContextMenu().getChildActions(), table.getContextMenu().getActiveFilter())) {
       if (m.isEnabled()) {
         actualMenus.add(m.getText());
       }
@@ -144,13 +147,8 @@ public class PageWithTable6Test {
         }
 
         @Override
-        protected boolean getConfiguredSingleSelectionAction() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredEmptySpaceAction() {
-          return true;
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.EmptySpace);
         }
       }
 
@@ -162,16 +160,10 @@ public class PageWithTable6Test {
         }
 
         @Override
-        protected boolean getConfiguredSingleSelectionAction() {
-          return true;
-        }
-
-        @Override
-        protected boolean getConfiguredEmptySpaceAction() {
-          return false;
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(TableMenuType.SingleSelection);
         }
       }
-
     }
   }
 }

@@ -34,7 +34,6 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
@@ -80,8 +79,8 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ISortOrderColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -245,8 +244,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             @Override
             public void run() {
               // call swing menu
-              new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, getScoutObject().getContextMenu(),
-                  ActionUtility.createMenuFilterVisibleAvailable()).enqueue();
+              IContextMenu contextMenu = getScoutObject().getContextMenu();
+              new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, contextMenu,
+                  contextMenu.getActiveFilter()).enqueue();
             }
           };
           getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -800,7 +800,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
           if (e.isPopupTrigger()) {
             // call swing menu
-            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), getScoutObject().getContextMenu(), ActionUtility.createMenuFilterVisibleAvailable()).enqueue();
+            IContextMenu contextMenu = getScoutObject().getContextMenu();
+            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, contextMenu.getActiveFilter()).enqueue();
           }
         }
       };
@@ -846,7 +847,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           // about to show
           IContextMenu contextMenu = getScoutObject().getContextMenu();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, ActionUtility.createMenuFilterVisibleAvailable(), false).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, contextMenu.getActiveFilter(), false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -957,7 +958,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         public void run() {
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(),
-              ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.of(ITableMenu.TableMenuType.EmptySpace, ITableMenu.TableMenuType.Header)), false).enqueue();
+              ActionUtility.createMenuFilterVisibleAndMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header), false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);

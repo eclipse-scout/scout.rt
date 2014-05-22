@@ -13,8 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.util.List;
 
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IValueFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 
 /**
  * Basic interface for all user fields where user inputs a value
@@ -128,14 +129,14 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
   void removeValueFieldListener(ValueFieldListener listener);
 
   /**
-   * @return
+   * @return the child list of {@link #getContextMenu()}
    */
   List<IMenu> getMenus();
 
   /**
-   * @return
+   * @return the invisible root menu container of all value field menus.
    */
-  IContextMenu getContextMenu();
+  IValueFieldContextMenu getContextMenu();
 
   /**
    * Gets if the default system menus (cut, copy, paste) should be added automatically to the menus of this field.

@@ -10,7 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract.action;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
@@ -28,8 +34,12 @@ public class EmptySpaceSelectionExtractor<T extends IMenu> extends AbstractBoole
   }
 
   @Override
-  public String getText(T object) {
-    return getBooleanText(object.isEmptySpaceAction());
+  public String getText(T action) {
+    Set<IMenuType> menuTypes = action.getMenuTypes();
+    boolean emptySpace = menuTypes.contains(TableMenuType.EmptySpace);
+    emptySpace |= menuTypes.contains(TreeMenuType.EmptySpace);
+    emptySpace |= menuTypes.contains(ValueFieldMenuType.Null);
+    return getBooleanText(emptySpace);
   }
 
 }

@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
@@ -78,13 +78,14 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   void requestFocus();
 
   /**
-   * @return
+   * @return the child list of {@link #getContextMenu()}
    */
   List<IMenu> getMenus();
 
   /**
-   * @return
+   * @return the invisible root menu container of all tree menus.
    */
+
   ITreeContextMenu getContextMenu();
 
   /**
@@ -473,7 +474,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * All nodes are imported starting under the (existing) root node
    */
   void importTreeData(AbstractTreeFieldData source) throws ProcessingException;
-
 
   /*
    * UI Processes

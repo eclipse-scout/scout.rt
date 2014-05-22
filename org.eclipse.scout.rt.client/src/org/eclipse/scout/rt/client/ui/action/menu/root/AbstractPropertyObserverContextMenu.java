@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -21,9 +21,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
 
   public AbstractPropertyObserverContextMenu(T owner) {
-    super(false);
-    setOwnerInternal(owner);
-    callInitializer();
+    super(owner);
   }
 
   @Override

@@ -10,25 +10,5 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
-
-public class MenuSeparator extends AbstractMenu {
-  public MenuSeparator() {
-    super();
-  }
-
-  @Override
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(10)
-  protected boolean getConfiguredSeparator() {
-    return true;
-  }
-
-  @Override
-  @ConfigOperation
-  @Order(10)
-  protected void execAction() {
-  }
+public final class MenuSeparator extends AbstractMenuSeparator {
 }

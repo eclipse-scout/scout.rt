@@ -58,11 +58,11 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
-import org.eclipse.scout.rt.client.ui.action.menu.TableContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
@@ -800,7 +800,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
     }
-    IContextMenu contextMenu = new TableContextMenu(this);
+    ITableContextMenu contextMenu = new TableContextMenu(this);
     contextMenu.setChildActions(menuList);
     setContextMenu(contextMenu);
 
@@ -1665,13 +1665,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setMenus(menus);
   }
 
-  protected void setContextMenu(IContextMenu contextMenu) {
+  protected void setContextMenu(ITableContextMenu contextMenu) {
     propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public IContextMenu getContextMenu() {
-    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  public ITableContextMenu getContextMenu() {
+    return (ITableContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
 
   @Override
@@ -1701,6 +1701,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
     Class<? extends IMenu> c = getReplacingMenuClass(menuType);
@@ -1711,6 +1712,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
         if ((!m.isInheritAccessibility()) || isEnabled()) {
           m.prepareAction();
+          m.aboutToShow();
           if (m.isVisible() && m.isEnabled()) {
             m.doAction();
             return true;
@@ -3870,7 +3872,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-
   /**
    * Called before the header menus are displayed.
    * <p>
@@ -3908,7 +3909,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
   }
-
 
   // main handler
   protected void fireTableEventInternal(TableEvent e) {

@@ -11,13 +11,12 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -81,14 +80,13 @@ public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableFiel
       return;
     }
 
-    List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-        ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.<ITableMenu.TableMenuType> of(ITableMenu.TableMenuType.EmptySpace)));
+    List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(), ActionUtility.createMenuFilterVisibleAndMenuTypes(TableMenuType.EmptySpace));
     if (emptySpaceMenus != null) {
       menuList.addAll(emptySpaceMenus);
     }
 
     if (table.getSelectedRowCount() > 0) {
-      List<IMenu> rowMenus = ActionUtility.getActions(table.getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
+      List<IMenu> rowMenus = ActionUtility.getActions(table.getMenus(), table.getContextMenu().getActiveFilter());
       if (rowMenus != null) {
         List<IMenu> editableRowMenus = new ArrayList<IMenu>(rowMenus);
         ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, editableRowMenus);

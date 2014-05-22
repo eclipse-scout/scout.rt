@@ -37,11 +37,14 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITreeContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.TreeContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
@@ -195,7 +198,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   *
+   * 
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -214,7 +217,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   *
+   * 
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -248,7 +251,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   *
+   * 
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -264,7 +267,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   *
+   * 
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -276,7 +279,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   *
+   * 
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -296,7 +299,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   @ConfigOperation
@@ -494,7 +497,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   *
+   * 
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -772,8 +775,23 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void rebuildKeyStrokesInternal() {
-    //Get the menus for the selected nodes
-    List<IMenu> menus = ActionUtility.getActions(getMenus(), ActionUtility.createMenuFilterVisibleAvailable());
+
+    final List<IMenu> menus = new ArrayList<IMenu>();
+    final IActionFilter activeFilter = getContextMenu().getActiveFilter();
+    getContextMenu().acceptVisitor(new IActionVisitor() {
+      @Override
+      public int visit(IAction action) {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (menu.isEnabled() && !menu.isSeparator() && !menu.hasChildActions()) {
+            if (activeFilter.accept(menu)) {
+              menus.add(menu);
+            }
+          }
+        }
+        return CONTINUE;
+      }
+    });
 
     //Compute the Keystrokes: base + keyStroke for the current Menus.
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(m_baseKeyStrokes);
@@ -1912,7 +1930,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   *
+   * 
    * @param nodes
    * @return
    */
@@ -2109,7 +2127,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     fireTreeEventInternal(e);
   }
 
-
   private TransferObject fireNodesDragRequest(Collection<ITreeNode> nodes) {
     if (CollectionUtility.hasElements(nodes)) {
       TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODES_DRAG_REQUEST, nodes);
@@ -2130,7 +2147,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
@@ -2140,7 +2157,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * This method gets called after the drag action has been finished.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireDragFinished() {

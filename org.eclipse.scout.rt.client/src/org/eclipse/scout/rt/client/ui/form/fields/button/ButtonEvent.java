@@ -24,10 +24,6 @@ public class ButtonEvent extends EventObject {
    */
   public static final int TYPE_CLICKED = 1;
   /**
-   * broadcast event to collect contributed menus
-   */
-  public static final int TYPE_POPUP = 2;
-  /**
    * In case button was pressed and armed, this event sets armed=false and
    * prevents the button from firing an action
    */

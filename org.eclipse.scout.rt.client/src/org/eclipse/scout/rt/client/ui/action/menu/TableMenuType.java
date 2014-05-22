@@ -8,22 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.button;
-
+package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * A Button has 2 aspects
- * <ol>
- * <li>System-button / NonSystem-button is marked by getSystemType()<br>
- * System buttons in a dialog have a pre-defined action handling
- * <li>Process-button / NonProcess-button is marked by isProcessButton()<br>
- * Process buttons are normally placed on dialogs button bar on the lower dialog bar
- * </ol>
+ * All possible menus types of a table menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
+ * method.
  */
-public interface IButtonUIFacade {
-
-  void fireButtonClickedFromUI();
-
-  void setSelectedFromUI(boolean b);
-
+public enum TableMenuType implements IMenuType {
+  EmptySpace,
+  SingleSelection,
+  MultiSelection,
+  Header
 }

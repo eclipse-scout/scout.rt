@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-/**
- *
- */
-public interface ITableContextMenu extends IContextMenu {
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 
+/**
+ * All possible menus types of a tree menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
+ * method on any {@link ITree}.
+ */
+public enum TreeMenuType implements IMenuType {
+  EmptySpace,
+  SingleSelection,
+  MultiSelection
 }

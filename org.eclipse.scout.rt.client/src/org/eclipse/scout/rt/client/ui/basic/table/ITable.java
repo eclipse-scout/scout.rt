@@ -20,8 +20,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
@@ -899,12 +900,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void addMenu(IMenu menu);
 
   /**
-   * @return
+   * @return the child list of {@link #getContextMenu()}
    */
   List<IMenu> getMenus();
 
   /**
-   * @return
+   * @return the invisible root menu container of all table menus.
    */
-  IContextMenu getContextMenu();
+
+  ITableContextMenu getContextMenu();
 }

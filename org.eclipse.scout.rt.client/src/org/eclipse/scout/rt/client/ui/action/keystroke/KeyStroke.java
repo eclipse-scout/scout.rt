@@ -43,6 +43,7 @@ public class KeyStroke extends AbstractKeyStroke {
     return m_id;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void execAction() throws ProcessingException {
     if (m_delegate != null) {

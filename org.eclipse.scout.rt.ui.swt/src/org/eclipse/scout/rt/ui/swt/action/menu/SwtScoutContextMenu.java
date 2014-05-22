@@ -14,8 +14,7 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.action.menu.text.ITextAccess;
@@ -109,7 +108,7 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
         item.dispose();
       }
     }
-    SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment(), getSwtMenu().getItemCount() > 0);
+    SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), getScoutContextMenu().getActiveFilter(), getEnvironment(), getSwtMenu().getItemCount() > 0);
   }
 
   public ISwtEnvironment getEnvironment() {

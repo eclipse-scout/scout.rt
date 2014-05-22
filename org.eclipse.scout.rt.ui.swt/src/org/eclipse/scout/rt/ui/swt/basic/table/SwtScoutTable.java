@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swt.basic.table;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,8 +41,8 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -1258,8 +1257,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         //nop
       }
 
-      if (scoutMenusRef.get() != null) {
-        SwtMenuUtility.fillMenu(m_contextMenu, scoutMenusRef.get().getChildActions(), ActionUtility.createMenuFilterVisibleAvailable(), getEnvironment());
+      IContextMenu contextMenu = scoutMenusRef.get();
+      if (contextMenu != null) {
+        SwtMenuUtility.fillMenu(m_contextMenu, contextMenu.getChildActions(), contextMenu.getActiveFilter(), getEnvironment());
       }
     }
 
@@ -1319,7 +1319,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       // within the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
         SwtMenuUtility.fillMenu(m_headerMenu, scoutMenusRef.get().getChildActions(),
-            ActionUtility.createMenuFilterVisibleAndMenuTypes(EnumSet.of(ITableMenu.TableMenuType.EmptySpace, ITableMenu.TableMenuType.Header)), getEnvironment());
+            ActionUtility.createMenuFilterVisibleAndMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header)), getEnvironment());
       }
     }
 

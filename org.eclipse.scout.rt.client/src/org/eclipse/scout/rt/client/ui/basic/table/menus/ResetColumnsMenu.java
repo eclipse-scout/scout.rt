@@ -12,19 +12,21 @@ package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EnumSet;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public class ResetColumnsMenu extends AbstractTableMenu {
+public class ResetColumnsMenu extends AbstractMenu {
   private final ITable m_table;
 
   public ResetColumnsMenu(ITable table) {
@@ -37,7 +39,7 @@ public class ResetColumnsMenu extends AbstractTableMenu {
   }
 
   @Order(10.0)
-  public class ResetAllMenu extends AbstractTableMenu {
+  public class ResetAllMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
@@ -50,8 +52,8 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
-    protected EnumSet<TableMenuType> getConfiguredMenuType() {
-      return EnumSet.of(ITableMenu.TableMenuType.Header);
+    protected Set<IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
     }
 
     @Override
@@ -76,11 +78,11 @@ public class ResetColumnsMenu extends AbstractTableMenu {
   }
 
   @Order(20.0)
-  public class Separator1Menu extends MenuSeparator {
+  public class Separator1Menu extends AbstractMenuSeparator {
   }
 
   @Order(30.0)
-  public class ResetViewMenu extends AbstractTableMenu {
+  public class ResetViewMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
@@ -93,8 +95,8 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
-    protected EnumSet<TableMenuType> getConfiguredMenuType() {
-      return EnumSet.of(ITableMenu.TableMenuType.Header);
+    protected Set<IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
     }
 
     @Override
@@ -117,7 +119,7 @@ public class ResetColumnsMenu extends AbstractTableMenu {
   }
 
   @Order(40.0)
-  public class ResetSortingMenu extends AbstractTableMenu {
+  public class ResetSortingMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
@@ -130,8 +132,8 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
-    protected EnumSet<TableMenuType> getConfiguredMenuType() {
-      return EnumSet.of(ITableMenu.TableMenuType.Header);
+    protected Set<IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
     }
 
     @Override
@@ -148,7 +150,7 @@ public class ResetColumnsMenu extends AbstractTableMenu {
   }
 
   @Order(50.0)
-  public class ResetColumnFiltersMenu extends AbstractTableMenu {
+  public class ResetColumnFiltersMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
@@ -161,8 +163,8 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
-    protected EnumSet<TableMenuType> getConfiguredMenuType() {
-      return EnumSet.of(ITableMenu.TableMenuType.Header);
+    protected Set<IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
     }
 
     @Override

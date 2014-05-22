@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.spellchecker.forms;
 
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -37,6 +38,8 @@ import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheck
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.EditorSequenceBox.EditorField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.UserDictionaryTableField;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -366,8 +369,8 @@ public class SpellCheckerOptionsForm extends AbstractForm {
             }
 
             @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.SingleSelection);
             }
 
             @Override

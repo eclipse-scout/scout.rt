@@ -14,9 +14,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.SpecUtility;
 import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
@@ -37,7 +40,7 @@ public class ActionExtractorTest {
   public void testSingleSelectionExtractor() {
     SingleSelectionExtractor<AbstractMenu> ex = new SingleSelectionExtractor<AbstractMenu>();
     AbstractMenu testAction = mock(AbstractMenu.class);
-    when(testAction.isSingleSelectionAction()).thenReturn(true);
+    when(testAction.getMenuTypes()).thenReturn(CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection));
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
     assertEquals(trueText, text);
@@ -60,7 +63,7 @@ public class ActionExtractorTest {
   public void testMultiSelectionExtractor() {
     MultiSelectionExtractor<AbstractMenu> ex = new MultiSelectionExtractor<AbstractMenu>();
     AbstractMenu testAction = mock(AbstractMenu.class);
-    when(testAction.isMultiSelectionAction()).thenReturn(true);
+    when(testAction.getMenuTypes()).thenReturn(CollectionUtility.<IMenuType> hashSet(TableMenuType.MultiSelection));
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
     assertEquals(trueText, text);
@@ -83,7 +86,7 @@ public class ActionExtractorTest {
   public void testEmptySpaceSelectionExtractor() {
     EmptySpaceSelectionExtractor<AbstractMenu> ex = new EmptySpaceSelectionExtractor<AbstractMenu>();
     AbstractMenu testAction = mock(AbstractMenu.class);
-    when(testAction.isEmptySpaceAction()).thenReturn(true);
+    when(testAction.getMenuTypes()).thenReturn(CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace));
     String trueText = TEXTS.get(AbstractBooleanTextExtractor.DOC_ID_TRUE);
     String text = ex.getText(testAction);
     assertEquals(trueText, text);

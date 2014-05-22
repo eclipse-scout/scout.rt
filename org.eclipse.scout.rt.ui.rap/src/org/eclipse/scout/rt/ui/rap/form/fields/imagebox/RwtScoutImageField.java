@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;

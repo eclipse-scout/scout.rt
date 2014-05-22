@@ -10,18 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
-import java.util.EnumSet;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractTableMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ITableMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class OrganizeColumnsMenu extends AbstractTableMenu {
+public class OrganizeColumnsMenu extends AbstractMenu {
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {
@@ -39,8 +41,8 @@ public class OrganizeColumnsMenu extends AbstractTableMenu {
   }
 
   @Override
-  protected EnumSet<TableMenuType> getConfiguredMenuType() {
-    return EnumSet.of(ITableMenu.TableMenuType.Header);
+  protected Set<IMenuType> getConfiguredMenuTypes() {
+    return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
   }
 
   @Override

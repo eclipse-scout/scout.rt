@@ -10,16 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,7 +42,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   private boolean m_multiSelectionAction;
   private boolean m_emptySpaceAction;
   private boolean m_visibleProperty;
-  private IPropertyObserver m_owner;
   private Object m_ownerValue;
 
   public AbstractMenu() {
@@ -48,6 +50,21 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   public AbstractMenu(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  /**
+   * All menu types this menu should be showed with. For menus which are used in different contexts (Table, Tree,
+   * ValueField) a combination of several menu type definitions can be returned.
+   * 
+   * @see TableMenuType
+   * @see TreeMenuType
+   * @see ValueFieldMenuType
+   * @return
+   */
+  protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+    return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
+        TreeMenuType.SingleSelection,
+        ValueFieldMenuType.NotNull);
   }
 
   /**
@@ -91,90 +108,23 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     if (!CompareUtility.equals(m_ownerValue, newValue)) {
       m_ownerValue = newValue;
       execOwnerValueChanged(newValue);
-      calculateAvailability(newValue);
     }
   }
 
   /**
-   * @param newValue
-   */
-  protected void calculateAvailability(Object newOwnerValue) {
-    if (hasChildActions()) {
-      setAvailableInternal(true);
-      return;
-    }
-    // lagacy support
-
-    boolean available = false;
-    if (getOwner() instanceof IValueField<?>) {
-      available |= isSingleSelectionAction() && newOwnerValue != null;
-      available |= isMultiSelectionAction() && newOwnerValue != null;
-      available |= isEmptySpaceAction() && newOwnerValue == null;
-    }
-    else if (getOwner() instanceof ITable) {
-      if (newOwnerValue instanceof Collection) {
-        Collection collectionValue = (Collection) newOwnerValue;
-        if (isEmptySpaceAction()) {
-          available = collectionValue.isEmpty();
-        }
-        else {
-          Collection<ITableRow> rows = convertToTableRows(collectionValue);
-          if (rows != null) {
-            boolean allEnabled = true;
-            for (ITableRow r : rows) {
-              if (!r.isEnabled()) {
-                allEnabled = false;
-                break;
-              }
-            }
-            if (allEnabled) {
-              available |= isSingleSelectionAction() && collectionValue.size() == 1;
-              available |= isMultiSelectionAction() && collectionValue.size() > 1;
-            }
-          }
-        }
-      }
-      else {
-        available = isEmptySpaceAction() && newOwnerValue == null;
-      }
-    }
-    else if (getOwner() instanceof ITree) {
-      // try tree
-      if (newOwnerValue instanceof Collection) {
-        Collection collectionValue = (Collection) newOwnerValue;
-        if (isEmptySpaceAction()) {
-          available = collectionValue.isEmpty();
-        }
-        else {
-          Collection<ITreeNode> treeNodes = convertToTreeNodes(collectionValue);
-          if (treeNodes != null) {
-            boolean allEnabled = true;
-            for (ITreeNode node : treeNodes) {
-              if (!node.isEnabled()) {
-                allEnabled = false;
-                break;
-              }
-            }
-            if (allEnabled) {
-              available |= isSingleSelectionAction() && collectionValue.size() == 1;
-              available |= isMultiSelectionAction() && collectionValue.size() > 1;
-            }
-          }
-        }
-      }
-      else {
-        available = isEmptySpaceAction() && newOwnerValue == null;
-      }
-    }
-    else {
-      // always available for not value fields
-      available = true;
-    }
-    setAvailableInternal(available);
-  }
-
-  /**
-   * AFTER a new valid master value was stored, this method is called
+   * This method is called after a new valid owner value was stored in the model. The owner is the {@link ITable},
+   * {@link ITree} or {@link IValueField} the menu belongs to. To get changes of other fields use a
+   * {@link PropertyChangeListener} an add it to a certain other field in the {@link AbstractMenu#execInitAction()}
+   * method.
+   * 
+   * @param newOwnerValue
+   *          depending on the owner the newOwnerValue differs.
+   *          <ul>
+   *          <li>for {@link ITree} it is the current selection {@link Set} of {@link ITreeNode}'s.</li>
+   *          <li>for {@link ITable} it is the current selection {@link List} of {@link ITableRow}'s.</li>
+   *          <li>for {@link IValueField} it is the current value.</li>
+   *          </ul>
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50.0)
@@ -182,6 +132,15 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   }
 
+  /**
+   * this method is called before a menu will be displayed. This method should only be used to update the text, icon or
+   * other display styles. <h3>NOTE</h3> <b>Do not change visibility or structure of a
+   * menu in this method unless it is no other option available!</b> <br>
+   * Menus are considered to listen whatever changes of the application model to update their visibility and structure.
+   * This is the only way a GUI layer can reflect menu changes immediately.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(60.0)
   protected void execAboutToShow() throws ProcessingException {
@@ -256,10 +215,9 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   protected void initConfig() {
     super.initConfig();
-    // default
+    setEmptySpaceAction(getConfiguredEmptySpaceAction());
     setSingleSelectionAction(getConfiguredSingleSelectionAction());
     setMultiSelectionAction(getConfiguredMultiSelectionAction());
-    setEmptySpaceAction(getConfiguredEmptySpaceAction());
     if (isSingleSelectionAction() || isMultiSelectionAction() || isEmptySpaceAction()) {
       // ok
     }
@@ -267,32 +225,56 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
       // legacy case of implicit new menu
       setEmptySpaceAction(true);
     }
-    // calculate initial availability (emtpySpace = true, multi = false, single = false)
-    calculateAvailability(null);
+    if (!ConfigurationUtility.isMethodOverwrite(AbstractMenu.class, "getConfiguredMenuTypes", new Class[0], this.getClass())) {
+
+      // legacy
+      Set<IMenuType> menuTypes = new HashSet<IMenuType>();
+      if (isSingleSelectionAction()) {
+        menuTypes.add(TableMenuType.SingleSelection);
+        menuTypes.add(TreeMenuType.SingleSelection);
+        menuTypes.add(ValueFieldMenuType.NotNull);
+      }
+      if (isMultiSelectionAction()) {
+        menuTypes.add(TableMenuType.MultiSelection);
+        menuTypes.add(TreeMenuType.MultiSelection);
+        menuTypes.add(ValueFieldMenuType.NotNull);
+      }
+      if (isEmptySpaceAction()) {
+        menuTypes.add(TableMenuType.EmptySpace);
+        menuTypes.add(TreeMenuType.EmptySpace);
+        menuTypes.add(ValueFieldMenuType.Null);
+      }
+      setMenuTypes(menuTypes);
+    }
+    else {
+      setMenuTypes(getConfiguredMenuTypes());
+    }
   }
 
   @Override
   public void addChildActions(List<? extends IMenu> actionList) {
     super.addChildActions(actionList);
-    afterChildMenusAdd(actionList);
+    if (CollectionUtility.hasElements(actionList)) {
+      afterChildMenusAdd(actionList);
+    }
   }
 
   @Override
   public void removeChildActions(List<? extends IMenu> actionList) {
     super.removeChildActions(actionList);
-    afterChildMenusRemove(actionList);
+    if (CollectionUtility.hasElements(actionList)) {
+      afterChildMenusRemove(actionList);
+    }
   }
 
   protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
     if (CollectionUtility.hasElements(newChildMenus)) {
-      final IPropertyObserver owner = getOwner();
       final Object ownerValue = m_ownerValue;
       IActionVisitor visitor = new IActionVisitor() {
         @Override
         public int visit(IAction action) {
           if (action instanceof IMenu) {
             IMenu menu = (IMenu) action;
-            menu.setOwnerInternal(owner);
             try {
               menu.handleOwnerValueChanged(ownerValue);
             }
@@ -316,7 +298,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         public int visit(IAction action) {
           if (action instanceof IMenu) {
             IMenu menu = (IMenu) action;
-            menu.setOwnerInternal(null);
             try {
               menu.handleOwnerValueChanged(null);
             }
@@ -333,18 +314,14 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setOwnerInternal(IPropertyObserver owner) {
-    if (!CompareUtility.equals(m_owner, owner)) {
-      m_owner = owner;
-      calculateAvailability(m_ownerValue);
-    }
-
+  public Set<IMenuType> getMenuTypes() {
+    return CollectionUtility.<IMenuType> hashSet((Set<IMenuType>) propertySupport.getProperty(PROP_MENU_TYPES));
   }
 
-  @Override
-  public IPropertyObserver getOwner() {
-    return m_owner;
+  public void setMenuTypes(Set<? extends IMenuType> menuTypes) {
+    propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
   }
 
   @SuppressWarnings("deprecation")
@@ -387,15 +364,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   public void setEmptySpaceAction(boolean b) {
     m_emptySpaceAction = b;
-  }
-
-  @Override
-  public boolean isAvailable() {
-    return propertySupport.getPropertyBool(PROP_AVAILABLE);
-  }
-
-  protected void setAvailableInternal(boolean available) {
-    propertySupport.setPropertyBool(PROP_AVAILABLE, available);
   }
 
 }

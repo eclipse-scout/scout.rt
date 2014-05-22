@@ -13,14 +13,15 @@ package org.eclipse.scout.rt.extension.client.ui.desktop.internal;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.extension.client.IWrappedObject;
 
 /**
@@ -89,18 +90,13 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
-  public IPropertyObserver getOwner() {
-    return m_menu.getOwner();
-  }
-
-  @Override
-  public void setOwnerInternal(IPropertyObserver menuOwner) {
-    m_menu.setOwnerInternal(menuOwner);
-  }
-
-  @Override
   public void setParent(IMenu parent) {
     m_menu.setParent(parent);
+  }
+
+  @Override
+  public Set<IMenuType> getMenuTypes() {
+    return m_menu.getMenuTypes();
   }
 
   @Override
@@ -350,6 +346,11 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
     return m_menu.getMnemonic();
   }
 
+  @Override
+  public void aboutToShow() {
+    m_menu.aboutToShow();
+  }
+
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override
@@ -397,13 +398,4 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
     m_menu.handleOwnerValueChanged(newValue);
   }
 
-  @Override
-  public boolean isAvailable() {
-    return m_menu.isAvailable();
-  }
-
-  @Override
-  public void aboutToShow() {
-    m_menu.aboutToShow();
-  }
 }

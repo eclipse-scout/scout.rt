@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -273,7 +274,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(5f)
-  public class Separator1Menu extends MenuSeparator {
+  public class Separator1Menu extends AbstractMenuSeparator {
   }
 
   private void addBookmarkTreeInternal(BookmarkFolder folder, List<IMenu> actionList) {

@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 
 /**
  * , Samuel Moser
  */
 public interface IImageFieldUIFacade {
-
-  List<IMenu> firePopupFromUI();
 
   void setImageTransformFromUI(AffineTransformSpec t);
 

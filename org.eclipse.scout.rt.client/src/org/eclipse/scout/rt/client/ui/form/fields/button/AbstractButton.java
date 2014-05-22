@@ -27,10 +27,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.FormFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -395,19 +395,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     fireButtonEvent(new ButtonEvent(this, ButtonEvent.TYPE_REQUEST_POPUP));
   }
 
-  private List<IMenu> fireButtonPopup() {
-    ButtonEvent e = new ButtonEvent(this, ButtonEvent.TYPE_POPUP);
-    // single observer add our menus
-    for (IMenu menu : getMenus()) {
-      menu.prepareAction();
-      if (menu.isVisible()) {
-        e.addPopupMenu(menu);
-      }
-    }
-    fireButtonEvent(e);
-    return e.getPopupMenus();
-  }
-
   // main handler
   private void fireButtonEvent(ButtonEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(ButtonListener.class);
@@ -432,11 +419,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
-    }
-
-    @Override
-    public List<IMenu> fireButtonPopupFromUI() {
-      return fireButtonPopup();
     }
 
     /**

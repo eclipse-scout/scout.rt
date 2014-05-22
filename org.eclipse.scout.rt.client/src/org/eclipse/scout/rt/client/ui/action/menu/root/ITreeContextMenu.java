@@ -8,11 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
+
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 
 /**
- *
+ * The tree menu container is the invisible root container for all context menus on a tree.
  */
 public interface ITreeContextMenu extends IContextMenu {
 
+  @Override
+  public ITree getOwner();
 }

@@ -58,6 +58,7 @@ public class BatchNormalizerTest {
    * <li>Cacheable: all</li>
    * </ul>
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testNice() throws Exception {
     BatchLookupCall batchCall = new BatchLookupCall();
@@ -122,6 +123,7 @@ public class BatchNormalizerTest {
    * <li>Cacheable: only some</li>
    * </ul>
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testCacheable() throws Exception {
     BatchLookupCall batchCall = new BatchLookupCall();

@@ -92,6 +92,14 @@ public final class CollectionUtility {
     return c1.equals(c2);
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T firstElement(Object c) {
+    if (c instanceof Collection<?>) {
+      return (T) firstElement((Collection<?>) c);
+    }
+    return null;
+  }
+
   /*
    * Collection/List handling
    */

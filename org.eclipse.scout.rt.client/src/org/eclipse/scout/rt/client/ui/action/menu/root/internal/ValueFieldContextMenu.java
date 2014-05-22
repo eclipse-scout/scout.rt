@@ -8,14 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -23,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  *
  */
-public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField> {
+public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> implements IValueFieldContextMenu {
 
   /**
    * @param owner
@@ -35,7 +38,9 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField> {
   @Override
   protected void initConfig() {
     super.initConfig();
-    handleOwnerValueChanged();
+    // set active filter
+    setActiveFilter(ActionUtility.createMenuFilterVisibleForValueFieldValue(getOwner().getValue()));
+    calculateLocalVisibility();
   }
 
   @Override
@@ -68,7 +73,10 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField> {
           return CONTINUE;
         }
       });
+      // set active filter
+      setActiveFilter(ActionUtility.createMenuFilterVisibleForValueFieldValue(ownerValue));
     }
+    calculateLocalVisibility();
   }
 
   @Override

@@ -65,6 +65,11 @@ public final class MenuUtility {
     return CollectionUtility.emptyArrayList();
   }
 
+  /**
+   * @param menu
+   * @return true if the menu is a visible leaf in the menu tree or the menu is a menu group (has child menus) and at
+   *         least one of the recursive child menus is a visisble leaf.
+   */
   public static <T extends IActionNode<?>> boolean isVisible(T menu) {
     if (!menu.isVisible()) {
       return false;
@@ -108,7 +113,7 @@ public final class MenuUtility {
 
     // remove tailing separators
     while (!consolidatedMenus.isEmpty() && consolidatedMenus.getLast().isSeparator()) {
-        consolidatedMenus.removeLast();
+      consolidatedMenus.removeLast();
     }
     return consolidatedMenus;
   }
