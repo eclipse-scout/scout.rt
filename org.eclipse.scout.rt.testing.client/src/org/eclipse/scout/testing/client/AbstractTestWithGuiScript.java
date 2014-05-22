@@ -110,16 +110,24 @@ public abstract class AbstractTestWithGuiScript {
   }
 
   /**
+   * Calls {@link #doTest()} and starts the test.
+   * The timeout of the test is set to infinite but can be overridden by subclasses
+   */
+  @Test(timeout = 0)
+  public void test() throws Throwable {
+    doTest();
+  }
+
+  /**
    * This is the hardwired controller of the ui test.
    * <p>
    * First it schedules a new Job that calls {@link #runGui()}<br>
    * Then is calls {@link #runModel()} <br>
    * When the gui script has finished or failed it schedules back a model job that calls {@link #disposeModel()}
-   * 
+   *
    * @throws Throwable
    */
-  @Test
-  public final void test() throws Throwable {
+  public final void doTest() throws Throwable {
     IGuiMockService guiMockService = SERVICES.getService(IGuiMockService.class);
     if (guiMockService == null) {
       return;
