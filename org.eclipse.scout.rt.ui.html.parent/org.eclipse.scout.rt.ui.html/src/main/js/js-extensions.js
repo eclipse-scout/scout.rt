@@ -1,3 +1,5 @@
+// TODO AWE: Inheritance Diskussion abwarten: dann ggf. löschen
+
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
  */

@@ -4,6 +4,7 @@ scout.ModelAdapter = function(model, session) {
   this.$container;
 
   //check for undefined is necessary for inheritance
+  // TODO AWE: (inheritance) kann es den fall hier überhaupt noch geben, bzw. den else fall?
   if (session && model) {
     this.session.widgetMap[model.id] = this;
   }
@@ -13,9 +14,18 @@ scout.ModelAdapter = function(model, session) {
 scout.ModelAdapter.prototype.attach = function($parent) {
   if (!this.$container) {
     this._render($parent);
+    this._applyModel();
   } else {
     this.$container.appendTo($parent);
   }
+};
+
+scout.ModelAdapter.prototype._render = function() {
+  // NOP
+};
+
+scout.ModelAdapter.prototype._applyModel = function() {
+  // NOP
 };
 
 scout.ModelAdapter.prototype.detach = function() {
