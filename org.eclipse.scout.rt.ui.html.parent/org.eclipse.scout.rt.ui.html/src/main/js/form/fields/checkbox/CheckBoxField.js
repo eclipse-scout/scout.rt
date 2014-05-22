@@ -4,7 +4,6 @@ scout.CheckBoxField = function(model, session) {
 };
 scout.inherits(scout.CheckBoxField, scout.FormField);
 
-
 scout.CheckBoxField.prototype._render = function($parent) {
   scout.CheckBoxField.parent.prototype._render.call(this, $parent);
   this._$checkBox = $('<input type="checkbox" class="field" />');

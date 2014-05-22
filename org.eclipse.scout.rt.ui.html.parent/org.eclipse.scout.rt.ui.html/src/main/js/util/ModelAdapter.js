@@ -21,15 +21,40 @@ scout.ModelAdapter.prototype.attach = function($parent) {
 };
 
 /**
- * The _render method creates the UI through DOM manipulation. At this point we should not apply model
- * properties on the UI, since sub-classes may need to contribute to the DOM first.
+ * This method applies all property changes from the JSON event on this.model and delegates to _onModelPropertyChange.
+ */
+scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
+  for (var propertyName in event) {
+    // exclude 'id' and 'type_' since they're part of the interface and not part of the model
+    // we could move all properties into a data property to separate interface from model data.
+    if (propertyName != 'id' && propertyName != 'type_') {
+      this.model[propertyName] = event[propertyName];
+    }
+  }
+  this._onModelPropertyChange(event);
+}; // TODO AWE: (form) jasmine-test this!
+
+/**
+ * This method is called by the public onModelPropertyChange method after the model has been updated.
+ * Subclasses should overwrite this method to update the UI when a property has changed. The default
+ * impl. des nothing.
+ */
+scout.ModelAdapter.prototype._onModelPropertyChange = function() {
+  // NOP
+};
+
+/**
+ * This method creates the UI through DOM manipulation. At this point we should not apply model
+ * properties on the UI, since sub-classes may need to contribute to the DOM first. The default
+ * impl. des nothing.
  */
 scout.ModelAdapter.prototype._render = function() {
   // NOP
 };
 
 /**
- * Applies model properties on the DOM UI created by the _render() method before.
+ * This method applies model properties on the DOM UI created by the _render() method before.
+ * The default impl. des nothing.
  */
 scout.ModelAdapter.prototype._applyModel = function() {
   // NOP

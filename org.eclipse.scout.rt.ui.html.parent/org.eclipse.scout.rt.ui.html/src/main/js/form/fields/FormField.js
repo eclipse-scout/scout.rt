@@ -32,23 +32,19 @@ scout.FormField.prototype._applyModel = function() {
 };
 
 scout.FormField.prototype._setEnabled = function(enabled) {
-  // TODO AWE: (form) hier ist etwas doof, weil dieser code auch im applyModel aufgerufen wird (1)
-  this.model.enabled = enabled;
+  // NOP
 };
 
 scout.FormField.prototype._setValue = function(value) {
-  // TODO AWE: (form) hier ist etwas doof, weil dieser code auch im applyModel aufgerufen wird (2)
-  this.model.value = value;
+  // NOP
 };
 
 scout.FormField.prototype._setMandatory = function(mandatory) {
-  this.model.mandatory = mandatory;
   this._updateStatusLabel();
 };
 
 
 scout.FormField.prototype._setErrorStatus = function(errorStatus) {
-  this.model.errorStatus = errorStatus;
   this._updateStatusLabel();
 };
 
@@ -79,18 +75,17 @@ scout.FormField.prototype._updateStatusLabel = function() {
   }
 };
 
-// TODO AWE: (form) prinzipiell soll das model bei einem property change immer updated werden
-// am besten passiert das im ModelAdapter. Untersuchen müssen wir, ob wir so nicht ein reihen-
-// folge problem bekommen. Ggf. müssen wir zuerst alle properties die vom server kommen syncen
-// und erst danach die changes abarbeiten.
-scout.FormField.prototype.onModelPropertyChange = function(event) {
+scout.FormField.prototype._onModelPropertyChange = function(event) {
   if (event.hasOwnProperty('value')) {
     this._setValue(event.value);
-  } else if (event.hasOwnProperty('enabled')) {
+  }
+  if (event.hasOwnProperty('enabled')) {
     this._setEnabled(event.enabled);
-  } else if (event.hasOwnProperty('mandatory')) {
+  }
+  if (event.hasOwnProperty('mandatory')) {
     this._setMandatory(event.mandatory);
-  } else if (event.hasOwnProperty('errorStatus')) {
+  }
+  if (event.hasOwnProperty('errorStatus')) {
     this._setErrorStatus(event.errorStatus);
   }
 };
