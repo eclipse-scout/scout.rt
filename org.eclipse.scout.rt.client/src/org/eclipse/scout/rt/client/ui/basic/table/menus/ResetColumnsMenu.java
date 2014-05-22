@@ -45,6 +45,11 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
+    protected boolean getConfiguredInheritAccessibility() {
+      return false;
+    }
+
+    @Override
     protected EnumSet<TableMenuType> getConfiguredMenuType() {
       return EnumSet.of(ITableMenu.TableMenuType.Header);
     }
@@ -83,6 +88,11 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
+    protected boolean getConfiguredInheritAccessibility() {
+      return false;
+    }
+
+    @Override
     protected EnumSet<TableMenuType> getConfiguredMenuType() {
       return EnumSet.of(ITableMenu.TableMenuType.Header);
     }
@@ -115,6 +125,11 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     }
 
     @Override
+    protected boolean getConfiguredInheritAccessibility() {
+      return false;
+    }
+
+    @Override
     protected EnumSet<TableMenuType> getConfiguredMenuType() {
       return EnumSet.of(ITableMenu.TableMenuType.Header);
     }
@@ -138,6 +153,11 @@ public class ResetColumnsMenu extends AbstractTableMenu {
     @Override
     protected String getConfiguredText() {
       return ScoutTexts.get("ResetTableColumnFilter");
+    }
+
+    @Override
+    protected boolean getConfiguredInheritAccessibility() {
+      return false;
     }
 
     @Override

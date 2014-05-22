@@ -38,6 +38,11 @@ public class CopyWidthsOfColumnsMenu extends AbstractTableMenu {
   }
 
   @Override
+  protected boolean getConfiguredInheritAccessibility() {
+    return false;
+  }
+
+  @Override
   protected EnumSet<TableMenuType> getConfiguredMenuType() {
     return EnumSet.of(ITableMenu.TableMenuType.Header);
   }
