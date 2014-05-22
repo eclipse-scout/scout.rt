@@ -162,7 +162,6 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         }
 
         function removeMenu() {
-          $.log('remove')
           var $RowMenuContainer = $('#RowMenuContainer'),
             h = $RowMenuContainer.outerHeight();
 
