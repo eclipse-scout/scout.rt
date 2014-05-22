@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -71,6 +72,7 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
+    m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
     m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -200,7 +202,12 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
-    getUiField().setEnabled(b);
+    if (b) {
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+    }
+    else {
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY);
+    }
   }
 
   private class P_ContextMenuPropertyListener implements PropertyChangeListener {

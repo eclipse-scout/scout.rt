@@ -112,8 +112,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
-    m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.NONE);
-    m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
+    m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
+    m_smartContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_smartContainer, getUiEnvironment(), SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
@@ -222,7 +222,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     }
   }
 
-
   @Override
   protected void detachScout() {
     // workaround since disposeFieldInternal in AbstractSmartField is never called.
@@ -255,10 +254,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     // field
     getUiField().setEnabled(b);
     if (b) {
-      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
     }
     else {
-      m_smartContainer.setData(RWT.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
+      m_smartContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_SMARTFIELD_DISABLED);
     }
   }
 

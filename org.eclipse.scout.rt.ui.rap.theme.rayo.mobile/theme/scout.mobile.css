@@ -726,6 +726,18 @@ Composite.labelfield { padding:6px 0px 0px 0px; }
 
 Composite.htmlfield { padding:6px 0px 0px 0px; }
 
+Composite[BORDER].inputField {
+  padding:0px 0px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+}
+
+Composite[BORDER].inputField-readOnly {
+  padding:0px 0px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
+}
+
 Button.formButton {
   background-image:none;
   color:#000000;
@@ -893,33 +905,33 @@ Link-Hyperlink { color:red; }
 
 Link-Hyperlink:disabled { color:#2a5a76; }
 
-Composite.colorpickerfield {
+Composite[BORDER].colorfield {
   padding:0px 2px 0px 0px;
   border:1px solid #95b7c1;
   border-radius:4px;
   background-image:none;
 }
 
-Composite.colorpickerfield-disabled {
+Composite[BORDER].colorfield-disabled {
   padding:0px 2px 0px 0px;
   border:1px solid #c9dadf;
   border-radius:4px;
 }
 
-Label.colorpickerfield {
+Label.colorfield {
   padding:0px 2px 0px 0px;
   background-image:none;
 }
 
-Label.colorpickerfield_splitLabel { background-color:#95b7c1; }
+Label.colorfield_splitLabel { background-color:#95b7c1; }
 
-Text.colorpickerfield {
+Text.colorfield {
   border-radius:4px;
   background-image:none;
   background-color:transparent;
 }
 
-Text.colorpickerfield:disabled { background-color:#f4f8fc; }
+Text.colorfield:disabled { background-color:#f4f8fc; }
 
 Button.colorpicker_browse {
   background-image:url(theme/img/button/smartfield_browse.png);
@@ -968,18 +980,6 @@ Button.colorpicker_browse_disabled_menu:hover { background-image:url(theme/img/b
 Button-FocusIndicator.colorpicker_browse_disabled_menu {
   background-color:transparent;
   border:none;
-}
-
-Composite.datefield {
-  padding:0px 0px 0px 0px;
-  border:1px solid #95b7c1;
-  border-radius:4px;
-}
-
-Composite.datefield-disabled {
-  padding:0px 0px 0px 0px;
-  border:1px solid #c9dadf;
-  border-radius:4px;
 }
 
 Text.datefield {
@@ -1475,15 +1475,15 @@ Shell-CloseButton:inactive { background-image:url(theme/img/window/shell-close.p
 
 Shell-CloseButton:inactive:hover { background-image:url(theme/img/window/shell-close-hover.png); }
 
-Composite.smartfield {
-  padding:0px;
+Composite[BORDER].smartfield {
+  padding:0px 2px 0px 0px;
   border:1px solid #95b7c1;
   border-radius:4px;
   background-image:none;
 }
 
-Composite.smartfield-disabled {
-  padding:0px;
+Composite[BORDER].smartfield-disabled {
+  padding:0px 2px 0px 0px;
   border:1px solid #c9dadf;
   border-radius:4px;
 }
@@ -1963,18 +1963,6 @@ Text[MULTI][BORDER]:read-only { border:1px solid #c9dadf; }
 
 Text-Message { color:#a7a6aa; }
 
-Composite.timefield {
-  padding:0px 0px 0px 0px;
-  border:1px solid #95b7c1;
-  border-radius:4px;
-}
-
-Composite.timefield-disabled {
-  padding:0px 0px 0px 0px;
-  border:1px solid #c9dadf;
-  border-radius:4px;
-}
-
 Text.timefield {
   border-radius:4px;
   background-image:none;
@@ -2403,6 +2391,10 @@ CLabel.mobileFormHeader {
 Composite.mobileFormFooter { background-image:gradient(linear,left top,left bottom,from(#ddebf4),to(#d4e1e7)); }
 
 Composite.smartFieldActionBar { background-image:gradient(linear,left top,left bottom,from(#ddebf4),to(#d4e1e7)); }
+
+Composite.smartfield { padding:0px; }
+
+Composite.smartfield-disabled { padding:0px; }
 
 Composite.smartfield:hover { background-color:#fef9f1; }
 

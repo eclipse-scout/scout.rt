@@ -17,6 +17,6 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
  *
  */
 public interface IRwtScoutColorField extends IRwtScoutFormField<IColorField> {
-  String VARIANT_COLORPICKERFIELD = "colorpickerfield";
-  String VARIANT_COLORPICKERFIELD_DISABLED = "colorpickerfield-disabled";
+  String VARIANT_COLOR_FIELD = "colorfield";
+  String VARIANT_COLOR_FIELD_DISABLED = "colorfield-disabled";
 }

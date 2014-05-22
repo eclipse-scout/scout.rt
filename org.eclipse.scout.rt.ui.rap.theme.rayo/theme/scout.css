@@ -756,6 +756,16 @@ Composite.htmlfield {
   /* a little padding to make sure the content is on the same line as the field's label */
   padding: 4px 0px 0px 0px;
 }
+Composite[BORDER].inputField {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite[BORDER].inputField-readOnly {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
 Button.formButton {
   background-image: none;
   color: #000000;
@@ -855,33 +865,33 @@ Link-Hyperlink {
 Link-Hyperlink:disabled {
   color: #2a5a76;
 }
-Composite.colorpickerfield {
+Composite[BORDER].colorfield {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
   background-image: none;
 }
-Composite.colorpickerfield-disabled {
+Composite[BORDER].colorfield-disabled {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
   border-radius: 4px;
 }
-Label.colorpickerfield {
+Label.colorfield {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   background-image: none;
 }
-Label.colorpickerfield_splitLabel {
+Label.colorfield_splitLabel {
   background-color: #95b7c1;
 }
-Text.colorpickerfield {
+Text.colorfield {
   border-radius: 4px;
   background-image: none;
   background-color: transparent;
 }
-Text.colorpickerfield:disabled {
+Text.colorfield:disabled {
   background-color: #f4f8fc;
 }
 Button.colorpicker_browse {
@@ -930,16 +940,6 @@ Button-FocusIndicator.colorpicker_browse_disabled_menu {
   border: none;
 }
 /*Datefield*/
-Composite.datefield {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #95b7c1;
-  border-radius: 4px;
-}
-Composite.datefield-disabled {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #c9dadf;
-  border-radius: 4px;
-}
 Text.datefield {
   border-radius: 4px;
   background-image: none;
@@ -1419,14 +1419,14 @@ Shell-CloseButton:inactive {
 Shell-CloseButton:inactive:hover {
   background-image: url(theme/img/window/shell-close-hover.png );
 }
-Composite.smartfield {
+Composite[BORDER].smartfield {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
   background-image: none;
 }
-Composite.smartfield-disabled {
+Composite[BORDER].smartfield-disabled {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
@@ -1778,16 +1778,6 @@ Text-Message {
   color: #a7a6aa;
 }
 /*Timefield*/
-Composite.timefield {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #95b7c1;
-  border-radius: 4px;
-}
-Composite.timefield-disabled {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #c9dadf;
-  border-radius: 4px;
-}
 Text.timefield {
   border-radius: 4px;
   background-image: none;

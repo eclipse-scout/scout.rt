@@ -76,7 +76,7 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_colorPickerContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, getColorPickerFieldVariant());
+    m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_COLOR_FIELD);
 
     m_colorPreviewLabel = getUiEnvironment().getFormToolkit().createLabel(m_colorPickerContainer, "");
     m_colorPreviewLabel.addDisposeListener(new DisposeListener() {
@@ -178,11 +178,11 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
   }
 
   protected String getColorPickerFieldVariant() {
-    return VARIANT_COLORPICKERFIELD;
+    return VARIANT_COLOR_FIELD;
   }
 
   protected String getColorPickerFieldDisabledVariant() {
-    return VARIANT_COLORPICKERFIELD_DISABLED;
+    return VARIANT_COLOR_FIELD_DISABLED;
   }
 
   @Override
@@ -291,10 +291,10 @@ public class RwtScoutColorField extends RwtScoutBasicFieldComposite<IColorField>
     m_colorPickButton.setEnabled(b);
     getUiField().setEnabled(b);
     if (b) {
-      m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, getColorPickerFieldVariant());
+      m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_COLOR_FIELD);
     }
     else {
-      m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, getColorPickerFieldDisabledVariant());
+      m_colorPickerContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_COLOR_FIELD_DISABLED);
     }
   }
 
