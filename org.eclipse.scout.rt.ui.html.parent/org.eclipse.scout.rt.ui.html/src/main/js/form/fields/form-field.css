@@ -42,22 +42,23 @@ div.inbox {
 }
 
 .form-field {
-  background-color: #eaeaea;
+  background-color: #f8f8f8;
   height: 25px;
-  /*width: 100%;*/
-  border: 1px solid #999;
+  border: 1px solid #eeeeee;
 }
 
 .form-field > .label {
   color: #5D5D5D;
-  float: left;
-  position: relative;
+  display:inline-block;
   top: 8px;
   width: 130px;
 }
 
 .status-label {
-  height: 16px;
-  width: 16px;
-  background-color:orange;
+  display:inline-block;
+  width : 15px;
+}
+
+.error-status {
+  background-color:yellow;
 }

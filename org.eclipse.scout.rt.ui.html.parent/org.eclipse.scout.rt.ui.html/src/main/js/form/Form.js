@@ -8,7 +8,7 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 scout.Form.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form');
   // TODO AWE: append form title section (including ! ? and progress indicator)
-  this._$title = this.$container.appendDiv(undefined, 'form-title', 'TODO: Form title');
+  this._$title = this.$container.appendDiv(undefined, 'form-title', this.model.title);
 
   // TODO AWE: copy/paste from GroupBox.js
   var formField, i, formFieldModel;

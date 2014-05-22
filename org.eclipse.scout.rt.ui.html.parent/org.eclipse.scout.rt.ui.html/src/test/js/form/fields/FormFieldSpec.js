@@ -20,5 +20,4 @@ describe("FormField", function() {
 
   // TODO AWE: (form) add more tests to FormFieldSpec
 
-
 });
