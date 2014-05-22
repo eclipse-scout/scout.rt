@@ -596,14 +596,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
         setSelectionFromScout(e.getTable().getSelectedRows());
         break;
-      case TableEvent.TYPE_ROWS_INSERTED:
-      case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_DELETED:
-      case TableEvent.TYPE_ALL_ROWS_DELETED:
-      case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-        setSelectionFromScout(e.getTable().getSelectedRows());
-        break;
-      }
     }
   }
 
