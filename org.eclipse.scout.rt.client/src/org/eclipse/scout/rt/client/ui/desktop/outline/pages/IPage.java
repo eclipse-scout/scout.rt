@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
  * {@link IPageWithTable} In the outline, it is possible to drill down the content of the node (except if the page is
  * configured as a leaf)
  */
-public abstract interface IPage extends ITreeNode, ITypeWithClassId {
+public interface IPage extends ITreeNode, ITypeWithClassId {
 
   void initPage() throws ProcessingException;
 

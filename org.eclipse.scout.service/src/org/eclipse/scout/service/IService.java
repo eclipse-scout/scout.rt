@@ -152,7 +152,7 @@ import org.osgi.framework.ServiceRegistration;
  * 
  * @since 1.0.0 see also {@link org.eclipse.scout.commons.annotations.Priority} for defining service ranking
  */
-public abstract interface IService {
+public interface IService {
   /**
    * The method is called by the framework just after the service was lazily
    * created by the service factory (not when it was registered!). The service

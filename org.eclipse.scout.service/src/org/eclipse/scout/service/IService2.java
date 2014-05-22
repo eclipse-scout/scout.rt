@@ -152,5 +152,5 @@ package org.eclipse.scout.service;
  * @deprecated will be removed with M-Release. Use {@link IService} instead.
  */
 @Deprecated
-public abstract interface IService2 extends IService {
+public interface IService2 extends IService {
 }
