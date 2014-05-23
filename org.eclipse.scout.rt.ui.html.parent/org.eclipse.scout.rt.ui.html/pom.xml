@@ -58,6 +58,8 @@
           </execution>
         </executions>
         <configuration>
+          <!-- AWE: do not break build when Jasmine tests fail -->
+          <haltOnFailure>false</haltOnFailure>
           <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
           <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
           <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
