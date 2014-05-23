@@ -127,7 +127,7 @@ transition: height 0.2s;
 #DesktopTree.bread-crum .tree-home {
 display:block;
 cursor: pointer;
-left: calc(50% - 24px);
+left: calc(50% - 30px);
 position: relative;
 border-radius: 30%;
 width: 40px;
