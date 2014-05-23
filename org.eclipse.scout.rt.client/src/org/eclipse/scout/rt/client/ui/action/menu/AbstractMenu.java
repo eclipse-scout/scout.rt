@@ -59,7 +59,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * @see TableMenuType
    * @see TreeMenuType
    * @see ValueFieldMenuType
-   * @return
    */
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
     return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
