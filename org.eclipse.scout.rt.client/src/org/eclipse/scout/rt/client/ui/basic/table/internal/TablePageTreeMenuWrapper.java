@@ -37,7 +37,24 @@ public class TablePageTreeMenuWrapper implements IMenu {
   private boolean m_localEnabled;
   private Set<IMenuType> m_menuTypes;
 
-  public TablePageTreeMenuWrapper(IMenu wrappedMenu, IMenuType... menuTypes) {
+  /**
+   * API to ensure at least one menu type!
+   */
+  public TablePageTreeMenuWrapper(IMenu wrappedMenu, IMenuType firstMenuType, IMenuType... additionalTypes) {
+    Set<IMenuType> menuTypeSet = CollectionUtility.hashSet(firstMenuType);
+    if (additionalTypes != null) {
+      for (IMenuType t : additionalTypes) {
+        if (t != null) {
+          menuTypeSet.add(t);
+        }
+      }
+    }
+    m_wrappedMenu = wrappedMenu;
+    m_menuTypes = menuTypeSet;
+    setup();
+  }
+
+  public TablePageTreeMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
     m_wrappedMenu = wrappedMenu;
     m_menuTypes = CollectionUtility.hashSet(menuTypes);
     setup();
@@ -51,7 +68,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
     // create child wrapper
     for (IMenu m : childActions) {
-      wrappedChildActions.add(new TablePageTreeMenuWrapper(m));
+      wrappedChildActions.add(new TablePageTreeMenuWrapper(m, getMenuTypes()));
     }
     m_childMenus = wrappedChildActions;
   }
