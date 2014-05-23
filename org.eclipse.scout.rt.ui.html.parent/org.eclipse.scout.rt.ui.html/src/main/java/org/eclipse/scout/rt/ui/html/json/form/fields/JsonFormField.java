@@ -73,7 +73,6 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
       @Override
       public Object valueToJson(Object value) {
-        // TODO AWE: (layout) prüfen ob das immer != null ist
         return new JsonGridData((GridData) value).toJson();
       }
     });

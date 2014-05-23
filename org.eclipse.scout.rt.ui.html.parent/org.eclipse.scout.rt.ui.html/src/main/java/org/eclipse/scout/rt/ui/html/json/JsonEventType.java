@@ -36,7 +36,7 @@ public enum JsonEventType {
   }
 
   public boolean matches(JsonEvent jsonEvent) {
-    return matches(jsonEvent.getEventType());
+    return matches(jsonEvent.getType());
   }
 
   public static JsonEventType valueOfName(String eventType) {

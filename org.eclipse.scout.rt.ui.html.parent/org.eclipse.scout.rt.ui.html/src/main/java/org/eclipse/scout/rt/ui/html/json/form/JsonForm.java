@@ -127,7 +127,7 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_FORM_CLOSING.equals(event.getEventType())) {
+    if (EVENT_FORM_CLOSING.equals(event.getType())) {
       handleUiFormClosing(event, res);
     }
   }

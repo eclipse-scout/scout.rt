@@ -133,24 +133,24 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_ROW_CLICKED.equals(event.getEventType())) {
+    if (EVENT_ROW_CLICKED.equals(event.getType())) {
       handleUiRowClicked(event, res);
     }
-    else if (EVENT_ROW_ACTION.equals(event.getEventType())) {
+    else if (EVENT_ROW_ACTION.equals(event.getType())) {
       handleUiRowAction(event, res);
     }
-    else if (EVENT_ROWS_SELECTED.equals(event.getEventType())) {
+    else if (EVENT_ROWS_SELECTED.equals(event.getType())) {
       handleUiRowsSelected(event, res);
     }
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getEventObject());
+    final ITableRow tableRow = extractTableRow(event.getJsonObject());
     getModelObject().getUIFacade().fireRowClickFromUI(tableRow);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
-    final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
+    final List<ITableRow> tableRows = extractTableRows(event.getJsonObject());
     TableEvent tableEvent = new TableEvent(getModelObject(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
     getTableEventFilter().addIgnorableModelEvent(tableEvent);
     try {
@@ -162,7 +162,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getEventObject());
+    final ITableRow tableRow = extractTableRow(event.getJsonObject());
     getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
   }
 

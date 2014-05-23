@@ -91,7 +91,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_ACTIVATE.equals(event.getEventType())) {
+    if (EVENT_ACTIVATE.equals(event.getType())) {
       handleUiActivate(event, res);
     }
     else {
@@ -100,7 +100,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
   }
 
   public void handleUiActivate(JsonEvent event, JsonResponse res) {
-    final String formId = getString(event.getEventObject(), JsonForm.PROP_FORM_ID);
+    final String formId = getString(event.getJsonObject(), JsonForm.PROP_FORM_ID);
     JsonForm jsonForm = getCurrentJsonForm();
     while (!jsonForm.getId().equals(formId) || getModelObject().getCurrentNavigationForm() == null) {
       try {

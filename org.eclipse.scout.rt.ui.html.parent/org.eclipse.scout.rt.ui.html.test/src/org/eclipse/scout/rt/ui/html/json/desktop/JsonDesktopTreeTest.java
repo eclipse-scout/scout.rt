@@ -134,7 +134,7 @@ public class JsonDesktopTreeTest {
     JsonEvent event = JsonTestUtility.createJsonEvent(JsonDesktopTree.EVENT_NODES_SELECTED);
     JSONArray nodeIds = new JSONArray();
     nodeIds.put(nodeId);
-    event.getEventObject().put(JsonDesktopTree.PROP_NODE_IDS, nodeIds);
+    event.getJsonObject().put(JsonDesktopTree.PROP_NODE_IDS, nodeIds);
     return event;
   }
 }

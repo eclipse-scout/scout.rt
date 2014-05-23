@@ -42,7 +42,7 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_MENU_ACTION.equals(event.getEventType())) {
+    if (EVENT_MENU_ACTION.equals(event.getType())) {
       handleUiMenuAction(event, res);
     }
   }

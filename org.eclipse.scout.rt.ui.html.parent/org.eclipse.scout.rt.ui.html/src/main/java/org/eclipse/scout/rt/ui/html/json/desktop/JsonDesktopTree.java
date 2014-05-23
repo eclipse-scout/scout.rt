@@ -350,22 +350,22 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("nodeClicked".equals(event.getEventType())) {
+    if ("nodeClicked".equals(event.getType())) {
       handleUiNodeClick(event, res);
     }
-    else if (EVENT_NODES_SELECTED.equals(event.getEventType())) {
+    else if (EVENT_NODES_SELECTED.equals(event.getType())) {
       handleUiNodesSelected(event, res);
     }
-    else if (EVENT_NODE_EXPANDED.equals(event.getEventType())) {
+    else if (EVENT_NODE_EXPANDED.equals(event.getType())) {
       handleUiNodeExpanded(event, res);
     }
-    else if ("graph".equals(event.getEventType())) {
+    else if ("graph".equals(event.getType())) {
       handleUiGraph(event, res);
     }
-    else if ("map".equals(event.getEventType())) {
+    else if ("map".equals(event.getType())) {
       handleUiMap(event, res);
     }
-    else if ("dataModel".equals(event.getEventType())) {
+    else if ("dataModel".equals(event.getType())) {
       handleUiDataModel(event, res);
     }
     else {
@@ -374,12 +374,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(getString(event.getEventObject(), PROP_NODE_ID));
+    final ITreeNode node = getTreeNodeForNodeId(getString(event.getJsonObject(), PROP_NODE_ID));
     getModelObject().getUIFacade().fireNodeClickFromUI(node);
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
-    final List<ITreeNode> nodes = extractTreeNodes(event.getEventObject());
+    final List<ITreeNode> nodes = extractTreeNodes(event.getJsonObject());
     TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
@@ -392,8 +392,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(getString(event.getEventObject(), PROP_NODE_ID));
-    final boolean expanded = getBoolean(event.getEventObject(), "expanded");
+    final ITreeNode node = getTreeNodeForNodeId(getString(event.getJsonObject(), PROP_NODE_ID));
+    final boolean expanded = getBoolean(event.getJsonObject(), "expanded");
     if (node.isExpanded() == expanded) {
       return;
     }
@@ -410,14 +410,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   protected void handleUiGraph(JsonEvent event, JsonResponse res) {
     JSONObject responseEvent = new JSONObject();
     putProperty(responseEvent, "graph", newJSONObject(GRAPH));
-    String nodeId = getString(event.getEventObject(), PROP_NODE_ID);
+    String nodeId = getString(event.getJsonObject(), PROP_NODE_ID);
     getJsonSession().currentJsonResponse().addActionEvent("graphLoaded", nodeId, responseEvent);
   }
 
   protected void handleUiMap(JsonEvent event, JsonResponse res) {
     JSONObject responseEvent = new JSONObject();
     putProperty(responseEvent, "map", newJSONObject(MAP));
-    String nodeId = getString(event.getEventObject(), PROP_NODE_ID);
+    String nodeId = getString(event.getJsonObject(), PROP_NODE_ID);
     getJsonSession().currentJsonResponse().addActionEvent("mapLoaded", nodeId, responseEvent);
   }
 

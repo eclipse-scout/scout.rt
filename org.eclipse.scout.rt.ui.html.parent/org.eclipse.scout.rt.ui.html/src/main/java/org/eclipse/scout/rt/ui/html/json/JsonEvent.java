@@ -12,26 +12,29 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.json.JSONObject;
 
+/**
+ * This class is a Java wrapper around a <code>JSONObject</code> with properties 'type_' and 'id'.
+ */
 public class JsonEvent {
 
   public static final String TYPE = "type_";
   public static final String ID = "id";
 
-  private final JSONObject m_event;
+  private final JSONObject m_json;
 
   public JsonEvent(JSONObject event) {
-    m_event = event;
+    m_json = event;
   }
 
-  public String getEventType() { // TODO AWE: re-name type
-    return JsonObjectUtility.getString(m_event, TYPE);
+  public String getType() {
+    return JsonObjectUtility.getString(m_json, TYPE);
   }
 
-  public String getEventId() {// re-name type
-    return JsonObjectUtility.getString(m_event, ID);
+  public String getId() {
+    return JsonObjectUtility.getString(m_json, ID);
   }
 
-  public JSONObject getEventObject() {
-    return m_event;
+  public JSONObject getJsonObject() {
+    return m_json;
   }
 }

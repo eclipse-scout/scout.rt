@@ -136,7 +136,7 @@ public class JsonTableTest {
     JsonEvent event = JsonTestUtility.createJsonEvent(JsonTable.EVENT_ROWS_SELECTED);
     JSONArray rowIds = new JSONArray();
     rowIds.put(rowId);
-    event.getEventObject().put(JsonTable.PROP_ROW_IDS, rowIds);
+    event.getJsonObject().put(JsonTable.PROP_ROW_IDS, rowIds);
     return event;
   }
 
