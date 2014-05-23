@@ -58,6 +58,7 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     updateTextFromScout();
     updateEnabledFormScout();
     updateVisibleFromScout();
+    updateTooltipTextFromScout();
   }
 
   @Override
@@ -122,6 +123,13 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     getUiField().setLayoutData(data);
   }
 
+  /**
+   * @since 4.1.0 (backported)
+   */
+  protected void updateTooltipTextFromScout() {
+    getUiField().setToolTipText(getScoutObject().getTooltipText());
+  }
+
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     if (IToolButton.PROP_ICON_ID.equals(name)) {
@@ -139,6 +147,9 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     }
     else if (IToolButton.PROP_VISIBLE.equals(name)) {
       updateVisibleFromScout();
+    }
+    else if (IToolButton.PROP_TOOLTIP_TEXT.equals(name)) {
+      updateTooltipTextFromScout();
     }
   }
 
