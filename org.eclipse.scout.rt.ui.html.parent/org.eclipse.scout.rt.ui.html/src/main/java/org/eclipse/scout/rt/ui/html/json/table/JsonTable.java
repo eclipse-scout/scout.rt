@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +41,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.desktop.MenuManager;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,25 +50,20 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
-  public static final String EVENT_SELECTION_MENUS_CHANGED = "selectionMenusChanged";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_MENUS = "menus";
-  public static final String PROP_SELECTION_MENUS = "selectionMenus";
-  public static final String PROP_EMPTY_SPACE_MENUS = "emptySpaceMenus";
 
   private P_ModelTableListener m_modelTableListener;
   private Map<String, ITableRow> m_tableRows;
   private Map<ITableRow, String> m_tableRowIds;
   private TableEventFilter m_tableEventFilter;
-  private MenuManager m_menuManager;
 
   public JsonTable(ITable modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(modelObject);
-    m_menuManager = new MenuManager(getJsonSession());
 
     putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_HEADER_VISIBLE, modelObject) {
       @Override
@@ -124,10 +117,7 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
       jsonRows.put(jsonRow);
     }
     putProperty(json, "rows", jsonRows);
-    m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
-    putProperty(json, PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
-    m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
-    putProperty(json, PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
+    putProperty(json, PROP_MENUS, modelObjectsToJson(getModelObject().getMenus()));
     return json;
   }
 
@@ -164,14 +154,6 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
     final ITableRow tableRow = extractTableRow(event.getJsonObject());
     getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
-  }
-
-  protected List<IMenu> fetchMenusForSelection() {
-    return new LinkedList<IMenu>(getModelObject().getMenus());
-  }
-
-  protected List<IMenu> fetchMenusForEmptySpace() {
-    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {
@@ -324,13 +306,6 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
   }
 
   protected void handleModelTableEvent(TableEvent event) {
-    switch (event.getType()) {
-      case TableEvent.TYPE_ROWS_SELECTED: {
-        handleModelSelectionMenusChanged(event.getRows());
-        break;
-      }
-    }
-
     event = getTableEventFilter().filterIgnorableModelEvent(event);
     if (event == null) {
       return;
@@ -395,15 +370,6 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
       jsonRowIds.put(rowId);
     }
     getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
-  }
-
-  protected void handleModelSelectionMenusChanged(Collection<ITableRow> modelRows) {
-    JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
-    if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
-      putProperty(jsonEvent, PROP_MENUS, m_menuManager.getJsonSelectionMenus());
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
-    }
   }
 
   private class P_ModelTableListener implements TableListener {

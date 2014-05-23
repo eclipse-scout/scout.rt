@@ -40,10 +40,10 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
 
     function onMouseUp(event) {
       $(".table-row").off(".menuHandler");
-      showSelectionMenu(event.pageX, event.pageY, event.which);
+      showRowMenu(event.pageX, event.pageY, event.which);
     }
 
-    function showSelectionMenu(x, y, button) {
+    function showRowMenu(x, y, button) {
       // selection
       var $selectedRows = $('.row-selected'),
         $firstRow = $selectedRows.first();
@@ -59,13 +59,29 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         var h1 = $RowDrill.outerHeight();
         $RowDrill.height(0).animateAVCSD('height', h1, null, null, 75);
       }
-      var $RowMenu = $('#RowMenu');
-      if ($RowMenu.length === 0) {
-        $RowMenu = that.table.$dataScroll.appendDiv('RowMenu')
-          .on('click', '', clickRowMenu);
 
-        var h2 = $RowMenu.outerHeight();
-        $RowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
+      var menus;
+      if ($selectedRows.length > 1) {
+        menus = that.filterMultiSelectionRowMenus(that.table.model.menus);
+      } else {
+        menus = that.filterSingleSelectionRowMenus(that.table.model.menus);
+      }
+
+      var $RowMenu = $('#RowMenu');
+      if (!menus || menus.length === 0) {
+        if ($RowMenu.length > 0) {
+          $RowMenu.remove();
+        }
+      } else {
+        if ($RowMenu.length === 0) {
+          $RowMenu = that.table.$dataScroll.appendDiv('RowMenu')
+            .on('click', '', clickRowMenu);
+
+          var h2 = $RowMenu.outerHeight();
+          $RowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
+        }
+
+        $RowMenu.data('menus', menus);
       }
 
       // place menu
@@ -109,7 +125,7 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
           removeMenu();
         }
 
-        var menus = that.table.model.selectionMenus;
+        var menus = $RowMenu.data('menus');
         if (menus && menus.length > 0) {
           // create 2 container, animate do not allow overflow
           var $RowMenuContainer = $RowMenu.beforeDiv('RowMenuContainer')
@@ -119,6 +135,9 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
 
           // create menu-item and menu-button
           for (var i = 0; i < menus.length; i++) {
+            if (menus[i].separator) {
+              continue;
+            }
             if (menus[i].iconId) {
               $RowMenuContainer.appendDiv('', 'menu-button')
                 .attr('id', menus[i].id)
@@ -131,6 +150,9 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
                 .attr('id', menus[i].id)
                 .on('click', '', onMenuItemClicked);
             }
+
+            var menuAdapter = that.table.session.widgetMap[menus[i].id];
+            menuAdapter.sendAboutToShow();
           }
 
           // wrap menu-buttons and add one div for label
@@ -147,6 +169,8 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
 
           // every user action will close menu
           $('*').one('mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu', removeMenu);
+
+          //FIXME CGU we need to wait for the server calls to be finished before showing the menus.
         }
 
         function onHoverIn() {
@@ -174,4 +198,12 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
       }
     }
   }
+};
+
+scout.TableRowMenuHandler.prototype.filterSingleSelectionRowMenus = function(menus) {
+  return scout.menus.filter(menus, ['SingleSelection']);
+};
+
+scout.TableRowMenuHandler.prototype.filterMultiSelectionRowMenus = function(menus) {
+  return scout.menus.filter(menus, ['MultiSelection']);
 };

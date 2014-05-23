@@ -16,10 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserverRenderer.class);
 
   private P_PropertyChangeListener m_propertyChangeListener;
 
@@ -73,6 +76,7 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, jsonProperty.valueToJson(newValue));
+      LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId());
     }
   }
 

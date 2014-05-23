@@ -35,7 +35,7 @@ describe("MobileTable", function() {
       var table = helper.createMobileTable(model);
       table.attach(session.$entryPoint);
 
-      model.selectionMenus = [helper.createMenu('1','menu')];
+      model.menus = [helper.createMenuModel('1','menu')];
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerRightClick();
 

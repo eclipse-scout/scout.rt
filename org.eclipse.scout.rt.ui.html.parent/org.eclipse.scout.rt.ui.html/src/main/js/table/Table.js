@@ -27,6 +27,13 @@ scout.Table = function(model, session) {
       this.configurator.configure(this);
     }
     this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+
+    if (this.model.menus) {
+      for(var i=0;i<this.model.menus.length;i++) {
+        var menu = this.session.objectFactory.create(this.model.menus[i]);
+        menu.owner = this;
+      }
+    }
   }
 };
 
@@ -34,7 +41,6 @@ scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.EVENT_ROWS_INSERTED = 'rowsInserted';
 scout.Table.EVENT_ROW_CLICKED = 'rowClicked';
 scout.Table.EVENT_ROW_ACTION = 'rowAction';
-scout.Table.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
 
 scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -544,18 +550,6 @@ scout.Table.prototype.findSelectedRows = function() {
   return this.$dataScroll.find('.row-selected');
 };
 
-scout.Table.prototype._onSelectionMenusChanged = function(selectedRowIds, menus) {
-  this.model.selectionMenus = menus;
-
-  var $selectedRows = this.findSelectedRows();
-  //FIXME see tree for reference
-
-  //delgate to handler
-  if (this.rowMenuHandler) {
-//  this.rowMenuHandler.xxx
-  }
-};
-
 scout.Table.prototype.filter = function() {
   var that = this,
     rowCount = 0,
@@ -794,9 +788,11 @@ scout.Table.prototype.onModelAction = function(event) {
     this.insertRows(event.rows);
   } else if (event.type_ == scout.Table.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
-  } else if (event.type_ == scout.Table.EVENT_SELECTION_MENUS_CHANGED) {
-    this._onSelectionMenusChanged(event.selectedRowIds, event.menus);
   } else {
     $.log("Model event not handled. Widget: scout.Table. Event: " + event.type_ + ".");
   }
+};
+
+scout.Table.prototype.onMenuPropertyChange = function(event) {
+  //FIXME CGU implement
 };

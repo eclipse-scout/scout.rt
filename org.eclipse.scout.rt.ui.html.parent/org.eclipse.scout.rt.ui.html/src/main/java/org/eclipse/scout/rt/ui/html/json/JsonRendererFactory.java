@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.rangebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 
@@ -63,6 +65,9 @@ public class JsonRendererFactory {
       return new JsonFormField((IFormField) modelObject, session, id);
     }
     // other model objects
+    else if (modelObject instanceof IContextMenu) {
+      return new JsonContextMenu((IContextMenu) modelObject, session, id);
+    }
     else if (modelObject instanceof IMenu) {
       return new JsonMenu((IMenu) modelObject, session, id);
     }

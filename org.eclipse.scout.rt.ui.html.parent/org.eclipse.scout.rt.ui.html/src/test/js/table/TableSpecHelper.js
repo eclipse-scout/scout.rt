@@ -1,5 +1,7 @@
+/* global MenuSpecHelper */
 var TableSpecHelper = function(session) {
   this.session = session;
+  this.menuHelper = new MenuSpecHelper();
 };
 
 TableSpecHelper.prototype.createModel = function(id, columns, rows) {
@@ -31,13 +33,8 @@ TableSpecHelper.prototype.createModelCell = function(text) {
   };
 };
 
-TableSpecHelper.prototype.createMenu = function(id, text, icon) {
-  return {
-    "id": id,
-    "text": text,
-    "iconId": icon,
-    "objectType": "Menu"
-  };
+TableSpecHelper.prototype.createMenuModel = function(id, text, icon) {
+  return this.menuHelper.createModel(id, text, icon, ['SingleSelection']);
 };
 
 TableSpecHelper.prototype.createModelColumns = function(count) {
@@ -100,4 +97,8 @@ TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {
 
 TableSpecHelper.prototype.getDisplayingRowMenu = function(table) {
   return table.$data.find('#RowMenu');
+};
+
+TableSpecHelper.prototype.getDisplayingRowMenuContainer = function(table) {
+  return table.$data.find('#RowMenuContainer');
 };

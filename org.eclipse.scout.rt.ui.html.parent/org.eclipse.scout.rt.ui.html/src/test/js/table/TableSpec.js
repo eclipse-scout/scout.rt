@@ -2,6 +2,7 @@
 describe("Table", function() {
   var session;
   var helper;
+  var menuHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -158,6 +159,32 @@ describe("Table", function() {
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED]);
     });
 
+    it("shows menu icon if there are menus", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      model.menus = [helper.createMenuModel('1', 'menu')];
+      var $row = table.$dataScroll.children().first();
+      clickRowAndAssertSelection(table, $row);
+
+      var $menu = helper.getDisplayingRowMenu(table);
+      expect($menu.length).toBeTruthy();
+    });
+
+    it("does not show menu icon if there are no menus", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      model.menus = undefined;
+      var $row = table.$dataScroll.children().first();
+      clickRowAndAssertSelection(table, $row);
+
+      var $menu = helper.getDisplayingRowMenu(table);
+      expect($menu.length).toBeFalsy();
+    });
+
   });
 
   describe("row double click", function() {
@@ -183,12 +210,32 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      model.selectionMenus = [helper.createMenu('1', 'menu')];
+      var menuModel = helper.createMenuModel('1', 'menu');
+      new scout.Menu(menuModel, session); //register adapter
+      model.menus = [menuModel];
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerRightClick();
 
       var $menu = helper.getDisplayingRowMenu(table);
       expect($menu.length).toBeTruthy();
+    });
+
+    it("and sends aboutToShow for every menu item", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      var menuModel = helper.createMenuModel('1', 'menu');
+      new scout.Menu(menuModel, session); //register adapter
+      model.menus = [menuModel];
+      var $row0 = table.$dataScroll.children().eq(0);
+      $row0.triggerRightClick();
+
+      jasmine.clock().tick(0);
+
+      var requestData = mostRecentJsonRequest();
+      var event = new scout.Event(scout.Menu.EVENT_ABOUT_TO_SHOW, '1');
+      expect(requestData).toContainEvents(event);
     });
 
   });

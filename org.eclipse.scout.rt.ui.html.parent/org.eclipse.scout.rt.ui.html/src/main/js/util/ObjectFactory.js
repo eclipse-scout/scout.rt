@@ -71,6 +71,11 @@ scout.defaultObjectFactories = [{
     return new scout.Form(model, session);
   }
 }, {
+  objectType: 'Menu',
+  create: function(model, session) {
+    return new scout.Menu(model, session);
+  }
+}, {
   objectType: 'FormField',
   create: function(model, session) {
     return new scout.FormField(model, session);

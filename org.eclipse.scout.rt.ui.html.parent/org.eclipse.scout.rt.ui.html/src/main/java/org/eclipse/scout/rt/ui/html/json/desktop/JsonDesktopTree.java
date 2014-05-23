@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -32,30 +31,27 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutline> {
+public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutline> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
-  public static final String EVENT_SELECTION_MENUS_CHANGED = "selectionMenusChanged";
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
   public static final String PROP_MENUS = "menus";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
-  public static final String PROP_SELECTION_MENUS = "selectionMenus";
-  public static final String PROP_EMPTY_SPACE_MENUS = "emptySpaceMenus";
 
   private P_ModelTreeListener m_modelTreeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
-  private MenuManager m_menuManager;
 
   //FIXME remove after model is updated with new properties
   private String PROP_CUSTOM_JSON = "customJson";
@@ -92,7 +88,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModelObject());
-    m_menuManager = new MenuManager(getJsonSession());
   }
 
   @Override
@@ -123,7 +118,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     super.dispose();
     m_treeNodeIds.clear();
     m_treeNodes.clear();
-    m_menuManager.dispose();
   }
 
   public TreeEventFilter getTreeEventFilter() {
@@ -146,21 +140,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     putProperty(json, PROP_NODES, jsonPages);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModelObject().getSelectedNodes()));
 
-    m_menuManager.replaceSelectionMenus(fetchMenusForSelection());
-    putProperty(json, PROP_SELECTION_MENUS, m_menuManager.getJsonSelectionMenus());
-    m_menuManager.replaceSelectionMenus(fetchMenusForEmptySpace());
-    putProperty(json, PROP_EMPTY_SPACE_MENUS, m_menuManager.getJsonEmptySpaceMenus());
+    putProperty(json, PROP_MENUS, modelObjectsToJson(getModelObject().getMenus()));
+
+    //FIXME cgu refactor
+    modelObjectToJson(getModelObject().getContextMenu());
     return json;
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {
-    switch (event.getType()) {
-      case TreeEvent.TYPE_NODES_SELECTED: {
-        handleModelSelectedNodeMenusChanged(event.getNodes());
-        break;
-      }
-    }
-
     event = getTreeEventFilter().filterIgnorableModelEvent(event);
     if (event == null) {
       return;
@@ -237,15 +224,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
   }
 
-  protected void handleModelSelectedNodeMenusChanged(Collection<ITreeNode> modelNodes) {
-    JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-    if (m_menuManager.replaceSelectionMenus(fetchMenusForSelection())) {
-      putProperty(jsonEvent, PROP_MENUS, m_menuManager.getJsonSelectionMenus());
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_SELECTION_MENUS_CHANGED, getId(), jsonEvent);
-    }
-  }
-
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
@@ -258,6 +236,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     for (TreeEvent event : events) {
       handleModelTreeEvent(event);
     }
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(ContextMenuEvent event) {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, modelObjectsToJson(getModelObject().getMenus()));
   }
 
   protected String getOrCreatedNodeId(ITreeNode node) {
@@ -432,18 +415,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       throw new JsonException(e);
     }
     getJsonSession().currentJsonResponse().addActionEvent("dataModelLoaded", getId(), responseEvent);
-  }
-
-  protected List<IMenu> fetchMenusForSelection() {
-    // fireNodePopup does not work is tree is changing
-    while (getModelObject().isTreeChanging()) { //FIXME CGU remove after menu refactoring
-      getModelObject().setTreeChanging(false);
-    }
-    return new LinkedList<IMenu>(getModelObject().getMenus());
-  }
-
-  protected List<IMenu> fetchMenusForEmptySpace() {
-    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   private class P_ModelTreeListener implements TreeListener {

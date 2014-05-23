@@ -6,10 +6,15 @@ scout.DesktopTree = function(model, session) {
 
   this._selectedNodes = [];
   this._desktopTable;
+
+  if (this.model.menus) {
+    for (var i = 0; i < this.model.menus.length; i++) {
+      var menu = this.session.objectFactory.create(this.model.menus[i]);
+      menu.owner = this;
+    }
+  }
 };
 scout.inherits(scout.DesktopTree, scout.ModelAdapter);
-
-scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED = 'selectionMenusChanged';
 
 scout.DesktopTree.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'tree');
@@ -61,6 +66,8 @@ scout.DesktopTree.prototype.attachModel = function() {
       this._desktopTable = this.session.widgetMap[selectedNode.id];
       this._desktopTable.attach($('#DesktopBench'));
     }
+
+    this._showOrHideMenus(this._findNodeById(selectedNode.id));
   }
 };
 
@@ -189,44 +196,11 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
     this._desktopTable.attach($('#DesktopBench'));
   }
 
-
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
     this.session.send('nodesSelected', this.model.id, {
       "nodeIds": [node.id]
     });
-  }
-
-  //Menu visibility depend on selectionMenusChanged event which is triggered by selection -> await possible event
-  //event is NOT fired if the selectionMenus haven't changed
-  var that = this;
-  if (this.session.areRequestsPending() || this.session.areEventsQueued()) {
-    this.session.listen().done(onEventsProcessed);
-  } else {
-    this._showSelectionMenuAndHideOthers($node);
-  }
-
-  function onEventsProcessed(eventTypes) {
-    //Only process if not already processed by _onSelectionMenuChanged
-    if (eventTypes.indexOf(scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) < 0) {
-      that._showSelectionMenuAndHideOthers($node);
-    }
-  }
-
-};
-
-scout.DesktopTree.prototype._showSelectionMenuAndHideOthers = function($node) {
-  var hasSelectionMenus = this.model.selectionMenus && this.model.selectionMenus.length > 0;
-  if (hasSelectionMenus && $node.find('.tree-item-menu').length > 0) {
-    //Already there
-    return;
-  }
-
-  if (hasSelectionMenus) {
-    this._addNodeMenu($node);
-  } else {
-    //Don't touch other nodes -> cache 'has menu' state to make it more responsive. Alternative would be to always remove every node menu before adding a new one
-    this._removeNodeMenu($node);
   }
 };
 
@@ -362,101 +336,77 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
 
 scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
   var that = this;
+  var $node = $clicked.parent(),
+    nodeId = $node.attr('id'),
+    y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 30,
+    menus = $clicked.data('menus');
 
-  //This switch is necessary because we keep 'has menu'-state, see also _showSelectionMenuAndHideOthers
-  if (!$clicked.parent().isSelected()) {
-    //make sure node is selected when activating the menu, otherwise the wrong menus are returned
-    this.session.listen().done(openNodeMenu);
-    this._setNodeSelected($clicked.parent(), true);
-  } else if (this.session.areRequestsPending() || this.session.areEventsQueued()) {
-    //Await pending requests before opening the menu, to make sure the selectionMenus haven't changed in the meantime
-    this.session.listen().done(openNodeMenu);
-  } else {
-    openNodeMenu();
+  if ($('#TreeMenuContainer').length) {
+    removeMenu();
+    return;
   }
 
-  function openNodeMenu() {
-    var $node = $clicked.parent(),
-      nodeId = $node.attr('id'),
-      y = $clicked.offset().top - that._$desktopTreeScroll.offset().top + 30,
-      menus = that.model.selectionMenus;
+  if (menus && menus.length > 0) {
+    var $TreeMenuContainer = $node.parent().appendDiv('TreeMenuContainer')
+      .css('right', 24).css('top', y);
 
-    if ($('#TreeMenuContainer').length) {
-      removeMenu();
-      return;
-    }
+    $node.addClass('menu-open');
 
-    if (menus && menus.length > 0) {
-      var $TreeMenuContainer = $node.parent().appendDiv('TreeMenuContainer')
-        .css('right', 24).css('top', y);
-
-      $node.addClass('menu-open');
-
-      // create menu-item and menu-button
-      for (var i = 0; i < menus.length; i++) {
-        if (menus[i].iconId) {
-          $TreeMenuContainer.appendDiv('', 'menu-button')
-            .attr('id', menus[i].id)
-            .attr('data-icon', menus[i].iconId)
-            .attr('data-label', menus[i].text)
-            .on('click', '', onMenuItemClicked)
-            .hover(onHoverIn, onHoverOut);
-        } else {
-          $TreeMenuContainer.appendDiv('', 'menu-item', menus[i].text)
-            .attr('id', menus[i].id)
-            .on('click', '', onMenuItemClicked);
-        }
+    // create menu-item and menu-button
+    for (var i = 0; i < menus.length; i++) {
+      if (menus[i].separator) {
+        continue;
       }
-
-      // wrap menu-buttons and add one div for label
-      $('.menu-button', $TreeMenuContainer).wrapAll('<div id="MenuButtons"></div>');
-      $('#MenuButtons', $TreeMenuContainer).appendDiv('MenuButtonsLabel');
-      $TreeMenuContainer.append($('#MenuButtons', $TreeMenuContainer));
-
-      // animated opening
-      var h = $TreeMenuContainer.outerHeight();
-      $TreeMenuContainer.css('height', 0).animateAVCSD('height', h);
-
-      // every user action will close menu
-      $('*').one('mousedown.treeMenu keydown.treeMenu mousewheel.treeMenu', removeMenu);
+      if (menus[i].iconId) {
+        $TreeMenuContainer.appendDiv('', 'menu-button')
+          .attr('id', menus[i].id)
+          .attr('data-icon', menus[i].iconId)
+          .attr('data-label', menus[i].text)
+          .on('click', '', onMenuItemClicked)
+          .hover(onHoverIn, onHoverOut);
+      } else {
+        $TreeMenuContainer.appendDiv('', 'menu-item', menus[i].text)
+          .attr('id', menus[i].id)
+          .on('click', '', onMenuItemClicked);
+      }
     }
 
-    function onHoverIn() {
-      $('#MenuButtonsLabel').text($(this).data('label'));
-    }
+    // wrap menu-buttons and add one div for label
+    $('.menu-button', $TreeMenuContainer).wrapAll('<div id="MenuButtons"></div>');
+    $('#MenuButtons', $TreeMenuContainer).appendDiv('MenuButtonsLabel');
+    $TreeMenuContainer.append($('#MenuButtons', $TreeMenuContainer));
 
-    function onHoverOut() {
-      $('#MenuButtonsLabel').text('');
-    }
+    // animated opening
+    var h = $TreeMenuContainer.outerHeight();
+    $TreeMenuContainer.css('height', 0).animateAVCSD('height', h);
 
-    function onMenuItemClicked() {
-      that.session.send('menuAction', $(this).attr('id'));
-    }
-
-    function removeMenu() {
-      var $TreeMenuContainer = $('#TreeMenuContainer'),
-        h = $TreeMenuContainer.outerHeight();
-
-      $TreeMenuContainer.animateAVCSD('height', 0,
-        function() {
-          $(this).remove();
-          $node.removeClass('menu-open');
-        });
-
-      $('*').off('.treeMenu');
-    }
+    // every user action will close menu
+    $('*').one('mousedown.treeMenu keydown.treeMenu mousewheel.treeMenu', removeMenu);
   }
-};
 
-scout.DesktopTree.prototype._onSelectionMenusChanged = function(selectedNodeIds, menus) {
-  this.model.selectionMenus = menus;
-  var $node = this._findNodeById(this.model.selectedNodeIds[0]);
+  function onHoverIn() {
+    $('#MenuButtonsLabel').text($(this).data('label'));
+  }
 
-  //Add menu, but only if the selection on the gui hasn't changed in the meantime
-  if (scout.arrays.equalsIgnoreOrder(selectedNodeIds, this.model.selectedNodeIds)) {
-    var $selectedNode = this._findSelectedNodes();
+  function onHoverOut() {
+    $('#MenuButtonsLabel').text('');
+  }
 
-    this._showSelectionMenuAndHideOthers($selectedNode);
+  function onMenuItemClicked() {
+    that.session.send('menuAction', $(this).attr('id'));
+  }
+
+  function removeMenu() {
+    var $TreeMenuContainer = $('#TreeMenuContainer'),
+      h = $TreeMenuContainer.outerHeight();
+
+    $TreeMenuContainer.animateAVCSD('height', 0,
+      function() {
+        $(this).remove();
+        $node.removeClass('menu-open');
+      });
+
+    $('*').off('.treeMenu');
   }
 };
 
@@ -475,7 +425,7 @@ scout.DesktopTree.prototype._updateBreadCrum = function() {
     var l = parseFloat($start.attr("data-level"));
     if (l === level + 1) {
       $start.addClass('bread-children');
-    } else  if (l === level) {
+    } else if (l === level) {
       break;
     }
     $start = $start.next();
@@ -501,12 +451,9 @@ scout.DesktopTree.prototype._findSelectedNodes = function() {
   return this._$desktopTreeScroll.find('.selected');
 };
 
-scout.DesktopTree.prototype._addNodeMenu = function($node) {
-  if ($node.find('.tree-item-menu').length > 0) {
-    return;
-  }
-
-  $node.appendDiv('', 'tree-item-menu')
+scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
+  var $menu = $node.appendDiv('', 'tree-item-menu')
+    .data('menus', menus)
     .on('click', '', onNodeMenuClicked);
 
   var that = this;
@@ -520,11 +467,50 @@ scout.DesktopTree.prototype._removeNodeMenu = function($node) {
   $node.find('.tree-item-menu').remove();
 };
 
-scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
-
+scout.DesktopTree.prototype.filterSingleSelectionNodeMenus = function(menus) {
+  return scout.menus.filter(menus, ['SingleSelection']);
 };
 
-scout.DesktopTree.prototype.onModelCreate = function() {};
+scout.DesktopTree.prototype.filterMultiSelectionNodeMenus = function(menus) {
+  return scout.menus.filter(menus, ['MultiSelection']);
+};
+
+scout.DesktopTree.prototype._setMenus = function(menus) {
+  this.model.menus = menus;
+
+  //Register new menus
+  if (menus) {
+    for (var i = 0; i < this.model.menus.length; i++) {
+      if (!this.session.widgetMap[menus[i]]) {
+        var menu = this.session.objectFactory.create(menus[i]);
+        menu.owner = this;
+      }
+    }
+  }
+
+  if (this.model.selectedNodeIds && this.model.selectedNodeIds.length > 0) {
+    var $node = this._findNodeById(this.model.selectedNodeIds[0]);
+    this._showOrHideMenus($node);
+  }
+};
+
+scout.DesktopTree.prototype._showOrHideMenus = function($node) {
+  var menus = this.model.menus;
+  if (menus) {
+    menus = this.filterSingleSelectionNodeMenus(this.model.menus);
+  }
+  if (menus && menus.length > 0) {
+    this._addNodeMenu($node, menus);
+  } else {
+    this._removeNodeMenu($node);
+  }
+};
+
+scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
+  if (event.hasOwnProperty('menus')) {
+    this._setMenus(event.menus);
+  }
+};
 
 scout.DesktopTree.prototype.onModelAction = function(event) {
   if (event.type_ == 'nodesInserted') {
@@ -536,9 +522,11 @@ scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type_ == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
-  } else if (event.type_ == scout.DesktopTree.EVENT_SELECTION_MENUS_CHANGED) {
-    this._onSelectionMenusChanged(event.nodeIds, event.menus);
   } else {
     $.log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
   }
+};
+
+scout.DesktopTree.prototype.onMenuPropertyChange = function(event) {
+  //FIXME CGU implement
 };
