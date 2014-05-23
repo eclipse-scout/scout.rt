@@ -27,7 +27,7 @@ public class DefaultCodeTypeTypesTableConfig extends DefaultTypesTableConfig {
   @Override
   public List<IDocTextExtractor<Class<?>>> getTextExtractors() {
     ArrayList<IDocTextExtractor<Class<?>>> extractors = new ArrayList<IDocTextExtractor<Class<?>>>();
-    extractors.add(new CodeTypeNameExtractor());
+    extractors.add(new CodeTypeNameExtractor(true));
     extractors.add(new SpecialDescriptionExtractor(TEXTS.get("org.eclipse.scout.rt.spec.doc"), ""));
     extractors.add(new CodeTypeCodesExtractor());
     return extractors;

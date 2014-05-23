@@ -26,8 +26,15 @@ import org.eclipse.scout.rt.spec.client.out.mediawiki.MediawikiUtility;
  */
 public class CodeTypeNameExtractor extends AbstractNamedTextExtractor<Class<?>> {
 
-  public CodeTypeNameExtractor() {
+  protected boolean m_createAnchor;
+
+  /**
+   * @param createAnchor
+   *          If true the extracted text starts with an anchor with ["c_" + classId] as id.
+   */
+  public CodeTypeNameExtractor(boolean createAnchor) {
     super(TEXTS.get("org.eclipse.scout.rt.spec.type"));
+    m_createAnchor = createAnchor;
   }
 
   @SuppressWarnings("unchecked")
@@ -41,6 +48,6 @@ public class CodeTypeNameExtractor extends AbstractNamedTextExtractor<Class<?>> 
     if (StringUtility.isNullOrEmpty(text)) {
       text = c.getSimpleName();
     }
-    return MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(c)) + text;
+    return text != null && m_createAnchor ? MediawikiUtility.createAnchor("c_" + ConfigurationUtility.getAnnotatedClassIdWithFallback(c)) + text : text;
   }
 }

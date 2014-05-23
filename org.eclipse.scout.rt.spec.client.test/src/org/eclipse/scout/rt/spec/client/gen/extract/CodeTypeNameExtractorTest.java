@@ -35,6 +35,7 @@ public class CodeTypeNameExtractorTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
+    @SuppressWarnings("unchecked")
     TestingCodeService codeService = new TestingCodeService(CollectionUtility.arrayList(new TestCodeType(), new MissingTextCodeType()));
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, codeService, codeLookupCallFactoryService);
@@ -47,9 +48,12 @@ public class CodeTypeNameExtractorTest {
 
   @Test
   public void testGetText() {
-    CodeTypeNameExtractor ex = new CodeTypeNameExtractor();
+    CodeTypeNameExtractor ex = new CodeTypeNameExtractor(true);
     assertEquals("{{a:c_3cfe2a7a-ca97-4076-b772-942bbb93efc5}}" + TEST_CODE_TYPE, ex.getText(TestCodeType.class));
     assertEquals("{{a:c_3233993b-1ef0-4571-910c-1c939443580b}}MissingTextCodeType", ex.getText(MissingTextCodeType.class));
+    ex = new CodeTypeNameExtractor(false);
+    assertEquals(TEST_CODE_TYPE, ex.getText(TestCodeType.class));
+    assertEquals("MissingTextCodeType", ex.getText(MissingTextCodeType.class));
   }
 
   @ClassId("3cfe2a7a-ca97-4076-b772-942bbb93efc5")
