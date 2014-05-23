@@ -20,6 +20,19 @@ scout.Form.prototype._render = function($parent) {
     }
     formField.attach(this.$container);
   }
+
+  if (this.model.displayHint == 'dialog') {
+    this.$container.addClass('dialog-form');
+
+    // TODO AWE: (form) hacky hack: add something to close the form
+    var closeButton = $('<button>Close [X]</button>');
+    closeButton.prependTo(this.$container);
+    var that = this;
+    closeButton.on('click', function() {
+      that.session.send('formClosing', that.model.id);
+    });
+  }
+
 };
 
 scout.Form.prototype.onModelCreate = function() {

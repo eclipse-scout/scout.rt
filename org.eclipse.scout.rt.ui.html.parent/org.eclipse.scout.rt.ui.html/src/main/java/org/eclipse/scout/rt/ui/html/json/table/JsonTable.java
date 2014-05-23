@@ -25,11 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -149,64 +146,32 @@ public class JsonTable extends AbstractJsonPropertyObserverRenderer<ITable> {
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
     final ITableRow tableRow = extractTableRow(event.getEventObject());
-    new ClientSyncJob("Row clicked", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireRowClickFromUI(tableRow);
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireRowClickFromUI(tableRow);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
     final List<ITableRow> tableRows = extractTableRows(event.getEventObject());
-    new ClientSyncJob("Rows selected", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        TableEvent tableEvent = new TableEvent(getModelObject(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
-        getTableEventFilter().addIgnorableModelEvent(tableEvent);
-
-        try {
-          getModelObject().getUIFacade().setSelectedRowsFromUI(tableRows);
-        }
-        finally {
-          getTableEventFilter().removeIgnorableModelEvent(tableEvent);
-        }
-      }
-    }.runNow(new NullProgressMonitor());
+    TableEvent tableEvent = new TableEvent(getModelObject(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
+    getTableEventFilter().addIgnorableModelEvent(tableEvent);
+    try {
+      getModelObject().getUIFacade().setSelectedRowsFromUI(tableRows);
+    }
+    finally {
+      getTableEventFilter().removeIgnorableModelEvent(tableEvent);
+    }
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
     final ITableRow tableRow = extractTableRow(event.getEventObject());
-    new ClientSyncJob("Row action", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireRowActionFromUI(tableRow);
   }
 
   protected List<IMenu> fetchMenusForSelection() {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getMenus());
-      }
-    }.runNow(new NullProgressMonitor());
-
-    return menuList;
+    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   protected List<IMenu> fetchMenusForEmptySpace() {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getMenus());
-      }
-    }.runNow(new NullProgressMonitor());
-
-    return menuList;
+    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

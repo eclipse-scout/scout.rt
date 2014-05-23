@@ -14,17 +14,17 @@ import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getString;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.navigation.BreadCrumbsEvent;
 import org.eclipse.scout.rt.client.mobile.navigation.BreadCrumbsListener;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumb;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonRenderer;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.json.JSONArray;
@@ -50,7 +50,6 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
   @Override
   protected void attachModel() {
     super.attachModel();
-
     if (m_breadCrumbsListener == null) {
       m_breadCrumbsListener = new P_BreadCrumbsListener();
       getModelObject().addBreadCrumbsListener(m_breadCrumbsListener);
@@ -60,7 +59,6 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
   @Override
   protected void detachModel() {
     super.detachModel();
-
     if (m_breadCrumbsListener != null) {
       getModelObject().removeBreadCrumbsListener(m_breadCrumbsListener);
       m_breadCrumbsListener = null;
@@ -70,13 +68,17 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-
     putProperty(json, PROP_BREAD_CRUMBS, breadCrumbsToJson(getModelObject().getBreadCrumbs()));
-
-    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(getModelObject().getCurrentNavigationForm());
-    putProperty(json, PROP_CURRENT_FORM_ID, jsonForm.getId());
-
+    putProperty(json, PROP_CURRENT_FORM_ID, getCurrentJsonForm().getId());
     return json;
+  }
+
+  private JsonForm getCurrentJsonForm() {
+    return getJsonForm(getModelObject().getCurrentNavigationForm());
+  }
+
+  private JsonForm getJsonForm(IForm form) {
+    return (JsonForm) getJsonSession().getJsonRenderer(form);
   }
 
   protected JSONArray breadCrumbsToJson(Collection<IBreadCrumb> breadCrumbs) {
@@ -99,17 +101,16 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
 
   public void handleUiActivate(JsonEvent event, JsonResponse res) {
     final String formId = getString(event.getEventObject(), JsonForm.PROP_FORM_ID);
-
-    new ClientSyncJob("Activate bread crumb", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(getModelObject().getCurrentNavigationForm());
-        while (!jsonForm.getId().equals(formId) || getModelObject().getCurrentNavigationForm() == null) {
-          getModelObject().stepBack();
-          jsonForm = (JsonForm) getJsonSession().getJsonRenderer(getModelObject().getCurrentNavigationForm());
-        }
+    JsonForm jsonForm = getCurrentJsonForm();
+    while (!jsonForm.getId().equals(formId) || getModelObject().getCurrentNavigationForm() == null) {
+      try {
+        getModelObject().stepBack();
       }
-    }.runNow(new NullProgressMonitor());
+      catch (ProcessingException e) {
+        throw new JsonException(e);
+      }
+      jsonForm = getCurrentJsonForm();
+    }
   }
 
   protected class P_BreadCrumbsListener implements BreadCrumbsListener {
@@ -132,11 +133,8 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
 
     @Override
     public JSONObject toJson() {
-      JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(m_breadCrumb.getForm());
-
       JSONObject json = new JSONObject();
-      putProperty(json, JsonForm.PROP_FORM_ID, jsonForm.getId());
-
+      putProperty(json, JsonForm.PROP_FORM_ID, getJsonForm(m_breadCrumb.getForm()).getId());
       return json;
     }
 

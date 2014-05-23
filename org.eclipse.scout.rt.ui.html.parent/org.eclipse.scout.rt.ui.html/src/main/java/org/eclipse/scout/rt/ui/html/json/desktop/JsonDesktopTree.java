@@ -14,13 +14,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -378,30 +375,20 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(getString(event.getEventObject(), PROP_NODE_ID));
-    new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireNodeClickFromUI(node);
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireNodeClickFromUI(node);
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getEventObject());
-    new ClientSyncJob(EVENT_NODES_SELECTED, getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
-        getTreeEventFilter().addIgnorableModelEvent(treeEvent);
+    TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
+    getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
-        try {
-          getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
-        }
-        finally {
-          getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
-        }
-      }
-    }.runNow(new NullProgressMonitor());
+    try {
+      getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
+    }
+    finally {
+      getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
+    }
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
@@ -410,20 +397,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
     if (node.isExpanded() == expanded) {
       return;
     }
-    new ClientSyncJob("Node click", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
-        getTreeEventFilter().addIgnorableModelEvent(treeEvent);
-
-        try {
-          getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
-        }
-        finally {
-          getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
-        }
-      }
-    }.runNow(new NullProgressMonitor());
+    TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
+    getTreeEventFilter().addIgnorableModelEvent(treeEvent);
+    try {
+      getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
+    }
+    finally {
+      getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
+    }
   }
 
   protected void handleUiGraph(JsonEvent event, JsonResponse res) {
@@ -454,31 +435,15 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
   }
 
   protected List<IMenu> fetchMenusForSelection() {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        //fireNodePopup does not work is tree is changing
-        while (getModelObject().isTreeChanging()) { //FIXME CGU remove after menu refactoring
-          getModelObject().setTreeChanging(false);
-        }
-
-        List<IMenu> menus = getModelObject().getMenus();
-        menuList.addAll(menus);
-      }
-    }.runNow(new NullProgressMonitor());
-    return menuList;
+    // fireNodePopup does not work is tree is changing
+    while (getModelObject().isTreeChanging()) { //FIXME CGU remove after menu refactoring
+      getModelObject().setTreeChanging(false);
+    }
+    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   protected List<IMenu> fetchMenusForEmptySpace() {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    new ClientSyncJob("Fetching menus", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        menuList.addAll(getModelObject().getMenus());
-      }
-    }.runNow(new NullProgressMonitor());
-    return menuList;
+    return new LinkedList<IMenu>(getModelObject().getMenus());
   }
 
   private class P_ModelTreeListener implements TreeListener {

@@ -1,8 +1,5 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -45,12 +42,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserverRenderer<IViewBu
   }
 
   protected void handleUiClick(JsonEvent event, JsonResponse res) {
-    new ClientSyncJob("button click", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireActionFromUI();
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireActionFromUI();
   }
 
 }

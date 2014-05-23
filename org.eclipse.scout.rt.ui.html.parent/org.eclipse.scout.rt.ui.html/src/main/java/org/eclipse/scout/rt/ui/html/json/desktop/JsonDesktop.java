@@ -15,13 +15,10 @@ import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -70,17 +67,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
 
   @Override
   protected void attachModel() {
-    new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (!getDesktop().isOpened()) {
-          getDesktop().getUIFacade().fireDesktopOpenedFromUI();
-        }
-        if (!getDesktop().isGuiAvailable()) {
-          getDesktop().getUIFacade().fireGuiAttached();
-        }
-      }
-    }.runNow(new NullProgressMonitor());
+    if (!getDesktop().isOpened()) {
+      getDesktop().getUIFacade().fireDesktopOpenedFromUI();
+    }
+    if (!getDesktop().isGuiAvailable()) {
+      getDesktop().getUIFacade().fireGuiAttached();
+    }
 
     //FIXME add listener afterwards -> don't handle events, refactor
     super.attachModel();
@@ -116,15 +108,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     }
 
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
-    new ClientSyncJob("Bread crumbs", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
-        if (service != null) {
-          breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
-        }
-      }
-    }.runNow(new NullProgressMonitor());
+    IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
+    if (service != null) {
+      breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
+    }
     if (breadCrumbsNavigation.getValue() != null) {
       putProperty(json, "breadCrumbsNavigation", modelObjectToJson(breadCrumbsNavigation.getValue()));
     }
@@ -224,18 +211,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
-    new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        //FIXME implement
-        //for the moment auto close messagebox to not block the model thread
-        messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
-      }
-    }.runNow(new NullProgressMonitor());
+    //FIXME implement
+    //for the moment auto close messagebox to not block the model thread
+    messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
   }
 
   protected void handleModelDesktopClosed() {
-    LOG.info("Desktop closed.");
+    LOG.info("Desktop closed");
     dispose();
     //FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done for all, logout is done for all as well, gmail does the same).
     //Important: Consider tomcat form auth problem, see scout rap logout mechanism for details

@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
-import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -22,9 +23,12 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
@@ -70,8 +74,23 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
     }
-    m_currentJsonResponse.addCreateEvent(jsonReq.getSessionPartId(), m_jsonClientSession.toJson());
-    LOG.info("JsonSession initialized.");
+    JSONObject json = initJsonSession(clientSession);
+    m_currentJsonResponse.addCreateEvent(jsonReq.getSessionPartId(), json);
+    LOG.info("JsonSession initialized");
+  }
+
+  /**
+   * This call runs in a Scout job and creates the initial JSON session object with the Desktop.
+   */
+  private JSONObject initJsonSession(IClientSession clientSession) {
+    final Holder<JSONObject> jsonHolder = new Holder<>(JSONObject.class);
+    new ClientSyncJob("AbstractJsonSession#init", clientSession) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        jsonHolder.setValue(m_jsonClientSession.toJson());
+      }
+    }.runNow(new NullProgressMonitor());
+    return jsonHolder.getValue();
   }
 
   protected UserAgent createUserAgent(JsonRequest jsonReq) {
@@ -196,8 +215,69 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonClientSession.processRequestLocale(httpReq.getLocale());
 
     final JsonResponse res = currentJsonResponse();
-    for (JsonEvent event : jsonReq.getEvents()) {
-      processEvent(event, res);
+
+    for (final JsonEvent event : jsonReq.getEvents()) {
+      // TODO AWE: (jobs) prüfen ob das hier probleme macht: dadurch läuft processEvent immer im richtigen
+      // context. JsonRenderer instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
+      // einen Scout-service aufrufen wollen. Es wurde bewusst für jedes processEvent ein eigener Job gestartet
+      // und nicht für den ganzen Loop.
+      new ClientSyncJob("processEvent", getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          processEvent(event, res);
+        }
+      }.schedule();
+    }
+
+    // see --> ClientJob#rescheduleWaitingSyncJobs
+    // wir wollen vermutlich auch nur die Jobs die von unserer client session gestartet worden sind, oder?
+    while (true) {
+      List<ClientJob> jobList = new ArrayList<>();
+      for (Job job : Job.getJobManager().find(ClientJob.class)) {
+        if (job instanceof ClientJob) {
+          ClientJob clientJob = (ClientJob) job;
+          if (clientJob.getClientSession() == getClientSession()) {
+            jobList.add(clientJob);
+          }
+        }
+      }
+
+      if (jobList.isEmpty()) {
+        LOG.info("Job list is empty. Finish request");
+        break;
+      }
+      else {
+        int numJobs = jobList.size();
+        int numSync = 0;
+        int numWaitFor = 0;
+        for (ClientJob job : jobList) {
+          LOG.info("--------- JOB:" + job + " sync=" + job.isSync() + " waitFor=" + job.isWaitFor());
+          if (job.isWaitFor()) {
+            numWaitFor++;
+          }
+          else if (job.isSync()) {
+            numSync++;
+          }
+        }
+        LOG.info("Job list size=" + numJobs + ", sync (running)=" + numSync + " waitFor (blocking)=" + numWaitFor);
+        if (numSync > 0) {
+          LOG.info("There are still running sync jobs - must wait until they have finished");
+        }
+        else if (numJobs == numWaitFor) {
+          LOG.info("Only 'waitFor' jobs left in the queue - it's allowed to finish the request");
+          break;
+        }
+
+        // TODO AWE: das geht sicher schöner (notify?)
+        // wir könnten es auch mit einem IJobChangeListener versuchen....
+        LOG.info("Going to sleep before checking the job queue again...");
+        try {
+          Thread.sleep(25);
+        }
+        catch (InterruptedException e) {
+          e.printStackTrace(); // FIXME AWE
+        }
+      }
     }
 
     //Clear event map when sent to client
@@ -206,9 +286,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void processEvent(JsonEvent event, JsonResponse res) {
-    final String id = event.getEventId();
-    DecimalFormat format = new DecimalFormat();
-    format.toLocalizedPattern();
+    final String id = event.getEventId(); // TODO AWE: (ask C.GU) das sollte besser rendererId oder widgetId heissen, nicht?
     final IJsonRenderer jsonRenderer = getJsonRenderer(id);
     if (jsonRenderer == null) {
       throw new JsonException("No renderer found for id " + id);
@@ -241,13 +319,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return;
     }
 
-    new ClientSyncJob("Disoposing client session", clientSession) {
+    new ClientSyncJob("Disposing client session", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
       }
     }.runNow(new NullProgressMonitor());
-
     LOG.info("Session " + event.getName() + " terminated.");
   }
 

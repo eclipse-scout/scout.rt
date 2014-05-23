@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -51,12 +48,7 @@ public class JsonMenu extends AbstractJsonPropertyObserverRenderer<IMenu> {
   }
 
   public void handleUiMenuAction(JsonEvent event, JsonResponse res) {
-    new ClientSyncJob("Menu action", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireActionFromUI();
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireActionFromUI();
   }
 
 }

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -135,12 +133,7 @@ public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
   }
 
   public void handleUiFormClosing(JsonEvent event, JsonResponse res) {
-    new ClientSyncJob("Form closing", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        getModelObject().getUIFacade().fireFormClosingFromUI();
-      }
-    }.runNow(new NullProgressMonitor());
+    getModelObject().getUIFacade().fireFormClosingFromUI();
   }
 
   protected class P_ModelFormListener implements FormListener {

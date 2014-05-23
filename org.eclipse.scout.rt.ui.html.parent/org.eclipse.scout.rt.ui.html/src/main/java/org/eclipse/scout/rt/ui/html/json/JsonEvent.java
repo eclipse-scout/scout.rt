@@ -23,11 +23,11 @@ public class JsonEvent {
     m_event = event;
   }
 
-  public String getEventType() {
+  public String getEventType() { // TODO AWE: re-name type
     return JsonObjectUtility.getString(m_event, TYPE);
   }
 
-  public String getEventId() {
+  public String getEventId() {// re-name type
     return JsonObjectUtility.getString(m_event, ID);
   }
 

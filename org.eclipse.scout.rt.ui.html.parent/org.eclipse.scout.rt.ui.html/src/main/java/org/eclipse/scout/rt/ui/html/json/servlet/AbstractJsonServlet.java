@@ -70,7 +70,6 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started.");
-
     try {
       for (IServletRequestInterceptor service : SERVICES.getServices(IServletRequestInterceptor.class)) {
         if (service.interceptPost(this, req, resp)) {
