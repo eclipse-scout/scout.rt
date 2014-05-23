@@ -55,6 +55,9 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   /**
    * All menu types this menu should be showed with. For menus which are used in different contexts (Table, Tree,
    * ValueField) a combination of several menu type definitions can be returned.
+   * In case the menu is added on any other component (different from {@link ITable}, {@link ITree}, {@link IValueField}
+   * )
+   * the menu type does not have any affect.
    * 
    * @see TableMenuType
    * @see TreeMenuType
