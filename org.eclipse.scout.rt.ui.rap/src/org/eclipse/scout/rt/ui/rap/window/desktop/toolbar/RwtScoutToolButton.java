@@ -58,6 +58,7 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     updateTextFromScout();
     updateEnabledFormScout();
     updateVisibleFromScout();
+    updateTooltipTextFromScout();
   }
 
   @Override
@@ -104,11 +105,11 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     }
   }
 
-  private void updateEnabledFormScout() {
+  protected void updateEnabledFormScout() {
     getUiField().setEnabled(getScoutObject().isEnabled());
   }
 
-  private void updateVisibleFromScout() {
+  protected void updateVisibleFromScout() {
     getUiField().setVisible(getScoutObject().isVisible());
     // Instruct layout to exclude button when invisible
     RowData data = new RowData();
@@ -118,6 +119,13 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     }
     data.exclude = !getScoutObject().isVisible();
     getUiField().setLayoutData(data);
+  }
+
+  /**
+   * @since 4.1.0
+   */
+  protected void updateTooltipTextFromScout() {
+    getUiField().setToolTipText(getScoutObject().getTooltipText());
   }
 
   @Override
@@ -137,6 +145,9 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     }
     else if (IToolButton.PROP_VISIBLE.equals(name)) {
       updateVisibleFromScout();
+    }
+    else if (IToolButton.PROP_TOOLTIP_TEXT.equals(name)) {
+      updateTooltipTextFromScout();
     }
   }
 
