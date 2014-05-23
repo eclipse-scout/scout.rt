@@ -57,7 +57,7 @@
       <unit id="org.w3c.dom.events.source" version="3.0.0.draft20060413_v201105210656"/>
     </location>
     <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+      <repository id="scout_nightly_4.0" location="http://download.eclipse.org/scout/nightly/4.0/"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
