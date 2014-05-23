@@ -34,7 +34,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
   private IMenu m_wrappedMenu;
   private IPropertyObserver m_menuOwner;
   private List<IMenu> m_childMenus;
-  private boolean m_localEnabled;
+  private boolean m_localEnabled = true;
   private Set<IMenuType> m_menuTypes;
 
   /**
