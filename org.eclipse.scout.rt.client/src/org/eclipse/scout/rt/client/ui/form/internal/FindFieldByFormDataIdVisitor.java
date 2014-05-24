@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 
 /**
@@ -76,11 +77,14 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
       if (field instanceof IValueField) {
         // fieldTypeRank is fine
       }
-      else if (!(field instanceof ICompositeField)) {
+      else if (field instanceof ITableField) {
         fieldTypeRank += 1;
       }
-      else {
+      else if (!(field instanceof ICompositeField)) {
         fieldTypeRank += 2;
+      }
+      else {
+        fieldTypeRank += 3;
       }
       // Compute the enclosing field path rank that is used as additional hint for determining the
       // best matching form field for the requested formId. Note: for compatibility reasons, the enclosing
