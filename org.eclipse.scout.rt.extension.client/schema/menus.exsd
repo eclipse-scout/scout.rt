@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.scout.rt.extension.client" id="menus" name="Menus"/>
       </appinfo>
       <documentation>
-         This extension point allows to addn, modify and removed programmed menus.
+         This extension point allows to add, modify and removed programmed menus.
 
 The extensions are processed in the following order:
 &lt;ol&gt;
@@ -32,21 +32,21 @@ The extensions are processed in the following order:
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -76,7 +76,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
@@ -86,14 +86,14 @@ The extensions are processed in the following order:
          <attribute name="order" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -120,7 +120,7 @@ The extensions are processed in the following order:
          <attribute name="menu" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
@@ -130,7 +130,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuModifier"/>
@@ -140,7 +140,7 @@ The extensions are processed in the following order:
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -167,7 +167,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
@@ -177,7 +177,7 @@ The extensions are processed in the following order:
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -189,7 +189,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
@@ -204,7 +204,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode"/>
@@ -219,7 +219,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.form.fields.IFormField"/>
@@ -234,7 +234,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
@@ -249,7 +249,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.IDesktop"/>
@@ -264,7 +264,7 @@ The extensions are processed in the following order:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuExtensionFilter"/>
