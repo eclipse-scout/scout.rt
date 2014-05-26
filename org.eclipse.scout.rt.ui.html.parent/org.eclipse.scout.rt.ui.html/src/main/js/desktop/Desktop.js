@@ -14,6 +14,8 @@ scout.Desktop.prototype._render = function($parent) {
     marginTop = 0,
     marginRight = 0;
 
+  this.$parent = $parent;
+
   // create all 4 containers
   if (this.model.viewButtons) {
     views = new scout.DesktopViewButtonBar($parent, this.model.viewButtons, this.session);
@@ -25,16 +27,18 @@ scout.Desktop.prototype._render = function($parent) {
     marginRight = tools.$div.outerWidth();
   }
 
-  var layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
+  this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.model.outline) {
     tree = new scout.DesktopTreeContainer($parent, this.model.outline, this.session);
-    layout.register(tree.$div, 'W');
+    this.tree = tree;
+    this.layout.register(tree.$div, 'W');
+    this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
 
   var bench = new scout.DesktopBench($parent, this.session);
-  layout.register(bench.$container, 'C');
+  this.layout.register(bench.$container, 'C');
 
-  layout.layout();
+  this.layout.layout();
 
   this._bench = bench;
 
@@ -43,7 +47,6 @@ scout.Desktop.prototype._render = function($parent) {
   }
 
   if (tree) {
-    this.tree = tree;
     this.tree.attachModel();
   }
 
@@ -58,11 +61,37 @@ scout.Desktop.prototype._resolveViewContainer = function(form) {
 };
 
 /**
+ * If the outline contains no nodes, the desktop tree area will be detached.
+ */
+scout.Desktop.prototype.showOrHideDesktopTree = function() {
+  if (!this.tree) {
+    return;
+  }
+
+  if (this.tree.detached) {
+    if (this.tree.desktopTree.model.nodes.length > 0) {
+      this.tree.$div.insertBefore(this._bench.$container);
+      this.tree.detached = false;
+      this.layout.unregister(this.tree.$div);
+      this.layout.layout();
+    }
+  } else {
+    if (this.tree.desktopTree.model.nodes.length === 0) {
+      this.tree.$div.detach();
+      this.tree.detached = true;
+      this.layout.register(this.tree.$div, 'W');
+      this.layout.layout();
+    }
+  }
+};
+
+/**
  * @override
  */
 scout.Desktop.prototype.onModelCreate = function(event) {
   if (event.objectType == "Outline") {
     this.tree.onOutlineCreated(event);
+    this.showOrHideDesktopTree();
   } else {
     scout.Desktop.parent.prototype.onModelCreate.call(this, event);
   }
@@ -74,6 +103,7 @@ scout.Desktop.prototype.onModelCreate = function(event) {
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
     this.tree.onOutlineChanged(event.outlineId);
+    this.showOrHideDesktopTree();
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

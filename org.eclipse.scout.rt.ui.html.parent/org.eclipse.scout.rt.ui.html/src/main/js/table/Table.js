@@ -18,7 +18,7 @@ scout.Table = function(model, session) {
   }
 
   //non inheritance based initialization
-  if(arguments.length>0) {
+  if (arguments.length > 0) {
     this.events = new scout.EventSupport();
     this._filterMap = {};
 
@@ -29,7 +29,7 @@ scout.Table = function(model, session) {
     this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 
     if (this.model.menus) {
-      for(var i=0;i<this.model.menus.length;i++) {
+      for (var i = 0; i < this.model.menus.length; i++) {
         var menu = this.session.objectFactory.create(this.model.menus[i]);
         menu.owner = this;
       }
@@ -47,7 +47,7 @@ scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
-scout.Table.prototype._createTableConfigurator = function () {
+scout.Table.prototype._createTableConfigurator = function() {
   return new scout.TableConfigurator(this);
 };
 
@@ -91,14 +91,20 @@ scout.Table.prototype.attach = function($container) {
 };
 
 scout.Table.prototype.drawSelection = function() {
-  if(this.selectionHandler) {
+  if (this.selectionHandler) {
     this.selectionHandler.drawSelection();
   }
 };
 
 scout.Table.prototype.resetSelection = function() {
-  if(this.selectionHandler) {
+  if (this.selectionHandler) {
     this.selectionHandler.resetSelection();
+  }
+};
+
+scout.Table.prototype.toggleSelection = function() {
+  if (this.selectionHandler) {
+    this.selectionHandler.toggleSelection();
   }
 };
 
@@ -322,7 +328,7 @@ scout.Table.prototype.sendRowsSelected = function() {
   }
 };
 
-scout.Table.prototype.sendRowAction = function ($row) {
+scout.Table.prototype.sendRowAction = function($row) {
   this.session.send(scout.Table.EVENT_ROW_ACTION, this.model.id, {
     "rowId": $row.attr('id')
   });
@@ -520,29 +526,10 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
     rowIds = [rowIds];
   }
 
-  var table = this.model;
-  table.selectedRowIds = rowIds;
+  this.model.selectedRowIds = rowIds;
 
-  if (this.$dataScroll) {
-    this.resetSelection();
-
-    //select rows
-    for (var i = 0; i < rowIds.length; i++) {
-      var rowId = rowIds[i];
-      var $row = $('#' + rowId);
-      $row.addClass('row-selected');
-    }
-
-    this.drawSelection();
-  }
-
-  //FIXME selection menu is not shown when using this method
-
-  if (!this.updateFromModelInProgress) {
-    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
-    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.model.id, {
-      "rowIds": rowIds
-    });
+  if (this.selectionHandler) {
+    this.selectionHandler.selectRowsByIds(rowIds);
   }
 };
 

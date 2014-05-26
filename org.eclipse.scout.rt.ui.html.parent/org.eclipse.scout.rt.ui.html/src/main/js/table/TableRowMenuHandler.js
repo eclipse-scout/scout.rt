@@ -34,6 +34,8 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
   var that = this;
 
   function onMouseDown(event) {
+    $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
+
     $(".table-row").one("mouseup.menuHandler", function(event) {
       onMouseUp(event);
     });
@@ -44,9 +46,12 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
     }
 
     function showRowMenu(x, y, button) {
-      // selection
       var $selectedRows = $('.row-selected'),
         $firstRow = $selectedRows.first();
+
+      if($selectedRows.length === 0) {
+        return;
+      }
 
       // make menu - if not already there
       var $RowDrill = $('#RowDrill');

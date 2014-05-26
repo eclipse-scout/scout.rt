@@ -55,9 +55,10 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   if (this._startup) {
     request.startup = true;
     this._startup = false;
-  }
-  if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
-    request.userAgent = this.userAgent;
+
+    if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
+      request.userAgent = this.userAgent;
+    }
   }
 
   var that = this;

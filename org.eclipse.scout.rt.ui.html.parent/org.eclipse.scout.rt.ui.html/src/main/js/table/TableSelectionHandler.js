@@ -1,6 +1,7 @@
 /**
- * Gives the possibility to make a selection with mouse move.<p>
- * Also displays menu buttons to open a context menu.
+ * Enhances the table with selection behaviour.<p>
+ *
+ * If mouseMoveSelectionEnabled is set to true, the user can select the rows by moving the mouse with pressed left mouse button.
  *
  */
 scout.TableSelectionHandler = function(table) {
@@ -42,8 +43,6 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
         $selectedRows.removeClass('row-selected');
       }
     }
-
-    $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
 
     // just a click...
     selectData(event);
@@ -122,5 +121,40 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
 
 scout.TableSelectionHandler.prototype.resetSelection = function() {
   $('.row-selected', this.table.$data).removeClass('row-selected');
+  this.drawSelection();
+};
+
+scout.TableSelectionHandler.prototype.selectRowsByIds = function(rowIds) {
+  if (this.table.$dataScroll) {
+    this.resetSelection();
+
+    for (var i = 0; i < rowIds.length; i++) {
+      var rowId = rowIds[i];
+      var $row = $('#' + rowId);
+      $row.addClass('row-selected');
+    }
+
+    this.drawSelection();
+  }
+
+  //FIXME row menu is not shown when using this method
+
+  if (!this.table.updateFromModelInProgress) {
+    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
+    this.table.session.send(scout.Table.EVENT_ROWS_SELECTED, this.table.model.id, {
+      "rowIds": rowIds
+    });
+  }
+};
+
+scout.TableSelectionHandler.prototype.toggleSelection = function() {
+  var $selectedRows = $('.row-selected', this.table.$data);
+
+  if ($selectedRows.length == this.table.model.rows.length) {
+    $selectedRows.removeClass('row-selected');
+  } else {
+    $('.table-row', this.table.$data).addClass('row-selected');
+  }
+
   this.drawSelection();
 };

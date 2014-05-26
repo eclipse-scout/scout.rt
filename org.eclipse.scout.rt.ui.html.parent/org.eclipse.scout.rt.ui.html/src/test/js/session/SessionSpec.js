@@ -10,9 +10,9 @@ describe("Session", function() {
     jasmine.clock().uninstall();
   });
 
-  function createSession() {
+  function createSession(userAgent) {
     setFixtures(sandbox());
-    return new scout.Session($('#sandbox'), '1.1');
+    return new scout.Session($('#sandbox'), '1.1', userAgent);
   }
 
   describe("send", function() {
@@ -38,6 +38,54 @@ describe("Session", function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
+
+  });
+
+  describe("init", function() {
+
+    it("sends startup parameter", function() {
+      var session = createSession();
+
+      session.init();
+      jasmine.clock().tick(0);
+
+      var requestData = mostRecentJsonRequest();
+      expect(requestData.startup).toBe(true);
+
+      //don't send it on subsequent requests
+      session.send('nodeClicked', 1);
+      jasmine.clock().tick(0);
+
+      requestData = mostRecentJsonRequest();
+      expect(requestData.startup).toBeUndefined();
+    });
+
+    it("sends user agent on startup if not desktop", function() {
+      var session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE));
+
+      session.init();
+      jasmine.clock().tick(0);
+
+      var requestData = mostRecentJsonRequest();
+      expect(requestData.userAgent.deviceType).toBe('MOBILE');
+
+      //don't send it on subsequent requests
+      session.send('nodeClicked', 1);
+      jasmine.clock().tick(0);
+
+      requestData = mostRecentJsonRequest();
+      expect(requestData.userAgent).toBeUndefined();
+
+      //device type desktop is the default, so don't send it
+      session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP));
+
+      session.init();
+      jasmine.clock().tick(0);
+
+      requestData = mostRecentJsonRequest();
+      expect(requestData.userAgent).toBeUndefined();
+    });
+
   });
 
 });

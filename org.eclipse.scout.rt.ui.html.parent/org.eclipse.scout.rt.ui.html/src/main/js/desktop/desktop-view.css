@@ -16,7 +16,8 @@ font-size: 18px;
 line-height: 26px;
 color: #9C9C9C;
 cursor: pointer;
-white-space: nowrap;}
+white-space: nowrap;
+}
 
 .view-item:hover{
 color: #595959;
@@ -26,6 +27,12 @@ border-bottom: 2px solid #595959;
 .view-item.selected {
 color: #FE9915 !important;
 border-bottom: 2px solid #FE9915;
+}
+
+.view-item-icon:before {
+font-family: fontAwesome;
+/* content: attr(data-iconId); */
+content: "\f002";
 }
 
 #ViewAdd {

@@ -3,8 +3,8 @@ scout.MobileTableConfigurator = function(table) {
 };
 
 scout.MobileTableConfigurator.prototype.configure = function() {
-  this.selectionHandler = new scout.TableSelectionHandler(this.table);
-  this.selectionHandler.mouseMoveSelectionEnabled = false;
+  this.table.selectionHandler = new scout.TableSelectionHandler(this.table);
+  this.table.selectionHandler.mouseMoveSelectionEnabled = false;
 };
 
 scout.MobileTableConfigurator.prototype.render = function() {

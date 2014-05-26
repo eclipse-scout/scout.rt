@@ -10,7 +10,7 @@ scout.TableFooter = function(table, $parent, session) {
   var that = this;
   this._$controlLabel = this._$tableControl.appendDiv(undefined, 'control-label');
 
-  this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', toggleSelect);
+  this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
   this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
   this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._table.drawData.bind(this._table));
 
@@ -49,19 +49,6 @@ scout.TableFooter = function(table, $parent, session) {
     function() {
       $('#control_label').text('');
     });
-
-  function toggleSelect() {
-    var $selectedRows = $('.row-selected', that._table.$data);
-
-    if ($selectedRows.length == that._table.model.rows.length) {
-      $selectedRows.removeClass('row-selected');
-    } else {
-      $('.table-row', that._table.$data).addClass('row-selected');
-    }
-
-    that._table.drawSelection();
-  }
-
 };
 
 scout.TableFooter.prototype._setInfoLoad = function(count) {
@@ -78,7 +65,7 @@ scout.TableFooter.prototype._setInfoFilter = function(count, origin) {
 
 scout.TableFooter.prototype._setInfoSelect = function(count, all) {
   var allText = all ? 'Keine' : 'Alle';
-  this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren');
+  this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren'); //FIXME get translations from server
   this._$infoSelect.show().widthToContent();
 };
 
