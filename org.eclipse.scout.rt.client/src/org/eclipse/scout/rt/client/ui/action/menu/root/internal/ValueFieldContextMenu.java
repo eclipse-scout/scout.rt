@@ -31,8 +31,8 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   /**
    * @param owner
    */
-  public ValueFieldContextMenu(IValueField owner) {
-    super(owner);
+  public ValueFieldContextMenu(IValueField owner, List<? extends IMenu> initialChildMenus) {
+    super(owner, initialChildMenus);
   }
 
   @Override

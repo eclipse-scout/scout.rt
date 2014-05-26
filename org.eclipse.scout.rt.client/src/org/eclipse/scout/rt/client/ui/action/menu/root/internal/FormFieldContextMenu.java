@@ -28,8 +28,8 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractProperty
   /**
    * @param owner
    */
-  public FormFieldContextMenu(T owner) {
-    super(owner);
+  public FormFieldContextMenu(T owner, List<? extends IMenu> initialChildMenus) {
+    super(owner, initialChildMenus);
   }
 
   @Override

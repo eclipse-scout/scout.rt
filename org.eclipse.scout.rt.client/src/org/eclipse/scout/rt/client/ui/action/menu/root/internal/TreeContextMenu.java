@@ -40,8 +40,8 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   /**
    * @param owner
    */
-  public TreeContextMenu(ITree owner) {
-    super(owner);
+  public TreeContextMenu(ITree owner, List<? extends IMenu> initialChildMenus) {
+    super(owner, initialChildMenus);
   }
 
   @Override

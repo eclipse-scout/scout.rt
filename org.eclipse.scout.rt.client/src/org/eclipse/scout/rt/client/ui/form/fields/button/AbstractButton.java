@@ -225,9 +225,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this);
+    IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menuList);
     contextMenu.setContainerInternal(this);
-    contextMenu.setChildActions(menuList);
     setContextMenu(contextMenu);
   }
 

@@ -37,16 +37,17 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
 
   private PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
 
-  public AbstractContextMenu(IPropertyObserver owner) {
-    this(owner, true);
+  public AbstractContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList) {
+    this(owner, initialChildList, true);
   }
 
-  public AbstractContextMenu(IPropertyObserver owner, boolean callInitializer) {
+  public AbstractContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList, boolean callInitializer) {
     super(false);
     m_owner = owner;
     if (callInitializer) {
       callInitializer();
     }
+    setChildActions(initialChildList);
   }
 
   @Override
@@ -101,6 +102,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     super.afterChildMenusAdd(newChildMenus);
     addScoutMenuVisibilityListenerRec(newChildMenus);
     calculateLocalVisibility();
+    fireContextMenuEvent(new ContextMenuEvent(this, ContextMenuEvent.TYPE_STRUCTURE_CHANGED));
   }
 
   @Override
@@ -108,6 +110,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     super.afterChildMenusRemove(childMenusToRemove);
     removeScoutMenuVisibilityListenerRec(childMenusToRemove);
     calculateLocalVisibility();
+    fireContextMenuEvent(new ContextMenuEvent(this, ContextMenuEvent.TYPE_STRUCTURE_CHANGED));
   }
 
   /**
@@ -141,25 +144,28 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   }
 
   protected void calculateLocalVisibility() {
-    final BooleanHolder visibleHolder = new BooleanHolder(false);
+
     final IActionFilter activeFilter = getActiveFilter();
-    acceptVisitor(new IActionVisitor() {
-      @Override
-      public int visit(IAction action) {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
-            return CONTINUE;
+    if (activeFilter != null) {
+      final BooleanHolder visibleHolder = new BooleanHolder(false);
+      acceptVisitor(new IActionVisitor() {
+        @Override
+        public int visit(IAction action) {
+          if (action instanceof IMenu) {
+            IMenu menu = (IMenu) action;
+            if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
+              return CONTINUE;
+            }
+            else if (activeFilter.accept(menu)) {
+              visibleHolder.setValue(true);
+              return CANCEL;
+            }
           }
-          else if (activeFilter.accept(menu)) {
-            visibleHolder.setValue(true);
-            return CANCEL;
-          }
+          return CONTINUE;
         }
-        return CONTINUE;
-      }
-    });
-    setVisible(visibleHolder.getValue());
+      });
+      setVisible(visibleHolder.getValue());
+    }
   }
 
   private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
