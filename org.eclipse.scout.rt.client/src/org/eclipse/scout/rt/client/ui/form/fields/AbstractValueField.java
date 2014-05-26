@@ -117,9 +117,8 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     //set container on menus
-    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this);
+    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this, menuList);
     contextMenu.setContainerInternal(this);
-    contextMenu.setChildActions(menuList);
     setContextMenu(contextMenu);
   }
 

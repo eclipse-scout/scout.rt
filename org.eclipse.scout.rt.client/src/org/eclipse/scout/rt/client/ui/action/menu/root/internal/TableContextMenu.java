@@ -38,8 +38,8 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   /**
    * @param owner
    */
-  public TableContextMenu(ITable owner) {
-    super(owner);
+  public TableContextMenu(ITable owner, List<? extends IMenu> initialChildMenus) {
+    super(owner, initialChildMenus);
   }
 
   @Override

@@ -117,7 +117,8 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * This method is called after a new valid owner value was stored in the model. The owner is the {@link ITable},
    * {@link ITree} or {@link IValueField} the menu belongs to. To get changes of other fields use a
    * {@link PropertyChangeListener} an add it to a certain other field in the {@link AbstractMenu#execInitAction()}
-   * method.
+   * method. <h3>NOTE</h3> <b>This method is only called for menus on a {@link ITable}, {@link ITree},
+   * {@link IValueField}! For all other fields this method will NEVER be called.</b> <br>
    * 
    * @param newOwnerValue
    *          depending on the owner the newOwnerValue differs.

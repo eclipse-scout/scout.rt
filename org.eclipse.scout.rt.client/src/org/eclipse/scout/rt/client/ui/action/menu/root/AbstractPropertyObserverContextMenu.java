@@ -12,16 +12,18 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  *
  */
 public abstract class AbstractPropertyObserverContextMenu<T extends IPropertyObserver> extends AbstractContextMenu {
 
-  public AbstractPropertyObserverContextMenu(T owner) {
-    super(owner);
+  public AbstractPropertyObserverContextMenu(T owner, List<? extends IMenu> initialChildMenus) {
+    super(owner, initialChildMenus);
   }
 
   @Override

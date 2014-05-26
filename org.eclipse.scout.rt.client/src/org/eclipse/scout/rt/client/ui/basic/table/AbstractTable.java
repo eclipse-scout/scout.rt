@@ -800,8 +800,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
     }
-    ITableContextMenu contextMenu = new TableContextMenu(this);
-    contextMenu.setChildActions(menuList);
+    ITableContextMenu contextMenu = new TableContextMenu(this, menuList);
     setContextMenu(contextMenu);
 
     // key strokes

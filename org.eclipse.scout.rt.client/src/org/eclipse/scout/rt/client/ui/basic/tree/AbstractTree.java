@@ -461,8 +461,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     catch (Exception e) {
       LOG.error("Error occured while dynamically contributing menus.", e);
     }
-    TreeContextMenu contextMenu = new TreeContextMenu(this);
-    contextMenu.setChildActions(menuList);
+    TreeContextMenu contextMenu = new TreeContextMenu(this, menuList);
     setContextMenuInternal(contextMenu);
 
   }
