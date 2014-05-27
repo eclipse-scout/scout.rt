@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
@@ -22,6 +23,10 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -31,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
@@ -313,10 +319,51 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     return m_pageToTableRowMap.get(childPageNode);
   }
 
+  private List<? extends IMenu> m_pageMenusOfSelection;
+
+  /**
+   *
+   */
+  protected void updateContextMenusForSelection() {
+    // remove old
+    if (m_pageMenusOfSelection != null) {
+      getInternalTable().getContextMenu().removeChildActions(m_pageMenusOfSelection);
+      m_pageMenusOfSelection = null;
+    }
+
+    List<IMenu> pageMenus = new ArrayList<IMenu>();
+    List<ITableRow> selectedRows = getInternalTable().getSelectedRows();
+    if (CollectionUtility.size(selectedRows) == 1) {
+      ITreeNode node = getTreeNodeFor(CollectionUtility.firstElement(selectedRows));
+      if (node instanceof IPageWithTable<?>) {
+        IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
+        List<IMenu> menus = ActionUtility.getActions(tablePage.getTable().getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace));
+        for (IMenu m : menus) {
+          pageMenus.add(new TablePageTreeMenuWrapper(m, TableMenuType.SingleSelection));
+        }
+      }
+      else if (node instanceof IPageWithNodes) {
+        IPageWithNodes pageWithNodes = (IPageWithNodes) node;
+        List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getTree().getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(TreeMenuType.SingleSelection));
+        for (IMenu m : menus) {
+          pageMenus.add(new TablePageTreeMenuWrapper(m, TableMenuType.SingleSelection));
+        }
+      }
+    }
+    getInternalTable().getContextMenu().addChildActions(pageMenus);
+    m_pageMenusOfSelection = pageMenus;
+
+  }
+
   /**
    * inner table
    */
   private class P_Table extends AbstractTable {
+
+    @Override
+    protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+      super.execRowsSelected(rows);
+    }
 
     @Override
     protected boolean getConfiguredSortEnabled() {
@@ -392,8 +439,13 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
           outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
           break;
         }
+        case TableEvent.TYPE_ROWS_SELECTED: {
+          updateContextMenusForSelection();
+          break;
+        }
       }
 
     }
   }
+
 }
