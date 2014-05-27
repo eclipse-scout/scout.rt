@@ -65,7 +65,6 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   protected void callInitializer() {
     if (!m_initialized) {
       initConfig();
-      ensureItemsLoadedInternal(new Date(System.currentTimeMillis() - MONTH_MILLIS), new Date(System.currentTimeMillis() + MONTH_MILLIS));
       m_initialized = true;
     }
   }

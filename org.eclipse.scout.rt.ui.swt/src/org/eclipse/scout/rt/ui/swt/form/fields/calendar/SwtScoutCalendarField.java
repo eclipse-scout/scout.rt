@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.calendar;
 
-import java.util.Calendar;
-
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -58,14 +56,13 @@ public class SwtScoutCalendarField extends SwtScoutFieldComposite<ICalendarField
   @Override
   protected void attachScout() {
     super.attachScout();
-    //init swt->scout properties
-    final Calendar minDate = m_calendar.getViewDateStart();
-    final Calendar maxDate = m_calendar.getViewDateEnd();
+    m_calendar.setCondensedMode(getScoutObject().getCalendar().isDisplayCondensed());
+    m_calendar.setCalendarComponentsFromScout(getScoutObject().getCalendar().getComponents());
     //notify Scout
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getCalendar().getUIFacade().setVisibleRangeFromUI(minDate.getTime(), maxDate.getTime());
+        getScoutObject().getCalendar().getUIFacade().setVisibleRangeFromUI(m_calendar.getViewDateStart().getTime(), m_calendar.getViewDateEnd().getTime());
       }
     };
     JobEx job = getEnvironment().invokeScoutLater(r, 0);
@@ -76,8 +73,6 @@ public class SwtScoutCalendarField extends SwtScoutFieldComposite<ICalendarField
       //nop
     }
     //end notify
-    m_calendar.setCondensedMode(getScoutObject().getCalendar().isDisplayCondensed());
-    m_calendar.setCalendarComponentsFromScout(getScoutObject().getCalendar().getComponents());
   }
 
   @Override

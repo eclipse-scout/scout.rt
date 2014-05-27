@@ -62,10 +62,13 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   @Override
   protected void attachScout() {
     super.attachScout();
-    // init swing->scout properties
+    //setup dateChooser
+    setSetupFromScout(getScoutObject().getDisplayMode(), getScoutObject().isDisplayCondensed());
+    setCalendarComponentsFromScout(getScoutObject().getComponents());
+    setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
+    // notify Scout
     final Date minDate = m_dateChooser.getViewDateStart();
     final Date maxDate = m_dateChooser.getViewDateEnd();
-    // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
@@ -74,9 +77,6 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     };
     getSwingEnvironment().invokeScoutLater(t, 0);
     // end notify
-    setSetupFromScout(getScoutObject().getDisplayMode(), getScoutObject().isDisplayCondensed());
-    setCalendarComponentsFromScout(getScoutObject().getComponents());
-    setSelectionFromScout(getScoutObject().getSelectedDate(), getScoutObject().getSelectedComponent());
   }
 
   public DateChooser getDateChooser() {
