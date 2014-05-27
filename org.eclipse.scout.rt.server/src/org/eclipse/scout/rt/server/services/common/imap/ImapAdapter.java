@@ -34,7 +34,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 @SuppressWarnings("restriction")
-public class ImapAdapter {
+public class ImapAdapter implements IImapAdapter {
 
   public static final String TRASH_FOLDER_NAME = "Trash";
   public static final int DEFAULT_IMAP_PORT = 143;
@@ -67,10 +67,12 @@ public class ImapAdapter {
     super.finalize();
   }
 
+  @Override
   public Message[] getUnseenMessages() throws ProcessingException {
     return getUnseenMessages(getDefaultFolderName());
   }
 
+  @Override
   public Message[] getUnseenMessages(String folderName) throws ProcessingException {
     connect();
     ArrayList<Message> messages = new ArrayList<Message>();
@@ -95,10 +97,12 @@ public class ImapAdapter {
     return messages.toArray(new Message[messages.size()]);
   }
 
+  @Override
   public Message[] getAllMessages() throws ProcessingException {
     return getAllMessages(getDefaultFolderName());
   }
 
+  @Override
   public Message[] getAllMessages(String folderName) throws ProcessingException {
     connect();
     Message[] messages = new Message[0];
@@ -115,14 +119,17 @@ public class ImapAdapter {
     return messages;
   }
 
+  @Override
   public void moveToTrash(Message[] messages) throws ProcessingException {
     moveMessages(TRASH_FOLDER_NAME, messages);
   }
 
+  @Override
   public void moveMessages(String destFolderName, Message[] messages) throws ProcessingException {
     copyMessages(destFolderName, messages, true);
   }
 
+  @Override
   public void copyMessages(String destFolderName, Message[] messages) throws ProcessingException {
     copyMessages(destFolderName, messages, false);
   }
@@ -146,10 +153,8 @@ public class ImapAdapter {
 
   /**
    * messages are flagged as DELETED and their folder is closed in order to delete them on the server
-   * 
-   * @param messages
-   * @throws ProcessingException
    */
+  @Override
   public void deleteMessagesPermanently(Message[] messages) throws ProcessingException {
     connect();
     Set<Folder> folders = new HashSet<Folder>();
@@ -169,10 +174,12 @@ public class ImapAdapter {
     }
   }
 
+  @Override
   public void createFolder(String folderName) throws ProcessingException {
     findFolder(folderName, true);
   }
 
+  @Override
   public void removeFolder(String folderName) throws ProcessingException {
     connect();
     try {
@@ -189,6 +196,7 @@ public class ImapAdapter {
     }
   }
 
+  @Override
   public void connect() throws ProcessingException {
     if (!isConnected()) {
       m_cachedFolders.clear();
@@ -279,6 +287,7 @@ public class ImapAdapter {
     return folder;
   }
 
+  @Override
   public void closeConnection() throws ProcessingException {
     if (isConnected()) {
       List<MessagingException> exceptions = new ArrayList<MessagingException>();
@@ -317,63 +326,78 @@ public class ImapAdapter {
     }
   }
 
+  @Override
   public boolean isConnected() {
     return m_store != null && m_store.isConnected();
   }
 
+  @Override
   public Store getStore() throws ProcessingException {
     connect();
     return m_store;
   }
 
+  @Override
   public String getDefaultFolderName() {
     return m_defaultFolderName;
   }
 
+  @Override
   public void setDefaultFolderName(String defaultFolderName) {
     m_defaultFolderName = defaultFolderName;
   }
 
+  @Override
   public String getHost() {
     return m_host;
   }
 
+  @Override
   public void setHost(String host) {
     m_host = host;
   }
 
+  @Override
   public int getPort() {
     return m_port;
   }
 
+  @Override
   public void setPort(int port) {
     m_port = port;
   }
 
+  @Override
   public String getUsername() {
     return m_username;
   }
 
+  @Override
   public void setUsername(String username) {
     m_username = username;
   }
 
+  @Override
   public String getPassword() {
     return m_password;
   }
 
+  @Override
   public void setPassword(String password) {
     m_password = password;
   }
 
+  @Override
   public boolean isUseSSL() {
     return m_useSSL;
   }
 
+  @Override
   public void setUseSSL(boolean useSSL) {
     m_useSSL = useSSL;
   }
 
+  @Override
   public String[] getSSLProtocols() {
     if (m_sslProtocols == null) {
       return null;
@@ -381,6 +405,7 @@ public class ImapAdapter {
     return Arrays.copyOf(m_sslProtocols, m_sslProtocols.length);
   }
 
+  @Override
   public void setSSLProtocols(String[] sslProtocols) {
     if (sslProtocols == null) {
       m_sslProtocols = null;
