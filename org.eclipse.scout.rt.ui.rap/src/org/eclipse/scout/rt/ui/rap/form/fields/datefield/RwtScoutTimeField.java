@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
-import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
@@ -55,7 +54,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 
 public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
@@ -134,7 +132,7 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     textField.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
-    ButtonEx timeChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_timeContainer, SWT.PUSH | SWT.NO_FOCUS);
+    Button timeChooserButton = getUiEnvironment().getFormToolkit().createButton(m_timeContainer, "", SWT.PUSH | SWT.NO_FOCUS);
     timeChooserButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     container.setTabList(new Control[]{m_timeContainer});
@@ -148,7 +146,7 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousHourKeyStroke(), false);
 
     // listener
-    timeChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
+    timeChooserButton.addSelectionListener(new P_RwtBrowseButtonListener());
     attachFocusListener(textField, true);
     textField.addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;
@@ -160,6 +158,7 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
         }
       }
     });
+
     //
     setUiContainer(container);
     setUiLabel(label);
@@ -186,7 +185,7 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     return m_dropDownButton;
   }
 
-  public void setDropDownButton(ButtonEx b) {
+  public void setDropDownButton(Button b) {
     m_dropDownButton = b;
   }
 
@@ -485,22 +484,13 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     }
   }
 
-  private class P_RwtBrowseButtonListener implements Listener {
+  private class P_RwtBrowseButtonListener extends SelectionAdapter {
     private static final long serialVersionUID = 1L;
 
-    public P_RwtBrowseButtonListener() {
-    }
-
     @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case ButtonEx.SELECTION_ACTION:
-          getUiField().forceFocus();
-          handleUiTimeChooserAction();
-          break;
-        default:
-          break;
-      }
+    public void widgetSelected(SelectionEvent e) {
+      getUiField().forceFocus();
+      handleUiTimeChooserAction();
     }
   } // end class P_RwtBrowseButtonListener
 

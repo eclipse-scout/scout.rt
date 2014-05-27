@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtScoutContextMenu;
-import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
@@ -55,7 +54,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 
 public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> implements IRwtScoutDateField, IPopupSupport {
@@ -150,7 +148,7 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     getUiEnvironment().addKeyStroke(textField, new P_ShiftYearDownKeyStroke(), false);
 
     // listener
-    dateChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
+    dateChooserButton.addSelectionListener(new P_RwtBrowseButtonListener());
     attachFocusListener(textField, true);
     textField.addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;
@@ -491,22 +489,13 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     }
   }
 
-  private class P_RwtBrowseButtonListener implements Listener {
+  private class P_RwtBrowseButtonListener extends SelectionAdapter {
     private static final long serialVersionUID = 1L;
 
-    public P_RwtBrowseButtonListener() {
-    }
-
     @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case ButtonEx.SELECTION_ACTION:
-          getUiField().forceFocus();
-          handleUiDateChooserAction();
-          break;
-        default:
-          break;
-      }
+    public void widgetSelected(SelectionEvent e) {
+      getUiField().forceFocus();
+      handleUiDateChooserAction();
     }
   } // end class P_RwtBrowseButtonListener
 
