@@ -78,7 +78,7 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype.detach = function() {
   this.$container.detach();
-  scout.keystrokeManager.removeAdapter(this._keystrokeAdapter);
+  this.dispose();
 };
 
 scout.Table.prototype.attach = function($container) {
@@ -90,6 +90,9 @@ scout.Table.prototype.attach = function($container) {
   scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 };
 
+scout.Table.prototype.dispose = function() {
+  scout.keystrokeManager.removeAdapter(this._keystrokeAdapter);
+};
 
 scout.Table.prototype.clearSelection = function() {
   if (this.selectionHandler) {
@@ -148,8 +151,7 @@ scout.Table.prototype._sort = function() {
     return 0;
   }
 
-  // find all rows
-  var $rows = $('.table-row');
+  var $rows = this.findRows();
 
   // store old position
   $rows.each(function() {
@@ -213,7 +215,7 @@ scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
 };
 
 scout.Table.prototype.drawData = function() {
-  $('.table-row', this.$data).remove();
+  this.findRows().remove();
   this._drawData(0);
   if(this.selectionHandler) {
     this.selectionHandler.dataDrawn();
@@ -545,11 +547,19 @@ scout.Table.prototype.findSelectedRows = function() {
   return this.$dataScroll.find('.row-selected');
 };
 
+scout.Table.prototype.findRows = function() {
+  if (!this.$dataScroll) {
+    return $();
+  }
+
+  return this.$dataScroll.find('.table-row');
+};
+
 scout.Table.prototype.filter = function() {
   var that = this,
     rowCount = 0,
     origin = [],
-    $allRows = $('.table-row', that.$dataScroll);
+    $allRows = this.findRows();
 
   that.clearSelection();
   $('.table-row-sum', this.$dataScroll).hide();
@@ -604,7 +614,7 @@ scout.Table.prototype.resetFilter = function() {
 
   // reset rows
   var that = this;
-  $('.table-row', that.$dataScroll).each(function() {
+  this.findRows().each(function() {
     that.showRow($(this));
   });
   this._group();

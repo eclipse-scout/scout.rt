@@ -35,6 +35,19 @@ scout.Form.prototype._render = function($parent) {
 
 };
 
+scout.Form.prototype.detach = function() {
+  scout.Form.parent.prototype.detach.call(this);
+
+  var i, formFieldModel, formField;
+  for (i = 0; i < this.model.formFields.length; i++) {
+    formFieldModel = this.model.formFields[i];
+    formField = this.session.widgetMap[formFieldModel.id];
+    if(formField && formField.dispose) {
+      formField.dispose();
+    }
+  }
+};
+
 scout.Form.prototype.onModelCreate = function() {
 };
 

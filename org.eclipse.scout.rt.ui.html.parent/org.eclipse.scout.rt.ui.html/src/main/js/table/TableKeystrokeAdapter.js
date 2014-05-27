@@ -23,8 +23,8 @@ scout.TableKeystrokeAdapter = function(table) {
   handler = {
     keycodes: [38, 40, 36, 35, 33, 34],
     handle: function(keycode) {
-      var $rowsAll = $('.table-row', that._table.$container),
-        $rowsSelected = $('.row-selected', that._table.$container),
+      var $rowsAll = that._table.findRows(),
+        $rowsSelected = that._table.findSelectedRows(),
         $newRowSelection;
 
       // up: move up

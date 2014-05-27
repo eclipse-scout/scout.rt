@@ -19,6 +19,10 @@ scout.TableField.prototype._render = function($parent) {
   this.table.attach(this.$container);
 };
 
+scout.TableField.prototype.dispose = function() {
+  this.table.dispose();
+};
+
 scout.TableField.prototype.onModelCreate = function(event) {
   if (event.objectType == "Table") {
     if (this.table) {
