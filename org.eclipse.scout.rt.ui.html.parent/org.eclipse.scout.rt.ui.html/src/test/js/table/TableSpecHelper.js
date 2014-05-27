@@ -44,7 +44,7 @@ TableSpecHelper.prototype.createModelColumns = function(count) {
 
   var columns = [];
   for (var i = 0; i < count; i++) {
-    columns[i] = this.createModelColumn(i, 'col' + i);
+    columns[i] = this.createModelColumn(i+'', 'col' + i);
   }
   return columns;
 };
@@ -52,7 +52,7 @@ TableSpecHelper.prototype.createModelColumns = function(count) {
 TableSpecHelper.prototype.createModelCells = function(count) {
   var cells = [];
   for (var i = 0; i < count; i++) {
-    cells[i] = this.createModelCell(i, 'cell' + i);
+    cells[i] = this.createModelCell(i+'', 'cell' + i);
   }
   return cells;
 };
@@ -64,10 +64,10 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(i, this.createModelCells(colCount));
+    rows[i] = this.createModelRow(i+'', this.createModelCells(colCount));
   }
   return rows;
-},
+};
 
 TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
   return this.createModel('1', this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
@@ -81,9 +81,20 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   return new scout.MobileTable(model, this.session);
 };
 
+TableSpecHelper.prototype.getRowIds = function(rows) {
+  var rowIds = [];
+  for (var i = 0; i < rows.length; i++) {
+    rowIds.push(rows[i].id);
+  }
+  return rowIds;
+};
+
 TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {
   table.selectRowsByIds(rowIds);
+  this.assertSelection(table, rowIds);
+};
 
+TableSpecHelper.prototype.assertSelection = function(table, rowIds) {
   var $selectedRows = table.findSelectedRows();
   expect($selectedRows.length).toBe(rowIds.length);
 
@@ -93,6 +104,14 @@ TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {
   });
 
   expect(scout.arrays.equalsIgnoreOrder(rowIds, selectedRowIds)).toBeTruthy();
+  expect(scout.arrays.equalsIgnoreOrder(rowIds, table.model.selectedRowIds)).toBeTruthy();
+};
+
+TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
+  var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, id, {
+    "rowIds": rowIds
+  });
+  expect(mostRecentJsonRequest()).toContainEvents(event);
 };
 
 TableSpecHelper.prototype.getDisplayingRowMenu = function(table) {

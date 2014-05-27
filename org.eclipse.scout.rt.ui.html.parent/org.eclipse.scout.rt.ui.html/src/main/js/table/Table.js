@@ -90,15 +90,10 @@ scout.Table.prototype.attach = function($container) {
   scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 };
 
-scout.Table.prototype.drawSelection = function() {
-  if (this.selectionHandler) {
-    this.selectionHandler.drawSelection();
-  }
-};
 
-scout.Table.prototype.resetSelection = function() {
+scout.Table.prototype.clearSelection = function() {
   if (this.selectionHandler) {
-    this.selectionHandler.resetSelection();
+    this.selectionHandler.clearSelection();
   }
 };
 
@@ -118,7 +113,7 @@ scout.Table.prototype._sort = function() {
   var sortColumns = [];
 
   // remove selection
-  this.resetSelection();
+  this.clearSelection();
 
   // find all sort columns
   for (var c = 0; c < this.model.columns.length; c++) {
@@ -220,7 +215,9 @@ scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
 scout.Table.prototype.drawData = function() {
   $('.table-row', this.$data).remove();
   this._drawData(0);
-  this.drawSelection();
+  if(this.selectionHandler) {
+    this.selectionHandler.dataDrawn();
+  }
 };
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
@@ -310,7 +307,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
 scout.Table.prototype.sendRowsSelected = function() {
   var rowIds = [],
-    $selectedRows = $('.row-selected');
+    $selectedRows = this.findSelectedRows();
 
   $selectedRows.each(function() {
     rowIds.push($(this).attr('id'));
@@ -529,11 +526,22 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   this.model.selectedRowIds = rowIds;
 
   if (this.selectionHandler) {
-    this.selectionHandler.selectRowsByIds(rowIds);
+    this.selectionHandler.drawSelection();
+  }
+
+  if (!this.updateFromModelInProgress) {
+    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
+    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.model.id, {
+      "rowIds": rowIds
+    });
   }
 };
 
 scout.Table.prototype.findSelectedRows = function() {
+  if (!this.$dataScroll) {
+    return $();
+  }
+
   return this.$dataScroll.find('.row-selected');
 };
 
@@ -543,7 +551,7 @@ scout.Table.prototype.filter = function() {
     origin = [],
     $allRows = $('.table-row', that.$dataScroll);
 
-  that.resetSelection();
+  that.clearSelection();
   $('.table-row-sum', this.$dataScroll).hide();
 
   $allRows.each(function() {
@@ -592,7 +600,7 @@ scout.Table.prototype.filter = function() {
 };
 
 scout.Table.prototype.resetFilter = function() {
-  this.resetSelection();
+  this.clearSelection();
 
   // reset rows
   var that = this;
@@ -733,7 +741,16 @@ scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
   this.events.trigger(type, event);
 };
 
-scout.Table.prototype.triggerRowsSelected = function($rows, allSelected) {
+scout.Table.prototype.triggerRowsSelected = function($rows) {
+  var rowCount = 0, allSelected = false;
+  if (this.model.rows) {
+    rowCount = this.model.rows.length;
+  }
+
+  if($rows) {
+    allSelected = $rows.length == rowCount;
+  }
+
   var type = scout.Table.GUI_EVENT_ROWS_SELECTED;
   var event = {
     $rows: $rows,

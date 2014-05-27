@@ -19,7 +19,11 @@ scout.TableFooter = function(table, $parent, session) {
   });
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
-    that._setInfoSelect(event.$rows.length, event.allSelected);
+    var numRows = 0;
+    if (event.$rows) {
+      numRows = event.$rows.length;
+    }
+    that._setInfoSelect(numRows, event.allSelected);
   });
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {

@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;

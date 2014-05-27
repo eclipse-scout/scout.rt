@@ -97,6 +97,43 @@ describe("Table", function() {
 
   });
 
+  describe("toggle selection", function() {
+    it("selects all if not all are selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      var $selectedRows = table.findSelectedRows();
+      expect($selectedRows.length).toBe(0);
+
+      table.toggleSelection();
+      helper.assertSelection(table, helper.getRowIds(model.rows));
+      jasmine.clock().tick(0);
+      helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
+    });
+
+    it("selects none if all are selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.attach(session.$entryPoint);
+
+      var $selectedRows = table.findSelectedRows();
+      expect($selectedRows.length).toBe(0);
+
+      helper.selectRowsAndAssert(table, helper.getRowIds(model.rows));
+
+      table.toggleSelection();
+      helper.assertSelection(table, []);
+      jasmine.clock().tick(0);
+      helper.assertSelectionEvent(model.id, []);
+
+      table.toggleSelection();
+      helper.assertSelection(table, helper.getRowIds(model.rows));
+      jasmine.clock().tick(0);
+      helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
+    });
+  });
+
   describe("row click", function() {
 
     function clickRowAndAssertSelection(table, $row) {

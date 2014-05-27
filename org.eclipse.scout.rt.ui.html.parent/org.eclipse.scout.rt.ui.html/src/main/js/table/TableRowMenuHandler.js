@@ -15,7 +15,7 @@ scout.TableRowMenuHandler = function(table) {
 };
 
 scout.TableRowMenuHandler.prototype._onRowsSelected = function($rows) {
-  if (!$rows.length) {
+  if (!$rows) {
     $('#RowMenu, #RowDrill, #RowMenuContainer').remove();
   }
 };

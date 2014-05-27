@@ -27,7 +27,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     var $row = $(event.delegateTarget),
       add = true,
       first,
-      $selectedRows = $('.row-selected'),
+      $selectedRows = that.table.findSelectedRows(),
       selectionChanged = false;
 
     // click without ctrl always starts new selection, with ctrl toggle
@@ -75,8 +75,10 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
         $actionRow.removeClass('row-selected');
       }
 
-      // draw nice border
-      that.drawSelection();
+      $selectedRows = that.table.findSelectedRows();
+      that._clearSelectionBorder();
+      that._drawSelectionBorder($selectedRows);
+      that.table.triggerRowsSelected($selectedRows);
 
       //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
       selectionChanged = true;
@@ -95,12 +97,46 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 };
 
 scout.TableSelectionHandler.prototype.drawSelection = function() {
-  // remove nice border
-  $('.select-middle, .select-top, .select-bottom, .select-single')
-    .removeClass('select-middle select-top select-bottom select-single');
+  this.clearSelection(true);
 
-  // draw nice border
-  var $selectedRows = $('.row-selected');
+  var rowIds = this.table.model.selectedRowIds;
+  var selectedRows = [];
+  for (var i = 0; i < rowIds.length; i++) {
+    var rowId = rowIds[i];
+    var $row = $('#' + rowId, this.table.$data);
+    $row.addClass('row-selected');
+    selectedRows.push($row);
+  }
+
+  var $selectedRows = $(selectedRows);
+  this._drawSelectionBorder($selectedRows);
+
+  this.table.triggerRowsSelected($selectedRows);
+};
+
+
+scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
+  this.table.findSelectedRows().removeClass('row-selected');
+  this._clearSelectionBorder();
+
+  if (!dontFire) {
+    this.table.triggerRowsSelected();
+    this.table.sendRowsSelected();
+  }
+};
+
+scout.TableSelectionHandler.prototype.dataDrawn = function() {
+  var $selectedRows = this.table.findSelectedRows();
+
+  this._clearSelectionBorder();
+  this._drawSelectionBorder($selectedRows);
+  this.table.triggerRowsSelected($selectedRows);
+};
+
+/**
+ * Adds the css classes for the selection border based on the selected rows.
+ */
+scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedRows) {
   $selectedRows.each(function() {
     var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
       hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
@@ -110,51 +146,30 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
     if (hasPrev && !hasNext) $(this).addClass('select-bottom');
     if (!hasPrev && !hasNext) $(this).addClass('select-single');
   });
-
-  // show count
-  var rowCount = 0;
-  if (this.table.model.rows) {
-    rowCount = this.table.model.rows.length;
-  }
-  this.table.triggerRowsSelected($selectedRows, $selectedRows.length == rowCount);
 };
 
-scout.TableSelectionHandler.prototype.resetSelection = function() {
-  $('.row-selected', this.table.$data).removeClass('row-selected');
-  this.drawSelection();
+scout.TableSelectionHandler.prototype._clearSelectionBorder = function() {
+  $('.select-middle, .select-top, .select-bottom, .select-single')
+  .removeClass('select-middle select-top select-bottom select-single');
 };
 
-scout.TableSelectionHandler.prototype.selectRowsByIds = function(rowIds) {
-  if (this.table.$dataScroll) {
-    this.resetSelection();
+scout.TableSelectionHandler.prototype.selectAll = function() {
+  this.clearSelection(true);
 
-    for (var i = 0; i < rowIds.length; i++) {
-      var rowId = rowIds[i];
-      var $row = $('#' + rowId);
-      $row.addClass('row-selected');
-    }
+  var $rows = $('.table-row', this.table.$data);
+  $rows.addClass('row-selected');
 
-    this.drawSelection();
-  }
+  this._drawSelectionBorder($rows);
 
-  //FIXME row menu is not shown when using this method
-
-  if (!this.table.updateFromModelInProgress) {
-    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
-    this.table.session.send(scout.Table.EVENT_ROWS_SELECTED, this.table.model.id, {
-      "rowIds": rowIds
-    });
-  }
+  this.table.triggerRowsSelected($rows);
+  this.table.sendRowsSelected();
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
-  var $selectedRows = $('.row-selected', this.table.$data);
-
-  if ($selectedRows.length == this.table.model.rows.length) {
-    $selectedRows.removeClass('row-selected');
+  if (this.table.model.selectedRowIds &&
+      this.table.model.selectedRowIds.length === this.table.model.rows.length) {
+    this.clearSelection();
   } else {
-    $('.table-row', this.table.$data).addClass('row-selected');
+    this.selectAll();
   }
-
-  this.drawSelection();
 };

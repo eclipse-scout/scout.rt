@@ -1,3 +1,6 @@
+/*jshint -W079 */
+/*global JasmineMavenReporter */
+
 //Since we don't use a IIF to wrap the scout code when running tests, we need to define the scout namespace here
 var scout = {};
 
