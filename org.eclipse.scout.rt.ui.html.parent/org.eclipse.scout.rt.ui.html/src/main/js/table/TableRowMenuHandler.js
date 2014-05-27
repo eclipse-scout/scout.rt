@@ -49,20 +49,20 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
       var $selectedRows = $('.row-selected'),
         $firstRow = $selectedRows.first();
 
-      if($selectedRows.length === 0) {
+      if ($selectedRows.length === 0) {
         return;
       }
 
       // make menu - if not already there
-      var $RowDrill = $('#RowDrill');
-      if ($RowDrill.length === 0) {
-        $RowDrill = that.table.$dataScroll.appendDiv('RowDrill')
+      var $rowDrill = $('#RowDrill');
+      if ($rowDrill.length === 0) {
+        $rowDrill = that.table.$dataScroll.appendDiv('RowDrill')
           .on('click', '', function() {
             that.table.sendRowAction($firstRow);
           });
 
-        var h1 = $RowDrill.outerHeight();
-        $RowDrill.height(0).animateAVCSD('height', h1, null, null, 75);
+        var h1 = $rowDrill.outerHeight();
+        $rowDrill.height(0).animateAVCSD('height', h1, null, null, 75);
       }
 
       var menus;
@@ -72,21 +72,21 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         menus = that.filterSingleSelectionRowMenus(that.table.model.menus);
       }
 
-      var $RowMenu = $('#RowMenu');
+      var $rowMenu = $('#RowMenu');
       if (!menus || menus.length === 0) {
-        if ($RowMenu.length > 0) {
-          $RowMenu.remove();
+        if ($rowMenu.length > 0) {
+          $rowMenu.remove();
         }
       } else {
-        if ($RowMenu.length === 0) {
-          $RowMenu = that.table.$dataScroll.appendDiv('RowMenu')
+        if ($rowMenu.length === 0) {
+          $rowMenu = that.table.$dataScroll.appendDiv('RowMenu')
             .on('click', '', clickRowMenu);
 
-          var h2 = $RowMenu.outerHeight();
-          $RowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
+          var h2 = $rowMenu.outerHeight();
+          $rowMenu.height(0).animateAVCSD('height', h2, null, null, 75);
         }
 
-        $RowMenu.data('menus', menus);
+        $rowMenu.data('menus', menus);
       }
 
       // place menu
@@ -94,16 +94,16 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
       var top = $selectedRows.last().offset().top - that.table.$dataScroll.offset().top + 32,
         left = Math.max(25, Math.min($firstRow.outerWidth() - 164, x - that.table.$dataScroll.offset().left - 13));
 
-      $RowDrill.css('left', left - 16).css('top', top);
-      $RowMenu.css('left', left + 16).css('top', top);
+      $rowDrill.css('left', left - 16).css('top', top);
+      $rowMenu.css('left', left + 16).css('top', top);
 
       // mouse over effect
       var $showMenu = $selectedRows
         .add($selectedRows.first().prev())
         .add($selectedRows.last().next())
         .add($selectedRows.last().next().next())
-        .add($RowDrill)
-        .add($RowMenu);
+        .add($rowDrill)
+        .add($rowMenu);
 
       $showMenu
         .on('mouseenter', '', enterSelection)
@@ -114,29 +114,30 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
       }
 
       function enterSelection(event) {
-        $RowDrill.animateAVCSD('height', h1, null, null, 75);
-        $RowMenu.animateAVCSD('height', h2, null, null, 75);
+        $rowDrill.animateAVCSD('height', h1, null, null, 75);
+        $rowMenu.animateAVCSD('height', h2, null, null, 75);
       }
 
       function leaveSelection(event) {
         if (!$(event.toElement).is($showMenu) && !$('#RowMenuContainer').length) {
-          $RowDrill.animateAVCSD('height', 6, null, null, 75);
-          $RowMenu.animateAVCSD('height', 6, null, null, 75);
+          $rowDrill.animateAVCSD('height', 6, null, null, 75);
+          $rowMenu.animateAVCSD('height', 6, null, null, 75);
         }
       }
 
       function clickRowMenu() {
         if ($('#RowMenuContainer').length) {
           removeMenu();
+          return;
         }
 
-        var menus = $RowMenu.data('menus');
+        var menus = $rowMenu.data('menus');
         if (menus && menus.length > 0) {
           // create 2 container, animate do not allow overflow
-          var $RowMenuContainer = $RowMenu.beforeDiv('RowMenuContainer')
+          var $rowMenuContainer = $rowMenu.beforeDiv('RowMenuContainer')
             .css('left', left + 16).css('top', top);
 
-          $showMenu = $showMenu.add($RowMenuContainer);
+          $showMenu = $showMenu.add($rowMenuContainer);
 
           // create menu-item and menu-button
           for (var i = 0; i < menus.length; i++) {
@@ -144,14 +145,14 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
               continue;
             }
             if (menus[i].iconId) {
-              $RowMenuContainer.appendDiv('', 'menu-button')
+              $rowMenuContainer.appendDiv('', 'menu-button')
                 .attr('id', menus[i].id)
                 .attr('data-icon', menus[i].iconId)
                 .attr('data-label', menus[i].text)
                 .on('click', '', onMenuItemClicked)
                 .hover(onHoverIn, onHoverOut);
             } else {
-              $RowMenuContainer.appendDiv('', 'menu-item', menus[i].text)
+              $rowMenuContainer.appendDiv('', 'menu-item', menus[i].text)
                 .attr('id', menus[i].id)
                 .on('click', '', onMenuItemClicked);
             }
@@ -161,19 +162,21 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
           }
 
           // wrap menu-buttons and add one div for label
-          $('.menu-button', $RowMenuContainer).wrapAll('<div id="MenuButtons"></div>');
-          $('#MenuButtons', $RowMenuContainer).appendDiv('MenuButtonsLabel');
-          $RowMenuContainer.append($('#MenuButtons', $RowMenuContainer));
+          $('.menu-button', $rowMenuContainer).wrapAll('<div id="MenuButtons"></div>');
+          $('#MenuButtons', $rowMenuContainer).appendDiv('MenuButtonsLabel');
+          $rowMenuContainer.append($('#MenuButtons', $rowMenuContainer));
 
           // animated opening
-          var h = $RowMenuContainer.outerHeight();
-          $RowMenuContainer.css('height', 0).animateAVCSD('height', h);
+          var h = $rowMenuContainer.outerHeight();
+          $rowMenuContainer.css('height', 0).animateAVCSD('height', h);
 
-          var t = parseInt($RowMenu.css('top'), 0);
-          $RowMenu.css('top', t).animateAVCSD('top', t + h - 2);
+          var t = parseInt($rowMenu.css('top'), 0);
+          $rowMenu.css('top', t).animateAVCSD('top', t + h - 2);
 
           // every user action will close menu
-          $('*').one('mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu', removeMenu);
+          var closingEvents = 'mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu';
+          $(document).one(closingEvents, removeMenu);
+          $rowMenuContainer.one(closingEvents, $.suppressEvent); // menu is removed in 'click' event, see onMenuItemClicked()
 
           //FIXME CGU we need to wait for the server calls to be finished before showing the menus.
         }
@@ -187,18 +190,22 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         }
 
         function onMenuItemClicked() {
+          removeMenu();
           that.table.session.send('menuAction', $(this).attr('id'));
         }
 
-        function removeMenu() {
-          var $RowMenuContainer = $('#RowMenuContainer'),
-            h = $RowMenuContainer.outerHeight();
-
-          $RowMenuContainer.animateAVCSD('height', 0, $.removeThis);
-
-          var t = parseInt($RowMenu.css('top'), 0);
-          $RowMenu.css('top', t).animateAVCSD('top', t - h + 2);
-          $('*').off('.rowMenu');
+        function removeMenu(event) {
+          var $rowMenuContainer = $('#RowMenuContainer');
+          if (!$rowMenuContainer.length) {
+            return; // Menu does not exist anymore
+          }
+          // Animate
+          var h = $rowMenuContainer.outerHeight();
+          $rowMenuContainer.animateAVCSD('height', 0, $.removeThis);
+          var t = parseInt($rowMenu.css('top'), 0);
+          $rowMenu.css('top', t).animateAVCSD('top', t - h + 2);
+          // Remove all cleanup handlers
+          $(document).off('.rowMenu');
         }
       }
     }

@@ -119,8 +119,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
 
-  function addSelectBar($Container) {
-    var $svg = $Container.appendSVG('svg', 'ChartBar', 'select-chart');
+  function addSelectBar($container) {
+    var $svg = $container.appendSVG('svg', 'ChartBar', 'select-chart');
     var show = [2, 4, 3, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
@@ -132,8 +132,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     }
   }
 
-  function addSelectStacked($Container) {
-    var $svg = $Container.appendSVG('svg', 'ChartStacked', 'select-chart'),
+  function addSelectStacked($container) {
+    var $svg = $container.appendSVG('svg', 'ChartStacked', 'select-chart'),
       show = [2, 4, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
@@ -145,8 +145,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     }
   }
 
-  function addSelectLine($Container) {
-    var $svg = $Container.appendSVG('svg', 'ChartLine', 'select-chart'),
+  function addSelectLine($container) {
+    var $svg = $container.appendSVG('svg', 'ChartLine', 'select-chart'),
       show = [0, 1.7, 1, 2, 1.5, 3],
       pathPoints = [];
 
@@ -158,8 +158,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     attr('d', 'M' + pathPoints.join('L'));
   }
 
-  function addSelectPie($Container) {
-    var $svg = $Container.appendSVG('svg', 'ChartPie', 'select-chart'),
+  function addSelectPie($container) {
+    var $svg = $container.appendSVG('svg', 'ChartPie', 'select-chart'),
       show = [
         [0, 0.1],
         [0.1, 0.25],
@@ -172,8 +172,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     }
   }
 
-  function addSelectScatter($Container) {
-    var $svg = $Container.appendSVG('svg', 'ChartScatter', 'select-chart');
+  function addSelectScatter($container) {
+    var $svg = $container.appendSVG('svg', 'ChartScatter', 'select-chart');
 
     $svg.appendSVG('line', '', 'select-fill-line')
       .attr('x1', 3).attr('y1', 53)

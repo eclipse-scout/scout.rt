@@ -64,17 +64,26 @@
   };
 
   /**
+   * Convenience function that can be used as an jQuery event handler, when
+   * this event should be "swallowed". Technically, this function just calls
+   * 'stopPropagation()' on the event.
+   */
+  $.suppressEvent = function(event) {
+    event.stopPropagation();
+  };
+
+  /**
    * from http://api.jquery.com/jquery.getscript/
    */
-  $.getCachedScript = function( url, options ) {
+  $.getCachedScript = function(url, options) {
 
-    options = $.extend( options || {}, {
+    options = $.extend(options || {}, {
       dataType: "script",
       cache: true,
       url: url
     });
 
-    return jQuery.ajax( options );
+    return jQuery.ajax(options);
   };
 
   //== $.prototype extensions
