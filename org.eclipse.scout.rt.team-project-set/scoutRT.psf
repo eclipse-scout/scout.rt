@@ -1,116 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.eclipse.egit.core.GitProvider">
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.apache.derby.jdbc_1091.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.commons"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.net"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.net.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.org.w3c.dom.svg.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt-repository"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.mobile"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.mobile.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.testenvironment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.core-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.extension.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.extension.client.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.feature.about"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,develop,org.eclipse.scout.rt.incubator.parent"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.jdbc.derby10"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.parent"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.rap-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.rap-repository"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.rap.basic.target-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.rap.testing-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.testenvironment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.shared"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.shared.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.swing-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.swt-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.team-project-set"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.spec-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.client.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.commons"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.commons.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.core-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.dependency-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.server"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.server.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.shared"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.shared.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.swing-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.swt-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.ui.rap"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.ui.swing"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.testing.ui.swt"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,develop,org.eclipse.scout.rt.ui.rap.incubator.filechooser"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,develop,org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,develop,org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.mobile"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.theme.rayo"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.theme.rayo.mobile"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.workbench"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.svg.calendar"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing.browser.swt.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swt"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swt.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.v34v35-repository"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.service"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.service.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.ui.rap"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.ui.swing"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.ui.swt"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.target"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.batik.dependency-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.spec.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.spec.client.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.apache.derby.jdbc_1091.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.commons"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.commons.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.jaxws216"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.jaxws216.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.net"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.net.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.org.w3c.dom.svg.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt-repository"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.batik.dependency-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client.mobile"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client.mobile.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.client.testenvironment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.core-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.extension.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.extension.client.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.feature.about"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.0.x,org.eclipse.scout.rt.incubator.parent"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.jdbc.derby10"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.parent"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.rap-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.rap-repository"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.rap.basic.target-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.rap.testing-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.server"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.server.commons"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.server.commons.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.server.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.server.testenvironment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.servicetunnel"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.shared"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.shared.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.spec-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.spec.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.spec.client.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.swing-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.swt-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.team-project-set"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.client.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.commons"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.commons.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.core-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.dependency-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.server"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.server.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.shared"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.shared.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.swing-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.swt-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.ui.rap"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.ui.swing"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.testing.ui.swt"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.mobile"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.theme.rayo"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.theme.rayo.mobile"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.rap.workbench"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.svg.calendar"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.swing"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.swing.browser.swt.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.swing.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.swt"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.ui.swt.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.rt.v34v35-repository"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.service"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.service.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.svg.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.svg.ui.rap"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.svg.ui.swing"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.svg.ui.swt"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.0.x,org.eclipse.scout.target"/>
 </provider>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
+<item elementID="=org.eclipse.scout.rt.extension.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.jaxws216.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.jdbc.derby10" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.team-project-set" type="4"/>
-<item elementID="=org.apache.derby.jdbc_1091.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.net" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws216" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.parent" type="4"/>
-<item elementID="=org.eclipse.scout.rt.extension.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap-repository" type="4"/>
 <item elementID="=org.eclipse.scout.service.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.extension.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.service" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.jdbc.derby10" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.v34v35-repository" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt-repository" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.target" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.incubator.parent" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository" type="4"/>
 <item elementID="=org.eclipse.scout.net.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.apache.derby.jdbc_1091.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.jdbc.derby10" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.net" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.jaxws216" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.org.w3c.dom.svg.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.server.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.servicetunnel" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375704042674_2" label="scout.rt.client" name="scout.rt.client">
 <item elementID="=org.eclipse.scout.svg.ui.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -127,14 +123,13 @@
 <item elementID="=org.eclipse.scout.rt.ui.rap.mobile" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.svg.ui.swt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.svg.calendar" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.client.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.client.mobile" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.mobile.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.client.mobile" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.client.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swing.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.rap.incubator.filechooser" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705268989_6" label="scout.rt.feature" name="scout.rt.feature">
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing.swt-feature" type="4"/>
@@ -148,28 +143,41 @@
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap.testing-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap.basic.target-feature" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.spec-feature" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.core-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing.dependency-feature" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.core-feature" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.batik.dependency-feature" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.spec-feature" type="4"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1401293127641_28" label="scout.rt.incubator" name="scout.rt.incubator">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.incubator.parent" type="4"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1374843791650_20" label="scout.rt.releng" name="scout.rt.releng">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.team-project-set" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.v34v35-repository" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt-repository" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap-repository" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.parent" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.target" type="4"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705167852_7" label="scout.rt.spec" name="scout.rt.spec">
+<item elementID="=org.eclipse.scout.rt.spec.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.spec.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705167866_4" label="scout.rt.testing" name="scout.rt.testing">
 <item elementID="=org.eclipse.scout.rt.testing.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.ui.swt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.ui.swt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.ui.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-</workingSets>
-<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705167852_7" label="scout.rt.spec" name="scout.rt.spec">
-<item elementID="=org.eclipse.scout.rt.spec.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.spec.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.ui.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 </psf>
