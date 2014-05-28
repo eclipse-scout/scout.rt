@@ -17,21 +17,24 @@ scout.DesktopTree = function(model, session) {
 scout.inherits(scout.DesktopTree, scout.ModelAdapter);
 
 scout.DesktopTree.prototype._render = function($parent) {
+  this.$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'tree');
   this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.model.nodes);
 
-  // home node for bread crum
-  this._$desktopTreeScroll.prependDiv('-1', 'tree-home', '')
+  // home node and menu section for bread crumb
+  this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
     .attr('data-level', -1)
     .on('click', '', onHomeClick);
+  this._$treeMenu = this.$parent.appendDiv('', 'tree-menu', '');
 
   var that = this;
 
   function onHomeClick(event) {
     $(this).selectOne();
-    that._updateBreadCrum();
+    that._$treeMenu.empty();
+    that._updateBreadCrumb();
   }
 };
 
@@ -316,7 +319,7 @@ scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
 
   this._setNodeSelected($clicked);
   this._setNodeExpanded($clicked, true);
-  this._updateBreadCrum();
+  this._updateBreadCrumb();
 };
 
 scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
@@ -348,7 +351,7 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
 
   if (menus && menus.length > 0) {
     var $treeMenuContainer = $node.parent().appendDiv('TreeMenuContainer')
-      .css('right', 24).css('top', y);
+      .css('right', 20).css('top', y);
 
     $node.addClass('menu-open');
 
@@ -416,7 +419,7 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
   }
 };
 
-scout.DesktopTree.prototype._updateBreadCrum = function() {
+scout.DesktopTree.prototype._updateBreadCrumb = function() {
   var $selected = $('.selected', this._$desktopTreeScroll),
     $allNodes = this._$desktopTreeScroll.children(),
     level = parseFloat($selected.attr('data-level'));
@@ -449,28 +452,26 @@ scout.DesktopTree.prototype._updateBreadCrum = function() {
   }
 };
 
+scout.DesktopTree.prototype.doBreadCrumb = function(show) {
+  if (show && !this.$parent.hasClass('bread-crumb')) {
+    this.$parent.addClass('bread-crumb');
+    var h = this._$treeMenu.css('height', 'auto').css('height');
+    this._$treeMenu.css('height', h);
+    //this._$desktopTreeScroll.css('height', 'calc(100% - ' + h + ')');
+  } else if (!show && this.$parent.hasClass('bread-crumb')) {
+    this.$parent.removeClass('bread-crumb');
+  }
+
+  this.scrollbar.initThumb();
+
+};
+
 scout.DesktopTree.prototype._findNodeById = function(nodeId) {
   return this._$desktopTreeScroll.find('#' + nodeId);
 };
 
 scout.DesktopTree.prototype._findSelectedNodes = function() {
   return this._$desktopTreeScroll.find('.selected');
-};
-
-scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
-  var $menu = $node.appendDiv('', 'tree-item-menu')
-    .data('menus', menus)
-    .on('click', '', onNodeMenuClicked);
-
-  var that = this;
-
-  function onNodeMenuClicked(event) {
-    return that._onNodeMenuClicked(event, $(this));
-  }
-};
-
-scout.DesktopTree.prototype._removeNodeMenu = function($node) {
-  $node.find('.tree-item-menu').remove();
 };
 
 scout.DesktopTree.prototype.filterSingleSelectionNodeMenus = function(menus) {
@@ -510,6 +511,71 @@ scout.DesktopTree.prototype._showOrHideMenus = function($node) {
   } else {
     this._removeNodeMenu($node);
   }
+
+};
+
+scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
+  var $menu = $node.appendDiv('', 'tree-item-menu')
+    .data('menus', menus)
+    .on('click', '', onNodeMenuClicked);
+
+  // delete old menu menu
+  this._$treeMenu.empty();
+
+  if (menus && menus.length > 0) {
+    // create menu-item and menu-button
+    for (var i = 0; i < menus.length; i++) {
+      if (menus[i].separator) {
+        continue;
+      }
+      if (menus[i].iconId) {
+        this._$treeMenu.appendDiv('', 'menu-button')
+          .attr('id', menus[i].id)
+          .attr('data-icon', menus[i].iconId)
+          .attr('data-label', menus[i].text)
+          .on('click', '', onMenuItemClicked)
+          .hover(onHoverIn, onHoverOut);
+      } else {
+        this._$treeMenu.appendDiv('', 'menu-item', menus[i].text)
+          .attr('id', menus[i].id)
+          .on('click', '', onMenuItemClicked);
+      }
+    }
+
+    // wrap menu-buttons and add div for label
+    $('.menu-button',  this._$treeMenu).wrapAll('<div id="MenuButtons"></div>');
+    var $menuButton = $('#MenuButtons',  this._$treeMenu);
+    var $menuLabel = $menuButton.appendDiv('MenuButtonsLabel');
+    this._$treeMenu.append($menuButton);
+
+    // size menu
+    var h = this._$treeMenu.css('height', 'auto').css('height');
+    this._$treeMenu.css('height', h);
+
+  }
+
+  var that = this;
+
+  function onNodeMenuClicked(event) {
+    return that._onNodeMenuClicked(event, $(this));
+  }
+
+  function onHoverIn() {
+    $menuLabel.text($(this).data('label'));
+  }
+
+  function onHoverOut() {
+    $menuLabel.text('');
+  }
+
+  function onMenuItemClicked() {
+    that.session.send('menuAction', $(this).attr('id'));
+  }
+};
+
+scout.DesktopTree.prototype._removeNodeMenu = function($node) {
+  $node.find('.tree-item-menu').remove();
+  this._$treeMenu.empty();
 };
 
 scout.DesktopTree.prototype.onModelPropertyChange = function(event) {

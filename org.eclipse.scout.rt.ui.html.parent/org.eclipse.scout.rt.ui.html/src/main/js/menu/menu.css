@@ -1,5 +1,7 @@
 .menu-item{
 color: #0082A1;
+overflow: hidden;
+text-overflow: ellipsis;
 cursor: pointer;
 line-height: 23px;
 padding: 4px 8px 0px 9px;

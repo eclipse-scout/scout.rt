@@ -32,6 +32,8 @@ scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
   $div.appendDiv(undefined, 'splitter-vertical')
     .on('mousedown', '', resize);
 
+  var that = this;
+
   function resize() {
     var w;
 
@@ -46,10 +48,10 @@ scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
       $div.next().width('calc(100% - ' + (w + 80) + 'px)')
         .css('left', w);
 
-      if (w <= 180 && $div.attr('id') === 'DesktopTree') {
-        $div.addClass('bread-crum');
+      if (w <= 180) {
+        that.desktopTree.doBreadCrumb(true);
       } else {
-        $div.removeClass('bread-crum');
+        that.desktopTree.doBreadCrumb(false);
       }
 
     }
@@ -58,7 +60,7 @@ scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
       $('body').off('mousemove')
         .removeClass('col-resize');
 
-      if (w < 180 && $div.attr('id') === 'DesktopTree') {
+      if (w < 180) {
         w = 180;
         $div.animateAVCSD('width', w, null,
             function(i){$div.next().css('width', 'calc(100% - ' + (i + 80) + 'px)'); });
