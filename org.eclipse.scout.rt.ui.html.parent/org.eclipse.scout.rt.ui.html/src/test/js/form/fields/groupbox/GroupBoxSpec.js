@@ -5,7 +5,11 @@ describe("GroupBox", function() {
     var session;
     var groupBox;
     var model = {
-          "label": "fooBar"
+          label: "fooBar",
+          gridData : {
+            x : 0,
+            y : 0
+          }
     };
 
     beforeEach(function() {
