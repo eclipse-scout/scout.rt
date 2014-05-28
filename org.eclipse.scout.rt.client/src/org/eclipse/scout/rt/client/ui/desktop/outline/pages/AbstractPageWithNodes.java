@@ -344,7 +344,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
       else if (node instanceof IPageWithNodes) {
         IPageWithNodes pageWithNodes = (IPageWithNodes) node;
-        List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getTree().getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(TreeMenuType.SingleSelection));
+        List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), ActionUtility.createMenuFilterMenuTypes(TreeMenuType.SingleSelection));
         for (IMenu m : menus) {
           pageMenus.add(new TablePageTreeMenuWrapper(m, TableMenuType.SingleSelection));
         }
