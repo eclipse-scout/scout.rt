@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.rangebox.JsonSequenceBox;
@@ -60,8 +62,10 @@ public class JsonAdapterFactory {
     else if (modelObject instanceof ITableField<?>) {
       return new JsonTableField((ITableField) modelObject, session, id);
     }
+    else if (modelObject instanceof IButton) {
+      return new JsonButton((IButton) modelObject, session, id);
+    }
     else if (modelObject instanceof IFormField) {
-      // TODO AWE: direktes instanzieren von form-field verbieten
       return new JsonFormField((IFormField) modelObject, session, id);
     }
     // other model objects
