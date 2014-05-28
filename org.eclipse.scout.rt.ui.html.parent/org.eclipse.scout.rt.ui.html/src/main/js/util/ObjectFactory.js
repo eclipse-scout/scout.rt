@@ -81,6 +81,11 @@ scout.defaultObjectFactories = [{
     return new scout.FormField(model, session);
   }
 }, {
+  objectType: 'Button',
+  create: function(model, session) {
+    return new scout.Button(model, session);
+  }
+}, {
   objectType: 'CheckBoxField',
   create: function(model, session) {
     return new scout.CheckBoxField(model, session);

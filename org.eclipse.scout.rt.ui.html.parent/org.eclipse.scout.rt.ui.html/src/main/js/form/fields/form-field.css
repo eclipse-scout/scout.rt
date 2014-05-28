@@ -10,6 +10,9 @@ div.inbox {
 .x3 {
     left: 810px;
 }
+.x4 {
+    left: 1205px;
+}
 .y1 {
     top: 0;
 }
@@ -21,6 +24,12 @@ div.inbox {
 }
 .y4 {
     top: 105px;
+}
+.y5 {
+    top: 135px;
+}
+.y6 {
+    top: 165px;
 }
 .w1 {
     width: 355px;

@@ -9,7 +9,12 @@ scout.inherits(scout.GroupBox, scout.ModelAdapter);
 
 scout.GroupBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'group-box');
-  this.$container.addClass('w2');
+  var gridData = this.model.gridData;
+  this.$container.addClass('inbox').
+    addClass('w1').
+    addClass('h1').
+    addClass('x' + (gridData.x + 1)).
+    addClass('y' + (gridData.y + 1));
 
   if (this.model.label) {
     // TODO AWE: das geht wohl auch hübscher mit :after
