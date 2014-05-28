@@ -40,20 +40,20 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private JsonClientSession m_jsonClientSession;
 
-  // TODO AWE: JsonRendererFactory überschreibbar machen, via Scout-service
-  private final JsonRendererFactory m_jsonRendererFactory;
+  // TODO AWE: JsonAdapterFactory überschreibbar machen, via Scout-service
+  private final JsonAdapterFactory m_jsonAdapterFactory;
 
-  private final JsonRendererRegistry m_jsonRendererRegistry;
+  private final JsonAdapterRegistry m_jsonAdapterRegistry;
 
-  private long m_jsonRendererSeq;
+  private long m_jsonAdapterSeq;
   private JsonResponse m_currentJsonResponse;
   private HttpServletRequest m_currentHttpRequest;
   private JsonEventProcessor m_jsonEventProcessor;
 
   public AbstractJsonSession() {
     m_currentJsonResponse = new JsonResponse();
-    m_jsonRendererFactory = new JsonRendererFactory();
-    m_jsonRendererRegistry = new JsonRendererRegistry();
+    m_jsonAdapterFactory = new JsonAdapterFactory();
+    m_jsonAdapterRegistry = new JsonAdapterRegistry();
   }
 
   @Override
@@ -67,7 +67,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
     // FIXME AWE/CGU: use sessionId or use createUniqueIdFor? duplicates possible?
     // was <<jsonReq.getSessionPartId()>> before, now createUniqueIdFor is used again
-    m_jsonClientSession = (JsonClientSession) getOrCreateJsonRenderer(clientSession);
+    m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
@@ -130,24 +130,25 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   private IClientSession createClientSessionInternal(Class<? extends IClientSession> clazz, UserAgent userAgent, Subject subject, Locale locale, String virtualSessionId) {
+    IClientSession clientSession;
     try {
-      IClientSession clientSession = clazz.newInstance();
-      clientSession.setSubject(subject);
-      if (virtualSessionId != null) {
-        clientSession.setVirtualSessionId(virtualSessionId);
-      }
-      clientSession.setUserAgent(userAgent);
+      clientSession = clazz.newInstance();
+    }
+    catch (InstantiationException | IllegalAccessException e) {
+      throw new JsonException("Could not create client session.", e);
+    }
 
-      return clientSession;
+    clientSession.setSubject(subject);
+    if (virtualSessionId != null) {
+      clientSession.setVirtualSessionId(virtualSessionId);
     }
-    catch (Throwable t) {
-      LOG.error("could not load session", t);
-      return null;
-    }
+    clientSession.setUserAgent(userAgent);
+
+    return clientSession;
   }
 
   public void dispose() {
-    m_jsonRendererRegistry.dispose();
+    m_jsonAdapterRegistry.dispose();
   }
 
   @Override
@@ -156,43 +157,43 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public String createUniqueIdFor(IJsonRenderer jsonRenderer) {
+  public String createUniqueIdFor(IJsonAdapter jsonAdapter) {
     //FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
-    return "" + (++m_jsonRendererSeq);
+    return "" + (++m_jsonAdapterSeq);
   }
 
   @Override
-  public IJsonRenderer<?> getOrCreateJsonRenderer(Object modelObject) {
-    IJsonRenderer<?> jsonRenderer = getJsonRenderer(modelObject);
-    if (jsonRenderer != null) {
-      return jsonRenderer;
+  public IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject) {
+    IJsonAdapter<?> jsonAdapter = getJsonAdapter(modelObject);
+    if (jsonAdapter != null) {
+      return jsonAdapter;
     }
-    jsonRenderer = createJsonRenderer(modelObject);
-    return jsonRenderer;
+    jsonAdapter = createJsonAdapter(modelObject);
+    return jsonAdapter;
   }
 
   @Override
-  public IJsonRenderer<?> createJsonRenderer(Object modelObject) {
+  public IJsonAdapter<?> createJsonAdapter(Object modelObject) {
     String id = createUniqueIdFor(null); //FIXME cgu
-    IJsonRenderer<?> jsonRenderer = m_jsonRendererFactory.createJsonRenderer(modelObject, this, id);
-    jsonRenderer.init();
-    m_jsonRendererRegistry.addJsonRenderer(id, modelObject, jsonRenderer);
-    return jsonRenderer;
+    IJsonAdapter<?> jsonAdapter = m_jsonAdapterFactory.createJsonAdapter(modelObject, this, id);
+    jsonAdapter.init();
+    m_jsonAdapterRegistry.addJsonAdapter(id, modelObject, jsonAdapter);
+    return jsonAdapter;
   }
 
   @Override
-  public IJsonRenderer<?> getJsonRenderer(String id) {
-    return m_jsonRendererRegistry.getJsonRenderer(id);
+  public IJsonAdapter<?> getJsonAdapter(String id) {
+    return m_jsonAdapterRegistry.getJsonAdapter(id);
   }
 
   @Override
-  public IJsonRenderer<?> getJsonRenderer(Object modelObject) {
-    return m_jsonRendererRegistry.getJsonRenderer(modelObject);
+  public IJsonAdapter<?> getJsonAdapter(Object modelObject) {
+    return m_jsonAdapterRegistry.getJsonAdapter(modelObject);
   }
 
   @Override
-  public void unregisterJsonRenderer(String id) {
-    m_jsonRendererRegistry.removeJsonRenderer(id);
+  public void unregisterJsonAdapter(String id) {
+    m_jsonAdapterRegistry.removeJsonAdapter(id);
   }
 
   @Override

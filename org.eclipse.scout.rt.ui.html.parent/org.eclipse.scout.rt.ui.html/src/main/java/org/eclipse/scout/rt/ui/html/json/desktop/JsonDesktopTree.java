@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
 import org.eclipse.scout.rt.ui.html.json.Activator;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -38,7 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutline> implements IContextMenuOwner {
+public class JsonDesktopTree extends AbstractJsonPropertyObserverAdapter<IOutline> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
@@ -209,7 +209,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserverRenderer<IOutli
       //FIXME CGU really dispose? Or better keep for offline? Memory issue?
       if (node instanceof IPageWithTable) {
         IPageWithTable<?> pageWithTable = (IPageWithTable<?>) node;
-        JsonTable table = (JsonTable) getJsonSession().getJsonRenderer(pageWithTable.getTable());
+        JsonTable table = (JsonTable) getJsonSession().getJsonAdapter(pageWithTable.getTable());
         if (table != null) {
           table.dispose();
         }

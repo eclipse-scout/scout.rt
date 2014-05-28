@@ -41,9 +41,9 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   protected void handleModelTableChanged(ITable table) {
-    JsonTable jsonTable = (JsonTable) getJsonSession().getJsonRenderer(table);
+    JsonTable jsonTable = (JsonTable) getJsonSession().getJsonAdapter(table);
     if (jsonTable == null) {
-      jsonTable = (JsonTable) getJsonSession().createJsonRenderer(table);
+      jsonTable = (JsonTable) getJsonSession().createJsonAdapter(table);
       getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
     }
     else {

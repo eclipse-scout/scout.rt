@@ -40,13 +40,13 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 
 /**
- * This factory creates IJsonRenderer instances for a given model object. You must call the <code>init()</code> method
- * on the return value from <code>createJsonRenderer()</code>.
+ * This factory creates IJsonAdapter instances for a given model object. You must call the <code>init()</code> method
+ * on the return value from <code>createJsonAdapter()</code>.
  */
-public class JsonRendererFactory {
+public class JsonAdapterFactory {
 
   @SuppressWarnings("unchecked")
-  public IJsonRenderer createJsonRenderer(Object modelObject, IJsonSession session, String id) {
+  public IJsonAdapter createJsonAdapter(Object modelObject, IJsonSession session, String id) {
     // form fields
     if (modelObject instanceof IGroupBox) {
       return new JsonGroupBox((IGroupBox) modelObject, session, id);
@@ -92,7 +92,7 @@ public class JsonRendererFactory {
     else if (modelObject instanceof IBreadCrumbsNavigation) {
       return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) modelObject, session, id);
     }
-    throw new IllegalArgumentException("Cannot create JSON-renderer for model-object " + modelObject);
+    throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + modelObject);
   }
 
 }

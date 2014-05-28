@@ -36,7 +36,7 @@ class JsonEventProcessor {
   void processEvents(JsonRequest request, final JsonResponse response) {
     for (final JsonEvent event : request.getEvents()) {
       // TODO AWE: (jobs) prüfen ob das hier probleme macht: dadurch läuft processEvent immer im richtigen
-      // context. JsonRenderer instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
+      // context. JsonAdapter instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
       // einen Scout-service aufrufen wollen. Es wurde bewusst für jedes processEvent ein eigener Job gestartet
       // und nicht für den ganzen Loop.
       new ClientSyncJob("processEvent", m_jsonSession.getJsonSession().getClientSession()) {
@@ -51,13 +51,13 @@ class JsonEventProcessor {
 
   private void processEvent(JsonEvent event, JsonResponse response) {
     final String id = event.getId();
-    final IJsonRenderer jsonRenderer = m_jsonSession.getJsonSession().getJsonRenderer(id);
-    if (jsonRenderer == null) {
-      throw new JsonException("No renderer found for id " + id);
+    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonSession().getJsonAdapter(id);
+    if (jsonAdapter == null) {
+      throw new JsonException("No adapter found for id " + id);
     }
     try {
       LOG.info("Handling event. Type: " + event.getType() + ", Id: " + id);
-      jsonRenderer.handleUiEvent(event, response);
+      jsonAdapter.handleUiEvent(event, response);
     }
     catch (Throwable t) {
       LOG.error("Handling event. Type: " + event.getType() + ", Id: " + id, t);

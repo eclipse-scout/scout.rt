@@ -15,14 +15,14 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
+public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   private final IJsonSession m_jsonSession;
   private final T m_modelObject;
   private final String m_id;
   private boolean m_initialized;
 
-  public AbstractJsonRenderer(T modelObject, IJsonSession jsonSession, String id) {
+  public AbstractJsonAdapter(T modelObject, IJsonSession jsonSession, String id) {
     if (modelObject == null) {
       throw new IllegalArgumentException("modelObject must not be null");
     }
@@ -53,7 +53,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
 
   /**
    * Override this method in order to attach listeners on the Scout model object.
-   * At this point a JsonRenderer instance has been already created for the model object.
+   * At this point a JsonAdapter instance has been already created for the model object.
    * The default implementation does nothing.
    */
   protected void attachModel() {
@@ -65,7 +65,7 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
       return; // TODO AWE: (ask C.GU) das wäre auch eher IllegalState, nicht?
     }
     detachModel();
-    getJsonSession().unregisterJsonRenderer(getId()); //FIXME CGU unregistering here, but registering not?
+    getJsonSession().unregisterJsonAdapter(getId()); //FIXME CGU unregistering here, but registering not?
   }
 
   protected void detachModel() {
@@ -91,18 +91,18 @@ public abstract class AbstractJsonRenderer<T> implements IJsonRenderer<T> {
   }
 
   /**
-   * Calls <code>jsonSession.getOrCreateJsonRenderer(Object)</code> and returns <code>toJson()</code>.
+   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>.
    */
   protected final JSONObject modelObjectToJson(Object modelObject) {
     if (modelObject == null) {
       return null;
     }
-    IJsonRenderer<?> jsonRenderer = getJsonSession().getOrCreateJsonRenderer(modelObject);
-    return jsonRenderer.toJson();
+    IJsonAdapter<?> jsonAdapter = getJsonSession().getOrCreateJsonAdapter(modelObject);
+    return jsonAdapter.toJson();
   }
 
   /**
-   * Calls <code>jsonSession.getOrCreateJsonRenderer(Object)</code> for each object in the model objects List and adds
+   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> for each object in the model objects List and adds
    * the return values of <code>toJson()</code> to the JSONArray.
    */
   protected final JSONArray modelObjectsToJson(List<?> modelObjects) {

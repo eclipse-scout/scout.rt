@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
-public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> {
+public class JsonDesktop extends AbstractJsonPropertyObserverAdapter<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
   public static final String PROP_OUTLINE_ID = "outlineId";
@@ -172,9 +172,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
     if (isFormBased()) {
       return;
     }
-    JsonDesktopTree jsonOutline = (JsonDesktopTree) getJsonSession().getJsonRenderer(outline);
+    JsonDesktopTree jsonOutline = (JsonDesktopTree) getJsonSession().getJsonAdapter(outline);
     if (jsonOutline == null) {
-      jsonOutline = (JsonDesktopTree) getJsonSession().createJsonRenderer(outline);
+      jsonOutline = (JsonDesktopTree) getJsonSession().createJsonAdapter(outline);
       getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonOutline.toJson());
     }
     else {
@@ -185,10 +185,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected void handleModelFormAdded(IForm form) {
-    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(form);
+    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonAdapter(form);
     if (jsonForm == null) {
       if (!isFormBlocked(form)) {
-        jsonForm = (JsonForm) getJsonSession().createJsonRenderer(form);
+        jsonForm = (JsonForm) getJsonSession().createJsonAdapter(form);
         if (jsonForm != null) {
           getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonForm.toJson());
         }
@@ -202,7 +202,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverRenderer<IDesktop> 
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonRenderer(form);
+    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonAdapter(form);
     if (jsonForm != null) {
       JSONObject jsonEvent = new JSONObject();
       putProperty(jsonEvent, JsonForm.PROP_FORM_ID, jsonForm.getId());

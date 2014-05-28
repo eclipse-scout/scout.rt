@@ -20,8 +20,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 /**
  * This class creates JSON output for an IBooleanField used as a check-box.
- * 
- * @author awe
  */
 public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
 

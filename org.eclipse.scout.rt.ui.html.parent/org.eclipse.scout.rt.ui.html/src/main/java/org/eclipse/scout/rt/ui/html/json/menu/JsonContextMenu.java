@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
-import org.eclipse.scout.rt.ui.html.json.IJsonRenderer;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
-public class JsonContextMenu extends AbstractJsonPropertyObserverRenderer<IContextMenu> {
+public class JsonContextMenu extends AbstractJsonPropertyObserverAdapter<IContextMenu> {
 
   private ContextMenuListener m_contextMenuListener;
 
@@ -63,7 +63,7 @@ public class JsonContextMenu extends AbstractJsonPropertyObserverRenderer<IConte
   }
 
   public void handleModelContextMenuStructureChanged(ContextMenuEvent event) {
-    IJsonRenderer<?> owner = getJsonSession().getJsonRenderer(event.getSource().getOwner());
+    IJsonAdapter<?> owner = getJsonSession().getJsonAdapter(event.getSource().getOwner());
     if (owner instanceof IContextMenuOwner) {
       ((IContextMenuOwner) owner).handleModelContextMenuChanged(event);
     }

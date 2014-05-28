@@ -17,13 +17,13 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverRenderer;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
 
-public class JsonForm extends AbstractJsonPropertyObserverRenderer<IForm> {
+public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public JsonForm(IForm modelObject, IJsonSession jsonSession, String id) {

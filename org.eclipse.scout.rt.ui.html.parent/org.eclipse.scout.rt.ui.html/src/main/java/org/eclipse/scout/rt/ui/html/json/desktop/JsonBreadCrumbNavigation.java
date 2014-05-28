@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.BreadCrumbsListener;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumb;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonRenderer;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsNavigation> {
+public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNavigation> {
   public static final String EVENT_ACTIVATE = "activate";
   public static final String EVENT_CHANGED = "changed";
   public static final String PROP_BREAD_CRUMBS = "breadcrumbs";
@@ -78,7 +78,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonRenderer<IBreadCrumbsN
   }
 
   private JsonForm getJsonForm(IForm form) {
-    return (JsonForm) getJsonSession().getJsonRenderer(form);
+    return (JsonForm) getJsonSession().getJsonAdapter(form);
   }
 
   protected JSONArray breadCrumbsToJson(Collection<IBreadCrumb> breadCrumbs) {

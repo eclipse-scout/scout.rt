@@ -20,29 +20,29 @@ public interface IJsonSession {
 
   IClientSession getClientSession();
 
-  String createUniqueIdFor(IJsonRenderer<?> renderer);
+  String createUniqueIdFor(IJsonAdapter<?> adapter);
 
   /**
-   * Returns an IJsonRenderer instance for the given renderer ID.
+   * Returns an IJsonAdapter instance for the given adapter ID.
    */
-  IJsonRenderer<?> getJsonRenderer(String id);
+  IJsonAdapter<?> getJsonAdapter(String id);
 
   /**
-   * Returns an IJsonRenderer instance for the given model object.
+   * Returns an IJsonAdapter instance for the given model object.
    */
-  IJsonRenderer<?> getJsonRenderer(Object modelObject);
+  IJsonAdapter<?> getJsonAdapter(Object modelObject);
 
   /**
-   * Creates a new IJsonRenderer instance for the given modelObject, or returns an existing instance.
+   * Creates a new IJsonAdapter instance for the given modelObject, or returns an existing instance.
    */
-  IJsonRenderer<?> getOrCreateJsonRenderer(Object modelObject);
+  IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject);
 
   /**
-   * Creates a new IJsonRenderer instance for the given modelObject.
+   * Creates a new IJsonAdapter instance for the given modelObject.
    */
-  IJsonRenderer<?> createJsonRenderer(Object modelObject);
+  IJsonAdapter<?> createJsonAdapter(Object modelObject);
 
-  void unregisterJsonRenderer(String id);
+  void unregisterJsonAdapter(String id);
 
   /**
    * @return the current ui response that is collecting changes for the next

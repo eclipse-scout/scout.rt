@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.json.IJsonRenderer;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 /**
  * Creates JSON output for a Scout form-field object.
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonRenderer;
  * @param <T>
  *          Type of Scout form-field
  */
-public interface IJsonFormField<T extends IFormField> extends IJsonRenderer<T> {
+public interface IJsonFormField<T extends IFormField> extends IJsonAdapter<T> {
 
   String PROP_GRID_DATA = "gridData";
 

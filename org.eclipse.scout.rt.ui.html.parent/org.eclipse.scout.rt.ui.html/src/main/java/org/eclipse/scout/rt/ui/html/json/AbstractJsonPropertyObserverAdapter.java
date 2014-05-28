@@ -21,8 +21,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyObserver> extends AbstractJsonRenderer<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserverRenderer.class);
+public abstract class AbstractJsonPropertyObserverAdapter<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserverAdapter.class);
 
   private P_PropertyChangeListener m_propertyChangeListener;
 
@@ -31,13 +31,13 @@ public abstract class AbstractJsonPropertyObserverRenderer<T extends IPropertyOb
    */
   private Map<String, JsonProperty> m_jsonProperties;
 
-  public AbstractJsonPropertyObserverRenderer(T modelObject, IJsonSession jsonSession, String id) {
+  public AbstractJsonPropertyObserverAdapter(T modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
     m_jsonProperties = new HashMap<>();
   }
 
   /**
-   * Adds a property to the list of JSON properties. These properties are automatically managed by the JsonRenderer,
+   * Adds a property to the list of JSON properties. These properties are automatically managed by the JsonAdapter,
    * which means they're automatically included in the object returned by the <code>toJson()</code> method and also
    * are propagated to the browser-side client when a property change event occurs.
    */

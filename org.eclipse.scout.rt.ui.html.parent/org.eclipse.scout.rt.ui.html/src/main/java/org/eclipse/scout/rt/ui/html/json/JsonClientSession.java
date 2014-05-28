@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.json.JSONObject;
 
-public class JsonClientSession extends AbstractJsonRenderer<IClientSession> {
+public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonClientSession.class);
 
   private ILocaleListener m_localeListener;
