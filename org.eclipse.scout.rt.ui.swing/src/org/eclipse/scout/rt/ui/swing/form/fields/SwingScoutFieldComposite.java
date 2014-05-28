@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.util.List;
 
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -97,6 +98,8 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     if (m_swingStatusLabel != null) {
       LogicalGridData statusLabelGridData = null;
       if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+        // border to ensure a little gap between the label and the field.
+        m_swingStatusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
         statusLabelGridData = LogicalGridDataBuilder.createLabelOnTop(((IFormField) getScoutObject()).getGridData());
       }
       else {
