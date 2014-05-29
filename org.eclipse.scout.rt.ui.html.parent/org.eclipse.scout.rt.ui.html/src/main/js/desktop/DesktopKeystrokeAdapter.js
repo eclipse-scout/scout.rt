@@ -46,11 +46,11 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, toolBox, tree) {
       handle: function(keycode) {
         // left: up in tree
         if (keycode == 37) {
-          $('.selected', that._tree.$div).prev().click();
+          $('.selected', that._tree.$div).prev('.tree-item').click();
         }
         // right: down in tree
         else if (keycode == 39) {
-          $('.selected', that._tree.$div).next().click();
+          $('.selected', that._tree.$div).next('.tree-item').click();
         }
         // +/-: open and close tree
         else if (keycode == 109 || keycode == 107) {
@@ -80,8 +80,8 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
 
   if (this._tree) {
     var $node = $('.selected', this._tree.$div),
-      $prev = $node.prev(),
-      $next = $node.next();
+      $prev = $node.prev('.tree-item'),
+      $next = $node.next('.tree-item');
 
     if ($node.hasClass('can-expand')) {
       if ($node.hasClass('expanded')) {
