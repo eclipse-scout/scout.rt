@@ -12,15 +12,16 @@ text-decoration: underline;
 color: #FE9915;
 }
 
-#MenuButtons{
-height: 53px;
+.menu-buttons{
 }
 
-#MenuButtonsLabel{
+.menu-buttons-label{
 color: #FE9915;
 padding: 0px 8px 0px 9px;
 line-height: 20px;
+height: 0px;
 }
+
 
 .menu-button{
 display:inline-block;

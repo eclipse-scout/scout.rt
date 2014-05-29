@@ -338,82 +338,50 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
 };
 
 scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
-  var that = this;
-  var $node = $clicked.parent(),
-    nodeId = $node.attr('id'),
-    y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 30,
-    menus = $clicked.data('menus');
+  var $treeMenuContainer = $('.tree-menu-container',  this._$desktopTreeScroll);
 
-  if ($('#TreeMenuContainer').length) {
+  if ($treeMenuContainer.length) {
     removeMenu();
     return;
   }
 
-  if (menus && menus.length > 0) {
-    var $treeMenuContainer = $node.parent().appendDiv('TreeMenuContainer')
-      .css('right', 20).css('top', y);
+  var $children = this._$treeMenu.children();
+  if ($children.length) {
+    $treeMenuContainer =  this._$desktopTreeScroll.appendDiv('', 'tree-menu-container')
+      .css('right', 20)
+      .css('top', $clicked.offset().top - this._$desktopTreeScroll.offset().top + 30);
 
-    $node.addClass('menu-open');
+    $clicked.parent().addClass('menu-open');
 
-    // create menu-item and menu-button
-    for (var i = 0; i < menus.length; i++) {
-      if (menus[i].separator) {
-        continue;
-      }
-      if (menus[i].iconId) {
-        $treeMenuContainer.appendDiv('', 'menu-button')
-          .attr('id', menus[i].id)
-          .attr('data-icon', menus[i].iconId)
-          .attr('data-label', menus[i].text)
-          .on('click', '', onMenuItemClicked)
-          .hover(onHoverIn, onHoverOut);
-      } else {
-        $treeMenuContainer.appendDiv('', 'menu-item', menus[i].text)
-          .attr('id', menus[i].id)
-          .on('click', '', onMenuItemClicked);
-      }
-    }
-
-    // wrap menu-buttons and add one div for label
-    $('.menu-button', $treeMenuContainer).wrapAll('<div id="MenuButtons"></div>');
-    $('#MenuButtons', $treeMenuContainer).appendDiv('MenuButtonsLabel');
-    $treeMenuContainer.append($('#MenuButtons', $treeMenuContainer));
+    $children.clone(true).appendTo($treeMenuContainer);
 
     // animated opening
-    var h = $treeMenuContainer.outerHeight();
-    $treeMenuContainer.css('height', 0).animateAVCSD('height', h);
+    $treeMenuContainer.css('height', 0).heightToContent(150);
 
-    // every user action will close menu
+
+    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
     var closingEvents = 'mousedown.treeMenu keydown.treeMenu mousewheel.treeMenu';
     $(document).one(closingEvents, removeMenu);
-    $treeMenuContainer.one(closingEvents, $.suppressEvent); // menu is removed in 'click' event, see onMenuItemClicked()
+    $treeMenuContainer.one(closingEvents, $.suppressEvent);
   }
 
-  function onHoverIn() {
-    $('#MenuButtonsLabel').text($(this).data('label'));
-  }
-
-  function onHoverOut() {
-    $('#MenuButtonsLabel').text('');
-  }
-
-  function onMenuItemClicked() {
-    removeMenu();
-    that.session.send('menuAction', $(this).attr('id'));
-  }
+  var that = this;
 
   function removeMenu() {
-    var $treeMenuContainer = $('#TreeMenuContainer');
+    var $treeMenuContainer = $('.tree-menu-container',  this._$desktopTreeScroll);
+
     if (!$treeMenuContainer.length) {
-      return; // Menu does not exist anymore
+      return;
     }
+
     // Animate
     var h = $treeMenuContainer.outerHeight();
     $treeMenuContainer.animateAVCSD('height', 0,
       function() {
         $(this).remove();
         $node.removeClass('menu-open');
-      });
+      }, null, 150);
+
     // Remove all cleanup handlers
     $(document).off('.treeMenu');
   }
@@ -455,11 +423,11 @@ scout.DesktopTree.prototype._updateBreadCrumb = function() {
 scout.DesktopTree.prototype.doBreadCrumb = function(show) {
   if (show && !this.$parent.hasClass('bread-crumb')) {
     this.$parent.addClass('bread-crumb');
-    var h = this._$treeMenu.css('height', 'auto').css('height');
-    this._$treeMenu.css('height', h);
+    this._$treeMenu.heightToContent(150);
     //this._$desktopTreeScroll.css('height', 'calc(100% - ' + h + ')');
   } else if (!show && this.$parent.hasClass('bread-crumb')) {
     this.$parent.removeClass('bread-crumb');
+    this._$treeMenu.animateAVCSD('height', 0, null, null, 150);
   }
 
   this.scrollbar.initThumb();
@@ -522,8 +490,8 @@ scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
   // delete old menu menu
   this._$treeMenu.empty();
 
+  // create menu-item and menu-button
   if (menus && menus.length > 0) {
-    // create menu-item and menu-button
     for (var i = 0; i < menus.length; i++) {
       if (menus[i].separator) {
         continue;
@@ -534,7 +502,7 @@ scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
           .attr('data-icon', menus[i].iconId)
           .attr('data-label', menus[i].text)
           .on('click', '', onMenuItemClicked)
-          .hover(onHoverIn, onHoverOut);
+          .mouseenter(onHoverIn);
       } else {
         this._$treeMenu.appendDiv('', 'menu-item', menus[i].text)
           .attr('id', menus[i].id)
@@ -543,15 +511,14 @@ scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
     }
 
     // wrap menu-buttons and add div for label
-    $('.menu-button',  this._$treeMenu).wrapAll('<div id="MenuButtons"></div>');
-    var $menuButton = $('#MenuButtons',  this._$treeMenu);
-    var $menuLabel = $menuButton.appendDiv('MenuButtonsLabel');
+    $('.menu-button',  this._$treeMenu).wrapAll('<div class="menu-buttons"></div>');
+    var $menuButton = $('.menu-buttons',  this._$treeMenu);
+    $menuButton.mouseleave(onHoverOut);
+    $menuButton.prependDiv('', 'menu-buttons-label');
     this._$treeMenu.append($menuButton);
 
     // size menu
-    var h = this._$treeMenu.css('height', 'auto').css('height');
-    this._$treeMenu.css('height', h);
-
+    this._$treeMenu.heightToContent(150);
   }
 
   var that = this;
@@ -561,11 +528,19 @@ scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
   }
 
   function onHoverIn() {
-    $menuLabel.text($(this).data('label'));
+    var $container = $(this).parent().parent();
+    $container.css('height', 'auto');
+    $('.menu-buttons-label', $container)
+      .text($(this).data('label'))
+      .heightToContent(150);
   }
 
   function onHoverOut() {
-    $menuLabel.text('');
+    var $container = $(this).parent().parent();
+
+    $('.menu-buttons-label', $container)
+      .stop()
+      .animateAVCSD('height', 0, null, function() { $(this).text(''); }, 150);
   }
 
   function onMenuItemClicked() {

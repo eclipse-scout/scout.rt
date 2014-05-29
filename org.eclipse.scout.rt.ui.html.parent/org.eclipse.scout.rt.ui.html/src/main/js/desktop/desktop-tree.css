@@ -152,8 +152,7 @@ color: #fff;
 }
 
 #DesktopTree .tree-menu {
-height: 0px; 
-transition: height 0.2s;}
+}
 
 #DesktopTree.bread-crumb .tree-menu {
 width: calc(100% - 10px);
@@ -161,9 +160,5 @@ position: absolute;
 bottom: 0;
 overflow: hidden;
 white-space: nowrap;
-padding: 2px;
-}
-
-
-#DesktopTree.bread-crumb #DesktopTreeScroll{
+padding: 2px 2px 10px 2px;
 }
