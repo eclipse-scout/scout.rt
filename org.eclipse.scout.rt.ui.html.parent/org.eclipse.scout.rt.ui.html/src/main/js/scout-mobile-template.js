@@ -29,7 +29,6 @@
 //@include("src/main/js/desktop/DesktopGraph.js");
 //@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");
 //@include("src/main/js/desktop/DesktopMap.js");
-//@include("src/main/js/desktop/DesktopToolButton.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");
 //@include("src/main/js/desktop/DesktopTree.js");
 //@include("src/main/js/desktop/DesktopViewButton.js");

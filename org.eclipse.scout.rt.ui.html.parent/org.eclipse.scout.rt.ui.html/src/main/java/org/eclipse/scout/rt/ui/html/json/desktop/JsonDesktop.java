@@ -44,7 +44,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserverAdapter<IDesktop> {
 
   private DesktopListener m_desktopListener;
 
-  private String TOOL_BUTTONS = "[{\"id\": \"t1\", \"label\": \"Suche\", \"icon\": \"\uf002\", \"shortcut\": \"F3\"}," +
+  private String TOOL_BUTTONS = "[" +
       "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
       "          {\"id\": \"t3\", \"label\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
       "          {\"id\": \"t4\", \"label\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
@@ -157,6 +157,10 @@ public class JsonDesktop extends AbstractJsonPropertyObserverAdapter<IDesktop> {
         handleModelFormRemoved(event.getForm());
         break;
       }
+      case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE: {
+        handleModelFormEnsureVisible(event.getForm());
+        break;
+      }
       case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
         handleModelMessageBoxAdded(event.getMessageBox());
         break;
@@ -207,6 +211,15 @@ public class JsonDesktop extends AbstractJsonPropertyObserverAdapter<IDesktop> {
       JSONObject jsonEvent = new JSONObject();
       putProperty(jsonEvent, JsonForm.PROP_FORM_ID, jsonForm.getId());
       getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), jsonEvent);
+    }
+  }
+
+  protected void handleModelFormEnsureVisible(IForm form) {
+    JsonForm jsonForm = (JsonForm) getJsonSession().getJsonAdapter(form);
+    if (jsonForm != null) {
+      JSONObject jsonEvent = new JSONObject();
+      putProperty(jsonEvent, JsonForm.PROP_FORM_ID, jsonForm.getId());
+      getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), jsonEvent);
     }
   }
 

@@ -10,7 +10,7 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
  * @override
  */
 scout.Desktop.prototype._render = function($parent) {
-  var views, tools, tree,
+  var views,
     marginTop = 0,
     marginRight = 0;
 
@@ -22,16 +22,15 @@ scout.Desktop.prototype._render = function($parent) {
     marginTop = views.$div.outerHeight();
   }
   if (this.model.toolButtons) {
-    tools = new scout.DesktopToolButton(this.model.toolButtons, this.session);
-    tools.render($parent);
-    marginRight = tools.$div.outerWidth();
+    this.taskbar = new scout.DesktopTaskbar(this);
+    this.taskbar.render($parent);
+    marginRight = this.taskbar.$div.outerWidth();
   }
 
   this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.model.outline) {
-    tree = new scout.DesktopTreeContainer($parent, this.model.outline, this.session);
-    this.tree = tree;
-    this.layout.register(tree.$div, 'W');
+    this.tree = new scout.DesktopTreeContainer($parent, this.model.outline, this.session);
+    this.layout.register(this.tree.$div, 'W');
     this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
 
@@ -42,11 +41,11 @@ scout.Desktop.prototype._render = function($parent) {
 
   this._bench = bench;
 
-  if (views || tools || tree) {
-    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(views, tools, tree));
+  if (views || this.taskbar || this.tree) {
+    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(views, this.taskbar, this.tree));
   }
 
-  if (tree) {
+  if (this.tree) {
     this.tree.attachModel();
   }
 

@@ -1,11 +1,28 @@
 scout.Form = function(model, session) {
   scout.Form.parent.call(this, model, session);
   this._$title;
+  this._$parent;
 };
 
 scout.inherits(scout.Form, scout.ModelAdapter);
 
+/**
+ * @override
+ */
+scout.Form.prototype.attach = function($parent) {
+  if (!this.$container) {
+    this._render($parent);
+    this._applyModel();
+  } else {
+    this.$container.appendTo($parent);
+    if (this.$glasspane) {
+      this.$glasspane.appendTo($parent);
+    }
+  }
+};
+
 scout.Form.prototype._render = function($parent) {
+  this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
   // TODO AWE: append form title section (including ! ? and progress indicator)
   this._$title = this.$container.appendDiv(undefined, 'form-title', this.model.title);
@@ -42,20 +59,32 @@ scout.Form.prototype.detach = function() {
   for (i = 0; i < this.model.formFields.length; i++) {
     formFieldModel = this.model.formFields[i];
     formField = this.session.widgetMap[formFieldModel.id];
-    if(formField && formField.dispose) {
+    if (formField && formField.dispose) {
       formField.dispose();
     }
   }
 };
 
-scout.Form.prototype.onModelCreate = function() {
+scout.Form.prototype.enable = function() {
+  this.$glasspane.remove();
 };
+
+scout.Form.prototype.disable = function() {
+  this.$glasspane = this._$parent.appendDiv(undefined, 'glasspane'); //FIXME CGU how to do this properly? disable every mouse and keyevent?
+  //FIXME CGU adjust values on resize
+  this.$glasspane.
+  width(this.$container.width()).
+  height(this.$container.height()).
+  css('top', this.$container.position().top).
+  css('left', this.$container.position().left);
+};
+
+scout.Form.prototype.onModelCreate = function() {};
 
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type_ == 'formClosed') {
     this.dispose();
-  }
-  else {
+  } else {
     $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
   }
 };

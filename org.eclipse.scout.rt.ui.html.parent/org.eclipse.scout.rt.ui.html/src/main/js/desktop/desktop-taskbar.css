@@ -1,38 +1,40 @@
-#DesktopTools{
+.desktop-taskbar{
 position: absolute;
 right: 0px;
 top: 58px;
 z-index: 10;
 height: calc(100% - 58px);
-width: 80px;
+width: 100px;
 border-left: 1px solid #CCC;
 background-color: #FFF;
 overflow: hidden;
 }
 
-.tool-item{
+.taskbar-item{
 position: relative;
 float: right;
-height: 58px;
-width: 80px;
+height: 62px;
+width: 100px;
 padding: 15px 15px 15px 15px;
 text-align: center;
 cursor: pointer;
-color:#FFF;}
+color:#FFF;
+}
 
-.tool-item:before{
+.taskbar-item:before{
 font-family: fontAwesome;
 font-size: 30px;
 color:#0082A1;
 content: attr(data-icon) '\A';
+display: block;
 }
 
-.tool-item:hover{
-color:#0082A1;
-}
-
-.tool-item.selected, .tool-item.selected:before{
+.taskbar-item.selected, .taskbar-item.selected:before{
 color:#FE9915 !important;
+}
+
+.taskbar-item.disabled:before{
+color:#CCC;
 }
 
 .tool-item.selected:hover:before{
@@ -41,7 +43,10 @@ content: "\f00d" '\A';
 
 .tool-item.disabled:hover, .tool-item.disabled:before{
 cursor: default;
-color:#CCC;
+}
+
+.taskbar-item:hover{
+color:#0082A1;
 }
 
 .tool-open{
@@ -56,7 +61,7 @@ overflow: hidden;
 z-index: 11;
 }
 
-.tool-item .key-box {
+.taskbar-item .key-box {
 left: 4px;
 top: 8px;
 width: 22px;
@@ -64,4 +69,16 @@ width: 22px;
 
 .tool-item.disabled .key-box{
 background-color:#CCC;
+}
+
+
+.form-thumbnails {
+  display:inline-block;
+}
+
+.form-thumbnail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
 }

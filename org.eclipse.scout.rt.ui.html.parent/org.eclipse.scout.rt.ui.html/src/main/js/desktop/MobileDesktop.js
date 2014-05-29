@@ -11,7 +11,7 @@ scout.inherits(scout.MobileDesktop, scout.BaseDesktop);
  * @override
  */
 scout.MobileDesktop.prototype._render = function($parent) {
-  var tools, marginTop=0;
+  var  marginTop=0;
   this.$parent = $parent;
 
   //FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
@@ -39,7 +39,7 @@ scout.MobileDesktop.prototype._resolveViewContainer = function(form) {
 /**
  * @override
  */
-scout.MobileDesktop.prototype._attachForm = function(form) {
+scout.MobileDesktop.prototype._addForm = function(form) {
   var layoutDirty = false;
   if (form.model.displayHint == "view") {
     var position = form.model.displayViewId;
@@ -64,7 +64,7 @@ scout.MobileDesktop.prototype._attachForm = function(form) {
   if (layoutDirty) {
     this.layout.layout();
   }
-  scout.MobileDesktop.parent.prototype._attachForm.call(this, form);
+  scout.MobileDesktop.parent.prototype._addForm.call(this, form);
 };
 
 scout.MobileDesktop.prototype._createMainArea = function() {
