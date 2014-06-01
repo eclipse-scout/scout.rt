@@ -95,13 +95,19 @@ scout.TableFooter.prototype._resetControlLabel = function() {
 /**
  * @param control object with label and action().
  */
-scout.TableFooter.prototype.addControl = function(control) {
+scout.TableFooter.prototype.addGroup = function(title) {
+  var $group = $.makeDiv(undefined, 'control-group').attr('data-title', title);
+  this._$controlLabel.before($group);
+  return $group;
+};
+
+
+scout.TableFooter.prototype.addControl = function($group, control) {
   var classes = 'control ';
   if (control.cssClass) {
     classes += control.cssClass;
   }
-  var $control = $.makeDiv(undefined, classes);
-  this._$controlLabel.before($control);
+  var $control = $group.appendDiv(undefined, classes);
 
   var that = this;
 
@@ -150,7 +156,8 @@ scout.TableFooter.prototype.addControl = function(control) {
       // do not handle the click
       event.stopImmediatePropagation();
     } else {
-      $clicked.selectOne();
+      $('.control', this._$tableControl).removeClass('selected');
+      $clicked.addClass('selected');
     }
   }
 };
@@ -169,7 +176,6 @@ scout.TableFooter.prototype.openTableControl = function() {
     500);
 
   // visual: update label, size container and control
-  this._updateControlLabel(this._$tableControl.children('.selected').first());
   this.$controlContainer.height(340);
   this._$tableControl.animateAVCSD('height', 400, null, null, 500);
 

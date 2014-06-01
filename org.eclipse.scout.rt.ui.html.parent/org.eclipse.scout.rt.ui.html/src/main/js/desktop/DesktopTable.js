@@ -29,6 +29,43 @@ scout.DesktopTable.prototype._render = function($parent) {
   this._$parent = $parent;
   this.table.attach(this._$parent);
 
+  var $groupSearch = this.table.footer.addGroup('Suche');
+
+  // TODO cru > cgu: wenn suche vorhanden dann im modell übergeben
+  var queryControl = {
+    cssClass: 'control-query',
+    action: controlQuery
+  };
+  if (true) {
+    queryControl.label = 'Abfage';
+    queryControl.enabled = true;
+  }
+  this.table.footer.addControl($groupSearch, queryControl);
+
+  // TODO cru > cgu: wenn erweiterte suche vorhanden dann im modell übergeben
+  var analyzeControl = {
+    cssClass: 'control-analyze',
+    action: controlAnalyze
+  };
+  if (true) {
+    analyzeControl.label = 'Analyse';
+    analyzeControl.enabled = true;
+  }
+  this.table.footer.addControl($groupSearch, analyzeControl);
+
+  // TODO cru > cgu: wenn kategorien vorhanden dann im modell übergeben
+  var categoryControl = {
+    cssClass: 'control-category',
+    action: controlCategory
+  };
+  if (true) {
+    categoryControl.label = 'Kategorien';
+    categoryControl.enabled = true;
+  }
+  this.table.footer.addControl($groupSearch, categoryControl);
+
+  var $groupVisual = this.table.footer.addGroup('Anzeige');
+
   var chartControl = {
     cssClass: 'control-chart',
     action: controlChart
@@ -37,7 +74,7 @@ scout.DesktopTable.prototype._render = function($parent) {
     chartControl.label = this.model.chart.label;
     chartControl.enabled = true;
   }
-  this.table.footer.addControl(chartControl);
+  this.table.footer.addControl($groupVisual, chartControl);
 
   var mapControl = {
     cssClass: 'control-map',
@@ -47,7 +84,7 @@ scout.DesktopTable.prototype._render = function($parent) {
     mapControl.label = this.model.map.label;
     mapControl.enabled = true;
   }
-  this.table.footer.addControl(mapControl);
+  this.table.footer.addControl($groupVisual, mapControl);
 
   var graphControl = {
     cssClass: 'control-graph',
@@ -57,9 +94,27 @@ scout.DesktopTable.prototype._render = function($parent) {
     graphControl.label = this.model.graph.label;
     graphControl.enabled = true;
   }
-  this.table.footer.addControl(graphControl);
+  this.table.footer.addControl($groupVisual, graphControl);
 
   var that = this;
+
+  function controlQuery() {
+    // TODO cru > cgu: korrekt modell übergeben, zwischenspeichern
+    that._query = new scout.DesktopQuery(that.table.footer.$controlContainer);
+    that.table.footer.openTableControl();
+  }
+
+  function controlAnalyze() {
+    // TODO cru > cgu: korrekt modell übergeben, zwischenspeichern
+    that._analyze = new scout.DesktopAnalyze(that.table.footer.$controlContainer);
+    that.table.footer.openTableControl();
+  }
+
+  function controlCategory() {
+    // TODO cru > cgu: korrekt modell übergeben, zwischenspeichern
+    that._category = new scout.DesktopCategory(that.table.footer.$controlContainer);
+    that.table.footer.openTableControl();
+  }
 
   function controlChart() {
     if (that._chart) { //FIXME filter selection should be restored when changing from map to chart and back, maybe don't dispose every time?

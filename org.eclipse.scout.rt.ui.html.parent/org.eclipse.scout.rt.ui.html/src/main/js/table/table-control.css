@@ -4,44 +4,82 @@ bottom: 0px;
 height: 50px;
 width: 100%;
 padding-right: 15px;
-padding-left: 10px;
 white-space: nowrap;
 }
 
-.control{
-padding: 14px 18px 10px 2px;
+.control-group {
+display: inline;
 float: left;
-cursor: pointer;
+position: relative;
+padding-left: 10px;
+margin-right: 7px;
+border-right: 1px solid #CCC;
+margin-top: 6px;
+height: 38px;
 }
 
-.control:hover:before {
+.control-group:before {
+content: attr(data-title);
+position: absolute;
+color: #ccc;
+font-size: 8px;
+width: 100%; 
+top: -4px;
+left: 6px;
+}
+
+.control{
+padding: 9px 18px 10px 2px;
+float: left;
+cursor: pointer;
+position: relative;
+}
+
+.control:hover:before, .control:hover:after {
 color: #FE9915;
 }
 
-.control.disabled:hover, .control.disabled:before{
+.control.disabled:hover, .control.disabled:before, .control.disabled:after{
 cursor: default;
 color:#CCC;
 }
 
-.control-graph:before, .control-chart:before, .control-map:before {
+.control.selected:before, .control.selected:after {
+color: #FE9915 !important;
+}
+
+
+.control:before{
 font-family: fontAwesome;
 font-size: 24px;
 color:#0082A1;
 }
 
+.control:after{
+font-family: fontAwesome;
+font-size: 10px;
+color:#0082A1;
+position: relative;
+top: -11px;
+left: -1px;
+}
+
+.control-query:before {content:"\F002";}
+.control-analyze:before {content:"\F002";}
+.control-category:before {content:"\F02B";}
+
 .control-graph:before {content:"\F0E8";}
 .control-chart:before {content:"\F080";}
 .control-map:before {content:"\F0AC";}
+
+.control-analyze:after{content:"\F067";}
 
 
 .control-label {
 float: left;
 padding-top: 18px;
+padding-left: 6px;
 color: #0082A1;
-}
-
-.control.selected:before {
-color: #FE9915 !important;
 }
 
 #InfoLoad, #InfoMore, #InfoFilter, #InfoSelect {

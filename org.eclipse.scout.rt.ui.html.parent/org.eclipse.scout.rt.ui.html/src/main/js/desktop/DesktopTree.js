@@ -124,7 +124,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
           };
 
         $('#TreeItemAnimate').css('height', 0)
-          .animateAVCSD('height', h, removeContainer, this.scrollbar.initThumb.bind(this.scrollbar));
+          .animateAVCSD('height', h, removeContainer, this.scrollbar.initThumb.bind(this.scrollbar), 200);
 
         // animated control, at the end: parent is expanded
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
@@ -140,7 +140,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
         };
 
         $control.css('borderSpacing', 0)
-          .animateAVCSD('borderSpacing', 135, addExpanded, rotateControl);
+          .animateAVCSD('borderSpacing', 135, addExpanded, rotateControl, 200);
       }
     }
   } else {
@@ -151,7 +151,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
       return $(this).attr("data-level") <= level;
     })
       .wrapAll('<div id="TreeItemAnimate"></div>)');
-    $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar));
+    $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar), 200);
 
     // animated control
     $control = $node.children('.tree-item-control');
@@ -159,7 +159,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
       $control.css('transform', 'rotate(' + now + 'deg)');
     };
     $control.css('borderSpacing', 135)
-      .animateAVCSD('borderSpacing', 0, null, rotateControl);
+      .animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
   }
 };
 
@@ -379,7 +379,7 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
     $treeMenuContainer.animateAVCSD('height', 0,
       function() {
         $(this).remove();
-        $node.removeClass('menu-open');
+        $clicked.parent().removeClass('menu-open');
       }, null, 150);
 
     // Remove all cleanup handlers

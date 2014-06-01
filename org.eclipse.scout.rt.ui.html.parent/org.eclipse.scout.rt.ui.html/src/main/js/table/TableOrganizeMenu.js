@@ -116,6 +116,12 @@ scout.TableOrganizeMenu = function(table, x, y) {
     .on('mouseenter', '.header-command', enterCommand)
     .on('mouseleave', '.header-command', leaveCommand);
 
+  // animated opening
+  $menuTable
+    .css('height', 0)
+    .heightToContent();
+
+
   function removeMenu(event) {
     if ($menuTable.has($(event.target)).length === 0) {
       $menuTable.animateAVCSD('height', 0, function() {

@@ -17,6 +17,8 @@ line-height: 26px;
 color: #9C9C9C;
 cursor: pointer;
 white-space: nowrap;
+min-width: 50px;
+text-align: center;
 }
 
 .view-item:hover{
