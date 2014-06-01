@@ -35,6 +35,7 @@ scout.DesktopTree.prototype._render = function($parent) {
     $(this).selectOne();
     that._$treeMenu.empty();
     that._updateBreadCrumb();
+    that.scrollbar.initThumb();
   }
 };
 
@@ -99,12 +100,19 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   if (!node.childNodes || node.childNodes.length === 0) {
     return true;
   }
-  var level = $node.attr('data-level'),
+  var bread = this.$parent.hasClass('bread-crumb'),
+    level = $node.attr('data-level'),
     $control,
-    rotateControl;
+    rotateControl = function (now /*, fx*/ ) { $control.css('transform', 'rotate(' + now + 'deg)'); };
 
   if (expanded) {
     this._addNodes(node.childNodes, $node);
+    this._updateBreadCrumb();
+
+    if (bread) {
+      $node.addClass('expanded');
+      return;
+    }
 
     // open node
     if ($node.hasClass('can-expand') && !$node.hasClass('expanded')) {
@@ -130,10 +138,6 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
         $node.data('expanding', true); //save expanding state to prevent adding the same nodes twice
         $control = $node.children('.tree-item-control');
 
-        rotateControl = function(now /*, fx*/ ) {
-          $control.css('transform', 'rotate(' + now + 'deg)');
-        };
-
         var addExpanded = function() {
           $node.addClass('expanded');
           $node.removeData('expanding');
@@ -155,9 +159,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
 
     // animated control
     $control = $node.children('.tree-item-control');
-    rotateControl = function(now /*, fx*/ ) {
-      $control.css('transform', 'rotate(' + now + 'deg)');
-    };
+
     $control.css('borderSpacing', 135)
       .animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
   }
@@ -238,7 +240,6 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     var level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
-      .addClass('bread-children')
       .on('click', '', onNodeClicked)
       .data('node', node)
       .attr('data-level', level)
@@ -301,10 +302,11 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
   }
 
   function onNodeContextClick(e) {
-    $(this).click();
-    //TODO cgu: geht nicht beim ertsen klick?
-    $('.tree-item-menu', $(this)).click();
     e.preventDefault();
+
+    //TODO cgu: geht nicht beim ertsen klick?
+    $(this).click();
+    that._onNodeMenuClicked(e, $('.tree-item-menu', this));
   }
 
   // return all created nodes
@@ -422,6 +424,7 @@ scout.DesktopTree.prototype._updateBreadCrumb = function() {
 
 scout.DesktopTree.prototype.doBreadCrumb = function(show) {
   if (show && !this.$parent.hasClass('bread-crumb')) {
+    this._updateBreadCrumb();
     this.$parent.addClass('bread-crumb');
     this._$treeMenu.heightToContent(150);
     //this._$desktopTreeScroll.css('height', 'calc(100% - ' + h + ')');

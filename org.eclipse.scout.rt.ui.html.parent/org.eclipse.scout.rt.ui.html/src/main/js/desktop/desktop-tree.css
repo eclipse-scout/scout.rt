@@ -25,8 +25,9 @@ padding: 12px 0px 0px 16px;
 
  /* bread crumb mode */
 #DesktopTree.bread-crumb .tree-item{
-display: none;
 height: 0px;
+padding: 0px;
+border: 0px;
 } 
 
 #DesktopTree.bread-crumb .tree-item.bread-parent,
