@@ -84,7 +84,10 @@ scout.TableKeystrokeAdapter = function(table) {
         }
       }
 
-      that._table.selectRowsByIds($newRowSelection.attr('id'));
+      // TODO cru: handling of shift key
+      if ($newRowSelection.length > 0) {
+        that._table.selectRowsByIds($newRowSelection.attr('id'));
+      }
 
       //FIXME If selection is not visible we need to scroll
       //that._table.scrollToSelection();
