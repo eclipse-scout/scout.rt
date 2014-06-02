@@ -1,6 +1,6 @@
 package org.eclipse.scout.commons.osgi;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.net.URL;
@@ -16,18 +16,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.internal.Activator;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleReference;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * Class loader implementation that uses a list of bundles to load classes.
- * 
+ *
  * @since 3.8.2
  */
 public class BundleListClassLoader extends ClassLoader {
@@ -73,13 +76,11 @@ public class BundleListClassLoader extends ClassLoader {
   private static final String BUNDLE_EXCLUDE_FILTER_PROPERTY = "org.eclipse.scout.commons.osgi.BundleListClassLoader#excludeBundles";
   private static final String REGEX_MARKER = "regex:";
 
-  private static P_FastClassContextFinder s_fastClassContextFinder;
   private static ClassLoader s_myClassLoader;
   static {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
       @Override
       public Object run() {
-        s_fastClassContextFinder = new P_FastClassContextFinder();
         s_myClassLoader = BundleListClassLoader.class.getClassLoader();
         return null;
       }
@@ -88,16 +89,13 @@ public class BundleListClassLoader extends ClassLoader {
 
   private final Bundle[] m_bundles;
   private final Bundle[] m_bundlesSortedByBundleSymbolicNameLenght;
+  private String[] m_bundleOrderPrefixes = null;
   private final ClassLoader m_parentContextClassLoader;
   private final ReadWriteLock m_cacheLock = new ReentrantReadWriteLock();
   private final Map<String, WeakReference<Class<?>>> m_classCache;
-
-  private final PrivilegedAction<List<ClassLoader>> m_getClassLoaderImplPrivilegedAction = new PrivilegedAction<List<ClassLoader>>() {
-    @Override
-    public List<ClassLoader> run() {
-      return getClassLoaderContextImpl();
-    }
-  };
+  private final boolean m_useResourceFiltering;
+  private final boolean m_useResourceCaching;
+  private final Map<String, Vector<URL>> m_resourceCache;
 
   public BundleListClassLoader(ClassLoader parent, Bundle... bundles) {
     super(parent);
@@ -142,6 +140,9 @@ public class BundleListClassLoader extends ClassLoader {
     });
     //
     m_classCache = new HashMap<String, WeakReference<Class<?>>>();
+    m_useResourceFiltering = SerializationUtility.isUseBundleOrderPrefixListAsResourceFilterEnabled();
+    m_useResourceCaching = SerializationUtility.isResourceUrlCachingInBundleListClassLoaderEnabled();
+    m_resourceCache = new HashMap<String, Vector<URL>>();
   }
 
   private Class<?> putInCache(String name, Class<?> c) {
@@ -155,10 +156,45 @@ public class BundleListClassLoader extends ClassLoader {
     return c;
   }
 
+  private URL putInCache(String name, URL resources) {
+    Vector<URL> urlList = new Vector<URL>();
+    urlList.add(resources);
+    urlList = putInCache(name, urlList);
+    return urlList.firstElement();
+  }
+
+  private Vector<URL> putInCache(String name, Vector<URL> resources) {
+    if (m_useResourceCaching) {
+      m_cacheLock.writeLock().lock();
+      try {
+        m_resourceCache.put(name, resources);
+      }
+      finally {
+        m_cacheLock.writeLock().unlock();
+      }
+    }
+    return resources;
+  }
+
+  private Vector<URL> getFromCache(String name) {
+    if (!m_useResourceCaching) {
+      return null;
+    }
+    m_cacheLock.readLock().lock();
+    try {
+      Vector<URL> ref = m_resourceCache.get(name);
+      return ref;
+    }
+    finally {
+      m_cacheLock.readLock().unlock();
+    }
+  }
+
   public void clearCaches() {
     m_cacheLock.writeLock().lock();
     try {
       m_classCache.clear();
+      m_resourceCache.clear();
     }
     finally {
       m_cacheLock.writeLock().unlock();
@@ -285,95 +321,86 @@ public class BundleListClassLoader extends ClassLoader {
     }
 
     // 9. class not found
-    putInCache(className, null);
+    putInCache(className, (Class<?>) null);
     throw new ClassNotFoundException(className);
   }
 
   @Override
   public URL getResource(String name) {
+    Enumeration<URL> urlList = getResources(name);
+    if (urlList != null && urlList.hasMoreElements()) {
+      return urlList.nextElement();
+    }
+    return null;
+  }
+
+  @Override
+  public InputStream getResourceAsStream(String name) {
+    try {
+      URL u = getResource(name);
+      if (u != null) {
+        return u.openStream();
+      }
+    }
+    catch (Exception e) {
+      //nop
+    }
+    return null;
+  }
+
+  @Override
+  public Enumeration<URL> getResources(String name) {
     if (!registerLoadingItem(name)) {
       return null;
     }
     try {
-      List<ClassLoader> clList = getClassLoaderContext();
-      for (ClassLoader cl : clList) {
-        URL res = cl.getResource(name);
-        if (res != null) {
-          return res;
+      // 1. check if resource is already in the cache
+      Vector<URL> ref = getFromCache(name);
+      if (ref != null) {
+        return ref.elements();
+      }
+
+      // 2. search in bundles
+      Vector<URL> urlList = new Vector<URL>();
+      for (Bundle b : m_bundles) {
+        try {
+          Enumeration<URL> en = b.getResources(name);
+          if (en != null && en.hasMoreElements()) {
+            while (en.hasMoreElements()) {
+              URL url = en.nextElement();
+              urlList.add(url);
+            }
+          }
+        }
+        catch (Exception e) {
+          //nop
         }
       }
-      return super.getResource(name);
+
+      // 3. filter resources
+      if (m_useResourceFiltering) {
+        Vector<URL> newUrlList = new Vector<URL>();
+        Vector<URL> customUrlList = new Vector<URL>();
+        Enumeration<URL> elements = urlList.elements();
+        while (elements.hasMoreElements()) {
+          URL resource = elements.nextElement();
+          newUrlList.add(resource);
+          if (isUrlFromBundlePrefixes(resource)) {
+            customUrlList.add(resource);
+          }
+        }
+        if (!customUrlList.isEmpty()) {
+          urlList = customUrlList;
+        }
+        else {
+          urlList = newUrlList;
+        }
+      }
+      return putInCache(name, urlList).elements();
     }
     finally {
       unregisterLoadingItem(name);
     }
-  }
-
-  @Override
-  protected Enumeration<URL> findResources(String name) throws IOException {
-    if (!registerLoadingItem(name)) {
-      return EMPTY_URL_ENUMERATION;
-    }
-    try {
-      List<ClassLoader> clList = getClassLoaderContext();
-      for (ClassLoader cl : clList) {
-        Enumeration<URL> res = cl.getResources(name);
-        if (res != null && res.hasMoreElements()) {
-          return res;
-        }
-      }
-      return super.findResources(name);
-    }
-    finally {
-      unregisterLoadingItem(name);
-    }
-  }
-
-  private List<ClassLoader> getClassLoaderContext() {
-    if (System.getSecurityManager() != null) {
-      return AccessController.doPrivileged(m_getClassLoaderImplPrivilegedAction);
-    }
-    return getClassLoaderContextImpl();
-  }
-
-  private List<ClassLoader> getClassLoaderContextImpl() {
-    Class<?>[] currentStack = s_fastClassContextFinder.getClassContext();
-    List<ClassLoader> result = new ArrayList<ClassLoader>(1);
-    ClassLoader prevCl = null;
-    for (Class<?> classOnStack : currentStack) {
-      if (classOnStack == BundleListClassLoader.class || classOnStack == P_FastClassContextFinder.class) {
-        continue;
-      }
-      ClassLoader cl = classOnStack.getClassLoader();
-      if (cl == null || cl == this) {
-        continue;
-      }
-      if (prevCl != cl && isDistinctClassLoaderHierarchy(cl)) {
-        prevCl = cl;
-        result.add(cl);
-      }
-      if (cl == s_myClassLoader || cl instanceof BundleReference) {
-        // Stop search at our own class loader or the first bundle class loader in the stack.
-        // (Implementation note: because "BundleClassLoader" is an internal class, we check
-        // for "BundleReference" instead)
-        break;
-      }
-    }
-    return result;
-  }
-
-  private boolean isDistinctClassLoaderHierarchy(ClassLoader cl) {
-    if (cl == null || cl == getParent()) {
-      return false;
-    }
-    for (ClassLoader parent = cl.getParent(); parent != null; parent = parent.getParent()) {
-      if (parent == this) {
-        return false;
-      }
-    }
-    // Okay, the given class loader really has nothing ourself, so it is safe to use (without
-    // this check, we would risk an endless loop).
-    return true;
   }
 
   private boolean registerLoadingItem(String name) {
@@ -473,14 +500,56 @@ public class BundleListClassLoader extends ClassLoader {
   }
 
   /**
-   * Helper class which allows public access to {@link SecurityManager}s protected <code>getClassContext()</code>
-   * method, which is faster than {@link Thread#getStackTrace()} (according to http://stackoverflow.com/a/2924426).
+   * return true if resource {@link URL} is located in a bundle from the list of bundleOrderPrefixes
    */
-  private static final class P_FastClassContextFinder extends SecurityManager {
-
-    @Override
-    public Class<?>[] getClassContext() {
-      return super.getClassContext();
+  private boolean isUrlFromBundlePrefixes(URL resource) {
+    if (m_bundleOrderPrefixes == null) {
+      m_bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
     }
+    long bundleID = getBundleID(resource.getHost());
+    if (bundleID >= 0) {
+      Bundle bundle = getBundle(bundleID);
+      if (bundle != null) {
+        for (String bundlePrefix : m_bundleOrderPrefixes) {
+          if (StringUtility.contains(bundle.getSymbolicName(), bundlePrefix)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * find the bundleId in the host string.
+   * Example: 80.2hwhefh29:3
+   *
+   * @param host
+   *          from resource {@link URL}
+   * @return bundle id
+   */
+  private long getBundleID(String host) {
+    int dotIndex = host.indexOf('.');
+    return (dotIndex >= 0 && dotIndex < host.length() - 1) ? Long.parseLong(host.substring(0, dotIndex)) : -1;
+  }
+
+  /**
+   * find the {@link Bundle} from a bundle id
+   *
+   * @param id
+   *          bundle id
+   * @return the corresponding {@link Bundle}
+   */
+  private Bundle getBundle(long id) {
+    BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+    Bundle result = null;
+    for (Bundle candidate : bundleContext.getBundles()) {
+      if (candidate.getBundleId() == id) {
+        if (result == null || result.getVersion().compareTo(candidate.getVersion()) < 0) {
+          result = candidate;
+        }
+      }
+    }
+    return result;
   }
 }
