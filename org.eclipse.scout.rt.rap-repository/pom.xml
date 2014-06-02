@@ -29,7 +29,6 @@
   <properties>
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.rt-repository-${project.version}.zip</p2repo-zip-path>
     <target-platform>${rap-repo-target-platform}</target-platform>
-    <platform-version>${rap-repo-platform-version}</platform-version>
   </properties>
 
   <build>

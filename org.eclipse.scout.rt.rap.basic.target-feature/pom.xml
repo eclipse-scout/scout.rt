@@ -28,7 +28,6 @@
 
   <properties>
     <target-platform>${rap-repo-target-platform}</target-platform>
-    <platform-version>${rap-repo-platform-version}</platform-version>
   </properties>
 
   <build>

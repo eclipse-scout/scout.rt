@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-3.10I.target" sequenceNumber="10">
+<target name="scout-indigo.target" sequenceNumber="10">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_luna_I" location="http://download.eclipse.org/eclipse/updates/4.4-I-builds/"/>
+      <repository id="eclipse_indigo" location="http://download.eclipse.org/releases/indigo/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.rcp.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.rcp.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.pde.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.pde.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.jdt.source.feature.group" version="0.0.0"/>
 
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
-
-      <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.emf.common.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.emf.ecore.source.feature.group" version="0.0.0"/>
-    </location>
-
-   <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_luna" location="http://download.eclipse.org/releases/luna"/>
+      <unit id="org.eclipse.equinox.server.servletbridge.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
     </location>
 
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
 
       <unit id="javax.servlet" version="3.0.0.v201112011016"/>
@@ -93,7 +87,7 @@
       <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="rap_nightly" location="http://download.eclipse.org/rt/rap/nightly/runtime/"/>
+      <repository id="rap_2.3" location="http://download.eclipse.org/rt/rap/2.3/RC2-20140527-1230/"/>
 
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
     </location>
@@ -102,7 +96,9 @@
 
       <unit id="org.eclipse.rap.fileupload.feature.feature.group" version="0.0.0"/>
     </location>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+
+    <!--  uncomment Scout Nightly update site for development -->
+    <!-- location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
@@ -117,7 +113,7 @@
       <unit id="org.eclipse.scout.sdk.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.sdk.rap.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.sdk.testing.source.feature.group" version="0.0.0"/>
-    </location>
+    </location -->
 
     <location includeAllPlatforms="true" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="scout_testing" location="http://download.eclipse.org/scout/releases/4.0/testing"/>
@@ -130,6 +126,5 @@
 
       <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
     </location>
-
   </locations>
 </target>

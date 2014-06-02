@@ -40,49 +40,39 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>eclipse-3.4.target</file>
+                  <file>eclipse-helios.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.4</classifier>
+                  <classifier>eclipse-helios</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.5.target</file>
+                  <file>eclipse-indigo.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.5</classifier>
+                  <classifier>eclipse-indigo</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.6.target</file>
+                  <file>eclipse-indigo-build.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.6</classifier>
+                  <classifier>eclipse-indigo-build</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.7.target</file>
+                  <file>eclipse-juno.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.7</classifier>
+                  <classifier>eclipse-juno</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.8.target</file>
+                  <file>eclipse-kepler.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.8</classifier>
+                  <classifier>eclipse-kepler</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.9.target</file>
+                  <file>eclipse-luna.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.9</classifier>
+                  <classifier>eclipse-luna</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.9I.target</file>
+                  <file>eclipse-luna-integration.target</file>
                   <type>target</type>
-                  <classifier>eclipse-3.9I</classifier>
-                </artifact>
-                <artifact>
-                  <file>eclipse-3.10.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-3.10</classifier>
-                </artifact>
-                <artifact>
-                  <file>eclipse-3.10I.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-3.10I</classifier>
+                  <classifier>eclipse-luna-integration</classifier>
                 </artifact>
                 <artifact>
                   <file>eclipse-staging.target</file>
@@ -114,15 +104,13 @@
                 </goals>
                 <configuration>
                   <targetFiles>
-                    <param>eclipse-3.4.target</param>
-                    <param>eclipse-3.5.target</param>
-                    <param>eclipse-3.6.target</param>
-                    <param>eclipse-3.7.target</param>
-                    <param>eclipse-3.8.target</param>
-                    <param>eclipse-3.9.target</param>
-                    <param>eclipse-3.9I.target</param>
-                    <param>eclipse-3.10.target</param>
-                    <param>eclipse-3.10I.target</param>
+                    <param>eclipse-helios.target</param>
+                    <param>eclipse-indigo.target</param>
+                    <param>eclipse-indigo-build.target</param>                    
+                    <param>eclipse-juno.target</param>
+                    <param>eclipse-kepler.target</param>
+                    <param>eclipse-luna.target</param>
+                    <param>eclipse-luna-integration.target</param>
                     <param>eclipse-staging.target</param>
                   </targetFiles>
                   <failOnError>true</failOnError>
