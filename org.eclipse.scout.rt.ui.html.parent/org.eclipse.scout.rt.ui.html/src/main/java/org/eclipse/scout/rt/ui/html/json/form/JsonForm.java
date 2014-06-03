@@ -17,9 +17,11 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
 
@@ -41,7 +43,9 @@ public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
-  public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
+  // TODO AWE: (talk 2 C.GU) - ich denke wir sollten die rootgroup-box doch übertragen, anstatt die properties künstlich
+  // aufs Form zu kopieren - sonst duplizieren wir hier und im JS viel code.
+  public static final String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
 
   private FormListener m_modelFormListener;
 
@@ -84,7 +88,10 @@ public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     // we do not send the root group box itself to the UI
-    putProperty(json, "formFields", modelObjectsToJson(model.getRootGroupBox().getControlFields()));
+    IGroupBox rootGroupBox = model.getRootGroupBox();
+    putProperty(json, "formFields", modelObjectsToJson(rootGroupBox.getControlFields()));
+    putProperty(json, "gridData", new JsonGridData(rootGroupBox.getGridData()).toJson());
+    putProperty(json, PROP_GRID_COLUMN_COUNT, rootGroupBox.getGridColumnCount());
     // TODO AWE: check controlFields VS fields --> guess fields is more appropriate
     // TODO AWE: return other props
     return json;

@@ -2,6 +2,8 @@ scout.Form = function(model, session) {
   scout.Form.parent.call(this, model, session);
   this._$title;
   this._$parent;
+  this._gridLayout;
+  this._resizeHandler;
 };
 
 scout.inherits(scout.Form, scout.ModelAdapter);
@@ -24,6 +26,9 @@ scout.Form.prototype.attach = function($parent) {
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
+  this.$container.data('columns', this.model.gridColumnCount);
+  this._gridLayout = new scout.GridLayout(this.$container);
+
   // TODO AWE: append form title section (including ! ? and progress indicator)
   this._$title = this.$container.appendDiv(undefined, 'form-title', this.model.title);
 
@@ -50,6 +55,10 @@ scout.Form.prototype._render = function($parent) {
     });
   }
 
+  this._gridLayout.layout();
+  // we must keep a stable reference to the resize-handler so we can remove the handler in the dispose method later
+  this._resizeHandler = this._gridLayout.updateLayout.bind(this._gridLayout);
+  $(window).on('resize', this._resizeHandler);
 };
 
 scout.Form.prototype.detach = function() {
@@ -70,13 +79,13 @@ scout.Form.prototype.enable = function() {
 };
 
 scout.Form.prototype.disable = function() {
-  this.$glasspane = this._$parent.appendDiv(undefined, 'glasspane'); //FIXME CGU how to do this properly? disable every mouse and keyevent?
-  //FIXME CGU adjust values on resize
+  this.$glasspane = this._$parent.appendDiv(undefined, 'glasspane'); // FIXME CGU how to do this properly? disable every mouse and keyevent?
+  // FIXME CGU adjust values on resize
   this.$glasspane.
-  width(this.$container.width()).
-  height(this.$container.height()).
-  css('top', this.$container.position().top).
-  css('left', this.$container.position().left);
+    width(this.$container.width()).
+    height(this.$container.height()).
+    css('top', this.$container.position().top).
+    css('left', this.$container.position().left);
 };
 
 scout.Form.prototype.onModelCreate = function() {};
@@ -87,4 +96,9 @@ scout.Form.prototype.onModelAction = function(event) {
   } else {
     $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
   }
+};
+
+scout.Form.prototype.dispose = function() {
+  scout.Form.parent.prototype.dispose.call(this);
+  $(window).off('resize', this._resizeHandler);
 };

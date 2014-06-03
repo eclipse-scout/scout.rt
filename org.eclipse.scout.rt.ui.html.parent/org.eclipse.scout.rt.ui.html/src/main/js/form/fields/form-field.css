@@ -1,59 +1,12 @@
 div.inbox {
   position: absolute;
 }
-.x1 {
-    left: 20px;
-}
-.x2 {
-    left: 415px;
-}
-.x3 {
-    left: 810px;
-}
-.x4 {
-    left: 1205px;
-}
-.y1 {
-    top: 0;
-}
-.y2 {
-    top: 35px;
-}
-.y3 {
-    top: 70px;
-}
-.y4 {
-    top: 105px;
-}
-.y5 {
-    top: 135px;
-}
-.y6 {
-    top: 165px;
-}
-.w1 {
-    width: 355px;
-}
-.w2 {
-    width: 750px;
-}
-.h1 {
-    height: 21px;
-}
-.h2 {
-    height: 50px;
-}
-.h3 {
-    height: 79px;
-}
-.h4 {
-    height: 108px;
-}
 
 .form-field {
   background-color: #f8f8f8;
-  height: 25px;
+  /*height: 25px;*/
   border: 1px solid #eeeeee;
+  position:absolute;
 }
 
 .form-field > .label {

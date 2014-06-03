@@ -5,7 +5,8 @@ scout.Button = function(model, session) {
 scout.inherits(scout.Button, scout.FormField);
 
 scout.Button.prototype._render = function($parent) {
-  scout.Button.parent.prototype._render.call(this, $parent);
+  this.$container = $parent.appendDiv(undefined, 'form-field');
+  this.$container.data('gridData', this.model.gridData);
   // TODO AWE: (button) remove mnemonic
   this._$button = $('<button>' + this.model.label + '</button>');
   this._$button.appendTo(this.$container);

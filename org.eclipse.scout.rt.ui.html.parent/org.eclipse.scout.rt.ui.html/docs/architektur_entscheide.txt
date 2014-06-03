@@ -1,3 +1,16 @@
+JsonAdapter / JavaScript Model [03.06.2014 cgu, awe]
+- Der Konstruktor aller JS ModelAdapter ist parameterlos. Grund: durch die JS-Vererbung via inheritsFrom, wird der super-Ctor
+  immer einmal ohne Argumente aufgerufen, man müsste darum im Ctor 'if (model && session)' verwenden um Exceptions zu vermeiden.
+  Darum wird neu anstatt dem Ctor eine init Methode mit den beiden Argumenten model, session verwendet.
+- Server-seitig schicken wir nur beim ersten Mal das komplette Model als JSON-string. Der Client erzeugt aus diesem JSON-string
+  eine ModelAdapter Instanz und speichert diese in der modelAdapterMap. Wird die gleiche Instanz ein zweites Mal benötigt, schickt
+  der Server nur noch die ID dieser Instanz im JSON-string, der Client liefert dann die bereits vorhandene Instanz aus der model-
+  AdapterMap zurück.
+- Wird eine (Scout-)Model Instanz abgeräumt (z.B. eine Form Instanz) muss die serverseitige JsonAdapter Implementierung dafür sorgen,
+  dass alle Kinder (z.B. FormFields) aus der modelAdapterRegistry entfernt werden. Der genau gleiche Clean-up muss auf Clientseite
+  erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterMap gelöscht werden.
+
+
 Aufteilung zwischen GUI-Elementen und Server / Model-Interaktion?
 - z.B. Table schickt Server Event im Selektions-Code. Alternative wäre ein Listener, welcher auf Selektion hört und dort den Event schickt.
 - Vorteil des Listeners: Saubere Trennung, Komponenten könnten einfacher ersetzt werden?

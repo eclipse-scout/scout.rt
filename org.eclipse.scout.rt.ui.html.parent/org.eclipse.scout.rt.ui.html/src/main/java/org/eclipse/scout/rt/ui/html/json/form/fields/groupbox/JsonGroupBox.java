@@ -21,6 +21,8 @@ import org.json.JSONObject;
  */
 public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
+  public static final String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
+
   public JsonGroupBox(IGroupBox aGroupBox, IJsonSession session, String id) {
     super(aGroupBox, session, id);
     putJsonProperty(new JsonProperty<IGroupBox, String>(IGroupBox.PROP_BORDER_DECORATION, aGroupBox) {
@@ -33,6 +35,12 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
       @Override
       protected Boolean getValueImpl(IGroupBox groupBox) {
         return groupBox.isBorderVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<IGroupBox, Integer>(PROP_GRID_COLUMN_COUNT, aGroupBox) {
+      @Override
+      protected Integer getValueImpl(IGroupBox groupBox) {
+        return groupBox.getGridColumnCount();
       }
     });
   }
