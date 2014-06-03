@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -70,36 +69,33 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   /**
-   * @return
-   * @deprecated use {@link AbstractTableMenu} as superclass and
-   *             {@link AbstractTableMenu#getConfiguredSingleSelectionAction()} instead.
+   * @deprecated Will be removed in Scout 5.0.<br>
+   *             Use {@link TableMenuType#SingleSelection} and/or {@link TreeMenuType#SingleSelection} in
+   *             {@link #getConfiguredMenuTypes()} instead.
    */
   @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   protected boolean getConfiguredSingleSelectionAction() {
     return true;
   }
 
   /**
-   * @return
-   * @deprecated use {@link AbstractTableMenu} as superclass and
-   *             {@link AbstractTableMenu#getConfiguredMultiSelectionAction()} instead.
+   * @deprecated Will be removed in Scout 5.0.<br>
+   *             Use {@link TableMenuType#MultiSelection} and/or {@link TreeMenuType#MultiSelection} in
+   *             {@link #getConfiguredMenuTypes()} instead.
    */
   @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected boolean getConfiguredMultiSelectionAction() {
     return false;
   }
 
   /**
-   * @return
-   * @deprecated use {@link AbstractTableMenu} as superclass and
-   *             {@link AbstractTableMenu#getConfiguredEmptySpaceAction()} instead.
+   * @deprecated Will be removed in Scout 5.0.<br>
+   *             Use {@link TableMenuType#EmptySpace} and/or {@link TreeMenuType#EmptySpace} in
+   *             {@link #getConfiguredMenuTypes()} instead.
    */
   @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   protected boolean getConfiguredEmptySpaceAction() {
     return false;
