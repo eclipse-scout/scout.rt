@@ -23,6 +23,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
+import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
@@ -44,15 +46,26 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     super.initializeService(registration);
     m_pubSubMessageService = SERVICES.getService(IPubSubMessageService.class);
     m_nodeId = UUID.randomUUID().toString();
+    enable();
+  }
+
+  @Override
+  public void disposeServices() {
+    super.disposeServices();
+    disable();
   }
 
   @Override
   public boolean enable() {
     if (m_pubSubMessageService != null) {
       m_enabled = m_pubSubMessageService.subscribe(QUEUE_NAME);
-//      if (m_enabled) {
+      if (m_enabled) {
 //        Activator.getDefault().getNodeSynchronizationInfo().setClusterSyncService(this);
-//      }
+      }
+    }
+    else {
+      m_enabled = false;
+      LOG.error("Clustersync could not be enabled. No service of type IPubSubMessageService found.");
     }
     return m_enabled;
   }
@@ -79,17 +92,24 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   @Override
   public void publishNotification(IClusterNotification notification) {
     if (m_enabled) {
-      if (m_pubSubMessageService.publishNotification(notification)) {
-        //TODO
+      ClusterNotificationMessage message = new ClusterNotificationMessage(notification, getNotificationProperties());
+      m_pubSubMessageService.publishNotification(message);
+//      if (publishSuccessful) {
+      //TODO
 //        Activator.getDefault().getNodeSynchronizationInfo().incrementSentMessageCount();
-      }
+//      }
     }
+  }
+
+  protected IClusterNotificationMessageProperties getNotificationProperties() {
+    return new ClusterNotificationMessageProperties(getNodeId(), ServerJob.getCurrentSession().getUserId());
   }
 
   @Override
   public void processNotification(IClusterNotificationMessage notification) {
-    //Don't progress notifications send by itself
-    if (notification.getOriginNode() != null && !notification.getOriginNode().equals(m_nodeId)) {
+    //Do not progress notifications sent by node itself
+    String originNode = notification.getProperties().getOriginNode();
+    if (m_nodeId.equals(originNode)) {
 // TODO update info
 //      Activator.getDefault().getNodeSynchronizationInfo().incrementReceivedMessageCount();
 //      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedDate(new Date());

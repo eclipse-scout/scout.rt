@@ -10,16 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import org.eclipse.scout.service.IService;
-
 /**
  *
  */
-public interface IPubSubMessageService extends IService {
+public interface IClusterNotificationMessageProperties {
 
-  public boolean subscribe(String queueName);
+  String getOriginNode();
 
-  public boolean unsubsribe(String queueName);
+  String getOriginUser();
 
-  public boolean publishNotification(IClusterNotificationMessage notification);
 }

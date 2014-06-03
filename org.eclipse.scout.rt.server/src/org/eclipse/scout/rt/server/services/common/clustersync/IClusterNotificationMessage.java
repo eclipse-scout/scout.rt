@@ -17,9 +17,7 @@ import java.io.Serializable;
  */
 public interface IClusterNotificationMessage extends Serializable {
 
-  String getOriginNode();
-
-  String getOriginUser();
+  IClusterNotificationMessageProperties getProperties();
 
   IClusterNotification getNotification();
 

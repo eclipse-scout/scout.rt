@@ -40,7 +40,9 @@ public class ClientNotificationService extends AbstractService implements IClien
 
   @Override
   public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
-    return m_clientNotificationQueue.getNextNotifications(blockingTimeout);
+    Set<IClientNotification> n = m_clientNotificationQueue.getNextNotifications(blockingTimeout);
+    addClusterInfo(n);
+    return n;
   }
 
   @Override
@@ -101,11 +103,24 @@ public class ClientNotificationService extends AbstractService implements IClien
     try {
       IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
       if (s != null) {
+        element.getNotification().setOriginalServerNode(s.getNodeId());
         s.publishNotification(new ClientNotificationClusterNotification(element));
       }
     }
     catch (ProcessingException e) {
       LOG.error("could not send cluster sync message", e);
+    }
+  }
+
+  /**
+   * Has no effect, if no cluster service is registered
+   */
+  protected void addClusterInfo(Set<IClientNotification> notifications) {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      for (IClientNotification n : notifications) {
+        n.setProvidingServerNode(s.getNodeId());
+      }
     }
   }
 
