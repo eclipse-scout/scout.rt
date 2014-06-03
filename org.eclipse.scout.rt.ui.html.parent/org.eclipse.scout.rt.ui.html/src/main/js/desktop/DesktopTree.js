@@ -27,7 +27,7 @@ scout.DesktopTree.prototype._render = function($parent) {
   this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
     .attr('data-level', -1)
     .on('click', '', onHomeClick);
-  this._$treeMenu = this.$parent.appendDiv('', 'tree-menu', '');
+  this._$treeMenu = this.$container.appendDiv('', 'tree-menu', '');
 
   var that = this;
 

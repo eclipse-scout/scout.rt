@@ -1,0 +1,70 @@
+.command-container {
+width: 175px;
+height: 100%;
+float: left;
+padding-top: 10px;}
+
+.command-container .separator {
+width: 150px;
+float: left;
+clear: both;
+min-height: 16px;
+}
+
+.command-container .command {
+position:relative;
+width: 150px;
+float: left;
+clear: both;
+heigth: 26px;
+line-height: 26px;
+background-color: #e2e2e2;
+cursor: pointer;
+margin-bottom: 5px;
+padding: 2px 20px 0px 6px;
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
+}
+
+.command-container .command:hover{
+background-color: #ccc;
+}
+
+
+.venn-container {
+width: 500px;
+height: 100%;
+float: left;
+}
+
+rect.venn-all {
+fill: #fff;
+stroke: #ddd;
+stroke-width: 2;
+}
+
+text.venn-all-text {
+fill: #aaa;
+font-size: 10px;
+text-anchor: end;
+}
+
+
+circle.venn-circle {
+fill: #0082a1;
+cursor: pointer;
+opacity: 0.5;
+}
+
+text.venn-circle-text {
+fill: #fff;
+font-size: 10px;
+text-anchor: middle;
+alignment-baseline: middle;
+}
+
+circle.venn-circle.selected, circle.venn-circle:hover{
+fill: #fe9915; 
+}
+

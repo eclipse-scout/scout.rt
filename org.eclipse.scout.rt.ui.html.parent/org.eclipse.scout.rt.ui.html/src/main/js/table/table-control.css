@@ -5,6 +5,7 @@ height: 50px;
 width: 100%;
 padding-right: 15px;
 white-space: nowrap;
+overflow: hidden;
 }
 
 .control-group {
@@ -24,8 +25,8 @@ position: absolute;
 color: #ccc;
 font-size: 8px;
 width: 100%; 
-top: -4px;
-left: 6px;
+top: -2px;
+left: 12px;
 }
 
 .control{
@@ -55,30 +56,18 @@ font-size: 24px;
 color:#0082A1;
 }
 
-.control:after{
-font-family: fontAwesome;
-font-size: 10px;
-color:#0082A1;
-position: relative;
-top: -11px;
-left: -1px;
-}
-
 .control-query:before {content:"\F002";}
-.control-analyze:before {content:"\F002";}
+.control-analyze:before {content:"\F140";}
 .control-category:before {content:"\F02B";}
 
 .control-graph:before {content:"\F0E8";}
 .control-chart:before {content:"\F080";}
 .control-map:before {content:"\F0AC";}
 
-.control-analyze:after{content:"\F067";}
-
-
 .control-label {
 float: left;
 padding-top: 18px;
-padding-left: 6px;
+padding-left: 4px;
 color: #0082A1;
 }
 
@@ -107,10 +96,10 @@ color: #444;
 position: absolute;
 width: 100%;
 left: 0px;
-height: 17px;
+height: 21px;
 background-color: #CCC;
-border-top: 8px solid #FFF;
-border-bottom: 8px solid #FFF;
+border-top: 10px solid #FFF;
+border-bottom: 10px solid #FFF;
 border-right: 10px solid #FFF;
 }
 
