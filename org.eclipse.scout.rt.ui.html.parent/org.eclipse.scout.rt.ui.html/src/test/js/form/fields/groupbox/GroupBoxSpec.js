@@ -9,7 +9,8 @@ describe("GroupBox", function() {
           gridData : {
             x : 0,
             y : 0
-          }
+          },
+          gridColumnCount : 2
     };
 
     beforeEach(function() {
