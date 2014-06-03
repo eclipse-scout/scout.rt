@@ -73,6 +73,8 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -85,6 +87,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -156,6 +159,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     setUiField(table);
     //cell editing support
     m_uiCellEditorComposite = new RwtScoutTableCellEditor(this);
+
+    table.addMenuDetectListener(new P_RwtHeaderMenuDetectListener());
 
     //columns
     initializeUiColumns();
@@ -711,6 +716,28 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return visualCellIndex;
   }
 
+  /**
+   * @param p
+   *          is the location of the Table control (i.e. not scrollbar adjusted)
+   * @since 4.1
+   */
+  private TableColumn getUiColumnAt(Point p) {
+    Table table = getUiTableViewer().getTable();
+    int x = p.x + getUiField().getHorizontalBar().getSelection();
+    int[] order = table.getColumnOrder();
+    for (int index : order) {
+      // loop over columns according current display-order
+      TableColumn c = table.getColumn(index);
+      if (c != null) {
+        if (x >= 0 && x <= c.getWidth()) {
+          return c;
+        }
+        x = x - c.getWidth();
+      }
+    }
+    return null;
+  }
+
   protected void setSelectionFromUi(final StructuredSelection selection) {
     if (getUpdateUiFromScoutLock().isAcquired()) {
       return;
@@ -1179,6 +1206,71 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
     }
   }
+
+  /**
+   * @since 4.1
+   */
+  private class P_RwtHeaderMenuDetectListener implements MenuDetectListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuDetected(MenuDetectEvent event) {
+      Table table = getUiField();
+      Point pTable = table.getDisplay().map(null, table, new Point(event.x, event.y));
+      Rectangle clientArea = table.getClientArea();
+      boolean header = clientArea.y <= pTable.y && pTable.y < clientArea.y + table.getHeaderHeight();
+      if (!header) {
+        return;
+      }
+//      // clear all previous
+//      // Windows BUG: fires menu hide before the selection on the menu item is
+//      // propagated.
+//      if (m_headerMenu != null) {
+//        for (MenuItem item : m_headerMenu.getItems()) {
+//          disposeMenuItem(item);
+//        }
+//      }
+      setContextColumnFromUi(getUiColumnAt(pTable));
+//      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+//      Runnable t = new Runnable() {
+//        @SuppressWarnings("deprecation")
+//        @Override
+//        public void run() {
+//          IContextMenu contextMenu = getScoutObject().getContextMenu();
+//          // manually call about to show
+//          contextMenu.aboutToShow();
+//          contextMenu.prepareAction();
+//          scoutMenusRef.set(contextMenu);
+//        }
+//      };
+//      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+//      try {
+//        job.join(1200);
+//      }
+//      catch (InterruptedException ex) {
+//        //nop
+//      }
+//      // grab the actions out of the job, when the actions are providden
+//      // within the scheduled time the popup will be handled.
+//      if (scoutMenusRef.get() != null) {
+//        SwtMenuUtility.fillMenu(m_headerMenu, scoutMenusRef.get().getChildActions(),
+//            ActionUtility.createMenuFilterVisibleAndMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header)), getEnvironment());
+//      }
+    }
+
+//    private void disposeMenuItem(MenuItem item) {
+//      Menu menu = item.getMenu();
+//      if (menu != null) {
+//        for (MenuItem childItem : menu.getItems()) {
+//          disposeMenuItem(childItem);
+//        }
+//        menu.dispose();
+//      }
+//      item.dispose();
+//    }
+
+  } // end class P_HeaderMenuListener
 
   private class P_TableColumnListener implements Listener {
     private static final long serialVersionUID = 1L;

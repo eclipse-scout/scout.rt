@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
 public class CopyWidthsOfColumnsMenu extends AbstractMenu {
@@ -51,8 +52,8 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
 
   @Override
   protected void execInitAction() throws ProcessingException {
-    // This menu is only visible in development mode
-    setVisible(Platform.inDevelopmentMode());
+    // This menu is only visible in development mode and not in the web client
+    setVisible(Platform.inDevelopmentMode() && !UserAgentUtility.isWebClient());
   }
 
   /**
