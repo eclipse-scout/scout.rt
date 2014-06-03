@@ -23,7 +23,7 @@ public class ClientNotificationClusterNotificationListener implements IClusterNo
   @Override
   public void onNotification(IClusterNotificationMessage notification) {
     if (accept(notification.getNotification())) {
-      ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) notification;
+      ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) notification.getNotification();
       SERVICES.getService(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
     }
   }

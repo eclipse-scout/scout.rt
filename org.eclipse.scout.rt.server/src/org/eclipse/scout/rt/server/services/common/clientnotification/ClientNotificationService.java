@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.ServiceRegistration;
 
 public class ClientNotificationService extends AbstractService implements IClientNotificationService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationService.class);
@@ -36,6 +37,12 @@ public class ClientNotificationService extends AbstractService implements IClien
 
   public ClientNotificationService() {
     m_clientNotificationQueue = new ClientNotificationQueue();
+  }
+
+  @Override
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
+    addClusterNotificationListener();
   }
 
   @Override
@@ -94,6 +101,13 @@ public class ClientNotificationService extends AbstractService implements IClien
       t.registerMember(m);
     }
     return m;
+  }
+
+  protected void addClusterNotificationListener() {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      s.addListener(new ClientNotificationClusterNotificationListener());
+    }
   }
 
   /**

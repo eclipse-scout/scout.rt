@@ -16,12 +16,10 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificat
  *
  */
 public class ClusterNotificationMessageProperties implements IClusterNotificationMessageProperties {
-  private String m_originNode;
-  private String m_originUser;
+  private static final long serialVersionUID = 245680805887844037L;
+  private final String m_originNode;
+  private final String m_originUser;
 
-  /**
-   *
-   */
   public ClusterNotificationMessageProperties(String originNode, String originUser) {
     m_originNode = originNode;
     m_originUser = originUser;

@@ -32,10 +32,10 @@ import org.osgi.framework.ServiceRegistration;
 /**
  *
  */
-public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService {
+public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPubSubMessageListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
-  private final List<IClusterNotificationListener> m_distributedNotificationListener = new ArrayList<IClusterNotificationListener>();
+  private final List<IClusterNotificationListener> m_listeners = new ArrayList<IClusterNotificationListener>();
   private final static String QUEUE_NAME = "scoutNotificationQueue";
   private IPubSubMessageService m_pubSubMessageService;
   private String m_nodeId;
@@ -60,6 +60,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     if (m_pubSubMessageService != null) {
       m_enabled = m_pubSubMessageService.subscribe(QUEUE_NAME);
       if (m_enabled) {
+        m_pubSubMessageService.setListener(this);
 //        Activator.getDefault().getNodeSynchronizationInfo().setClusterSyncService(this);
       }
     }
@@ -105,24 +106,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return new ClusterNotificationMessageProperties(getNodeId(), ServerJob.getCurrentSession().getUserId());
   }
 
-  @Override
-  public void processNotification(IClusterNotificationMessage notification) {
-    //Do not progress notifications sent by node itself
-    String originNode = notification.getProperties().getOriginNode();
-    if (m_nodeId.equals(originNode)) {
-// TODO update info
-//      Activator.getDefault().getNodeSynchronizationInfo().incrementReceivedMessageCount();
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedDate(new Date());
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedUserId(notification.getOriginUser());
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedClusterNodeId(notification.getOriginNode());
-
-      IServerSession session = getBackendSession();
-      P_NotificationProcessinJob notificationProcessJob = new P_NotificationProcessinJob("NotificationProcessingJob", session, notification, m_distributedNotificationListener);
-      notificationProcessJob.runNow(new NullProgressMonitor());
-    }
-
-  }
-
   private AbstractServerSession getBackendSession() {
     //TODO
     return new AbstractServerSession(true) {
@@ -133,17 +116,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private class P_NotificationProcessinJob extends ServerJob {
 
     IClusterNotificationMessage m_distributedNotification;
-    List<IClusterNotificationListener> m_distributedNotificationListener;
+    List<IClusterNotificationListener> m_listeners;
 
     public P_NotificationProcessinJob(String name, IServerSession serverSession, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
       super(name, serverSession);
       m_distributedNotification = notification;
-      m_distributedNotificationListener = listener;
+      m_listeners = listener;
     }
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      for (IClusterNotificationListener listener : m_distributedNotificationListener) {
+      for (IClusterNotificationListener listener : m_listeners) {
         listener.onNotification(m_distributedNotification);
       }
       return Status.OK_STATUS;
@@ -152,16 +135,34 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   @Override
   public void addListener(IClusterNotificationListener listener) {
-    m_distributedNotificationListener.add(listener);
+    m_listeners.add(listener);
   }
 
   @Override
   public void removeListener(IClusterNotificationListener listener) {
-    m_distributedNotificationListener.remove(listener);
+    m_listeners.remove(listener);
   }
 
   @Override
   public String getNodeId() {
     return m_nodeId;
+  }
+
+  @Override
+  public void onMessage(IClusterNotificationMessage message) {
+    //Do not progress notifications sent by node itself
+    String originNode = message.getProperties().getOriginNode();
+    if (!m_nodeId.equals(originNode)) {
+// TODO update info
+//      Activator.getDefault().getNodeSynchronizationInfo().incrementReceivedMessageCount();
+//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedDate(new Date());
+//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedUserId(notification.getOriginUser());
+//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedClusterNodeId(notification.getOriginNode());
+
+      IServerSession session = getBackendSession();
+      P_NotificationProcessinJob notificationProcessJob = new P_NotificationProcessinJob("NotificationProcessingJob", session, message, m_listeners);
+      notificationProcessJob.runNow(new NullProgressMonitor());
+    }
+
   }
 }
