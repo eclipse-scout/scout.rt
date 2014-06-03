@@ -2031,7 +2031,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     newSelectedNodes.removeAll(oldSelection);
     e.setNewSelectedNodes(newSelectedNodes);
     // update node menus
-    updateNodeMenus(newSelectedNodes);
+    updateNodeMenus(newSelection);
     //single observer
     try {
       execNodesSelected(e);
@@ -2055,11 +2055,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       getContextMenu().removeChildActions(m_currentNodeMenus);
       m_currentNodeMenus = null;
     }
-    if (newSelectedNodes != null) {
-      List<IMenu> nodeMenus = new ArrayList<IMenu>();
-      for (ITreeNode node : newSelectedNodes) {
-        nodeMenus.addAll(node.getMenus());
-      }
+    List<IMenu> nodeMenus = new ArrayList<IMenu>();
+    // take only first node to avoid having multiple same menus due to all nodes.
+    if (CollectionUtility.hasElements(newSelectedNodes)) {
+      nodeMenus.addAll(CollectionUtility.firstElement(newSelectedNodes).getMenus());
       m_currentNodeMenus = nodeMenus;
       getContextMenu().addChildActions(nodeMenus);
     }
