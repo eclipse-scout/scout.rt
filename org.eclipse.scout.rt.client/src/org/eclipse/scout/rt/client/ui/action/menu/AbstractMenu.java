@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -62,6 +63,8 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * @see TreeMenuType
    * @see ValueFieldMenuType
    */
+  @Order(55)
+  @ConfigProperty(ConfigProperty.MENU_TYPE)
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
     return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
         TreeMenuType.SingleSelection,

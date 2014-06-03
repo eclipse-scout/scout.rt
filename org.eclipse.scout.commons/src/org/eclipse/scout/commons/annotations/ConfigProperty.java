@@ -230,9 +230,12 @@ public @interface ConfigProperty {
    * java.math.RoundingMode
    */
   String ROUNDING_MODE = "ROUNDING_MODE";
-
   /**
    * int one of [TOOLBAR_FORM_HEADER, TOOLBAR_VIEW_PART] of IForm
    */
   String TOOLBAR_LOCATION = "TOOLBAR_LOCATION";
+  /**
+   * Set of menu type enum values
+   */
+  String MENU_TYPE = "MENU_TYPE";
 }
