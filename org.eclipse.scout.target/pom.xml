@@ -40,6 +40,16 @@
             <configuration>
               <artifacts>
                 <artifact>
+                  <file>build-incubator.target</file>
+                  <type>target</type>
+                  <classifier>build-incubator</classifier>
+                </artifact>
+                <artifact>
+                  <file>build-sdk.target</file>
+                  <type>target</type>
+                  <classifier>build-sdk</classifier>
+                </artifact>
+                <artifact>
                   <file>eclipse-helios.target</file>
                   <type>target</type>
                   <classifier>eclipse-helios</classifier>
@@ -48,11 +58,6 @@
                   <file>eclipse-indigo.target</file>
                   <type>target</type>
                   <classifier>eclipse-indigo</classifier>
-                </artifact>
-                <artifact>
-                  <file>eclipse-indigo-build.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-indigo-build</classifier>
                 </artifact>
                 <artifact>
                   <file>eclipse-juno.target</file>
@@ -104,9 +109,10 @@
                 </goals>
                 <configuration>
                   <targetFiles>
+                    <param>build-incubator.target</param>
+                    <param>build-sdk.target</param>
                     <param>eclipse-helios.target</param>
                     <param>eclipse-indigo.target</param>
-                    <param>eclipse-indigo-build.target</param>                    
                     <param>eclipse-juno.target</param>
                     <param>eclipse-kepler.target</param>
                     <param>eclipse-luna.target</param>

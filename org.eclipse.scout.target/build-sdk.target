@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<?pde version="3.6"?>
+<target name="scout-sdk-build.target" sequenceNumber="10">
+  <locations>
+    <!-- Scout Nightly update site used by Scout SDK for building -->
+    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+
+      <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
+    </location>
+  </locations>
+</target>
