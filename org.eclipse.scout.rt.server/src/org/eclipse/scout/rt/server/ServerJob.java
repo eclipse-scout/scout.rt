@@ -46,15 +46,15 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJob.class);
 
   //use classloader from SerializationUtility in Server Job
-  private static final String customClassloaderProperty = "org.eclipse.scout.rt.server.customServerJobClassloader";
+  private static final String CUSTOM_CLASSLOADER_PROPERTY = "org.eclipse.scout.rt.server.customServerJobClassloader";
   private final IServerSession m_serverSession;
   private Subject m_subject;
   private long m_transactionSequence;
-  private final boolean m_useCostomClassLoader;
+  private final boolean m_useCustomClassLoader;
 
   /**
    * Perform a transaction on a {@link IServerSession} within a security {@link Subject} (optional)<br>
-   * 
+   *
    * @param serverSession
    *          must not be null
    */
@@ -64,7 +64,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
 
   /**
    * Perform a transaction on a {@link IServerSession} within a security {@link Subject} (optional)<br>
-   * 
+   *
    * @param serverSession
    *          must not be null
    * @param subject
@@ -77,12 +77,12 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     }
     m_serverSession = serverSession;
     m_subject = subject;
-    m_useCostomClassLoader = isUseCustomClassloader();
+    m_useCustomClassLoader = isUseCustomClassloader();
   }
 
   private boolean isUseCustomClassloader() {
     try {
-      return StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(customClassloaderProperty));
+      return StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(CUSTOM_CLASSLOADER_PROPERTY));
     }
     catch (Exception e) {
       return false;
@@ -156,7 +156,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
    * By calling this method, a new transaction on {@link IServerSession} is created and automatically comitted after
    * successful completion.
    * </p>
-   * 
+   *
    * @param monitor
    */
   @Override
@@ -176,8 +176,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
                 public IStatus run() throws Exception {
                   return runTransactionWrapper(monitor);
                 }
-              }
-              );
+              });
         }
         catch (PrivilegedActionException e) {
           Throwable t = e.getCause();
@@ -215,7 +214,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       LocaleThreadLocal.set(m_serverSession.getLocale());
       TextsThreadLocal.set(m_serverSession.getTexts());
       ActiveTransactionRegistry.register(transaction);
-      if (m_useCostomClassLoader) {
+      if (m_useCustomClassLoader) {
         Thread.currentThread().setContextClassLoader(SerializationUtility.getClassLoader());
       }
       //
