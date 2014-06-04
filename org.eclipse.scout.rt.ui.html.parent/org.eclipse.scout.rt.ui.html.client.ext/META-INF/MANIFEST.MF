@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Html UI Ext
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.client.ext
+Bundle-Version: 4.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.eclipse.scout.rt.client.ui.html.client.ext
+Require-Bundle: org.eclipse.scout.rt.client;bundle-version="4.1.0"

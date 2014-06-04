@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Desktop = function(model, session) {
-  scout.Desktop.parent.call(this, model, session);
+scout.Desktop = function() {
+  scout.Desktop.parent.call(this);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -88,7 +88,7 @@ scout.Desktop.prototype.showOrHideDesktopTree = function() {
  * @override
  */
 scout.Desktop.prototype.onModelCreate = function(event) {
-  if (event.objectType == "Outline") {
+  if (event.objectType == "DesktopTree") {
     this.tree.onOutlineCreated(event);
     this.showOrHideDesktopTree();
   } else {

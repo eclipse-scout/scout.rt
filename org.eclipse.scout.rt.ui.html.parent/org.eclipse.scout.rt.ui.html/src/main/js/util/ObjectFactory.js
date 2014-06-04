@@ -27,7 +27,10 @@ scout.ObjectFactory.prototype.create = function(model) {
     throw 'No factory registered for objectType ' + model.objectType;
   }
 
-  return factory.create(model, this.session);
+  var object = factory.create();
+  object.init(model, this.session);
+
+  return object;
 };
 
 /**
@@ -57,52 +60,87 @@ scout.ObjectFactory.prototype.register = function(factories) {
 
 scout.defaultObjectFactories = [{
   objectType: 'Desktop',
-  create: function(model, session) {
-    return new scout.Desktop(model, session);
+  create: function() {
+    return new scout.Desktop();
+  }
+}, {
+  objectType: 'DesktopTree',
+  create: function() {
+    return new scout.DesktopTree();
+  }
+}, {
+  objectType: 'ChartTableControl',
+  create: function() {
+    return new scout.ChartTableControl();
+  }
+}, {
+  objectType: 'MapTableControl',
+  create: function() {
+    return new scout.MapTableControl();
+  }
+}, {
+  objectType: 'GraphTableControl',
+  create: function() {
+    return new scout.GraphTableControl();
+  }
+}, {
+  objectType: 'AnalysisTableControl',
+  create: function() {
+    return new scout.AnalysisTableControl();
   }
 }, {
   objectType: 'Table',
-  create: function(model, session) {
-    return new scout.Table(model, session);
+  create: function() {
+    return new scout.Table();
+  }
+}, {
+  objectType: 'TableControl',
+  create: function() {
+    return new scout.TableControl();
   }
 }, {
   objectType: 'Form',
-  create: function(model, session) {
-    return new scout.Form(model, session);
+  create: function() {
+    return new scout.Form();
   }
 }, {
   objectType: 'Menu',
-  create: function(model, session) {
-    return new scout.Menu(model, session);
+  create: function() {
+    return new scout.Menu();
   }
 }, {
   objectType: 'FormField',
-  create: function(model, session) {
-    return new scout.FormField(model, session);
+  create: function() {
+    return new scout.FormField();
   }
 }, {
   objectType: 'Button',
-  create: function(model, session) {
-    return new scout.Button(model, session);
+  create: function() {
+    return new scout.Button();
   }
 }, {
   objectType: 'CheckBoxField',
-  create: function(model, session) {
-    return new scout.CheckBoxField(model, session);
+  create: function() {
+    return new scout.CheckBoxField();
   }
 }, {
   objectType: 'TableField',
-  create: function(model, session) {
-    return new scout.TableField(model, session);
+  create: function() {
+    return new scout.TableField();
   }
 }, {
   objectType: 'GroupBox',
-  create: function(model, session) {
-    return new scout.GroupBox(model, session);
+  create: function() {
+    return new scout.GroupBox();
+  }
+}, {
+  objectType: 'TabBox',
+  create: function() {
+    return new scout.TabBox();
   }
 }, {
   objectType: 'SequenceBox',
-  create: function(model, session) {
-    return new scout.SequenceBox(model, session);
+  create: function() {
+    return new scout.SequenceBox();
   }
 }];

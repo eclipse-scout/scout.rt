@@ -1,0 +1,29 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.ui.html.client.ext;
+
+public class AnalysisTableControl extends AbstractTableControl implements IAnalysisTableControl {
+
+  public AnalysisTableControl() {
+    this(true);
+  }
+
+  public AnalysisTableControl(boolean callInitializer) {
+    super(callInitializer);
+  }
+
+  @Override
+  protected void initConfig() {
+    setLabel("Analyse");
+    setCssClass("control-analysis");
+    setGroup("Suche");
+  }
+}

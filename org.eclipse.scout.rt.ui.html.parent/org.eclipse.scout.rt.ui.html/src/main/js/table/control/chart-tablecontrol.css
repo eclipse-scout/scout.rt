@@ -1,6 +1,6 @@
+.control-chart:before {content:"\F080";}
 
 /* chart - type select */
-
 #ChartSelect{
 float: left;
 }

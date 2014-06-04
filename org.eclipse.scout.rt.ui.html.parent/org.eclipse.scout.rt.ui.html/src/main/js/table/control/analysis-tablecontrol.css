@@ -1,3 +1,5 @@
+.control-analysis:before {content:"\F140";}
+
 .command-container {
 width: 175px;
 height: 100%;
@@ -65,6 +67,6 @@ alignment-baseline: middle;
 }
 
 circle.venn-circle.selected, circle.venn-circle:hover{
-fill: #fe9915; 
+fill: #fe9915;
 }
 

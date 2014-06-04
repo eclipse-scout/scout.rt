@@ -177,7 +177,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     String id = createUniqueIdFor(null); //FIXME cgu
     IJsonAdapter<?> jsonAdapter = m_jsonAdapterFactory.createJsonAdapter(modelObject, this, id);
     jsonAdapter.init();
-    m_jsonAdapterRegistry.addJsonAdapter(id, modelObject, jsonAdapter);
     return jsonAdapter;
   }
 
@@ -189,6 +188,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public IJsonAdapter<?> getJsonAdapter(Object modelObject) {
     return m_jsonAdapterRegistry.getJsonAdapter(modelObject);
+  }
+
+  @Override
+  public void registerJsonAdapter(IJsonAdapter<?> adapter) {
+    m_jsonAdapterRegistry.addJsonAdapter(adapter);
   }
 
   @Override

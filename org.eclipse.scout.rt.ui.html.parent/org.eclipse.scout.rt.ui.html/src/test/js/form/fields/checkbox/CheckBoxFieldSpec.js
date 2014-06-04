@@ -9,7 +9,8 @@ describe("CheckBoxField", function() {
     beforeEach(function() {
       setFixtures(sandbox());
       session = new scout.Session($('#sandbox'), '1.1');
-      checkBox = new scout.CheckBoxField(model, session);
+      checkBox = new scout.CheckBoxField();
+      checkBox.init(model, session);
     });
 
     it("inherits from FormField", function() {

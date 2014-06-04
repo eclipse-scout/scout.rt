@@ -1,23 +1,82 @@
-scout.ModelAdapter = function(model, session) {
+scout.ModelAdapter = function() {
+  this.model;
+  this.session;
+  this.parent;
+  this.children = [];
+};
+
+scout.ModelAdapter.prototype.init = function(model, session) {
   this.model = model;
   this.session = session;
-  this.$container;
-
-  //check for undefined is necessary for inheritance
-  // TODO AWE: (inheritance, ask C.GU) kann es den fall hier überhaupt noch geben, bzw. den else fall?
-  if (session && model) {
-    this.session.widgetMap[model.id] = this;
-  }
+  this.session.registerModelAdapter(this);
 };
 
 // TODO AWE/CGU: evtl. in render() re-namen
 scout.ModelAdapter.prototype.attach = function($parent) {
-  if (!this.$container) {
-    this._render($parent);
-    this._applyModel();
+  if (!this.isRendered()) {
+    this.render($parent);
   } else {
     this.$container.appendTo($parent);
   }
+};
+
+scout.ModelAdapter.prototype.detach = function() {
+  if (this.isRendered()) {
+    this.$container.detach();
+  }
+
+  this.dispose();
+};
+
+scout.ModelAdapter.prototype.render = function($parent) {
+  if(this.isRendered()) {
+    throw "Already rendered.";
+  }
+
+  this._render($parent);
+  this._applyModel();
+};
+
+scout.ModelAdapter.prototype.isRendered = function() {
+  return this.$container && this.$container.parent().length > 0; //FIXME CGU maybe better to remove every child? currently, parent is set to null, $container of children still set
+};
+
+/**
+ * This method creates the UI through DOM manipulation. At this point we should not apply model
+ * properties on the UI, since sub-classes may need to contribute to the DOM first. The default
+ * impl. des nothing.
+ */
+scout.ModelAdapter.prototype._render = function() {
+  // NOP
+};
+
+/**
+ * This method applies model properties on the DOM UI created by the _render() method before.
+ * The default impl. des nothing.
+ */
+scout.ModelAdapter.prototype._applyModel = function() {
+  // NOP
+};
+
+scout.ModelAdapter.prototype.remove = function() {
+  if (this.isRendered()) {
+    this.$container.remove();
+    this.$container = null;
+  }
+
+  this.dispose();
+};
+
+scout.ModelAdapter.prototype.dispose = function() {
+  // NOP
+};
+
+scout.ModelAdapter.prototype.destroy = function() {
+  this.session.unregisterModelAdapter(this);
+};
+
+scout.ModelAdapter.prototype.addChild = function(childAdapter) {
+  this.children.push(childAdapter); //FIXME CGU when to remove child?
 };
 
 /**
@@ -41,36 +100,5 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
  */
 scout.ModelAdapter.prototype._onModelPropertyChange = function() {
   // NOP
-};
-
-/**
- * This method creates the UI through DOM manipulation. At this point we should not apply model
- * properties on the UI, since sub-classes may need to contribute to the DOM first. The default
- * impl. des nothing.
- */
-scout.ModelAdapter.prototype._render = function() {
-  // NOP
-};
-
-/**
- * This method applies model properties on the DOM UI created by the _render() method before.
- * The default impl. des nothing.
- */
-scout.ModelAdapter.prototype._applyModel = function() {
-  // NOP
-};
-
-scout.ModelAdapter.prototype.detach = function() {
-  // TODO AWE: (ask C.GU) wird hier bewusst detach anstatt remove verwendet? warum?
-  // siehe: http://api.jquery.com/detach/
-  this.$container.detach();
-};
-
-scout.ModelAdapter.prototype.dispose = function() {
-  if (this.$container) {
-    this.$container.remove();
-    this.$container = null;
-  }
-  this.session.widgetMap[this.model.id] = null;
 };
 

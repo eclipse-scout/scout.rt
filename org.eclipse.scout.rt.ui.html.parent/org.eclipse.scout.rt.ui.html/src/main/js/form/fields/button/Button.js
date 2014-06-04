@@ -1,5 +1,5 @@
-scout.Button = function(model, session) {
-  scout.Button.parent.call(this, model, session);
+scout.Button = function() {
+  scout.Button.parent.call(this);
   this._$button;
 };
 scout.inherits(scout.Button, scout.FormField);

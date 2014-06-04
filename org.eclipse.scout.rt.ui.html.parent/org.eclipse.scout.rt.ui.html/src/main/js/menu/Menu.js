@@ -1,6 +1,5 @@
-scout.Menu = function(model, session) {
-  scout.Menu.parent.call(this, model, session);
-  this.owner;
+scout.Menu = function() {
+  scout.Menu.parent.call(this);
 };
 scout.inherits(scout.Menu, scout.ModelAdapter);
 
@@ -23,7 +22,7 @@ scout.Menu.prototype.onModelPropertyChange = function(event) {
   if (event.hasOwnProperty('visible')) {
     this.model.visible = event.visible;
   }
-  if(this.owner) {
-    this.owner.onMenuPropertyChange(event);
+  if (this.parent) {
+    this.parent.onMenuPropertyChange(event);
   }
 };

@@ -1,12 +1,12 @@
-scout.DesktopQuery = function($controlContainer) {
-  $controlContainer.empty().text('query');
+scout.AnalysisTableControl = function() {
 };
+scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
-scout.DesktopAnalyze = function($controlContainer) {
-  $controlContainer.empty();
+scout.AnalysisTableControl.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv(); //FIXME CGU maybe not necessary
 
   // command container
-  var $commandContainer = $controlContainer.appendDiv('', 'command-container');
+  var $commandContainer = this.$container.appendDiv('', 'command-container');
 
   $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
   $commandContainer.appendDiv('', 'separator', '');
@@ -21,7 +21,7 @@ scout.DesktopAnalyze = function($controlContainer) {
   var MID_X = 250, MID_Y = 165, MIN_R = 20, MAX_R = 120;
 
   // svg container
-  var $vennContainer = $controlContainer
+  var $vennContainer = this.$container
       .appendSVG('svg', '', 'venn-container')
       .attrSVG('viewBox', '0 0 500 340')
       .attrSVG('preserveAspectRatio', 'xMinYMin');
@@ -312,6 +312,13 @@ scout.DesktopAnalyze = function($controlContainer) {
 
 };
 
-scout.DesktopCategory = function($controlContainer) {
-  $controlContainer.empty().text('category');
+scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
+  this.model.dataModel = dataModel;
+};
+
+scout.AnalysisTableControl.prototype._onModelPropertyChange = function(event) {
+  scout.AnalysisTableControl.parent.prototype._onModelPropertyChange.call(this, event);
+  if (event.hasOwnProperty('dataModel')) {
+    this._setDataModel(event.dataModel);
+  }
 };

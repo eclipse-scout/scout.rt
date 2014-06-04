@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopChartMatrix = function(table, session) {
+scout.ChartTableControlMatrix = function(table, session) {
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
@@ -13,7 +13,7 @@ scout.DesktopChartMatrix = function(table, session) {
 /**
  * add data axis
  */
-scout.DesktopChartMatrix.prototype.addData = function(data, dataGroup) {
+scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
   var dataAxis = [],
     locale = this.locale;
 
@@ -60,7 +60,7 @@ scout.DesktopChartMatrix.prototype.addData = function(data, dataGroup) {
 };
 
 //add x or y Axis
-scout.DesktopChartMatrix.prototype.addAxis = function(axis, axisGroup) {
+scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale;
 
@@ -148,7 +148,7 @@ scout.DesktopChartMatrix.prototype.addAxis = function(axis, axisGroup) {
   return keyAxis;
 };
 
-scout.DesktopChartMatrix.prototype.calculateCube = function() {
+scout.ChartTableControlMatrix.prototype.calculateCube = function() {
   var cube = {},
     r, v, k, data, key;
 
@@ -242,7 +242,7 @@ scout.DesktopChartMatrix.prototype.calculateCube = function() {
   return cube;
 };
 
-scout.DesktopChartMatrix.prototype.columnCount = function() {
+scout.ChartTableControlMatrix.prototype.columnCount = function() {
   var colCount = [];
 
   for (var c = 0; c < this._columns.length; c++) {

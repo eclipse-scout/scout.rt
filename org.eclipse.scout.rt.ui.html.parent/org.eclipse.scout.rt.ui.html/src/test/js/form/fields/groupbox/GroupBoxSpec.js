@@ -16,7 +16,8 @@ describe("GroupBox", function() {
     beforeEach(function() {
       setFixtures(sandbox());
       session = new scout.Session($('#sandbox'), '1.1');
-      groupBox = new scout.GroupBox(model, session);
+      groupBox = new scout.GroupBox();
+      groupBox.init(model, session);
     });
 
     it("adds group-box div when label is set", function() {

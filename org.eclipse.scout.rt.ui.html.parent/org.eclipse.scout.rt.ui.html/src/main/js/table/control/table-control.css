@@ -24,7 +24,7 @@ content: attr(data-title);
 position: absolute;
 color: #ccc;
 font-size: 8px;
-width: 100%; 
+width: 100%;
 top: -2px;
 left: 12px;
 }
@@ -55,14 +55,6 @@ font-family: fontAwesome;
 font-size: 24px;
 color:#0082A1;
 }
-
-.control-query:before {content:"\F002";}
-.control-analyze:before {content:"\F140";}
-.control-category:before {content:"\F02B";}
-
-.control-graph:before {content:"\F0E8";}
-.control-chart:before {content:"\F080";}
-.control-map:before {content:"\F0AC";}
 
 .control-label {
 float: left;
@@ -123,3 +115,6 @@ width: calc(100% - 20px);
 height: 340px;
 margin: 0px 20px 10px 10px;
 }
+
+.control-query:before {content:"\F002";}
+.control-category:before {content:"\F02B";}

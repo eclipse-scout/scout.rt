@@ -30,11 +30,6 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-  }
-
-  @Override
   public JSONObject toJson() {
     //FIXME when to dispose table? maybe introduce dispose event for table fields -> dont dispose for outlineTables, dispose otherwise
     return putProperty(super.toJson(), ITableField.PROP_TABLE, modelObjectToJson(getModelObject().getTable()));

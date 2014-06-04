@@ -9,6 +9,7 @@ scout.TableFooter = function(table, $parent, session) {
 
   var that = this;
   this._$controlLabel = this._$tableControl.appendDiv(undefined, 'control-label');
+  this._controlGroups = {};
 
   this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
   this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
@@ -98,26 +99,43 @@ scout.TableFooter.prototype._resetControlLabel = function() {
 scout.TableFooter.prototype.addGroup = function(title) {
   var $group = $.makeDiv(undefined, 'control-group').attr('data-title', title);
   this._$controlLabel.before($group);
+  this._controlGroups[title] = $group;
   return $group;
 };
 
-
-scout.TableFooter.prototype.addControl = function($group, control) {
+scout.TableFooter.prototype.addControl = function(control) {
   var classes = 'control ';
-  if (control.cssClass) {
-    classes += control.cssClass;
+  if (control.model.cssClass) {
+    classes += control.model.cssClass;
   }
-  var $control = $group.appendDiv(undefined, classes);
 
-  var that = this;
+  var $group = this._controlGroups[control.model.group];
+  if (!$group) {
+    $group = this.addGroup(control.model.group);
+  }
 
-  if (control.enabled) {
-    $control.data('label', control.label)
+  var $control = $group.appendDiv(undefined, classes)
+    .data('control', control);
+
+  //Link button with scout.TableControl
+  control.$controlButton = $control;
+
+  this.setControlEnabled(control);
+};
+
+scout.TableFooter.prototype.setControlEnabled = function(control) {
+  var $control = control.$controlButton,
+    that = this;
+
+  if (control.model.enabled) {
+    $control.data('label', control.model.label)
+      .removeClass('disabled')
       .hover(onControlHoverIn, onControlHoverOut)
-      .click(onControlClicked)
-      .click(control.action);
+      .click(onControlClicked);
   } else {
-    $control.addClass('disabled');
+    $control.addClass('disabled')
+      .off('mouseenter mouseleave')
+      .off('click');
   }
 
   function onControlHoverIn(event) {
@@ -130,35 +148,9 @@ scout.TableFooter.prototype.addControl = function($group, control) {
 
   function onControlClicked(event) {
     var $clicked = $(this);
+    var control = $clicked.data('control');
 
-    // reset handling resize
-    that._$controlResizeTop.off('mousedown');
-    that._$controlResizeBottom.off('mousedown');
-
-    if ($clicked.hasClass('selected')) {
-      // classes: unselect and stop resizing
-      $clicked.removeClass('selected');
-      $clicked.parent().removeClass('resize-on');
-
-      //adjust table
-      that._table.$data.animateAVCSD('height',
-        parseFloat(that._table.$container.css('height')) - 93,
-        function() {
-          $(this).css('height', 'calc(100% - 85px');
-        },
-        that._table.updateScrollbar.bind(that._table),
-        500);
-
-      // visual: reset label and close control
-      that._resetControlLabel();
-      that._$tableControl.animateAVCSD('height', 50, null, null, 500);
-
-      // do not handle the click
-      event.stopImmediatePropagation();
-    } else {
-      $('.control', this._$tableControl).removeClass('selected');
-      $clicked.addClass('selected');
-    }
+    control.toggle();
   }
 };
 
@@ -216,4 +208,31 @@ scout.TableFooter.prototype.openTableControl = function() {
 
     return false;
   }
+};
+
+scout.TableFooter.prototype.closeTableControl = function(control) {
+  // reset handling resize
+  this._$controlResizeTop.off('mousedown');
+  this._$controlResizeBottom.off('mousedown');
+
+  // classes: unselect and stop resizing
+  this._$tableControl.removeClass('resize-on');
+
+  var that = this;
+  //adjust table
+  this._table.$data.animateAVCSD('height',
+    parseFloat(that._table.$container.css('height')) - 93,
+    function() {
+      $(this).css('height', 'calc(100% - 85px');
+    },
+    that._table.updateScrollbar.bind(that._table),
+    500);
+
+  // visual: reset label and close control
+  this._resetControlLabel();
+  this._$tableControl.animateAVCSD('height', 50, null, null, 500);
+
+  this._$tableControl.promise().done(function() {
+    control.remove();
+  });
 };

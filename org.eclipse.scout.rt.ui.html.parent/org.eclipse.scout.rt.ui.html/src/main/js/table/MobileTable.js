@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MobileTable = function(model, session) {
-  scout.MobileTable.parent.call(this, model, session);
+scout.MobileTable = function() {
+  scout.MobileTable.parent.call(this);
 
   //FIXME should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   this.model.headerVisible = false;

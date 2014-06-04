@@ -1,15 +1,15 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableField = function(model, session) {
-  scout.TableField.parent.call(this, model, session);
+scout.TableField = function() {
+  scout.TableField.parent.call(this);
 };
 scout.inherits(scout.TableField, scout.ModelAdapter);
 
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');
   if (this.model.label) {
-    this.$label = this.$container.makeDiv(undefined, 'label');
+    this.$label = this.$container.appendDiv(undefined, 'label');
   }
 
   this.table = this.session.widgetMap[this.model.table];

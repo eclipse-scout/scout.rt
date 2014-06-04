@@ -1,5 +1,5 @@
-scout.CheckBoxField = function(model, session) {
-  scout.CheckBoxField.parent.call(this, model, session);
+scout.CheckBoxField = function() {
+  scout.CheckBoxField.parent.call(this);
   this._$checkBox;
 };
 scout.inherits(scout.CheckBoxField, scout.FormField);

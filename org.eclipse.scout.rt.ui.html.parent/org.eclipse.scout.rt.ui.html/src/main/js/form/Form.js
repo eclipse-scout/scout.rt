@@ -1,11 +1,10 @@
-scout.Form = function(model, session) {
-  scout.Form.parent.call(this, model, session);
+scout.Form = function() {
+  scout.Form.parent.call(this);
   this._$title;
   this._$parent;
   this._resizeHandler;
   this._rootGroupBox;
 };
-
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 /**
@@ -75,11 +74,6 @@ scout.Form.prototype._render = function($parent) {
   $(window).on('resize', this._resizeHandler);
 };
 
-scout.Form.prototype.detach = function() {
-  scout.Form.parent.prototype.detach.call(this);
-  this._rootGroupBox.dispose();
-};
-
 // TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
 scout.Form.prototype.enable = function() {
   this.$glasspane.remove();
@@ -95,11 +89,20 @@ scout.Form.prototype.disable = function() {
     css('left', this.$container.position().left);
 };
 
+scout.Form.prototype.dispose = function() {
+  this._rootGroupBox.dispose();
+};
+
+scout.Form.prototype.destroy = function() {
+  scout.Form.parent.prototype.destroy.call(this);
+  this.remove();
+};
+
 scout.Form.prototype.onModelCreate = function() {};
 
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type_ == 'formClosed') {
-    this.dispose();
+    this.destroy();
   } else {
     $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
   }

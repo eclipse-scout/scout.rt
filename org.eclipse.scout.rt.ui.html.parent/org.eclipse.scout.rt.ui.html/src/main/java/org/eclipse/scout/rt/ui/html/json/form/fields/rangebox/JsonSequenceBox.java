@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.rangebox;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -34,6 +35,14 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
   @Override
   public JSONObject toJson() {
     return putProperty(super.toJson(), PROP_FIELDS, modelObjectsToJson(getModelObject().getFields()));
+  }
+
+  @Override
+  public void dispose() {
+    for (IFormField formField : getModelObject().getFields()) {
+      getJsonSession().getJsonAdapter(formField).dispose();
+    }
+    super.dispose();
   }
 
 }

@@ -1,27 +1,29 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopGraph = function($controlContainer, model) {
-  // create container
-  var $graphContainer = $controlContainer.empty()
-    .appendSVG('svg', 'GraphContainer');
+scout.GraphTableControl = function() {
+  scout.GraphTableControl.parent.call(this);
+};
+scout.inherits(scout.GraphTableControl, scout.TableControl);
 
-  var graph = model;
+scout.GraphTableControl.prototype._render = function($parent) {
+  this.$container = $parent.appendSVG('svg', 'GraphContainer');
 
   // some basics
   var wBox = 120,
     hBox = 60,
     kelvin = 1000,
-    wContainer = $graphContainer.width(),
-    hContainer = $graphContainer.height();
+    wContainer = this.$container.width(),
+    hContainer = this.$container.height(),
+    graph = this.model.graph;
 
 
   // create all links with label
   for (var l = 0; l < graph.links.length; l++) {
     var link = graph.links[l];
 
-    link.$div = $graphContainer.appendSVG('line', null, 'graph-link');
-    link.$divText = $graphContainer.appendSVG('text', null, 'graph-link-text', link.label)
+    link.$div = this.$container.appendSVG('line', null, 'graph-link');
+    link.$divText = this.$container.appendSVG('text', null, 'graph-link-text', link.label)
       .attr('dy', -5);
   }
 
@@ -29,12 +31,12 @@ scout.DesktopGraph = function($controlContainer, model) {
   for (var n = 0; n < graph.nodes.length; n++) {
     var node = graph.nodes[n];
 
-    node.$div = $graphContainer.appendSVG('rect', null, 'graph-node ' + node.type)
+    node.$div = this.$container.appendSVG('rect', null, 'graph-node ' + node.type)
       .attr('width', wBox).attr('height', hBox)
       .attr('x', 0).attr('y', 0)
       .on('mousedown', moveNode);
 
-    node.$divText = $graphContainer.appendSVG('text', null, 'graph-node-text', node.name)
+    node.$divText = this.$container.appendSVG('text', null, 'graph-node-text', node.name)
       .on('mousedown', moveNode);
 
     setNode(node, Math.random() * (wContainer - wBox), Math.random() * (hContainer - hBox));
@@ -234,3 +236,15 @@ scout.DesktopGraph = function($controlContainer, model) {
   }
 
 };
+
+scout.GraphTableControl.prototype._setGraph = function(graph) {
+  this.model.graph = graph;
+};
+
+scout.GraphTableControl.prototype._onModelPropertyChange = function(event) {
+  scout.GraphTableControl.parent.prototype._onModelPropertyChange.call(this, event);
+  if (event.hasOwnProperty('graph')) {
+    this._setGraph(event.graph);
+  }
+};
+

@@ -1,26 +1,30 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopMap = function($parent, table, model) {
-  // create container
-  var $mapContainer = $parent.empty()
+scout.MapTableControl = function() {
+};
+scout.inherits(scout.MapTableControl, scout.TableControl);
+
+scout.MapTableControl.prototype._render = function($parent) {
+  this.$container = $parent.empty()
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
-    .attrSVG("preserveAspectRatio", "xMidYMid"),
-    filter = {},
-    countries = model.objects.countries.geometries;
+    .attrSVG("preserveAspectRatio", "xMidYMid");
 
-  this._table = table;
-  this._filterResetListener = table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    $mapContainer.find('.map-item.selected').removeClassSVG('selected');
+  var filter = {},
+    that = this,
+    countries = this.model.map.objects.countries.geometries;
+
+  this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+    that.$container.find('.map-item.selected').removeClassSVG('selected');
   });
 
   // find all countries in table
   var tableCountries = [];
-  for (var i = 0; i < table.model.columns.length; i++) {
-    for (var j = 0; j < model.columnIds.length; j++) {
-      if (table.model.columns[i].id == model.columnIds[j]) {
-        for (var r = 0; r < table.model.rows.length; r++) {
-          var value = table.model.rows[r].cells[i];
+  for (var i = 0; i < this.table.model.columns.length; i++) {
+    for (var j = 0; j < this.model.columnIds.length; j++) {
+      if (this.table.model.columns[i].id == this.model.columnIds[j]) {
+        for (var r = 0; r < this.table.model.rows.length; r++) {
+          var value = this.table.model.rows[r].cells[i];
           if (tableCountries.indexOf(value) == -1) tableCountries.push(value);
         }
       }
@@ -47,8 +51,8 @@ scout.DesktopMap = function($parent, table, model) {
           x, y;
 
         // loop all points of arc
-        for (var s = 0; s < model.arcs[arc].length; s++) {
-          var line = model.arcs[arc][s];
+        for (var s = 0; s < this.model.map.arcs[arc].length; s++) {
+          var line = this.model.map.arcs[arc][s];
 
           // first point is absolute, all other delta
           if (s === 0) {
@@ -77,7 +81,7 @@ scout.DesktopMap = function($parent, table, model) {
     }
 
     // finally: append country as svg path
-    var $country = $mapContainer.appendSVG('path', countries[c].id, 'map-item')
+    var $country = this.$container.appendSVG('path', countries[c].id, 'map-item')
       .attr('d', pathString)
       .click(clickMap);
 
@@ -106,7 +110,7 @@ scout.DesktopMap = function($parent, table, model) {
 
     //  filter function
     var filterFunc = function($row) {
-      for (var c = 0; c < table.model.columns.length; c++) {
+      for (var c = 0; c < that.table.model.columns.length; c++) {
         var text = $row.children().eq(c).text();
         if (countries.indexOf(text) > -1) return true;
       }
@@ -115,16 +119,34 @@ scout.DesktopMap = function($parent, table, model) {
 
     // callback to table
     // set filter function
-    var filter = table.getFilter(scout.DesktopMap.FILTER_KEY) || {};
-    filter.label = model.label;
+    var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
+    filter.label = that.model.label;
     filter.accept = filterFunc;
-    table.registerFilter(scout.DesktopMap.FILTER_KEY, filter);
-    table.filter();
+    that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
+    that.table.filter();
   }
 };
 
-scout.DesktopMap.FILTER_KEY = 'MAP';
+scout.MapTableControl.FILTER_KEY = 'MAP';
 
-scout.DesktopMap.prototype.dispose = function() {
-  this._table.events.removeListener(this._filterResetListener);
+scout.MapTableControl.prototype.dispose = function() {
+  this.table.events.removeListener(this._filterResetListener);
+};
+
+scout.MapTableControl.prototype._setColumns = function(columns) {
+  this.model.columns = columns;
+};
+
+scout.MapTableControl.prototype._setMap = function(map) {
+  this.model.map = map;
+};
+
+scout.MapTableControl.prototype._onModelPropertyChange = function(event) {
+  scout.MapTableControl.parent.prototype._onModelPropertyChange.call(this, event);
+  if (event.hasOwnProperty('map')) {
+    this._setMap(event.map);
+  }
+  if (event.hasOwnProperty('columns')) {
+    this._setColumns(event.columns);
+  }
 };

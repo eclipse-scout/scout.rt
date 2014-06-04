@@ -24,6 +24,50 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
   this.widgetMap[sessionPartId] = this;
 };
 
+scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
+  this.widgetMap[modelAdapter.model.id] = null;
+};
+
+scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
+  this.widgetMap[modelAdapter.model.id] = modelAdapter;
+};
+
+scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
+  if (!model) {
+    return;
+  }
+  if (!parent) {
+    throw "parent needs to be set";
+  }
+
+  var adapter = this.widgetMap[model.id];
+  if (adapter) {
+    return adapter;
+  }
+
+  adapter = this.objectFactory.create(model);
+
+  if (scout.ModelAdapter.prototype.isPrototypeOf(parent)) {
+    adapter.parent = parent;
+    parent.addChild(adapter);
+  }
+
+  return adapter;
+};
+
+scout.Session.prototype.getOrCreateModelAdapters = function(modelArray, parent) {
+  if (!modelArray) {
+    return;
+  }
+
+  var adapters = [], i;
+  for (i = 0; i < modelArray.length; i++) {
+    adapters[i] = this.getOrCreateModelAdapter(modelArray[i], parent);
+  }
+
+  return adapters;
+};
+
 /**
  *
  * Sends the request asynchronously and processes the response later.<br>
@@ -48,8 +92,8 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
-    events : events,
-    sessionPartId : this._sessionPartId
+    events: events,
+    sessionPartId: this._sessionPartId
   };
 
   if (this._startup) {
@@ -64,13 +108,13 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   var that = this;
   this._requestsPendingCounter++;
   $.ajax({
-    async : true,
-    type : "POST",
-    dataType : "json",
-    cache : false,
-    url : 'json',
-    data : JSON.stringify(request),
-    success : function(message) {
+    async: true,
+    type: "POST",
+    dataType: "json",
+    cache: false,
+    url: 'json',
+    data: JSON.stringify(request),
+    success: function(message) {
       that._requestsPendingCounter--;
 
       if (message.errorMessage) {
@@ -116,12 +160,12 @@ scout.Session.prototype._processEvents = function(events) {
   // TODO AWE: convert plain JS event object in Event class
   var session = this;
   for (var i = 0; i < events.length; i++) {
-    var event = events[i], widgetId;
+    var event = events[i],
+      widgetId;
 
     if (event.type_ == 'create') {
       widgetId = event.parentId;
-    }
-    else {
+    } else {
       widgetId = event.id;
     }
 
@@ -134,15 +178,12 @@ scout.Session.prototype._processEvents = function(events) {
     try {
       if (event.type_ == 'create') {
         widget.onModelCreate(event);
-      }
-      else if (event.type_ == 'property') {
+      } else if (event.type_ == 'property') {
         widget.onModelPropertyChange(event);
-      }
-      else {
+      } else {
         widget.onModelAction(event);
       }
-    }
-    finally {
+    } finally {
       widget.updateFromModelInProgress = null;
     }
   }

@@ -93,7 +93,7 @@ scout.TableOrganizeMenu = function(table, x, y) {
   $commandFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
-  var filter = table.getFilter(scout.DesktopMap.FILTER_KEY),
+  var filter = table.getFilter(scout.MapTableControl.FILTER_KEY),
     filterText;
 
   if (filter) {
@@ -164,7 +164,7 @@ scout.TableOrganizeMenu = function(table, x, y) {
     var $input = $(this);
     $input.val($input.val().toLowerCase());
 
-    var filter = table.getFilter(scout.DesktopMap.FILTER_KEY);
+    var filter = table.getFilter(scout.MapTableControl.FILTER_KEY);
     if (!filter && $input.val()) {
       filter = {
         accept: function($row) {
@@ -172,9 +172,9 @@ scout.TableOrganizeMenu = function(table, x, y) {
           return rowText.indexOf(this.text) > -1;
         }
       };
-      table.registerFilter(scout.DesktopMap.FILTER_KEY, filter);
+      table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
     } else if (!$input.val()) {
-      table.unregisterFilter(scout.DesktopMap.FILTER_KEY);
+      table.unregisterFilter(scout.MapTableControl.FILTER_KEY);
     }
 
     if (filter) {

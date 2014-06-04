@@ -25,10 +25,21 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.client.ui.html.client.ext.IAnalysisTableControl;
+import org.eclipse.scout.rt.client.ui.html.client.ext.IChartTableControl;
+import org.eclipse.scout.rt.client.ui.html.client.ext.IGraphTableControl;
+import org.eclipse.scout.rt.client.ui.html.client.ext.IMapTableControl;
+import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonGraphTableControl;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonMapTableControl;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -36,6 +47,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.rangebox.JsonSequenceBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -55,6 +67,9 @@ public class JsonAdapterFactory {
     }
     else if (modelObject instanceof ISequenceBox) {
       return new JsonSequenceBox((ISequenceBox) modelObject, session, id);
+    }
+    else if (modelObject instanceof ITabBox) {
+      return new JsonTabBox((ITabBox) modelObject, session, id);
     }
     else if (modelObject instanceof ICheckBox) {
       return new JsonCheckBoxField((IBooleanField) modelObject, session, id);
@@ -89,6 +104,21 @@ public class JsonAdapterFactory {
     }
     else if (modelObject instanceof IDesktop) {
       return new JsonDesktop((IDesktop) modelObject, session, id);
+    }
+    else if (modelObject instanceof IChartTableControl) {
+      return new JsonChartTableControl((IChartTableControl) modelObject, session, id);
+    }
+    else if (modelObject instanceof IGraphTableControl) {
+      return new JsonGraphTableControl((IGraphTableControl) modelObject, session, id);
+    }
+    else if (modelObject instanceof IMapTableControl) {
+      return new JsonMapTableControl((IMapTableControl) modelObject, session, id);
+    }
+    else if (modelObject instanceof IAnalysisTableControl) {
+      return new JsonAnalysisTableControl((IAnalysisTableControl) modelObject, session, id);
+    }
+    else if (modelObject instanceof ITableControl) {
+      return new JsonTableControl((ITableControl) modelObject, session, id);
     }
     else if (modelObject instanceof IClientSession) {
       return new JsonClientSession((IClientSession) modelObject, session, id);

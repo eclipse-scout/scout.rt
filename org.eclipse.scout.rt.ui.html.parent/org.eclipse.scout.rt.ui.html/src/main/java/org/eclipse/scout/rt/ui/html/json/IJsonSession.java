@@ -35,12 +35,14 @@ public interface IJsonSession {
   /**
    * Creates a new IJsonAdapter instance for the given modelObject, or returns an existing instance.
    */
-  IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject);
+  IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject); // TODO CGU: rename to 'model'
 
   /**
    * Creates a new IJsonAdapter instance for the given modelObject.
    */
   IJsonAdapter<?> createJsonAdapter(Object modelObject);
+
+  void registerJsonAdapter(IJsonAdapter<?> adapter);
 
   void unregisterJsonAdapter(String id);
 

@@ -13,7 +13,8 @@ describe("ObjectFactory", function() {
 
       object = null;
       try {
-        object = factory.create(model, session);
+        object = factory.create();
+        object.init(model, session);
       } catch (e) {
         //Object probably not registered, check SpecRunnerMaven.html
         expect(object).toBeTruthy();

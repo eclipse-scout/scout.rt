@@ -24,12 +24,8 @@
 //@include("src/main/js/desktop/MobileDesktop.js");
 //@include("src/main/js/desktop/MobileDesktopToolButtons.js");
 //@include("src/main/js/desktop/DesktopBench.js");
-//@include("src/main/js/desktop/DesktopChartMatrix.js");
 //@include("src/main/js/desktop/DesktopTable.js");
-//@include("src/main/js/desktop/DesktopChart.js");
-//@include("src/main/js/desktop/DesktopGraph.js");
 //@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");
-//@include("src/main/js/desktop/DesktopMap.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");
 //@include("src/main/js/desktop/DesktopTree.js");
 //@include("src/main/js/desktop/DesktopViewButton.js");

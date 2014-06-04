@@ -1,15 +1,15 @@
 scout.mobileObjectFactories = scout.defaultObjectFactories;
 scout.mobileObjectFactories = scout.mobileObjectFactories.concat( [ {
   objectType : 'Table',
-  create : function(model, session) {
-    return new scout.MobileTable(model, session);
+  create : function() {
+    return new scout.MobileTable();
   },
   deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
 },
 {
   objectType : 'Desktop',
-  create : function(model, session) {
-    return new scout.MobileDesktop(model, session);
+  create : function() {
+    return new scout.MobileDesktop();
   },
   deviceType: scout.UserAgent.DEVICE_TYPE_MOBILE
 }]);

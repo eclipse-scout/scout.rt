@@ -1,5 +1,4 @@
-scout.BreadCrumbsNavigation = function(model, session) {
-  scout.BreadCrumbsNavigation.parent.call(this, model, session);
+scout.BreadCrumbsNavigation = function() {
 };
 scout.inherits(scout.BreadCrumbsNavigation, scout.ModelAdapter);
 

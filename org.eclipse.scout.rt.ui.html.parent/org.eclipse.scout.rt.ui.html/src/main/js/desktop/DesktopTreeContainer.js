@@ -2,16 +2,16 @@ scout.DesktopTreeContainer = function($parent, model, session) {
   this.session = session;
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
-  this.desktopTree = new scout.DesktopTree(model, session);
+  this.desktopTree = session.getOrCreateModelAdapter(model, this);
   this.desktopTree.attach(this._$desktopTree);
   this._addVerticalSplitter(this._$desktopTree);
 };
 
-scout.DesktopTreeContainer.prototype.onOutlineCreated = function(event) {
+scout.DesktopTreeContainer.prototype.onOutlineCreated = function(model) {
   if (this.desktopTree) {
     this.desktopTree.detach();
   }
-  this.desktopTree = new scout.DesktopTree(event, this.session);
+  this.desktopTree = this.session.getOrCreateModelAdapter(model, this);
   this.desktopTree.attach(this._$desktopTree);
   this.desktopTree.attachModel();
 };

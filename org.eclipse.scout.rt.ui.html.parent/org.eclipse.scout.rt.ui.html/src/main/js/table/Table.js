@@ -1,9 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Table = function(model, session) {
-  this.model = model;
-  this.session = session;
+scout.Table = function() {
+  scout.Table.parent.call(this);
 
   this.$container;
   this.$data;
@@ -12,30 +11,8 @@ scout.Table = function(model, session) {
   this.scrollbar;
   this.selectionHandler;
   this.rowMenuHandler;
-
-  if (session && model) {
-    this.session.widgetMap[model.id] = this;
-  }
-
-  //non inheritance based initialization
-  if (arguments.length > 0) {
-    this.events = new scout.EventSupport();
-    this._filterMap = {};
-
-    this.configurator = this._createTableConfigurator();
-    if (this.configurator) {
-      this.configurator.configure(this);
-    }
-    this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
-
-    if (this.model.menus) {
-      for (var i = 0; i < this.model.menus.length; i++) {
-        var menu = this.session.objectFactory.create(this.model.menus[i]);
-        menu.owner = this;
-      }
-    }
-  }
 };
+scout.inherits(scout.Table, scout.ModelAdapter);
 
 scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.EVENT_ROWS_INSERTED = 'rowsInserted';
@@ -46,6 +23,21 @@ scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
+
+scout.Table.prototype.init = function(model, session) {
+  scout.Table.parent.prototype.init.call(this, model, session);
+
+  this.events = new scout.EventSupport();
+  this._filterMap = {};
+
+  this.configurator = this._createTableConfigurator();
+  if (this.configurator) {
+    this.configurator.configure(this);
+  }
+  this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+
+  session.getOrCreateModelAdapters(this.model.menus, this);
+};
 
 scout.Table.prototype._createTableConfigurator = function() {
   return new scout.TableConfigurator(this);
@@ -74,13 +66,11 @@ scout.Table.prototype._render = function($parent) {
 
   // load data and create rows
   this.drawData();
+
+//  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 };
 
-scout.Table.prototype.detach = function() {
-  this.$container.detach();
-  this.dispose();
-};
-
+//FIXME CGU remove after switch to render
 scout.Table.prototype.attach = function($container) {
   if (!this.$container) {
     this._render($container);

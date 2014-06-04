@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -57,6 +58,14 @@ public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
       m_modelFormListener = new P_ModelFormListener();
       getModelObject().addFormListener(m_modelFormListener);
     }
+  }
+
+  @Override
+  public void dispose() {
+    for (IFormField formField : getModelObject().getRootGroupBox().getFields()) {
+      getJsonSession().getJsonAdapter(formField).dispose();
+    }
+    super.dispose();
   }
 
   @Override

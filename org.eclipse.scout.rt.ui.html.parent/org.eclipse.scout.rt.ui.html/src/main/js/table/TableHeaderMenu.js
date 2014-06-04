@@ -130,7 +130,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .data('label', 'Filtern nach');
 
   var group = (column.type === 'date') ?  3 : -1,
-    matrix = new scout.DesktopChartMatrix(table, session),
+    matrix = new scout.ChartTableControlMatrix(table, session),
     xAxis = matrix.addAxis(id, group),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();

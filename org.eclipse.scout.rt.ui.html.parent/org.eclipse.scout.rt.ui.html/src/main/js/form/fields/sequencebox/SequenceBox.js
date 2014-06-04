@@ -1,5 +1,5 @@
-scout.SequenceBox = function(model, session) {
-  scout.SequenceBox.parent.call(this, model, session);
+scout.SequenceBox = function() {
+  scout.SequenceBox.parent.call(this);
   this._gridLayout;
 };
 

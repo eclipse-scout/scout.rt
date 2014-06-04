@@ -1,20 +1,18 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTree = function(model, session) {
-  scout.DesktopTree.parent.call(this, model, session);
-
+scout.DesktopTree = function() {
+  scout.DesktopTree.parent.call(this);
   this._selectedNodes = [];
   this._desktopTable;
-
-  if (this.model.menus) {
-    for (var i = 0; i < this.model.menus.length; i++) {
-      var menu = this.session.objectFactory.create(this.model.menus[i]);
-      menu.owner = this;
-    }
-  }
 };
 scout.inherits(scout.DesktopTree, scout.ModelAdapter);
+
+scout.DesktopTree.prototype.init = function(model, session) {
+  scout.DesktopTree.parent.prototype.init.call(this, model, session);
+
+  session.getOrCreateModelAdapters(model.menus, this);
+};
 
 scout.DesktopTree.prototype._render = function($parent) {
   this.$parent = $parent;
@@ -271,7 +269,8 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
         node.outlineId = this.model.id;
 
         //TODO cgu: performance issue:
-        new scout.DesktopTable(node, this.session);
+        var table = new scout.DesktopTable();
+        table.init(node, this.session);
       }
     }
 
@@ -457,6 +456,7 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
   this.model.menus = menus;
 
   //Register new menus
+  //FIXME CGU refactor to getOrCreate
   if (menus) {
     for (var i = 0; i < this.model.menus.length; i++) {
       if (!this.session.widgetMap[menus[i]]) {

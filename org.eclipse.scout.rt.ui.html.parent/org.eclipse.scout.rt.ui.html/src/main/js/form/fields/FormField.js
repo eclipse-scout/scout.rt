@@ -1,6 +1,6 @@
-scout.FormField = function(model, session) {
-  scout.FormField.parent.call(this, model, session);
-  this.$label;
+scout.FormField = function() {
+  scout.FormField.parent.call(this);
+  this._$label;
   /**
    * The status label is used for error-status and mandatory info.
    */

@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.GroupBox = function(model, session) {
-  scout.GroupBox.parent.call(this, model, session);
+scout.GroupBox = function() {
+  scout.GroupBox.parent.call(this);
   this._$label;
   this._gridLayout;
 };

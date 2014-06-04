@@ -7,7 +7,8 @@ describe("FormField", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    formField = new scout.FormField(model, session);
+    formField = new scout.FormField();
+    formField.init(model, session);
   });
 
   describe("inheritance", function() {

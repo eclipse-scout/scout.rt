@@ -29,6 +29,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     m_modelObject = modelObject;
     m_jsonSession = jsonSession;
     m_id = id;
+    m_jsonSession.registerJsonAdapter(this);
   }
 
   @Override
@@ -65,7 +66,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
       return; // TODO AWE: (ask C.GU) das wäre auch eher IllegalState, nicht?
     }
     detachModel();
-    getJsonSession().unregisterJsonAdapter(getId()); //FIXME CGU unregistering here, but registering not?
+    m_jsonSession.unregisterJsonAdapter(m_id);
   }
 
   protected void detachModel() {
@@ -91,14 +92,25 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   /**
-   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>.
+   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>. //FIXME CGU adjust
+   * javadoc
    */
   protected final JSONObject modelObjectToJson(Object modelObject) {
     if (modelObject == null) {
       return null;
     }
+
     IJsonAdapter<?> jsonAdapter = getJsonSession().getOrCreateJsonAdapter(modelObject);
     return jsonAdapter.toJson();
+    //FIXME cgu implement
+//    IJsonAdapter<?> jsonAdapter = m_jsonSession.getJsonAdapter(modelObject);
+//    if (jsonAdapter == null) {
+//      jsonAdapter = (IJsonAdapter<?>) getJsonSession().createJsonAdapter(modelObject);
+//      return jsonAdapter.toJson();
+//    }
+//    else {
+//      return putProperty(new JSONObject(), "id", jsonAdapter.getId());
+//    }
   }
 
   /**

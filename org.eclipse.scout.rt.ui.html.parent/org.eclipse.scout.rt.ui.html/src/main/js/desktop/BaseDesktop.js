@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.BaseDesktop = function(model, session) {
-  scout.BaseDesktop.parent.call(this, model, session);
+scout.BaseDesktop = function() {
+  scout.BaseDesktop.parent.call(this);
   this.taskbar;
   this.modalDialogStack = [];
 };

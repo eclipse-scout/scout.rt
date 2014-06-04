@@ -53,10 +53,13 @@ class JsonAdapterRegistry {
     m_modelAdapterMap = new HashMap<>();
   }
 
-  void addJsonAdapter(String id, Object modelObject, IJsonAdapter jsonAdapter) {
-    P_RegistryValue value = new P_RegistryValue(id, modelObject, jsonAdapter);
+  void addJsonAdapter(IJsonAdapter jsonAdapter) {
+    String id = jsonAdapter.getId();
+    Object model = jsonAdapter.getModelObject();
+
+    P_RegistryValue value = new P_RegistryValue(id, model, jsonAdapter);
     m_idAdapterMap.put(id, value);
-    m_modelAdapterMap.put(modelObject, value);
+    m_modelAdapterMap.put(model, value);
   }
 
   void removeJsonAdapter(String id) {

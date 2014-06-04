@@ -1,7 +1,13 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopChart = function($controlContainer, table, model, session) {
+scout.ChartTableControl = function() {
+};
+scout.inherits(scout.ChartTableControl, scout.TableControl);
+
+scout.ChartTableControl.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv(); //FIXME CGU maybe not necessary
+
   // group functions for dates
   // todo
   var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
@@ -10,19 +16,20 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     countDesc = 'Anzahl';
 
   var removeChart = null,
-    columns = table.model.columns,
+    columns = this.table.model.columns,
     xAxis,
     yAxis,
-    filter = {};
+    filter = {},
+    that = this;
 
-  this._table = table;
-  this._filterResetListener = table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+
+  this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     //  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    $controlContainer.find('.main-chart.selected').removeClassSVG('selected');
+    that.$container.find('.main-chart.selected').removeClassSVG('selected');
   });
 
   // create container
-  var $chartSelect = $controlContainer.empty().appendDiv('ChartSelect');
+  var $chartSelect = this.$container.appendDiv('ChartSelect');
 
   // create chart types for selection
   addSelectBar($chartSelect);
@@ -47,8 +54,8 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
   $('svg.select-chart').first().addClassSVG('selected');
 
   // create container for x/y-axis
-  var $xAxisSelect = $controlContainer.appendDiv('XAxisSelect'),
-    $yAxisSelect = $controlContainer.appendDiv('YAxisSelect');
+  var $xAxisSelect = this.$container.appendDiv('XAxisSelect'),
+    $yAxisSelect = this.$container.appendDiv('YAxisSelect');
 
   // all x/y-axis for selection
   for (var c1 = 0; c1 < columns.length; c1++) {
@@ -74,7 +81,7 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
     .click(drawChart);
 
   // find best x and y axis: best is 9 different entries
-  var matrix = new scout.DesktopChartMatrix(table, session),
+  var matrix = new scout.ChartTableControlMatrix(this.table, this.session),
     columnCount = matrix.columnCount(),
     comp = function(a, b) {
       return Math.abs(a[1] - 9) - Math.abs(b[1] - 9);
@@ -91,7 +98,7 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
   });
 
   // create container for data
-  var $dataSelect = $controlContainer.appendDiv('DataSelect');
+  var $dataSelect = this.$container.appendDiv('DataSelect');
   $dataSelect.appendDiv('', 'select-data data-count', countDesc)
     .data('column', -1);
 
@@ -114,7 +121,7 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = $controlContainer.appendSVG('svg', 'ChartMain')
+  var $chartMain = this.$container.appendSVG('svg', 'ChartMain')
     .attrSVG('viewBox', '0 0 1000 320')
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
@@ -256,7 +263,7 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
       dataSum = $('.selected', $dataSelect).hasClass('data-sum');
 
     // build matrix
-    var matrix = new scout.DesktopChartMatrix(table, session),
+    var matrix = new scout.ChartTableControlMatrix(that.table, that.session),
       dataAxis = matrix.addData(data, dataCount ? -1 : (dataSum ? 1 : 2));
 
     xAxis = matrix.addAxis(axis, axisGroup);
@@ -676,16 +683,16 @@ scout.DesktopChart = function($controlContainer, table, model, session) {
       }
     };
 
-    var filter = table.getFilter(scout.DesktopChart.FILTER_KEY) || {};
-    filter.label = model.label;
+    var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
+    filter.label = that.model.label;
     filter.accept = filterFunc;
-    table.registerFilter(scout.DesktopChart.FILTER_KEY, filter);
-    table.filter();
+    that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
+    that.table.filter();
   }
 };
 
-scout.DesktopChart.FILTER_KEY = 'CHART';
+scout.ChartTableControl.FILTER_KEY = 'CHART';
 
-scout.DesktopChart.prototype.dispose = function() {
-  this._table.events.removeListener(this._filterResetListener);
+scout.ChartTableControl.prototype.dispose = function() {
+  this.table.events.removeListener(this._filterResetListener);
 };
