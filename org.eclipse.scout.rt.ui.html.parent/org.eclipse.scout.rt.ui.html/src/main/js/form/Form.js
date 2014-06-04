@@ -2,8 +2,8 @@ scout.Form = function(model, session) {
   scout.Form.parent.call(this, model, session);
   this._$title;
   this._$parent;
-  this._gridLayout;
   this._resizeHandler;
+  this._rootGroupBox;
 };
 
 scout.inherits(scout.Form, scout.ModelAdapter);
@@ -26,22 +26,19 @@ scout.Form.prototype.attach = function($parent) {
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
-  this.$container.data('columns', this.model.gridColumnCount);
-  this._gridLayout = new scout.GridLayout(this.$container);
 
   // TODO AWE: append form title section (including ! ? and progress indicator)
+  // TODO AWE: append [X] when form is dialog and closable.
   this._$title = this.$container.appendDiv(undefined, 'form-title', this.model.title);
 
-  // TODO AWE: copy/paste from GroupBox.js
-  var formField, i, formFieldModel;
-  for (i = 0; i < this.model.formFields.length; i++) {
-    formFieldModel = this.model.formFields[i];
-    formField = this.session.widgetMap[formFieldModel.id];
-    if (!formField) {
-      formField = this.session.objectFactory.create(formFieldModel);
-    }
-    formField.attach(this.$container);
+  var rootGroupBox = this.session.widgetMap[this.model.rootGroupBox.id];
+  if (!rootGroupBox) {
+    rootGroupBox =  this.session.objectFactory.create(this.model.rootGroupBox);
   }
+  rootGroupBox.attach(this.$container);
+  this._rootGroupBox = rootGroupBox;
+
+  // TODO AWE: (form) collect system buttons
 
   if (this.model.displayHint == 'dialog') {
     this.$container.addClass('dialog-form');
@@ -55,25 +52,18 @@ scout.Form.prototype._render = function($parent) {
     });
   }
 
-  this._gridLayout.layout();
-  // we must keep a stable reference to the resize-handler so we can remove the handler in the dispose method later
-  this._resizeHandler = this._gridLayout.updateLayout.bind(this._gridLayout);
+  // we must keep a stable reference to the resize-handler, so we can remove the handler in the dispose method later
+  this._rootGroupBox.updateLayout();
+  this._resizeHandler = this._rootGroupBox.updateLayout.bind(this._rootGroupBox);
   $(window).on('resize', this._resizeHandler);
 };
 
 scout.Form.prototype.detach = function() {
   scout.Form.parent.prototype.detach.call(this);
-
-  var i, formFieldModel, formField;
-  for (i = 0; i < this.model.formFields.length; i++) {
-    formFieldModel = this.model.formFields[i];
-    formField = this.session.widgetMap[formFieldModel.id];
-    if (formField && formField.dispose) {
-      formField.dispose();
-    }
-  }
+  this._rootGroupBox.dispose();
 };
 
+// TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
 scout.Form.prototype.enable = function() {
   this.$glasspane.remove();
 };

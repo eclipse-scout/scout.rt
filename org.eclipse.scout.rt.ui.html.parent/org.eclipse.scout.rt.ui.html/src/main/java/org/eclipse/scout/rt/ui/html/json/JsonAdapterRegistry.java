@@ -26,6 +26,8 @@ class JsonAdapterRegistry {
 
     private final IJsonAdapter<?> m_jsonAdapter;
 
+    // FIXME AWE: continue... 2 Dialoge offen / close --> NPE
+
     private final Object m_modelObject;
 
     P_RegistryValue(String id, Object modelObject, IJsonAdapter<?> jsonAdapter) {

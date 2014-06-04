@@ -21,6 +21,7 @@ public class JsonButton extends JsonFormField<IButton> {
 
   public JsonButton(IButton modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
+    // TODO AWE: System-type von button mit ans UI schicken?
   }
 
   @Override

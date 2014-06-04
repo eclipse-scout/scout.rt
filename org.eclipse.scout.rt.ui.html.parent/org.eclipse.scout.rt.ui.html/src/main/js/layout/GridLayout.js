@@ -9,7 +9,7 @@ scout.GridLayout = function($container) {
   }
   this.$container = $container;
   this.columns = $container.data('columns');
-  this.width = $container.width();
+  this.width = $container.parent().width();
   this.columnWidth = 0;
   this.gap = 15;
   // TODO AWE: (layout) gap und rowHeight fix? ist heute in Swing auch so aber via Swing environment überschreibbar.
@@ -40,9 +40,10 @@ scout.GridLayout.prototype.updateGridDimension = function() {
  */
 scout.GridLayout.prototype.updateLayout = function() {
   var oldWidth = this.width;
-  var newWidth = this.$container.width();
+  var newWidth = this.$container.parent().width();
+  console.info('container id=' + this.$container.attr('scout:id') + ' | updateLayout oldWidth=' + oldWidth + ' newWidth=' + newWidth);
   if (oldWidth != newWidth) {
-    console.info('resize newWidth=' + newWidth + ' container=' + this.$container.attr('class'));
+    console.info('container id=' + this.$container.attr('scout:id') + ' | updateLayout --> call layout()');
     this.width = newWidth;
     this.layout();
   }
@@ -50,8 +51,9 @@ scout.GridLayout.prototype.updateLayout = function() {
 
 scout.GridLayout.prototype.layout = function() {
   this.updateGridDimension();
+  this.$container.css('width', this.width + 'px');
   this.layoutFields();
-  console.info('layout DONE container=' + this.$container.attr('class'));
+  console.info('layout DONE container id=' + this.$container.attr('scout:id'));
 };
 
 scout.GridLayout.prototype.layoutFields = function() {

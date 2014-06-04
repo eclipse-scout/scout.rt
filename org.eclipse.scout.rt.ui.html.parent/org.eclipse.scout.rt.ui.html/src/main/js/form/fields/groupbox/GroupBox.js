@@ -12,6 +12,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field group-box');
   this.$container.data('gridData', this.model.gridData);
   this.$container.data('columns', this.model.gridColumnCount);
+  this.$container.attr('scout:id', this.model.id); // TODO AWE: (Team) nützlich für debugging im DOM, alle form-fields?
   this._gridLayout = new scout.GridLayout(this.$container);
   this.$container.data('gridLayout', this._gridLayout);
 
@@ -33,21 +34,28 @@ scout.GroupBox.prototype._render = function($parent) {
     }
   }
 
+  this.layout();
+};
+
+scout.GroupBox.prototype.updateLayout = function() {
+  if (this.$container) {
+    this._gridLayout.updateLayout();
+  } else {
+    // TODO AWE: (C.GU) schauen woher dieses zweite form kommt (id=19)
+    console.error('groupBox ' + this.model.id + ' has this.$container=null. Cannot updateLayout()');
+  }
+};
+
+scout.GroupBox.prototype.layout = function() {
   this._gridLayout.layout();
-  this.$container.on('resize', this._gridLayout.updateLayout.bind(this._gridLayout));
 };
 
 scout.GroupBox.prototype._onModelBorderVisibleChanged = function(borderVisible) {
-
+  // NOP
 };
 
 scout.GroupBox.prototype.onModelPropertyChange = function(event) {
   if (event.hasOwnProperty('borderVisible')) {
     this._onModelBorderVisibleChanged(event.borderVisible);
   }
-};
-
-scout.GroupBox.prototype.dispose = function() {
-  scout.GroupBox.parent.prototype.dispose.call(this);
-  this.$container.off('resize', this._gridLayout.updateLayout);
 };
