@@ -65,7 +65,7 @@ public class DefaultSearchFilterService extends AbstractService implements ISear
     //list box
     if (field instanceof AbstractListBox<?>) {
       AbstractListBox<?> valueField = (AbstractListBox<?>) field;
-      if (valueField.getValue() != null) {
+      if (!valueField.getValue().isEmpty()) {
         search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
       }
       return;
@@ -73,7 +73,7 @@ public class DefaultSearchFilterService extends AbstractService implements ISear
     //tree box
     if (field instanceof AbstractTreeBox<?>) {
       AbstractTreeBox<?> valueField = (AbstractTreeBox<?>) field;
-      if (valueField.getValue() != null) {
+      if (!valueField.getValue().isEmpty()) {
         search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
       }
       return;
