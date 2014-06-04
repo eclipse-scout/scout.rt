@@ -4,6 +4,14 @@ scout.Button = function(model, session) {
 };
 scout.inherits(scout.Button, scout.FormField);
 
+
+scout.Button.SYSTEM_TYPE = {
+  NONE : 0,
+  CANCEL : 1,
+  CLOSE : 2,
+  OK : 3,
+};
+
 scout.Button.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field');
   this.$container.data('gridData', this.model.gridData);
@@ -16,11 +24,23 @@ scout.Button.prototype._render = function($parent) {
   });
 };
 
+scout.Button.prototype.getSystemType = function() {
+  return this.model.systemType;
+};
+
 scout.Button.prototype._setEnabled = function(enabled) {
   if (enabled) {
     this._$button.removeAttr('disabled');
   } else {
     this._$button.attr('disabled', 'disabled');
+  }
+};
+
+scout.Button.prototype._setVisible = function(visible) {
+  if (visible) {
+    this._$button.css('display', 'inline');
+  } else {
+    this._$button.css('display', 'none');
   }
 };
 

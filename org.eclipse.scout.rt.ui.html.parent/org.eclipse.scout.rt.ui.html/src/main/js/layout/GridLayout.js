@@ -37,13 +37,19 @@ scout.GridLayout.prototype.updateGridDimension = function() {
 
 /**
  * When dimensions of container have changed, layout must be updated.
+ *
+ * @param force (optional)
+ *   when force is set to true, container is laid out even when size has not changed.
  */
-scout.GridLayout.prototype.updateLayout = function() {
+scout.GridLayout.prototype.updateLayout = function(force) {
+  if (force === undefined) {
+    force = false;
+  }
   var oldWidth = this.width;
   var newWidth = this.$container.parent().width();
-  console.info('container id=' + this.$container.attr('scout:id') + ' | updateLayout oldWidth=' + oldWidth + ' newWidth=' + newWidth);
-  if (oldWidth != newWidth) {
-    console.info('container id=' + this.$container.attr('scout:id') + ' | updateLayout --> call layout()');
+  console.info('container id=' + this.$container.attr('id') + ' | updateLayout force=' + force + ' oldWidth=' + oldWidth + ' newWidth=' + newWidth);
+  if (force || oldWidth != newWidth) {
+    console.info('container id=' + this.$container.attr('id') + ' | updateLayout --> call layout()');
     this.width = newWidth;
     this.layout();
   }
@@ -53,7 +59,7 @@ scout.GridLayout.prototype.layout = function() {
   this.updateGridDimension();
   this.$container.css('width', this.width + 'px');
   this.layoutFields();
-  console.info('layout DONE container id=' + this.$container.attr('scout:id'));
+  console.info('layout DONE container id=' + this.$container.attr('id'));
 };
 
 scout.GridLayout.prototype.layoutFields = function() {

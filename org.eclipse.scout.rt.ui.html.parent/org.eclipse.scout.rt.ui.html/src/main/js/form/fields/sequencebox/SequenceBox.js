@@ -7,6 +7,7 @@ scout.inherits(scout.SequenceBox, scout.FormField);
 
 scout.SequenceBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field sequence-box');
+  this.$container.attr('id', 'Scout-' + this.model.id);
   this.$container.data('gridData', this.model.gridData);
   // the sequence box has as many columns as it has fields
   this.$container.data('columns', this.model.fields.length);
@@ -22,12 +23,8 @@ scout.SequenceBox.prototype._render = function($parent) {
     }
     fieldWidget.attach(this.$container);
   }
-
-  this._gridLayout.layout();
-  this.$container.on('resize', this._gridLayout.updateLayout.bind(this._gridLayout));
 };
 
 scout.SequenceBox.prototype.dispose = function() {
   scout.SequenceBox.parent.prototype.dispose.call(this);
-  this.$container.off('resize', this._gridLayout.updateLayout);
 };

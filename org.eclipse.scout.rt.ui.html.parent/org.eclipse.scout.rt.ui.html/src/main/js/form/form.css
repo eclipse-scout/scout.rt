@@ -18,3 +18,11 @@
   position: fixed;
   z-index:1000;
 }
+
+.dialog-title {
+  font-weight:bold;
+}
+
+.dialog-bar > button {
+  float:right;
+}

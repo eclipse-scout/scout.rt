@@ -16,11 +16,20 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 public class JsonButton extends JsonFormField<IButton> {
 
+  public final static String PROP_SYSTEM_TYPE = "systemType";
+
   public JsonButton(IButton modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
+    putJsonProperty(new JsonProperty<IButton, Integer>(PROP_SYSTEM_TYPE, modelObject) {
+      @Override
+      protected Integer getValueImpl(IButton model) {
+        return model.getSystemType();
+      }
+    });
     // TODO AWE: System-type von button mit ans UI schicken?
   }
 
@@ -32,7 +41,7 @@ public class JsonButton extends JsonFormField<IButton> {
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (JsonEventType.CLICK.matches(event)) {
-
+      getModelObject().getUIFacade().fireButtonClickedFromUI();
     }
   }
 }
