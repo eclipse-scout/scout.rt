@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.service.AbstractService;
@@ -37,16 +38,25 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   private final List<IClusterNotificationListener> m_listeners = new ArrayList<IClusterNotificationListener>();
   private final static String QUEUE_NAME = "scoutNotificationQueue";
+
   private IPubSubMessageService m_pubSubMessageService;
   private String m_nodeId;
   private boolean m_enabled;
+  private IServerSession m_session;
 
   @Override
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
     m_pubSubMessageService = SERVICES.getService(IPubSubMessageService.class);
     m_nodeId = UUID.randomUUID().toString();
+    m_session = createBackendSession();
     enable();
+  }
+
+  private AbstractServerSession createBackendSession() {
+    return new AbstractServerSession(true) {
+      private static final long serialVersionUID = 1L;
+    };
   }
 
   @Override
@@ -61,7 +71,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       m_enabled = m_pubSubMessageService.subscribe(QUEUE_NAME);
       if (m_enabled) {
         m_pubSubMessageService.setListener(this);
-//        Activator.getDefault().getNodeSynchronizationInfo().setClusterSyncService(this);
       }
     }
     else {
@@ -71,15 +80,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return m_enabled;
   }
 
+  /**
+   * @return the synchronization status of the current node
+   */
+  public IClusterNodeStatusInfo getNodeStatus() {
+    return Activator.getDefault().getClusterSynchronizationInfo();
+  }
+
   @Override
   public boolean disable() {
     boolean unregisterSuccessful = m_pubSubMessageService.unsubsribe(QUEUE_NAME);
-
     if (unregisterSuccessful) {
-//update info
-//      if (Activator.getDefault().getNodeSynchronizationInfo().getClusterSyncService() == m_pubSubMessageService) {
-//        Activator.getDefault().getNodeSynchronizationInfo().setClusterSyncService(null);
-//      }
       m_enabled = false;
     }
     return unregisterSuccessful;
@@ -94,11 +105,10 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   public void publishNotification(IClusterNotification notification) {
     if (m_enabled) {
       ClusterNotificationMessage message = new ClusterNotificationMessage(notification, getNotificationProperties());
-      m_pubSubMessageService.publishNotification(message);
-//      if (publishSuccessful) {
-      //TODO
-//        Activator.getDefault().getNodeSynchronizationInfo().incrementSentMessageCount();
-//      }
+      boolean successful = m_pubSubMessageService.publishNotification(message);
+      if (successful) {
+        Activator.getDefault().getClusterSynchronizationInfo().incrementSentMessageCount();
+      }
     }
   }
 
@@ -106,19 +116,19 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return new ClusterNotificationMessageProperties(getNodeId(), ServerJob.getCurrentSession().getUserId());
   }
 
-  private AbstractServerSession getBackendSession() {
-    //TODO
-    return new AbstractServerSession(true) {
-      private static final long serialVersionUID = 1L;
-    };
+  /**
+   * @return {@link IServerSession} used to handle incoming notification messages
+   */
+  protected IServerSession getBackendSession() {
+    return m_session;
   }
 
-  private class P_NotificationProcessinJob extends ServerJob {
+  private class P_NotificationProcessingJob extends ServerJob {
 
     IClusterNotificationMessage m_distributedNotification;
     List<IClusterNotificationListener> m_listeners;
 
-    public P_NotificationProcessinJob(String name, IServerSession serverSession, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
+    public P_NotificationProcessingJob(String name, IServerSession serverSession, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
       super(name, serverSession);
       m_distributedNotification = notification;
       m_listeners = listener;
@@ -153,16 +163,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     //Do not progress notifications sent by node itself
     String originNode = message.getProperties().getOriginNode();
     if (!m_nodeId.equals(originNode)) {
-// TODO update info
-//      Activator.getDefault().getNodeSynchronizationInfo().incrementReceivedMessageCount();
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedDate(new Date());
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedUserId(notification.getOriginUser());
-//      Activator.getDefault().getNodeSynchronizationInfo().setLastChangedClusterNodeId(notification.getOriginNode());
-
-      IServerSession session = getBackendSession();
-      P_NotificationProcessinJob notificationProcessJob = new P_NotificationProcessinJob("NotificationProcessingJob", session, message, m_listeners);
-      notificationProcessJob.runNow(new NullProgressMonitor());
+      Activator.getDefault().getClusterSynchronizationInfo().updateReceiveStatus(message);
+      P_NotificationProcessingJob j = new P_NotificationProcessingJob("NotificationProcessingJob", getBackendSession(), message, m_listeners);
+      j.runNow(new NullProgressMonitor());
     }
-
   }
 }
