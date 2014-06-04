@@ -30,7 +30,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // up: move up
       if (keycode == 38) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = $rowsSelected.first().prev();
+          $newRowSelection = $rowsSelected.first().prev('.table-row');
         } else {
           $newRowSelection = $rowsAll.last();
         }
@@ -39,7 +39,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // down: move down
       if (keycode == 40) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = $rowsSelected.last().next();
+          $newRowSelection = $rowsSelected.last().next('.table-row');
         } else {
           $newRowSelection = $rowsAll.first();
         }
