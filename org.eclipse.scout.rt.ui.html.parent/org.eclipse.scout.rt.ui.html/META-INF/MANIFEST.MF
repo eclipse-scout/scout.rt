@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout Json UI
+Bundle-Name: Scout Html UI
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.html;singleton:=true
 Bundle-Version: 4.1.0.qualifier
 Bundle-Vendor: BSI Business Systems Integration AG
