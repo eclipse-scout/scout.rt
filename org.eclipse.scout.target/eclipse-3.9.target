@@ -80,8 +80,6 @@
       <unit id="org.w3c.dom.events.source" version="3.0.0.draft20060413_v201105210656"/>
       <unit id="com.thoughtworks.selenium" version="2.25.0.v201212071504"/>
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
-      <unit id="com.google.guava" version="12.0.0.v201212092141"/>
-      <unit id="com.google.guava.source" version="12.0.0.v201212092141"/>
       <unit id="com.google.guava" version="15.0.0.v201403281430"/>
       <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
     </location>
