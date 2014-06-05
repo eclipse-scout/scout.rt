@@ -770,7 +770,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     createColumnsInternal();
     // menus
     List<IMenu> menuList = new ArrayList<IMenu>();
-    execCreateHeaderMenus(menuList);
 
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
@@ -796,6 +795,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    execCreateHeaderMenus(menuList);
     //set container on menus
     for (IMenu menu : menuList) {
       menu.setContainerInternal(this);
