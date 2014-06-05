@@ -162,9 +162,9 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
           }
 
           // wrap menu-buttons and add one div for label
-          $('.menu-button', $rowMenuContainer).wrapAll('<div id="MenuButtons"></div>');
-          $('#MenuButtons', $rowMenuContainer).appendDiv('MenuButtonsLabel');
-          $rowMenuContainer.append($('#MenuButtons', $rowMenuContainer));
+          $('.menu-button', $rowMenuContainer).wrapAll('<div class="menu-buttons"></div>');
+          $('.menu-buttons', $rowMenuContainer).appendDiv(undefined, 'menu-buttons-label');
+          $rowMenuContainer.append($('.menu-buttons', $rowMenuContainer));
 
           // animated opening
           var h = $rowMenuContainer.outerHeight();
@@ -182,11 +182,11 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
         }
 
         function onHoverIn() {
-          $('#MenuButtonsLabel').text($(this).data('label'));
+          $('.menu-buttons-label').text($(this).data('label'));
         }
 
         function onHoverOut() {
-          $('#MenuButtonsLabel').text('');
+          $('.menu-buttons-label').text('');
         }
 
         function onMenuItemClicked() {

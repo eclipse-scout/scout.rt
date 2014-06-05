@@ -226,6 +226,14 @@ min-width: 140px;
 content: "\f00d";
 }
 
+#RowMenuContainer > .menu-buttons {
+  height: 53px;
+}
+
+#RowMenuContainer > .menu-buttons-label {
+  height: 20px;
+}
+
 
 .table .key-box{
 right: 24px;
