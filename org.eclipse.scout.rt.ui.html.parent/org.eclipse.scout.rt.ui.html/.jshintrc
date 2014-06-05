@@ -17,6 +17,7 @@
     "sandbox": false,
     "expect": false,
     "spyOn": false,
-    "mostRecentJsonRequest": false
+    "mostRecentJsonRequest": false,
+    "createUniqueAdapterId": false
   }
 }

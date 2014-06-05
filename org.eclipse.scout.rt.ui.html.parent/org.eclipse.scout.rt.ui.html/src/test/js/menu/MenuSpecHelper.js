@@ -13,3 +13,9 @@ MenuSpecHelper.prototype.createModel = function(id, text, icon, types) {
     "objectType": "Menu"
   };
 };
+
+MenuSpecHelper.prototype.createMenu = function(model) {
+  var menu = new scout.Menu();
+  menu.init(model, this.session);
+  return menu;
+};

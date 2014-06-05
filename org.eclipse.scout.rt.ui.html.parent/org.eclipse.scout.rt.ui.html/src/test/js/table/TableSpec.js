@@ -78,7 +78,7 @@ describe("Table", function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
+      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.model.id, {
         "rowIds": rowIds
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -201,7 +201,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      model.menus = [helper.createMenuModel('1', 'menu')];
+      model.menus = [helper.createMenuModel(createUniqueAdapterId(), 'menu')];
       var $row = table.$dataScroll.children().first();
       clickRowAndAssertSelection(table, $row);
 
@@ -247,8 +247,9 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var menuModel = helper.createMenuModel('1', 'menu');
-      new scout.Menu(menuModel, session); //register adapter
+      var menuModel = helper.createMenuModel(createUniqueAdapterId(), 'menu');
+      //register adapter
+      helper.menuHelper.createMenu(menuModel);
       model.menus = [menuModel];
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerRightClick();
@@ -262,8 +263,9 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.attach(session.$entryPoint);
 
-      var menuModel = helper.createMenuModel('1', 'menu');
-      new scout.Menu(menuModel, session); //register adapter
+      var menuModel = helper.createMenuModel(createUniqueAdapterId(), 'menu');
+      //register adapter
+      helper.menuHelper.createMenu(menuModel);
       model.menus = [menuModel];
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerRightClick();
@@ -271,7 +273,7 @@ describe("Table", function() {
       jasmine.clock().tick(0);
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(scout.Menu.EVENT_ABOUT_TO_SHOW, '1');
+      var event = new scout.Event(scout.Menu.EVENT_ABOUT_TO_SHOW, menuModel.id);
       expect(requestData).toContainEvents(event);
     });
 
@@ -327,7 +329,7 @@ describe("Table", function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(scout.Table.EVENT_ROWS_SELECTED);
 
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
+      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.model.id, {
         "rowIds": ['0', '1', '2']
       });
       expect(requestData).toContainEvents(event);
@@ -361,7 +363,7 @@ describe("Table", function() {
       jasmine.clock().tick(0);
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
+      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.model.id, {
         "rowIds": ['0', ]
       });
       expect(requestData).toContainEvents(event);
@@ -379,7 +381,7 @@ describe("Table", function() {
       spyOn(table, 'insertRows');
 
       var rows = helper.createModelRows(2, 5);
-      var event = new scout.Event(scout.Table.EVENT_ROWS_INSERTED, '1', {
+      var event = new scout.Event(scout.Table.EVENT_ROWS_INSERTED, table.model.id, {
         "rows": rows
       });
       table.onModelAction(event);
@@ -395,7 +397,7 @@ describe("Table", function() {
       spyOn(table, 'selectRowsByIds');
 
       var rowIds = ['0', '4'];
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, '1', {
+      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.model.id, {
         "rowIds": rowIds
       });
       table.onModelAction(event);
@@ -415,7 +417,7 @@ describe("Table", function() {
       expect(table._header).toBeDefined();
       expect(table._$header.is(':visible')).toBe(true);
 
-      var event = new scout.Event('property', '1', {
+      var event = new scout.Event('property', table.model.id, {
         "headerVisible": false
       });
       table.onModelPropertyChange(event);

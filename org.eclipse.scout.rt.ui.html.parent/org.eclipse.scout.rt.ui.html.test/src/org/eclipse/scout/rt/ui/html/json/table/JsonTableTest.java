@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -123,7 +122,7 @@ public class JsonTableTest {
   public static JsonTable createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
 
-    JsonTable jsonTable = new JsonTable(table, jsonSession, "1");
+    JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonTable.init();
 
     //init treeNode map

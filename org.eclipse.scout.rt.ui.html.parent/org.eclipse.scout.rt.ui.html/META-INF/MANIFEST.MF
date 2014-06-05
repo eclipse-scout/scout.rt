@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.scout.rt.client;bundle-version="[4.1.0,4.2.0)",
  org.eclipse.scout.rt.server.commons;bundle-version="[4.1.0,4.2.0)",
  org.eclipse.equinox.http.registry,
  org.eclipse.scout.rt.client.mobile;bundle-version="[4.1.0,4.2.0)",
- org.eclipse.scout.rt.ui.html.client.ext
+ org.eclipse.scout.rt.ui.html.client.ext;bundle-version="[4.1.0,4.2.0)"
 Export-Package: org.eclipse.scout.rt.ui.html.json,
  org.eclipse.scout.rt.ui.html.json.servlet
 Bundle-Activator: org.eclipse.scout.rt.ui.html.json.Activator

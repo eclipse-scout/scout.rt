@@ -6,6 +6,11 @@ function mostRecentJsonRequest() {
   }
 }
 
+var m_adapterSeq = 0;
+function createUniqueAdapterId() {
+  return m_adapterSeq++;
+}
+
 var jasmineScoutMatchers = {
   /**
    * Checks if given request contains expected events, order does not matter.

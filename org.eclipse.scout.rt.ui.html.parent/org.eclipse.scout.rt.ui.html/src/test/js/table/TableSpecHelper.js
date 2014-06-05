@@ -1,7 +1,7 @@
 /* global MenuSpecHelper */
 var TableSpecHelper = function(session) {
   this.session = session;
-  this.menuHelper = new MenuSpecHelper();
+  this.menuHelper = new MenuSpecHelper(session);
 };
 
 TableSpecHelper.prototype.createModel = function(id, columns, rows) {
@@ -70,15 +70,19 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 };
 
 TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
-  return this.createModel('1', this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
+  return this.createModel(createUniqueAdapterId(), this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
 };
 
 TableSpecHelper.prototype.createTable = function(model) {
-  return new scout.Table(model, this.session);
+  var table = new scout.Table(model, this.session);
+  table.init(model, this.session);
+  return table;
 };
 
 TableSpecHelper.prototype.createMobileTable = function(model) {
-  return new scout.MobileTable(model, this.session);
+  var table = new scout.MobileTable(model, this.session);
+  table.init(model, this.session);
+  return table;
 };
 
 TableSpecHelper.prototype.getRowIds = function(rows) {

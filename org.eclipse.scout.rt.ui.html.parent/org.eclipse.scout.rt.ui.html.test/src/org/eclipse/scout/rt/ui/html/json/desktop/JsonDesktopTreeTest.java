@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
@@ -122,7 +121,7 @@ public class JsonDesktopTreeTest {
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession, "1");
+    JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonDesktopTree.init();
 
     // init treeNode map

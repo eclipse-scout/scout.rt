@@ -6,7 +6,6 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import java.lang.ref.WeakReference;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOneOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOutlineForms;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
@@ -42,7 +41,7 @@ public class JsonDesktopTest {
 
   public static JsonDesktop createJsonDesktopWithMocks(IDesktop desktop) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession, "1");
+    JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonDesktop.init();
     return jsonDesktop;
   }
