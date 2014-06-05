@@ -61,7 +61,6 @@ public class BundleListClassLoader extends ClassLoader {
   }
   private static final ThreadLocal<Set<String>> LOOP_DETECTOR = new ThreadLocal<Set<String>>();
   private static final Enumeration<URL> EMPTY_URL_ENUMERATION = new Enumeration<URL>() {
-
     @Override
     public boolean hasMoreElements() {
       return false;
@@ -117,13 +116,13 @@ public class BundleListClassLoader extends ClassLoader {
       }
     }
     m_bundles = filteredBundleList.toArray(new Bundle[filteredBundleList.size()]);
-    if (m_bundles.length == 0) {
+    if (getBundles().length == 0) {
       throw new IllegalArgumentException("filtered bundle list must not be empty. [bundles=" + Arrays.toString(bundles) + "]");
     }
     //
-    m_bundlesSortedByBundleSymbolicNameLenght = new Bundle[m_bundles.length];
-    System.arraycopy(m_bundles, 0, m_bundlesSortedByBundleSymbolicNameLenght, 0, m_bundles.length);
-    Arrays.sort(m_bundlesSortedByBundleSymbolicNameLenght, new Comparator<Bundle>() {
+    m_bundlesSortedByBundleSymbolicNameLenght = new Bundle[getBundles().length];
+    System.arraycopy(getBundles(), 0, getBundlesSortedByBundleSymbolicNameLenght(), 0, getBundles().length);
+    Arrays.sort(getBundlesSortedByBundleSymbolicNameLenght(), new Comparator<Bundle>() {
       @Override
       public int compare(Bundle b1, Bundle b2) {
         if (b1 == null && b2 == null) {
@@ -145,7 +144,27 @@ public class BundleListClassLoader extends ClassLoader {
     m_resourceCache = new HashMap<String, Vector<URL>>();
   }
 
-  private Class<?> putInCache(String name, Class<?> c) {
+  public Bundle[] getBundles() {
+    return m_bundles;
+  }
+
+  public Bundle[] getBundlesSortedByBundleSymbolicNameLenght() {
+    return m_bundlesSortedByBundleSymbolicNameLenght;
+  }
+
+  public ClassLoader getParentContextClassLoader() {
+    return m_parentContextClassLoader;
+  }
+
+  public boolean isUseResourceFilteringEnabled() {
+    return m_useResourceFiltering;
+  }
+
+  public boolean isUseResourceCachingEnabled() {
+    return m_useResourceCaching;
+  }
+
+  protected Class<?> putInCache(String name, Class<?> c) {
     m_cacheLock.writeLock().lock();
     try {
       m_classCache.put(name, new WeakReference<Class<?>>(c));
@@ -156,15 +175,15 @@ public class BundleListClassLoader extends ClassLoader {
     return c;
   }
 
-  private URL putInCache(String name, URL resources) {
+  protected URL putInCache(String name, URL resources) {
     Vector<URL> urlList = new Vector<URL>();
     urlList.add(resources);
     urlList = putInCache(name, urlList);
     return urlList.firstElement();
   }
 
-  private Vector<URL> putInCache(String name, Vector<URL> resources) {
-    if (m_useResourceCaching) {
+  protected Vector<URL> putInCache(String name, Vector<URL> resources) {
+    if (isUseResourceCachingEnabled()) {
       m_cacheLock.writeLock().lock();
       try {
         m_resourceCache.put(name, resources);
@@ -176,8 +195,8 @@ public class BundleListClassLoader extends ClassLoader {
     return resources;
   }
 
-  private Vector<URL> getFromCache(String name) {
-    if (!m_useResourceCaching) {
+  protected Vector<URL> getFromCache(String name) {
+    if (!isUseResourceCachingEnabled()) {
       return null;
     }
     m_cacheLock.readLock().lock();
@@ -190,7 +209,7 @@ public class BundleListClassLoader extends ClassLoader {
     }
   }
 
-  public void clearCaches() {
+  protected void clearCaches() {
     m_cacheLock.writeLock().lock();
     try {
       m_classCache.clear();
@@ -239,7 +258,7 @@ public class BundleListClassLoader extends ClassLoader {
 
     // 3. delegate classes starting with 'java.' to parent class loader
     if (className.startsWith("java.")) {
-      return m_parentContextClassLoader.loadClass(className);
+      return getParentContextClassLoader().loadClass(className);
     }
 
     // 4. check if class is already in the cache
@@ -263,7 +282,7 @@ public class BundleListClassLoader extends ClassLoader {
     Set<Bundle> usedBundles = new HashSet<Bundle>();
 
     // 5. search in best matching bundles based on class and bundle symbolic name
-    for (Bundle bundle : m_bundlesSortedByBundleSymbolicNameLenght) {
+    for (Bundle bundle : getBundlesSortedByBundleSymbolicNameLenght()) {
       if (usedBundles.contains(bundle)) {
         continue;
       }
@@ -280,7 +299,7 @@ public class BundleListClassLoader extends ClassLoader {
     }
 
     // 6. search in active bundles
-    for (Bundle bundle : m_bundlesSortedByBundleSymbolicNameLenght) {
+    for (Bundle bundle : getBundlesSortedByBundleSymbolicNameLenght()) {
       if (usedBundles.contains(bundle)) {
         continue;
       }
@@ -297,7 +316,7 @@ public class BundleListClassLoader extends ClassLoader {
     }
 
     // 7. search in remaining bundles
-    for (Bundle b : m_bundles) {
+    for (Bundle b : getBundles()) {
       if (usedBundles.contains(b)) {
         continue;
       }
@@ -313,7 +332,7 @@ public class BundleListClassLoader extends ClassLoader {
     // 8. try context class loader
     try {
       // do not call super.loadClass because it checks the native cache (see eclipse equinox bug 127963)
-      c = m_parentContextClassLoader.loadClass(className);
+      c = getParentContextClassLoader().loadClass(className);
       return putInCache(className, c);
     }
     catch (Exception e) {
@@ -327,9 +346,9 @@ public class BundleListClassLoader extends ClassLoader {
 
   @Override
   public URL getResource(String name) {
-    Enumeration<URL> urlList = getResources(name);
-    if (urlList != null && urlList.hasMoreElements()) {
-      return urlList.nextElement();
+    Enumeration<URL> resources = getResources(name);
+    if (resources != null && resources.hasMoreElements()) {
+      return resources.nextElement();
     }
     return null;
   }
@@ -361,41 +380,11 @@ public class BundleListClassLoader extends ClassLoader {
       }
 
       // 2. search in bundles
-      Vector<URL> urlList = new Vector<URL>();
-      for (Bundle b : m_bundles) {
-        try {
-          Enumeration<URL> en = b.getResources(name);
-          if (en != null && en.hasMoreElements()) {
-            while (en.hasMoreElements()) {
-              URL url = en.nextElement();
-              urlList.add(url);
-            }
-          }
-        }
-        catch (Exception e) {
-          //nop
-        }
-      }
+      Vector<URL> urlList = searchResourcesInBundles(name);
 
       // 3. filter resources
-      if (m_useResourceFiltering) {
-        Vector<URL> newUrlList = new Vector<URL>();
-        Vector<URL> customUrlList = new Vector<URL>();
-        Enumeration<URL> elements = urlList.elements();
-        while (elements.hasMoreElements()) {
-          URL resource = elements.nextElement();
-          newUrlList.add(resource);
-          if (isUrlFromBundlePrefixes(resource)) {
-            customUrlList.add(resource);
-          }
-        }
-        if (!customUrlList.isEmpty()) {
-          urlList = customUrlList;
-        }
-        else {
-          urlList = newUrlList;
-        }
-      }
+      urlList = filterResources(urlList);
+
       return putInCache(name, urlList).elements();
     }
     finally {
@@ -403,7 +392,46 @@ public class BundleListClassLoader extends ClassLoader {
     }
   }
 
-  private boolean registerLoadingItem(String name) {
+  protected Vector<URL> searchResourcesInBundles(String name) {
+    Vector<URL> urlList = new Vector<URL>();
+    for (Bundle b : getBundles()) {
+      try {
+        Enumeration resources = b.getResources(name);
+        while (resources != null && resources.hasMoreElements()) {
+          URL url = (URL) resources.nextElement();
+          urlList.add(url);
+        }
+      }
+      catch (Exception e) {
+        //nop
+      }
+    }
+    return urlList;
+  }
+
+  protected Vector<URL> filterResources(Vector<URL> urlList) {
+    if (isUseResourceFilteringEnabled()) {
+      Vector<URL> newUrlList = new Vector<URL>();
+      Vector<URL> customUrlList = new Vector<URL>();
+      Enumeration<URL> resources = urlList.elements();
+      while (resources != null && resources.hasMoreElements()) {
+        URL resource = resources.nextElement();
+        newUrlList.add(resource);
+        if (isUrlFromBundlePrefixes(resource)) {
+          customUrlList.add(resource);
+        }
+      }
+      if (!customUrlList.isEmpty()) {
+        urlList = customUrlList;
+      }
+      else {
+        urlList = newUrlList;
+      }
+    }
+    return urlList;
+  }
+
+  protected boolean registerLoadingItem(String name) {
     Set<String> loadingItems = LOOP_DETECTOR.get();
     if (loadingItems != null && loadingItems.contains(name)) {
       return false;
@@ -417,7 +445,7 @@ public class BundleListClassLoader extends ClassLoader {
     return true;
   }
 
-  private void unregisterLoadingItem(String name) {
+  protected void unregisterLoadingItem(String name) {
     // invariant: register has already been invoked
     LOOP_DETECTOR.get().remove(name);
   }
@@ -502,7 +530,7 @@ public class BundleListClassLoader extends ClassLoader {
   /**
    * return true if resource {@link URL} is located in a bundle from the list of bundleOrderPrefixes
    */
-  private boolean isUrlFromBundlePrefixes(URL resource) {
+  protected boolean isUrlFromBundlePrefixes(URL resource) {
     if (m_bundleOrderPrefixes == null) {
       m_bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
     }
@@ -528,7 +556,7 @@ public class BundleListClassLoader extends ClassLoader {
    *          from resource {@link URL}
    * @return bundle id
    */
-  private long getBundleID(String host) {
+  protected long getBundleID(String host) {
     int dotIndex = host.indexOf('.');
     return (dotIndex >= 0 && dotIndex < host.length() - 1) ? Long.parseLong(host.substring(0, dotIndex)) : -1;
   }
@@ -540,7 +568,7 @@ public class BundleListClassLoader extends ClassLoader {
    *          bundle id
    * @return the corresponding {@link Bundle}
    */
-  private Bundle getBundle(long id) {
+  protected Bundle getBundle(long id) {
     BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
     Bundle result = null;
     for (Bundle candidate : bundleContext.getBundles()) {
