@@ -3,9 +3,15 @@ scout.Form = function() {
   this._$title;
   this._$parent;
   this._resizeHandler;
-  this._rootGroupBox;
+  this.rootGroupBox;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
+
+scout.Form.prototype.init = function(model, session) {
+  scout.Form.parent.prototype.init.call(this, model, session);
+
+  this.rootGroupBox = this.session.getOrCreateModelAdapter(this.model.rootGroupBox, this);
+};
 
 /**
  * @override
@@ -26,15 +32,10 @@ scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
 
-  var rootGroupBox = this.session.modelAdapterRegistry[this.model.rootGroupBox.id];
-  if (!rootGroupBox) {
-    rootGroupBox =  this.session.objectFactory.create(this.model.rootGroupBox);
-  }
-  rootGroupBox.attach(this.$container);
-  this._rootGroupBox = rootGroupBox;
+  this.rootGroupBox.attach(this.$container);
 
   var closeable = false;
-  var systemButtons = rootGroupBox.getSystemButtons();
+  var systemButtons = this.rootGroupBox.getSystemButtons();
   if (systemButtons) {
     // TODO AWE: CSS for button-bar / position / visible
     var $buttonBar = $('<div class="button-bar"></div>');
@@ -69,8 +70,8 @@ scout.Form.prototype._render = function($parent) {
   }
 
   // we must keep a stable reference to the resize-handler, so we can remove the handler in the dispose method later
-  this._rootGroupBox.updateLayout(true);
-  this._resizeHandler = this._rootGroupBox.updateLayout.bind(this._rootGroupBox);
+  this.rootGroupBox.updateLayout(true);
+  this._resizeHandler = this.rootGroupBox.updateLayout.bind(this.rootGroupBox);
   $(window).on('resize', this._resizeHandler);
 };
 
@@ -107,5 +108,5 @@ scout.Form.prototype.onModelAction = function(event) {
 scout.Form.prototype.dispose = function() {
   scout.Form.parent.prototype.dispose.call(this);
   $(window).off('resize', this._resizeHandler);
-  this._rootGroupBox.dispose();
+  this.rootGroupBox.dispose();
 };

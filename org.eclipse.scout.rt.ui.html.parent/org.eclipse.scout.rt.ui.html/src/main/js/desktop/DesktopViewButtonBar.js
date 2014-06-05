@@ -10,7 +10,8 @@ scout.DesktopViewButtonBar = function($parent, viewButtons, session) {
 
   //  add view-item, all before #viewAdd
   for (var i = 0; i < viewButtons.length; i++) {
-    new scout.DesktopViewButton($desktopView, viewButtons[i], session);
+    var button = session.getOrCreateModelAdapter(viewButtons[i], this);
+    button.render($desktopView);
   }
 
   //  create logo and plus sign
@@ -24,8 +25,10 @@ scout.DesktopViewButtonBar = function($parent, viewButtons, session) {
     var viewButton = {
       "id": "ownView" + c,
       "text": name[0] + ' (' + c + ')'
-    };
-    new scout.DesktopViewButtonOwn($desktopView, viewButton, session);
+    }, buttonOwn;
+    buttonOwn = new scout.DesktopViewButtonOwn($desktopView);
+    buttonOwn.init();
+    buttonOwn.render();
   }
 
 };

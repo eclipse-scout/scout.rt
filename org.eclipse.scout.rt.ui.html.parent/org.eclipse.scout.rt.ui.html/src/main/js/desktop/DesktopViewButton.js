@@ -2,25 +2,24 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 
-scout.DesktopViewButton = function($parent, model, session) {
-  // TODO AWE: (inheritance) der button wird free-style sollte wohl besser auch von ModelAdapter erben
-  // und die entsprechenden methoden implementieren.
+scout.DesktopViewButton = function() {
   this._$viewButton;
-  this.model = model;
+};
+scout.inherits(scout.DesktopViewButton, scout.ModelAdapter);
 
-  session.modelAdapterRegistry[model.id] = this;
+scout.DesktopViewButton.prototype._render = function($parent) {
   var state = '';
-  if (model.selected) {
+  if (this.model.selected) {
     state = 'selected';
   }
-  this._$viewButton = $parent.appendDiv(model.id, 'view-item ' + state, model.text);
+  this._$viewButton = $parent.appendDiv(this.model.id, 'view-item ' + state, this.model.text);
 
-  this._setIconId(model.iconId);
+  this._setIconId(this.model.iconId);
 
   var that = this;
   this._$viewButton.on('click', '', function() {
     that._$viewButton.selectOne();
-    session.send('click', model.id);
+    that.session.send('click', that.model.id);
   });
 };
 
@@ -59,5 +58,3 @@ scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
     this._setText(event.text);
   }
 };
-
-scout.DesktopViewButton.prototype.onModelAction = function() {};

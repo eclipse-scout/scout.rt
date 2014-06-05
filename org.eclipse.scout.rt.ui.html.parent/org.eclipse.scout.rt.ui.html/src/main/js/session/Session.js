@@ -61,7 +61,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
 
 scout.Session.prototype.getOrCreateModelAdapters = function(modelArray, parent) {
   if (!modelArray) {
-    return;
+    return [];
   }
 
   var adapters = [], i;

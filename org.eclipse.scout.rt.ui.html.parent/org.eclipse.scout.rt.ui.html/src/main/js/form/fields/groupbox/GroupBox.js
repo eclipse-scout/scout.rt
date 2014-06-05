@@ -8,6 +8,12 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 
+scout.GroupBox.prototype.init = function(model, session) {
+  scout.GroupBox.parent.prototype.init.call(this, model, session);
+
+  this.formFields = this.session.getOrCreateModelAdapters(this.model.formFields, this);
+};
+
 scout.GroupBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field group-box');
   this.$container.attr('id', 'Scout-' + this.model.id);
@@ -22,38 +28,29 @@ scout.GroupBox.prototype._render = function($parent) {
     this._$label = this.$container.appendDiv(undefined, 'group-box-title', this.model.label + span);
   }
 
-  this._formFields = [];
-  if (this.model.formFields) {
-    var i, formFieldModel, formField;
-    for (i = 0; i < this.model.formFields.length; i++) {
-      formFieldModel = this.model.formFields[i];
-      formField = this.session.modelAdapterRegistry[formFieldModel.id];
-      if (!formField) {
-        formField = this.session.objectFactory.create(formFieldModel);
-      }
-      if (!this._isSystemButton(formField)) { // do not render system buttons on group box
-        formField.attach(this.$container);
-      }
-      this._formFields[i] = formField;
+  var i, formField;
+  for (i = 0; i < this.formFields.length; i++) {
+    formField = this.formFields[i];
+    if (!this._isSystemButton(formField)) { // do not render system buttons on group box
+      formField.attach(this.$container);
     }
   }
 };
 
-
 scout.GroupBox.prototype._isSystemButton = function(formField) {
   return formField instanceof scout.Button &&
-         formField.getSystemType() != scout.Button.SYSTEM_TYPE.NONE;
+    formField.getSystemType() != scout.Button.SYSTEM_TYPE.NONE;
 };
 
 scout.GroupBox.prototype.getFormFields = function() {
-  return this._formFields;
+  return this.formFields;
 };
 
 scout.GroupBox.prototype.getSystemButtons = function() {
   var i, formField, systemButtons = [];
-  for (i=0; i<this._formFields.length; i++) {
-    if (this._isSystemButton(this._formFields[i])) {
-      systemButtons.push(this._formFields[i]);
+  for (i = 0; i < this.formFields.length; i++) {
+    if (this._isSystemButton(this.formFields[i])) {
+      systemButtons.push(this.formFields[i]);
     }
   }
   return systemButtons;

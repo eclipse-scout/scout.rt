@@ -8,21 +8,20 @@ scout.BaseDesktop = function() {
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
+scout.BaseDesktop.prototype.init = function(model, session) {
+  scout.BaseDesktop.parent.prototype.init.call(this, model, session);
+
+  this.forms = this.session.getOrCreateModelAdapters(this.model.forms, this);
+};
+
 scout.BaseDesktop.prototype._render = function($parent) {
   //this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids,
   // maybe better change to class to support multiple session divs with multiple
   // desktops
 
-  var form, i, formModel;
-  if (this.model.forms) {
-    for (i = 0; i < this.model.forms.length; i++) {
-      formModel = this.model.forms[i];
-      form = this.session.modelAdapterRegistry[formModel.id];
-      if (!form) {
-        form = this.session.objectFactory.create(formModel);
-      }
-      this._addForm(form);
-    }
+  var i, form;
+  for (i = 0; i < this.forms.length; i++) {
+    this._addForm(this.forms[i]);
   }
 };
 

@@ -1,11 +1,13 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopViewButtonOwn = function($parent, viewButton, session) {
+scout.DesktopViewButtonOwn = function() {
+  scout.DesktopViewButtonOwn.parent.call(this);
+};
+scout.inherits(scout.DesktopViewButtonOwn, scout.ModelAdapter);
 
-  session.modelAdapterRegistry[viewButton.id] = this;
-
-  this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
+scout.DesktopViewButtonOwn.prototype._render = function($parent) {
+  this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', this.model.text);
   this._$viewButton.on('click', '', onClick)
     .appendDiv('', 'view-remove')
     .on('click', '', removeOwnView)
@@ -18,7 +20,7 @@ scout.DesktopViewButtonOwn = function($parent, viewButton, session) {
     this._$viewButton.selectOne();
     //FIXME what to do on session?
     /*
-      session.send('click', viewButton.id);
+      session.send('click', fhat.model.id);
        */
   }
 

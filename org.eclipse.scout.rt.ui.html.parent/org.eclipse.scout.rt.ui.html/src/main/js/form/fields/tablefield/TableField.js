@@ -6,16 +6,18 @@ scout.TableField = function() {
 };
 scout.inherits(scout.TableField, scout.ModelAdapter);
 
+scout.TableField.prototype.init = function(model, session) {
+  scout.TableField.parent.prototype.init.call(this, model, session);
+
+  this.table = this.session.getOrCreateModelAdapter(this.model.table, this);
+};
+
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');
   if (this.model.label) {
     this.$label = this.$container.appendDiv(undefined, 'label');
   }
 
-  this.table = this.session.modelAdapterRegistry[this.model.table];
-  if (!this.table) {
-    this.table = this.session.objectFactory.create(this.model.table);
-  }
   this.table.attach(this.$container);
 };
 

@@ -18,7 +18,7 @@ scout.DesktopTreeContainer.prototype.onOutlineCreated = function(model) {
 
 scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
   this.desktopTree.detach();
-  this.desktopTree = this.session.modelAdapterRegistry[outlineId];
+  this.desktopTree = this.session.getModelAdapter(outlineId);
   this.desktopTree.attach(this._$desktopTree);
   this.desktopTree.attachModel();
 };

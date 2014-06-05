@@ -65,7 +65,7 @@ scout.DesktopTree.prototype.attachModel = function() {
     this.setNodeSelectedById(selectedNode.id);
 
     if (selectedNode.type === 'table' && !this._desktopTable) {
-      this._desktopTable = this.session.modelAdapterRegistry[selectedNode.id];
+      this._desktopTable = this.session.getModelAdapter(selectedNode.id);
       this._desktopTable.attach($('#DesktopBench'));
     }
 
@@ -195,7 +195,7 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
   }
 
   if (node.type === 'table') {
-    this._desktopTable = this.session.modelAdapterRegistry[node.id];
+    this._desktopTable = this.session.getModelAdapter(node.id);
     this._desktopTable.attach($('#DesktopBench'));
   }
 
@@ -264,7 +264,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     // Create tables for table pages
     //FIXME really always create table (no gui is created)
     if (node.table) {
-      var desktopTable = this.session.modelAdapterRegistry[node.id];
+      var desktopTable = this.session.getModelAdapter(node.id);
       if (!desktopTable) {
         node.outlineId = this.model.id;
 
@@ -456,15 +456,7 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
   this.model.menus = menus;
 
   //Register new menus
-  //FIXME CGU refactor to getOrCreate
-  if (menus) {
-    for (var i = 0; i < this.model.menus.length; i++) {
-      if (!this.session.modelAdapterRegistry[menus[i]]) {
-        var menu = this.session.objectFactory.create(menus[i]);
-        menu.owner = this;
-      }
-    }
-  }
+  this.session.getOrCreateModelAdapters(menus, this);
 
   if (this.model.selectedNodeIds && this.model.selectedNodeIds.length > 0) {
     var $node = this._findNodeById(this.model.selectedNodeIds[0]);

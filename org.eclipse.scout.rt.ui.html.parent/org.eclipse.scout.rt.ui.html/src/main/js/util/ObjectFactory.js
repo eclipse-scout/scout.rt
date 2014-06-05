@@ -69,6 +69,11 @@ scout.defaultObjectFactories = [{
     return new scout.DesktopTree();
   }
 }, {
+  objectType: 'ViewButton',
+  create: function() {
+    return new scout.DesktopViewButton();
+  }
+}, {
   objectType: 'ChartTableControl',
   create: function() {
     return new scout.ChartTableControl();
