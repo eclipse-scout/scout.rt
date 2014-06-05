@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Session = function($entryPoint, sessionPartId, userAgent) {
-  this.widgetMap = {};
+  this.modelAdapterRegistry = {};
   this.locale;
   this.$entryPoint = $entryPoint;
   this._asyncEvents = [];
@@ -21,15 +21,19 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
 
   // FIXME maybe better separate session object from event processing, create
   // ClientSession.js?
-  this.widgetMap[sessionPartId] = this;
+  this.modelAdapterRegistry[sessionPartId] = this;
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
-  this.widgetMap[modelAdapter.model.id] = null;
+  this.modelAdapterRegistry[modelAdapter.model.id] = null;
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
-  this.widgetMap[modelAdapter.model.id] = modelAdapter;
+  this.modelAdapterRegistry[modelAdapter.model.id] = modelAdapter;
+};
+
+scout.Session.prototype.getModelAdapter = function(id) {
+  return this.modelAdapterRegistry[id];
 };
 
 scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
@@ -40,7 +44,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
     throw "parent needs to be set";
   }
 
-  var adapter = this.widgetMap[model.id];
+  var adapter = this.modelAdapterRegistry[model.id];
   if (adapter) {
     return adapter;
   }
@@ -169,7 +173,7 @@ scout.Session.prototype._processEvents = function(events) {
       widgetId = event.id;
     }
 
-    var widget = session.widgetMap[widgetId];
+    var widget = session.modelAdapterRegistry[widgetId];
     if (!widget) {
       throw "No widget found for id " + widgetId;
     }

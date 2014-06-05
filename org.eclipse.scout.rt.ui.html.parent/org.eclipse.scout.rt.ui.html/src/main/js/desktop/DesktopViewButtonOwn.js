@@ -3,7 +3,7 @@
 
 scout.DesktopViewButtonOwn = function($parent, viewButton, session) {
 
-  session.widgetMap[viewButton.id] = this;
+  session.modelAdapterRegistry[viewButton.id] = this;
 
   this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', viewButton.text);
   this._$viewButton.on('click', '', onClick)

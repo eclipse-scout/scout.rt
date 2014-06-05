@@ -12,7 +12,7 @@ scout.TableField.prototype._render = function($parent) {
     this.$label = this.$container.appendDiv(undefined, 'label');
   }
 
-  this.table = this.session.widgetMap[this.model.table];
+  this.table = this.session.modelAdapterRegistry[this.model.table];
   if (!this.table) {
     this.table = this.session.objectFactory.create(this.model.table);
   }
@@ -38,7 +38,7 @@ scout.TableField.prototype.onModelCreate = function(event) {
 
 scout.TableField.prototype._onModelTableChanged = function(tableId) {
   this.table.detach();
-  this.table = this.session.widgetMap[tableId];
+  this.table = this.session.modelAdapterRegistry[tableId];
   this.table.attach(this._$container);
 };
 

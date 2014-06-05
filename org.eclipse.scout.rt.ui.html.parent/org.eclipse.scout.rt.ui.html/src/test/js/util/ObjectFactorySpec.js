@@ -20,7 +20,7 @@ describe("ObjectFactory", function() {
         expect(object).toBeTruthy();
       }
 
-      registeredObject = session.widgetMap[model.id];
+      registeredObject = session.modelAdapterRegistry[model.id];
       expect(registeredObject).toBe(object);
     }
   }

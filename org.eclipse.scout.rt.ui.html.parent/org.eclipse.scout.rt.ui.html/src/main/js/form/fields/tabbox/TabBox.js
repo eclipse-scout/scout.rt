@@ -13,7 +13,7 @@ scout.TabBox.prototype._render = function($parent) {
     var i, groupBoxModel, groupBoxWidget;
     for (i = 0; i < this.model.groupBoxes.length; i++) {
       groupBoxModel = this.model.groupBoxes[i];
-      groupBoxWidget = this.session.widgetMap[groupBoxModel.id];
+      groupBoxWidget = this.session.modelAdapterRegistry[groupBoxModel.id];
       if (!groupBoxWidget) {
         groupBoxWidget = this.session.objectFactory.create(groupBoxModel);
       }

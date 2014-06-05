@@ -157,7 +157,7 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
                 .on('click', '', onMenuItemClicked);
             }
 
-            var menuAdapter = that.table.session.widgetMap[menus[i].id];
+            var menuAdapter = that.table.session.modelAdapterRegistry[menus[i].id];
             menuAdapter.sendAboutToShow();
           }
 

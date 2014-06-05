@@ -17,7 +17,7 @@ scout.SequenceBox.prototype._render = function($parent) {
   var i, fieldModel, fieldWidget;
   for (i = 0; i < this.model.fields.length; i++) {
     fieldModel = this.model.fields[i];
-    fieldWidget = this.session.widgetMap[fieldModel.id];
+    fieldWidget = this.session.modelAdapterRegistry[fieldModel.id];
     if (!fieldWidget) {
       fieldWidget = this.session.objectFactory.create(fieldModel);
     }

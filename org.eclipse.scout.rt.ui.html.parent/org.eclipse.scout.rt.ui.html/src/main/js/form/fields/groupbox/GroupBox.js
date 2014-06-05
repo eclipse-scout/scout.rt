@@ -27,7 +27,7 @@ scout.GroupBox.prototype._render = function($parent) {
     var i, formFieldModel, formField;
     for (i = 0; i < this.model.formFields.length; i++) {
       formFieldModel = this.model.formFields[i];
-      formField = this.session.widgetMap[formFieldModel.id];
+      formField = this.session.modelAdapterRegistry[formFieldModel.id];
       if (!formField) {
         formField = this.session.objectFactory.create(formFieldModel);
       }
@@ -74,6 +74,18 @@ scout.GroupBox.prototype.layout = function() {
 
 scout.GroupBox.prototype._onModelBorderVisibleChanged = function(borderVisible) {
   // NOP
+};
+
+scout.GroupBox.prototype.dispose = function() {
+  scout.GroupBox.parent.prototype.dispose.call(this);
+
+  var i, formField;
+  for (i = 0; i < this.model.formFields.length; i++) {
+    formField = this.session.getModelAdapter(this.model.formFields[i].id);
+    if (formField) {
+      formField.dispose();
+    }
+  }
 };
 
 scout.GroupBox.prototype.onModelPropertyChange = function(event) {

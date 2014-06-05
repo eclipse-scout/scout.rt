@@ -8,7 +8,7 @@ scout.DesktopViewButton = function($parent, model, session) {
   this._$viewButton;
   this.model = model;
 
-  session.widgetMap[model.id] = this;
+  session.modelAdapterRegistry[model.id] = this;
   var state = '';
   if (model.selected) {
     state = 'selected';

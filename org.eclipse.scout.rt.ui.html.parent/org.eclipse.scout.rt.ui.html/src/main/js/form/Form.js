@@ -26,7 +26,7 @@ scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
 
-  var rootGroupBox = this.session.widgetMap[this.model.rootGroupBox.id];
+  var rootGroupBox = this.session.modelAdapterRegistry[this.model.rootGroupBox.id];
   if (!rootGroupBox) {
     rootGroupBox =  this.session.objectFactory.create(this.model.rootGroupBox);
   }
@@ -89,10 +89,6 @@ scout.Form.prototype.disable = function() {
     css('left', this.$container.position().left);
 };
 
-scout.Form.prototype.dispose = function() {
-  this._rootGroupBox.dispose();
-};
-
 scout.Form.prototype.destroy = function() {
   scout.Form.parent.prototype.destroy.call(this);
   this.remove();
@@ -111,4 +107,5 @@ scout.Form.prototype.onModelAction = function(event) {
 scout.Form.prototype.dispose = function() {
   scout.Form.parent.prototype.dispose.call(this);
   $(window).off('resize', this._resizeHandler);
+  this._rootGroupBox.dispose();
 };
