@@ -85,7 +85,7 @@
       <executions>
         <execution>
           <id>process-css</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -104,7 +104,7 @@
         </execution>
         <execution>
           <id>process-mobile-css</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -123,7 +123,7 @@
         </execution>
         <execution>
           <id>process-js</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -142,7 +142,7 @@
         </execution>
         <execution>
           <id>process-mobile-js</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <goals>
             <goal>java</goal>
           </goals>
@@ -169,7 +169,7 @@
       <executions>
         <execution>
           <id>copy</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <configuration>
             <target name="copy fastclick to process_script for minimizing">
               <copy file="${project.basedir}/libjs/fastclickmod-1.0.1.js" tofile="${project.build.directory}/process_script/fastclickmod-1.0.1.js" />
@@ -191,7 +191,7 @@
       <executions>
         <execution>
           <id>minify</id>
-          <phase>package</phase>
+          <phase>prepare-package</phase>
           <goals>
             <goal>compress</goal>
           </goals>
