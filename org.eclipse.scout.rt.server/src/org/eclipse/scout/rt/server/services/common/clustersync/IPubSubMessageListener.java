@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.server.services.common.clustersync;
+
 
 /**
- * All possible menus types of a table menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
- * method.
+ *
  */
-public enum TableMenuType implements IMenuType {
-  EmptySpace,
-  SingleSelection,
-  MultiSelection,
-  Header
+public interface IPubSubMessageListener {
+
+  void onMessage(IClusterNotificationMessage message);
+
 }

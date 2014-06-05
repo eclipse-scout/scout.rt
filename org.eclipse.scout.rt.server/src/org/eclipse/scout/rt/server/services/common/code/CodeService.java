@@ -27,27 +27,45 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * delegates to {@link CodeTypeStore}
  */
 @Priority(-1)
-public class CodeService extends AbstractService implements IClusterSyncCodeService {
+public class CodeService extends AbstractService implements IClusterSyncCodeService, IClusterNotificationListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeService.class);
 
-  private CodeTypeStore m_codeTypeStore;
-  private Object m_codeTypeClassDescriptorMapLock;
-  private HashMap<String, Set<BundleClassDescriptor>> m_codeTypeClassDescriptorMap;
+  private final CodeTypeStore m_codeTypeStore;
+  private final Object m_codeTypeClassDescriptorMapLock;
+  private final HashMap<String, Set<BundleClassDescriptor>> m_codeTypeClassDescriptorMap;
 
   public CodeService() {
     m_codeTypeStore = new CodeTypeStore();
     m_codeTypeClassDescriptorMapLock = new Object();
     m_codeTypeClassDescriptorMap = new HashMap<String, Set<BundleClassDescriptor>>();
+  }
+
+  @Override
+  public void initializeService(ServiceRegistration registration) {
+    addClusterNotificationListener();
+  }
+
+  protected void addClusterNotificationListener() {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      s.addListener(this);
+    }
   }
 
   @Override
@@ -114,6 +132,10 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
       return null;
     }
     m_codeTypeStore.unloadCodeTypeCache(type);
+
+    List<Class<? extends ICodeType<?, ?>>> codetypeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    codetypeList.add(type);
+    publishCluster(codetypeList);
     return getCodeTypeCache().reloadCodeType(type);
   }
 
@@ -123,7 +145,15 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
       return null;
     }
     m_codeTypeStore.unloadCodeTypeCache(types);
+    publishCluster(types);
     return getCodeTypeCache().reloadCodeTypes(types);
+  }
+
+  private void publishCluster(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      s.publishNotification(new UnloadCodeTypeCacheClusterNotification(codetypeList));
+    }
   }
 
   @Override
@@ -277,6 +307,20 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
       }
     }
     return false;
+  }
+
+  @Override
+  public void onNotification(IClusterNotificationMessage notification) {
+    IClusterNotification clusterNotification = notification.getNotification();
+    if ((clusterNotification instanceof UnloadCodeTypeCacheClusterNotification)) {
+      try {
+        UnloadCodeTypeCacheClusterNotification n = (UnloadCodeTypeCacheClusterNotification) clusterNotification;
+        reloadCodeTypesNoFire(n.getTypes());
+      }
+      catch (ProcessingException e) {
+        LOG.error("Unable to reload CodeTypes", e);
+      }
+    }
   }
 
 }

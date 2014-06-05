@@ -10,15 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
- * Message sent between cluster nodes
+ *
  */
-public interface IClusterNotificationMessage extends Serializable {
+public interface IClusterNodeStatusInfo {
 
-  IClusterNotificationMessageProperties getProperties();
+  /**
+   * @return number of sent messages
+   */
+  long getSentMessageCount();
 
-  IClusterNotification getNotification();
+  /**
+   * @return number of received messages
+   */
+  long getReceivedMessageCount();
+
+  /**
+   * @return date of the last received message
+   */
+  Date getLastReceivedDate();
+
+  /**
+   * @return user id of the last received message
+   */
+  String getLastReceivedOriginUser();
+
+  /**
+   * @return node id of the last received message
+   */
+  String getLastReceivedOriginNode();
 
 }

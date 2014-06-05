@@ -59,7 +59,4 @@ public interface IClusterSynchronizationService extends IService {
    */
   void removeListener(IClusterNotificationListener listener);
 
-  /** TODO use callback instead */
-  void processNotification(IClusterNotificationMessage notification);
-
 }

@@ -8,15 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu.root;
+package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import java.util.EventListener;
+import java.io.Serializable;
 
 /**
  *
  */
-public interface ContextMenuListener extends EventListener {
+public interface IClusterNotificationMessageProperties extends Serializable {
 
-  void contextMenuChanged(ContextMenuEvent event);
+  String getOriginNode();
+
+  String getOriginUser();
 
 }

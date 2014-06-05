@@ -10,8 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security.internal;
 
+import java.util.Collection;
+
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 
 public class AccessControlCacheChangedClusterNotification implements IClusterNotification {
   private static final long serialVersionUID = 128460814967537176L;
+
+  private final Collection<String> m_userIds;
+
+  public Collection<String> getUserIds() {
+    return m_userIds;
+  }
+
+  public AccessControlCacheChangedClusterNotification(Collection<String> userIds) {
+    m_userIds = userIds;
+  }
+
+  public AccessControlCacheChangedClusterNotification() {
+    this(null);
+  }
 }

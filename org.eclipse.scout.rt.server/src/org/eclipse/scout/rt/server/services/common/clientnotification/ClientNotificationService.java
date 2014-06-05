@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.ServiceRegistration;
 
 public class ClientNotificationService extends AbstractService implements IClientNotificationService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationService.class);
@@ -39,8 +40,16 @@ public class ClientNotificationService extends AbstractService implements IClien
   }
 
   @Override
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
+    addClusterNotificationListener();
+  }
+
+  @Override
   public Set<IClientNotification> getNextNotifications(long blockingTimeout) {
-    return m_clientNotificationQueue.getNextNotifications(blockingTimeout);
+    Set<IClientNotification> n = m_clientNotificationQueue.getNextNotifications(blockingTimeout);
+    addClusterInfo(n);
+    return n;
   }
 
   @Override
@@ -94,6 +103,13 @@ public class ClientNotificationService extends AbstractService implements IClien
     return m;
   }
 
+  protected void addClusterNotificationListener() {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      s.addListener(new ClientNotificationClusterNotificationListener());
+    }
+  }
+
   /**
    * Has no effect, if no cluster service is registered
    */
@@ -101,11 +117,24 @@ public class ClientNotificationService extends AbstractService implements IClien
     try {
       IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
       if (s != null) {
+        element.getNotification().setOriginalServerNode(s.getNodeId());
         s.publishNotification(new ClientNotificationClusterNotification(element));
       }
     }
     catch (ProcessingException e) {
       LOG.error("could not send cluster sync message", e);
+    }
+  }
+
+  /**
+   * Has no effect, if no cluster service is registered
+   */
+  protected void addClusterInfo(Set<IClientNotification> notifications) {
+    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    if (s != null) {
+      for (IClientNotification n : notifications) {
+        n.setProvidingServerNode(s.getNodeId());
+      }
     }
   }
 

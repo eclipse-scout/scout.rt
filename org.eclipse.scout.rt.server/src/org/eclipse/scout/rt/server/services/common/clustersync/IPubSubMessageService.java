@@ -17,9 +17,13 @@ import org.eclipse.scout.service.IService;
  */
 public interface IPubSubMessageService extends IService {
 
-  public boolean subscribe(String queueName);
+  boolean subscribe(String queueName);
 
-  public boolean unsubsribe(String queueName);
+  boolean unsubsribe(String queueName);
 
-  public boolean publishNotification(IClusterNotification notification);
+  void setListener(IPubSubMessageListener listener);
+
+  IPubSubMessageListener getListener();
+
+  boolean publishNotification(IClusterNotificationMessage notification);
 }
