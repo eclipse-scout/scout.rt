@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -32,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.html.client.ext.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.html.client.ext.IGraphTableControl;
 import org.eclipse.scout.rt.client.ui.html.client.ext.IMapTableControl;
 import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
+import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonChartTableControl;
@@ -89,6 +91,9 @@ public class JsonAdapterFactory {
     }
     else if (modelObject instanceof IMenu) {
       return new JsonMenu((IMenu) modelObject, session, id);
+    }
+    else if (modelObject instanceof IKeyStroke) {
+      return new JsonKeyStroke((IKeyStroke) modelObject, session, id);
     }
     else if (modelObject instanceof IForm) {
       return new JsonForm((IForm) modelObject, session, id);

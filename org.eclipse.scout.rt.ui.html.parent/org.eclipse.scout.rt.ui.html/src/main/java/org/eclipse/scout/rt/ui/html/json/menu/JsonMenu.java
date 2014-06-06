@@ -106,5 +106,4 @@ public class JsonMenu extends AbstractJsonPropertyObserverAdapter<IMenu> {
   public void handleUiMenuAboutToShow(JsonEvent event, JsonResponse res) {
     getModelObject().aboutToShow();
   }
-
 }
