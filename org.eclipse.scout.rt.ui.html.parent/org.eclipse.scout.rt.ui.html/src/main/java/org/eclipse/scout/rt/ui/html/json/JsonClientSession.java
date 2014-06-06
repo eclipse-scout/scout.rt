@@ -39,8 +39,8 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   private ILocaleListener m_localeListener;
   private boolean m_localeManagedByModel;
 
-  public JsonClientSession(IClientSession modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public JsonClientSession(IClientSession model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
     m_localeManagedByModel = false;
   }
 
@@ -53,12 +53,12 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   protected void attachModel() {
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
-      getModelObject().addLocaleListener(m_localeListener);
+      getModel().addLocaleListener(m_localeListener);
     }
 
-    if (!getModelObject().isActive()) {
+    if (!getModel().isActive()) {
       //FIXME copied from session service. Moved here to be able to attach locale listener first
-      ClientSyncJob job = new ClientSyncJob("Session startup", getModelObject()) {
+      ClientSyncJob job = new ClientSyncJob("Session startup", getModel()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           getCurrentSession().startSession(Activator.getDefault().getBundle());
@@ -72,7 +72,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   @Override
   protected void detachModel() {
     if (m_localeListener != null) {
-      getModelObject().removeLocaleListener(m_localeListener);
+      getModel().removeLocaleListener(m_localeListener);
       m_localeListener = null;
     }
   }
@@ -80,8 +80,8 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, "desktop", modelObjectToJson(getModelObject().getDesktop()));
-    putProperty(json, "locale", localeToJson(getModelObject().getLocale()));
+    putProperty(json, "desktop", modelToJson(getModel().getDesktop()));
+    putProperty(json, "locale", localeToJson(getModel().getLocale()));
     return json;
   }
 
@@ -96,8 +96,8 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (!getModelObject().getLocale().equals(locale)) {
-          getModelObject().setLocale(locale);
+        if (!getModel().getLocale().equals(locale)) {
+          getModel().setLocale(locale);
         }
       }
     }.runNow(new NullProgressMonitor());

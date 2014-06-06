@@ -23,30 +23,30 @@ public abstract class JsonProperty<T, V> {
 
   private final String m_propertyName;
 
-  private final T m_modelObject;
+  private final T m_model;
 
-  public JsonProperty(String propertyName, T modelObject) {
+  public JsonProperty(String propertyName, T model) {
     m_propertyName = propertyName;
-    m_modelObject = modelObject;
+    m_model = model;
   }
 
   public String getPropertyName() {
     return m_propertyName;
   }
 
-  abstract protected V getValueImpl(T modelObject);
+  abstract protected V getValueImpl(T model);
 
   public Object valueToJson(Object value) {
     return value;
   }
 
   public Object getValueAsJson() {
-    return valueToJson(getValueImpl(m_modelObject));
+    return valueToJson(getValueImpl(m_model));
   }
 
   @Override
   public String toString() {
-    return m_propertyName + ": " + m_modelObject;
+    return m_propertyName + ": " + m_model;
   }
 
 }

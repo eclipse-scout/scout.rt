@@ -62,7 +62,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   public IDesktop getDesktop() {
-    return getModelObject();
+    return getModel();
   }
 
   @Override
@@ -97,14 +97,14 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     JSONObject json = super.toJson();
 
     List<IForm> modelForms = getForms();
-    putProperty(json, "forms", modelObjectsToJson(modelForms));
+    putProperty(json, "forms", modelsToJson(modelForms));
     putProperty(json, "toolButtons", newJSONArray(TOOL_BUTTONS));
 
     boolean formBased = isFormBased();
     if (!formBased) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
-      putProperty(json, "viewButtons", modelObjectsToJson(getDesktop().getViewButtons()));
-      putProperty(json, "outline", modelObjectToJson(getDesktop().getOutline()));
+      putProperty(json, "viewButtons", modelsToJson(getDesktop().getViewButtons()));
+      putProperty(json, "outline", modelToJson(getDesktop().getOutline()));
     }
 
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
@@ -113,7 +113,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
     }
     if (breadCrumbsNavigation.getValue() != null) {
-      putProperty(json, "breadCrumbsNavigation", modelObjectToJson(breadCrumbsNavigation.getValue()));
+      putProperty(json, "breadCrumbsNavigation", modelToJson(breadCrumbsNavigation.getValue()));
     }
     return json;
   }

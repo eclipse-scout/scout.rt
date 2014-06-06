@@ -22,12 +22,12 @@ public class JsonButton extends JsonFormField<IButton> {
 
   public final static String PROP_SYSTEM_TYPE = "systemType";
 
-  public JsonButton(IButton modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
-    putJsonProperty(new JsonProperty<IButton, Integer>(PROP_SYSTEM_TYPE, modelObject) {
+  public JsonButton(IButton model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
+    putJsonProperty(new JsonProperty<IButton, Integer>(PROP_SYSTEM_TYPE, model) {
       @Override
-      protected Integer getValueImpl(IButton model) {
-        return model.getSystemType();
+      protected Integer getValueImpl(IButton button) {
+        return button.getSystemType();
       }
     });
     // TODO AWE: System-type von button mit ans UI schicken?
@@ -41,7 +41,7 @@ public class JsonButton extends JsonFormField<IButton> {
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (JsonEventType.CLICK.matches(event)) {
-      getModelObject().getUIFacade().fireButtonClickedFromUI();
+      getModel().getUIFacade().fireButtonClickedFromUI();
     }
   }
 }

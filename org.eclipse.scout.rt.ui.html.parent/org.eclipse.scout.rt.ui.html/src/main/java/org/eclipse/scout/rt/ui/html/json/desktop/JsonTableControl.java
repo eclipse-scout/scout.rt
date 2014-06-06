@@ -76,7 +76,7 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-      getModelObject().fireActivatedFromUI();
+      getModel().fireActivatedFromUI();
     }
   }
 

@@ -114,13 +114,13 @@ public final class JsonObjectUtility {
    * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>. //FIXME CGU adjust
    * javadoc
    */
-  public static final JSONObject modelObjectToJson(IJsonSession session, Object modelObject) {
-    if (modelObject == null) {
+  public static final JSONObject modelToJson(IJsonSession session, Object model) {
+    if (model == null) {
       return null;
     }
-    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(modelObject);
+    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(model);
     if (jsonAdapter == null) {
-      jsonAdapter = (IJsonAdapter<?>) session.createJsonAdapter(modelObject);
+      jsonAdapter = (IJsonAdapter<?>) session.createJsonAdapter(model);
       return jsonAdapter.toJson();
     }
     else {
@@ -132,17 +132,17 @@ public final class JsonObjectUtility {
    * Creates a new json object and puts the model into it.
    */
   public static JSONObject newJsonObjectForModel(IJsonSession session, String propertyName, Object model) {
-    return putProperty(new JSONObject(), propertyName, modelObjectToJson(session, model));
+    return putProperty(new JSONObject(), propertyName, modelToJson(session, model));
   }
 
   /**
    * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> for each object in the model objects List and adds
    * the return values of <code>toJson()</code> to the JSONArray.
    */
-  public static JSONArray modelObjectsToJson(IJsonSession session, List<?> modelObjects) {
+  public static JSONArray modelsToJson(IJsonSession session, List<?> models) {
     JSONArray array = new JSONArray();
-    for (Object modelObject : modelObjects) {
-      array.put(modelObjectToJson(session, modelObject));
+    for (Object model : models) {
+      array.put(modelToJson(session, model));
     }
     return array;
   }

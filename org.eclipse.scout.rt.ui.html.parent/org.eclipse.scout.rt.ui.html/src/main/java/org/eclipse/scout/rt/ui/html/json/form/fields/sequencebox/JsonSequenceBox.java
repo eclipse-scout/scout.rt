@@ -33,12 +33,12 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_FIELDS, modelObjectsToJson(getModelObject().getFields()));
+    return putProperty(super.toJson(), PROP_FIELDS, modelsToJson(getModel().getFields()));
   }
 
   @Override
   public void dispose() {
-    disposeJsonAdapters(getModelObject().getFields());
+    disposeJsonAdapters(getModel().getFields());
     super.dispose();
   }
 

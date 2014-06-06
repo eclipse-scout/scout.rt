@@ -27,32 +27,32 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
     super(model, session, id);
     putJsonProperty(new JsonProperty<T, String>(IFormField.PROP_LABEL, model) {
       @Override
-      protected String getValueImpl(T modelObject) {
-        return modelObject.getLabel();
+      protected String getValueImpl(T field) {
+        return field.getLabel();
       }
     });
     putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(T modelObject) {
-        return modelObject.isEnabled();
+      protected Boolean getValueImpl(T field) {
+        return field.isEnabled();
       }
     });
     putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(T modelObject) {
-        return modelObject.isVisible();
+      protected Boolean getValueImpl(T field) {
+        return field.isVisible();
       }
     });
     putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_MANDATORY, model) {
       @Override
-      protected Boolean getValueImpl(T modelObject) {
-        return modelObject.isMandatory();
+      protected Boolean getValueImpl(T field) {
+        return field.isMandatory();
       }
     });
     putJsonProperty(new JsonProperty<T, IProcessingStatus>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
-      protected IProcessingStatus getValueImpl(T modelObject) {
-        return modelObject.getErrorStatus();
+      protected IProcessingStatus getValueImpl(T field) {
+        return field.getErrorStatus();
       }
 
       @Override
@@ -67,8 +67,8 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
     });
     putJsonProperty(new JsonProperty<T, GridData>(IJsonFormField.PROP_GRID_DATA, model) {
       @Override
-      protected GridData getValueImpl(T modelObject) {
-        return modelObject.getGridData();
+      protected GridData getValueImpl(T field) {
+        return field.getGridData();
       }
 
       @Override

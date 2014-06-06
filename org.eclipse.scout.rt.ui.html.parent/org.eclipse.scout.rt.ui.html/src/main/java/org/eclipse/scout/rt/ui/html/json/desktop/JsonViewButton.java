@@ -10,21 +10,21 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
 
-  public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
-    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_TEXT, modelObject) {
+  public JsonViewButton(IViewButton model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
+    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_TEXT, model) {
       @Override
       protected String getValueImpl(IViewButton button) {
         return button.getText();
       }
     });
-    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_ICON_ID, modelObject) {
+    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_ICON_ID, model) {
       @Override
       protected String getValueImpl(IViewButton button) {
         return button.getIconId();
       }
     });
-    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_SELECTED, modelObject) {
+    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_SELECTED, model) {
       @Override
       protected Boolean getValueImpl(IViewButton button) {
         return button.isSelected();
@@ -48,7 +48,7 @@ public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
   }
 
   protected void handleUiClick(JsonEvent event, JsonResponse res) {
-    getModelObject().getUIFacade().fireActionFromUI();
+    getModel().getUIFacade().fireActionFromUI();
   }
 
 }

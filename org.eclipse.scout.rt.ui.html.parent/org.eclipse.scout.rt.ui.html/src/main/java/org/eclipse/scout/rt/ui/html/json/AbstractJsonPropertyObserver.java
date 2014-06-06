@@ -31,8 +31,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    */
   private Map<String, JsonProperty> m_jsonProperties;
 
-  public AbstractJsonPropertyObserver(T modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
     m_jsonProperties = new HashMap<>();
   }
 
@@ -50,7 +50,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     super.attachModel();
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();
-      getModelObject().addPropertyChangeListener(m_propertyChangeListener);
+      getModel().addPropertyChangeListener(m_propertyChangeListener);
     }
   }
 
@@ -58,7 +58,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   protected void detachModel() {
     super.detachModel();
     if (m_propertyChangeListener != null) {
-      getModelObject().removePropertyChangeListener(m_propertyChangeListener);
+      getModel().removePropertyChangeListener(m_propertyChangeListener);
       m_propertyChangeListener = null;
     }
   }

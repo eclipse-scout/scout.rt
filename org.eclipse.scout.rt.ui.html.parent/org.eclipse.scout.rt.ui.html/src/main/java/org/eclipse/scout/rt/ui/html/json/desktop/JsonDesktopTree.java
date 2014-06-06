@@ -48,11 +48,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
 
-  public JsonDesktopTree(IOutline modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public JsonDesktopTree(IOutline model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
-    m_treeEventFilter = new TreeEventFilter(getModelObject());
+    m_treeEventFilter = new TreeEventFilter(getModel());
   }
 
   @Override
@@ -65,7 +65,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     super.attachModel();
     if (m_modelTreeListener == null) { //FIXME CGU illegal state when null
       m_modelTreeListener = new P_ModelTreeListener();
-      getModelObject().addUITreeListener(m_modelTreeListener);
+      getModel().addUITreeListener(m_modelTreeListener);
     }
   }
 
@@ -73,7 +73,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   protected void detachModel() {
     super.detachModel();
     if (m_modelTreeListener != null) {
-      getModelObject().removeTreeListener(m_modelTreeListener);
+      getModel().removeTreeListener(m_modelTreeListener);
       m_modelTreeListener = null;
     }
   }
@@ -93,22 +93,22 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonPages = new JSONArray();
-    if (getModelObject().isRootNodeVisible()) {
-      IPage rootPage = getModelObject().getRootPage();
+    if (getModel().isRootNodeVisible()) {
+      IPage rootPage = getModel().getRootPage();
       jsonPages.put(pageToJson(rootPage));
     }
     else {
-      for (IPage childPage : getModelObject().getRootPage().getChildPages()) {
+      for (IPage childPage : getModel().getRootPage().getChildPages()) {
         jsonPages.put(pageToJson(childPage));
       }
     }
     putProperty(json, PROP_NODES, jsonPages);
-    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModelObject().getSelectedNodes()));
+    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
 
-    putProperty(json, PROP_MENUS, modelObjectsToJson(getModelObject().getMenus()));
+    putProperty(json, PROP_MENUS, modelsToJson(getModel().getMenus()));
 
     //FIXME cgu refactor
-    modelObjectToJson(getModelObject().getContextMenu());
+    modelToJson(getModel().getContextMenu());
     return json;
   }
 
@@ -128,7 +128,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       }
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_COLLAPSED: {
-        if (!getModelObject().isRootNodeVisible() && getModelObject().getRootNode() == event.getNode()) {
+        if (!getModel().isRootNodeVisible() && getModel().getRootNode() == event.getNode()) {
           //Not necessary to send events for invisible root node
           return;
         }
@@ -205,7 +205,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   @Override
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, modelObjectsToJson(getModelObject().getMenus()));
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, modelsToJson(getModel().getMenus()));
   }
 
   protected String getOrCreatedNodeId(ITreeNode node) {
@@ -240,10 +240,10 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       pageType = "table";
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       ITable table = pageWithTable.getTable();
-      putProperty(json, "table", modelObjectToJson(table));
+      putProperty(json, "table", modelToJson(table));
 
       if (page instanceof IPage2) {
-        putProperty(json, "tableControls", modelObjectsToJson(((IPage2) page).getTableControls()));
+        putProperty(json, "tableControls", modelsToJson(((IPage2) page).getTableControls()));
       }
 
     }
@@ -305,16 +305,16 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(getString(event.getJsonObject(), PROP_NODE_ID));
-    getModelObject().getUIFacade().fireNodeClickFromUI(node);
+    getModel().getUIFacade().fireNodeClickFromUI(node);
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getJsonObject());
-    TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODES_SELECTED, nodes);
+    TreeEvent treeEvent = new TreeEvent(getModel(), TreeEvent.TYPE_NODES_SELECTED, nodes);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
 
     try {
-      getModelObject().getUIFacade().setNodesSelectedFromUI(nodes);
+      getModel().getUIFacade().setNodesSelectedFromUI(nodes);
     }
     finally {
       getTreeEventFilter().removeIgnorableModelEvent(treeEvent);
@@ -327,10 +327,10 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     if (node.isExpanded() == expanded) {
       return;
     }
-    TreeEvent treeEvent = new TreeEvent(getModelObject(), TreeEvent.TYPE_NODE_EXPANDED, node);
+    TreeEvent treeEvent = new TreeEvent(getModel(), TreeEvent.TYPE_NODE_EXPANDED, node);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
     try {
-      getModelObject().getUIFacade().setNodeExpandedFromUI(node, expanded);
+      getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
     }
     finally {
       getTreeEventFilter().removeIgnorableModelEvent(treeEvent);

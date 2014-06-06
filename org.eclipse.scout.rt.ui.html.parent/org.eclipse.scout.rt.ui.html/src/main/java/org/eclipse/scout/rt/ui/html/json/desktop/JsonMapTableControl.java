@@ -59,7 +59,7 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
     if ("selected".equals(event.getType())) {
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", newJSONObject(MAP));
 
-      getModelObject().fireActivatedFromUI();
+      getModel().fireActivatedFromUI();
     }
   }
 }

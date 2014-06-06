@@ -30,17 +30,17 @@ public interface IJsonSession {
   /**
    * Returns an IJsonAdapter instance for the given model object.
    */
-  IJsonAdapter<?> getJsonAdapter(Object modelObject);
+  IJsonAdapter<?> getJsonAdapter(Object model);
 
   /**
-   * Creates a new IJsonAdapter instance for the given modelObject, or returns an existing instance.
+   * Creates a new IJsonAdapter instance for the given model, or returns an existing instance.
    */
-  IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject); // TODO CGU: rename to 'model'
+  IJsonAdapter<?> getOrCreateJsonAdapter(Object model);
 
   /**
-   * Creates a new IJsonAdapter instance for the given modelObject.
+   * Creates a new IJsonAdapter instance for the given model.
    */
-  IJsonAdapter<?> createJsonAdapter(Object modelObject);
+  IJsonAdapter<?> createJsonAdapter(Object model);
 
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 

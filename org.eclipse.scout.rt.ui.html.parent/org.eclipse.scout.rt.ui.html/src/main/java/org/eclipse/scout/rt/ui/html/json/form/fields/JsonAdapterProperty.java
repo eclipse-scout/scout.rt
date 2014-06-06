@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 public abstract class JsonAdapterProperty<T, V> extends JsonProperty<T, V> {
   private IJsonSession m_jsonSession;
 
-  public JsonAdapterProperty(String propertyName, T modelObject, IJsonSession session) {
-    super(propertyName, modelObject);
+  public JsonAdapterProperty(String propertyName, T model, IJsonSession session) {
+    super(propertyName, model);
     m_jsonSession = session;
   }
 
@@ -27,7 +27,7 @@ public abstract class JsonAdapterProperty<T, V> extends JsonProperty<T, V> {
 
   @Override
   public Object valueToJson(Object value) {
-    return JsonObjectUtility.modelObjectToJson(m_jsonSession, value);
+    return JsonObjectUtility.modelToJson(m_jsonSession, value);
   }
 
 }

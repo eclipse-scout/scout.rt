@@ -53,7 +53,7 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
     if ("selected".equals(event.getType())) {
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
 
-      getModelObject().fireActivatedFromUI();
+      getModel().fireActivatedFromUI();
 
     }
   }

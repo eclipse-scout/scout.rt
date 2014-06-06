@@ -19,15 +19,15 @@ import org.json.JSONObject;
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   private final IJsonSession m_jsonSession;
-  private final T m_modelObject;
+  private final T m_model;
   private final String m_id;
   private boolean m_initialized;
 
-  public AbstractJsonAdapter(T modelObject, IJsonSession jsonSession, String id) {
-    if (modelObject == null) {
-      throw new IllegalArgumentException("modelObject must not be null");
+  public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id) {
+    if (model == null) {
+      throw new IllegalArgumentException("model must not be null");
     }
-    m_modelObject = modelObject;
+    m_model = model;
     m_jsonSession = jsonSession;
     m_id = id;
     m_jsonSession.registerJsonAdapter(this);
@@ -43,8 +43,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public T getModelObject() {
-    return m_modelObject;
+  public T getModel() {
+    return m_model;
   }
 
   @Override
@@ -93,12 +93,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.newJsonObjectForModel(getJsonSession(), propertyName, model);
   }
 
-  protected final JSONObject modelObjectToJson(Object modelObject) {
-    return JsonObjectUtility.modelObjectToJson(getJsonSession(), modelObject);
+  protected final JSONObject modelToJson(Object model) {
+    return JsonObjectUtility.modelToJson(getJsonSession(), model);
   }
 
-  protected final JSONArray modelObjectsToJson(List<?> modelObjects) {
-    return JsonObjectUtility.modelObjectsToJson(getJsonSession(), modelObjects);
+  protected final JSONArray modelsToJson(List<?> models) {
+    return JsonObjectUtility.modelsToJson(getJsonSession(), models);
   }
 
   protected void disposeJsonAdapters(Collection<? extends Object> models) {

@@ -38,8 +38,8 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
 
   private BreadCrumbsListener m_breadCrumbsListener;
 
-  public JsonBreadCrumbNavigation(IBreadCrumbsNavigation modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public JsonBreadCrumbNavigation(IBreadCrumbsNavigation model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
   }
 
   @Override
@@ -52,7 +52,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
     super.attachModel();
     if (m_breadCrumbsListener == null) {
       m_breadCrumbsListener = new P_BreadCrumbsListener();
-      getModelObject().addBreadCrumbsListener(m_breadCrumbsListener);
+      getModel().addBreadCrumbsListener(m_breadCrumbsListener);
     }
   }
 
@@ -60,7 +60,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
   protected void detachModel() {
     super.detachModel();
     if (m_breadCrumbsListener != null) {
-      getModelObject().removeBreadCrumbsListener(m_breadCrumbsListener);
+      getModel().removeBreadCrumbsListener(m_breadCrumbsListener);
       m_breadCrumbsListener = null;
     }
   }
@@ -68,13 +68,13 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_BREAD_CRUMBS, breadCrumbsToJson(getModelObject().getBreadCrumbs()));
+    putProperty(json, PROP_BREAD_CRUMBS, breadCrumbsToJson(getModel().getBreadCrumbs()));
     putProperty(json, PROP_CURRENT_FORM_ID, getCurrentJsonForm().getId());
     return json;
   }
 
   private JsonForm getCurrentJsonForm() {
-    return getJsonForm(getModelObject().getCurrentNavigationForm());
+    return getJsonForm(getModel().getCurrentNavigationForm());
   }
 
   private JsonForm getJsonForm(IForm form) {
@@ -102,9 +102,9 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
   public void handleUiActivate(JsonEvent event, JsonResponse res) {
     final String formId = getString(event.getJsonObject(), JsonForm.PROP_FORM_ID);
     JsonForm jsonForm = getCurrentJsonForm();
-    while (!jsonForm.getId().equals(formId) || getModelObject().getCurrentNavigationForm() == null) {
+    while (!jsonForm.getId().equals(formId) || getModel().getCurrentNavigationForm() == null) {
       try {
-        getModelObject().stepBack();
+        getModel().stepBack();
       }
       catch (ProcessingException e) {
         throw new JsonException(e);

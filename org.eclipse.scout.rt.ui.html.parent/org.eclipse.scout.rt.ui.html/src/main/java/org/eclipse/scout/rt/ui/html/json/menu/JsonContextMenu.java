@@ -23,8 +23,8 @@ public class JsonContextMenu extends AbstractJsonPropertyObserver<IContextMenu> 
 
   private ContextMenuListener m_contextMenuListener;
 
-  public JsonContextMenu(IContextMenu modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public JsonContextMenu(IContextMenu model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
   }
 
   @Override
@@ -33,7 +33,7 @@ public class JsonContextMenu extends AbstractJsonPropertyObserver<IContextMenu> 
 
     if (m_contextMenuListener == null) {
       m_contextMenuListener = new P_ContextMenuListener();
-      getModelObject().addContextMenuListener(m_contextMenuListener);
+      getModel().addContextMenuListener(m_contextMenuListener);
     }
   }
 
@@ -42,7 +42,7 @@ public class JsonContextMenu extends AbstractJsonPropertyObserver<IContextMenu> 
     super.detachModel();
 
     if (m_contextMenuListener != null) {
-      getModelObject().removeContextMenuListener(m_contextMenuListener);
+      getModel().removeContextMenuListener(m_contextMenuListener);
       m_contextMenuListener = null;
     }
   }

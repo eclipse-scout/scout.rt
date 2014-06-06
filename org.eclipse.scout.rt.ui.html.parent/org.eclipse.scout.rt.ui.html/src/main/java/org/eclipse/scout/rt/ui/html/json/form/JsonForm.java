@@ -26,8 +26,8 @@ import org.json.JSONObject;
 public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
-  public JsonForm(IForm modelObject, IJsonSession jsonSession, String id) {
-    super(modelObject, jsonSession, id);
+  public JsonForm(IForm model, IJsonSession jsonSession, String id) {
+    super(model, jsonSession, id);
   }
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
@@ -55,13 +55,13 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
 
     if (m_modelFormListener == null) {
       m_modelFormListener = new P_ModelFormListener();
-      getModelObject().addFormListener(m_modelFormListener);
+      getModel().addFormListener(m_modelFormListener);
     }
   }
 
   @Override
   public void dispose() {
-    disposeJsonAdapters(getModelObject().getRootGroupBox().getFields());
+    disposeJsonAdapters(getModel().getRootGroupBox().getFields());
     super.dispose();
   }
 
@@ -70,7 +70,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     super.detachModel();
 
     if (m_modelFormListener != null) {
-      getModelObject().removeFormListener(m_modelFormListener);
+      getModel().removeFormListener(m_modelFormListener);
       m_modelFormListener = null;
     }
   }
@@ -78,7 +78,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    IForm model = getModelObject();
+    IForm model = getModel();
     putProperty(json, PROP_TITLE, model.getTitle());
     putProperty(json, PROP_ICON_ID, model.getIconId());
     putProperty(json, PROP_MAXIMIZE_ENABLED, model.isMaximizeEnabled());
@@ -88,7 +88,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, "rootGroupBox", modelObjectToJson(model.getRootGroupBox()));
+    putProperty(json, "rootGroupBox", modelToJson(model.getRootGroupBox()));
     // TODO AWE: return other props
     return json;
   }
@@ -136,7 +136,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   }
 
   public void handleUiFormClosing(JsonEvent event, JsonResponse res) {
-    getModelObject().getUIFacade().fireFormClosingFromUI();
+    getModel().getUIFacade().fireFormClosingFromUI();
   }
 
   protected class P_ModelFormListener implements FormListener {

@@ -42,7 +42,7 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
 
   @Override
   public void dispose() {
-    disposeJsonAdapter(getModelObject().getTable());
+    disposeJsonAdapter(getModel().getTable());
     super.dispose();
   }
 }

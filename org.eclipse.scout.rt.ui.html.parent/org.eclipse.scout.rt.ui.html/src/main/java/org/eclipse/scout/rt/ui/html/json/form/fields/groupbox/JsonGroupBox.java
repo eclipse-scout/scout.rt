@@ -52,13 +52,13 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), "formFields", modelObjectsToJson(getModelObject().getFields()));
+    return putProperty(super.toJson(), "formFields", modelsToJson(getModel().getFields()));
   }
 
   @Override
   // TODO AWE: JsonCompositeField für group / seq. / etc.
   public void dispose() {
-    disposeJsonAdapters(getModelObject().getFields());
+    disposeJsonAdapters(getModel().getFields());
     super.dispose();
   }
 

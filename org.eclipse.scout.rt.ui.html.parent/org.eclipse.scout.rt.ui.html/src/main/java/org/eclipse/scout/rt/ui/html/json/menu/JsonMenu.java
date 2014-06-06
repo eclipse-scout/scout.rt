@@ -36,40 +36,40 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
 
     putJsonProperty(new JsonProperty<IMenu, String>(IMenu.PROP_TEXT, model) {
       @Override
-      protected String getValueImpl(IMenu modelObject) {
-        return modelObject.getText();
+      protected String getValueImpl(IMenu menu) {
+        return menu.getText();
       }
     });
     putJsonProperty(new JsonProperty<IMenu, String>(IMenu.PROP_ICON_ID, model) {
       @Override
-      protected String getValueImpl(IMenu modelObject) {
-        return modelObject.getIconId();//FIXME CGU how to handle resources?
+      protected String getValueImpl(IMenu menu) {
+        return menu.getIconId();//FIXME CGU how to handle resources?
       }
     });
 
     putJsonProperty(new JsonProperty<IMenu, Boolean>(IMenu.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(IMenu modelObject) {
-        return modelObject.isEnabled();
+      protected Boolean getValueImpl(IMenu menu) {
+        return menu.isEnabled();
       }
     });
     putJsonProperty(new JsonProperty<IMenu, Boolean>(IFormField.PROP_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(IMenu modelObject) {
-        return modelObject.isVisible();
+      protected Boolean getValueImpl(IMenu menu) {
+        return menu.isVisible();
       }
     });
     putJsonProperty(new JsonProperty<IMenu, Boolean>(PROP_SEPARATOR, model) {
       @Override
-      protected Boolean getValueImpl(IMenu modelObject) {
-        return modelObject.isSeparator();
+      protected Boolean getValueImpl(IMenu menu) {
+        return menu.isSeparator();
       }
     });
     putJsonProperty(new JsonProperty<IMenu, Set<String>>(PROP_MENU_TYPES, model) {
       @Override
-      protected Set<String> getValueImpl(IMenu modelObject) {
+      protected Set<String> getValueImpl(IMenu menu) {
         Set<String> menuTypes = new HashSet<>();
-        for (IMenuType type : modelObject.getMenuTypes()) {
+        for (IMenuType type : menu.getMenuTypes()) {
           menuTypes.add(type.toString());
         }
         return menuTypes;
@@ -80,7 +80,7 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_CHILD_MENUS, modelObjectsToJson(getModelObject().getChildActions()));
+    putProperty(json, PROP_CHILD_MENUS, modelsToJson(getModel().getChildActions()));
     return json;
   }
 
@@ -100,10 +100,10 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   }
 
   public void handleUiMenuAction(JsonEvent event, JsonResponse res) {
-    getModelObject().getUIFacade().fireActionFromUI();
+    getModel().getUIFacade().fireActionFromUI();
   }
 
   public void handleUiMenuAboutToShow(JsonEvent event, JsonResponse res) {
-    getModelObject().aboutToShow();
+    getModel().aboutToShow();
   }
 }

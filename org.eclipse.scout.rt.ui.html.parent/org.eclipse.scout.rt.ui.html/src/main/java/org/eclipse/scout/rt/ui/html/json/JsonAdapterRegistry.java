@@ -28,11 +28,11 @@ class JsonAdapterRegistry {
 
     // FIXME AWE: continue... 2 Dialoge offen / close --> NPE
 
-    private final Object m_modelObject;
+    private final Object m_model;
 
-    P_RegistryValue(String id, Object modelObject, IJsonAdapter<?> jsonAdapter) {
+    P_RegistryValue(String id, Object model, IJsonAdapter<?> jsonAdapter) {
       m_id = id;
-      m_modelObject = modelObject;
+      m_model = model;
       m_jsonAdapter = jsonAdapter;
     }
 
@@ -55,7 +55,7 @@ class JsonAdapterRegistry {
 
   void addJsonAdapter(IJsonAdapter jsonAdapter) {
     String id = jsonAdapter.getId();
-    Object model = jsonAdapter.getModelObject();
+    Object model = jsonAdapter.getModel();
 
     P_RegistryValue value = new P_RegistryValue(id, model, jsonAdapter);
     m_idAdapterMap.put(id, value);
@@ -66,7 +66,7 @@ class JsonAdapterRegistry {
     P_RegistryValue value = m_idAdapterMap.remove(id);
     if (value != null) {
       //FIXME CGU not null check necessary for tests, check with awe
-      m_modelAdapterMap.remove(value.m_modelObject);
+      m_modelAdapterMap.remove(value.m_model);
     }
   }
 
@@ -74,8 +74,8 @@ class JsonAdapterRegistry {
     return m_idAdapterMap.get(id).m_jsonAdapter;
   }
 
-  IJsonAdapter<?> getJsonAdapter(Object modelObject) {
-    P_RegistryValue value = m_modelAdapterMap.get(modelObject);
+  IJsonAdapter<?> getJsonAdapter(Object model) {
+    P_RegistryValue value = m_modelAdapterMap.get(model);
     if (value == null) {
       return null;
     }

@@ -62,76 +62,76 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 public class JsonAdapterFactory {
 
   @SuppressWarnings("unchecked")
-  public IJsonAdapter createJsonAdapter(Object modelObject, IJsonSession session, String id) {
+  public IJsonAdapter createJsonAdapter(Object model, IJsonSession session, String id) {
     // form fields
-    if (modelObject instanceof IGroupBox) {
-      return new JsonGroupBox((IGroupBox) modelObject, session, id);
+    if (model instanceof IGroupBox) {
+      return new JsonGroupBox((IGroupBox) model, session, id);
     }
-    else if (modelObject instanceof ISequenceBox) {
-      return new JsonSequenceBox((ISequenceBox) modelObject, session, id);
+    else if (model instanceof ISequenceBox) {
+      return new JsonSequenceBox((ISequenceBox) model, session, id);
     }
-    else if (modelObject instanceof ITabBox) {
-      return new JsonTabBox((ITabBox) modelObject, session, id);
+    else if (model instanceof ITabBox) {
+      return new JsonTabBox((ITabBox) model, session, id);
     }
-    else if (modelObject instanceof ICheckBox) {
-      return new JsonCheckBoxField((IBooleanField) modelObject, session, id);
+    else if (model instanceof ICheckBox) {
+      return new JsonCheckBoxField((IBooleanField) model, session, id);
     }
-    else if (modelObject instanceof ITableField<?>) {
-      return new JsonTableField((ITableField) modelObject, session, id);
+    else if (model instanceof ITableField<?>) {
+      return new JsonTableField((ITableField) model, session, id);
     }
-    else if (modelObject instanceof IButton) {
-      return new JsonButton((IButton) modelObject, session, id);
+    else if (model instanceof IButton) {
+      return new JsonButton((IButton) model, session, id);
     }
-    else if (modelObject instanceof IFormField) {
-      return new JsonFormField((IFormField) modelObject, session, id);
+    else if (model instanceof IFormField) {
+      return new JsonFormField((IFormField) model, session, id);
     }
     // other model objects
-    else if (modelObject instanceof IContextMenu) {
-      return new JsonContextMenu((IContextMenu) modelObject, session, id);
+    else if (model instanceof IContextMenu) {
+      return new JsonContextMenu((IContextMenu) model, session, id);
     }
-    else if (modelObject instanceof IMenu) {
-      return new JsonMenu((IMenu) modelObject, session, id);
+    else if (model instanceof IMenu) {
+      return new JsonMenu((IMenu) model, session, id);
     }
-    else if (modelObject instanceof IKeyStroke) {
-      return new JsonKeyStroke((IKeyStroke) modelObject, session, id);
+    else if (model instanceof IKeyStroke) {
+      return new JsonKeyStroke((IKeyStroke) model, session, id);
     }
-    else if (modelObject instanceof IForm) {
-      return new JsonForm((IForm) modelObject, session, id);
+    else if (model instanceof IForm) {
+      return new JsonForm((IForm) model, session, id);
     }
-    else if (modelObject instanceof IViewButton) {
-      return new JsonViewButton((IViewButton) modelObject, session, id);
+    else if (model instanceof IViewButton) {
+      return new JsonViewButton((IViewButton) model, session, id);
     }
-    else if (modelObject instanceof IOutline) {
-      return new JsonDesktopTree((IOutline) modelObject, session, id);
+    else if (model instanceof IOutline) {
+      return new JsonDesktopTree((IOutline) model, session, id);
     }
-    else if (modelObject instanceof ITable) {
-      return new JsonTable((ITable) modelObject, session, id);
+    else if (model instanceof ITable) {
+      return new JsonTable((ITable) model, session, id);
     }
-    else if (modelObject instanceof IDesktop) {
-      return new JsonDesktop((IDesktop) modelObject, session, id);
+    else if (model instanceof IDesktop) {
+      return new JsonDesktop((IDesktop) model, session, id);
     }
-    else if (modelObject instanceof IChartTableControl) {
-      return new JsonChartTableControl((IChartTableControl) modelObject, session, id);
+    else if (model instanceof IChartTableControl) {
+      return new JsonChartTableControl((IChartTableControl) model, session, id);
     }
-    else if (modelObject instanceof IGraphTableControl) {
-      return new JsonGraphTableControl((IGraphTableControl) modelObject, session, id);
+    else if (model instanceof IGraphTableControl) {
+      return new JsonGraphTableControl((IGraphTableControl) model, session, id);
     }
-    else if (modelObject instanceof IMapTableControl) {
-      return new JsonMapTableControl((IMapTableControl) modelObject, session, id);
+    else if (model instanceof IMapTableControl) {
+      return new JsonMapTableControl((IMapTableControl) model, session, id);
     }
-    else if (modelObject instanceof IAnalysisTableControl) {
-      return new JsonAnalysisTableControl((IAnalysisTableControl) modelObject, session, id);
+    else if (model instanceof IAnalysisTableControl) {
+      return new JsonAnalysisTableControl((IAnalysisTableControl) model, session, id);
     }
-    else if (modelObject instanceof ITableControl) {
-      return new JsonTableControl((ITableControl) modelObject, session, id);
+    else if (model instanceof ITableControl) {
+      return new JsonTableControl((ITableControl) model, session, id);
     }
-    else if (modelObject instanceof IClientSession) {
-      return new JsonClientSession((IClientSession) modelObject, session, id);
+    else if (model instanceof IClientSession) {
+      return new JsonClientSession((IClientSession) model, session, id);
     }
-    else if (modelObject instanceof IBreadCrumbsNavigation) {
-      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) modelObject, session, id);
+    else if (model instanceof IBreadCrumbsNavigation) {
+      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id);
     }
-    throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + modelObject);
+    throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
   }
 
 }

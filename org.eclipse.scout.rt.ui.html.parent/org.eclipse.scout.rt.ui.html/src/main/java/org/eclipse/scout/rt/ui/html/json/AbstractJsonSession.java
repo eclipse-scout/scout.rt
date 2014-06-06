@@ -153,7 +153,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public IClientSession getClientSession() {
-    return m_jsonClientSession.getModelObject();
+    return m_jsonClientSession.getModel();
   }
 
   @Override
@@ -163,19 +163,19 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public IJsonAdapter<?> getOrCreateJsonAdapter(Object modelObject) {
-    IJsonAdapter<?> jsonAdapter = getJsonAdapter(modelObject);
+  public IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
+    IJsonAdapter<?> jsonAdapter = getJsonAdapter(model);
     if (jsonAdapter != null) {
       return jsonAdapter;
     }
-    jsonAdapter = createJsonAdapter(modelObject);
+    jsonAdapter = createJsonAdapter(model);
     return jsonAdapter;
   }
 
   @Override
-  public IJsonAdapter<?> createJsonAdapter(Object modelObject) {
+  public IJsonAdapter<?> createJsonAdapter(Object model) {
     String id = createUniqueIdFor(null); //FIXME cgu
-    IJsonAdapter<?> jsonAdapter = m_jsonAdapterFactory.createJsonAdapter(modelObject, this, id);
+    IJsonAdapter<?> jsonAdapter = m_jsonAdapterFactory.createJsonAdapter(model, this, id);
     jsonAdapter.init();
     return jsonAdapter;
   }
@@ -186,8 +186,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public IJsonAdapter<?> getJsonAdapter(Object modelObject) {
-    return m_jsonAdapterRegistry.getJsonAdapter(modelObject);
+  public IJsonAdapter<?> getJsonAdapter(Object model) {
+    return m_jsonAdapterRegistry.getJsonAdapter(model);
   }
 
   @Override

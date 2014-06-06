@@ -22,18 +22,18 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
  */
 public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
 
-  public JsonValueField(T modelObject, IJsonSession session, String id) {
-    super(modelObject, session, id);
-    putJsonProperty(new JsonProperty<T, String>(IValueField.PROP_DISPLAY_TEXT, modelObject) {
+  public JsonValueField(T model, IJsonSession session, String id) {
+    super(model, session, id);
+    putJsonProperty(new JsonProperty<T, String>(IValueField.PROP_DISPLAY_TEXT, model) {
       @Override
-      protected String getValueImpl(T model) {
-        return model.getDisplayText();
+      protected String getValueImpl(T field) {
+        return field.getDisplayText();
       }
     });
-    putJsonProperty(new JsonProperty<T, Object>(IValueField.PROP_VALUE, modelObject) {
+    putJsonProperty(new JsonProperty<T, Object>(IValueField.PROP_VALUE, model) {
       @Override
-      protected Object getValueImpl(T model) {
-        return model.getValue();
+      protected Object getValueImpl(T field) {
+        return field.getValue();
       }
     });
   }

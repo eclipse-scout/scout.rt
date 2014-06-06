@@ -23,7 +23,7 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
    * 
    * @return
    */
-  T getModelObject();
+  T getModel();
 
   void init();
 

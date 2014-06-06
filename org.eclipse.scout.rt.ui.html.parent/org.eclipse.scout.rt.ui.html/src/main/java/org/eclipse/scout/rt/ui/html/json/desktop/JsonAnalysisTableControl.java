@@ -47,7 +47,7 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
         throw new JsonException(e);
       }
 
-      getModelObject().fireActivatedFromUI();
+      getModel().fireActivatedFromUI();
     }
   }
 }
