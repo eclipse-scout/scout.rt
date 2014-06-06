@@ -123,7 +123,14 @@ public class ScriptProcessor {
           int lineNo = 1;
           boolean insideBlockComment = false;
           StringBuilder buf = new StringBuilder();
-          for (String line : text.split("[\\n]")) {
+          String[] lines = text.split("[\\n]");
+          for (String line : lines) {
+            buf.append((insideBlockComment ? "//" : "/*")).
+                append(name).append(":").
+                append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
+                append((insideBlockComment ? "//" : "*/")).append(" ").
+                append(line).
+                append("\n");
             if (lineIsBeginOfMultilineBlockComment(line)) {
               //also if line is endMLBC AND beginMLBC
               insideBlockComment = true;
@@ -131,11 +138,6 @@ public class ScriptProcessor {
             else if (lineIsEndOfMultilineBlockComment(line)) {
               insideBlockComment = false;
             }
-            else if (!insideBlockComment) {
-              buf.append("/*" + name + ":" + lineNo + "*/");
-            }
-            buf.append(line);
-            buf.append("\n");
             lineNo++;
           }
           return buf.toString();
