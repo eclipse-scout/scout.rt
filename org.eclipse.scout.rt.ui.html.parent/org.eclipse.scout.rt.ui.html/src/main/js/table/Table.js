@@ -36,7 +36,7 @@ scout.Table.prototype.init = function(model, session) {
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 
-  session.getOrCreateModelAdapters(this.model.menus, this);
+  session.getOrCreateModelAdapters(model.menus, this);
 };
 
 scout.Table.prototype._createTableConfigurator = function() {
@@ -46,18 +46,18 @@ scout.Table.prototype._createTableConfigurator = function() {
 scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
 
-  this.$container = this._$parent.appendDiv(this.model.id, 'table');
+  this.$container = this._$parent.appendDiv(this.id, 'table');
 
-  this._$header = this.$container.appendDiv(this.model.id + '_header', 'table-header');
-  if (!this.model.headerVisible) {
+  this._$header = this.$container.appendDiv(this.id + '_header', 'table-header');
+  if (!this.headerVisible) {
     //FIXME maybe better to not create at all?
     this._$header.hide();
   }
   this._header = new scout.TableHeader(this, this._$header, this.session);
 
-  this.$data = this.$container.appendDiv(this.model.id + '_data', 'table-data');
+  this.$data = this.$container.appendDiv(this.id + '_data', 'table-data');
 
-  this._$footer = this.$container.appendDiv(this.model.id + '_footer');
+  this._$footer = this.$container.appendDiv(this.id + '_footer');
   this.footer = new scout.TableFooter(this, this._$footer, this.session);
 
   if (this.configurator && this.configurator.render) {
@@ -109,8 +109,8 @@ scout.Table.prototype._sort = function() {
   this.clearSelection();
 
   // find all sort columns
-  for (var c = 0; c < this.model.columns.length; c++) {
-    var column = this.model.columns[c],
+  for (var c = 0; c < this.columns.length; c++) {
+    var column = this.columns[c],
       order = column.$div.attr('data-sort-order'),
       dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
     if (order >= 0) {
@@ -214,7 +214,7 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
   var rowClass = 'table-row ',
-    table = this.model,
+    table = this,  // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
     rowWidth = this._header.totalWidth + 4;
 
   if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
@@ -238,7 +238,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
 scout.Table.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '',
-    table = this.model,
+    table = this, // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
     that = this,
     numRowsLoaded = startRow,
     $rows;
@@ -285,7 +285,7 @@ scout.Table.prototype._drawData = function(startRow) {
   function onClick(event) {
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
-    that.session.send(scout.Table.EVENT_ROW_CLICKED, that.model.id, {
+    that.session.send(scout.Table.EVENT_ROW_CLICKED, that.id, {
       "rowId": $row.attr('id')
     });
   }
@@ -305,26 +305,26 @@ scout.Table.prototype.sendRowsSelected = function() {
     rowIds.push($(this).attr('id'));
   });
 
-  if (scout.arrays.equalsIgnoreOrder(rowIds, this.model.selectedRowIds)) {
+  if (scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     return;
   }
 
-  this.model.selectedRowIds = rowIds;
-  if (this.model.selectedRowIds) {
-    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.model.id, {
+  this.selectedRowIds = rowIds;
+  if (this.selectedRowIds) {
+    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
       "rowIds": rowIds
     });
   }
 };
 
 scout.Table.prototype.sendRowAction = function($row) {
-  this.session.send(scout.Table.EVENT_ROW_ACTION, this.model.id, {
+  this.session.send(scout.Table.EVENT_ROW_ACTION, this.id, {
     "rowId": $row.attr('id')
   });
 };
 
 scout.Table.prototype.getValue = function(col, row) {
-  var cell = this.model.rows[row].cells[col];
+  var cell = this.rows[row].cells[col];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -339,7 +339,7 @@ scout.Table.prototype.getValue = function(col, row) {
 };
 
 scout.Table.prototype.getText = function(col, row) {
-  var cell = this.model.rows[row].cells[col];
+  var cell = this.rows[row].cells[col];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return '';
@@ -439,7 +439,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     maxValue,
     colorFunc;
 
-  for (var r = 0; r < this.model.rows.length; r++) {
+  for (var r = 0; r < this.rows.length; r++) {
     var v = this.getValue(colorColumn, r);
 
     if (v < minValue || minValue === undefined) minValue = v;
@@ -499,7 +499,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
 scout.Table.prototype.insertRows = function(rows) {
   //always insert new rows at the end
-  var table = this.model;
+  var table = this;  // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
   if (table.rows) {
     table.rows.push.apply(table.rows, rows);
   } else {
@@ -515,7 +515,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
     rowIds = [rowIds];
   }
 
-  this.model.selectedRowIds = rowIds;
+  this.selectedRowIds = rowIds;
 
   if (this.selectionHandler) {
     this.selectionHandler.drawSelection();
@@ -523,7 +523,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 
   if (!this.updateFromModelInProgress) {
     //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
-    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.model.id, {
+    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
       "rowIds": rowIds
     });
   }
@@ -533,7 +533,6 @@ scout.Table.prototype.findSelectedRows = function() {
   if (!this.$dataScroll) {
     return $();
   }
-
   return this.$dataScroll.find('.row-selected');
 };
 
@@ -541,7 +540,6 @@ scout.Table.prototype.findRows = function() {
   if (!this.$dataScroll) {
     return $();
   }
-
   return this.$dataScroll.find('.table-row');
 };
 
@@ -560,9 +558,9 @@ scout.Table.prototype.filter = function() {
       show = true,
       i;
 
-    for (i = 0; i < that.model.columns.length; i++) {
-      if (that.model.columns[i].filterFunc) {
-        show = show && that.model.columns[i].filterFunc($row);
+    for (i = 0; i < that.columns.length; i++) {
+      if (that.columns[i].filterFunc) {
+        show = show && that.columns[i].filterFunc($row);
       }
     }
 
@@ -580,9 +578,9 @@ scout.Table.prototype.filter = function() {
   });
 
   // find info text
-  for (var i = 0; i < this.model.columns.length; i++) {
-    if (this.model.columns[i].filterFunc) {
-      origin.push(that.model.columns[i].$div.text());
+  for (var i = 0; i < this.columns.length; i++) {
+    if (this.columns[i].filterFunc) {
+      origin.push(that.columns[i].$div.text());
     }
   }
 
@@ -610,9 +608,9 @@ scout.Table.prototype.resetFilter = function() {
   this._group();
 
   // set back all filter functions
-  for (var i = 0; i < this.model.columns.length; i++) {
-    this.model.columns[i].filter = [];
-    this.model.columns[i].filterFunc = null;
+  for (var i = 0; i < this.columns.length; i++) {
+    this.columns[i].filter = [];
+    this.columns[i].filterFunc = null;
   }
   this._filterMap = {};
   this._triggerFilterResetted();
@@ -743,8 +741,8 @@ scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
 
 scout.Table.prototype.triggerRowsSelected = function($rows) {
   var rowCount = 0, allSelected = false;
-  if (this.model.rows) {
-    rowCount = this.model.rows.length;
+  if (this.rows) {
+    rowCount = this.rows.length;
   }
 
   if($rows) {

@@ -10,7 +10,6 @@ scout.inherits(scout.DesktopTree, scout.ModelAdapter);
 
 scout.DesktopTree.prototype.init = function(model, session) {
   scout.DesktopTree.parent.prototype.init.call(this, model, session);
-
   session.getOrCreateModelAdapters(model.menus, this);
 };
 
@@ -19,7 +18,7 @@ scout.DesktopTree.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'tree');
   this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
-  this._addNodes(this.model.nodes);
+  this._addNodes(this.nodes);
 
   // home node and menu section for bread crumb
   this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
@@ -86,7 +85,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function($node, expanded) {
   var node = $node.data('node');
   if (node.expanded != expanded) {
     if (!this.updateFromModelInProgress) {
-      this.session.send('nodeExpanded', this.model.id, {
+      this.session.send('nodeExpanded', this.id, {
         "nodeId": node.id,
         "expanded": expanded
       });
@@ -185,7 +184,7 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
     return;
   }
   var node = $node.data('node');
-  this.model.selectedNodeIds = [node.id];
+  this.selectedNodeIds = [node.id];
   this._selectedNodes = [node];
 
   $node.selectOne();
@@ -201,7 +200,7 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.updateFromModelInProgress) {
-    this.session.send('nodesSelected', this.model.id, {
+    this.session.send('nodesSelected', this.id, {
       "nodeIds": [node.id]
     });
   }
@@ -266,7 +265,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     if (node.table) {
       var desktopTable = this.session.getModelAdapter(node.id);
       if (!desktopTable) {
-        node.outlineId = this.model.id;
+        node.outlineId = this.id;
 
         //TODO cgu: performance issue:
         var table = new scout.DesktopTable();
@@ -274,7 +273,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       }
     }
 
-    if (this.model.selectedNodeIds && this.model.selectedNodeIds.indexOf(node.id) > -1) {
+    if (this.selectedNodeIds && this.selectedNodeIds.indexOf(node.id) > -1) {
       if (this._selectedNodes.indexOf(node) <= -1) {
         this._selectedNodes.push(node);
       }
@@ -314,7 +313,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
 
 scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
   var nodeId = $clicked.attr('id');
-  this.session.send('nodeClicked', this.model.id, {
+  this.session.send('nodeClicked', this.id, {
     "nodeId": nodeId
   });
 
@@ -453,21 +452,21 @@ scout.DesktopTree.prototype.filterMultiSelectionNodeMenus = function(menus) {
 };
 
 scout.DesktopTree.prototype._setMenus = function(menus) {
-  this.model.menus = menus;
+  this.menus = menus;
 
   //Register new menus
   this.session.getOrCreateModelAdapters(menus, this);
 
-  if (this.model.selectedNodeIds && this.model.selectedNodeIds.length > 0) {
-    var $node = this._findNodeById(this.model.selectedNodeIds[0]);
+  if (this.selectedNodeIds && this.selectedNodeIds.length > 0) {
+    var $node = this._findNodeById(this.selectedNodeIds[0]);
     this._showOrHideMenus($node);
   }
 };
 
 scout.DesktopTree.prototype._showOrHideMenus = function($node) {
-  var menus = this.model.menus;
+  var menus = this.menus;
   if (menus) {
-    menus = this.filterSingleSelectionNodeMenus(this.model.menus);
+    menus = this.filterSingleSelectionNodeMenus(this.menus);
   }
   if (menus && menus.length > 0) {
     this._addNodeMenu($node, menus);

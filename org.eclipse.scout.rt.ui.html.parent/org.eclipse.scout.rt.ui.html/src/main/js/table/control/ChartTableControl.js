@@ -16,7 +16,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
     countDesc = 'Anzahl';
 
   var removeChart = null,
-    columns = this.table.model.columns,
+    columns = this.table.columns,
     xAxis,
     yAxis,
     filter = {},
@@ -684,7 +684,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
     };
 
     var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
-    filter.label = that.model.label;
+    filter.label = that.label;
     filter.accept = filterFunc;
     that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
     that.table.filter();

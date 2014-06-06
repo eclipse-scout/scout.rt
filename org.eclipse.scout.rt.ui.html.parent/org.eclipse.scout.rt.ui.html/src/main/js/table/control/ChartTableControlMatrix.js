@@ -5,8 +5,8 @@ scout.ChartTableControlMatrix = function(table, session) {
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
-  this._columns = table.model.columns;
-  this._rows = table.model.rows;
+  this._columns = table.columns;
+  this._rows = table.rows;
   this._table = table;
 };
 

@@ -98,8 +98,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 
 scout.TableSelectionHandler.prototype.drawSelection = function() {
   this.clearSelection(true);
-
-  var rowIds = this.table.model.selectedRowIds;
+  var rowIds = this.table.selectedRowIds;
   var selectedRows = [];
   for (var i = 0; i < rowIds.length; i++) {
     var rowId = rowIds[i];
@@ -166,8 +165,8 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
-  if (this.table.model.selectedRowIds &&
-      this.table.model.selectedRowIds.length === this.table.model.rows.length) {
+  if (this.table.selectedRowIds &&
+      this.table.selectedRowIds.length === this.table.rows.length) {
     this.clearSelection();
   } else {
     this.selectAll();

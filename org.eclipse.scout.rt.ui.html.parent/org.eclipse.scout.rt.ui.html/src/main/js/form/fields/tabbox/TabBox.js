@@ -8,11 +8,9 @@ scout.inherits(scout.TabBox, scout.ModelAdapter);
 
 scout.TabBox.prototype.init = function(model, session) {
   scout.TabBox.parent.prototype.init.call(this, model, session);
-
   //create groupbox adapter for selected tab
-  this.session.getOrCreateModelAdapter(this.model.selectedTab, this);
-
-  this.groupBoxes = this.session.getOrCreateModelAdapters(this.model.groupBoxes, this);
+  this.session.getOrCreateModelAdapter(model.selectedTab, this);
+  this.groupBoxes = this.session.getOrCreateModelAdapters(model.groupBoxes, this);
 };
 
 scout.TabBox.prototype._render = function($parent) {
@@ -26,10 +24,9 @@ scout.TabBox.prototype._render = function($parent) {
 
 scout.TabBox.prototype.dispose = function() {
   scout.TabBox.parent.prototype.dispose.call(this);
-
   var i, groupBox;
-  for (i = 0; i < this.model.groupBoxes.length; i++) {
-    groupBox = this.session.getModelAdapter(this.model.groupBoxes[i].id);
+  for (i = 0; i < this.groupBoxes.length; i++) {
+    groupBox = this.session.getModelAdapter(this.groupBoxes[i].id);
     if (groupBox) {
       groupBox.dispose();
     }

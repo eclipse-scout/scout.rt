@@ -1,6 +1,5 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
-
   this.table;
   this.form;
 };
@@ -8,15 +7,13 @@ scout.inherits(scout.TableControl, scout.ModelAdapter);
 
 scout.TableControl.prototype.init = function(model, session) {
   scout.TableControl.parent.prototype.init.call(this, model, session);
-
   this.form = this.session.getOrCreateModelAdapter(model.form, this);
   this.$controlButton;
 };
 
 scout.TableControl.prototype._render = function($parent) {
   this.form.render($parent);
-
-  //Set container to make it removed by ModelAdapter.remove()
+  // Set container to make it removed by ModelAdapter.remove()
   this.$container = this.form.$container;
 };
 
@@ -24,7 +21,7 @@ scout.TableControl.prototype._render = function($parent) {
  * api for table footer
  */
 scout.TableControl.prototype.toggle = function() {
-  if (!this.model.selected) {
+  if (!this.selected) {
     if (!this.$controlButton.hasClass('selected')) {
       this.$controlButton.addClass('selected');
     }
@@ -35,18 +32,14 @@ scout.TableControl.prototype.toggle = function() {
     this.$controlButton.removeClass('selected');
   }
 
-  this.session.send('selected', this.model.id);
+  this.session.send('selected', this.id);
 };
 
 scout.TableControl.prototype._setForm = function(form) {
-  this.model.form = form;
-
   this.form = this.session.getOrCreateModelAdapter(form, this);
 };
 
 scout.TableControl.prototype._setSelected = function(selected) {
-  this.model.selected = selected;
-
   var previouslySelectedControl = this.table.footer.selectedControl;
   if (selected) {
     this.table.footer.selectedControl = this;
@@ -81,19 +74,26 @@ scout.TableControl.prototype._setSelected = function(selected) {
 };
 
 scout.TableControl.prototype._setEnabled = function(enabled) {
-  this.model.enabled = enabled;
-
   this.table.footer.setControlEnabled(this);
 };
 
-scout.TableControl.prototype._onModelPropertyChange = function(event) {
+scout.TableControl.prototype.onModelPropertyChange = function(event) {
+  // FIXME AWE: das hier muss dann mit der lösung im ModelAdapter gemacht werden!
+  // dann kann das entfernt werden. Problem ist, dass die property (JSON) zuerst noch
+  // in einen adapter konvertiert werden muss. Ohne den Hack würde die property auf
+  // dem Adapter fälschlicherweise durch das JSON ersetzt.
+  // [HACK]
+  var hasForm = false;
   if (event.hasOwnProperty('form')) {
-    this._setForm(event.form);
+    this.form = this.session.getOrCreateModelAdapter(event.form, this);
+    delete event.form;
+    hasForm = true;
   }
-  if (event.hasOwnProperty('selected')) {
-    this._setSelected(event.selected);
+
+  scout.TableControl.parent.prototype.onModelPropertyChange.call(this, event);
+
+  if (hasForm) {
+    this._setForm(this.form);
   }
-  if (event.hasOwnProperty('enabled')) {
-    this._setEnabled(event.enabled);
-  }
+  // [/HACK]
 };

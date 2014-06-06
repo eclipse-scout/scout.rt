@@ -347,12 +347,5 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 };
 
 scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
-  this.model.dataModel = dataModel;
-};
-
-scout.AnalysisTableControl.prototype._onModelPropertyChange = function(event) {
-  scout.AnalysisTableControl.parent.prototype._onModelPropertyChange.call(this, event);
-  if (event.hasOwnProperty('dataModel')) {
-    this._setDataModel(event.dataModel);
-  }
+  // NOP
 };

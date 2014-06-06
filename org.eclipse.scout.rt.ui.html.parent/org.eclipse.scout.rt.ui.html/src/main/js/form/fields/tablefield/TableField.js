@@ -8,16 +8,14 @@ scout.inherits(scout.TableField, scout.ModelAdapter);
 
 scout.TableField.prototype.init = function(model, session) {
   scout.TableField.parent.prototype.init.call(this, model, session);
-
-  this.table = this.session.getOrCreateModelAdapter(this.model.table, this);
+  this.table = this.session.getOrCreateModelAdapter(model.table, this);
 };
 
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');
-  if (this.model.label) {
+  if (this.label) {
     this.$label = this.$container.appendDiv(undefined, 'label');
   }
-
   if (this.table) {
     this.table.render(this.$container);
   }

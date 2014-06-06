@@ -3,7 +3,7 @@
 
 scout.TableHeader = function(table, $tableHeader, session) {
   var that = this,
-    columns = table.model.columns;
+    columns = table.columns;
 
   this.totalWidth = 0;
   this.dragDone = false;

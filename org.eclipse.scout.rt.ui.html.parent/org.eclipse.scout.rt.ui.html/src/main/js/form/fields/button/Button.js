@@ -2,8 +2,8 @@ scout.Button = function() {
   scout.Button.parent.call(this);
   this._$button;
 };
-scout.inherits(scout.Button, scout.FormField);
 
+scout.inherits(scout.Button, scout.FormField);
 
 scout.Button.SYSTEM_TYPE = {
   NONE : 0,
@@ -14,18 +14,13 @@ scout.Button.SYSTEM_TYPE = {
 
 scout.Button.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field');
-  this.$container.data('gridData', this.model.gridData);
+  this.$container.data('gridData', this.gridData);
   // TODO AWE: (button) remove mnemonic
-  this._$button = $('<button>' + this.model.label + '</button>');
+  this._$button = $('<button>' + this.label + '</button>');
   this._$button.appendTo(this.$container);
-  var that = this;
   this._$button.on('click', function() {
-    that.session.send('click', that.model.id);
-  });
-};
-
-scout.Button.prototype.getSystemType = function() {
-  return this.model.systemType;
+    this.session.send('click', this.id);
+  }.bind(this));
 };
 
 scout.Button.prototype._setEnabled = function(enabled) {

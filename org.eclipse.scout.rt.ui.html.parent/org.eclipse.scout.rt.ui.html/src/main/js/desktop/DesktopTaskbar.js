@@ -12,8 +12,8 @@ scout.DesktopTaskbar.prototype.render = function($desktop) {
   this.$div = $desktop.appendDiv(undefined, 'desktop-taskbar');
 
   // create tool-items
-  for (var i = 0; i < this.desktop.model.toolButtons.length; i++) {
-    var toolButton = this.desktop.model.toolButtons[i];
+  for (var i = 0; i < this.desktop.toolButtons.length; i++) {
+    var toolButton = this.desktop.toolButtons[i];
     var state = toolButton.state || '',
       icon = toolButton.icon || '',
       shortcut = toolButton.shortcut || '';
@@ -48,11 +48,10 @@ scout.DesktopTaskbar.prototype.open = function($tool) {
 };
 
 scout.DesktopTaskbar.prototype.formAdded = function(form) {
-  var $formThumb = this.$formThumbs.appendDiv(undefined, 'form-thumbnail taskbar-item', form.model.title);
-  this.formThumbsMap[form.model.id] = $formThumb;
+  var $formThumb = this.$formThumbs.appendDiv(undefined, 'form-thumbnail taskbar-item', form.title);
+  this.formThumbsMap[form.id] = $formThumb;
   $formThumb.attr('data-icon', '\uf096');
   $formThumb.on('click', onFormThumbClick);
-
   $formThumb.selectOne();
 
   var that = this;
@@ -62,25 +61,19 @@ scout.DesktopTaskbar.prototype.formAdded = function(form) {
 };
 
 scout.DesktopTaskbar.prototype.formActivated = function(form) {
-  var $formThumb = this.formThumbsMap[form.model.id];
-
-  $formThumb.selectOne();
+  this.formThumbsMap[form.id].selectOne();
 };
 
 scout.DesktopTaskbar.prototype.formRemoved = function(form) {
-  var $formThumb = this.formThumbsMap[form.model.id];
-  delete this.formThumbsMap[form.model.id];
+  var $formThumb = this.formThumbsMap[form.id];
+  delete this.formThumbsMap[form.id];
   $formThumb.remove();
 };
 
 scout.DesktopTaskbar.prototype.formDisabled = function(form) {
-  var $formThumb = this.formThumbsMap[form.model.id];
-
-  $formThumb.addClass('disabled');
+  this.formThumbsMap[form.id].addClass('disabled');
 };
 
 scout.DesktopTaskbar.prototype.formEnabled = function(form) {
-  var $formThumb = this.formThumbsMap[form.model.id];
-
-  $formThumb.removeClass('disabled');
+  this.formThumbsMap[form.id].removeClass('disabled');
 };

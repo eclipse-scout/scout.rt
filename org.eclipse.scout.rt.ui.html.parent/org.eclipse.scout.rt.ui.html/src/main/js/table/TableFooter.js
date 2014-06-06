@@ -105,13 +105,13 @@ scout.TableFooter.prototype.addGroup = function(title) {
 
 scout.TableFooter.prototype.addControl = function(control) {
   var classes = 'control ';
-  if (control.model.cssClass) {
-    classes += control.model.cssClass;
+  if (control.cssClass) {
+    classes += control.cssClass;
   }
 
-  var $group = this._controlGroups[control.model.group];
+  var $group = this._controlGroups[control.group];
   if (!$group) {
-    $group = this.addGroup(control.model.group);
+    $group = this.addGroup(control.group);
   }
 
   var $control = $group.appendDiv(undefined, classes)
@@ -127,8 +127,8 @@ scout.TableFooter.prototype.setControlEnabled = function(control) {
   var $control = control.$controlButton,
     that = this;
 
-  if (control.model.enabled) {
-    $control.data('label', control.model.label)
+  if (control.enabled) {
+    $control.data('label', control.label)
       .removeClass('disabled')
       .hover(onControlHoverIn, onControlHoverOut)
       .click(onControlClicked);

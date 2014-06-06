@@ -17,19 +17,19 @@ scout.Desktop.prototype._render = function($parent) {
   this.$parent = $parent;
 
   // create all 4 containers
-  if (this.model.viewButtons) {
-    views = new scout.DesktopViewButtonBar($parent, this.model.viewButtons, this.session);
+  if (this.viewButtons) {
+    views = new scout.DesktopViewButtonBar($parent, this.viewButtons, this.session);
     marginTop = views.$div.outerHeight();
   }
-  if (this.model.toolButtons) {
+  if (this.toolButtons) {
     this.taskbar = new scout.DesktopTaskbar(this);
     this.taskbar.render($parent);
     marginRight = this.taskbar.$div.outerWidth();
   }
 
   this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
-  if (this.model.outline) {
-    this.tree = new scout.DesktopTreeContainer($parent, this.model.outline, this.session);
+  if (this.outline) {
+    this.tree = new scout.DesktopTreeContainer($parent, this.outline, this.session);
     this.layout.register(this.tree.$div, 'W');
     this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
@@ -68,14 +68,14 @@ scout.Desktop.prototype.showOrHideDesktopTree = function() {
   }
 
   if (this.tree.detached) {
-    if (this.tree.desktopTree.model.nodes.length > 0) {
+    if (this.tree.desktopTree.nodes.length > 0) {
       this.tree.$div.insertBefore(this._bench.$container);
       this.tree.detached = false;
       this.layout.unregister(this.tree.$div);
       this.layout.layout();
     }
   } else {
-    if (this.tree.desktopTree.model.nodes.length === 0) {
+    if (this.tree.desktopTree.nodes.length === 0) {
       this.tree.$div.detach();
       this.tree.detached = true;
       this.layout.register(this.tree.$div, 'W');

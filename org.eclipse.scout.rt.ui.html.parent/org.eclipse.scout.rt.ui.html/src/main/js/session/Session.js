@@ -25,11 +25,11 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
-  this.modelAdapterRegistry[modelAdapter.model.id] = null;
+  this.modelAdapterRegistry[modelAdapter.id] = null;
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
-  this.modelAdapterRegistry[modelAdapter.model.id] = modelAdapter;
+  this.modelAdapterRegistry[modelAdapter.id] = modelAdapter;
 };
 
 scout.Session.prototype.getModelAdapter = function(id) {

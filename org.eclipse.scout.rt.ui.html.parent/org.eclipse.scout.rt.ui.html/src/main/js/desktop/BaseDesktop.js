@@ -10,8 +10,7 @@ scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
 scout.BaseDesktop.prototype.init = function(model, session) {
   scout.BaseDesktop.parent.prototype.init.call(this, model, session);
-
-  this.forms = this.session.getOrCreateModelAdapters(this.model.forms, this);
+  this.forms = this.session.getOrCreateModelAdapters(model.forms, this);
 };
 
 scout.BaseDesktop.prototype._render = function($parent) {
@@ -27,12 +26,12 @@ scout.BaseDesktop.prototype._render = function($parent) {
 
 scout.BaseDesktop.prototype._addForm = function(form) {
   var added = false;
-  if (form.model.displayHint == "view") {
+  if (form.displayHint == "view") {
     form.attach(this._resolveViewContainer(form));
     added = true;
-  } else if (form.model.displayHint == "dialog") {
+  } else if (form.displayHint == "dialog") {
     var previousForm;
-    if (form.model.modal && this.modalDialogStack.length > 0) {
+    if (form.modal && this.modalDialogStack.length > 0) {
       previousForm = this.modalDialogStack[this.modalDialogStack.length - 1];
       previousForm.disable();
     }
@@ -47,7 +46,7 @@ scout.BaseDesktop.prototype._addForm = function(form) {
       this.taskbar.formAdded(form);
     }
   } else {
-    $.log("Form displayHint not handled: '" + form.model.displayHint + "'.");
+    $.log("Form displayHint not handled: '" + form.displayHint + "'.");
   }
 };
 
@@ -55,7 +54,7 @@ scout.BaseDesktop.prototype._removeForm = function(form) {
   if (form) {
     form.detach();
 
-    if (form.model.displayHint === "dialog") {
+    if (form.displayHint === "dialog") {
       scout.arrays.remove(this.modalDialogStack, form);
       var previousForm = this.modalDialogStack[this.modalDialogStack.length - 1];
       if (previousForm) {
@@ -74,7 +73,7 @@ scout.BaseDesktop.prototype._removeForm = function(form) {
 
 scout.BaseDesktop.prototype.activateForm = function(form) {
   if (form) {
-    if (form.model.displayHint === "dialog") {
+    if (form.displayHint === "dialog") {
       //re attach it at the end
       form.attach(this.$parent);
 

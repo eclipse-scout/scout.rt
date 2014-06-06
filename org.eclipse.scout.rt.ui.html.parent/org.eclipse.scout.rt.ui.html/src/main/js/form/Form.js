@@ -9,8 +9,7 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype.init = function(model, session) {
   scout.Form.parent.prototype.init.call(this, model, session);
-
-  this.rootGroupBox = this.session.getOrCreateModelAdapter(this.model.rootGroupBox, this);
+  this.rootGroupBox = this.session.getOrCreateModelAdapter(model.rootGroupBox, this);
 };
 
 /**
@@ -19,7 +18,6 @@ scout.Form.prototype.init = function(model, session) {
 scout.Form.prototype.attach = function($parent) {
   if (!this.$container) {
     this._render($parent);
-    this._applyModel();
   } else {
     this.$container.appendTo($parent);
     if (this.$glasspane) {
@@ -43,26 +41,26 @@ scout.Form.prototype._render = function($parent) {
     for (i=0; i<systemButtons.length; i++) {
       button = systemButtons[i];
       button.attach($buttonBar);
-      if (button.isVisible() &&
-          button.getSystemType() == scout.Button.SYSTEM_TYPE.CANCEL ||
-          button.getSystemType() == scout.Button.SYSTEM_TYPE.CLOSE) {
+      if (button.visible &&
+          button.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
+          button.systemType == scout.Button.SYSTEM_TYPE.CLOSE) {
         closeable = true;
       }
     }
     this.$container.append($buttonBar);
   }
 
-  if (this.model.displayHint == 'dialog') {
+  if (this.displayHint == 'dialog') {
     // TODO AWE: append form title section (including ! ? and progress indicator)
     var $dialogBar = $('<div class="dialog-bar"></div>');
-    var $dialogTitle = $('<span class="dialog-title">' + this.model.title + '</span>');
+    var $dialogTitle = $('<span class="dialog-title">' + this.title + '</span>');
     $dialogBar.append($dialogTitle);
     if (closeable) {
       var $closeButton = $('<button>X</button>');
       $dialogBar.append($closeButton);
       var that = this;
       $closeButton.on('click', function() {
-        that.session.send('formClosing', that.model.id);
+        that.session.send('formClosing', that.id);
       });
     }
     this.$container.addClass('dialog-form');

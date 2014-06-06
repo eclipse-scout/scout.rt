@@ -67,9 +67,9 @@ scout.TableRowMenuHandler.prototype._onRowsDrawn = function($rows) {
 
       var menus;
       if ($selectedRows.length > 1) {
-        menus = that.filterMultiSelectionRowMenus(that.table.model.menus);
+        menus = that.filterMultiSelectionRowMenus(that.table.menus);
       } else {
-        menus = that.filterSingleSelectionRowMenus(that.table.model.menus);
+        menus = that.filterSingleSelectionRowMenus(that.table.menus);
       }
 
       var $rowMenu = $('#RowMenu');

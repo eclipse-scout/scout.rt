@@ -6,15 +6,14 @@ scout.inherits(scout.CheckBoxField, scout.FormField);
 
 scout.CheckBoxField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field');
-  this.$container.data('gridData', this.model.gridData);
-  this.$label = this.$container.appendDiv(undefined, 'label', this.model.label);
+  this.$container.data('gridData', this.gridData);
+  this.$label = this.$container.appendDiv(undefined, 'label', this.label);
   this._$checkBox = $('<input type="checkbox" class="field" />');
   this._$checkBox.appendTo(this.$container);
 
-  var that = this;
   this._$checkBox.on('click', function() {
-    that.session.send('click', that.model.id);
-  });
+    this.session.send('click', this.id);
+  }.bind(this));
 };
 
 scout.CheckBoxField.prototype._setEnabled = function(enabled) {

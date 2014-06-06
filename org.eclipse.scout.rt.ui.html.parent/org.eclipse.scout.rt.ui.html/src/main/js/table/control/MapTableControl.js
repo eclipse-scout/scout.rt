@@ -1,6 +1,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.MapTableControl = function() {
+  scout.MapTableControl.parent.call(this);
 };
 scout.inherits(scout.MapTableControl, scout.TableControl);
 
@@ -12,7 +13,7 @@ scout.MapTableControl.prototype._render = function($parent) {
 
   var filter = {},
     that = this,
-    countries = this.model.map.objects.countries.geometries;
+    countries = this.map.objects.countries.geometries;
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     that.$container.find('.map-item.selected').removeClassSVG('selected');
@@ -20,11 +21,11 @@ scout.MapTableControl.prototype._render = function($parent) {
 
   // find all countries in table
   var tableCountries = [];
-  for (var i = 0; i < this.table.model.columns.length; i++) {
-    for (var j = 0; j < this.model.columnIds.length; j++) {
-      if (this.table.model.columns[i].id == this.model.columnIds[j]) {
-        for (var r = 0; r < this.table.model.rows.length; r++) {
-          var value = this.table.model.rows[r].cells[i];
+  for (var i = 0; i < this.table.columns.length; i++) {
+    for (var j = 0; j < this.columnIds.length; j++) {
+      if (this.table.columns[i].id == this.columnIds[j]) {
+        for (var r = 0; r < this.table.rows.length; r++) {
+          var value = this.table.rows[r].cells[i];
           if (tableCountries.indexOf(value) == -1) tableCountries.push(value);
         }
       }
@@ -51,8 +52,8 @@ scout.MapTableControl.prototype._render = function($parent) {
           x, y;
 
         // loop all points of arc
-        for (var s = 0; s < this.model.map.arcs[arc].length; s++) {
-          var line = this.model.map.arcs[arc][s];
+        for (var s = 0; s < this.map.arcs[arc].length; s++) {
+          var line = this.map.arcs[arc][s];
 
           // first point is absolute, all other delta
           if (s === 0) {
@@ -110,7 +111,7 @@ scout.MapTableControl.prototype._render = function($parent) {
 
     //  filter function
     var filterFunc = function($row) {
-      for (var c = 0; c < that.table.model.columns.length; c++) {
+      for (var c = 0; c < that.table.columns.length; c++) {
         var text = $row.children().eq(c).text();
         if (countries.indexOf(text) > -1) return true;
       }
@@ -120,7 +121,7 @@ scout.MapTableControl.prototype._render = function($parent) {
     // callback to table
     // set filter function
     var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
-    filter.label = that.model.label;
+    filter.label = that.label;
     filter.accept = filterFunc;
     that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
     that.table.filter();
@@ -133,20 +134,7 @@ scout.MapTableControl.prototype.dispose = function() {
   this.table.events.removeListener(this._filterResetListener);
 };
 
-scout.MapTableControl.prototype._setColumns = function(columns) {
-  this.model.columns = columns;
-};
-
 scout.MapTableControl.prototype._setMap = function(map) {
-  this.model.map = map;
+  // NOP
 };
 
-scout.MapTableControl.prototype._onModelPropertyChange = function(event) {
-  scout.MapTableControl.parent.prototype._onModelPropertyChange.call(this, event);
-  if (event.hasOwnProperty('map')) {
-    this._setMap(event.map);
-  }
-  if (event.hasOwnProperty('columns')) {
-    this._setColumns(event.columns);
-  }
-};
