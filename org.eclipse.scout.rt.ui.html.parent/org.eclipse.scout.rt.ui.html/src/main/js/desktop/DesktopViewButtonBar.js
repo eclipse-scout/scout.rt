@@ -22,12 +22,12 @@ scout.DesktopViewButtonBar = function($parent, viewButtons, session) {
     var name = $desktopView.children('.selected').text().split('(');
     var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
     //TODO widget id?
-    var viewButton = {
-      "id": "ownView" + c,
+    var dummyModel = {
+      "id": 'ownView' + c,
       "text": name[0] + ' (' + c + ')'
     }, buttonOwn;
     buttonOwn = new scout.DesktopViewButtonOwn($desktopView);
-    buttonOwn.init();
+    buttonOwn.init(dummyModel, session);
     buttonOwn.render();
   }
 
