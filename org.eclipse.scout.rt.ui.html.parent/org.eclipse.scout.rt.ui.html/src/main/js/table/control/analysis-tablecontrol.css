@@ -11,6 +11,8 @@ width: 150px;
 float: left;
 clear: both;
 min-height: 16px;
+color: #bfbfbf;
+white-space: pre-wrap; 
 }
 
 .command-container .command {

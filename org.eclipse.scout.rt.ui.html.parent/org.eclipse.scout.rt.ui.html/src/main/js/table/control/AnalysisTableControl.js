@@ -5,7 +5,7 @@ scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 scout.AnalysisTableControl.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(); //FIXME CGU maybe not necessary
 
-  // command container
+//command container and commands
   var $commandContainer = this.$container.appendDiv('', 'command-container');
 
   $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
@@ -13,12 +13,11 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
   $commandContainer.appendDiv('', 'command new', 'Neues Kriterium').click(addCriteria);
   $commandContainer.appendDiv('', 'command delete', 'Kriterium verwerfen').click(removeCriteria);
   $commandContainer.appendDiv('', 'separator', '');
+  $commandContainer.appendDiv('', 'command union', 'Ansicht wechseln').click(switchShow);
   $commandContainer.appendDiv('', 'command union', 'Vereinigungsmenge');
   $commandContainer.appendDiv('', 'command distinct', 'Schnittmenge');
-  $commandContainer.appendDiv('', 'separator', 'eigene Auswahl');
+  $commandContainer.appendDiv('', 'separator', 'Durch klicken bei gedrückter Umstelltaste ...');
   $commandContainer.appendDiv('', 'command union', 'Simulator').click(simulateServer);
-
-  var MID_X = 250, MID_Y = 165, MIN_R = 20, MAX_R = 120;
 
   // svg container
   var $vennContainer = this.$container
@@ -31,21 +30,24 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     .attr('width', 490).attr('height', 300)
     .attr('rx', 10).attr('ry', 10);
 
-  var $totalCount = $vennContainer.appendSVG('text', '', 'venn-all-text')
-    .attr('x', 490).attr('y', 28);
-
+  // $criteria = circle per criteria; count calculated by server
   var $criteria = [],
-    count;
-
-  count = {};
+    show = true,
+    count = {};
   count.total = undefined;
 
+  // constants for venn diagram
+  var MID_X = 250, MID_Y = 165, DIST_R = 5, MIN_R = 20, MAX_R = 120;
+
+  // auto add forst criteria
   addCriteria();
 
  function addCriteria () {
+   // reset count
    count = {};
    count.total = undefined;
 
+   // draw circle
    if ($criteria.length < 3) {
      var $div = $vennContainer.appendSVG('circle', '', 'venn-circle')
        .attr('cx', MID_X)
@@ -60,51 +62,69 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
  }
 
  function removeCriteria () {
+   // reset count
    count = {};
    count.total = undefined;
 
+   // remove circle
    var $selected = $('.selected', $vennContainer);
    for (var c = 0; c < $criteria.length; c++) {
      if ($criteria[c][0] == $selected[0]) {
        $criteria[c].animateSVG('r', 0, $.removeThis);
        $criteria.splice(c, 1);
-       if ($criteria.length) {
-          selectCriteria.call($criteria[$criteria.length - 1]);
-       drawCriteria();
-       return;
-       }
+       break;
      }
+   }
+   // select next criteria
+   if ($criteria.length) {
+     selectCriteria.call($criteria[$criteria.length - 1]);
+     drawCriteria();
    }
  }
 
  function selectCriteria () {
+   // remove and add classes
    $(this).siblings().removeClassSVG('selected');
    $(this).addClassSVG('selected');
  }
 
- function drawCriteria () {
-   if (count.total) {
-     $totalCount.text(count.total + ' Datensätze ');
-   } else {
-     $totalCount.text('');
-   }
+ function switchShow () {
+   show = !show;
+   drawCriteria();
+ }
 
-   $('.venn-circle-text', $vennContainer)
+
+ function drawCriteria () {
+   // remove all text
+   $('text', $vennContainer)
      .animateSVG('opacity', 0, 100, $.removeThis);
 
-   var x0, x1, x2, y0, y1, y2, r0, r1, r2;
+   // show count all data
+   if (count.total) {
+     $vennContainer.appendSVG('text', '', 'venn-all-text', count.total + ' DatensÃ¤tze')
+       .attr('x', 490).attr('y', 28);
+   }
+
+   // init variables
+   var x, x0, x1, x2, y, y0, y1, y2, r0, r1, r2;
    var ret, d, d01, d02, d12;
    var alpha, beta;
-   $.log(count);
 
-   if ($criteria.length === 1) {
+   if ($criteria.length === 1 && count.total && !show) {
+     // that is easy...
      r0 = calcR(count['0'], MAX_R);
      x0 = 0;
      y0 = 0;
 
      moveCircle($criteria[0], r0, x0, y0);
-     drawText(count['0'], x0, y0);
-   } else if ($criteria.length === 2) {
+     drawText(count['0'], 0, 0);
+
+   } else if ($criteria.length === 1) {
+     // ... and simple
+     moveCircle($criteria[0], MAX_R * 0.9, 0, 0);
+     drawText(count['0'], 0, 0);
+
+   } else if ($criteria.length === 2&& count.total && !show) {
      // calculate size of circles
      r0 = calcR(count['0'], MAX_R);
      r1 = calcR(count['1'], MAX_R);
@@ -140,12 +160,20 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
        drawText(count['01'], x0 + r0 + (d - r0 - r1) / 2, y0);
      }
 
+   } else if ($criteria.length === 2) {
+     // 2 circles
+     moveCircle($criteria[0], MAX_R * 0.9, -MAX_R * 0.6, 0);
+     moveCircle($criteria[1], MAX_R * 0.9, +MAX_R * 0.6, 0);
 
-   } else if ($criteria.length === 3) {
+     drawText(count['0'], -MAX_R * 0.8, 0);
+     drawText(count['1'], +MAX_R * 0.8, 0);
+     drawText(count['01'], 0, 0);
+
+   } else if ($criteria.length === 3 && count.total && !show) {
      // calculate size of circles
-     r0 = calcR(count['0'], MAX_R - 20);
-     r1 = calcR(count['1'], MAX_R - 20);
-     r2 = calcR(count['2'], MAX_R - 20);
+     r0 = calcR(count['0'], MAX_R * 0.9);
+     r1 = calcR(count['1'], MAX_R * 0.9);
+     r2 = calcR(count['2'], MAX_R * 0.9);
 
      // find distance
      ret = findD(count['0'], count['1'], count['01'], r0, r1);
@@ -163,29 +191,28 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
      r2 = ret.rb;
      d12 = ret.d;
 
-     // find balance, start with 0 and 1
+     // find balance, start with 1
      x1 = d01 / ((r1*r1) / (r0*r0) + 1);
      y1 = 0;
 
+     // 0 is simple ;)
      x0 = x1 - d01;
      y0 = 0;
 
-     // fit 0 and 2
-     x2 = x0;
-     y2 = y0 + d02;
-
-     //  TODO cru: turn 2 to fit with 1
-     if (d01 > d02) {
+     //  fit 2 with 1
+     if (d12 > d01 + d02 || count['12'] === 0) {
+       x2 = x0 - d02;
+       y2 = y0;
+     } else  if (d12 < d01 - d02 || d12 < d02 - d01) {
        x2 = x0 + d02;
        y2 = y0;
-     } else {
+     } else  {
+       alpha = Math.acos((d02*d02 + d01*d01 - d12*d12) / (2 * d02 * d01));
+       beta = Math.acos((d12*d12 + d01*d01 - d02*d02) / (2 * d12 * d01));
+
+       x2 = x0 + d02 * Math.cos(alpha);
+       y2 = y0 + d02 * Math.sin(alpha);
      }
-
-     //alpha = Math.acos((d02*d02 + d01*d01 - d12*d12) / (2 * d02 * d01));
-     //beta = Math.acos((d12*d12 + d01*d01 - d02*d02) / (2 * d12 * d01));
-
-     //x2 = x0 + d02 * Math.cos(alpha);
-     //y2 = y0 + d02 * Math.sin(alpha);
 
      // find center
      var cx = (r0 * x0 + r1 * x1 + r2 * x2 ) / (r0 + r1 + r2) ;
@@ -196,41 +223,48 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
      moveCircle($criteria[1], r1, x1 - cx, y1 - cy);
      moveCircle($criteria[2], r2, x2 - cx, y2 - cy);
 
-     // draw text
-     drawText(count['0'], x0 - cx, y0 - cy);
-     drawText(count['1'], x1 - cx, y1 - cy);
-     drawText(count['2'], x2 - cx, y2 - cy);
+   } else if ($criteria.length === 3) {
+     // 3 circles
+     moveCircle($criteria[0], MAX_R * 0.7, -MAX_R * 0.47, -MAX_R * 0.4);
+     moveCircle($criteria[1], MAX_R * 0.7, +MAX_R * 0.47, -MAX_R * 0.4);
+     moveCircle($criteria[2], MAX_R * 0.7, 0, MAX_R * 0.4);
+
+     drawText(count['0'], -MAX_R * 0.7, -MAX_R * 0.5);
+     drawText(count['1'], +MAX_R * 0.7, -MAX_R * 0.5);
+     drawText(count['2'], 0, MAX_R * 0.6);
+
+     drawText(count['01'], 0, -MAX_R * 0.5);
+     drawText(count['02'], -MAX_R * 0.35, MAX_R * 0.1);
+     drawText(count['12'], +MAX_R * 0.35, MAX_R * 0.1);
+
+     drawText(count['012'], 0,  -MAX_R * 0.1);
 
 
    }
 
    function calcR (size, limit) {
-     if (count.total) {
-       return Math.max(limit * Math.sqrt(size / count.total), MIN_R);
-     } else {
-       return limit;
-     }
+     return Math.max(limit * Math.sqrt(size / count.total), MIN_R);
    }
 
    function findD (ca, cb, cab, ra, rb) {
      var ret = {};
 
      if (ca == cab) {
-       ret.ra = ra - 5;
-       ret.rb = rb + 5;
+       ret.ra = ra - DIST_R;
+       ret.rb = rb + DIST_R;
        ret.d = rb - ra;
      } else if (cb == cab) {
-       ret.ra = ra + 5;
-       ret.rb = rb - 5;
+       ret.ra = ra + DIST_R;
+       ret.rb = rb - DIST_R;
        ret.d = ra - rb;
      } else if (cab === 0) {
        ret.ra = ra;
        ret.rb = rb;
-       ret.d = ra + rb + 10;
+       ret.d = ra + rb + DIST_R * 2;
      } else {
        ret.ra = ra;
        ret.rb = rb;
-       ret.d = (1 - 2 * cab / (ca + cb)) * (ra + rb - 10);
+       ret.d = (1 - 2 * cab / (ca + cb)) * (ra + rb - DIST_R * 2);
      }
 
      return ret;
@@ -245,7 +279,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
    function drawText (text, dx, dy) {
      if (count.total) {
-       $vennContainer.appendSVG('text', '', 'venn-circle-text', text)
+       $vennContainer.appendSVG('text', '', 'venn-circle-text', text || '0')
        .attr('x', MID_X + dx)
        .attr('y', MID_Y + dy)
        .attr('opacity', 0)
