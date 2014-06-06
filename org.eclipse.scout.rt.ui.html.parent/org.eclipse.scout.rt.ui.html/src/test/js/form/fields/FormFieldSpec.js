@@ -30,10 +30,10 @@ describe("FormField", function() {
       // required
       formField._$statusLabel = $('<div></div>');
       formField.onModelPropertyChange(event);
-      expect(model.errorStatus).toBe('foo');
+      expect(formField.errorStatus).toBe('foo');
       // never apply id, type_ on model
-      expect(model.hasOwnProperty('id')).toBe(false);
-      expect(model.hasOwnProperty('type_')).toBe(false);
+      expect(formField.hasOwnProperty('id')).toBe(false);
+      expect(formField.hasOwnProperty('type_')).toBe(false);
     });
 
   });

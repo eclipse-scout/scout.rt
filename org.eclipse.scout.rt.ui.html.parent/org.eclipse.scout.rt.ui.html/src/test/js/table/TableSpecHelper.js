@@ -108,7 +108,7 @@ TableSpecHelper.prototype.assertSelection = function(table, rowIds) {
   });
 
   expect(scout.arrays.equalsIgnoreOrder(rowIds, selectedRowIds)).toBeTruthy();
-  expect(scout.arrays.equalsIgnoreOrder(rowIds, table.model.selectedRowIds)).toBeTruthy();
+  expect(scout.arrays.equalsIgnoreOrder(rowIds, table.selectedRowIds)).toBeTruthy();
 };
 
 TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
