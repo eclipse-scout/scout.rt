@@ -88,8 +88,13 @@ public final class JsonObjectUtility {
     }
   }
 
-  public static Object newJSONArray(String[] copyOfRange) {
-    return null;
+  public static Object newJSONArray(String[] array) {
+    try {
+      return new JSONArray(array);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
   }
 
   public static JSONObject newJSONObject(String source) {
