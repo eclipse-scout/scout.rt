@@ -23,6 +23,9 @@
 
   <properties>
     <compileSource>1.7</compileSource>
+    <target-platform>tools-scout</target-platform>
+    <target-groupid>com.bsiag.tools</target-groupid>
+    <target-artifactid>com.bsiag.tools.rt.target</target-artifactid>
   </properties>
 
   <modules>
