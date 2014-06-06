@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -84,45 +85,28 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return json;
   }
 
-  /**
-   * Adds a property to the given JSON object and deals with exceptions.
-   */
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  /**
-   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>. //FIXME CGU adjust
-   * javadoc
-   */
-  protected final JSONObject modelObjectToJson(Object modelObject) {
-    if (modelObject == null) {
-      return null;
-    }
-
-    IJsonAdapter<?> jsonAdapter = getJsonSession().getOrCreateJsonAdapter(modelObject);
-    return jsonAdapter.toJson();
-    //FIXME cgu implement
-//    IJsonAdapter<?> jsonAdapter = m_jsonSession.getJsonAdapter(modelObject);
-//    if (jsonAdapter == null) {
-//      jsonAdapter = (IJsonAdapter<?>) getJsonSession().createJsonAdapter(modelObject);
-//      return jsonAdapter.toJson();
-//    }
-//    else {
-//      return putProperty(new JSONObject(), "id", jsonAdapter.getId());
-//    }
+  protected JSONObject newJsonObjectForModel(String propertyName, Object model) {
+    return JsonObjectUtility.newJsonObjectForModel(getJsonSession(), propertyName, model);
   }
 
-  /**
-   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> for each object in the model objects List and adds
-   * the return values of <code>toJson()</code> to the JSONArray.
-   */
+  protected final JSONObject modelObjectToJson(Object modelObject) {
+    return JsonObjectUtility.modelObjectToJson(getJsonSession(), modelObject);
+  }
+
   protected final JSONArray modelObjectsToJson(List<?> modelObjects) {
-    JSONArray array = new JSONArray();
-    for (Object modelObject : modelObjects) {
-      array.put(modelObjectToJson(modelObject));
-    }
-    return array;
+    return JsonObjectUtility.modelObjectsToJson(getJsonSession(), modelObjects);
+  }
+
+  protected void disposeJsonAdapters(Collection<? extends Object> models) {
+    JsonObjectUtility.disposeJsonAdapters(getJsonSession(), models);
+  }
+
+  protected void disposeJsonAdapter(Object model) {
+    JsonObjectUtility.disposeJsonAdapter(getJsonSession(), model);
   }
 
 }

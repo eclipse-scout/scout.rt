@@ -1,14 +1,14 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
-public class JsonViewButton extends AbstractJsonPropertyObserverAdapter<IViewButton> {
+public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
 
   public JsonViewButton(IViewButton modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);

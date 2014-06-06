@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
-public class JsonContextMenu extends AbstractJsonPropertyObserverAdapter<IContextMenu> {
+public class JsonContextMenu extends AbstractJsonPropertyObserver<IContextMenu> {
 
   private ContextMenuListener m_contextMenuListener;
 

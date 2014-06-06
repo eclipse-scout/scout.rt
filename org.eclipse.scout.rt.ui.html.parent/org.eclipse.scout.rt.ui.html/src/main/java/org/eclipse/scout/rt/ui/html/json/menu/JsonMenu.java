@@ -16,14 +16,14 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonMenu extends AbstractJsonPropertyObserverAdapter<IMenu> {
+public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
 
   public static final String EVENT_MENU_ACTION = "menuAction";
   public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";

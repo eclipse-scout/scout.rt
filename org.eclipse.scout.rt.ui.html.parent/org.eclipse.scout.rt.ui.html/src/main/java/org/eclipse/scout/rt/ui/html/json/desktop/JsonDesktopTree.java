@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.html.client.ext.IPage2;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.ui.html.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonDesktopTree extends AbstractJsonPropertyObserverAdapter<IOutline> implements IContextMenuOwner {
+public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";

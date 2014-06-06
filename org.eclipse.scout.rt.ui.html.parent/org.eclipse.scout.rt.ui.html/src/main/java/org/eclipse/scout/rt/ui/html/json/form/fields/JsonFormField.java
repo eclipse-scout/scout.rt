@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
 // TODO AWE: make JsonFormField abstract (later), direktes instanzieren soll nicht mehr möglich sein
-public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserverAdapter<T> implements IJsonFormField<T> {
+public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserver<T> implements IJsonFormField<T> {
 
   public JsonFormField(T model, IJsonSession session, String id) {
     super(model, session, id);

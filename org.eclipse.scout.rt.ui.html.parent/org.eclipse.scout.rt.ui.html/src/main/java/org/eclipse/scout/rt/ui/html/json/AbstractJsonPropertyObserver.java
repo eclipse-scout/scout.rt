@@ -21,8 +21,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonPropertyObserverAdapter<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserverAdapter.class);
+public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
 
   private P_PropertyChangeListener m_propertyChangeListener;
 
@@ -31,7 +31,7 @@ public abstract class AbstractJsonPropertyObserverAdapter<T extends IPropertyObs
    */
   private Map<String, JsonProperty> m_jsonProperties;
 
-  public AbstractJsonPropertyObserverAdapter(T modelObject, IJsonSession jsonSession, String id) {
+  public AbstractJsonPropertyObserver(T modelObject, IJsonSession jsonSession, String id) {
     super(modelObject, jsonSession, id);
     m_jsonProperties = new HashMap<>();
   }

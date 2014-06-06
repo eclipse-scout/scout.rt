@@ -44,4 +44,9 @@ public abstract class JsonProperty<T, V> {
     return valueToJson(getValueImpl(m_modelObject));
   }
 
+  @Override
+  public String toString() {
+    return m_propertyName + ": " + m_modelObject;
+  }
+
 }

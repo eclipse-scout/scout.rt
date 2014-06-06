@@ -9,6 +9,9 @@ scout.inherits(scout.TabBox, scout.ModelAdapter);
 scout.TabBox.prototype.init = function(model, session) {
   scout.TabBox.parent.prototype.init.call(this, model, session);
 
+  //create groupbox adapter for selected tab
+  this.session.getOrCreateModelAdapter(this.model.selectedTab, this);
+
   this.groupBoxes = this.session.getOrCreateModelAdapters(this.model.groupBoxes, this);
 };
 

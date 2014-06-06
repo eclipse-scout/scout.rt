@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
-import org.eclipse.scout.rt.ui.html.json.form.fields.rangebox.JsonSequenceBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;

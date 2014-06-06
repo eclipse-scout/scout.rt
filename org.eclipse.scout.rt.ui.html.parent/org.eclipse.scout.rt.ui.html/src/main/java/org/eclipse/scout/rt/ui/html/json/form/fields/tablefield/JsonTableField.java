@@ -13,15 +13,26 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tablefield;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONObject;
 
 public class JsonTableField extends JsonFormField<ITableField<? extends ITable>> {
-  private static final String PROP_TABLE_ID = "tableId";
 
   public JsonTableField(ITableField<? extends ITable> model, IJsonSession session, String id) {
     super(model, session, id);
+
+    putJsonProperty(new JsonAdapterProperty<ITableField<? extends ITable>, ITable>(ITableField.PROP_TABLE, model, session) {
+      @Override
+      protected ITable getValueImpl(ITableField<? extends ITable> tableField) {
+        return tableField.getTable();
+      }
+    });
+  }
+
+  @Override
+  public JSONObject toJson() {
+    return super.toJson();
   }
 
   @Override
@@ -30,29 +41,8 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  public JSONObject toJson() {
-    //FIXME when to dispose table? maybe introduce dispose event for table fields -> dont dispose for outlineTables, dispose otherwise
-    return putProperty(super.toJson(), ITableField.PROP_TABLE, modelObjectToJson(getModelObject().getTable()));
-  }
-
-  protected void handleModelTableChanged(ITable table) {
-    JsonTable jsonTable = (JsonTable) getJsonSession().getJsonAdapter(table);
-    if (jsonTable == null) {
-      jsonTable = (JsonTable) getJsonSession().createJsonAdapter(table);
-      getJsonSession().currentJsonResponse().addCreateEvent(getId(), jsonTable.toJson());
-    }
-    else {
-      JSONObject jsonEvent = new JSONObject();
-      putProperty(jsonEvent, PROP_TABLE_ID, jsonTable.getId());
-      getJsonSession().currentJsonResponse().addActionEvent("tableChanged", getId(), jsonEvent);
-    }
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
-    super.handleModelPropertyChange(propertyName, newValue);
-    if (ITableField.PROP_TABLE.equals(propertyName)) {
-      handleModelTableChanged((ITable) newValue);
-    }
+  public void dispose() {
+    disposeJsonAdapter(getModelObject().getTable());
+    super.dispose();
   }
 }

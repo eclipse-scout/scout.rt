@@ -86,31 +86,20 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
   }
 };
 
-scout.BaseDesktop.prototype.onModelPropertyChange = function() {};
-
-scout.BaseDesktop.prototype.onModelCreate = function(event) {
-  if (event.objectType == "Form") {
-    var form = this.session.objectFactory.create(event);
-    this._addForm(form);
-  } else {
-    $.log("Widget creation not handled for object type '" + event.objectType + "'.");
-  }
-};
-
 scout.BaseDesktop.prototype.onModelAction = function(event) {
   var form;
 
   if (event.type_ == 'formAdded') {
-    form = this.session.modelAdapterRegistry[event.formId];
+    form = this.updateModelAdapters(this.forms, event.form, this);
     this._addForm(form);
   } else if (event.type_ == 'formRemoved') {
-    form = this.session.modelAdapterRegistry[event.formId];
+    form = this.updateModelAdapters(this.forms, event.form, this);
     this._removeForm(form);
   } else if (event.type_ == 'formEnsureVisible') {
-    form = this.session.modelAdapterRegistry[event.formId];
+    form = this.updateModelAdapters(this.forms, event.formm, this);
     this.activateForm(form);
   } else if (event.type_ == 'formRemoved') {
-    form = this.session.modelAdapterRegistry[event.formId];
+    form = this.updateModelAdapters(this.forms, event.form, this);
     this._removeForm(form);
   } else {
     $.log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");

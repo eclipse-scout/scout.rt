@@ -17,14 +17,13 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
 
-public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
+public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public JsonForm(IForm modelObject, IJsonSession jsonSession, String id) {
@@ -62,9 +61,7 @@ public class JsonForm extends AbstractJsonPropertyObserverAdapter<IForm> {
 
   @Override
   public void dispose() {
-    for (IFormField formField : getModelObject().getRootGroupBox().getFields()) {
-      getJsonSession().getJsonAdapter(formField).dispose();
-    }
+    disposeJsonAdapters(getModelObject().getRootGroupBox().getFields());
     super.dispose();
   }
 

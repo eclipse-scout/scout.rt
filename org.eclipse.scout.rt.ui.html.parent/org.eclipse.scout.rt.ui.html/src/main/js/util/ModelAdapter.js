@@ -29,7 +29,7 @@ scout.ModelAdapter.prototype.detach = function() {
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
-  if(this.isRendered()) {
+  if (this.isRendered()) {
     throw "Already rendered.";
   }
 
@@ -79,6 +79,27 @@ scout.ModelAdapter.prototype.addChild = function(childAdapter) {
   this.children.push(childAdapter); //FIXME CGU when to remove child?
 };
 
+scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, parent) {
+  var adapter = this.session.getOrCreateModelAdapter(model, parent);
+  if (adapters.indexOf(adapter) < 0) {
+    adapters.push(adapter);
+  }
+  return adapter;
+};
+
+scout.ModelAdapter.prototype.updateModelAdapterAndRender = function(model, parent) {
+  var adapter = this.session.getOrCreateModelAdapter(model, parent);
+
+  if (this.isRendered()) {
+    if (this.adapter) {
+      this.adapter.remove();
+    }
+    this.adapter.render(this.$container);
+  }
+
+  return adapter;
+};
+
 /**
  * This method applies all property changes from the JSON event on this.model and delegates to _onModelPropertyChange.
  */
@@ -101,4 +122,3 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 scout.ModelAdapter.prototype._onModelPropertyChange = function() {
   // NOP
 };
-

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form.fields.rangebox;
+package org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -39,9 +38,7 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
 
   @Override
   public void dispose() {
-    for (IFormField formField : getModelObject().getFields()) {
-      getJsonSession().getJsonAdapter(formField).dispose();
-    }
+    disposeJsonAdapters(getModelObject().getFields());
     super.dispose();
   }
 

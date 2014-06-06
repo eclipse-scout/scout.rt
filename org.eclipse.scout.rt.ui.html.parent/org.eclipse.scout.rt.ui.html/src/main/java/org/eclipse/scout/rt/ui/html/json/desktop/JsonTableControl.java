@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserverAdapter;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
-public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserverAdapter<ITableControl> {
+public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserver<ITableControl> {
 
   public JsonTableControl(ITableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);

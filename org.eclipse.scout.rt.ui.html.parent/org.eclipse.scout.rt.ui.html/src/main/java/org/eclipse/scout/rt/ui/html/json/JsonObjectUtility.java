@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,4 +110,54 @@ public final class JsonObjectUtility {
     }
   }
 
+  /**
+   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>. //FIXME CGU adjust
+   * javadoc
+   */
+  public static final JSONObject modelObjectToJson(IJsonSession session, Object modelObject) {
+    if (modelObject == null) {
+      return null;
+    }
+    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(modelObject);
+    if (jsonAdapter == null) {
+      jsonAdapter = (IJsonAdapter<?>) session.createJsonAdapter(modelObject);
+      return jsonAdapter.toJson();
+    }
+    else {
+      return putProperty(new JSONObject(), "id", jsonAdapter.getId());
+    }
+  }
+
+  /**
+   * Creates a new json object and puts the model into it.
+   */
+  public static JSONObject newJsonObjectForModel(IJsonSession session, String propertyName, Object model) {
+    return putProperty(new JSONObject(), propertyName, modelObjectToJson(session, model));
+  }
+
+  /**
+   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> for each object in the model objects List and adds
+   * the return values of <code>toJson()</code> to the JSONArray.
+   */
+  public static JSONArray modelObjectsToJson(IJsonSession session, List<?> modelObjects) {
+    JSONArray array = new JSONArray();
+    for (Object modelObject : modelObjects) {
+      array.put(modelObjectToJson(session, modelObject));
+    }
+    return array;
+  }
+
+  public static void disposeJsonAdapters(IJsonSession session, Collection<? extends Object> models) {
+    for (Object model : models) {
+      disposeJsonAdapter(session, model);
+    }
+  }
+
+  public static void disposeJsonAdapter(IJsonSession session, Object model) {
+    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(model);
+    //on session dispose, the adapters get disposed in random order, so the may already be disposed when calling this method
+    if (jsonAdapter != null) {
+      jsonAdapter.dispose();
+    }
+  }
 }

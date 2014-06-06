@@ -87,21 +87,9 @@ scout.Desktop.prototype.showOrHideDesktopTree = function() {
 /**
  * @override
  */
-scout.Desktop.prototype.onModelCreate = function(event) {
-  if (event.objectType == "DesktopTree") {
-    this.tree.onOutlineCreated(event);
-    this.showOrHideDesktopTree();
-  } else {
-    scout.Desktop.parent.prototype.onModelCreate.call(this, event);
-  }
-};
-
-/**
- * @override
- */
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
-    this.tree.onOutlineChanged(event.outlineId);
+    this.tree.onOutlineChanged(event.outline);
     this.showOrHideDesktopTree();
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);

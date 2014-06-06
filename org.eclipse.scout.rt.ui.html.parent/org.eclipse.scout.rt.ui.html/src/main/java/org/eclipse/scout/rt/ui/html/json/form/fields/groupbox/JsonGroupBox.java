@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
@@ -60,12 +58,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   @Override
   // TODO AWE: JsonCompositeField für group / seq. / etc.
   public void dispose() {
-    for (IFormField formField : getModelObject().getFields()) {
-      IJsonAdapter<?> jsonAdapter = getJsonSession().getJsonAdapter(formField);
-      if (jsonAdapter != null) {
-        jsonAdapter.dispose();
-      }
-    }
+    disposeJsonAdapters(getModelObject().getFields());
     super.dispose();
   }
 

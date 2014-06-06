@@ -7,18 +7,10 @@ scout.DesktopTreeContainer = function($parent, model, session) {
   this._addVerticalSplitter(this._$desktopTree);
 };
 
-scout.DesktopTreeContainer.prototype.onOutlineCreated = function(model) {
-  if (this.desktopTree) {
-    this.desktopTree.detach();
-  }
-  this.desktopTree = this.session.getOrCreateModelAdapter(model, this);
-  this.desktopTree.attach(this._$desktopTree);
-  this.desktopTree.attachModel();
-};
 
-scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outlineId) {
-  this.desktopTree.detach();
-  this.desktopTree = this.session.getModelAdapter(outlineId);
+scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outline) {
+  this.desktopTree.detach(); //FIXME CGU refactor to ModelAdapter.updateModelAdapterAndRender, but DesktopTreecontainer does not extend ModelAdapter
+  this.desktopTree = this.session.getOrCreateModelAdapter(outline, this); //FIXME CGU actually this.desktop
   this.desktopTree.attach(this._$desktopTree);
   this.desktopTree.attachModel();
 };

@@ -18,34 +18,23 @@ scout.TableField.prototype._render = function($parent) {
     this.$label = this.$container.appendDiv(undefined, 'label');
   }
 
-  this.table.attach(this.$container);
+  if (this.table) {
+    this.table.render(this.$container);
+  }
+};
+
+scout.TableField.prototype.setTable = function(table) {
+  this.table = this.updateModelAdapterAndRender(table, this);
 };
 
 scout.TableField.prototype.dispose = function() {
-  this.table.dispose();
-};
-
-scout.TableField.prototype.onModelCreate = function(event) {
-  if (event.objectType == "Table") {
-    if (this.table) {
-      this.table.detach();
-    }
-    this.table = this.session.objectFactory.create(event);
-    this.table.attach();
+  if (this.table) {
+    this.table.dispose();
   }
-  else {
-    $.log("Widget creation not handled for object type '" + event.objectType + "'.");
-  }
-};
-
-scout.TableField.prototype._onModelTableChanged = function(tableId) {
-  this.table.detach();
-  this.table = this.session.modelAdapterRegistry[tableId];
-  this.table.attach(this._$container);
 };
 
 scout.TableField.prototype.onModelPropertyChange = function(event) {
-  if (event.tableId !== undefined) {
-    this._onModelTableChanged(event.tableId);
+  if (event.table !== undefined) {
+    this.setTable(event.table);
   }
 };
