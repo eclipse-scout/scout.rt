@@ -20,3 +20,15 @@ scout.TabBox.prototype._render = function($parent) {
     this.groupBoxes[i].attach(this.$container);
   }
 };
+
+scout.TabBox.prototype.dispose = function() {
+  scout.TabBox.parent.prototype.dispose.call(this);
+
+  var i, groupBox;
+  for (i = 0; i < this.model.groupBoxes.length; i++) {
+    groupBox = this.session.getModelAdapter(this.model.groupBoxes[i].id);
+    if (groupBox) {
+      groupBox.dispose();
+    }
+  }
+};
