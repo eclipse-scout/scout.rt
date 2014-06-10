@@ -17,7 +17,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton2;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -28,17 +35,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IAnalysisTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IChartTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IGraphTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IMapTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonGraphTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonMapTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonTableControl;
@@ -101,6 +104,12 @@ public class JsonAdapterFactory {
     else if (model instanceof IViewButton) {
       return new JsonViewButton((IViewButton) model, session, id);
     }
+    else if (model instanceof IFormToolButton) {
+      return new NullAdapter(model, session, id);
+    }
+    else if (model instanceof IFormToolButton2) {
+      return new JsonFormToolButton((IFormToolButton2) model, session, id);
+    }
     else if (model instanceof IOutline) {
       return new JsonDesktopTree((IOutline) model, session, id);
     }
@@ -134,4 +143,21 @@ public class JsonAdapterFactory {
     throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
   }
 
+  //FIXME only needed temporarily, remove when switched to FormToolButton2
+  public static class NullAdapter extends AbstractJsonAdapter<Object> {
+
+    public NullAdapter(Object model, IJsonSession jsonSession, String id) {
+      super(model, jsonSession, id);
+    }
+
+    @Override
+    public String getObjectType() {
+      return null;
+    }
+
+    @Override
+    public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    }
+
+  }
 }

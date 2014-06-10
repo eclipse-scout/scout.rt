@@ -15,7 +15,7 @@ import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IMapTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;

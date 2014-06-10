@@ -1,26 +1,30 @@
-scout.DesktopKeystrokeAdapter = function(viewButtonBar, toolBox, tree) {
+scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
   this.handlers = [];
   this._viewButtonBar = viewButtonBar;
   this._tree = tree;
-  this._toolBox = toolBox;
+  this._taskbar = taskbar;
 
   var handler;
 
   var that = this;
   //FIXME read keycodes from model
-  if (toolBox) {
-    $('.tool-item', toolBox.$div).each(function(i, element) {
-      var shortcut = parseInt($(element).attr('data-shortcut').replace('F', ''), 10) + 111;
-      handler = {
-        keycodes: shortcut,
-        $element: $(element),
-        handle: function() {
-          this.$element.click();
+  if (taskbar) {
+    $('.taskbar-item', taskbar.$div).each(function(i, element) {
+      var keystroke = $(element).attr('data-shortcut');
+      if (keystroke) {
+        keystroke = keystroke.toUpperCase();
+        var shortcut = parseInt(keystroke.replace('F', ''), 10) + 111;
+        handler = {
+          keycodes: shortcut,
+          $element: $(element),
+          handle: function() {
+            this.$element.click();
 
-          return false;
-        }
-      };
-      that.handlers.push(handler);
+            return false;
+          }
+        };
+        that.handlers.push(handler);
+      }
     });
 
   }
@@ -66,8 +70,8 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, toolBox, tree) {
 };
 
 scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
-  if (this._toolBox) {
-    $('.tool-item', this._toolBox.$div).each(function(i, e) {
+  if (this._taskbar) {
+    $('.taskbar-item', this._taskbar.$div).each(function(i, e) {
       $(e).appendDiv('', 'key-box', $(e).attr('data-shortcut'));
     });
   }

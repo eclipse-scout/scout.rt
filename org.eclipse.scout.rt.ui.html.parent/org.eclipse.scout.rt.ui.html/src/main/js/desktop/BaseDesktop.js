@@ -5,6 +5,7 @@ scout.BaseDesktop = function() {
   scout.BaseDesktop.parent.call(this);
   this.taskbar;
   this.modalDialogStack = [];
+  this.focusedDialog;
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
@@ -25,23 +26,24 @@ scout.BaseDesktop.prototype._render = function($parent) {
 };
 
 scout.BaseDesktop.prototype._addForm = function(form) {
-  var added = false;
   if (form.displayHint == "view") {
     form.attach(this._resolveViewContainer(form));
-    added = true;
   } else if (form.displayHint == "dialog") {
-    var previousForm;
-    if (form.modal && this.modalDialogStack.length > 0) {
-      previousForm = this.modalDialogStack[this.modalDialogStack.length - 1];
-      previousForm.disable();
+    var previousModalForm;
+    if (form.modal) {
+      if (this.modalDialogStack.length > 0) {
+        previousModalForm = this.modalDialogStack[this.modalDialogStack.length - 1];
+        previousModalForm.disable();
+      }
+      this.modalDialogStack.push(form);
     }
-    this.modalDialogStack.push(form);
 
     form.attach(this.$parent);
+    this.focusedDialog = form;
 
     if (this.taskbar) {
-      if (previousForm) {
-        this.taskbar.formDisabled(previousForm);
+      if (previousModalForm) {
+        this.taskbar.formDisabled(previousModalForm);
       }
       this.taskbar.formAdded(form);
     }
@@ -51,38 +53,72 @@ scout.BaseDesktop.prototype._addForm = function(form) {
 };
 
 scout.BaseDesktop.prototype._removeForm = function(form) {
-  if (form) {
-    form.detach();
+  if (!form) {
+    return;
+  }
 
-    if (form.displayHint === "dialog") {
+  form.detach();
+
+  if (form.displayHint === "dialog") {
+    var previousModalForm;
+    if (form.modal) {
       scout.arrays.remove(this.modalDialogStack, form);
-      var previousForm = this.modalDialogStack[this.modalDialogStack.length - 1];
-      if (previousForm) {
-        previousForm.enable();
+      previousModalForm = this.modalDialogStack[this.modalDialogStack.length - 1];
+      if (previousModalForm) {
+        previousModalForm.enable();
+        this.activateForm(previousModalForm);
       }
+    }
+    if (form === this.focusedDialog) {
+      this.focusedDialog = null;
+    }
 
-      if (this.taskbar) {
-        if (previousForm) {
-          this.taskbar.formEnabled(previousForm);
-        }
-        this.taskbar.formRemoved(form);
+    if (this.taskbar) {
+      if (previousModalForm) {
+        this.taskbar.formEnabled(previousModalForm);
       }
+      this.taskbar.formRemoved(form);
     }
   }
 };
 
 scout.BaseDesktop.prototype.activateForm = function(form) {
-  if (form) {
-    if (form.displayHint === "dialog") {
-      //re attach it at the end
-      form.attach(this.$parent);
-
-      if (this.taskbar) {
-        this.taskbar.formActivated(form);
-      }
-    }
-
+  //FIXME CGU send form activated
+  if (!form || this.focusedDialog === form) {
+    return;
   }
+
+  if (form.displayHint === "dialog") {
+    //re attach it at the end
+    form.attach(this.$parent);
+    this.focusedDialog = form;
+
+    if (this.taskbar) {
+      this.taskbar.formActivated(form);
+    }
+  }
+};
+
+scout.BaseDesktop.prototype.minimizeForm = function(form) {
+  //FIXME CGU minimize maximize sind properties auf form, können auch vom modell gesteuert werden -> Steuerung eher über form.setMaximized
+  if (form.displayHint !== "dialog") {
+    return;
+  }
+
+  form.minized = true;
+  form.detach();
+  if (form === this.focusedDialog) {
+    this.focusedDialog = null;
+  }
+};
+
+scout.BaseDesktop.prototype.maximizeForm = function(form) {
+  if (form.displayHint !== "dialog") {
+    return;
+  }
+
+  form.minized = false;
+  form.attach(this.$parent);
 };
 
 scout.BaseDesktop.prototype.onModelAction = function(event) {
@@ -95,7 +131,7 @@ scout.BaseDesktop.prototype.onModelAction = function(event) {
     form = this.updateModelAdapters(this.forms, event.form, this);
     this._removeForm(form);
   } else if (event.type_ == 'formEnsureVisible') {
-    form = this.updateModelAdapters(this.forms, event.formm, this);
+    form = this.updateModelAdapters(this.forms, event.form, this);
     this.activateForm(form);
   } else if (event.type_ == 'formRemoved') {
     form = this.updateModelAdapters(this.forms, event.form, this);

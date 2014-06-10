@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 
-import org.eclipse.scout.rt.client.ui.html.client.ext.IGraphTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;

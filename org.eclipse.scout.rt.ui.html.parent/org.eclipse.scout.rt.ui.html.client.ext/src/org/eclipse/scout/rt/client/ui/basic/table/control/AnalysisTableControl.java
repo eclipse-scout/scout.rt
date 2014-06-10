@@ -8,25 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-public class GraphTableControl extends AbstractTableControl implements IGraphTableControl {
+public class AnalysisTableControl extends AbstractTableControl implements IAnalysisTableControl {
 
-  public GraphTableControl() {
+  public AnalysisTableControl() {
     this(true);
   }
 
-  public GraphTableControl(boolean callInitializer) {
+  public AnalysisTableControl(boolean callInitializer) {
     super(callInitializer);
   }
 
   @Override
   protected void initConfig() {
-    super.initConfig();
-
-    setLabel("Netzwerk");
-    setCssClass("control-graph");
-    setGroup("Anzeige");
+    setLabel("Analyse");
+    setCssClass("control-analysis");
+    setGroup("Suche");
   }
-
 }

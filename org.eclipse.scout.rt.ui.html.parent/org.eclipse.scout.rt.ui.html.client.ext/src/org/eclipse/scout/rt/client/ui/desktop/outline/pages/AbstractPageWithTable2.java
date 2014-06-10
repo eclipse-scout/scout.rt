@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 
 public class AbstractPageWithTable2<T extends ITable> extends AbstractPageWithTable<T> implements IPage2 {

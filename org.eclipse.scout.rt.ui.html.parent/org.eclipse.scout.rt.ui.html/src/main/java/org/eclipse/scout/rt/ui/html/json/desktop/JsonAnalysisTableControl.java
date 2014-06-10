@@ -14,8 +14,8 @@ import java.io.IOException;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.html.client.ext.IAnalysisTableControl;
-import org.eclipse.scout.rt.client.ui.html.client.ext.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.Activator;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;

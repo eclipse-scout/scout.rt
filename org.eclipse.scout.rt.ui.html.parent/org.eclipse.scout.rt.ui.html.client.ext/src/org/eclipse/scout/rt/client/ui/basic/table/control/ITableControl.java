@@ -8,20 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public class JsonChartTableControl extends JsonTableControl {
+public interface ITableControl extends IPropertyObserver {
+  String PROP_LABEL = "label";
+  String PROP_SELECTED = "selected";
+  String PROP_FORM = "form";
+  String PROP_ENABLED = "enabled";
 
-  public JsonChartTableControl(ITableControl model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
-  }
+  String getLabel();
 
-  @Override
-  public String getObjectType() {
-    return "ChartTableControl";
-  }
+  boolean isSelected();
 
+  IForm getForm();
+
+  //FIXME CGU better use icon instead?
+  String getCssClass();
+
+  String getGroup();
+
+  boolean isEnabled();
+
+  void fireActivatedFromUI();
 }

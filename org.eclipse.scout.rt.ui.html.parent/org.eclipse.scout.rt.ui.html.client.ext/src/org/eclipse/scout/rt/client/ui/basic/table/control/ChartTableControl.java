@@ -8,13 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+public class ChartTableControl extends AbstractTableControl implements IChartTableControl {
 
-/**
- *
- */
-public class AbstractPageWithNodes2 extends AbstractPageWithNodes {
+  public ChartTableControl() {
+    this(true);
+  }
+
+  public ChartTableControl(boolean callInitializer) {
+    super(callInitializer);
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+
+    setLabel("Diagramm");
+    setCssClass("control-chart");
+    setGroup("Anzeige");
+  }
 
 }

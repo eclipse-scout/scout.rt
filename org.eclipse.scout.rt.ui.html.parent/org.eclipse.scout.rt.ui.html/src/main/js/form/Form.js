@@ -26,6 +26,13 @@ scout.Form.prototype.attach = function($parent) {
   }
 };
 
+scout.Form.prototype.detach= function() {
+  scout.Form.parent.prototype.detach.call(this);
+  if (this.$glasspane) {
+    this.$glasspane.detach();
+  }
+};
+
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
@@ -76,6 +83,7 @@ scout.Form.prototype._render = function($parent) {
 // TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
 scout.Form.prototype.enable = function() {
   this.$glasspane.remove();
+  this.$glasspane = null;
 };
 
 scout.Form.prototype.disable = function() {

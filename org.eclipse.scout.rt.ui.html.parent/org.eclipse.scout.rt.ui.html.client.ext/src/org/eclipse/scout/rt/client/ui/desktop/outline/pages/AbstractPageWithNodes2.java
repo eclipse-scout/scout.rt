@@ -8,22 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-public class AnalysisTableControl extends AbstractTableControl implements IAnalysisTableControl {
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 
-  public AnalysisTableControl() {
-    this(true);
-  }
+/**
+ *
+ */
+public class AbstractPageWithNodes2 extends AbstractPageWithNodes {
 
-  public AnalysisTableControl(boolean callInitializer) {
-    super(callInitializer);
-  }
-
-  @Override
-  protected void initConfig() {
-    setLabel("Analyse");
-    setCssClass("control-analysis");
-    setGroup("Suche");
-  }
 }

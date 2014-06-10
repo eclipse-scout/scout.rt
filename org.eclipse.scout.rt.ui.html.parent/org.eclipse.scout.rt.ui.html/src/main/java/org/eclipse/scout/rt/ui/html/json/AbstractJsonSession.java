@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.json.JSONObject;
 
@@ -82,18 +84,24 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    */
   private JSONObject initJsonSession(IClientSession clientSession) {
     final Holder<JSONObject> jsonHolder = new Holder<>(JSONObject.class);
-    new ClientSyncJob("AbstractJsonSession#init", clientSession) {
+    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         jsonHolder.setValue(m_jsonClientSession.toJson());
       }
-    }.runNow(new NullProgressMonitor());
+    };
+    job.runNow(new NullProgressMonitor());
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
     return jsonHolder.getValue();
   }
 
   protected UserAgent createUserAgent(JsonRequest jsonReq) {
-    // FIXME CGU create UiLayer.HTML
-    IUiLayer uiLayer = UiLayer.RAP;
+    IUiLayer uiLayer = UiLayer2.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = m_currentHttpRequest.getHeader("User-Agent");
     JSONObject userAgent = jsonReq.getUserAgent();

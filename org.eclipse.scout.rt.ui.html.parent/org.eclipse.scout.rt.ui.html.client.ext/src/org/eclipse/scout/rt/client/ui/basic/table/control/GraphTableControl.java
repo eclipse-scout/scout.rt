@@ -8,29 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.rt.client.ui.form.IForm;
+public class GraphTableControl extends AbstractTableControl implements IGraphTableControl {
 
-public interface ITableControl extends IPropertyObserver {
-  String PROP_LABEL = "label";
-  String PROP_SELECTED = "selected";
-  String PROP_FORM = "form";
-  String PROP_ENABLED = "enabled";
+  public GraphTableControl() {
+    this(true);
+  }
 
-  String getLabel();
+  public GraphTableControl(boolean callInitializer) {
+    super(callInitializer);
+  }
 
-  boolean isSelected();
+  @Override
+  protected void initConfig() {
+    super.initConfig();
 
-  IForm getForm();
+    setLabel("Netzwerk");
+    setCssClass("control-graph");
+    setGroup("Anzeige");
+  }
 
-  //FIXME CGU better use icon instead?
-  String getCssClass();
-
-  String getGroup();
-
-  boolean isEnabled();
-
-  void fireActivatedFromUI();
 }

@@ -8,14 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.html.client.ext;
+package org.eclipse.scout.rt.shared.ui;
 
-import java.util.List;
+/**
+ * @since 3.8.0
+ */
+public enum UiLayer2 implements IUiLayer {
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+  HTML(true);
 
-public interface IPage2 extends IPage {
+  boolean m_webUi;
 
-  List<ITableControl> getTableControls();
+  private UiLayer2(boolean webUi) {
+    m_webUi = webUi;
+  }
+
+  private UiLayer2() {
+    this(false);
+  }
+
+  @Override
+  public boolean isWebUi() {
+    return m_webUi;
+  }
+
+  @Override
+  public String getIdentifier() {
+    return name();
+  }
+
+  public static IUiLayer createByIdentifier(String identifier) {
+    return valueOf(identifier);
+  }
 
 }

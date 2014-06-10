@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterFactory.NullAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,6 +127,9 @@ public final class JsonObjectUtility {
     IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(model);
     if (jsonAdapter == null) {
       jsonAdapter = (IJsonAdapter<?>) session.createJsonAdapter(model);
+      if (jsonAdapter instanceof NullAdapter) {
+        return null;
+      }
       return jsonAdapter.toJson();
     }
     else {
@@ -147,7 +151,10 @@ public final class JsonObjectUtility {
   public static JSONArray modelsToJson(IJsonSession session, List<?> models) {
     JSONArray array = new JSONArray();
     for (Object model : models) {
-      array.put(modelToJson(session, model));
+      JSONObject object = modelToJson(session, model);
+      if (object != null) {
+        array.put(object);
+      }
     }
     return array;
   }

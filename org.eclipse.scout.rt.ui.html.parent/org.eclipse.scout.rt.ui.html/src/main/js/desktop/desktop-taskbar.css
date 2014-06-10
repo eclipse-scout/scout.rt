@@ -37,10 +37,11 @@ color:#FE9915 !important;
 color:#CCC;
 }
 
-.tool-item.selected:hover:before{
+.taskbar-item.selected:hover:before{
 content: "\f00d" '\A';
 }
 
+//FIXME CGU this would be the real disabled state, not the modal dialog disable
 .tool-item.disabled:hover, .tool-item.disabled:before{
 cursor: default;
 }
@@ -49,24 +50,13 @@ cursor: default;
 color:#0082A1;
 }
 
-.tool-open{
-position: absolute;
-right: 80px;
-top: 58px;
-width: 0px;  /*animate to 300px;*/
-height: calc(100% - 58px);
-border-left:1px solid #CCC;
-background-color: rgba(255, 255, 255, 0.95);
-overflow: hidden;
-z-index: 11;
-}
-
 .taskbar-item .key-box {
 left: 4px;
 top: 8px;
 width: 22px;
 }
 
+//FIXME CGU this would be the real disabled state, not the modal dialog disable
 .tool-item.disabled .key-box{
 background-color:#CCC;
 }

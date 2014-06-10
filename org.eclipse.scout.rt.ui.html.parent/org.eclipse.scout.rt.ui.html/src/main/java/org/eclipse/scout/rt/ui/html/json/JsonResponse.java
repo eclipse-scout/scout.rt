@@ -89,7 +89,6 @@ public class JsonResponse {
     if (id == null) {
       throw new JsonException("id is null");
     }
-    //coalesce
     JSONObject event = eventData != null ? eventData : new JSONObject();
     putProperty(event, "id", id);
     putProperty(event, "type_", eventType);

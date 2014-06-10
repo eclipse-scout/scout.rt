@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONArray;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,12 +43,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   private DesktopListener m_desktopListener;
 
   private String TOOL_BUTTONS = "[" +
-      "          {\"id\": \"t2\", \"label\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
-      "          {\"id\": \"t3\", \"label\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
-      "          {\"id\": \"t4\", \"label\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
-      "          {\"id\": \"t5\", \"label\": \"Telefon\", \"icon\": \"\uf095\", \"shortcut\": \"F8\"}," +
-      "          {\"id\": \"t6\", \"label\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
-      "          {\"id\": \"t7\", \"label\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
+      "          {\"id\": \"t2\", \"objectType\": \"ToolButton\", \"text\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
+      "          {\"id\": \"t3\", \"objectType\": \"ToolButton\", \"text\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
+      "          {\"id\": \"t4\", \"objectType\": \"ToolButton\", \"text\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
+      "          {\"id\": \"t5\", \"objectType\": \"ToolButton\", \"text\": \"Telefon\", \"icon\": \"\uf095\", \"shortcut\": \"F8\"}," +
+      "          {\"id\": \"t6\", \"objectType\": \"ToolButton\", \"text\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
+      "          {\"id\": \"t7\", \"objectType\": \"ToolButton\", \"text\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
 
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession, String id) {
     super(desktop, jsonSession, id);
@@ -61,17 +59,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     return "Desktop";
   }
 
-  public IDesktop getDesktop() {
-    return getModel();
-  }
-
   @Override
   protected void attachModel() {
-    if (!getDesktop().isOpened()) {
-      getDesktop().getUIFacade().fireDesktopOpenedFromUI();
+    if (!getModel().isOpened()) {
+      getModel().getUIFacade().fireDesktopOpenedFromUI();
     }
-    if (!getDesktop().isGuiAvailable()) {
-      getDesktop().getUIFacade().fireGuiAttached();
+    if (!getModel().isGuiAvailable()) {
+      getModel().getUIFacade().fireGuiAttached();
     }
 
     //FIXME add listener afterwards -> don't handle events, refactor
@@ -79,7 +73,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
     if (m_desktopListener == null) {
       m_desktopListener = new P_DesktopListener();
-      getDesktop().addDesktopListener(m_desktopListener);
+      getModel().addDesktopListener(m_desktopListener);
     }
   }
 
@@ -87,7 +81,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   protected void detachModel() {
     super.detachModel();
     if (m_desktopListener != null) {
-      getDesktop().removeDesktopListener(m_desktopListener);
+      getModel().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
     }
   }
@@ -98,13 +92,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
     List<IForm> modelForms = getForms();
     putProperty(json, "forms", modelsToJson(modelForms));
-    putProperty(json, "toolButtons", newJSONArray(TOOL_BUTTONS));
+    putProperty(json, "toolButtons", modelsToJson(getModel().getToolButtons()));
 
     boolean formBased = isFormBased();
     if (!formBased) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
-      putProperty(json, "viewButtons", modelsToJson(getDesktop().getViewButtons()));
-      putProperty(json, "outline", modelToJson(getDesktop().getOutline()));
+      putProperty(json, "viewButtons", modelsToJson(getModel().getViewButtons()));
+      putProperty(json, "outline", modelToJson(getModel().getOutline()));
     }
 
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
@@ -125,12 +119,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
   protected List<IForm> getForms() {
     List<IForm> forms = new ArrayList<>();
-    for (IForm form : getDesktop().getViewStack()) {
+    for (IForm form : getModel().getViewStack()) {
       if (!isFormBlocked(form)) {
         forms.add(form);
       }
     }
-    for (IForm form : getDesktop().getDialogStack()) {
+    for (IForm form : getModel().getDialogStack()) {
       if (!isFormBlocked(form)) {
         forms.add(form);
       }

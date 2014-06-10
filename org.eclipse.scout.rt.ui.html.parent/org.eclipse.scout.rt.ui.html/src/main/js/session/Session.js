@@ -51,8 +51,8 @@ scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
 
   adapter = this.objectFactory.create(model);
 
+  adapter.parent = parent;
   if (scout.ModelAdapter.prototype.isPrototypeOf(parent)) {
-    adapter.parent = parent;
     parent.addChild(adapter);
   }
 
