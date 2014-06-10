@@ -16,15 +16,13 @@ scout.inherits(scout.DesktopTable, scout.ModelAdapter);
 scout.DesktopTable.prototype._render = function($parent) {
   this._$parent = $parent;
   this.table.attach(this._$parent);
-
-  if (this._tableControls) {
-    for (var i = 0; i < this._tableControls.length; i++) {
-      var control = this._tableControls[i];
+  if (this.tableControls) {
+    for (var i = 0; i < this.tableControls.length; i++) {
+      var control = this.tableControls[i];
       control.table = this.table;
       this.table.footer.addControl(control);
     }
   }
-
 };
 
 scout.DesktopTable.prototype.detach = function() {
