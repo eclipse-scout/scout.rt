@@ -1,5 +1,7 @@
 scout.AnalysisTableControl = function() {
+  scout.AnalysisTableControl.parent.call(this);
 };
+
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
 scout.AnalysisTableControl.prototype._render = function($parent) {

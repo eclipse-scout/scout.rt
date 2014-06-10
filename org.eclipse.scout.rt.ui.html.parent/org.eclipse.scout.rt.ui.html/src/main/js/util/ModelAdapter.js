@@ -2,14 +2,15 @@ scout.ModelAdapter = function() {
   this.session;
   this.parent;
   this.children = [];
+  this._adapterProperties = [];
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
+  this.session = session;
   // copy all properties from model to this adapter instance
   this._eachProperty(model, function(propertyName, value) {
     this[propertyName] = value;
   }.bind(this));
-  this.session = session;
   this.session.registerModelAdapter(this);
 };
 
@@ -35,7 +36,7 @@ scout.ModelAdapter.prototype.detach = function() {
 
 scout.ModelAdapter.prototype.render = function($parent) {
   if (this.isRendered()) {
-    throw "Already rendered.";
+    throw "Already rendered";
   }
   this._render($parent);
   this._callSetters();
@@ -43,6 +44,19 @@ scout.ModelAdapter.prototype.render = function($parent) {
 
 scout.ModelAdapter.prototype.isRendered = function() {
   return this.$container && this.$container.parent().length > 0; //FIXME CGU maybe better to remove every child? currently, parent is set to null, $container of children still set
+};
+
+/**
+ * Adds property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * @param properties String or String-array with property names.
+ */
+scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    this._adapterProperties = this._adapterProperties.concat(properties);
+  } else {
+    this._adapterProperties.push(properties);
+  }
 };
 
 /**
@@ -104,10 +118,27 @@ scout.ModelAdapter.prototype.updateModelAdapterAndRender = function(model, paren
   return adapter;
 };
 
+/**
+ * Loops through all properties of the given model (optional ignores the given properties).
+ * Creates an ModelAdapter instance for the given property when the propertyName is in the
+ * _adapterProperties array.
+ */
 scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
   for (var propertyName in model) {
     if (ignore === undefined || ignore.indexOf(propertyName) == -1) {
-      func(propertyName, model[propertyName]);
+      var value;
+      if (this._adapterProperties.indexOf(propertyName) > -1) {
+        if (Array.isArray(model[propertyName])) {
+          // TODO AWE: (ask C.GU) evtl. könnten wir die -s methode auch löschen und den isArray check
+          // in der createModelAdapter methode selber machen?
+          value = this.session.getOrCreateModelAdapters(model[propertyName], this);
+        } else {
+          value = this.session.getOrCreateModelAdapter(model[propertyName], this);
+        }
+      } else {
+        value = model[propertyName];
+      }
+      func(propertyName, value);
     }
   }
 };

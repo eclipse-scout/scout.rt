@@ -3,7 +3,7 @@ describe("ObjectFactory", function() {
   function verifyCreationAndRegistration(session, factories) {
     session.objectFactory.register(factories);
 
-    var i, model, factory, object, registeredObject;
+    var i, model, factory, object, modelAdapter;
     for (i = 0; i < factories.length; i++) {
       factory = factories[i];
       model = {
@@ -20,8 +20,8 @@ describe("ObjectFactory", function() {
         expect(object).toBeTruthy();
       }
 
-      registeredObject = session.modelAdapterRegistry[model.id];
-      expect(registeredObject).toBe(object);
+      modelAdapter = session.getModelAdapter(model.id);
+      expect(modelAdapter).toBe(object);
     }
   }
 

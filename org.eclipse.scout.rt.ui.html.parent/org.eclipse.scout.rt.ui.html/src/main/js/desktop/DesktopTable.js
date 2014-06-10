@@ -6,17 +6,12 @@
  */
 scout.DesktopTable = function() {
   scout.DesktopTable.parent.call(this);
-
-  this._tableControls;
+  this._addAdapterProperties(['table', 'tableControls']);
+  this.table;
+  this.tableControls;
 };
+
 scout.inherits(scout.DesktopTable, scout.ModelAdapter);
-
-scout.DesktopTable.prototype.init = function(model, session) {
-  scout.DesktopTable.parent.prototype.init.call(this, model, session);
-
-  this.table = session.getOrCreateModelAdapter(model.table, this);
-  this._tableControls = session.getOrCreateModelAdapters(model.tableControls, this);
-};
 
 scout.DesktopTable.prototype._render = function($parent) {
   this._$parent = $parent;

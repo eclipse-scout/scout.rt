@@ -2,7 +2,9 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.ChartTableControl = function() {
+  scout.ChartTableControl.parent.call(this);
 };
+
 scout.inherits(scout.ChartTableControl, scout.TableControl);
 
 scout.ChartTableControl.prototype._render = function($parent) {

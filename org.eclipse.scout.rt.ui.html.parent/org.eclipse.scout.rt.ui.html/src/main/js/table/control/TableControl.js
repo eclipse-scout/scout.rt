@@ -1,15 +1,12 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
+  this._addAdapterProperties('form');
   this.table;
   this.form;
-};
-scout.inherits(scout.TableControl, scout.ModelAdapter);
-
-scout.TableControl.prototype.init = function(model, session) {
-  scout.TableControl.parent.prototype.init.call(this, model, session);
-  this.form = this.session.getOrCreateModelAdapter(model.form, this);
   this.$controlButton;
 };
+
+scout.inherits(scout.TableControl, scout.ModelAdapter);
 
 scout.TableControl.prototype._render = function($parent) {
   this.form.render($parent);
@@ -75,25 +72,4 @@ scout.TableControl.prototype._setSelected = function(selected) {
 
 scout.TableControl.prototype._setEnabled = function(enabled) {
   this.table.footer.setControlEnabled(this);
-};
-
-scout.TableControl.prototype.onModelPropertyChange = function(event) {
-  // FIXME AWE: das hier muss dann mit der lösung im ModelAdapter gemacht werden!
-  // dann kann das entfernt werden. Problem ist, dass die property (JSON) zuerst noch
-  // in einen adapter konvertiert werden muss. Ohne den Hack würde die property auf
-  // dem Adapter fälschlicherweise durch das JSON ersetzt.
-  // [HACK]
-  var hasForm = false;
-  if (event.hasOwnProperty('form')) {
-    this.form = this.session.getOrCreateModelAdapter(event.form, this);
-    delete event.form;
-    hasForm = true;
-  }
-
-  scout.TableControl.parent.prototype.onModelPropertyChange.call(this, event);
-
-  if (hasForm) {
-    this._setForm(this.form);
-  }
-  // [/HACK]
 };
