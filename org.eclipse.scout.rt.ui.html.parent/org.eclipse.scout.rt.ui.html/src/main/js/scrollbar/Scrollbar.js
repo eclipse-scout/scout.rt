@@ -9,6 +9,7 @@ scout.Scrollbar = function($parent, axis) {
   this._offset;
 
   // create scrollbar
+  this.axis = axis;
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
   this._dim = (axis === "x" ? "Width" : "Height");

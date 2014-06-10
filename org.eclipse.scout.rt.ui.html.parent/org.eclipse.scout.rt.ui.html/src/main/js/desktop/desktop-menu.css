@@ -1,0 +1,53 @@
+.desktop-menu {
+width: 100%;
+position: relative;
+height: 50px;
+white-space: nowrap;
+border-bottom: 1px solid #CCC;
+background: #FFF;
+overflow: hidden;
+}
+
+
+.desktop-menu-tree, .desktop-menu-table {
+margin-top: 7px;
+padding-top: 4px;
+padding-bottom: 6px;
+float: left;
+patting-top: 10px;
+patting-bottom: 10px;
+}
+
+.desktop-menu-tree {
+padding-left: 30px;
+padding-right: 10px;
+margin-right: 7px;
+border-right: 1px solid #CCC;
+}
+
+.desktop-menu .menu-item {
+float: left;
+padding-left: 10px;
+} 
+
+.desktop-menu .menu-button:before{
+position: relative;
+line-height: 23px;
+top: 2px;
+}
+
+
+.desktop-menu .menu-button:after {
+content: attr(data-label);
+color: #0082A1;
+line-height: 23px;
+}
+
+.menu-button:hover:after{
+text-decoration: underline;
+color: #FE9915;
+}
+
+.desktop-menu .menu-buttons-label{
+display: none;
+}

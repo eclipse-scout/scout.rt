@@ -4,7 +4,6 @@ scout.TableConfigurator = function(table) {
 
 scout.TableConfigurator.prototype.configure = function() {
   this.table.selectionHandler = new scout.TableSelectionHandler(this.table);
-  this.table.rowMenuHandler = new scout.TableRowMenuHandler(this.table);
 };
 
 scout.TableConfigurator.prototype.render = function() {

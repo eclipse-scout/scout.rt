@@ -245,7 +245,7 @@
       }, duration);
     }
 
-    return this;
+    return newH;
   };
 
 

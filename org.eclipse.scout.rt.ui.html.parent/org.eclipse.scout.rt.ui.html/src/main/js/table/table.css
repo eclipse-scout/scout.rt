@@ -174,44 +174,7 @@ border-radius: 7px;
 border-bottom: 1px solid #FFF;
 }
 
-#RowMenu, #RowDrill {
-position: absolute;
-left: -25px;
-top: 0px;
-background-color: #FFF;
-width: 29px;
-height: 27px;
-padding: 3px 5px 0px 5px;
-cursor: pointer;
-overflow: hidden;
-border-bottom: 2px solid #0082A1;
-border-left: 2px solid #0082A1;
-border-right: 2px solid #0082A1;
-border-bottom-left-radius: 7px;
-border-bottom-right-radius: 7px;
-}
-
-#RowMenu:before, #RowDrill:before  {
-font-family: fontAwesome;
-font-size: 18px;
-line-height: 18px;
-color: #0082a1;
-}
-
-#RowMenu:hover:before, #RowDrill:hover:before {
-color:#fe9915;
-}
-
-#RowMenu:before {
-content:"\F0C9";
-}
-
-#RowDrill:before {
-content:"\F067";
-}
-
-
-#RowMenuContainer{
+.row-menu-container{
 position: absolute;
 border-bottom: 2px solid #0082A1;
 border-left: 2px solid #0082A1;
@@ -221,19 +184,6 @@ white-space: nowrap;
 padding: 2px;
 min-width: 140px;
 }
-
-#RowMenuContainer ~ #RowMenu:hover:before {
-content: "\f00d";
-}
-
-#RowMenuContainer > .menu-buttons {
-  height: 53px;
-}
-
-#RowMenuContainer > .menu-buttons-label {
-  height: 20px;
-}
-
 
 .table .key-box{
 right: 24px;

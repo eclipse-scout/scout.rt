@@ -16,7 +16,7 @@ scout.DesktopViewButtonBar = function($parent, viewButtons, session) {
 
   //  create logo and plus sign
   $desktopView.appendDiv('ViewAdd').on('click', '', addOwnView);
-  $desktopView.appendDiv('ViewLogo').delay(1000).animateAVCSD('width', 55, null, null, 1000);
+  $desktopView.appendDiv('ViewLogo').delay(1000).animateAVCSD('width', 40, null, null, 1000);
 
   function addOwnView() {
     var name = $desktopView.children('.selected').text().split('(');

@@ -21,6 +21,11 @@ scout.Desktop.prototype._render = function($parent) {
     views = new scout.DesktopViewButtonBar($parent, this.viewButtons, this.session);
     marginTop = views.$div.outerHeight();
   }
+
+  this.menu = new scout.DesktopMenu($parent, this.session);
+  marginTop += this.menu.$container.outerHeight();
+
+
   if (this.toolButtons) {
     this.taskbar = new scout.DesktopTaskbar(this);
     this.taskbar.render($parent);
@@ -33,6 +38,7 @@ scout.Desktop.prototype._render = function($parent) {
     this.layout.register(this.tree.$div, 'W');
     this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
+
 
   var bench = new scout.DesktopBench($parent, this.session);
   this.layout.register(bench.$container, 'C');

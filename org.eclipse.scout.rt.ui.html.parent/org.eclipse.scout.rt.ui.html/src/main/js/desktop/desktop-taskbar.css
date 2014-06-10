@@ -1,9 +1,9 @@
 .desktop-taskbar{
 position: absolute;
 right: 0px;
-top: 58px;
+top: 100px;
 z-index: 10;
-height: calc(100% - 58px);
+height: calc(100% - 100px);
 width: 100px;
 border-left: 1px solid #CCC;
 background-color: #FFF;

@@ -78,6 +78,8 @@ scout.Table.prototype.attach = function($container) {
     this.$container.appendTo($container);
   }
   scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
+
+  this._drawMenu(this.findSelectedRows());
 };
 
 scout.Table.prototype.dispose = function() {
@@ -254,7 +256,8 @@ scout.Table.prototype._drawData = function(startRow) {
 
     $rows = $(rowString);
     $rows.appendTo(this.$dataScroll)
-      .on('clicks', '', onClicks);
+      .on('clicks', '', onClicks)
+      .on('contextmenu', onContextMenu);
   }
 
   // update info and scrollbar
@@ -270,15 +273,66 @@ scout.Table.prototype._drawData = function(startRow) {
     }
   }
 
+  that = this;
+
   function onClicks(event) {
     if (event.type == 'singleClick') {
       onClick(event);
     }
-
     that.sendRowsSelected();
 
     if (event.type == 'doubleClick') {
       onDoubleClick(event);
+    }
+  }
+
+  function onContextMenu(event) {
+    $(this).click();
+    event.preventDefault();
+
+    var $rowMenuContainer = $('.row-menu-container',  that.$dataScroll);
+    if ($rowMenuContainer.length) {
+      removeMenu();
+      return;
+    }
+
+    var $children = $('.desktop-menu-table').children();
+    if ($children.length) {
+      var $selectedRows = $('.row-selected', that.$dataScroll),
+      top = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32,
+      left = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13));
+
+      if ($selectedRows.length === 0) {
+        return;
+      }
+
+      $rowMenuContainer =  that.$dataScroll.appendDiv('', 'row-menu-container')
+        .css('left', left + 16).css('top', top);
+
+      $children.clone(true).appendTo($rowMenuContainer);
+
+      // animated opening
+      $rowMenuContainer.css('height', 0).heightToContent(150);
+
+      // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
+      var closingEvents = 'mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu';
+      $(document).one(closingEvents, removeMenu);
+      $rowMenuContainer.one(closingEvents, $.suppressEvent);
+    }
+
+    function removeMenu() {
+      var rowMenuContainer = $('.row-menu-container',  that.$dataScroll);
+
+      if (!rowMenuContainer.length) {
+        return;
+      }
+
+      // Animate
+      var h = rowMenuContainer.outerHeight();
+      rowMenuContainer.animateAVCSD('height', 0, $.removeThis, null, 150);
+
+      // Remove all cleanup handlers
+      $(document).off('.rowMenu');
     }
   }
 
@@ -297,9 +351,26 @@ scout.Table.prototype._drawData = function(startRow) {
 
 };
 
+scout.Table.prototype._drawMenu = function($selectedRows) {
+  // FIXME cgu: nicer?
+  var menus;
+
+  if ($selectedRows.length ==1) {
+    menus = scout.menus.filter(this.menus, ['SingleSelection']);
+  } else if ($selectedRows.length > 1) {
+    menus = scout.menus.filter(this.menus, ['MultiSelection']);
+  } else {
+    menus = [];
+  }
+
+  $('.desktop-menu').data('this').addItems(menus, false);
+};
+
 scout.Table.prototype.sendRowsSelected = function() {
   var rowIds = [],
     $selectedRows = this.findSelectedRows();
+
+  this._drawMenu($selectedRows);
 
   $selectedRows.each(function() {
     rowIds.push($(this).attr('id'));

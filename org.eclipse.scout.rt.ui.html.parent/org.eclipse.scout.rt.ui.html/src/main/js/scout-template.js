@@ -27,7 +27,6 @@
 //@include("src/main/js/table/TableHeaderMenu.js");
 //@include("src/main/js/table/TableOrganizeMenu.js");
 //@include("src/main/js/table/TableKeystrokeAdapter.js");
-//@include("src/main/js/table/TableRowMenuHandler.js");
 //@include("src/main/js/table/TableSelectionHandler.js");
 //@include("src/main/js/table/control/TableControl.js");
 //@include("src/main/js/table/control/ChartTableControl.js");
@@ -38,6 +37,7 @@
 //@include("src/main/js/desktop/BaseDesktop.js");
 //@include("src/main/js/desktop/MobileDesktop.js");
 //@include("src/main/js/desktop/Desktop.js");
+//@include("src/main/js/desktop/DesktopMenu.js");
 //@include("src/main/js/desktop/DesktopBench.js");
 //@include("src/main/js/desktop/DesktopTable.js");
 //@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");

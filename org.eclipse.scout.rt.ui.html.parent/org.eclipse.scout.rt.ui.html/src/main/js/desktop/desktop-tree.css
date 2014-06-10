@@ -1,12 +1,12 @@
 #DesktopTree {
 min-height: 100px;
-overflow:hidden;
 }
 
 .tree {
+position: relative;
 height: 100%;
 width: 100%;
-overflow: hidden;
+overflow:hidden;
 }
 
 .tree > .scrollbar{
@@ -20,7 +20,7 @@ position: absolute;
 top: 0px;
 width: calc(100% - 18px);
 height: 100%;
-padding: 12px 0px 0px 16px;
+padding: 12px 0px 0px 10px;
 }
 
  /* bread crumb mode */
@@ -150,16 +150,4 @@ font-family: fontAwesome;
 font-size: 30px;
 content:"\F015";
 color: #fff;
-}
-
-#DesktopTree .tree-menu {
-height: 0px ;
-width: calc(100% - 10px);
-position: absolute;
-bottom: 0;
-overflow: hidden;
-white-space: nowrap;
-padding: 2px 2px 10px 2px;}
-
-#DesktopTree.bread-crumb .tree-menu {
 }

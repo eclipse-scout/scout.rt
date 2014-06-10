@@ -9,10 +9,9 @@ width: 300px;
 
 .desktop-area-C {
 left: 300px;
-top: 58px;
-height: calc(100% - 58px);
-overflow:hidden;
-}
+top: 114px;
+height: calc(100% - 114px);
+overflow:hidden;}
 
 .desktop-area-E {
 width: 600px;

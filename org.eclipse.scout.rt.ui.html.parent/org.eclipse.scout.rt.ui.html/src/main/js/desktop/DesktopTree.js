@@ -11,6 +11,7 @@ scout.inherits(scout.DesktopTree, scout.ModelAdapter);
 scout.DesktopTree.prototype.init = function(model, session) {
   scout.DesktopTree.parent.prototype.init.call(this, model, session);
   session.getOrCreateModelAdapters(model.menus, this);
+
 };
 
 scout.DesktopTree.prototype._render = function($parent) {
@@ -20,17 +21,16 @@ scout.DesktopTree.prototype._render = function($parent) {
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.nodes);
 
-  // home node and menu section for bread crumb
+  // home node for bread crumb
   this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
     .attr('data-level', -1)
     .on('click', '', onHomeClick);
-  this._$treeMenu = this.$container.appendDiv('', 'tree-menu', '');
 
   var that = this;
 
   function onHomeClick(event) {
     $(this).selectOne();
-    that._$treeMenu.empty();
+    that._showOrHideMenus();
     that._updateBreadCrumb();
     that.scrollbar.initThumb();
   }
@@ -299,12 +299,8 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     return that._onNodeControlClicked(event, $(this));
   }
 
-  function onNodeContextClick(e) {
-    e.preventDefault();
-
-    //TODO cgu: geht nicht beim ertsen klick?
-    $(this).click();
-    that._onNodeMenuClicked(e, $('.tree-item-menu', this));
+  function onNodeContextClick(event) {
+    return that._onNodeContextClick(event, $(this));
   }
 
   // return all created nodes
@@ -337,7 +333,12 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
   return false;
 };
 
-scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
+scout.DesktopTree.prototype._onNodeContextClick = function(event, $clicked) {
+  event.preventDefault();
+  $clicked.click();
+
+  //TODO cgu: warten bis menu verfügbar
+
   var $treeMenuContainer = $('.tree-menu-container',  this._$desktopTreeScroll);
 
   if ($treeMenuContainer.length) {
@@ -345,13 +346,13 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
     return;
   }
 
-  var $children = this._$treeMenu.children();
+  var $children = $('.desktop-menu-tree').children();
   if ($children.length) {
     $treeMenuContainer =  this._$desktopTreeScroll.appendDiv('', 'tree-menu-container')
       .css('right', 20)
-      .css('top', $clicked.offset().top - this._$desktopTreeScroll.offset().top + 30);
+      .css('top', $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32);
 
-    $clicked.parent().addClass('menu-open');
+    $clicked.addClass('menu-open');
 
     $children.clone(true).appendTo($treeMenuContainer);
 
@@ -379,7 +380,7 @@ scout.DesktopTree.prototype._onNodeMenuClicked = function(event, $clicked) {
     $treeMenuContainer.animateAVCSD('height', 0,
       function() {
         $(this).remove();
-        $clicked.parent().removeClass('menu-open');
+        $clicked.removeClass('menu-open');
       }, null, 150);
 
     // Remove all cleanup handlers
@@ -424,11 +425,8 @@ scout.DesktopTree.prototype.doBreadCrumb = function(show) {
   if (show && !this.$parent.hasClass('bread-crumb')) {
     this._updateBreadCrumb();
     this.$parent.addClass('bread-crumb');
-    this._$treeMenu.heightToContent(150);
-    //this._$desktopTreeScroll.css('height', 'calc(100% - ' + h + ')');
   } else if (!show && this.$parent.hasClass('bread-crumb')) {
     this.$parent.removeClass('bread-crumb');
-    this._$treeMenu.animateAVCSD('height', 0, null, null, 150);
   }
 
   this.scrollbar.initThumb();
@@ -441,14 +439,6 @@ scout.DesktopTree.prototype._findNodeById = function(nodeId) {
 
 scout.DesktopTree.prototype._findSelectedNodes = function() {
   return this._$desktopTreeScroll.find('.selected');
-};
-
-scout.DesktopTree.prototype.filterSingleSelectionNodeMenus = function(menus) {
-  return scout.menus.filter(menus, ['SingleSelection']);
-};
-
-scout.DesktopTree.prototype.filterMultiSelectionNodeMenus = function(menus) {
-  return scout.menus.filter(menus, ['MultiSelection']);
 };
 
 scout.DesktopTree.prototype._setMenus = function(menus) {
@@ -464,87 +454,7 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
 };
 
 scout.DesktopTree.prototype._showOrHideMenus = function($node) {
-  var menus = this.menus;
-  if (menus) {
-    menus = this.filterSingleSelectionNodeMenus(this.menus);
-  }
-  if (menus && menus.length > 0) {
-    this._addNodeMenu($node, menus);
-  } else {
-    this._removeNodeMenu($node);
-  }
-
-};
-
-scout.DesktopTree.prototype._addNodeMenu = function($node, menus) {
-  var $menu = $node.appendDiv('', 'tree-item-menu')
-    .data('menus', menus)
-    .on('click', '', onNodeMenuClicked);
-
-  // delete old menu menu
-  this._$treeMenu.empty();
-
-  // create menu-item and menu-button
-  if (menus && menus.length > 0) {
-    for (var i = 0; i < menus.length; i++) {
-      if (menus[i].separator) {
-        continue;
-      }
-      if (menus[i].iconId) {
-        this._$treeMenu.appendDiv('', 'menu-button')
-          .attr('id', menus[i].id)
-          .attr('data-icon', menus[i].iconId)
-          .attr('data-label', menus[i].text)
-          .on('click', '', onMenuItemClicked)
-          .mouseenter(onHoverIn);
-      } else {
-        this._$treeMenu.appendDiv('', 'menu-item', menus[i].text)
-          .attr('id', menus[i].id)
-          .on('click', '', onMenuItemClicked);
-      }
-    }
-
-    // wrap menu-buttons and add div for label
-    $('.menu-button',  this._$treeMenu).wrapAll('<div class="menu-buttons"></div>');
-    var $menuButton = $('.menu-buttons',  this._$treeMenu);
-    $menuButton.mouseleave(onHoverOut);
-    $menuButton.prependDiv('', 'menu-buttons-label');
-    this._$treeMenu.append($menuButton);
-
-    // size menu
-    this._$treeMenu.heightToContent(150);
-  }
-
-  var that = this;
-
-  function onNodeMenuClicked(event) {
-    return that._onNodeMenuClicked(event, $(this));
-  }
-
-  function onHoverIn() {
-    var $container = $(this).parent().parent();
-    $container.css('height', 'auto');
-    $('.menu-buttons-label', $container)
-      .text($(this).data('label'))
-      .heightToContent(150);
-  }
-
-  function onHoverOut() {
-    var $container = $(this).parent().parent();
-
-    $('.menu-buttons-label', $container)
-      .stop()
-      .animateAVCSD('height', 0, null, function() { $(this).text(''); }, 150);
-  }
-
-  function onMenuItemClicked() {
-    that.session.send('menuAction', $(this).attr('id'));
-  }
-};
-
-scout.DesktopTree.prototype._removeNodeMenu = function($node) {
-  $node.find('.tree-item-menu').remove();
-  this._$treeMenu.empty();
+  $('.desktop-menu').data('this').addItems(this.menus, true);
 };
 
 scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
