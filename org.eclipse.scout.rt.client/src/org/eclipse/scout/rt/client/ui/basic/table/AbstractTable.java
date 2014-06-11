@@ -74,7 +74,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ModifyCustomColumnMenu;
@@ -3237,7 +3237,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         for (P_CellLookup lookup : m_cellLookupBuffer) {
           ITableRow row = lookup.getRow();
           if (row.getTable() == AbstractTable.this) {
-            ISmartColumn<?> col = lookup.getColumn();
+            IContentAssistColumn<?, ?> col = lookup.getColumn();
             ILookupCall<?> call = col.prepareLookupCall(row);
             if (call != null && call.getKey() != null) {
               //split: local vs remote
@@ -3465,10 +3465,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       for (int i = 0; i < row.getCellCount(); i++) {
         IColumn<?> column = getColumnSet().getColumn(i);
         // lookups
-        if (column instanceof ISmartColumn) {
-          ISmartColumn<?> smartColumn = (ISmartColumn<?>) column;
-          if (smartColumn.getLookupCall() != null) {
-            m_cellLookupBuffer.add(new P_CellLookup(row, smartColumn));
+        if (column instanceof IContentAssistColumn) {
+          IContentAssistColumn<?, ?> assistColumn = (IContentAssistColumn<?, ?>) column;
+          if (assistColumn.getLookupCall() != null) {
+            m_cellLookupBuffer.add(new P_CellLookup(row, assistColumn));
           }
         }
       }
@@ -4322,11 +4322,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   }
 
-  private class P_CellLookup {
+  private static class P_CellLookup {
     private final ITableRow m_row;
-    private final ISmartColumn<?> m_column;
+    private final IContentAssistColumn<?, ?> m_column;
 
-    public P_CellLookup(ITableRow row, ISmartColumn<?> col) {
+    public P_CellLookup(ITableRow row, IContentAssistColumn<?, ?> col) {
       m_row = row;
       m_column = col;
     }
@@ -4335,7 +4335,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return m_row;
     }
 
-    public ISmartColumn<?> getColumn() {
+    public IContentAssistColumn<?, ?> getColumn() {
       return m_column;
     }
   }// end private class

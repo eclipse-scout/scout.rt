@@ -17,6 +17,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
+import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -119,6 +121,35 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
   @ConfigOperation
   @Order(140)
   protected void execPrepareLookup(ILookupCall<LOOKUP_TYPE> call, ITableRow row) {
+  }
+
+  /**
+   * the default implementation simply casts one to the other type
+   * 
+   * @param key
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  @ConfigOperation
+  @Order(410)
+  protected LOOKUP_TYPE execConvertValueToKey(VALUE_TYPE value) {
+    return (LOOKUP_TYPE) value;
+  }
+
+  @Override
+  public ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row) {
+    if (getLookupCall() != null) {
+      ILookupCall<LOOKUP_TYPE> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, this));
+      call.setKey(execConvertValueToKey(getValueInternal(row)));
+      call.setText(null);
+      call.setAll(null);
+      call.setRec(null);
+      execPrepareLookup(call, row);
+      return call;
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

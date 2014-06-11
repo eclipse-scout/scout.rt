@@ -18,15 +18,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
-import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
 
@@ -78,19 +75,6 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     return (VALUE_TYPE) key;
   }
 
-  /**
-   * the default implementation simply casts one to the other type
-   * 
-   * @param key
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  @ConfigOperation
-  @Order(410)
-  protected LOOKUP_CALL_KEY_TYPE execConvertValueToKey(VALUE_TYPE value) {
-    return (LOOKUP_CALL_KEY_TYPE) value;
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -111,22 +95,6 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   @Override
   public void setSortCodesByDisplayText(boolean b) {
     m_sortCodesByDisplayText = b;
-  }
-
-  @Override
-  public ILookupCall<LOOKUP_CALL_KEY_TYPE> prepareLookupCall(ITableRow row) {
-    if (getLookupCall() != null) {
-      ILookupCall<LOOKUP_CALL_KEY_TYPE> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, AbstractMixedSmartColumn.this));
-      call.setKey(execConvertValueToKey(getValueInternal(row)));
-      call.setText(null);
-      call.setAll(null);
-      call.setRec(null);
-      execPrepareLookup(call, row);
-      return call;
-    }
-    else {
-      return null;
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -167,6 +135,16 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
       @Override
       protected void execPrepareLookup(ILookupCall<LOOKUP_CALL_KEY_TYPE> call) throws ProcessingException {
         AbstractMixedSmartColumn.this.execPrepareLookup(call, row);
+      }
+
+      @Override
+      protected LOOKUP_CALL_KEY_TYPE execConvertValueToKey(VALUE_TYPE value) {
+        return AbstractMixedSmartColumn.this.execConvertValueToKey(value);
+      }
+
+      @Override
+      protected VALUE_TYPE execConvertKeyToValue(LOOKUP_CALL_KEY_TYPE key) {
+        return AbstractMixedSmartColumn.this.execConvertKeyToValue(key);
       }
     };
 
