@@ -54,6 +54,16 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
     return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
   }
 
+  @Override
+  protected BigDecimal getMinPossibleValue() {
+    return AbstractBigDecimalField.DEFAULT_MIN_VALUE;
+  }
+
+  @Override
+  protected BigDecimal getMaxPossibleValue() {
+    return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
+  }
+
   /**
    * uses {@link #parseToBigDecimalInternal(String)} to parse text
    */

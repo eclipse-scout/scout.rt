@@ -74,26 +74,20 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
   }
 
   @Override
+  protected Double getMinPossibleValue() {
+    return -Double.MAX_VALUE;
+  }
+
+  @Override
+  protected Double getMaxPossibleValue() {
+    return Double.MAX_VALUE;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setMinValue(getConfiguredMinimumValue());
     setMaxValue(getConfiguredMaximumValue());
-  }
-
-  /**
-   * Set the minimum value for this field. If value is <code>null</code>, it is replaced by Double.MIN_VALUE.
-   */
-  @Override
-  public void setMinValue(Double value) {
-    super.setMinValue(value == null ? -Double.MAX_VALUE : value);
-  }
-
-  /**
-   * Set the maximum value for this field. If value is <code>null</code>, it is replaced by -Double.MAX_VALUE.
-   */
-  @Override
-  public void setMaxValue(Double value) {
-    super.setMaxValue(value == null ? Double.MAX_VALUE : value);
   }
 
   /**
