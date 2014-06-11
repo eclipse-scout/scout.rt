@@ -80,26 +80,20 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   }
 
   @Override
+  protected Long getMinPossibleValue() {
+    return Long.MIN_VALUE;
+  }
+
+  @Override
+  protected Long getMaxPossibleValue() {
+    return Long.MAX_VALUE;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setMinValue(getConfiguredMinimumValue());
     setMaxValue(getConfiguredMaximumValue());
-  }
-
-  /**
-   * Set the minimum value for this field. If value is <code>null</code>, it is replaced by Long.MIN_VALUE.
-   */
-  @Override
-  public void setMinValue(Long value) {
-    super.setMinValue(value == null ? Long.MIN_VALUE : value);
-  }
-
-  /**
-   * Set the maximum value for this field. If value is <code>null</code>, it is replaced by Long.MAX_VALUE.
-   */
-  @Override
-  public void setMaxValue(Long value) {
-    super.setMaxValue(value == null ? Long.MAX_VALUE : value);
   }
 
   /**

@@ -55,6 +55,16 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
     return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
   }
 
+  @Override
+  protected BigInteger getMinPossibleValue() {
+    return AbstractBigIntegerField.DEFAULT_MIN_VALUE;
+  }
+
+  @Override
+  protected BigInteger getMaxPossibleValue() {
+    return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
+  }
+
   /**
    * uses {@link #parseToBigDecimalInternal(String)} to parse text and returns the result as BigInteger
    */
