@@ -248,8 +248,13 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     return getFormatInternal().getMaximumIntegerDigits();
   }
 
+  /**
+   * Set the minimum value for this field. If value is <code>null</code>, it is replaced by
+   * {@link #getMinPossibleValue()}.
+   */
   @Override
-  public void setMinValue(T n) {
+  public void setMinValue(T value) {
+    T n = (value == null) ? getMinPossibleValue() : value;
     try {
       setFieldChanging(true);
       //
@@ -273,8 +278,13 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     return (T) propertySupport.getProperty(PROP_MIN_VALUE);
   }
 
+  /**
+   * Set the maximum value for this field. If value is <code>null</code>, it is replaced by
+   * {@link #getMaxPossibleValue()}.
+   */
   @Override
-  public void setMaxValue(T n) {
+  public void setMaxValue(T value) {
+    T n = (value == null) ? getMaxPossibleValue() : value;
     try {
       setFieldChanging(true);
       //
@@ -302,6 +312,16 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     return CompareUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
   }
 
+  /**
+   * Lower bound for the value (depending on the type)
+   */
+  protected abstract T getMinPossibleValue();
+
+  /**
+   * Upper bound for the value (depending on the type)
+   */
+  protected abstract T getMaxPossibleValue();
+
   @Override
   protected T validateValueInternal(T rawValue) throws ProcessingException {
     T validValue = null;
@@ -311,10 +331,10 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
     }
     else {
       if (getMaxValue() != null && compareInternal(rawValue, getMaxValue()) > 0) {
-        throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", "" + formatValueInternal(getMinValue()), "" + formatValueInternal(getMaxValue())));
+        throwNumberTooLarge();
       }
       if (getMinValue() != null && compareInternal(rawValue, getMinValue()) < 0) {
-        throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", "" + formatValueInternal(getMinValue()), "" + formatValueInternal(getMaxValue())));
+        throwNumberTooSmall();
       }
       validValue = rawValue;
     }
@@ -402,13 +422,31 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       }
       // check for bad range
       if (getMinValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMinValue())) < 0) {
-        throw new ProcessingException(ScoutTexts.get("NumberTooSmallMessageXY", String.valueOf(getMinValue()), String.valueOf(getMaxValue())));
+        throwNumberTooSmall();
       }
       if (getMaxValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMaxValue())) > 0) {
-        throw new ProcessingException(ScoutTexts.get("NumberTooLargeMessageXY", String.valueOf(getMinValue()), String.valueOf(getMaxValue())));
+        throwNumberTooLarge();
       }
     }
     return retVal;
+  }
+
+  private void throwNumberTooLarge() throws VetoException {
+    if (getMinValue() == null || CompareUtility.equals(getMinValue(), getMinPossibleValue())) {
+      throw new VetoException(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())));
+    }
+    else {
+      throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
+    }
+  }
+
+  private void throwNumberTooSmall() throws VetoException {
+    if (getMaxValue() == null || CompareUtility.equals(getMaxValue(), getMaxPossibleValue())) {
+      throw new VetoException(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())));
+    }
+    else {
+      throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
+    }
   }
 
   /**

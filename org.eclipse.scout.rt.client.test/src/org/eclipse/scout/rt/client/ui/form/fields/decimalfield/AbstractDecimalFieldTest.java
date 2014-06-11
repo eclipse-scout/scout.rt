@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertComparableEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -26,28 +29,27 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility.NumberStringPercentSuffix;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractDecimalField}
  */
+@RunWith(ScoutClientTestRunner.class)
 public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
-  private static Locale ORIGINAL_LOCALE;
+  private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
+  private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
+  private NumberFormat m_formatter;
 
-  @BeforeClass
-  public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = LocaleThreadLocal.get();
-    LocaleThreadLocal.set(new Locale("de", "CH"));
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() {
-    LocaleThreadLocal.set(ORIGINAL_LOCALE);
+  @Before
+  public void setUp() {
+    m_formatter = DecimalFormat.getInstance();
   }
 
   @Override
@@ -68,6 +70,16 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   @Override
   protected int getConfiguredFractionDigits() {
     return 5;
+  }
+
+  @Override
+  protected BigDecimal getMinPossibleValue() {
+    return DEFAULT_MIN_VALUE;
+  }
+
+  @Override
+  protected BigDecimal getMaxPossibleValue() {
+    return DEFAULT_MAX_VALUE;
   }
 
   @Override
@@ -118,9 +130,9 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   public void testFormatValueInternal() {
     setMaxFractionDigits(3);
     setRoundingMode(RoundingMode.HALF_EVEN);
-    assertEquals("12.246", formatValueInternal(BigDecimal.valueOf(12.2465)));
+    assertEquals(m_formatter.format(12.246), formatValueInternal(BigDecimal.valueOf(12.2465)));
     setRoundingMode(RoundingMode.HALF_UP);
-    assertEquals("12.247", formatValueInternal(BigDecimal.valueOf(12.2465)));
+    assertEquals(m_formatter.format(12.247), formatValueInternal(BigDecimal.valueOf(12.2465)));
     setRoundingMode(RoundingMode.UNNECESSARY);
 
     boolean exceptionOccured = false;
@@ -142,29 +154,29 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
     setPercent(true);
     assertTrue(isPercent());
     assertEquals(dfPercent.getPositiveSuffix(), getFormatInternal().getPositiveSuffix());
     assertEquals(dfPercent.getNegativeSuffix(), getFormatInternal().getNegativeSuffix());
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88) + " %"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
     setPercent(false);
     assertFalse(isPercent());
     assertEquals("", getFormatInternal().getPositiveSuffix());
     assertEquals("", getFormatInternal().getNegativeSuffix());
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string containing '%' and property 'percent' is not set to 'true'.", this, "59.88 %");
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
     // manually setting suffixes
     getFormatInternal().setPositiveSuffix(dfPercent.getPositiveSuffix());
     assertFalse(isPercent());
     getFormatInternal().setNegativeSuffix(dfPercent.getNegativeSuffix());
     assertTrue(isPercent());
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88 %"));
-    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal("59.88"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88) + " %"));
+    assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
 
   }
 
@@ -294,6 +306,53 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertTrue("expected tracker to be notified, when value changed", propertyTracker.m_notified);
     assertComparableEquals("expected getter to return new setting", 6, getFractionDigits());
     assertComparableEquals("expected new setting in property change notification", 6, (Integer) propertyTracker.m_cachedProperty);
+  }
+
+  @Test
+  public void testNoErrorMessage() {
+    setValue(BigDecimal.valueOf(5));
+    assertNull(getErrorStatus());
+    setValue(DEFAULT_MIN_VALUE);
+    assertNull(getErrorStatus());
+    setValue(DEFAULT_MAX_VALUE);
+    assertNull(getErrorStatus());
+  }
+
+  @Test
+  public void testErrorMessageValueTooLarge() {
+    setMaxValue(BigDecimal.valueOf(100));
+
+    setValue(BigDecimal.valueOf(100));
+    assertNull(getErrorStatus());
+    setValue(BigDecimal.valueOf(101));
+    assertNotNull(getErrorStatus());
+
+    assertEquals(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+
+    setMinValue(BigDecimal.valueOf(10));
+
+    setValue(BigDecimal.valueOf(20));
+    assertNull(getErrorStatus());
+    setValue(BigDecimal.valueOf(101));
+    assertEquals(ScoutTexts.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+  }
+
+  @Test
+  public void testErrorMessageValueTooSmall() {
+    setMinValue(BigDecimal.valueOf(100));
+
+    setValue(BigDecimal.valueOf(100));
+    assertNull(getErrorStatus());
+    setValue(BigDecimal.valueOf(99));
+    assertNotNull(getErrorStatus());
+    assertEquals(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())), getErrorStatus().getMessage());
+
+    setMaxValue(BigDecimal.valueOf(200));
+
+    setValue(BigDecimal.valueOf(150));
+    assertNull(getErrorStatus());
+    setValue(BigDecimal.valueOf(50));
+    assertEquals(ScoutTexts.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
 
 }

@@ -80,26 +80,20 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   }
 
   @Override
+  protected Integer getMinPossibleValue() {
+    return Integer.MIN_VALUE;
+  }
+
+  @Override
+  protected Integer getMaxPossibleValue() {
+    return Integer.MAX_VALUE;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setMinValue(getConfiguredMinimumValue());
     setMaxValue(getConfiguredMaximumValue());
-  }
-
-  /**
-   * Set the minimum value for this field. If value is <code>null</code>, it is replaced by Integer.MIN_VALUE.
-   */
-  @Override
-  public void setMinValue(Integer value) {
-    super.setMinValue(value == null ? Integer.MIN_VALUE : value);
-  }
-
-  /**
-   * Set the maximum value for this field. If value is <code>null</code>, it is replaced by Integer.MAX_VALUE.
-   */
-  @Override
-  public void setMaxValue(Integer value) {
-    super.setMaxValue(value == null ? Integer.MAX_VALUE : value);
   }
 
   /**

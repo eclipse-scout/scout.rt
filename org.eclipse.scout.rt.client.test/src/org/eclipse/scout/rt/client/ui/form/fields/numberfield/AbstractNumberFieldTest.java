@@ -34,6 +34,8 @@ import org.junit.Test;
 public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   private static Locale ORIGINAL_LOCALE;
+  private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
+  private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
 
   @BeforeClass
   public static void setupBeforeClass() {
@@ -54,6 +56,16 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   @Override
   protected BigDecimal getConfiguredMaxValue() {
     return null;
+  }
+
+  @Override
+  protected BigDecimal getMinPossibleValue() {
+    return DEFAULT_MIN_VALUE;
+  }
+
+  @Override
+  protected BigDecimal getMaxPossibleValue() {
+    return DEFAULT_MAX_VALUE;
   }
 
   @Override
