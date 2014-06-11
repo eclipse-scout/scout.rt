@@ -125,7 +125,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   public void doHyperlinkAction(URL url) throws ProcessingException {
-    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+    if (url != null) {
+      execHyperlinkAction(url, url.getPath(), "local".equals(url.getHost()));
+    }
   }
 
   public void setValueFromURL(URL url, String encoding) throws ProcessingException {
