@@ -25,7 +25,9 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
   var $vennContainer = this.$container
       .appendSVG('svg', '', 'venn-container')
       .attrSVG('viewBox', '0 0 500 340')
-      .attrSVG('preserveAspectRatio', 'xMinYMin');
+      .attrSVG('preserveAspectRatio', 'xMinYMin')
+      .on('click', clickCriteria)
+      .on('contextmenu', clickSet);
 
   var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
 
@@ -58,10 +60,12 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
        .attr('cy', MID_Y)
        .attr('r', 0)
        .click(selectCriteria);
+
      $criteria.push($div);
 
-     drawCriteria();
+     updateCriteria();
      selectCriteria.call($div);
+     drawCriteria();
    }
  }
 
@@ -74,15 +78,23 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
    var $selected = $('.selected', $vennContainer);
    for (var c = 0; c < $criteria.length; c++) {
      if ($criteria[c][0] == $selected[0]) {
-       $criteria[c].animateSVG('r', 0, $.removeThis);
+       $criteria[c].animateSVG('r', 0, 300, $.removeThis);
        $criteria.splice(c, 1);
        break;
      }
    }
    // select next criteria
    if ($criteria.length) {
+     updateCriteria();
      selectCriteria.call($criteria[$criteria.length - 1]);
      drawCriteria();
+   }
+
+ }
+
+ function updateCriteria () {
+   for (var c = 0; c < $criteria.length; c++) {
+     $criteria[c][0].id = c;
    }
  }
 
@@ -97,7 +109,6 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
    drawCriteria();
  }
 
-
  function drawCriteria () {
    // remove all text
    $('text', $vennContainer)
@@ -108,7 +119,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
    // show count all data
    if (count.total) {
-     $vennContainer.appendSVG('text', '', 'venn-all-text', count.total + ' DatensÃ¤tze')
+     $vennContainer.appendSVG('text', '', 'venn-all-text', count.total + ' Datensätze')
        .attr('x', 490).attr('y', 28);
    }
 
@@ -245,9 +256,9 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
        x1 = x1 - cx;
        x2 = x2 - cx;
 
-       y0 = y0 - cx;
-       y1 = y1 - cx;
-       y2 = y2 - cx;
+       y0 = y0 - cy;
+       y1 = y1 - cy;
+       y2 = y2 - cy;
      } else {
        r0 = MAX_R * 0.7;
        r1 = MAX_R * 0.7;
@@ -288,7 +299,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
      drawSetIntersect('12', r2, x2, y2, r1, x1, y1, r0, x0, y0);
 
      //TODO cru: one element can not be clicked
-     //drawSetTriple('012', r2, x2, y2, r1, x1, y1, r0, x0, y0);
+     drawSetTriple('012', r2, x2, y2, r1, x1, y1, r0, x0, y0);
    }
    function calcR (size, limit) {
      return Math.max(limit * Math.sqrt(size / count.total), MIN_R);
@@ -335,157 +346,147 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
      }
    }
 
-   function drawSetOuter (r0, dx0, dy0, r1, dx1, dy1, r2, dx2, dy2) {
+   function drawSetOuter (ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
      // TODO cru: clone existing object instead of creating new ones
      // TODO cru: collect all functions
-
-     // create outer set
      var $mask = $vennDefs.empty().appendSVG('mask', 'maskAll', '');
+     appendRect($mask, '', 'white');
+     if (ra) appendCircle($mask, dxa, dya, ra);
+     if (rb) appendCircle($mask, dxb, dyb, rb);
+     if (rc) appendCircle($mask, dxc, dyc, rc);
 
-     $mask.appendSVG('rect', '', '')
-       .attr('x', 5).attr('y', 15)
-       .attr('width', 490).attr('height', 300)
-       .attr('rx', 10).attr('ry', 10)
-       .attr('fill', 'white');
-
-     if (r0) {
-       $mask.appendSVG('circle', '', '')
-         .attr('cx', MID_X + dx0)
-         .attr('cy', MID_Y + dy0)
-         .attr('r', r0);
-     }
-
-     if (r1) {
-       $mask.appendSVG('circle', '', '')
-         .attr('cx', MID_X + dx1)
-         .attr('cy', MID_Y + dy1)
-         .attr('r', r1);
-     }
-
-     if (r2) {
-       $mask.appendSVG('circle', '', '')
-         .attr('cx', MID_X + dx2)
-         .attr('cy', MID_Y + dy2)
-         .attr('r', r2);
-     }
-
-     $vennContainer.appendSVG('rect', '', 'venn-set')
-       .attr('x', 5).attr('y', 15)
-       .attr('width', 490).attr('height', 300)
+     appendRect($vennContainer, 'venn-set')
        .attr('mask', 'url(#maskAll)')
-       .on('contextmenu', setOne);
+       .attr('id', 'all');
    }
 
    function drawSetMain (id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
      var $mask = $vennDefs.appendSVG('mask', 'set' + id, '');
+     appendCircle($mask, dxa, dya, ra, '', 'white');
+     if (rb) appendCircle($mask, dxb, dyb, rb);
+     if (rc) appendCircle($mask, dxc, dyc, rc);
 
-     $mask.appendSVG('circle', '', '')
-       .attr('cx', MID_X + dxa)
-       .attr('cy', MID_Y + dya)
-       .attr('r', ra)
-       .attr('fill', 'white');
-
-     if (rb) {
-       $mask.appendSVG('circle', '', '')
-       .attr('cx', MID_X + dxb)
-       .attr('cy', MID_Y + dyb)
-       .attr('r', rb);
-     }
-
-     if (rc) {
-       $mask.appendSVG('circle', '', '')
-       .attr('cx', MID_X + dxc)
-       .attr('cy', MID_Y + dyc)
-       .attr('r', rc);
-     }
-
-     $vennContainer.appendSVG('circle', '', 'venn-set')
-       .attr('cx', MID_X + dxa)
-       .attr('cy', MID_Y + dya)
-       .attr('r', ra)
-       .attr('mask', "url(#set" + id + ")")
-       .on('contextmenu', setOne);
+     appendCircle($vennContainer, dxa, dya, ra, 'venn-set')
+       .attr('mask', 'url(#set' + id + ')')
+       .attr('id', id);
    }
 
    function drawSetIntersect (id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
      var $clip = $vennDefs.appendSVG('clipPath', 'set-clip' + id, '');
-
-     $clip.appendSVG('circle', '', '')
-         .attr('cx', MID_X + dxb)
-         .attr('cy', MID_Y + dyb)
-         .attr('r', rb);
-
+     appendCircle($clip, dxb, dyb, rb);
 
      if (rc) {
        var $mask = $vennDefs.appendSVG('mask', 'set-mask' + id, '');
-
-       $mask.appendSVG('circle', '', '')
-         .attr('cx', MID_X + dxa)
-         .attr('cy', MID_Y + dya)
-         .attr('r', ra)
-         .attr('fill', 'white');
-
-       $mask.appendSVG('circle', '', '')
-           .attr('cx', MID_X + dxc)
-           .attr('cy', MID_Y + dyc)
-           .attr('r', rc);
+       appendCircle($mask, dxa, dya, ra, '', 'white');
+       appendCircle($mask, dxc, dyc, rc);
      }
 
-     $vennContainer.appendSVG('circle', '', 'venn-set')
-       .attr('cx', MID_X + dxa)
-       .attr('cy', MID_Y + dya)
-       .attr('r', ra)
-       .attr('clip-path', "url(#set-clip" + id + ")")
-       .attr('mask', "url(#set-mask" + id + ")")
-       .on('contextmenu', setOne);
+     appendCircle($vennContainer, dxa, dya, ra, 'venn-set')
+       .attr('clip-path', 'url(#set-clip' + id + ')')
+       .attr('mask', 'url(#set-mask' + id + ')')
+       .attr('id', id);
    }
 
  function drawSetTriple (id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
    var $clip = $vennDefs.appendSVG('clipPath', 'set-clip' + id, '');
-
-   $clip.appendSVG('circle', '', '')
-       .attr('cx', MID_X + dxb)
-       .attr('cy', MID_Y + dyb)
-       .attr('r', rb);
+   appendCircle($clip, dxb, dyb, rb);
 
    var $mask = $vennDefs.appendSVG('mask', 'set-mask' + id, '');
+   appendCircle($mask, dxa, dya, ra);
+   appendCircle($mask, dxc, dyc, rc, '', 'white');
 
-   $mask.appendSVG('circle', '', '')
-     .attr('cx', MID_X + dxa)
-     .attr('cy', MID_Y + dya)
-     .attr('r', ra)
-     .attr('fill', 'black');
-
-   $mask.appendSVG('circle', '', '')
-     .attr('cx', MID_X + dxc)
-     .attr('cy', MID_Y + dyc)
-     .attr('r', rc)
-     .attr('fill', 'white');
-
-   $vennContainer.appendSVG('circle', '', 'venn-set')
-     .attr('cx', MID_X + dxa)
-     .attr('cy', MID_Y + dya)
-     .attr('r', ra)
-     .attr('clip-path', "url(#set-clip" + id + ")")
-     .attr('mask', "url(#set-mask" + id + ")")
-     .on('contextmenu', setOne);
+   appendCircle($vennContainer, dxa, dya, ra, 'venn-set')
+     .attr('clip-path', 'url(#set-clip' + id + ')')
+     .attr('mask', 'url(#set-mask' + id + ')')
+     .attr('id', id);
+   }
  }
-}
 
+ function clickCriteria (event) {
+   var candidate = findSet(event.clientX, event.clientY),
+     select = $('.selected', $vennContainer)[0].id,
+     next;
+
+   if (candidate.length === 0) return;
+
+   candidate.push(candidate[0]);
+   next = candidate[candidate.indexOf(select) + 1];
+
+   $.log(candidate, select, next);
+   $('.venn-circle', $vennContainer).removeClassSVG('selected');
+   $('#' + next, $vennContainer).addClassSVG('selected');
+ }
+
+ function clickSet (event) {
+   var candidate = findSet(event.clientX, event.clientY),
+     $clicked;
+   $.log(candidate);
+   if (candidate.length === 0) {
+     $clicked = $('#all.venn-set',  $vennContainer);
+   } else {
+     $clicked = $('#' + candidate.sort().join('') + '.venn-set',  $vennContainer);
+   }
+   $.log($clicked, candidate.sort().join(''));
+   if ($clicked.hasClassSVG('selected')) {
+     $clicked.removeClassSVG('selected');
+   } else {
+     $clicked.addClassSVG('selected');
+   }
+   event.preventDefault();
+ }
+
+ function appendRect ($def, claz, fill) {
+   var $rect = $def.appendSVG('rect', '', '')
+     .attr('x', 5).attr('y', 15)
+     .attr('width', 490).attr('height', 300)
+     .attr('rx', 10).attr('ry', 10);
+
+   if (claz) $rect.attr('class', claz);
+   if (fill) $rect.attr('fill', fill);
+
+   return $rect;
+ }
+
+ function appendCircle ($def, dx, dy, r, claz, fill) {
+   var $circle = $def.appendSVG('circle', '', '')
+     .attr('cx', MID_X + dx)
+     .attr('cy', MID_Y + dy)
+     .attr('r', r);
+
+   if (claz) $circle.attr('class', claz);
+   if (fill) $circle.attr('fill', fill);
+
+   return $circle;
+ }
+
+ function findSet (x, y) {
+   var root = $vennContainer[0],
+     rpos = root.createSVGRect();
+
+   rpos.x = event.clientX - $vennContainer.offset().left;
+   rpos.y = event.clientY - $vennContainer.offset().top;
+   $.log(rpos.x,rpos.y);
+   rpos.width = rpos.height = 1;
+   rpos.fill = 'red';
+
+   var list = root.getIntersectionList(rpos, null),
+     ret = [];
+
+   for(var i = 0; i < list.length; i++) {
+     var item = list[i].id;
+     for(var j = 0; j < item.length; j++) {
+       // workaround: do not use triple set to detect all sets
+       if (ret.indexOf(item[j]) == -1 && item.length != 3) ret.push(item[j]);
+     }
+   }
+
+   return ret;
+ }
 
  function setUnion () {
  }
 
  function setIntersect () {
- }
-
- function setOne (e) {
-   if ($(this).hasClassSVG('selected')) {
-     $(this).removeClassSVG('selected');
-   } else {
-     $(this).addClassSVG('selected');
-   }
-   e.preventDefault();
  }
 
  function simulateServer () {
