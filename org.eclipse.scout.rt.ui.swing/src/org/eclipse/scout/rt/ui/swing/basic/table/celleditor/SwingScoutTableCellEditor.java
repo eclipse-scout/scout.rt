@@ -421,7 +421,9 @@ public class SwingScoutTableCellEditor {
   private final class P_SwingInputVerifyListener implements ISwingInputVerifyListener {
     @Override
     public void verify(JComponent input) {
-      saveEditorFromSwing();
+      if (m_tableComposite.getSwingTable().isEditing()) {
+        m_tableComposite.getSwingTable().getCellEditor().stopCellEditing();
+      }
     }
   }
 
