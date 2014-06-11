@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 public interface IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends IContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
 
@@ -31,6 +29,4 @@ public interface IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends ICo
    * @since 04.11.2009 ticket 82478
    */
   void setSortCodesByDisplayText(boolean b);
-
-  ILookupCall<LOOKUP_CALL_KEY_TYPE> prepareLookupCall(ITableRow row);
 }

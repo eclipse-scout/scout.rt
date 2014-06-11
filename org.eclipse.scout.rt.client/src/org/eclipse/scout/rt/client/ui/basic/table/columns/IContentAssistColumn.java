@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
@@ -29,4 +30,5 @@ public interface IContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> extends IColumn<V
 
   void setLookupCall(ILookupCall<LOOKUP_TYPE> c);
 
+  ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row);
 }
