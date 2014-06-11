@@ -5,49 +5,84 @@ height: 50px;
 white-space: nowrap;
 border-bottom: 1px solid #CCC;
 background: #FFF;
-overflow: hidden;
 }
-
 
 .desktop-menu-tree, .desktop-menu-table {
 margin-top: 7px;
-padding-top: 4px;
-padding-bottom: 6px;
-float: left;
-patting-top: 10px;
-patting-bottom: 10px;
+padding: 3px 0px 3px 0px;
+display: inline-block;
+vertical-align: bottom;
+white-space: nowrap;
+overflow: hidden;
 }
 
 .desktop-menu-tree {
-padding-left: 30px;
+padding-left: 25px;
 padding-right: 10px;
 margin-right: 7px;
 border-right: 1px solid #CCC;
 }
 
-.desktop-menu .menu-item {
-float: left;
-padding-left: 10px;
-} 
-
-.desktop-menu .menu-button:before{
-position: relative;
-line-height: 23px;
-top: 2px;
-}
+.menu-item {
+display: inline-block;
+vertical-align: bottom;
+padding-left: 10px;} 
 
 
-.desktop-menu .menu-button:after {
-content: attr(data-label);
+.menu-item {
 color: #0082A1;
-line-height: 23px;
+overflow: hidden;
+cursor: pointer;
+line-height: 24px;
+padding: 4px 8px 0px 14px;
 }
 
-.menu-button:hover:after{
+.menu-item:before{
+position: relative;
+left: -5px;
+top: -1px;
+font-family: fontAwesome;
+font-size: 24px;
+line-height: 24px;
+color:#0082A1;
+content: '\A' attr(data-icon) '\A';
+text-decoration: none;
+display: inline-block;
+vertical-align: bottom;
+}
+
+.menu-item:hover {
+color: #FE9915;
 text-decoration: underline;
+}
+
+.menu-item:hover:before {
 color: #FE9915;
 }
 
-.desktop-menu .menu-buttons-label{
-display: none;
+
+.menu-container{
+position: absolute;
+border-bottom: 2px solid #0082A1;
+border-left: 2px solid #0082A1;
+border-right: 2px solid #0082A1;
+background-color: #FFF;
+white-space: nowrap;
+padding: 2px;
+min-width: 140px;
+}
+
+.menu-buttons {
+padding: 5px;
+}
+
+.menu-buttons .menu-item{
+width: 36px;
+color: #FFF;}
+
+.menu-buttons-label{
+color: #FE9915;
+padding: 0px 8px 0px 4px;
+line-height: 20px;
+height: 0px;
 }

@@ -171,18 +171,11 @@ border-radius: 7px;
 }
 
 .table-row.row-selected > div{
-border-bottom: 1px solid #FFF;
+border-bottom: 1px solid #EEE;
 }
 
-.row-menu-container{
-position: absolute;
-border-bottom: 2px solid #0082A1;
-border-left: 2px solid #0082A1;
-border-right: 2px solid #0082A1;
-background-color: #FFF;
-white-space: nowrap;
-padding: 2px;
-min-width: 140px;
+.table-row.select-single > div, .table-row.select-bottom > div{
+border-bottom: 1px solid #FFF;
 }
 
 .table .key-box{

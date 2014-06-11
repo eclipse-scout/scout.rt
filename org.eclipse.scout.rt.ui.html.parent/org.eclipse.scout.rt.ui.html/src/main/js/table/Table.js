@@ -253,10 +253,10 @@ scout.Table.prototype._drawData = function(startRow) {
     numRowsLoaded = r;
 
     // append block of rows
-
+    // TODO cgu/cru: delay vom clicks event ist leider nicht akzeptabel
     $rows = $(rowString);
     $rows.appendTo(this.$dataScroll)
-      .on('clicks', '', onClicks)
+      .on('click', '', onClicks)
       .on('contextmenu', onContextMenu);
   }
 
@@ -287,52 +287,15 @@ scout.Table.prototype._drawData = function(startRow) {
   }
 
   function onContextMenu(event) {
-    $(this).click();
     event.preventDefault();
+    onClicks(event);
 
-    var $rowMenuContainer = $('.row-menu-container',  that.$dataScroll);
-    if ($rowMenuContainer.length) {
-      removeMenu();
-      return;
-    }
+    var $selectedRows = $('.row-selected', that.$dataScroll),
+      x = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13)) + 16,
+      y = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32;
 
-    var $children = $('.desktop-menu-table').children();
-    if ($children.length) {
-      var $selectedRows = $('.row-selected', that.$dataScroll),
-      top = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32,
-      left = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13));
-
-      if ($selectedRows.length === 0) {
-        return;
-      }
-
-      $rowMenuContainer =  that.$dataScroll.appendDiv('', 'row-menu-container')
-        .css('left', left + 16).css('top', top);
-
-      $children.clone(true).appendTo($rowMenuContainer);
-
-      // animated opening
-      $rowMenuContainer.css('height', 0).heightToContent(150);
-
-      // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
-      var closingEvents = 'mousedown.rowMenu keydown.rowMenu mousewheel.rowMenu';
-      $(document).one(closingEvents, removeMenu);
-      $rowMenuContainer.one(closingEvents, $.suppressEvent);
-    }
-
-    function removeMenu() {
-      var rowMenuContainer = $('.row-menu-container',  that.$dataScroll);
-
-      if (!rowMenuContainer.length) {
-        return;
-      }
-
-      // Animate
-      var h = rowMenuContainer.outerHeight();
-      rowMenuContainer.animateAVCSD('height', 0, $.removeThis, null, 150);
-
-      // Remove all cleanup handlers
-      $(document).off('.rowMenu');
+    if ($selectedRows.length > 0) {
+      $('.desktop-menu').data('this').contextMenu(that.menus, false, that.$dataScroll, $(this), x, y);
     }
   }
 

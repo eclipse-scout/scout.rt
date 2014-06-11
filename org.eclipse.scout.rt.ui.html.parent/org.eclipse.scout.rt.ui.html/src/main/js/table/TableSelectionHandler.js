@@ -44,8 +44,10 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       }
     }
 
-    // just a click...
-    selectData(event);
+    // just a click... right click do not select if clicked in selection
+    if (event.which != 3 || !$row.is($selectedRows)) {
+      selectData(event);
+    }
 
     if (that.mouseMoveSelectionEnabled) {
       // ...or movement with held mouse button

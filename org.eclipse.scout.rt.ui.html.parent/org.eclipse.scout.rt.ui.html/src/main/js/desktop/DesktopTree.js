@@ -336,56 +336,12 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
 scout.DesktopTree.prototype._onNodeContextClick = function(event, $clicked) {
   event.preventDefault();
   $clicked.click();
-
   //TODO cgu: warten bis menu verfügbar
 
-  var $treeMenuContainer = $('.tree-menu-container',  this._$desktopTreeScroll);
+  var x = 20,
+    y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
 
-  if ($treeMenuContainer.length) {
-    removeMenu();
-    return;
-  }
-
-  var $children = $('.desktop-menu-tree').children();
-  if ($children.length) {
-    $treeMenuContainer =  this._$desktopTreeScroll.appendDiv('', 'tree-menu-container')
-      .css('right', 20)
-      .css('top', $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32);
-
-    $clicked.addClass('menu-open');
-
-    $children.clone(true).appendTo($treeMenuContainer);
-
-    // animated opening
-    $treeMenuContainer.css('height', 0).heightToContent(150);
-
-
-    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
-    var closingEvents = 'mousedown.treeMenu keydown.treeMenu mousewheel.treeMenu';
-    $(document).one(closingEvents, removeMenu);
-    $treeMenuContainer.one(closingEvents, $.suppressEvent);
-  }
-
-  var that = this;
-
-  function removeMenu() {
-    var $treeMenuContainer = $('.tree-menu-container',  this._$desktopTreeScroll);
-
-    if (!$treeMenuContainer.length) {
-      return;
-    }
-
-    // Animate
-    var h = $treeMenuContainer.outerHeight();
-    $treeMenuContainer.animateAVCSD('height', 0,
-      function() {
-        $(this).remove();
-        $clicked.removeClass('menu-open');
-      }, null, 150);
-
-    // Remove all cleanup handlers
-    $(document).off('.treeMenu');
-  }
+  $('.desktop-menu').data('this').contextMenu(this.menus, true, this._$desktopTreeScroll, $clicked, x, y);
 };
 
 scout.DesktopTree.prototype._updateBreadCrumb = function() {
