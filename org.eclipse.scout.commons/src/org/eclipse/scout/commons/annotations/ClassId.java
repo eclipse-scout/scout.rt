@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
  * 
  * @see org.eclipse.scout.commons.ITypeWithClassId
  */
+@DtoRelevant
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ClassId {
