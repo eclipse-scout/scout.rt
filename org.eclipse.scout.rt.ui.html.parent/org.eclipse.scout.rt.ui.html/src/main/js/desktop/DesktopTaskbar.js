@@ -74,7 +74,9 @@ scout.DesktopTaskbar.prototype.formAdded = function(form) {
 
     $button.select(selected);
 
+    that.formOfClickedButton = form;
     that.buttonSelected(form, selected);
+    that.formOfClickedButton = null;
   }
 };
 
@@ -136,7 +138,8 @@ scout.DesktopTaskbar.prototype.buttonSelected = function(form, selected) {
     }
     this.desktop.activateForm(form);
   } else {
-    if (!form.minimized) {
+    //minimize the form if the already selected button is clicked again
+    if (form === this.formOfClickedButton && !form.minimized) {
       this.desktop.minimizeForm(form);
     }
   }

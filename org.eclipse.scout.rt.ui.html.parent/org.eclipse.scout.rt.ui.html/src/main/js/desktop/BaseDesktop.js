@@ -67,6 +67,7 @@ scout.BaseDesktop.prototype._removeForm = function(form) {
     }
     if (form === this.focusedDialog) {
       this.focusedDialog = null;
+      this.activateTopDialog();
     }
 
     if (this.taskbar) {
@@ -105,6 +106,15 @@ scout.BaseDesktop.prototype.minimizeForm = function(form) {
   form.detach();
   if (form === this.focusedDialog) {
     this.focusedDialog = null;
+    this.activateTopDialog();
+  }
+
+};
+
+scout.BaseDesktop.prototype.activateTopDialog = function() {
+  var topDialog = this.$parent.find('.form:last');
+  if (topDialog) {
+    this.activateForm(topDialog.data('model'));
   }
 };
 

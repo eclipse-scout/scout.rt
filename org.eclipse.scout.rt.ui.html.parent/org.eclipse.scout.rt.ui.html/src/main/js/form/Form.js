@@ -31,6 +31,7 @@ scout.Form.prototype.detach= function() {
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
+  this.$container.data('model', this);
 
   this.rootGroupBox.render(this.$container);
 

@@ -21,7 +21,9 @@ scout.ToolButton.prototype._render = function($parent) {
   var that = this;
 
   function onClick() {
+    that.parent.formOfClickedButton = that.form;
     that._setSelected(!that.selected);
+    that.parent.formOfClickedButton = null;
   }
 };
 
