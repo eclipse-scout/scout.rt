@@ -318,7 +318,7 @@ scout.DesktopTree.prototype._onNodeContextClick = function(event, $clicked) {
   var x = 20,
     y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
 
-  $('.desktop-menu').data('this').contextMenu(this.menus, true, this._$desktopTreeScroll, $clicked, x, y);
+  $('.desktop-menu').data('this').contextMenu(true, this._$desktopTreeScroll, $clicked, x, y);
 };
 
 scout.DesktopTree.prototype._updateBreadCrumb = function() {

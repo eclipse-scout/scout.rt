@@ -20,49 +20,6 @@
     $(this).remove();
   };
 
-  $.DOUBLE_CLICK_DELAY_TIME = 250;
-
-  /**
-   * This event may be used to listen on click and on double click events on the same element.<p>
-   * This special event handling is necessary because javascript fires click events even if a double click happened.
-   * Therefore it is not possible to detect whether it is a double click or a click action.
-   */
-  $.event.special.clicks = {
-    delegateType: "click",
-    bindType: "click",
-    handle: function(event) {
-      var handleObj = event.handleObj;
-      var targetData = $.data(event.target);
-      var ret = null;
-
-      if (!targetData.clicks) {
-        targetData.clicks = 0;
-      }
-      targetData.clicks++;
-
-      if (targetData.clicks == 2) {
-        clearTimeout(targetData.clickTimer);
-        targetData.clickTimer = null;
-        targetData.clicks = null;
-
-        event.type = 'doubleClick';
-        ret = handleObj.handler.apply(this, [event]);
-        event.type = handleObj.type;
-        return ret;
-      } else {
-        targetData.clickTimer = setTimeout(function() {
-          targetData.clickTimer = null;
-          targetData.clicks = null;
-
-          event.type = 'singleClick';
-          ret = handleObj.handler.apply(this, [event]);
-          event.type = handleObj.type;
-          return ret;
-        }, $.DOUBLE_CLICK_DELAY_TIME);
-      }
-    }
-  };
-
   /**
    * Convenience function that can be used as an jQuery event handler, when
    * this event should be "swallowed". Technically, this function just calls

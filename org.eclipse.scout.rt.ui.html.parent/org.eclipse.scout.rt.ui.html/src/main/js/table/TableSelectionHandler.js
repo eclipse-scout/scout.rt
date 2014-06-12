@@ -35,11 +35,12 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       first = $selectedRows.first().index();
     } else if (event.ctrlKey) {
       add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
-    } else {
-      //Click on the already selected row must not reselect it
-      if ($selectedRows.length == 1 && $row.hasClass('row-selected')) {
-        return;
-      } else {
+    }
+    else {
+      //Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
+      //Right click on already selected rows must not clear the selection
+      if (!$row.hasClass('row-selected') ||
+          ($selectedRows.length > 1 && event.which != 3)) {
         $selectedRows.removeClass('row-selected');
       }
     }
@@ -89,10 +90,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     function onMouseUp(event) {
       $(".table-row").off(".selectionHandler");
 
-      //Handle mouse move selection. Single row selections are handled by onClicks
-      if ($row.get(0) != event.delegateTarget) {
-        that.table.sendRowsSelected();
-      }
+      that.table.sendRowsSelected();
     }
 
   }

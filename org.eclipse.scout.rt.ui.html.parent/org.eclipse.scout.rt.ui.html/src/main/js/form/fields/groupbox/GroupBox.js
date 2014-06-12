@@ -4,7 +4,7 @@
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this._$label;
-  this._addAdapterProperties(['formFields']);
+  this._addAdapterProperties(['formFields']);//FIXME CGU add default value
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 

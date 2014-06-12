@@ -100,3 +100,68 @@ $.fn.triggerRightClick = function() {
   });
   return $(this);
 };
+
+$.fn.triggerMouseDown = function(clicks) {
+  return $(this).triggerEventWithDetail('mousedown', clicks);
+};
+
+$.fn.triggerMouseUp = function(clicks) {
+  return $(this).triggerEventWithDetail('mouseup', clicks);
+};
+
+$.fn.triggerEventWithDetail = function(event, clicks) {
+  var $this = $(this);
+
+  if (!clicks) {
+    clicks = 1;
+  }
+
+  $this.trigger({
+    type: event,
+    originalEvent : {detail : clicks}
+  });
+  return $this;
+};
+
+$.fn.triggerContextMenu = function() {
+  var $this = $(this),
+    pos = $this.position(),
+    clicks = 1;
+
+  $this.triggerMouseDown(clicks);
+  $this.triggerMouseUp(clicks);
+  $this.trigger({
+    type: 'contextmenu',
+    pageX: pos.left,
+    pageY: pos.top
+  });
+  return $this;
+};
+
+$.fn.triggerClick = function(clicks) {
+  var $this = $(this),
+    pos = $this.position();
+
+  if (!clicks) {
+    clicks = 1;
+  }
+
+  $this.triggerMouseDown(clicks);
+  $this.triggerMouseUp(clicks);
+  $this.trigger({
+    type: 'click',
+    originalEvent : {detail : clicks}
+  });
+
+  return $this;
+};
+
+$.fn.triggerDoubleClick = function(clicks) {
+  var $this = $(this);
+  $this.triggerClick();
+  $this.triggerClick(2);
+  $this.trigger({
+    type: 'dblclick'
+  });
+  return $this;
+};

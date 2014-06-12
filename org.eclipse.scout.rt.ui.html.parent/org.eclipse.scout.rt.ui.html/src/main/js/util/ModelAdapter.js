@@ -7,10 +7,21 @@ scout.ModelAdapter = function() {
 
 scout.ModelAdapter.prototype.init = function(model, session) {
   this.session = session;
+
+  //FIXME CGU default values?
+//  for(var i=0;i<this._adapterProperties.length; i++) {
+//    var adapterProperty = this._adapterProperties[i];
+//
+//    if(!model.hasOwnProperty(adapterProperty)) {
+//      model[adapterProperty] = undefined;
+//    }
+//  }
+
   // copy all properties from model to this adapter instance
   this._eachProperty(model, function(propertyName, value) {
     this[propertyName] = value;
   }.bind(this));
+
   this.session.registerModelAdapter(this);
 };
 

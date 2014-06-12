@@ -10,8 +10,7 @@ scout.Table = function() {
   this._header;
   this.scrollbar;
   this.selectionHandler;
-  this.rowMenuHandler;
-  this._addAdapterProperties(['controls']);
+  this._addAdapterProperties(['controls', 'menus']);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -36,8 +35,6 @@ scout.Table.prototype.init = function(model, session) {
     this.configurator.configure(this);
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
-
-  session.getOrCreateModelAdapters(model.menus, this);
 };
 
 scout.Table.prototype._createTableConfigurator = function() {
@@ -240,7 +237,8 @@ scout.Table.prototype._drawData = function(startRow) {
     table = this, // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
     that = this,
     numRowsLoaded = startRow,
-    $rows;
+    $rows,
+    $mouseDownRow;
 
   if (table.rows && table.rows.length > 0) {
     for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
@@ -253,7 +251,9 @@ scout.Table.prototype._drawData = function(startRow) {
     // TODO cgu/cru: delay vom clicks event ist leider nicht akzeptabel
     $rows = $(rowString);
     $rows.appendTo(this.$dataScroll)
-      .on('click', '', onClicks)
+      .on('mousedown', '', onMouseDown)
+      .on('mouseup', '', onMouseUp) //mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
+      .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu);
   }
 
@@ -272,31 +272,34 @@ scout.Table.prototype._drawData = function(startRow) {
 
   that = this;
 
-  function onClicks(event) {
-    if (event.type == 'singleClick') {
-      onClick(event);
-    }
-    that.sendRowsSelected();
-
-    if (event.type == 'doubleClick') {
-      onDoubleClick(event);
-    }
-  }
-
   function onContextMenu(event) {
+    var $selectedRows, x, y;
     event.preventDefault();
-    onClicks(event);
 
-    var $selectedRows = $('.row-selected', that.$dataScroll),
-      x = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13)) + 16,
-      y = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32;
+    $selectedRows = $('.row-selected', that.$dataScroll);
+    x = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13)) + 16;
+    y = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32;
 
     if ($selectedRows.length > 0) {
-      $('.desktop-menu').data('this').contextMenu(that.menus, false, that.$dataScroll, $(this), x, y);
+      $('.desktop-menu').data('this').contextMenu(false, that.$dataScroll, $(this), x, y);
     }
   }
 
-  function onClick(event) {
+  function onMouseDown(event) {
+    $mouseDownRow = $(event.delegateTarget);
+  }
+
+  function onMouseUp(event) {
+    if (event.originalEvent.detail > 1) {
+      //don't execute on double click events
+      return;
+    }
+
+    var $mouseUpRow = $(event.delegateTarget);
+    if ($mouseDownRow[0] !== $mouseUpRow[0]) {
+      return;
+    }
+
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
     that.session.send(scout.Table.EVENT_ROW_CLICKED, that.id, {
@@ -333,6 +336,7 @@ scout.Table.prototype.sendRowsSelected = function() {
   var rowIds = [],
     $selectedRows = this.findSelectedRows();
 
+  //FIXME CGU Should be done by a listener in DesktopMenu
   this._drawMenu($selectedRows);
 
   $selectedRows.each(function() {

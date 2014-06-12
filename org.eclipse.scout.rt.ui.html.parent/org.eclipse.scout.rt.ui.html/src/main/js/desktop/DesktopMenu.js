@@ -7,7 +7,7 @@ scout.DesktopMenu = function($parent, session) {
   this.$table = this.$container.appendDiv('', 'desktop-menu-table');
 };
 
-scout.DesktopMenu.prototype.addItems = function (menus, tree, selection) {
+scout.DesktopMenu.prototype.addItems = function(menus, tree, selection) {
   var $div;
 
   if (tree) {
@@ -23,10 +23,10 @@ scout.DesktopMenu.prototype.addItems = function (menus, tree, selection) {
       if (menus[i].separator) {
         continue;
       }
-        $div.appendDiv('', 'menu-item', menus[i].text)
-          .attr('data-icon', menus[i].iconId)
-          .attr('id', menus[i].id)
-          .on('click', '', onMenuItemClicked);
+      $div.appendDiv('', 'menu-item', menus[i].text)
+        .attr('data-icon', menus[i].iconId)
+        .data('menu', menus[i])
+        .on('click', '', onMenuItemClicked);
     }
 
     // size menu
@@ -36,12 +36,13 @@ scout.DesktopMenu.prototype.addItems = function (menus, tree, selection) {
   var that = this;
 
   function onMenuItemClicked() {
-    that.session.send('menuAction', $(this).attr('id'));
+    var menu = $(this).data('menu');
+    menu.sendMenuAction();
   }
 };
 
-scout.DesktopMenu.prototype.contextMenu = function(menus, tree, $parent, $clicked, x, y) {
-  var $menuContainer = $('.menu-container', $parent);
+scout.DesktopMenu.prototype.contextMenu = function(tree, $parent, $clicked, x, y) {
+  var i, $menuContainer = $('.menu-container', $parent);
 
   if ($menuContainer.length) {
     removeMenu();
@@ -50,8 +51,12 @@ scout.DesktopMenu.prototype.contextMenu = function(menus, tree, $parent, $clicke
   var $children = tree ? $('.desktop-menu-table').children() : $('.desktop-menu-table').children();
   if ($children.length) {
 
-    $menuContainer = $parent.appendDiv('', 'menu-container');
+    $children.each(function() {
+      var menu = $(this).data('menu');
+      menu.sendAboutToShow();
+    });
 
+    $menuContainer = $parent.appendDiv('', 'menu-container');
     if (tree) {
       $menuContainer.css('right', x).css('top', y);
     } else {
@@ -67,7 +72,7 @@ scout.DesktopMenu.prototype.contextMenu = function(menus, tree, $parent, $clicke
     $('.menu-item[data-icon]', $menuContainer)
       .wrapAll('<div class="menu-buttons"></div>')
       .mouseenter(onHoverIn);
-    var $menuButton = $('.menu-buttons',  $menuContainer);
+    var $menuButton = $('.menu-buttons', $menuContainer);
     $menuButton.mouseleave(onHoverOut);
     $menuButton.appendDiv('', 'menu-buttons-label');
     $menuContainer.append($menuButton);
@@ -82,7 +87,7 @@ scout.DesktopMenu.prototype.contextMenu = function(menus, tree, $parent, $clicke
   }
 
   function removeMenu() {
-     // Animate
+    // Animate
     var h = $menuContainer.outerHeight();
     $menuContainer.animateAVCSD('height', 0,
       function() {
@@ -107,8 +112,9 @@ scout.DesktopMenu.prototype.contextMenu = function(menus, tree, $parent, $clicke
 
     $('.menu-buttons-label', $container)
       .stop()
-      .animateAVCSD('height', 0, null, function() { $(this).text(''); }, 150);
+      .animateAVCSD('height', 0, null, function() {
+        $(this).text('');
+      }, 150);
   }
 
 };
-
