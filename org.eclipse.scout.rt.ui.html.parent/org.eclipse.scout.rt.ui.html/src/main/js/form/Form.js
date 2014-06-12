@@ -4,13 +4,9 @@ scout.Form = function() {
   this._$parent;
   this._resizeHandler;
   this.rootGroupBox;
+  this._addAdapterProperties(['rootGroupBox']);
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
-
-scout.Form.prototype.init = function(model, session) {
-  scout.Form.parent.prototype.init.call(this, model, session);
-  this.rootGroupBox = this.session.getOrCreateModelAdapter(model.rootGroupBox, this);
-};
 
 /**
  * @override

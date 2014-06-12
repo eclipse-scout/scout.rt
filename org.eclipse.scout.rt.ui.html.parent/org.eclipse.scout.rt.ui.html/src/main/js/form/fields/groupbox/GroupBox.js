@@ -5,13 +5,9 @@ scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this._$label;
   this._gridLayout;
+  this._addAdapterProperties(['formFields']);
 };
 scout.inherits(scout.GroupBox, scout.FormField);
-
-scout.GroupBox.prototype.init = function(model, session) {
-  scout.GroupBox.parent.prototype.init.call(this, model, session);
-  this.formFields = this.session.getOrCreateModelAdapters(model.formFields, this);
-};
 
 scout.GroupBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field group-box');
@@ -68,7 +64,7 @@ scout.GroupBox.prototype.layout = function() {
   this._gridLayout.layout();
 };
 
-scout.GroupBox.prototype._onModelBorderVisibleChanged = function(borderVisible) {
+scout.GroupBox.prototype._setBorderVisible = function(borderVisible) {
   // NOP
 };
 
@@ -80,11 +76,5 @@ scout.GroupBox.prototype.dispose = function() {
     if (formField) {
       formField.dispose();
     }
-  }
-};
-
-scout.GroupBox.prototype.onModelPropertyChange = function(event) {
-  if (event.hasOwnProperty('borderVisible')) {
-    this._onModelBorderVisibleChanged(event.borderVisible);
   }
 };

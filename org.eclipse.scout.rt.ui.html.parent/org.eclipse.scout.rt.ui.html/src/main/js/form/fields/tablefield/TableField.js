@@ -3,13 +3,9 @@
 
 scout.TableField = function() {
   scout.TableField.parent.call(this);
+  this._addAdapterProperties(['table']);
 };
 scout.inherits(scout.TableField, scout.ModelAdapter);
-
-scout.TableField.prototype.init = function(model, session) {
-  scout.TableField.parent.prototype.init.call(this, model, session);
-  this.table = this.session.getOrCreateModelAdapter(model.table, this);
-};
 
 scout.TableField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'table-field');
@@ -21,8 +17,10 @@ scout.TableField.prototype._render = function($parent) {
   }
 };
 
-scout.TableField.prototype.setTable = function(table) {
-  this.table = this.updateModelAdapterAndRender(table, this);
+scout.TableField.prototype._setTable = function(table) {
+  if (this.isRendered()) {
+    table.render(this.$container.parent());
+  }
 };
 
 scout.TableField.prototype.dispose = function() {
@@ -33,6 +31,10 @@ scout.TableField.prototype.dispose = function() {
 
 scout.TableField.prototype.onModelPropertyChange = function(event) {
   if (event.table !== undefined) {
-    this.setTable(event.table);
+    //FIXME CGU verify with AWE: dieses verhalten müsste vom neuen konzept noch berücksichtigt werden
+    if (this.table) {
+      this.table.remove();
+    }
+    this._setTable(event.table);
   }
 };

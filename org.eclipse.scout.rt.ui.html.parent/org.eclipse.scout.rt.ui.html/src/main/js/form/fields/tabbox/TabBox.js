@@ -3,15 +3,10 @@
 
 scout.TabBox = function() {
   scout.TabBox.parent.call(this);
+
+  this._addAdapterProperties(['selectedTab', 'groupBoxes']);
 };
 scout.inherits(scout.TabBox, scout.ModelAdapter);
-
-scout.TabBox.prototype.init = function(model, session) {
-  scout.TabBox.parent.prototype.init.call(this, model, session);
-  //create groupbox adapter for selected tab
-  this.session.getOrCreateModelAdapter(model.selectedTab, this);
-  this.groupBoxes = this.session.getOrCreateModelAdapters(model.groupBoxes, this);
-};
 
 scout.TabBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'tab-box');

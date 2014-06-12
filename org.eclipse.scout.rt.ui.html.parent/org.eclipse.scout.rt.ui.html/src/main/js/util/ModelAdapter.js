@@ -105,19 +105,6 @@ scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, par
   return adapter;
 };
 
-scout.ModelAdapter.prototype.updateModelAdapterAndRender = function(model, parent) {
-  var adapter = this.session.getOrCreateModelAdapter(model, parent);
-
-  if (this.isRendered()) {
-    if (this.adapter) {
-      this.adapter.remove();
-    }
-    this.adapter.render(this.$container);
-  }
-
-  return adapter;
-};
-
 /**
  * Loops through all properties of the given model (optional ignores the given properties).
  * Creates an ModelAdapter instance for the given property when the propertyName is in the

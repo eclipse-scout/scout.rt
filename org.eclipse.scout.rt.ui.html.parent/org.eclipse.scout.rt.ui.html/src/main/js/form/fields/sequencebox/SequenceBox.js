@@ -1,14 +1,10 @@
 scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._gridLayout;
+  this._addAdapterProperties(['fields']);
 };
 
 scout.inherits(scout.SequenceBox, scout.FormField);
-
-scout.SequenceBox.prototype.init = function(model, session) {
-  scout.SequenceBox.parent.prototype.init.call(this, model, session);
-  this.fields = this.session.getOrCreateModelAdapters(this.fields, this);
-};
 
 scout.SequenceBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form-field sequence-box');

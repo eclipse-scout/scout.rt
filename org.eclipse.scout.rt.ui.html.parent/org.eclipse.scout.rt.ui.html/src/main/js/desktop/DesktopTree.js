@@ -5,13 +5,9 @@ scout.DesktopTree = function() {
   scout.DesktopTree.parent.call(this);
   this._selectedNodes = [];
   this._table;
+  this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.DesktopTree, scout.ModelAdapter);
-
-scout.DesktopTree.prototype.init = function(model, session) {
-  scout.DesktopTree.parent.prototype.init.call(this, model, session);
-  session.getOrCreateModelAdapters(model.menus, this);
-};
 
 scout.DesktopTree.prototype._render = function($parent) {
   this.$parent = $parent;
@@ -379,11 +375,6 @@ scout.DesktopTree.prototype._findSelectedNodes = function() {
 };
 
 scout.DesktopTree.prototype._setMenus = function(menus) {
-  this.menus = menus;
-
-  //Register new menus
-  this.session.getOrCreateModelAdapters(menus, this);
-
   if (this.selectedNodeIds && this.selectedNodeIds.length > 0) {
     var $node = this._findNodeById(this.selectedNodeIds[0]);
     this._showOrHideMenus($node);
@@ -392,12 +383,6 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
 
 scout.DesktopTree.prototype._showOrHideMenus = function($node) {
   $('.desktop-menu').data('this').addItems(this.menus, true);
-};
-
-scout.DesktopTree.prototype.onModelPropertyChange = function(event) {
-  if (event.hasOwnProperty('menus')) {
-    this._setMenus(event.menus);
-  }
 };
 
 scout.DesktopTree.prototype.onModelAction = function(event) {

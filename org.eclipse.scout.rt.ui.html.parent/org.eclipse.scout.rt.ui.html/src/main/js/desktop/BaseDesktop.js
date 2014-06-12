@@ -6,13 +6,9 @@ scout.BaseDesktop = function() {
   this.taskbar;
   this.modalDialogStack = [];
   this.focusedDialog;
+  this._addAdapterProperties(['forms']);
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
-
-scout.BaseDesktop.prototype.init = function(model, session) {
-  scout.BaseDesktop.parent.prototype.init.call(this, model, session);
-  this.forms = this.session.getOrCreateModelAdapters(model.forms, this);
-};
 
 scout.BaseDesktop.prototype._render = function($parent) {
   //this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids,

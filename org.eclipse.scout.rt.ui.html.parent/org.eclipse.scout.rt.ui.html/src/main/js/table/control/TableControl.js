@@ -1,9 +1,9 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
-  this._addAdapterProperties('form');
   this.table;
   this.form;
   this.$controlButton;
+  this._addAdapterProperties('form');
 };
 
 scout.inherits(scout.TableControl, scout.ModelAdapter);
@@ -33,7 +33,7 @@ scout.TableControl.prototype.toggle = function() {
 };
 
 scout.TableControl.prototype._setForm = function(form) {
-  this.form = this.session.getOrCreateModelAdapter(form, this);
+  // NOP
 };
 
 scout.TableControl.prototype._setSelected = function(selected) {

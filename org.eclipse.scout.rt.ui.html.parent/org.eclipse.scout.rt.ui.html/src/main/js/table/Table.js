@@ -11,7 +11,6 @@ scout.Table = function() {
   this.scrollbar;
   this.selectionHandler;
   this.rowMenuHandler;
-
   this._addAdapterProperties(['controls']);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
