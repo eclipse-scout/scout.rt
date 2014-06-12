@@ -8,7 +8,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   var pos = $header.index(),
     id = $header.data('index'),
-    column = table.model.columns[id];
+    column = table.columns[id];
 
   // create titel
   var $menuHeaderTitle = $('body').appendDiv('TableHeaderMenuTitle', 'header-menu')

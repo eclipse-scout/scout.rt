@@ -4,14 +4,13 @@
 scout.DesktopTree = function() {
   scout.DesktopTree.parent.call(this);
   this._selectedNodes = [];
-  this._desktopTable;
+  this._table;
 };
 scout.inherits(scout.DesktopTree, scout.ModelAdapter);
 
 scout.DesktopTree.prototype.init = function(model, session) {
   scout.DesktopTree.parent.prototype.init.call(this, model, session);
   session.getOrCreateModelAdapters(model.menus, this);
-
 };
 
 scout.DesktopTree.prototype._render = function($parent) {
@@ -20,6 +19,19 @@ scout.DesktopTree.prototype._render = function($parent) {
   this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
   this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
   this._addNodes(this.nodes);
+
+  var selectedNode;
+  if (this._selectedNodes.length > 0) {
+    selectedNode = this._selectedNodes[0];
+    this.setNodeSelectedById(selectedNode.id);
+
+    if (selectedNode.type === 'table' && !this._table) {
+      this._table = this.session.getModelAdapter(selectedNode.table.id);
+      this._table.render($('#DesktopBench'));
+    }
+
+    this._showOrHideMenus(this._findNodeById(selectedNode.id));
+  }
 
   // home node for bread crumb
   this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
@@ -39,36 +51,11 @@ scout.DesktopTree.prototype._render = function($parent) {
 /**
  * @override
  */
-scout.DesktopTree.prototype.detach = function() {
-  scout.DesktopTree.parent.prototype.detach.call(this);
-  if (this._desktopTable) {
-    this._desktopTable.detach();
-  }
-};
+scout.DesktopTree.prototype.remove = function() {
+  scout.DesktopTree.parent.prototype.remove.call(this);
 
-/**
- * @override
- */
-scout.DesktopTree.prototype.attach = function($parent) {
-  scout.DesktopTree.parent.prototype.attach.call(this, $parent);
-  if (this._desktopTable) {
-    this._desktopTable.attach($('#DesktopBench'));
-  }
-};
-
-scout.DesktopTree.prototype.attachModel = function() {
-  var selectedNode;
-
-  if (this._selectedNodes.length > 0) {
-    selectedNode = this._selectedNodes[0];
-    this.setNodeSelectedById(selectedNode.id);
-
-    if (selectedNode.type === 'table' && !this._desktopTable) {
-      this._desktopTable = this.session.getModelAdapter(selectedNode.id);
-      this._desktopTable.attach($('#DesktopBench'));
-    }
-
-    this._showOrHideMenus(this._findNodeById(selectedNode.id));
+  if (this._table) {
+    this._table.remove();
   }
 };
 
@@ -189,13 +176,13 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
 
   $node.selectOne();
 
-  if (this._desktopTable) {
-    this._desktopTable.detach();
+  if (this._table) {
+    this._table.remove();
   }
 
   if (node.type === 'table') {
-    this._desktopTable = this.session.getModelAdapter(node.id);
-    this._desktopTable.attach($('#DesktopBench'));
+    this._table = this.session.getModelAdapter(node.table.id);
+    this._table.render($('#DesktopBench'));
   }
 
   //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
@@ -263,14 +250,8 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     // Create tables for table pages
     //FIXME really always create table (no gui is created)
     if (node.table) {
-      var desktopTable = this.session.getModelAdapter(node.id);
-      if (!desktopTable) {
-        node.outlineId = this.id;
-
-        //TODO cgu: performance issue:
-        var table = new scout.DesktopTable();
-        table.init(node, this.session);
-      }
+      //TODO cgu: performance issue:
+      this.session.getOrCreateModelAdapter(node.table, this);
     }
 
     if (this.selectedNodeIds && this.selectedNodeIds.indexOf(node.id) > -1) {

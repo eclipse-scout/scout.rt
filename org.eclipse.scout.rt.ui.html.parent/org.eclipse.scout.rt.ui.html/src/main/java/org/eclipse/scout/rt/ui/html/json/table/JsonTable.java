@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -56,6 +57,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_MENUS = "menus";
+  public static final String PROP_CONTROLS = "controls";
 
   private P_ModelTableListener m_modelTableListener;
   private Map<String, ITableRow> m_tableRows;
@@ -247,6 +249,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
     }
     putProperty(json, "rows", jsonRows);
     putProperty(json, PROP_MENUS, modelsToJson(getModel().getMenus()));
+    if (getModel() instanceof ITable5) {
+      putProperty(json, "controls", modelsToJson(((ITable5) getModel()).getControls()));
+    }
+
     return json;
   }
 

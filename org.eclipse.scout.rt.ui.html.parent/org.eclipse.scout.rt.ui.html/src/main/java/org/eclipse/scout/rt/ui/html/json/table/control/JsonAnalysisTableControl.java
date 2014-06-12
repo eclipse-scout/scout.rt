@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import java.io.IOException;
 
@@ -38,13 +38,16 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-      try {
-        //FIXME add to model
-        String jsonData = new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/dummy_data_model.json").openStream()), "utf-8");
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "dataModel", new JSONObject(jsonData));
-      }
-      catch (JSONException | ProcessingException | IOException e) {
-        throw new JsonException(e);
+
+      if (!getModel().isSelected()) {
+        try {
+          //FIXME add to model
+          String jsonData = new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/dummy_data_model.json").openStream()), "utf-8");
+          getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "dataModel", new JSONObject(jsonData));
+        }
+        catch (JSONException | ProcessingException | IOException e) {
+          throw new JsonException(e);
+        }
       }
 
       getModel().fireActivatedFromUI();

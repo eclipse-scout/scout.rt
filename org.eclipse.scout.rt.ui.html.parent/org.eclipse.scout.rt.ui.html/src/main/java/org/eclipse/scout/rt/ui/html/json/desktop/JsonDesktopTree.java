@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage2;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -241,11 +240,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       ITable table = pageWithTable.getTable();
       putProperty(json, "table", modelToJson(table));
-
-      if (page instanceof IPage2) {
-        putProperty(json, "tableControls", modelsToJson(((IPage2) page).getTableControls()));
-      }
-
     }
     else {
       pageType = "node";

@@ -15,7 +15,7 @@ scout.GraphTableControl.prototype._render = function($parent) {
     kelvin = 1000,
     wContainer = this.$container.width(),
     hContainer = this.$container.height(),
-    graph = this.model.graph;
+    graph = this.graph;
 
 
   // create all links with label
@@ -238,13 +238,5 @@ scout.GraphTableControl.prototype._render = function($parent) {
 };
 
 scout.GraphTableControl.prototype._setGraph = function(graph) {
-  this.model.graph = graph;
+  // NOP
 };
-
-scout.GraphTableControl.prototype._onModelPropertyChange = function(event) {
-  scout.GraphTableControl.parent.prototype._onModelPropertyChange.call(this, event);
-  if (event.hasOwnProperty('graph')) {
-    this._setGraph(event.graph);
-  }
-};
-

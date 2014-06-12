@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IFormToolButton2 extends IToolButton {
+public interface IFormToolButton5 extends IToolButton {
   public static final String PROP_FORM = "form";
 
   IForm getForm();

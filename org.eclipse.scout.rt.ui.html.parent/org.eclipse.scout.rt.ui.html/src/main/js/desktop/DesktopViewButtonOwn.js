@@ -7,7 +7,7 @@ scout.DesktopViewButtonOwn = function() {
 scout.inherits(scout.DesktopViewButtonOwn, scout.ModelAdapter);
 
 scout.DesktopViewButtonOwn.prototype._render = function($parent) {
-  this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', this.model.text);
+  this._$viewButton = $('#ViewAdd').beforeDiv('', 'view-item view-own', this.text);
   this._$viewButton.on('click', '', onClick)
     .appendDiv('', 'view-remove')
     .on('click', '', removeOwnView)
@@ -16,11 +16,12 @@ scout.DesktopViewButtonOwn.prototype._render = function($parent) {
   var w = this._$viewButton.width();
   this._$viewButton.css('width', 0).animateAVCSD('width', w);
 
+  var that = this;
   function onClick() {
-    this._$viewButton.selectOne();
+    that._$viewButton.selectOne();
     //FIXME what to do on session?
     /*
-      session.send('click', fhat.model.id);
+      session.send('click', fhat.id);
        */
   }
 

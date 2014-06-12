@@ -10,7 +10,7 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
  * @override
  */
 scout.Desktop.prototype._render = function($parent) {
-  var views,
+  var viewbar,
     marginTop = 0,
     marginRight = 0;
 
@@ -18,8 +18,8 @@ scout.Desktop.prototype._render = function($parent) {
 
   // create all 4 containers
   if (this.viewButtons) {
-    views = new scout.DesktopViewButtonBar($parent, this.viewButtons, this.session);
-    marginTop = views.$div.outerHeight();
+    viewbar = new scout.DesktopViewButtonBar($parent, this.viewButtons, this.session);
+    marginTop = viewbar.$div.outerHeight();
   }
 
   this.menu = new scout.DesktopMenu($parent, this.session);
@@ -39,20 +39,17 @@ scout.Desktop.prototype._render = function($parent) {
     this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
 
+  this.bench = new scout.DesktopBench($parent, this.session);
+  this.layout.register(this.bench.$container, 'C');
 
-  var bench = new scout.DesktopBench($parent, this.session);
-  this.layout.register(bench.$container, 'C');
+  if (this.tree) {
+    this.tree.renderTree();
+  }
 
   this.layout.layout();
 
-  this._bench = bench;
-
-  if (views || this.taskbar || this.tree) {
-    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(views, this.taskbar, this.tree));
-  }
-
-  if (this.tree) {
-    this.tree.attachModel();
+  if (viewbar || this.taskbar || this.tree) {
+    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(viewbar, this.taskbar, this.tree));
   }
 
   scout.Desktop.parent.prototype._render.call(this, $parent);
@@ -62,7 +59,7 @@ scout.Desktop.prototype._render = function($parent) {
  * @override
  */
 scout.Desktop.prototype._resolveViewContainer = function(form) {
-  return this._bench.$container;
+  return this.bench.$container;
 };
 
 /**
@@ -75,7 +72,7 @@ scout.Desktop.prototype.showOrHideDesktopTree = function() {
 
   if (this.tree.detached) {
     if (this.tree.desktopTree.nodes.length > 0) {
-      this.tree.$div.insertBefore(this._bench.$container);
+      this.tree.$div.insertBefore(this.bench.$container);
       this.tree.detached = false;
       this.layout.unregister(this.tree.$div);
       this.layout.layout();

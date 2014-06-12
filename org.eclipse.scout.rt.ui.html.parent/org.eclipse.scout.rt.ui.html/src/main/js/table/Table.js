@@ -11,6 +11,8 @@ scout.Table = function() {
   this.scrollbar;
   this.selectionHandler;
   this.rowMenuHandler;
+
+  this._addAdapterProperties(['controls']);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -60,25 +62,21 @@ scout.Table.prototype._render = function($parent) {
   this._$footer = this.$container.appendDiv(this.id + '_footer');
   this.footer = new scout.TableFooter(this, this._$footer, this.session);
 
+  if (this.controls) {
+    for (var i = 0; i < this.controls.length; i++) {
+      var control = this.controls[i];
+      control.table = this;
+      this.footer.addControl(control);
+    }
+  }
+
   if (this.configurator && this.configurator.render) {
     this.configurator.render();
   }
+  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 
   // load data and create rows
   this.drawData();
-
-//  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
-};
-
-//FIXME CGU remove after switch to render
-scout.Table.prototype.attach = function($container) {
-  if (!this.$container) {
-    this._render($container);
-  } else {
-    this.$container.appendTo($container);
-  }
-  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
-
   this._drawMenu(this.findSelectedRows());
 };
 
@@ -326,7 +324,10 @@ scout.Table.prototype._drawMenu = function($selectedRows) {
     menus = [];
   }
 
-  $('.desktop-menu').data('this').addItems(menus, false);
+  var desktopMenu = $('.desktop-menu').data('this');
+  if (desktopMenu) {
+    desktopMenu.addItems(menus, false);
+  }
 };
 
 scout.Table.prototype.sendRowsSelected = function() {

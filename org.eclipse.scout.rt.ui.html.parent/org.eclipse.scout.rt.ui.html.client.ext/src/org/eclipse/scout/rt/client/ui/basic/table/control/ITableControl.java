@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.control;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface ITableControl extends IPropertyObserver {
+public interface ITableControl extends IPropertyObserver { //FIXME CGU may we can extend from IAction
   String PROP_LABEL = "label";
   String PROP_SELECTED = "selected";
   String PROP_FORM = "form";

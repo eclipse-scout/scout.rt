@@ -24,14 +24,13 @@
 //@include("src/main/js/desktop/MobileDesktop.js");
 //@include("src/main/js/desktop/MobileDesktopToolButtons.js");
 //@include("src/main/js/desktop/DesktopBench.js");
-//@include("src/main/js/desktop/DesktopTable.js");
 //@include("src/main/js/desktop/DesktopKeystrokeAdapter.js");
 //@include("src/main/js/desktop/DesktopTreeContainer.js");
 //@include("src/main/js/desktop/DesktopTree.js");
 //@include("src/main/js/desktop/DesktopViewButton.js");
 //@include("src/main/js/desktop/DesktopViewButtonBar.js");
 //@include("src/main/js/desktop/DesktopViewButtonOwn.js");
-//@include("src/main/js/desktop/BreadCrumbsNavigation.js");
+//@include("src/main/js/desktop/BreadCrumbNavigation.js");
 //@include("src/main/js/menu/Menu.js");
 //@include("src/main/js/menu/menus.js");
 //@include("src/main/js/table/Table.js");

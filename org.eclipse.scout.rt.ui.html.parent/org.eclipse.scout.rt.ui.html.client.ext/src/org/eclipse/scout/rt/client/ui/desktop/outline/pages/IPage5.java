@@ -10,13 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-
-public interface IPage2 extends IPage {
-
-  List<ITableControl> getTableControls();
+public interface IPage5 extends IPage {
 
 }

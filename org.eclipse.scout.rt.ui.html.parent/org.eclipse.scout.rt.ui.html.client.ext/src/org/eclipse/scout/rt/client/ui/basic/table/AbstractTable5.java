@@ -8,20 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.client.ui.basic.table;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 
-public class JsonChartTableControl extends JsonTableControl {
+public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
+  private List<ITableControl> m_tableControls;
 
-  public JsonChartTableControl(ITableControl model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public AbstractTable5() {
+    this(true);
+  }
+
+  public AbstractTable5(boolean callInitializer) {
+    super(false);
+
+    m_tableControls = new LinkedList<ITableControl>();
+
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   @Override
-  public String getObjectType() {
-    return "ChartTableControl";
+  public List<ITableControl> getControls() {
+    return m_tableControls;
   }
 
 }

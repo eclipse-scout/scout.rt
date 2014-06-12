@@ -1,27 +1,27 @@
 scout.DesktopTreeContainer = function($parent, model, session) {
   this.session = session;
+  this.desktopTree = session.getOrCreateModelAdapter(model, this);
+
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
-  this.desktopTree = session.getOrCreateModelAdapter(model, this);
-  this.desktopTree.attach(this._$desktopTree);
+};
+
+scout.DesktopTreeContainer.prototype.renderTree = function() {
+  this.desktopTree.render(this._$desktopTree);
   this._addVerticalSplitter(this._$desktopTree);
 };
 
-
 scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outline) {
-  this.desktopTree.detach(); //FIXME CGU refactor to ModelAdapter.updateModelAdapterAndRender, but DesktopTreecontainer does not extend ModelAdapter
+  this.desktopTree.remove(); //FIXME CGU refactor to ModelAdapter.updateModelAdapterAndRender, but DesktopTreecontainer does not extend ModelAdapter
   this.desktopTree = this.session.getOrCreateModelAdapter(outline, this); //FIXME CGU actually this.desktop
-  this.desktopTree.attach(this._$desktopTree);
-  this.desktopTree.attachModel();
-};
-
-scout.DesktopTreeContainer.prototype.attachModel = function() {
-  //TODO attachModel only necessary because setNodeSelection relies on desktop bench which is created later, is there a better way?
-  this.desktopTree.attachModel();
+  this.desktopTree.render(this._$desktopTree);
+  if (this._$splitter) {
+    this._$splitter.appendTo(this._$desktopTree); //move after tree, otherwise tree overlays splitter after outline change
+  }
 };
 
 scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
-  $div.appendDiv(undefined, 'splitter-vertical')
+  this._$splitter = $div.appendDiv(undefined, 'splitter-vertical')
     .on('mousedown', '', resize);
 
   var that = this;

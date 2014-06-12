@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton2;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -36,15 +36,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopTree;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonGraphTableControl;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonMapTableControl;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonTableControl;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -57,6 +51,12 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonFormToolButton;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonMapTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 
 /**
  * This factory creates IJsonAdapter instances for a given model object. You must call the <code>init()</code> method
@@ -107,8 +107,8 @@ public class JsonAdapterFactory {
     else if (model instanceof IFormToolButton) {
       return new NullAdapter(model, session, id);
     }
-    else if (model instanceof IFormToolButton2) {
-      return new JsonFormToolButton((IFormToolButton2) model, session, id);
+    else if (model instanceof IFormToolButton5) {
+      return new JsonFormToolButton((IFormToolButton5) model, session, id);
     }
     else if (model instanceof IOutline) {
       return new JsonDesktopTree((IOutline) model, session, id);

@@ -10,11 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 
-/**
- *
- */
-public class AbstractPageWithNodes2 extends AbstractPageWithNodes {
+public class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
 
 }

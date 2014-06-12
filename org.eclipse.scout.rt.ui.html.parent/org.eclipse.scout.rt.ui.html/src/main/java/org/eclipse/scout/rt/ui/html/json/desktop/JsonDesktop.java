@@ -107,7 +107,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
     }
     if (breadCrumbsNavigation.getValue() != null) {
-      putProperty(json, "breadCrumbsNavigation", modelToJson(breadCrumbsNavigation.getValue()));
+      putProperty(json, "breadCrumbNavigation", modelToJson(breadCrumbsNavigation.getValue()));
     }
     return json;
   }

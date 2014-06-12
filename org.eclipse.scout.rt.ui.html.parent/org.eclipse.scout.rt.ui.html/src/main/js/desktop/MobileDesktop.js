@@ -4,6 +4,7 @@
 scout.MobileDesktop = function() {
   scout.MobileDesktop.parent.call(this);
   this.areas = {};
+  this._addAdapterProperties(['breadCrumbNavigation']);
 };
 scout.inherits(scout.MobileDesktop, scout.BaseDesktop);
 
@@ -15,15 +16,15 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$parent = $parent;
 
   //FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
-  //  if (this.model.toolButtons) {
-  //    tools = new scout.MobileDesktopToolButtons(this.model.toolButtons, this.session);
+  //  if (this.toolButtons) {
+  //    tools = new scout.MobileDesktopToolButtons(this.toolButtons, this.session);
   //    tools.render($parent);
   //    marginTop = tools.$div.outerHeight();
   //  }
 
   this.layout = new scout.BorderLayout(marginTop, 0, 'desktop-area');
-  if (this.model.breadCrumbsNavigation) {
-    this.breadCrumbs = new scout.BreadCrumbsNavigation(this.model.breadCrumbsNavigation, this.session);
+  if (this.breadCrumbNavigation) {
+    this.breadCrumbNavigation.render($parent);
   }
 
   scout.MobileDesktop.parent.prototype._render.call(this, $parent);
@@ -33,7 +34,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
  * @override
  */
 scout.MobileDesktop.prototype._resolveViewContainer = function(form) {
-  return this.areas[form.model.displayViewId];
+  return this.areas[form.displayViewId];
 };
 
 /**
@@ -41,8 +42,8 @@ scout.MobileDesktop.prototype._resolveViewContainer = function(form) {
  */
 scout.MobileDesktop.prototype._addForm = function(form) {
   var layoutDirty = false;
-  if (form.model.displayHint == "view") {
-    var position = form.model.displayViewId;
+  if (form.displayHint == "view") {
+    var position = form.displayViewId;
     if (position !== 'C' && position !== 'E') {
       position = 'C';
     }
@@ -81,8 +82,8 @@ scout.MobileDesktop.prototype._createMainArea = function() {
 scout.MobileDesktop.prototype._removeForm = function(form) {
   scout.MobileDesktop.parent.prototype._removeForm.call(this, form);
 
-  if (form.model.displayHint == "view") {
-    var position = form.model.displayViewId;
+  if (form.displayHint == "view") {
+    var position = form.displayViewId;
     if (position !== 'C' && position !== 'E') {
       position = 'C';
     }

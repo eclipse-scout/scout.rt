@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 
@@ -51,7 +51,9 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
+      if (!getModel().isSelected()) {
+        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
+      }
 
       getModel().fireActivatedFromUI();
 

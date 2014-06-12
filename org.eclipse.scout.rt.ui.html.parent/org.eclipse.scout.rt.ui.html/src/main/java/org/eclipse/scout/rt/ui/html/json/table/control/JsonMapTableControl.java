@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 
@@ -57,8 +57,9 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", newJSONObject(MAP));
-
+      if (!getModel().isSelected()) {
+        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", newJSONObject(MAP));
+      }
       getModel().fireActivatedFromUI();
     }
   }

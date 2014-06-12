@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
  */
-public abstract class AbstractFormToolButton2 extends AbstractToolButton implements IFormToolButton2 {
+public abstract class AbstractFormToolButton5 extends AbstractToolButton implements IFormToolButton5 {
 
   private boolean m_previousSelectionState = false;
 
