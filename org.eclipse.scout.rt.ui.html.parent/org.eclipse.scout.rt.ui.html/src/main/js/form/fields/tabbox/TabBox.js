@@ -13,7 +13,7 @@ scout.TabBox.prototype._render = function($parent) {
 
   var i, groupBox;
   for (i = 0; i < this.groupBoxes.length; i++) {
-    this.groupBoxes[i].attach(this.$container);
+    this.groupBoxes[i].render(this.$container);
   }
 };
 

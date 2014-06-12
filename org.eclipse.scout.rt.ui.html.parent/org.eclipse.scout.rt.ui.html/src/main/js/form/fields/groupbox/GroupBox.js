@@ -27,7 +27,7 @@ scout.GroupBox.prototype._render = function($parent) {
   for (i = 0; i < this.formFields.length; i++) {
     formField = this.formFields[i];
     if (!this._isSystemButton(formField)) { // do not render system buttons on group box
-      formField.attach(this.$container);
+      formField.render(this.$container);
     }
   }
 };

@@ -17,7 +17,7 @@ scout.SequenceBox.prototype._render = function($parent) {
 
   var i, field;
   for (i = 0; i < this.fields.length; i++) {
-    this.fields[i].attach(this.$container);
+    this.fields[i].render(this.$container);
   }
 };
 

@@ -14,25 +14,8 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   this.session.registerModelAdapter(this);
 };
 
-// TODO AWE: analog AbstractJsonAdapter eine Liste von properties machen, für die automatisch
-// ein Adapter angelegt wird (beim init und beim propertyChange).
 
 // TODO AWE: underscore bei setter-func names entfernen
-
-scout.ModelAdapter.prototype.attach = function($parent) {
-  if (!this.isRendered()) {
-    this.render($parent);
-  } else {
-    this.$container.appendTo($parent);
-  }
-};
-
-scout.ModelAdapter.prototype.detach = function() {
-  if (this.isRendered()) {
-    this.$container.detach();
-  }
-  this.dispose();
-};
 
 scout.ModelAdapter.prototype.render = function($parent) {
   if (this.isRendered()) {

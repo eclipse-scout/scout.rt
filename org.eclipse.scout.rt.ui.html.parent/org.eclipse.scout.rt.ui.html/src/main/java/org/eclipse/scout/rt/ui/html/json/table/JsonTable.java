@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
@@ -179,18 +178,18 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
         return table.isScrollToSelection();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, ITypeWithClassId>(ITable.PROP_CONTAINER, model) {
-      @Override
-      protected ITypeWithClassId getValueImpl(ITable table) {
-        return table.getContainer();
-      }
-
-      @Override
-      public Object valueToJson(Object value) {
-        // XXX BSH Convert to JSON (or remove property entirely)
-        return null;
-      }
-    });
+//    putJsonProperty(new JsonProperty<ITable, ITypeWithClassId>(ITable.PROP_CONTAINER, model) { //FIXME BSH CGU: only send properties when needed, do we need this one?
+//      @Override
+//      protected ITypeWithClassId getValueImpl(ITable table) {
+//        return table.getContainer();
+//      }
+//
+//      @Override
+//      public Object valueToJson(Object value) {
+//        // XXX BSH Convert to JSON (or remove property entirely)
+//        return null;
+//      }
+//    });
     putJsonProperty(new JsonProperty<ITable, ITableContextMenu>(ITable.PROP_CONTEXT_MENU, model) {
       @Override
       protected ITableContextMenu getValueImpl(ITable table) {

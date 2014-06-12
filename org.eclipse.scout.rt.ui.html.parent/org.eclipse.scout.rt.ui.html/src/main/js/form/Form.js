@@ -8,12 +8,9 @@ scout.Form = function() {
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
-/**
- * @override
- */
 scout.Form.prototype.attach = function($parent) {
   if (!this.$container) {
-    this._render($parent);
+    this.render($parent);
   } else {
     this.$container.appendTo($parent);
     if (this.$glasspane) {
@@ -23,7 +20,9 @@ scout.Form.prototype.attach = function($parent) {
 };
 
 scout.Form.prototype.detach= function() {
-  scout.Form.parent.prototype.detach.call(this);
+  if (this.isRendered()) {
+    this.$container.detach();
+  }
   if (this.$glasspane) {
     this.$glasspane.detach();
   }
@@ -33,7 +32,7 @@ scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'form');
 
-  this.rootGroupBox.attach(this.$container);
+  this.rootGroupBox.render(this.$container);
 
   var closeable = false;
   var systemButtons = this.rootGroupBox.getSystemButtons();
@@ -43,7 +42,7 @@ scout.Form.prototype._render = function($parent) {
     var i, button;
     for (i=0; i<systemButtons.length; i++) {
       button = systemButtons[i];
-      button.attach($buttonBar);
+      button.render($buttonBar);
       if (button.visible &&
           button.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
           button.systemType == scout.Button.SYSTEM_TYPE.CLOSE) {
