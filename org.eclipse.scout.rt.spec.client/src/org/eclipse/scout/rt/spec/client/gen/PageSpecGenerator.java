@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.spec.client.config.IDocConfig;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityConfig;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
+import org.eclipse.scout.rt.spec.client.out.IDocTable;
 import org.eclipse.scout.rt.spec.client.out.internal.Section;
 
 /**
@@ -33,13 +34,16 @@ public class PageSpecGenerator {
 
   public IDocSection getDocSection(IPageWithTable<? extends ITable> page) {
     IDocEntityConfig<IPageWithTable<? extends ITable>> tablePageConfig = m_config.getTablePageConfig();
-    String title = tablePageConfig.getTitleExtractor().getText(page);
+
+    IDocTable tableSpec = DocGenUtility.createDocTable(page, tablePageConfig, true);
+
+    List<IMenu> menus = page.getTable().getMenus();
+    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuTableConfig(), false);
 
     List<IColumn<?>> columns = page.getTable().getColumns();
-    List<IMenu> menus = page.getTable().getMenus();
-
     IDocSection columnSection = DocGenUtility.createDocSection(columns, m_config.getColumnTableConfig(), false);
-    IDocSection menuSection = DocGenUtility.createDocSection(menus, m_config.getMenuTableConfig(), false);
-    return new Section(title, menuSection, columnSection);
+
+    String title = tablePageConfig.getTitleExtractor().getText(page);
+    return new Section(title, tableSpec, columnSection, menuSection);
   }
 }

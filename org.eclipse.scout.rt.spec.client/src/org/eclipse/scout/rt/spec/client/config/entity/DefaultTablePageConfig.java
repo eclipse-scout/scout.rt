@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.config.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.SearchFormExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.TypeExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.form.page.TablePageTitleExtractor;
 
 /**
@@ -23,6 +29,15 @@ public class DefaultTablePageConfig extends DefaultEntityConfig<IPageWithTable<?
   @Override
   public IDocTextExtractor<IPageWithTable<? extends ITable>> getTitleExtractor() {
     return new TablePageTitleExtractor<IPageWithTable<? extends ITable>>();
+  }
+
+  @Override
+  public List<IDocTextExtractor<IPageWithTable<? extends ITable>>> getPropertyTextExtractors() {
+    List<IDocTextExtractor<IPageWithTable<? extends ITable>>> propertyTemplate = new ArrayList<IDocTextExtractor<IPageWithTable<? extends ITable>>>();
+    propertyTemplate.add(new DescriptionExtractor<IPageWithTable<? extends ITable>>());
+    propertyTemplate.add(new SearchFormExtractor());
+    propertyTemplate.add(new TypeExtractor<IPageWithTable<? extends ITable>>());
+    return propertyTemplate;
   }
 
 }
