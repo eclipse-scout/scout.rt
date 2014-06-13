@@ -13,8 +13,7 @@ scout.Button.SYSTEM_TYPE = {
 };
 
 scout.Button.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(undefined, 'form-field');
-  this.$container.data('gridData', this.gridData);
+  this.$container = $parent;
   // TODO AWE: (button) remove mnemonic
   this._$button = $('<button>' + this.label + '</button>');
   this._$button.appendTo(this.$container);

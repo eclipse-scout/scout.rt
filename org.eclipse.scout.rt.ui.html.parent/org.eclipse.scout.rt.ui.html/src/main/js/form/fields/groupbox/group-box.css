@@ -1,22 +1,22 @@
+.root-group-box {
+  margin: 0;
+  background-color:#eee;
+  box-sizing:border-box;
+  position:relative;
+}
+
 .group-box {
-  clear: both;
-  float: left;
-  margin-top: 16px;
-  padding: 19px 20px;
-  /*position: relative;*/
-  width: 750px;
-  /*height: 100%;*/
+  margin-bottom:10px;
+  background-color:#ccc;
+  box-sizing:border-box;
+  position:relative;
 }
 
 .group-box-title {
-  clear: both;
+  border-bottom : 1px solid black;
   color: #5D5D5D;
   font-weight: bold;
-  height: auto;
-  margin: /*145px*/ auto auto;
-  position: relative;
   text-shadow: 6px 1px 0 #FFFFFF, 2px -2px 0 #FFFFFF, -2px 2px 0 #FFFFFF, 2px 2px 0 #FFFFFF;
-  /*width: 749px;*/
 }
 
 .group-box-title-border {
@@ -24,4 +24,16 @@
   display: block;
   height: 8px;
   margin-top: -8px;
+}
+
+
+/* TODO AWE: move to right file */
+ul.sequence-box {
+  margin:0;
+  padding:0;
+}
+
+ul.sequence-box li {
+  list-style: none;
+  display: inline;
 }

@@ -2,7 +2,6 @@ scout.Form = function() {
   scout.Form.parent.call(this);
   this._$title;
   this._$parent;
-  this._resizeHandler;
   this.rootGroupBox;
   this._addAdapterProperties(['rootGroupBox']);
 };
@@ -69,11 +68,6 @@ scout.Form.prototype._render = function($parent) {
     this.$container.addClass('dialog-form');
     this.$container.prepend($dialogBar);
   }
-
-  // we must keep a stable reference to the resize-handler, so we can remove the handler in the dispose method later
-  this.rootGroupBox.updateLayout(true);
-  this._resizeHandler = this.rootGroupBox.updateLayout.bind(this.rootGroupBox);
-  $(window).on('resize', this._resizeHandler);
 };
 
 // TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
@@ -109,6 +103,5 @@ scout.Form.prototype.onModelAction = function(event) {
 
 scout.Form.prototype.dispose = function() {
   scout.Form.parent.prototype.dispose.call(this);
-  $(window).off('resize', this._resizeHandler);
   this.rootGroupBox.dispose();
 };

@@ -5,11 +5,15 @@ scout.CheckBoxField = function() {
 scout.inherits(scout.CheckBoxField, scout.FormField);
 
 scout.CheckBoxField.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(undefined, 'form-field');
-  this.$container.data('gridData', this.gridData);
-  this.$label = this.$container.appendDiv(undefined, 'label', this.label);
+  this.$container = $parent;
+  this.$label = $('<label>' + this.label + '</label>');
+  this.$container.append(this.$label);
+
+  this._$errorStatus = $('<span class="status"></span>');
+  this.$container.append(this._$errorStatus);
+
   this._$checkBox = $('<input type="checkbox" class="field" />');
-  this._$checkBox.appendTo(this.$container);
+  this.$container.append(this._$checkBox);
 
   this._$checkBox.on('click', function() {
     this.session.send('click', this.id);

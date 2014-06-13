@@ -12,13 +12,13 @@ scout.GridLayout = function($container) {
   this.width = $container.parent().width();
   this.columnWidth = 0;
   this.gap = 15;
-  // TODO AWE: (layout) gap und rowHeight fix? ist heute in Swing auch so aber via Swing environment überschreibbar.
+  // TODO AWE: (grid-layout) gap und rowHeight fix? ist heute in Swing auch so aber via Swing environment überschreibbar.
   // vielleicht können wir das im CSS setzen und dort wieder auslesen? Sonst eine UIDefaults.js Datei
   // machen die pro Projekt überschrieben werden kann.
   this.rowHeight = 28;
 };
 
-// TODO AWE: generic toString method, move to *template.js?
+// TODO AWE: (grid-layout) generic toString method, move to *template.js?
 scout.GridLayout.prototype.toString = function() {
   return 'GridLayout[columns=' + this.columns +
     ' width=' + this.width +
@@ -28,8 +28,8 @@ scout.GridLayout.prototype.toString = function() {
 };
 
 scout.GridLayout.prototype.updateGridDimension = function() {
-  // TODO AWE: (layout) padding/margin vom container berücksichtigen
-  // TODO AWE: (layout) useUiHeight: was machen wir mit dem?
+  // TODO AWE: (grid-layout) padding/margin vom container berücksichtigen
+  // TODO AWE: (grid-layout) useUiHeight: was machen wir mit dem?
   var numGaps = this.columns - 1;
   var widthForColumns = this.width - numGaps * this.gap;
   this.columnWidth = Math.floor(widthForColumns / this.columns);

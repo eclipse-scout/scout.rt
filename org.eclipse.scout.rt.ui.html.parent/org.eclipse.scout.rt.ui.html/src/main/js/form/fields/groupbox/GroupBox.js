@@ -4,18 +4,15 @@
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this._$label;
-  this._gridLayout;
   this._addAdapterProperties(['formFields']);
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 
 scout.GroupBox.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(undefined, 'form-field group-box');
-  this.$container.attr('id', 'Scout-' + this.id);
-  this.$container.data('gridData', this.gridData);
-  this.$container.data('columns', this.gridColumnCount);
-  this._gridLayout = new scout.GridLayout(this.$container);
-  this.$container.data('gridLayout', this._gridLayout);
+  var root = this.parent.objectType == 'Form';
+  var cssClass = root ? 'root-group-box' : 'group-box';
+  this.$container = $parent.appendDiv(undefined, cssClass);
+  this.$container.attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
     // TODO AWE: das geht wohl auch hübscher mit :after
@@ -23,45 +20,53 @@ scout.GroupBox.prototype._render = function($parent) {
     this._$label = this.$container.appendDiv(undefined, 'group-box-title', this.label + span);
   }
 
-  var i, formField;
+  var i, controlFields = this.getControlFields();
+  if (root) { // TODO AWE: das hier schöner lösen, sollte alles in der selben klasse geschehen
+    for (i = 0; i < controlFields.length; i++) {
+      controlFields[i].render(this.$container);
+    }
+  } else {
+    new scout.TableLayout().render(this.$container, this, controlFields);
+  }
+};
+
+/**
+ * Returns all fields (including system buttons).
+ */
+scout.GroupBox.prototype.getFormFields = function() {
+  return this.formFields;
+};
+
+/**
+ * Returns all fields that are a system button.
+ */
+scout.GroupBox.prototype.getSystemButtons = function() {
+  return this._getFields(true);
+};
+
+/**
+ * Returns all fields that are _not_ a system button.
+ */
+scout.GroupBox.prototype.getControlFields = function() {
+  return this._getFields(false);
+};
+
+/**
+ * Returns all fields that are (not) a system button, depending on the given boolean value.
+ */
+scout.GroupBox.prototype._getFields = function(systemButton) {
+  var i, fields = [];
   for (i = 0; i < this.formFields.length; i++) {
-    formField = this.formFields[i];
-    if (!this._isSystemButton(formField)) { // do not render system buttons on group box
-      formField.render(this.$container);
+    if (systemButton == this._isSystemButton(this.formFields[i])) {
+      fields.push(this.formFields[i]);
     }
   }
+  return fields;
 };
 
 scout.GroupBox.prototype._isSystemButton = function(formField) {
   return formField instanceof scout.Button &&
     formField.systemType != scout.Button.SYSTEM_TYPE.NONE;
-};
-
-scout.GroupBox.prototype.getFormFields = function() {
-  return this.formFields;
-};
-
-scout.GroupBox.prototype.getSystemButtons = function() {
-  var i, formField, systemButtons = [];
-  for (i = 0; i < this.formFields.length; i++) {
-    if (this._isSystemButton(this.formFields[i])) {
-      systemButtons.push(this.formFields[i]);
-    }
-  }
-  return systemButtons;
-};
-
-scout.GroupBox.prototype.updateLayout = function(force) {
-  if (this.$container) {
-    this._gridLayout.updateLayout(force);
-  } else {
-    // TODO AWE: (C.GU) schauen woher dieses zweite form kommt (id=19)
-    console.error('groupBox ' + this.id + ' has this.$container=null. Cannot updateLayout()');
-  }
-};
-
-scout.GroupBox.prototype.layout = function() {
-  this._gridLayout.layout();
 };
 
 scout.GroupBox.prototype._setBorderVisible = function(borderVisible) {

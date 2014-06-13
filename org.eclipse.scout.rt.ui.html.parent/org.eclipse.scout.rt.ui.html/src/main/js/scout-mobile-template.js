@@ -20,6 +20,7 @@
 //@include("src/main/js/session/Locale.js");
 //@include("src/main/js/session/UserAgent.js");
 //@include("src/main/js/layout/GridLayout.js");
+//@include("src/main/js/layout/TableLayout.js");
 //@include("src/main/js/desktop/BaseDesktop.js");
 //@include("src/main/js/desktop/MobileDesktop.js");
 //@include("src/main/js/desktop/MobileDesktopToolButtons.js");
