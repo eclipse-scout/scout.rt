@@ -18,6 +18,7 @@ import java.awt.Rectangle;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
@@ -56,7 +57,7 @@ public class DropDownDecorationItem extends AbstractDecorationItem {
     int height = getHeight();
     // correction vertical alignment
     if (c.getHeight() > height) {
-      yy = y;//(c.getHeight() - height) / 2;
+      yy = y;
     }
     getIconForState().paintIcon(c, g, xx, yy);
     return new Rectangle(xx, yy, width, height);
@@ -87,11 +88,13 @@ public class DropDownDecorationItem extends AbstractDecorationItem {
   }
 
   public void setIconGroup(IconGroup iconGroup) {
+
     if (iconGroup == null) {
-      m_iconGroup = new IconGroup(getEnvironment(), AbstractIcons.SmartFieldBrowse);
+      iconGroup = new IconGroup(getEnvironment(), AbstractIcons.SmartFieldBrowse);
     }
-    else {
+    if (!CompareUtility.equals(m_iconGroup, iconGroup)) {
       m_iconGroup = iconGroup;
+      getOwner().repaint();
     }
   }
 

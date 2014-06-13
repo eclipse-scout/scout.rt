@@ -14,6 +14,7 @@ package org.eclipse.scout.rt.ui.swing.ext.decoration;
  *
  */
 public interface IDecorationItem extends IDecoration {
+
   public static enum State {
     Disabled,
     Normal,
