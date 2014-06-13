@@ -14,30 +14,33 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
+import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 
 /**
  * Custom widget for a button with drop-down menu.
  */
-public class JDropDownButton extends JComponent {
+public class JButtonWithMenu extends JComponent {
   private static final long serialVersionUID = 1L;
-  private static final String UI_CLASS_ID = "DropDownButtonUI";
+  private static final String UI_CLASS_ID = "ButtonWithMenuUI";
 
   private AbstractButton m_pushButton;
   private JButton m_menuButton;
-  private Icon enabledDownArrow, disDownArrow;
 
-  public JDropDownButton(AbstractButton mainButton) {
+  public JButtonWithMenu(AbstractButton mainButton) {
     setOpaque(false);
     //
     m_pushButton = mainButton;
@@ -58,15 +61,18 @@ public class JDropDownButton extends JComponent {
     });
     add(m_pushButton, BorderLayout.CENTER);
     //
-    enabledDownArrow = new SmallDownArrow();
-    disDownArrow = new SmallDisabledDownArrow();
-    m_menuButton = new JButton(enabledDownArrow);
-    m_menuButton.setDisabledIcon(disDownArrow);
+    m_menuButton = new JButton();
+    IconGroup iconGroup = MenuArrowDownIcon.createMenuArrowDownIconGroup(new Insets(1, 2, 15, 1));
+    m_menuButton.setIcon(iconGroup.getIcon(IconState.NORMAL));
+    m_menuButton.setRolloverIcon(iconGroup.getIcon(IconState.ROLLOVER));
+    m_menuButton.setDisabledIcon(iconGroup.getIcon(IconState.DISABLED));
     m_menuButton.setFocusPainted(false);
     m_menuButton.setFocusable(false);
+    m_menuButton.setBorder(BorderFactory.createEmptyBorder());
     add(m_menuButton, BorderLayout.EAST);
 
-    setLayout(new DropDownButtonLayout(m_pushButton, m_menuButton, 12));
+    FlowLayoutEx layout = new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, 0, 0);
+    setLayout(layout);// new DropDownButtonLayout(m_pushButton, m_menuButton, 12));
     updateUI();
   }
 
