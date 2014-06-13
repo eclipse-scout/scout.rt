@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 import org.eclipse.scout.rt.ui.swing.ext.JButtonEx;
+import org.eclipse.scout.rt.ui.swing.ext.JButtonWithMenu;
 import org.eclipse.scout.rt.ui.swing.ext.JDropDownButton;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JRadioButtonEx;
@@ -87,13 +88,28 @@ public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposit
     swingFieldAsButton.addActionListener(new P_SwingActionListener());
     // check if button has menus
     if (getScoutObject().getContextMenu().hasChildActions()) {
-      JDropDownButton dropDownButton = new JDropDownButton(swingFieldAsButton);
-      dropDownButton.getMenuButton().addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          handleSwingPopup((Component) e.getSource());
-        }
-      });
+      Component dropDownButton = null;
+      switch (getScoutButton().getDisplayStyle()) {
+        case IButton.DISPLAY_STYLE_RADIO:
+        case IButton.DISPLAY_STYLE_TOGGLE:
+          dropDownButton = new JButtonWithMenu(swingFieldAsButton);
+          ((JButtonWithMenu) dropDownButton).getMenuButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              handleSwingPopup((Component) e.getSource());
+            }
+          });
+          break;
+        default:
+          dropDownButton = new JDropDownButton(swingFieldAsButton);
+          ((JDropDownButton) dropDownButton).getMenuButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              handleSwingPopup((Component) e.getSource());
+            }
+          });
+          break;
+      }
       container = new JPanelEx();
       container.add(dropDownButton);
     }
