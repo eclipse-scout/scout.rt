@@ -28,6 +28,8 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons.Region;
 
 /**
  *
@@ -84,6 +86,9 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
   }
 
   private boolean isLocationOnText(Point p) {
+    if (getTarget() instanceof JTextFieldWithDecorationIcons) {
+      return ((JTextFieldWithDecorationIcons) getTarget()).getRegion(p) == Region.Text;
+    }
     if (getTarget() instanceof JTextComponent) {
       JTextComponent textComp = (JTextComponent) getTarget();
       Insets insets = textComp.getBorder().getBorderInsets(textComp);// textComp.getMargin();

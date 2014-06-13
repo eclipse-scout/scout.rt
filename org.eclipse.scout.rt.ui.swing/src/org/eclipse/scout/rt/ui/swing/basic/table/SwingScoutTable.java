@@ -35,7 +35,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -457,7 +456,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (getScoutObject() == null) {
       return;
     }
-    //
     List<ITableRow> scoutRows = getScoutObject().getSelectedRows();
     ListSelectionModel lsm = getSwingTableSelectionModel();
     //
@@ -467,35 +465,23 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     Arrays.sort(newSwingRows);
     // restore selection only, if list selection model has received its final value.
     if (!CompareUtility.equals(oldSwingRows, newSwingRows) && !lsm.getValueIsAdjusting()) {
-      HashSet<Integer> addSet = new HashSet<Integer>();
-      HashSet<Integer> removeSet = new HashSet<Integer>();
-      for (int index : newSwingRows) {
-        addSet.add(index);
-      }
-      for (int index : oldSwingRows) {
-        addSet.remove(index);
-        removeSet.add(index);
-      }
-      for (int index : newSwingRows) {
-        removeSet.remove(index);
-      }
       try {
         lsm.setValueIsAdjusting(true);
-        //
-        int lastIndex = -1;
-        for (int index : addSet) {
-          lsm.addSelectionInterval(index, index);
-          lastIndex = index;
+        // new
+        if (newSwingRows.length > 0) {
+          lsm.setLeadSelectionIndex(newSwingRows[0]);
+          lsm.setAnchorSelectionIndex(newSwingRows[0]);
+          lsm.clearSelection();
+          for (int rowIndex : newSwingRows) {
+            lsm.addSelectionInterval(rowIndex, rowIndex);
+          }
         }
-        for (int index : removeSet) {
-          lsm.removeSelectionInterval(index, index);
+        else if (getSwingTable().getRowCount() > 0) {
+          // set anchor lead
+          lsm.setLeadSelectionIndex(0);
+          lsm.setAnchorSelectionIndex(0);
+          lsm.clearSelection();
         }
-        if (lastIndex < 0) {
-          lastIndex = lsm.getMinSelectionIndex();
-        }
-        // update lead and anchor in model (bug 353998)
-        lsm.setAnchorSelectionIndex(lastIndex);
-        lsm.setLeadSelectionIndex(lastIndex);
       }
       finally {
         lsm.setValueIsAdjusting(false);

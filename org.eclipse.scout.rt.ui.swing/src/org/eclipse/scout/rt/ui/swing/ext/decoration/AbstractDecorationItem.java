@@ -113,7 +113,6 @@ public abstract class AbstractDecorationItem extends AbstractDecoration implemen
 
   @Override
   public void handleMouseChlicked(MouseEvent e) {
-
     if (isVisible() && isEnabled()) {
       for (MouseListener l : m_eventListeners.getListeners(MouseListener.class)) {
         l.mouseClicked(e);

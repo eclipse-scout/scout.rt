@@ -18,6 +18,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+import javax.swing.border.Border;
+
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
@@ -28,25 +31,48 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
 
   private static final long serialVersionUID = 1L;
 
+  public static enum Region {
+    Text, Decoration
+  }
+
+  protected static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
   private IDecoration m_decorationIcon;
-  private int m_originalMarginRight = -1;
-  private int m_insetsRight = 0;
 
-  private Cursor m_defaultCursor;
+  private final Cursor m_defaultCursor;
+  private final boolean m_backgroundDecoration;
+  private Insets m_cachedMargin;
 
-  private Insets m_cachedInsets;
+  private Insets m_originalMargin;
 
   public JTextFieldWithDecorationIcons() {
-    registerMouseMotionListener();
+    this(false);
+  }
+
+  public JTextFieldWithDecorationIcons(boolean backgroundDecoration) {
+    m_backgroundDecoration = backgroundDecoration;
     m_defaultCursor = getCursor();
+    registerMouseMotionListener();
   }
 
   @Override
   public void paint(Graphics g) {
-    setTextFieldMargin();
+    updateTextFieldMargin();
     super.paint(g);
+    postPaint(g);
+  }
+
+  /**
+   * @param g
+   */
+  protected void postPaint(Graphics g) {
     if (m_decorationIcon != null) {
-      int x = getWidth() - m_decorationIcon.getWidth() - 6/*- m_insetsRight*/;
+      Insets borderInsets = EMPTY_INSETS;
+      if (getBorder() != null) {
+        borderInsets = getBorder().getBorderInsets(null);
+      }
+      int decoIconWidth = m_decorationIcon.getWidth();
+      int x = getWidth() - decoIconWidth - borderInsets.right;
       int y = (getHeight() - m_decorationIcon.getHeight()) / 2;
       m_decorationIcon.paint(this, g, x, y);
     }
@@ -54,11 +80,15 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
 
   public void setDecorationIcon(IDecoration decorationIcon) {
     m_decorationIcon = decorationIcon;
-    setTextFieldMargin();
+    repaint();
   }
 
   public IDecoration getDecorationIcon() {
     return m_decorationIcon;
+  }
+
+  public boolean isBackgroundDecoration() {
+    return m_backgroundDecoration;
   }
 
   private void registerMouseMotionListener() {
@@ -87,7 +117,7 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
         if (fix != null && fix.mouseClicked()) {
           return;
         }
-        if (isDecorationIconRegion(e.getPoint())) {
+        if (getRegion(e.getPoint()) == Region.Decoration) {
           getDecorationIcon().handleMouseChlicked(e);
         }
       }
@@ -132,36 +162,57 @@ public class JTextFieldWithDecorationIcons extends JTextFieldEx {
 
   }
 
-  public boolean isDecorationIconRegion(Point cursorPosition) {
-    if (getDecorationIcon() == null) {
-      return false;
+  public Region getRegion(Point position) {
+    if (getDecorationIcon() != null) {
+      int xStartDecoration = getWidth() - getDecorationIcon().getWidth();
+      if (getBorder() != null) {
+        xStartDecoration -= getBorder().getBorderInsets(null).right;
+      }
+      if (position.x >= xStartDecoration) {
+        return Region.Decoration;
+      }
     }
-    if (cursorPosition.x >= getWidth() - getDecorationIcon().getWidth() - m_insetsRight) {
-      return true;
-    }
-    return false;
+    return Region.Text;
+
+  }
+
+  @Override
+  public void setBorder(Border border) {
+    super.setBorder(border);
+  }
+
+  @Override
+  public void setMargin(Insets m) {
+    m_originalMargin = m;
+    updateTextFieldMargin();
   }
 
   /**
    * This method may be called multiple times.
    */
-  private void setTextFieldMargin() {
-    Insets marginAndBorderInsets = getInsets();
-    Insets marginInsets = getMargin();
-    if (m_originalMarginRight == -1) {
-      m_originalMarginRight = marginInsets.right;
-    }
-    m_insetsRight = marginAndBorderInsets.right - marginInsets.right;
-    int iconWidth = 0;
-    if (getDecorationIcon() != null) {
-      iconWidth = getDecorationIcon().getWidth();
-    }
+  protected void updateTextFieldMargin() {
+    // no margin update on background decorations
+    if (!isBackgroundDecoration()) {
+      // compute new insets
+      if (m_originalMargin == null) {
+        m_originalMargin = getMargin();
+        if (m_originalMargin == null) {
+          m_originalMargin = EMPTY_INSETS;
+        }
+      }
+      Insets borderInsets = EMPTY_INSETS;
+      if (getBorder() != null) {
+        borderInsets = getBorder().getBorderInsets(null);
 
-    Insets calculatedInsets = new Insets(0, 0, 0, m_originalMarginRight + iconWidth);
-    //setMargin(Insets) causes a redraw of the component. Therefore, only repaint if the values have changed.
-    if (m_cachedInsets == null || !m_cachedInsets.equals(calculatedInsets)) {
-      m_cachedInsets = calculatedInsets;
-      setMargin(calculatedInsets);
+      }
+      Insets marginWithDecorationIcon = new Insets(m_originalMargin.top, m_originalMargin.left, m_originalMargin.bottom, borderInsets.right + m_originalMargin.right);
+      if (getDecorationIcon() != null) {
+        marginWithDecorationIcon.right += getDecorationIcon().getWidth();
+      }
+      if (!CompareUtility.equals(marginWithDecorationIcon, m_cachedMargin)) {
+        m_cachedMargin = marginWithDecorationIcon;
+        super.setMargin(m_cachedMargin);
+      }
     }
   }
 }

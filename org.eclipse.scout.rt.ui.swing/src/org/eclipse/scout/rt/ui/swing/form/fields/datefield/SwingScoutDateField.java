@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.DecorationGroup;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons.Region;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
@@ -98,7 +99,8 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
       container.add(label);
       setSwingLabel(label);
     }
-    JTextField dateField = createDateField(container);
+    JTextFieldWithDecorationIcons dateField = createDateField(container);
+
     Document doc = dateField.getDocument();
     addInputListenersForBasicField(dateField, doc);
     if (doc instanceof AbstractDocument) {
@@ -150,19 +152,25 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
    * <p>
    * May add additional components to the container.
    */
-  protected JTextField createDateField(JComponent container) {
+  protected JTextFieldWithDecorationIcons createDateField(JComponent container) {
     JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    initializeDateField(textField);
+    container.add(textField);
+    return textField;
+
+  }
+
+  protected void initializeDateField(JTextFieldWithDecorationIcons textField) {
     textField.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
         JTextFieldWithDecorationIcons text = (JTextFieldWithDecorationIcons) e.getComponent();
         // ensure click not on decorations
-        if (!text.isDecorationIconRegion(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
+        if (text.getRegion(e.getPoint()) == Region.Text && e.getButton() == MouseEvent.BUTTON1) {
           handleSwingDateChooserAction();
         }
       }
     });
-    container.add(textField);
     IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
     // context menu marker
     m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
@@ -192,8 +200,6 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     decorationGroup.addDecoration(m_dropdownIcon);
 
     textField.setDecorationIcon(decorationGroup);
-    return textField;
-
   }
 
   @Override
@@ -212,8 +218,12 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingDateField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
-  public JTextField getSwingDateField() {
-    return (JTextField) getSwingField();
+  public JTextFieldWithDecorationIcons getSwingDateField() {
+    return (JTextFieldWithDecorationIcons) getSwingField();
+  }
+
+  public DropDownDecorationItem getDropdownIcon() {
+    return m_dropdownIcon;
   }
 
   @Override

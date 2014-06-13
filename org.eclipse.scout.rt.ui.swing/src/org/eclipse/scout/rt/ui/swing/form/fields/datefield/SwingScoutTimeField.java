@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.DecorationGroup;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
+import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons.Region;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
@@ -159,19 +160,28 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
    * <p>
    * May add additional components to the container.
    */
-  protected JTextField createTimeField(JComponent container) {
+  protected JTextFieldWithDecorationIcons createTimeField(JComponent container) {
     JTextFieldWithDecorationIcons textField = new JTextFieldWithDecorationIcons();
+    initializeTimeField(textField);
+    container.add(textField);
+    return textField;
+
+  }
+
+  /**
+   * @param textField
+   */
+  protected void initializeTimeField(JTextFieldWithDecorationIcons textField) {
     textField.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
         JTextFieldWithDecorationIcons text = (JTextFieldWithDecorationIcons) e.getComponent();
         // ensure click not on decorations
-        if (!text.isDecorationIconRegion(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
+        if (text.getRegion(e.getPoint()) == Region.Text && e.getButton() == MouseEvent.BUTTON1) {
           handleSwingTimeChooserAction();
         }
       }
     });
-    container.add(textField);
     IDecorationGroup decorationGroup = new DecorationGroup(textField, getSwingEnvironment());
     // context menu marker
     m_contextMenuMarker = new ContextMenuDecorationItem(getScoutObject().getContextMenu(), textField, getSwingEnvironment());
@@ -201,7 +211,6 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
     decorationGroup.addDecoration(m_dropdownIcon);
 
     textField.setDecorationIcon(decorationGroup);
-    return textField;
   }
 
   @Override
@@ -220,8 +229,12 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTimeField(), getScoutObject().getContextMenu(), getSwingEnvironment());
   }
 
-  public JTextField getSwingTimeField() {
-    return (JTextField) getSwingField();
+  public JTextFieldWithDecorationIcons getSwingTimeField() {
+    return (JTextFieldWithDecorationIcons) getSwingField();
+  }
+
+  public DropDownDecorationItem getDropdownIcon() {
+    return m_dropdownIcon;
   }
 
   @Override
