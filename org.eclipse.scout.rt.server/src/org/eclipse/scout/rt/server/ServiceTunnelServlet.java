@@ -211,7 +211,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, ServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
+  protected IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, ServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
     UserAgent userAgent = UserAgent.createByIdentifier(serviceRequest.getUserAgent());
     String virtualSessionId = serviceRequest.getVirtualSessionId();
     if (virtualSessionId != null && !m_isMultiClientSessionCookieStore) {
@@ -225,35 +225,41 @@ public class ServiceTunnelServlet extends HttpServletEx {
   protected IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
-    synchronized (req.getSession()) {
-      IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), req, res);
-      if (serverSession == null) {
-        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-        serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
-        cacheService.put(IServerSession.class.getName(), serverSession, req, res);
+    IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), req, res);
+    if (serverSession == null) {
+      synchronized (req.getSession()) {
+        serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
+        if (serverSession == null) {
+          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
+          serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
+          cacheService.put(IServerSession.class.getName(), serverSession, req, res);
+        }
       }
-      return serverSession;
     }
+    return serverSession;
   }
 
   private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
-    synchronized (m_ajaxSessionCache) {
-      //update session timeout
-      int maxInactive = req.getSession().getMaxInactiveInterval();
-      if (maxInactive < 0) {
-        maxInactive = 3600;
+    //update session timeout
+    m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(3600L, 1000L * req.getSession().getMaxInactiveInterval()));
+    IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+    if (serverSession == null) {
+      synchronized (m_ajaxSessionCache) {
+        serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+        if (serverSession == null) { // double checking
+          return createAndCacheNewServerSession(ajaxSessionId, subject, userAgent, req, res);
+        }
       }
-      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * maxInactive));
-      IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
-      if (serverSession == null) {
-        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-        m_ajaxSessionCache.put(ajaxSessionId, serverSession);
-      }
-      else {
-        m_ajaxSessionCache.touch(ajaxSessionId);
-      }
-      return serverSession;
     }
+    m_ajaxSessionCache.touch(ajaxSessionId);
+    return serverSession;
+  }
+
+  private IServerSession createAndCacheNewServerSession(String ajaxSessionId, Subject subject, UserAgent userAgent, HttpServletRequest req, HttpServletResponse res) throws ProcessingException {
+    IServerSession serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
+    m_ajaxSessionCache.put(ajaxSessionId, serverSession);
+    return serverSession;
   }
 
   @Override
