@@ -8,8 +8,8 @@ var scout = {};
 // bind does not exist, see https://github.com/ariya/phantomjs/issues/10522
 // replace with jQuery's bind alternative
 if (!Function.prototype.bind) {
-  Function.prototype.bind = function (thisArg) {
-    jQuery.proxy(this, thisArg);
+  Function.prototype.bind = function(thisArg) {
+    return jQuery.proxy(this, thisArg);
   };
 }
 
