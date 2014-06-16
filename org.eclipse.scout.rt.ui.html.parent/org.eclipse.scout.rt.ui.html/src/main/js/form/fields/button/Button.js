@@ -14,8 +14,9 @@ scout.Button.SYSTEM_TYPE = {
 
 scout.Button.prototype._render = function($parent) {
   this.$container = $parent;
-  // TODO AWE: (button) remove mnemonic
-  this._$button = $('<button>' + this.label + '</button>');
+  this.$container.attr('id', 'Button-' + this.id);
+  var label = this.label.replace('&', '');
+  this._$button = $('<button>' + label + '</button>');
   this._$button.appendTo(this.$container);
   this._$button.on('click', function() {
     this.session.send('click', this.id);

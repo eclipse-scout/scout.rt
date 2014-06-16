@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -84,6 +86,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof IButton) {
       return new JsonButton((IButton) model, session, id);
+    }
+    else if (model instanceof IStringField) {
+      return new JsonStringField((IStringField) model, session, id);
     }
     else if (model instanceof IFormField) {
       return new JsonFormField((IFormField) model, session, id);
@@ -143,7 +148,7 @@ public class JsonAdapterFactory {
     throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
   }
 
-  //FIXME only needed temporarily, remove when switched to FormToolButton2
+  //FIXME CGU only needed temporarily, remove when switched to FormToolButton2
   public static class NullAdapter extends AbstractJsonAdapter<Object> {
 
     public NullAdapter(Object model, IJsonSession jsonSession, String id) {

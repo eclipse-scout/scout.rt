@@ -1,11 +1,11 @@
 scout.FormField = function() {
   scout.FormField.parent.call(this);
-  this._$label;
+  this.$label;
 
   /**
    * The status label is used for error-status and mandatory info.
    */
-  this.$statusLabel;
+  this.$status;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -40,12 +40,12 @@ scout.FormField.prototype._setValue = function(value) {
 };
 
 scout.FormField.prototype._setMandatory = function(mandatory) {
-  //this._updateStatusLabel(); FIXME AWE uncomment
+  this._updateStatusLabel();
 };
 
 
 scout.FormField.prototype._setErrorStatus = function(errorStatus) {
-  //this._updateStatusLabel(); FIXME AWE uncomment
+  this._updateStatusLabel();
 };
 
 scout.FormField.prototype._setVisible = function(visible) {
@@ -63,28 +63,23 @@ scout.FormField.prototype._setDisplayText = function(label) {
 };
 
 scout.FormField.prototype._updateStatusLabel = function() {
-  // errorStatus has higher priority than mandatory
-  var title, icon;
-  if (this.model.errorStatus) {
-    title = this.model.errorStatus.message;
-    icon = '!';
-  } else if (this.model.mandatory === true) {
-    title = null;
-    icon = '*';
-  }
-
-  if (icon) {
-    this.$statusLabel.
-      css('display', 'inline-block').
-      html(icon);
-    if (title) {
-      this.$statusLabel.attr('title', title);
-      this.$statusLabel.addClass('error-status');
-    } else {
-      this.$statusLabel.removeAttr('title');
-      this.$statusLabel.removeClass('error-status');
+  if (this.$status) {
+    // errorStatus has higher priority than mandatory
+    var title, icon = ' ';
+    if (this.errorStatus) {
+      title = this.errorStatus.message;
+      icon = '!';
+    } else if (this.mandatory === true) {
+      icon = '*';
     }
-  } else {
-    this.$statusLabel.css('display', 'none');
+
+    this.$status.html(icon);
+    if (title) {
+      this.$status.attr('title', title);
+      this.$status.addClass('error-status');
+    } else {
+      this.$status.removeAttr('title');
+      this.$status.removeClass('error-status');
+    }
   }
 };

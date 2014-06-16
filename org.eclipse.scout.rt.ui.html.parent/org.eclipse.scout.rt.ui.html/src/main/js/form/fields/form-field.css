@@ -1,18 +1,12 @@
-.tab-box {
-  margin: 0;
-  background-color:#ddd;
-  box-sizing:border-box;
+.form-grid {
+  width:100%;
+  border-spacing:15px;
 }
 
 .form-field {
   box-sizing:border-box;
-  border:1px dotted red;
+  /* DEBUG border:1px dotted red;*/
   white-space:nowrap;
-}
-
-.form-grid {
-  width:100%;
-  border-spacing:15px;
 }
 
 .form-field > label {
@@ -20,46 +14,14 @@
   display:inline-block;
 }
 
-.form-field > span {
+.form-field > span.status {
   width : 1%;
   display:inline-block;
 }
 
-.form-field > input {
-  width : 64%;
+.form-field > .field {
+  width : 66%;
   display:inline-block;
-}
-
-td {
-  vertical-align:top;
-}
-
-.cols-1 td {
-  width:100%;
-}
-
-.cols-2 td {
-  width:50%;
-}
-
-.cols-3 td {
-  width:33.3%;
-}
-
-.cols-4 td {
-  width:25%;
-}
-
-/* braucht es noch mehr cols-x definitionen? */
-
-.tab-box-header {
- background-color:#eee;
-}
-
-.tab-box-header > button {
-  border : 1px solid black;
-  border-bottom : none;
-  background-color:#eee;
 }
 
 /* Form-Fields */
@@ -67,20 +29,7 @@ td {
   width:100%;
 }
 
-/* image-field hack, resize per JS */
+/* Image-field hack, resize per JS */
 .form-field > img {
   height:1px;
-}
-
-#DialogStack {
-  position:absolute;
-  left:0px;
-  top:0px;
-}
-
-.dialog-frame {
-  border : 3px solid black;
-  position:absolute;
-  left:0px;
-  top:0px;
 }

@@ -1,39 +1,61 @@
 .root-group-box {
   margin: 0;
-  background-color:#eee;
+  /* DEBUG background-color:#eee;*/
   box-sizing:border-box;
   position:relative;
 }
 
 .group-box {
   margin-bottom:10px;
-  background-color:#ccc;
+  /* DEBUG background-color:#ccc;*/
   box-sizing:border-box;
   position:relative;
 }
 
 .group-box-title {
-  border-bottom : 1px solid black;
-  color: #5D5D5D;
-  font-weight: bold;
-  text-shadow: 6px 1px 0 #FFFFFF, 2px -2px 0 #FFFFFF, -2px 2px 0 #FFFFFF, 2px 2px 0 #FFFFFF;
+  width:100%;
 }
 
-.group-box-title-border {
-  border-top: 1px solid #CCCCCC;
-  display: block;
-  height: 8px;
+.group-box-title+* {
+  border-top: solid 1px #ccc;
+  padding-top: 8px;
   margin-top: -8px;
 }
 
-
-/* TODO AWE: move to right file */
-ul.sequence-box {
-  margin:0;
-  padding:0;
+.group-box-title span {
+  font-weight:bold;
+  background-color:white;
+  color:#5D5D5D;
+  padding-left:15px;
+  padding-right:8px;
 }
 
-ul.sequence-box li {
-  list-style: none;
-  display: inline;
+/*
+.group-box-title div {
+  position:absolute;
+  width:100%;
+  border-top:solid #ccc 1px;
+  margin-top: 8px;
+}
+*/
+
+td {
+  vertical-align:top;
+}
+
+/* also used for sequence-box */
+.cols-1 td, .cols-1 li {
+  width:100%;
+}
+
+.cols-2 td, .cols-2 li {
+  width:50%;
+}
+
+.cols-3 td, .cols-3 li {
+  width:33.3%;
+}
+
+.cols-4 td, .cols-4 li {
+  width:25%;
 }

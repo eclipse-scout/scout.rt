@@ -26,3 +26,9 @@
 .dialog-bar > button {
   float:right;
 }
+
+.dialog-bar:after {
+  content:'';
+  display:block;
+  clear:both;
+}

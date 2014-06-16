@@ -3,8 +3,8 @@
 
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this._$label;
-  this._addAdapterProperties(['formFields']);//FIXME CGU add default value
+  this.formFields = [];
+  this._addAdapterProperties('formFields');
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 
@@ -15,9 +15,10 @@ scout.GroupBox.prototype._render = function($parent) {
   this.$container.attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
-    // TODO AWE: das geht wohl auch hübscher mit :after
-    var span = '<span class="group-box-title-border"></span>';
-    this._$label = this.$container.appendDiv(undefined, 'group-box-title', this.label + span);
+    var $title = $('<div class="group-box-title"></div>');
+    this.$label = $('<span>' + this.label + '</span>');
+    $title.append(this.$label);
+    this.$container.append($title);
   }
 
   var i, controlFields = this.getControlFields();

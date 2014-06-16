@@ -28,7 +28,6 @@ scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
       for (i=0; i<fieldMap[y].length; i++) {
         field = fieldMap[y][i];
         $td = $('<td class="form-field"></td>');
-        // TODO AWE: form field attachen
         if (field.w > 1) {
           $td.attr('colspan', field.w);
         }
