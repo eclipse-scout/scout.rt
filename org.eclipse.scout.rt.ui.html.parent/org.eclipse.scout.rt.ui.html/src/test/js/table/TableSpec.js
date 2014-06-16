@@ -221,11 +221,11 @@ describe("Table", function() {
       var menuModel = helper.createMenuModel(createUniqueAdapterId(), 'menu');
       //register adapter
       helper.menuHelper.createMenu(menuModel);
-      table.menus = [menuModel];
+      table.menus = session.getOrCreateModelAdapters([menuModel], table);
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerContextMenu();
 
-      var $menu = helper.getDisplayingRowMenu(table);
+      var $menu = helper.getDisplayingContextMenu(table);
       expect($menu.length).toBeTruthy();
     });
 
@@ -237,7 +237,7 @@ describe("Table", function() {
       var menuModel = helper.createMenuModel(createUniqueAdapterId(), 'menu');
       //register adapter
       helper.menuHelper.createMenu(menuModel);
-      table.menus = [menuModel];
+      table.menus = session.getOrCreateModelAdapters([menuModel], table);
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerContextMenu();
 

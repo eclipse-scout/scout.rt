@@ -313,12 +313,15 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
 scout.DesktopTree.prototype._onNodeContextClick = function(event, $clicked) {
   event.preventDefault();
   $clicked.click();
-  //TODO cgu: warten bis menu verfügbar
 
   var x = 20,
-    y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
+  y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
 
-  $('.desktop-menu').data('this').contextMenu(true, this._$desktopTreeScroll, $clicked, x, y);
+  scout.menus.showContextMenuWithWait(this.session, showContextMenu);
+
+  function showContextMenu() {
+    scout.menus.showContextMenu(scout.menus.filter(this.menus), this._$desktopTreeScroll, $clicked, undefined, x, y);
+  }
 };
 
 scout.DesktopTree.prototype._updateBreadCrumb = function() {
@@ -382,7 +385,7 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
 };
 
 scout.DesktopTree.prototype._showOrHideMenus = function($node) {
-  $('.desktop-menu').data('this').addItems(this.menus, true);
+  $('.desktop-menu').data('this').addItems(scout.menus.filter(this.menus), true);
 };
 
 scout.DesktopTree.prototype.onModelAction = function(event) {

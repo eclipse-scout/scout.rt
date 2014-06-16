@@ -39,7 +39,7 @@ describe("MobileTable", function() {
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerContextMenu();
 
-      var $menu = helper.getDisplayingRowMenu(table);
+      var $menu = helper.getDisplayingContextMenu(table);
 
       expect($menu.length).toBeFalsy();
     });

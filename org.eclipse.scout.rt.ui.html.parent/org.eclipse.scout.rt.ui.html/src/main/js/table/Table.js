@@ -270,8 +270,6 @@ scout.Table.prototype._drawData = function(startRow) {
     }
   }
 
-  that = this;
-
   function onContextMenu(event) {
     var $selectedRows, x, y;
     event.preventDefault();
@@ -281,7 +279,11 @@ scout.Table.prototype._drawData = function(startRow) {
     y = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32;
 
     if ($selectedRows.length > 0) {
-      $('.desktop-menu').data('this').contextMenu(false, that.$dataScroll, $(this), x, y);
+      scout.menus.showContextMenuWithWait(that.session, showContextMenu);
+    }
+
+    function showContextMenu() {
+      scout.menus.showContextMenu(that._getRowMenus($selectedRows), that.$dataScroll, $(that), x, undefined, y);
     }
   }
 
@@ -296,7 +298,7 @@ scout.Table.prototype._drawData = function(startRow) {
     }
 
     var $mouseUpRow = $(event.delegateTarget);
-    if ($mouseDownRow[0] !== $mouseUpRow[0]) {
+    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
       return;
     }
 
@@ -316,9 +318,18 @@ scout.Table.prototype._drawData = function(startRow) {
 
 scout.Table.prototype._drawMenu = function($selectedRows) {
   // FIXME cgu: nicer?
+  var menus = this._getRowMenus($selectedRows);
+
+  var desktopMenu = $('.desktop-menu').data('this');
+  if (desktopMenu) {
+    desktopMenu.addItems(menus, false);
+  }
+};
+
+scout.Table.prototype._getRowMenus = function($selectedRows) {
   var menus;
 
-  if ($selectedRows.length ==1) {
+  if ($selectedRows.length == 1) {
     menus = scout.menus.filter(this.menus, ['SingleSelection']);
   } else if ($selectedRows.length > 1) {
     menus = scout.menus.filter(this.menus, ['MultiSelection']);
@@ -326,10 +337,7 @@ scout.Table.prototype._drawMenu = function($selectedRows) {
     menus = [];
   }
 
-  var desktopMenu = $('.desktop-menu').data('this');
-  if (desktopMenu) {
-    desktopMenu.addItems(menus, false);
-  }
+  return menus;
 };
 
 scout.Table.prototype.sendRowsSelected = function() {

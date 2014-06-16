@@ -118,10 +118,6 @@ TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
   expect(mostRecentJsonRequest()).toContainEvents(event);
 };
 
-TableSpecHelper.prototype.getDisplayingRowMenu = function(table) {
-  return table.$data.find('#RowMenu');
-};
-
-TableSpecHelper.prototype.getDisplayingRowMenuContainer = function(table) {
-  return table.$data.find('#RowMenuContainer');
+TableSpecHelper.prototype.getDisplayingContextMenu = function(table) {
+  return table.$data.find('.menu-container');
 };

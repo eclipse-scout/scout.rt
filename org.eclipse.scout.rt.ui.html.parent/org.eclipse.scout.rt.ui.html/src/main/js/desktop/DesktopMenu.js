@@ -29,9 +29,11 @@ scout.DesktopMenu.prototype.addItems = function(menus, tree, selection) {
         .on('click', '', onMenuItemClicked);
     }
 
-    // size menu
-    var h = $div.widthToContent(150);
   }
+
+  //TODO cru: border is visible even if there are no tree menus
+  // size menu
+  $div.widthToContent(150);
 
   var that = this;
 
@@ -39,82 +41,4 @@ scout.DesktopMenu.prototype.addItems = function(menus, tree, selection) {
     var menu = $(this).data('menu');
     menu.sendMenuAction();
   }
-};
-
-scout.DesktopMenu.prototype.contextMenu = function(tree, $parent, $clicked, x, y) {
-  var i, $menuContainer = $('.menu-container', $parent);
-
-  if ($menuContainer.length) {
-    removeMenu();
-  }
-
-  var $children = tree ? $('.desktop-menu-table').children() : $('.desktop-menu-table').children();
-  if ($children.length) {
-
-    $children.each(function() {
-      var menu = $(this).data('menu');
-      menu.sendAboutToShow();
-    });
-
-    $menuContainer = $parent.appendDiv('', 'menu-container');
-    if (tree) {
-      $menuContainer.css('right', x).css('top', y);
-    } else {
-      $menuContainer.css('left', x).css('top', y);
-    }
-
-    // TODO cru: if menu closed, will be removed
-    $clicked.addClass('menu-open');
-
-    $children.clone(true).appendTo($menuContainer);
-
-    // collect icon menus
-    $('.menu-item[data-icon]', $menuContainer)
-      .wrapAll('<div class="menu-buttons"></div>')
-      .mouseenter(onHoverIn);
-    var $menuButton = $('.menu-buttons', $menuContainer);
-    $menuButton.mouseleave(onHoverOut);
-    $menuButton.appendDiv('', 'menu-buttons-label');
-    $menuContainer.append($menuButton);
-
-    // animated opening
-    $menuContainer.css('height', 0).heightToContent(150);
-
-    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
-    var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
-    $(document).one(closingEvents, removeMenu);
-    $menuContainer.one(closingEvents, $.suppressEvent);
-  }
-
-  function removeMenu() {
-    // Animate
-    var h = $menuContainer.outerHeight();
-    $menuContainer.animateAVCSD('height', 0,
-      function() {
-        $(this).remove();
-        $clicked.removeClass('menu-open');
-      }, null, 150);
-
-    // Remove all cleanup handlers
-    $(document).off('.contextMenu');
-  }
-
-  function onHoverIn() {
-    var $container = $(this).parent().parent();
-    $container.css('height', 'auto');
-    $('.menu-buttons-label', $container)
-      .text($(this).text())
-      .heightToContent(150);
-  }
-
-  function onHoverOut() {
-    var $container = $(this).parent().parent();
-
-    $('.menu-buttons-label', $container)
-      .stop()
-      .animateAVCSD('height', 0, null, function() {
-        $(this).text('');
-      }, 150);
-  }
-
 };
