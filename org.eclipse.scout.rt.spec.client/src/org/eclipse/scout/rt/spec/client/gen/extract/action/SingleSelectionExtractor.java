@@ -19,14 +19,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * Extracts the value for {@link IAction#isSingleSelectionAction()} and returns the text for
- * ({@link AbstractBooleanTextExtractor#DOC_ID_TRUE} or {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}.
+ * ({@link SpecUtility#DOC_ID_TRUE} or {@link SpecUtility#DOC_ID_FALSE}.
  */
-public class SingleSelectionExtractor<T extends IMenu> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
+public class SingleSelectionExtractor<T extends IMenu> extends AbstractNamedTextExtractor<T> {
 
   public SingleSelectionExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.action.singleSelection"));
@@ -37,8 +37,7 @@ public class SingleSelectionExtractor<T extends IMenu> extends AbstractBooleanTe
    * 
    * @param action
    *          {@link IAction}
-   * @return translated text for {@link AbstractBooleanTextExtractor#DOC_ID_TRUE} or
-   *         {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}
+   * @return translated text for {@link SpecUtility#DOC_ID_TRUE} or {@link SpecUtility#DOC_ID_FALSE}
    */
   @Override
   public String getText(T action) {
@@ -46,6 +45,6 @@ public class SingleSelectionExtractor<T extends IMenu> extends AbstractBooleanTe
     boolean singleSeleciton = menuTypes.contains(TableMenuType.SingleSelection);
     singleSeleciton |= menuTypes.contains(TreeMenuType.SingleSelection);
     singleSeleciton |= menuTypes.contains(ValueFieldMenuType.NotNull);
-    return getBooleanText(singleSeleciton);
+    return SpecUtility.getBooleanText(singleSeleciton);
   }
 }

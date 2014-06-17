@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class FormFieldExtractorTest {
     when(testFormField.getProperty(IFormField.PROP_ENABLED)).thenReturn(true);
     FormFieldBooleanPropertyExtractor ex = new FormFieldBooleanPropertyExtractor(IFormField.PROP_ENABLED, "Enabled");
     String text = ex.getText(testFormField);
-    String trueText = TEXTS.get(FormFieldBooleanPropertyExtractor.DOC_ID_TRUE);
+    String trueText = TEXTS.get(SpecUtility.DOC_ID_TRUE);
 
     assertEquals("Boolean Doc Text Invalid", trueText, text);
   }

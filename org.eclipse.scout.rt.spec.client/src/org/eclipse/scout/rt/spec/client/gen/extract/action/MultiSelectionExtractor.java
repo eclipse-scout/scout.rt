@@ -18,14 +18,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  * Extracts the value for {@link IAction#isMultiSelectionAction()} and returns the text for
- * ({@link AbstractBooleanTextExtractor#DOC_ID_TRUE} or {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}.
+ * ({@link SpecUtility#DOC_ID_TRUE} or {@link SpecUtility#DOC_ID_FALSE}.
  */
-public class MultiSelectionExtractor<T extends IMenu> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
+public class MultiSelectionExtractor<T extends IMenu> extends AbstractNamedTextExtractor<T> {
 
   public MultiSelectionExtractor() {
     super(TEXTS.get("org.eclipse.scout.rt.spec.action.multiSelection"));
@@ -36,15 +36,14 @@ public class MultiSelectionExtractor<T extends IMenu> extends AbstractBooleanTex
    * 
    * @param action
    *          {@link IAction}
-   * @return translated text for {@link AbstractBooleanTextExtractor#DOC_ID_TRUE} or
-   *         {@link AbstractBooleanTextExtractor#DOC_ID_FALSE}
+   * @return translated text for {@link SpecUtility#DOC_ID_TRUE} or {@link SpecUtility#DOC_ID_FALSE}
    */
   @Override
   public String getText(T action) {
     Set<IMenuType> menuTypes = action.getMenuTypes();
     boolean multiSelection = menuTypes.contains(TableMenuType.MultiSelection);
     multiSelection |= menuTypes.contains(TreeMenuType.MultiSelection);
-    return getBooleanText(multiSelection);
+    return SpecUtility.getBooleanText(multiSelection);
   }
 
 }

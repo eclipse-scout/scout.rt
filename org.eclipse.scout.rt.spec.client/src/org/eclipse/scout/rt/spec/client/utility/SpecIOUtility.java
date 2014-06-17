@@ -53,16 +53,21 @@ import org.osgi.framework.Bundle;
 public final class SpecIOUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecIOUtility.class);
   public static final String ENCODING = "utf-8";
+
   private SpecIOUtility() {
   }
 
   public static String[] getRelativePaths(File[] files, File baseDir) {
     List<String> pathList = new ArrayList<String>();
     for (File f : files) {
-      String relative = baseDir.toURI().relativize(f.toURI()).getPath();
+      String relative = getReleativePath(baseDir, f);
       pathList.add(relative);
     }
     return CollectionUtility.toArray(pathList, String.class);
+  }
+
+  public static String getReleativePath(File baseDir, File f) {
+    return baseDir.toURI().relativize(f.toURI()).getPath();
   }
 
   public static String[] addPrefix(String[] files, String pathPrefix) {

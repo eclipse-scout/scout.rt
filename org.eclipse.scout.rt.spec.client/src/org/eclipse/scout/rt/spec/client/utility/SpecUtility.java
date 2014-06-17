@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 
 /**
@@ -34,6 +35,8 @@ import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
 public final class SpecUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecUtility.class);
   private static Set<Class<?>> s_allClasses;
+  public static final String DOC_ID_TRUE = "org.eclipse.scout.rt.spec.true";
+  public static final String DOC_ID_FALSE = "org.eclipse.scout.rt.spec.false";
   private SpecUtility() {
   }
 
@@ -152,6 +155,16 @@ public final class SpecUtility {
     }
     String typeDescription = new SpecialDescriptionExtractor(null, "_name").getText(type);
     return typeDescription != null;
+  }
+
+  /**
+   * Returns the language specific text for a boolean value
+   * 
+   * @param b
+   * @return text
+   */
+  public static String getBooleanText(boolean b) {
+    return b ? TEXTS.get(DOC_ID_TRUE) : TEXTS.get(DOC_ID_FALSE);
   }
 
 }

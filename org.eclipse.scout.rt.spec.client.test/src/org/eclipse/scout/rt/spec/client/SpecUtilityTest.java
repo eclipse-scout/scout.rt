@@ -169,6 +169,7 @@ public class SpecUtilityTest {
     }
 
     public class MainBox extends AbstractGroupBox {
+      @Order(10.0)
       public class SmartField extends AbstractSmartField<Long> {
         @Order(10.0)
         public class TopMenu1 extends AbstractMenu {

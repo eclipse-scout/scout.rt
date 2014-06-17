@@ -36,7 +36,7 @@ public class MediawikiImageWriter {
    * @throws IOException
    */
   public void appendImageLink(String imageName, int scale) throws IOException {
-    m_writer.append("[[Image:" + imageName + "|" + scale + "px]]");
+    m_writer.append(MediawikiUtility.createImageLink(imageName, scale));
     m_writer.append(NEWLINE);
   }
 

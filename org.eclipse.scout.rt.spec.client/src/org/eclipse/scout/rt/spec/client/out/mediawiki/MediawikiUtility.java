@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.out.mediawiki;
 
+import org.eclipse.scout.rt.spec.client.config.SpecFileConfig;
+
 /**
  * Utilities for mediawiki
  */
@@ -73,5 +75,29 @@ public final class MediawikiUtility {
     input = input.replaceAll("\\{\\{[^}]+}}", "");
     input = input.replaceAll("\\[\\[([A-Za-z][A-Za-z0-9_\\$\\.-]+)\\|(.*?)]]", "$2");
     return input;
+  }
+
+  /**
+   * Creates a link to an image.
+   * 
+   * @param imagePath
+   *          the path including filename of the image relative to the {@link SpecFileConfig#getMediawikiDir()}
+   * @return
+   */
+  public static String createImageLink(String imagePath) {
+    return "[[Image:" + imagePath + "]]";
+  }
+
+  /**
+   * Creates a link to an image which will be scaled in the output.
+   * 
+   * @param imagePath
+   *          the path including filename of the image relative to the {@link SpecFileConfig#getMediawikiDir()}
+   * @param scale
+   *          width in pixel
+   * @return
+   */
+  public static String createImageLink(String imagePath, int scale) {
+    return "[[Image:" + imagePath + "|" + scale + "px]]";
   }
 }

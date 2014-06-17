@@ -18,13 +18,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.spec.client.gen.extract.AbstractBooleanTextExtractor;
-import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
+import org.eclipse.scout.rt.spec.client.gen.extract.AbstractNamedTextExtractor;
+import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
 
 /**
  *
  */
-public class EmptySpaceSelectionExtractor<T extends IMenu> extends AbstractBooleanTextExtractor<T> implements IDocTextExtractor<T> {
+public class EmptySpaceSelectionExtractor<T extends IMenu> extends AbstractNamedTextExtractor<T> {
 
   /**
    * @param name
@@ -39,7 +39,7 @@ public class EmptySpaceSelectionExtractor<T extends IMenu> extends AbstractBoole
     boolean emptySpace = menuTypes.contains(TableMenuType.EmptySpace);
     emptySpace |= menuTypes.contains(TreeMenuType.EmptySpace);
     emptySpace |= menuTypes.contains(ValueFieldMenuType.Null);
-    return getBooleanText(emptySpace);
+    return SpecUtility.getBooleanText(emptySpace);
   }
 
 }
