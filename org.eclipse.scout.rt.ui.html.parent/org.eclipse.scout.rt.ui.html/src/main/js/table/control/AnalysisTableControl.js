@@ -5,9 +5,8 @@ scout.AnalysisTableControl = function() {
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
 scout.AnalysisTableControl.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(); //FIXME CGU maybe not necessary
+  this.$container = $parent.appendDiv('', 'analysis-container'); //FIXME CGU maybe not necessary
 
-  //command container and commands
   var $commandContainer = this.$container.appendDiv('', 'command-container');
 
   $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
@@ -28,10 +27,16 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     .attrSVG('preserveAspectRatio', 'xMinYMin')
     .on('click', clickCriteria)
     .on('contextmenu', clickSet);
-
   var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
-
   appendRect($vennContainer, 'venn-all');
+
+  // criteria container
+  var $criteriaContainer = this.$container.appendDiv('', 'criteria-container'),
+    $criteriaList = $criteriaContainer.appendDiv('', 'criteria-list'),
+    $criteriaScroll = $criteriaList.appendDiv('', 'criteria-scroll'),
+    scrollbar = new scout.Scrollbar($criteriaScroll , 'y');
+
+  scrollbar.initThumb();
 
   // $criteria = circle per criteria; count calculated by server
   var $criteria = [],
@@ -46,8 +51,8 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     MIN_R = 20,
     MAX_R = 120;
 
-  // auto add forst criteria
-  addCriteria();
+  // open
+  this.addCriteria = addCriteria;
 
   function addCriteria() {
     // reset count
@@ -62,6 +67,37 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       updateCriteria();
       selectCriteria($div);
       drawCriteria();
+    }
+
+    // draw datamodel
+    $.log(this.dataModel);
+
+
+
+    addNodes(this.dataModel, 0);
+
+    function addNodes (model, level) {
+      if (model) {
+        $criteriaScroll.appendDiv(model.id, 'criteria-node', model.text).css('padding-left', level * 30);
+
+        for (var i = 0; i < model.attributes.length; i++) {
+          var d = model.attributes[i];
+          $criteriaScroll.appendDiv(d.id, 'criteria-item', d.text).data('type', d.type).css('padding-left', (level + 1) * 30);
+          scrollbar.initThumb();
+        }
+
+        if (model.manyToOne) {
+          for (var j = 0; j < model.manyToOne.length; k++) {
+            addNodes(model.manyToOne[j], level + 1);
+          }
+        }
+
+        if (model.oneToMany) {
+          for (var k = 0; k < model.oneToMany.length; k++) {
+            addNodes(model.oneToMany[k], level + 1);
+          }
+        }
+      }
     }
   }
 
@@ -535,6 +571,6 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 };
 
 scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
-  $.log(dataModel);
-  // NOP
+  this.dataModel = dataModel;
+  this.addCriteria();
 };

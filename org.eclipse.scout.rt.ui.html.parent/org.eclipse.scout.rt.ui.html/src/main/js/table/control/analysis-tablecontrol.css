@@ -1,5 +1,10 @@
 .control-analysis:before {content:"\F140";}
 
+.analysis-container{
+height: 100%;
+width: 100%;
+}
+
 .command-container {
 width: 175px;
 height: 100%;
@@ -65,7 +70,8 @@ stroke-opacity: 1;
 
 .venn-set {
 fill: rgba(254, 153, 21, 0.1);
-opacity: 0;}
+opacity: 0;
+}
 
 .venn-set.selected {
 opacity: 1;
@@ -83,3 +89,59 @@ circle.venn-circle.selected, circle.venn-circle:hover{
 stroke: #fe9915;
 }
 
+.criteria-container {
+margin-left: 700px;
+height: 100%;
+}
+
+.criteria-list{
+position: relative;
+overflow:hidden;
+height: 100%;
+}
+
+.criteria-scroll {
+position: absolute;
+top: 0px;
+width: 100%;
+height: 100%;
+}
+
+.criteria-list > .scrollbar{
+right: 8px;}
+
+.criteria-node{
+}
+
+.criteria-item, .criteria-node{
+position:relative;
+width: 241px;
+float: left;
+clear: both;
+heigth: 26px;
+line-height: 26px;
+background-color: #e2e2e2;
+cursor: pointer;
+margin-bottom: 5px;
+padding: 2px 20px 0px 6px;
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
+}
+
+.criteria-node{
+font-weight: bold; 
+}
+
+.criteria-item:hover{
+background-color: #ccc;
+}
+
+.criteria-name{
+}
+
+.criteria-operator{
+}
+
+.criteria-value{
+}
