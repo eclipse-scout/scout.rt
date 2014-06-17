@@ -30,6 +30,8 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
         return field.getDisplayText();
       }
     });
+    // TODO AWE: vermutlich sollten wir den value nicht schicken, für text-felder wird immer der display-text
+    // benötigt. Für checkbox / radio könnten wir eine eigene implementierung für value machen
     putJsonProperty(new JsonProperty<T, Object>(IValueField.PROP_VALUE, model) {
       @Override
       protected Object getValueImpl(T field) {

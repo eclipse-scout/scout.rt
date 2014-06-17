@@ -127,7 +127,12 @@ scout.Session.prototype._sendNow = function(events, deferred) {
         return;
       }
 
-      that._processEvents(message.events);
+      this.processingEvents = true;
+      try {
+        that._processEvents(message.events);
+      } finally {
+        this.processingEvents = false;
+      }
 
       if (that._deferred) {
         for (var i = 0; i < message.events.length; i++) {
@@ -178,17 +183,12 @@ scout.Session.prototype._processEvents = function(events) {
       throw "No widget found for id " + widgetId;
     }
 
-    widget.updateFromModelInProgress = true;
-    try {
-      if (event.type_ == 'create') {
-        widget.onModelCreate(event);
-      } else if (event.type_ == 'property') {
-        widget.onModelPropertyChange(event);
-      } else {
-        widget.onModelAction(event);
-      }
-    } finally {
-      widget.updateFromModelInProgress = null;
+    if (event.type_ == 'create') {
+      widget.onModelCreate(event);
+    } else if (event.type_ == 'property') {
+      widget.onModelPropertyChange(event);
+    } else {
+      widget.onModelAction(event);
     }
   }
 };

@@ -1,7 +1,7 @@
 //FIXME maybe rename to FormToolButton or DesktopToolButton, or rename DesktopViewButton
 scout.ToolButton = function() {
   scout.ToolButton.parent.call(this);
-  this._addAdapterProperties(['form']);
+  this._addAdapterProperties('form');
 };
 scout.inherits(scout.ToolButton, scout.ModelAdapter);
 
@@ -40,7 +40,7 @@ scout.ToolButton.prototype._setSelected = function(selected) {
 
   this.parent.toolButtonSelected(this, selected);
 
-  if (this.selected !== selected) {
+  if (!this.session.processingEvents) {
     this.session.send('selected', this.id);
   }
   this.selected = selected;   //FIXME CGU necessary to prevent double sending when closing / opening phone form

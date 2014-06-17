@@ -11,6 +11,8 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.$label = $('<label>' + this.label + '</label>');
   this.$container.append(this.$label);
 
+  // TODO AWE: überlegen ob wir einen besser helper als makeDiv verwenden
+  // oder lieber HTML in den code schreiben / performance testen.
   this.$status = $('<span class="status"></span>');
   this.$container.append(this.$status);
 

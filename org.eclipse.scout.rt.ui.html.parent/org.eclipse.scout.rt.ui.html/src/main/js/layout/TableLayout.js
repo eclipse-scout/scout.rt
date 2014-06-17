@@ -28,11 +28,11 @@ scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
       for (i=0; i<fieldMap[y].length; i++) {
         field = fieldMap[y][i];
         $td = $('<td class="form-field"></td>');
-        if (field.w > 1) {
-          $td.attr('colspan', field.w);
+        if (field.gridData.w > 1) {
+          $td.attr('colspan', field.gridData.w);
         }
-        if (field.h > 1) {
-          $td.attr('rowspan', field.h);
+        if (field.gridData.h > 1) {
+          $td.attr('rowspan', field.gridData.h);
         }
         $tr.append($td);
         field.render($td);

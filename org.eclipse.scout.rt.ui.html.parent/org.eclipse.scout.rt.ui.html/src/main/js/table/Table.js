@@ -566,7 +566,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
     this.selectionHandler.drawSelection();
   }
 
-  if (!this.updateFromModelInProgress) {
+  if (!this.session.processingEvents) {
     //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
     this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
       "rowIds": rowIds

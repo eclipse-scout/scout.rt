@@ -134,12 +134,16 @@ scout.defaultObjectFactories = [{
     return new scout.CheckBoxField();
   }
 }, {
+  objectType: 'NumberField',
+  create: function() {
+    return new scout.NumberField();
+  }
+}, {
   objectType: 'StringField',
   create: function() {
     return new scout.StringField();
   }
-}, {
-  objectType: 'TableField',
+}, {  objectType: 'TableField',
   create: function() {
     return new scout.TableField();
   }

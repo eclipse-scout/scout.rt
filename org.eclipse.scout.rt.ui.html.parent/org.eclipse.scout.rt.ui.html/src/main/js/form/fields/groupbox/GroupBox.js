@@ -3,9 +3,8 @@
 
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this._$label;
   this.formFields = [];
-  this._addAdapterProperties(['formFields']);
+  this._addAdapterProperties('formFields');
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 

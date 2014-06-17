@@ -45,6 +45,7 @@
 //@include("src/main/js/form/fields/FormField.js");
 //@include("src/main/js/form/fields/button/Button.js");
 //@include("src/main/js/form/fields/checkbox/CheckBoxField.js");
+//@include("src/main/js/form/fields/numberfield/NumberField.js");
 //@include("src/main/js/form/fields/stringfield/StringField.js");
 //@include("src/main/js/form/fields/groupbox/GroupBox.js");
 //@include("src/main/js/form/fields/sequencebox/SequenceBox.js");

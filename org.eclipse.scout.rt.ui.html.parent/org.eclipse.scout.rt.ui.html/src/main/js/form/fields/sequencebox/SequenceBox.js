@@ -8,6 +8,7 @@ scout.inherits(scout.SequenceBox, scout.FormField);
 scout.SequenceBox.prototype._render = function($parent) {
   this.$container = $('<ul class="sequence-box"></ul>');
   this.$container.attr('id', 'SequenceBox-' + this.id);
+  // TODO AWE: check if we should use AbstractSequenceBox#SequenceBoxGrid
   this.$container.addClass('cols-' + this.fields.length);
 
   var i, field, $li;
