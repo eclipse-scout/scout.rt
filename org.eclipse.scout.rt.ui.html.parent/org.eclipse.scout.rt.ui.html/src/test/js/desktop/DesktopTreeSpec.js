@@ -30,12 +30,10 @@ describe("DesktopTree", function() {
   function createDesktopTree(model) {
     var tree = new scout.DesktopTree();
     tree.init(model, session);
-    tree.attach(session.$entryPoint);
+    tree.render(session.$entryPoint);
     return tree;
   }
 
-  /* FIXME C.RU / C.GU - fix this 3 tests
-   * --> commented out, breaks Scout build
   describe("constructor", function() {
     it("adds nodes", function() {
 
@@ -43,33 +41,34 @@ describe("DesktopTree", function() {
       model.nodes = [createModelNode(1)];
       var desktopTree = createDesktopTree(model);
 
-      expect(desktopTree._$desktopTreeScroll.children().length).toBe(1);
+      expect(desktopTree._$desktopTreeScroll.find('.tree-item').length).toBe(1);
     });
   });
 
   describe("_onNodeClicked", function() {
 
-    it("reacts on node clicks", function() {
-      var model = createModel();
-      model.nodes = [createModelNode(1)];
-      var desktopTree = createDesktopTree(model);
-
-      spyOn(desktopTree, '_onNodeClicked');
-      var $node = desktopTree._$desktopTreeScroll.children().first();
-      $node.click();
-
-      expect(desktopTree._onNodeClicked).toHaveBeenCalled();
-    });
+    //FIXME CGU fix it
+//    it("reacts on node clicks", function() {
+//      var model = createModel();
+//      model.nodes = [createModelNode(1)];
+//      var desktopTree = createDesktopTree(model);
+//
+//      spyOn(desktopTree, '_onNodeClicked');
+//      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
+//      $node.click();
+//
+//      expect(desktopTree._onNodeClicked).toHaveBeenCalled();
+//    });
 
     it("sends click, selection and expansion events in one call in this order", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
       var desktopTree = createDesktopTree(model);
 
-      var $node = desktopTree._$desktopTreeScroll.children().first();
+      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
       $node.click();
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
@@ -77,6 +76,5 @@ describe("DesktopTree", function() {
     });
   });
 
-  */
 
 });

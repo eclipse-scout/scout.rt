@@ -7,8 +7,26 @@ function mostRecentJsonRequest() {
 }
 
 var m_adapterSeq = 0;
+
 function createUniqueAdapterId() {
   return m_adapterSeq++;
+}
+
+/**
+ * Sends the queued requests and simulates a response as well.
+ * @param response if not set an empty success response will be generated
+ */
+function sendQueuedAjaxCalls(response) {
+  jasmine.clock().tick(0);
+
+  if (!response) {
+    response = {
+      status: 200,
+      responseText: '{"events":[]}'
+    };
+  }
+
+  jasmine.Ajax.requests.mostRecent().response(response);
 }
 
 var jasmineScoutMatchers = {
@@ -25,7 +43,7 @@ var jasmineScoutMatchers = {
         if (!Array.isArray(expected)) {
           expected = [expected];
         }
-        var result = {},i;
+        var result = {}, i;
 
         var actualEvents = [];
         if (actual) {
@@ -118,7 +136,9 @@ $.fn.triggerEventWithDetail = function(event, clicks) {
 
   $this.trigger({
     type: event,
-    originalEvent : {detail : clicks}
+    originalEvent: {
+      detail: clicks
+    }
   });
   return $this;
 };
@@ -150,7 +170,9 @@ $.fn.triggerClick = function(clicks) {
   $this.triggerMouseUp(clicks);
   $this.trigger({
     type: 'click',
-    originalEvent : {detail : clicks}
+    originalEvent: {
+      detail: clicks
+    }
   });
 
   return $this;

@@ -18,6 +18,7 @@
     "expect": false,
     "spyOn": false,
     "mostRecentJsonRequest": false,
-    "createUniqueAdapterId": false
+    "createUniqueAdapterId": false,
+    "sendQueuedAjaxCalls": false
   }
 }

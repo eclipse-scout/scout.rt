@@ -29,7 +29,7 @@ describe("Session", function() {
       session.send('nodeExpanded', 1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       //after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -47,14 +47,14 @@ describe("Session", function() {
       var session = createSession();
 
       session.init();
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBe(true);
 
       //don't send it on subsequent requests
       session.send('nodeClicked', 1);
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBeUndefined();
@@ -64,14 +64,14 @@ describe("Session", function() {
       var session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE));
 
       session.init();
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       //don't send it on subsequent requests
       session.send('nodeClicked', 1);
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
       expect(requestData.userAgent).toBeUndefined();
@@ -80,7 +80,7 @@ describe("Session", function() {
       session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP));
 
       session.init();
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
       expect(requestData.userAgent).toBeUndefined();

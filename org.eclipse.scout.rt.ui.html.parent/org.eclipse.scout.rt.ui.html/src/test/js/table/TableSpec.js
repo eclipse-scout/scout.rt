@@ -74,7 +74,7 @@ describe("Table", function() {
       var rowIds = ['0', '4'];
       table.selectRowsByIds(rowIds);
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
@@ -108,7 +108,7 @@ describe("Table", function() {
 
       table.toggleSelection();
       helper.assertSelection(table, helper.getRowIds(model.rows));
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
 
@@ -124,12 +124,12 @@ describe("Table", function() {
 
       table.toggleSelection();
       helper.assertSelection(table, []);
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, []);
 
       table.toggleSelection();
       helper.assertSelection(table, helper.getRowIds(model.rows));
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
   });
@@ -138,7 +138,6 @@ describe("Table", function() {
 
     function clickRowAndAssertSelection(table, $row) {
       $row.triggerClick();
-      jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME + 1);
 
       var $selectedRows = table.findSelectedRows();
       expect($selectedRows.length).toBe(1);
@@ -171,7 +170,7 @@ describe("Table", function() {
       var $row = table.$dataScroll.children().first();
       $row.triggerClick();
 
-      jasmine.clock().tick($.DOUBLE_CLICK_DELAY_TIME + 1);
+      sendQueuedAjaxCalls();
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED]);
     });
@@ -183,13 +182,13 @@ describe("Table", function() {
 
       var $row = table.$dataScroll.children().first();
       clickRowAndAssertSelection(table, $row);
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED]);
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED]);
     });
@@ -205,7 +204,7 @@ describe("Table", function() {
       var $row = table.$dataScroll.children().first();
       $row.triggerDoubleClick();
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED, scout.Table.EVENT_ROW_ACTION]);
     });
@@ -225,6 +224,8 @@ describe("Table", function() {
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerContextMenu();
 
+      sendQueuedAjaxCalls();
+
       var $menu = helper.getDisplayingContextMenu(table);
       expect($menu.length).toBeTruthy();
     });
@@ -241,7 +242,10 @@ describe("Table", function() {
       var $row0 = table.$dataScroll.children().eq(0);
       $row0.triggerContextMenu();
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
+
+      //Again, since the previous responses are awaited before opening the context menu, see showContextMenuWithWait in menus.js
+      sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(scout.Menu.EVENT_ABOUT_TO_SHOW, menuModel.id);
@@ -295,7 +299,7 @@ describe("Table", function() {
       $row2.trigger('mousemove');
       $row2.triggerMouseUp();
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(scout.Table.EVENT_ROWS_SELECTED);
@@ -331,7 +335,7 @@ describe("Table", function() {
       expect($row2).not.toHaveClass('row-selected');
       expect($row3).not.toHaveClass('row-selected');
 
-      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {

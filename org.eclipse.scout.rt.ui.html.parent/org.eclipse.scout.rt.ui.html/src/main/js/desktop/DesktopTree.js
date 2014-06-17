@@ -364,7 +364,10 @@ scout.DesktopTree.prototype._setMenus = function(menus) {
 };
 
 scout.DesktopTree.prototype._showOrHideMenus = function($node) {
-  $('.desktop-menu').data('this').addItems(scout.menus.filter(this.menus), true);
+  var desktopMenu = $('.desktop-menu').data('this'); //FIXME CGU should be done in desktop menu with a listener
+  if (desktopMenu) {
+    desktopMenu.addItems(scout.menus.filter(this.menus), true);
+  }
 };
 
 scout.DesktopTree.prototype.onModelAction = function(event) {
