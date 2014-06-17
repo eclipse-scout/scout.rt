@@ -205,8 +205,6 @@ scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 };
 
 scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
-  var $allNodes = $('');
-
   for (var i = nodes.length - 1; i >= 0; i--) {
     // create node
     var node = nodes[i];
@@ -220,16 +218,16 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     var level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
-      .on('click', '', onNodeClicked)
+      .on('click', '', this._onNodeClicked.bind(this))
       .data('node', node)
       .attr('data-level', level)
       .css('margin-left', level * 20)
       .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)')
-      .on('contextmenu', onNodeContextClick);
+      .on('contextmenu', this._onNodeContextClick.bind(this));
 
     // decorate with (close) control
     var $control = $node.appendDiv('', 'tree-item-control')
-      .on('click', '', onNodeControlClicked);
+      .on('click', '', this._onNodeControlClicked.bind(this));
 
     // rotate control if expanded
     if ($node.hasClass('expanded')) {
@@ -256,36 +254,17 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       }
     }
 
-    // collect all nodes for later return
-    $allNodes = $allNodes.add($node);
-
     // if model demands children, create them
     if (node.expanded && node.childNodes) {
-      var $n = this._addNodes(node.childNodes, $node);
-      $allNodes = $allNodes.add($n);
+      this._addNodes(node.childNodes, $node);
     }
   }
-
-  var that = this;
-
-  function onNodeClicked(event) {
-    return that._onNodeClicked(event, $(this));
-  }
-
-  function onNodeControlClicked(event) {
-    return that._onNodeControlClicked(event, $(this));
-  }
-
-  function onNodeContextClick(event) {
-    return that._onNodeContextClick(event, $(this));
-  }
-
-  // return all created nodes
-  return $allNodes;
 };
 
-scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
-  var nodeId = $clicked.attr('id');
+scout.DesktopTree.prototype._onNodeClicked = function(event) {
+  var $clicked = $(event.currentTarget),
+    nodeId = $clicked.attr('id');
+
   this.session.send('nodeClicked', this.id, {
     "nodeId": nodeId
   });
@@ -295,29 +274,29 @@ scout.DesktopTree.prototype._onNodeClicked = function(event, $clicked) {
   this._updateBreadCrumb();
 };
 
-scout.DesktopTree.prototype._onNodeControlClicked = function(event, $clicked) {
-  var $node = $clicked.parent(),
+scout.DesktopTree.prototype._onNodeControlClicked = function(event) {
+  var $clicked = $(event.currentTarget),
+    $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded');
 
   //TODO cru/cgu: talk about click on not seleced nodes
-  this._onNodeClicked(event, $node);
-
-  if ($node.hasClass('can-expand')) {
-    this._setNodeExpanded($node, expanded);
-  }
+  this._setNodeSelected($node);
+  this._setNodeExpanded($node, expanded);
 
   // prevent immediately reopening
   return false;
 };
 
-scout.DesktopTree.prototype._onNodeContextClick = function(event, $clicked) {
+scout.DesktopTree.prototype._onNodeContextClick = function(event) {
+  var $clicked = $(event.currentTarget);
+
   event.preventDefault();
   $clicked.click();
 
   var x = 20,
   y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
 
-  scout.menus.showContextMenuWithWait(this.session, showContextMenu);
+  scout.menus.showContextMenuWithWait(this.session, showContextMenu.bind(this));
 
   function showContextMenu() {
     scout.menus.showContextMenu(scout.menus.filter(this.menus), this._$desktopTreeScroll, $clicked, undefined, x, y);

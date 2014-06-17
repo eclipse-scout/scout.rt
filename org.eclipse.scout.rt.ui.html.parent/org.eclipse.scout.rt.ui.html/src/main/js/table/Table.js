@@ -248,7 +248,6 @@ scout.Table.prototype._drawData = function(startRow) {
     numRowsLoaded = r;
 
     // append block of rows
-    // TODO cgu/cru: delay vom clicks event ist leider nicht akzeptabel
     $rows = $(rowString);
     $rows.appendTo(this.$dataScroll)
       .on('mousedown', '', onMouseDown)

@@ -160,7 +160,7 @@ scout.menus = {
    */
   showContextMenuWithWait: function(session, func) {
     if (session.areRequestsPending() || session.areEventsQueued()) {
-      session.listen().done(onEventsProcessed());
+      session.listen().done(onEventsProcessed);
     } else {
       func();
     }
