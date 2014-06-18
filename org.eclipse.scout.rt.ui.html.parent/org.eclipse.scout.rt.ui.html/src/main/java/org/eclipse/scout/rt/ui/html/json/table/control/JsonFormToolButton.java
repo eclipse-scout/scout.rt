@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
+import java.beans.PropertyChangeEvent;
+
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
@@ -77,7 +81,20 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-      getModel().getUIFacade().fireActionFromUI();
+      handleUiSelected(event);
+    }
+  }
+
+  protected void handleUiSelected(JsonEvent event) {
+    boolean selected = JsonObjectUtility.getBoolean(event.getJsonObject(), IAction.PROP_SELECTED);
+
+    PropertyChangeEvent propertyEvent = new PropertyChangeEvent(getModel(), IAction.PROP_SELECTED, null, selected);
+    getPropertyEventFilter().addIgnorableModelEvent(propertyEvent);
+    try {
+      getModel().getUIFacade().setSelectedFromUI(selected);
+    }
+    finally {
+      getPropertyEventFilter().removeIgnorableModelEvent(propertyEvent);
     }
   }
 

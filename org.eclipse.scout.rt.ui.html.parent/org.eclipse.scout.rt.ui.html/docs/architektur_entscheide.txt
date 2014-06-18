@@ -34,6 +34,8 @@ Datenübertragung
   Wir könnten initial auch eine Map mit Default-Props schicken und dann die einzelnen Props nur, falls sie nicht default sind. Ob man aber so viel spart dabei?
 - Wie soll der Wert eines Properties gelöscht werden?
   -> [09.05.2014, awe, cgu]: Wir schicken einen Empty-String, auf dem Client kann dann mittels !value darauf geprüft werden.
+- Wenn das GUI mit einem Wert kommt (z.B. selected=true bei CheckBox), dann muss der Server nicht mit selected=true darauf antworten.
+  -> Der Property-Change Event vom Modell muss ignoriert werden -> PropertyChangeFilter bzw. Table oder TreeEventFilter
 
 Naming
 - Events und Properties sollten wie im Modell benannt werden. Z.B: beim Menu: "text" statt "label", weil es IMenu.getText(); heisst
@@ -144,15 +146,6 @@ Mobile
 - User-Feedback:
   Browser haben ein 300ms delay, siehe auch index-mobile.html
   Touch-Feedback kann man mittels den Pseudeselektor :active steuern. MouseDown kommt nicht bei TouchStart, da man nicht weiss, ob TouchStart zu einem Tab oder Scroll führt
-
-
-
-Plugin-Struktur
-- Aufteilung html / json ok, aber zur Zeit ist es nicht optimal.
-  - pom.xml von ui.html generiert files für ui.html? Muss das WebContent im ui.html drin sein?
-  - ScriptProcessor ist im Html-Plugin drin, processing wird aber im json plugin gemacht
-  -> eigentlich sind beide voneinander abhängig, was ein bisschen komisch ist.
-
 
 Styling / Farben
 - Wie wollen wir mit Custom Styling umgehen? Soll es die Properties setBackgroundColor / setFont etc weiterhin geben?

@@ -25,6 +25,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
 
   private P_PropertyChangeListener m_propertyChangeListener;
+  private PropertyEventFilter m_propertyEventFilter;
 
   /**
    * Key = propertyName.
@@ -34,6 +35,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_jsonProperties = new HashMap<>();
+    m_propertyEventFilter = new PropertyEventFilter(getModel());
   }
 
   /**
@@ -43,6 +45,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    */
   protected void putJsonProperty(JsonProperty jsonProperty) {
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
+  }
+
+  public PropertyEventFilter getPropertyEventFilter() {
+    return m_propertyEventFilter;
   }
 
   @Override
@@ -82,8 +88,12 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
-    public void propertyChange(final PropertyChangeEvent e) {
-      handleModelPropertyChange(e.getPropertyName(), e.getNewValue());
+    public void propertyChange(PropertyChangeEvent event) {
+      event = getPropertyEventFilter().filterIgnorableModelEvent(event);
+      if (event == null) {
+        return;
+      }
+      handleModelPropertyChange(event.getPropertyName(), event.getNewValue());
     }
   }
 

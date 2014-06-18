@@ -30,7 +30,7 @@ scout.DesktopTaskbar.prototype.open = function($tool) {
 
 scout.DesktopTaskbar.prototype.getToolButtonForForm = function(form) {
   for (var i = 0; i < this.toolButtons.length; i++) {
-    if (this.toolButtons[i].form === form) { //FIXME CGU geht nur, wenn setForm vor form.start() aufgerufen wird (siehe PhoneButton), darf nicht sein oder?
+    if (this.toolButtons[i].form === form) {
       return this.toolButtons[i];
     }
   }
@@ -39,9 +39,7 @@ scout.DesktopTaskbar.prototype.getToolButtonForForm = function(form) {
 scout.DesktopTaskbar.prototype.formActivated = function(form) {
   var toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
-    if (!toolButton.selected) {
-      toolButton._setSelected(true);
-    }
+    toolButton._setSelected(true);
     return;
   }
 
@@ -55,9 +53,7 @@ scout.DesktopTaskbar.prototype.formAdded = function(form) {
   var that = this;
   var toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
-    if (!toolButton.selected) {
-      toolButton._setSelected(true);
-    }
+    toolButton._setSelected(true);
     return;
   }
 
@@ -83,9 +79,7 @@ scout.DesktopTaskbar.prototype.formAdded = function(form) {
 scout.DesktopTaskbar.prototype.formRemoved = function(form) {
   var toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
-    if (toolButton.selected) {
       toolButton._setSelected(false);
-    }
     return;
   }
 
@@ -148,7 +142,7 @@ scout.DesktopTaskbar.prototype.buttonSelected = function(form, selected) {
 scout.DesktopTaskbar.prototype.unselectToolButtons = function(toolButton) {
   for (var i = 0; i < this.toolButtons.length; i++) {
     var otherToolButton = this.toolButtons[i];
-    if (otherToolButton !== toolButton && otherToolButton.selected) {
+    if (otherToolButton !== toolButton) {
       otherToolButton._setSelected(false);
     }
   }

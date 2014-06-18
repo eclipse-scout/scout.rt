@@ -28,22 +28,24 @@ scout.ToolButton.prototype._render = function($parent) {
 };
 
 scout.ToolButton.prototype._setForm = function(form) {
-  // NOP //FIXME CGU eventuell funktion nicht aufrufen wenn es sie nicht gibt? Oder müsste hier rendering passieren?
+  this.form = form;
+  //dynamically changing a form not supported so far
 };
 
 scout.ToolButton.prototype._setSelected = function(selected) {
-//  if (this.selected === selected) {
-//    return; //FIXME CGU wird zur Zeit vom Caller geprüft (DesktopTaskBar), wäre es nicht besser hier? bräuchte aber ein oldValue param oder was ähnliches
-//  }
+  if (selected == this.$container.isSelected()) {
+    return;
+  }
 
+  this.selected = selected;
   this.$container.select(selected);
-
   this.parent.toolButtonSelected(this, selected);
 
   if (!this.session.processingEvents) {
-    this.session.send('selected', this.id);
+    this.session.send('selected', this.id, {
+      selected: selected
+    });
   }
-  this.selected = selected;   //FIXME CGU necessary to prevent double sending when closing / opening phone form
 };
 
 scout.ToolButton.prototype._setEnabled = function(enabled) {

@@ -69,6 +69,11 @@ public class JsonResponse {
     if (id == null) {
       throw new JsonException("id is null");
     }
+    //If text is null it won't be transferred -> set to empty string
+    //FIXME CGU check if it is necessary on client to convert '' to null. Maybe not because !value also checks for emtpy string
+    if (newValue == null) {
+      newValue = "";
+    }
     //coalesce
     JSONObject event = m_idToPropertyChangeEventMap.get(id);
     if (event == null) {
@@ -78,7 +83,6 @@ public class JsonResponse {
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
-    //FIXME handle null values (null text -> empty text, otherwise it won't be transferred
     putProperty(event, propertyName, newValue);
   }
 

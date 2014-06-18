@@ -18,7 +18,8 @@ scout.TableField.prototype._render = function($parent) {
 };
 
 scout.TableField.prototype._setTable = function(table) {
-  if (this.isRendered()) {
+  this.table = table;
+  if (this.isRendered() && table) {
     table.render(this.$container.parent());
   }
 };
