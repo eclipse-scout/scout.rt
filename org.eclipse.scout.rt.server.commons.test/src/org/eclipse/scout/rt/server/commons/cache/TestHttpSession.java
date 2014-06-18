@@ -78,7 +78,7 @@ public class TestHttpSession implements HttpSession {
 
   @Override
   public String[] getValueNames() {
-    return null;
+    return new String[]{};
   }
 
   @Override

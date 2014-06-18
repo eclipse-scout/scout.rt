@@ -26,19 +26,10 @@ public class StickySessionCacheStoreServiceTest extends AbstractHttpSessionCache
   public void testTouchAttribute() {
     ICacheEntry mockEntry = mock(ICacheEntry.class);
     when(mockEntry.isActive()).thenReturn(true);
-    m_testSession.setAttribute(m_testKey, mockEntry);
-    m_cacheService.touch(m_testKey, m_requestMock, m_responseMock);
+    m_testSession.setAttribute(TEST_KEY, mockEntry);
+    m_cacheService.touch(TEST_KEY, m_requestMock, m_responseMock);
     verify(mockEntry, times(1)).touch();
   }
-
-//  @Test
-//  public void testExpiredValuesRemoved() {
-//    ICacheEntry mockEntry = mock(ICacheEntry.class);
-//    when(mockEntry.isActive()).thenReturn(true);
-//    m_testSession.setAttribute(m_testKey, mockEntry);
-//    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
-//    verify(m_testSession, times(1)).removeAttribute(m_testKey);
-//  }
 
   @Override
   protected AbstractHttpSessionCacheService createCacheService() {

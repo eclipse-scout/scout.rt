@@ -20,14 +20,14 @@ import org.junit.Test;
  */
 public class CacheElementTest {
 
-  private final String m_testValue = "testValue";
-  private final Long testExpiration = 1000L;
+  private static final String TEST_VALUE = "testValue";
+  private static final Long TEST_EXPIRATION = 1000L;
 
   @Test
   public void testCacheElement() {
-    ICacheEntry cacheElement = new CacheEntry<Object>(m_testValue, testExpiration, System.currentTimeMillis());
+    ICacheEntry cacheElement = new CacheEntry<Object>(TEST_VALUE, TEST_EXPIRATION, System.currentTimeMillis());
     assertTrue(cacheElement.isActive());
-    assertEquals(m_testValue, cacheElement.getValue());
+    assertEquals(TEST_VALUE, cacheElement.getValue());
   }
 
 }

@@ -22,7 +22,7 @@ public interface ICacheEntry<T> {
   /**
    * cached value
    */
-  public T getValue();
+  T getValue();
 
   /**
    * @return <code>true</code> if not expired
