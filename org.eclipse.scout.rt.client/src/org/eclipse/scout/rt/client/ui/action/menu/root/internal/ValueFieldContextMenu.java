@@ -39,7 +39,7 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterVisibleForValueFieldValue(getOwner().getValue()));
+    setActiveFilter(ActionUtility.createMenuFilterForValueFieldValue(getOwner().getValue()));
     calculateLocalVisibility();
   }
 
@@ -74,7 +74,7 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterVisibleForValueFieldValue(ownerValue));
+      setActiveFilter(ActionUtility.createMenuFilterForValueFieldValue(ownerValue));
     }
     calculateLocalVisibility();
   }

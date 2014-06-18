@@ -842,7 +842,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         public void run() {
           IActionFilter filter;
           if (node == null) {
-            filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TreeMenuType.EmptySpace);
+            filter = ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace);
           }
           else {
             filter = getScoutObject().getContextMenu().getActiveFilter();

@@ -34,7 +34,9 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 
@@ -56,7 +58,7 @@ public class SwingPopupWorker implements Runnable {
   private Component m_target;
   private final JTextComponent m_systemMenuOwner;
 
-  private IActionFilter m_actionFilter;
+  private final IActionFilter m_actionFilter;
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IContextMenu contextMenu) {
     this(env, target, point, contextMenu.getChildActions());
@@ -64,7 +66,7 @@ public class SwingPopupWorker implements Runnable {
   }
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, List<IMenu> scoutMenus) {
-    this(env, target, null, point, scoutMenus, ActionUtility.createVisibleFilter());
+    this(env, target, null, point, scoutMenus, ActionUtility.TRUE_FILTER);
   }
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, Point point, IContextMenu contextMenu, IActionFilter actionFilter) {
@@ -87,7 +89,7 @@ public class SwingPopupWorker implements Runnable {
   }
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, JTextComponent systemMenuOwner, Point point, List<? extends IMenu> scoutMenus, boolean isLightWeightPopup) {
-    this(env, target, systemMenuOwner, point, scoutMenus, ActionUtility.createVisibleFilter(), isLightWeightPopup);
+    this(env, target, systemMenuOwner, point, scoutMenus, ActionUtility.TRUE_FILTER, isLightWeightPopup);
   }
 
   public SwingPopupWorker(ISwingEnvironment env, Component target, JTextComponent systemMenuOwner, Point point, IContextMenu contextMenu, IActionFilter actionFilter, boolean isLightWeightPopup) {
@@ -122,13 +124,20 @@ public class SwingPopupWorker implements Runnable {
       @Override
       public void run() {
         if (m_contextMenu != null) {
-          m_contextMenu.aboutToShow();
-          m_contextMenu.prepareAction();
+          m_contextMenu.callAboutToShow(m_actionFilter);
         }
         else {
           for (IMenu m : m_scoutMenus) {
-            m.aboutToShow();
-            m.prepareAction();
+            m.acceptVisitor(new IActionVisitor() {
+              @Override
+              public int visit(IAction action) {
+                if (action instanceof IMenu) {
+                  ((IMenu) action).aboutToShow();
+                  ((IMenu) action).prepareAction();
+                }
+                return CONTINUE;
+              }
+            });
           }
         }
       }
@@ -140,8 +149,9 @@ public class SwingPopupWorker implements Runnable {
     catch (InterruptedException e) {
       LOG.error("error during prepare menus.", e);
     }
+    IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), m_actionFilter);
 
-    List<? extends IMenu> normalizedMenus = ActionUtility.visibleNormalizedActions(m_scoutMenus, m_actionFilter);
+    List<? extends IMenu> normalizedMenus = ActionUtility.visibleNormalizedActions(m_scoutMenus, displayFilter);
     if (!CollectionUtility.hasElements(normalizedMenus) && m_systemMenuOwner == null) {
       return;
     }
@@ -158,7 +168,7 @@ public class SwingPopupWorker implements Runnable {
       pop.addSeparator();
     }
     // recursively add actions
-    m_env.appendActions(pop, normalizedMenus, m_actionFilter);
+    m_env.appendActions(pop, normalizedMenus, displayFilter);
     try {
       if (pop.getComponentCount() > 0) {
         Point whereOnTarget = m_point;

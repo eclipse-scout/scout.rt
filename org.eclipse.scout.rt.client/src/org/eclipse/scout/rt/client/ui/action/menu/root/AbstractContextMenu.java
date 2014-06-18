@@ -53,7 +53,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   @Override
   protected void initConfig() {
     super.initConfig();
-    setActiveFilter(ActionUtility.createVisibleFilter());
+    setActiveFilter(ActionUtility.TRUE_FILTER);
     calculateLocalVisibility();
   }
 
@@ -141,6 +141,22 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
         removeScoutMenuVisibilityListenerRec(m.getChildActions());
       }
     }
+  }
+
+  @Override
+  public void callAboutToShow(final IActionFilter filter) {
+    acceptVisitor(new IActionVisitor() {
+      @SuppressWarnings("deprecation")
+      @Override
+      public int visit(IAction action) {
+        if (filter.accept(action) && action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          menu.aboutToShow();
+          menu.prepareAction();
+        }
+        return CONTINUE;
+      }
+    });
   }
 
   protected void calculateLocalVisibility() {

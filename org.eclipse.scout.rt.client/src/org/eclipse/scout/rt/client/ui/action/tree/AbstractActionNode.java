@@ -117,23 +117,6 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     m_parent = parent;
   }
 
-  /**
-   * override to prepare child menus as well
-   * 
-   * @throws ProcessingException
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  protected void prepareActionInternal() throws ProcessingException {
-    super.prepareActionInternal();
-    // child menus
-    if (hasChildActions()) {
-      for (T node : getChildActionsInternal()) {
-        node.prepareAction();
-      }
-    }
-  }
-
   private List<T> getChildActionsInternal() {
     return propertySupport.getPropertyList(PROP_CHILD_ACTIONS);
   }

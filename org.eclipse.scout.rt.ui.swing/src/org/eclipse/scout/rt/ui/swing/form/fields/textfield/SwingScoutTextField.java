@@ -65,10 +65,8 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
   @Override
   protected void installContextMenu() {
     getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
         }

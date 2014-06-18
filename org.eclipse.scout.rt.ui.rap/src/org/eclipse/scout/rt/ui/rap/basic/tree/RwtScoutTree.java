@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -44,7 +43,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -856,16 +855,18 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
         return;
       }
 
-      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+      ITreeContextMenu contextMenu = getScoutObject().getContextMenu();
+      final IActionFilter menuFilter;
+      if ((getUiField().getContextItem() == null)) {
+        menuFilter = ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace);
+      }
+      else {
+        menuFilter = contextMenu.getActiveFilter();
+      }
       Runnable t = new Runnable() {
-        @SuppressWarnings("deprecation")
         @Override
         public void run() {
-          IContextMenu contextMenu = getScoutObject().getContextMenu();
-          // manually call about to show
-          contextMenu.aboutToShow();
-          contextMenu.prepareAction();
-          scoutMenusRef.set(contextMenu);
+          getScoutObject().getContextMenu().callAboutToShow(menuFilter);
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -875,17 +876,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       catch (InterruptedException ex) {
         //nop
       }
-      IContextMenu contextMenu = scoutMenusRef.get();
-      if (contextMenu != null) {
-        IActionFilter filter = null;
-        if ((getUiField().getContextItem() == null)) {
-          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TreeMenuType.EmptySpace);
-        }
-        else {
-          filter = contextMenu.getActiveFilter();
-        }
-        RwtMenuUtility.fillMenu(((Menu) e.getSource()), contextMenu.getChildActions(), filter, getUiEnvironment());
-      }
+      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), menuFilter);
+      RwtMenuUtility.fillMenu(((Menu) e.getSource()), contextMenu.getChildActions(), displayFilter, getUiEnvironment());
     }
 
   } // end class P_ContextMenuListener

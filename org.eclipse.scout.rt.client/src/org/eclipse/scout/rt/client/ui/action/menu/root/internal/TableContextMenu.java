@@ -47,7 +47,7 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     super.initConfig();
     getOwner().addTableListener(new P_OwnerTableListener());
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterVisibleForTableSelection(getOwner().getSelectedRows()));
+    setActiveFilter(ActionUtility.createMenuFilterForTableSelection(getOwner().getSelectedRows()));
     calculateLocalVisibility();
   }
 
@@ -106,7 +106,7 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterVisibleForTableSelection(ownerValue));
+      setActiveFilter(ActionUtility.createMenuFilterForTableSelection(ownerValue));
       calculateLocalVisibility();
     }
   }

@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -40,6 +39,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -77,10 +77,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -1226,55 +1224,56 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   } // end class P_ColumnSortListener
 
-  private class P_ContextMenuListener extends MenuAdapter {
-    @Override
-    public void menuShown(MenuEvent e) {
-      // clear all previous
-      // Windows BUG: fires menu hide before the selection on the menu item is
-      // propagated.
-      if (m_contextMenu != null) {
-        for (MenuItem item : m_contextMenu.getItems()) {
-          disposeMenuItem(item);
-        }
-      }
-      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
-      Runnable t = new Runnable() {
-        @SuppressWarnings("deprecation")
-        @Override
-        public void run() {
-          IContextMenu contextMenu = getScoutObject().getContextMenu();
-          // manually call about to show
-          contextMenu.aboutToShow();
-          contextMenu.prepareAction();
-          scoutMenusRef.set(contextMenu);
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-
-      IContextMenu contextMenu = scoutMenusRef.get();
-      if (contextMenu != null) {
-        SwtMenuUtility.fillMenu(m_contextMenu, contextMenu.getChildActions(), contextMenu.getActiveFilter(), getEnvironment());
-      }
-    }
-
-    private void disposeMenuItem(MenuItem item) {
-      Menu menu = item.getMenu();
-      if (menu != null) {
-        for (MenuItem childItem : menu.getItems()) {
-          disposeMenuItem(childItem);
-        }
-        menu.dispose();
-      }
-      item.dispose();
-    }
-
-  } // end class P_ContextMenuListener
+//  private class P_ContextMenuListener extends MenuAdapter {
+//    @Override
+//    public void menuShown(MenuEvent e) {
+//      // clear all previous
+//      // Windows BUG: fires menu hide before the selection on the menu item is
+//      // propagated.
+//      if (m_contextMenu != null) {
+//        for (MenuItem item : m_contextMenu.getItems()) {
+//          disposeMenuItem(item);
+//        }
+//      }
+////      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+//      Runnable t = new Runnable() {
+//        @Override
+//        public void run() {
+//          IContextMenu contextMenu = getScoutObject().getContextMenu();
+//          // manually call about to show
+//          contextMenu.callAboutToShow(contextMenu.getActiveFilter());
+////          contextMenu.aboutToShow();
+////          contextMenu.prepareAction();
+////          scoutMenusRef.set(contextMenu);
+//        }
+//      };
+//      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
+//      try {
+//        job.join(1200);
+//      }
+//      catch (InterruptedException ex) {
+//        //nop
+//      }
+//
+//      IContextMenu contextMenu = getScoutObject().getContextMenu();
+//      if (contextMenu != null) {
+//        IActionFilter filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
+//        SwtMenuUtility.fillMenu(m_contextMenu, contextMenu.getChildActions(), filter, getEnvironment());
+//      }
+//    }
+//
+//    private void disposeMenuItem(MenuItem item) {
+//      Menu menu = item.getMenu();
+//      if (menu != null) {
+//        for (MenuItem childItem : menu.getItems()) {
+//          disposeMenuItem(childItem);
+//        }
+//        menu.dispose();
+//      }
+//      item.dispose();
+//    }
+//
+//  } // end class P_ContextMenuListener
 
   private class P_SwtHeaderMenuDetectListener implements MenuDetectListener {
 
@@ -1296,16 +1295,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
       setContextColumnFromSwt(getSwtColumnAt(pTable));
-      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+      final IActionFilter menuFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header));
       Runnable t = new Runnable() {
-        @SuppressWarnings("deprecation")
         @Override
         public void run() {
+
           IContextMenu contextMenu = getScoutObject().getContextMenu();
-          // manually call about to show
-          contextMenu.aboutToShow();
-          contextMenu.prepareAction();
-          scoutMenusRef.set(contextMenu);
+
+          contextMenu.callAboutToShow(menuFilter);
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);
@@ -1317,10 +1314,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
       // grab the actions out of the job, when the actions are providden
       // within the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        SwtMenuUtility.fillMenu(m_headerMenu, scoutMenusRef.get().getChildActions(),
-            ActionUtility.createMenuFilterVisibleAndMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header)), getEnvironment());
-      }
+      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), menuFilter);
+      SwtMenuUtility.fillMenu(m_headerMenu, getScoutObject().getContextMenu().getChildActions(), displayFilter, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {
