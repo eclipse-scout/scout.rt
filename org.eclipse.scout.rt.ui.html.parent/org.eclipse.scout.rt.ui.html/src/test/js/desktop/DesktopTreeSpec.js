@@ -30,7 +30,6 @@ describe("DesktopTree", function() {
   function createDesktopTree(model) {
     var tree = new scout.DesktopTree();
     tree.init(model, session);
-    tree.render(session.$entryPoint);
     return tree;
   }
 
@@ -40,6 +39,7 @@ describe("DesktopTree", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
       var desktopTree = createDesktopTree(model);
+      desktopTree.render(session.$entryPoint);
 
       expect(desktopTree._$desktopTreeScroll.find('.tree-item').length).toBe(1);
     });
@@ -47,23 +47,24 @@ describe("DesktopTree", function() {
 
   describe("_onNodeClicked", function() {
 
-    //FIXME CGU fix it
-//    it("reacts on node clicks", function() {
-//      var model = createModel();
-//      model.nodes = [createModelNode(1)];
-//      var desktopTree = createDesktopTree(model);
-//
-//      spyOn(desktopTree, '_onNodeClicked');
-//      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
-//      $node.click();
-//
-//      expect(desktopTree._onNodeClicked).toHaveBeenCalled();
-//    });
+    it("reacts on node clicks", function() {
+      var model = createModel();
+      model.nodes = [createModelNode(1)];
+      var desktopTree = createDesktopTree(model);
+      spyOn(desktopTree, '_onNodeClicked');
+      desktopTree.render(session.$entryPoint);
+
+      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
+      $node.click();
+
+      expect(desktopTree._onNodeClicked).toHaveBeenCalled();
+    });
 
     it("sends click, selection and expansion events in one call in this order", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
       var desktopTree = createDesktopTree(model);
+      desktopTree.render(session.$entryPoint);
 
       var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
       $node.click();
