@@ -41,6 +41,12 @@
 //@include("src/main/js/table/TableOrganizeMenu.js");
 //@include("src/main/js/table/TableKeystrokeAdapter.js");
 //@include("src/main/js/table/TableSelectionHandler.js");
+//@include("src/main/js/table/control/TableControl.js");
+//@include("src/main/js/table/control/ChartTableControl.js");
+//@include("src/main/js/table/control/ChartTableControlMatrix.js");
+//@include("src/main/js/table/control/GraphTableControl.js");
+//@include("src/main/js/table/control/MapTableControl.js");
+//@include("src/main/js/table/control/AnalysisTableControl.js");
 //@include("src/main/js/form/Form.js");
 //@include("src/main/js/form/fields/FormField.js");
 //@include("src/main/js/form/fields/button/Button.js");
@@ -50,6 +56,7 @@
 //@include("src/main/js/form/fields/groupbox/GroupBox.js");
 //@include("src/main/js/form/fields/sequencebox/SequenceBox.js");
 //@include("src/main/js/form/fields/tablefield/TableField.js");
+//@include("src/main/js/form/fields/tabbox/TabBox.js");
 //@include("src/main/js/scrollbar/Scrollbar.js");
 //@include("src/main/js/text/DecimalFormat.js");
 //@include("src/main/js/text/DateFormat.js");
