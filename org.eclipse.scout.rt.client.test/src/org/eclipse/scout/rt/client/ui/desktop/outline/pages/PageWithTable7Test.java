@@ -59,7 +59,7 @@ public class PageWithTable7Test {
   public static class PageWithTableOutline extends AbstractOutline {
 
     @Override
-    protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       pageList.add(new PageWithTable());
     }
   }

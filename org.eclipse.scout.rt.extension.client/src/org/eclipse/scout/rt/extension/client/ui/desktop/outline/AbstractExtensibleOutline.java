@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -37,7 +37,7 @@ public abstract class AbstractExtensibleOutline extends AbstractOutline implemen
   }
 
   @Override
-  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
     PageExtensionUtility.adaptOutline(this, pageList);
   }

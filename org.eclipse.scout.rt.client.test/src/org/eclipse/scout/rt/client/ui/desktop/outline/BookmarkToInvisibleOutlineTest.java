@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -64,7 +64,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       pageList.add(new CockpitMainTablePage());
       pageList.add(new CockpitSecondTablePage());
     }
@@ -77,7 +77,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       pageList.add(new AdminMainTablePage());
     }
   }
