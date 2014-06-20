@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//FIXME seams to be very similar to IOUtility. Either use IOUtility or enhance IOUtility with missing functionality. Or maybe use FileUtility?
+//FIXME seems to be very similar to IOUtility. Either use IOUtility or enhance IOUtility with missing functionality. Or maybe use FileUtility?
 public final class TextFileUtil {
 
   private TextFileUtil() {
@@ -63,10 +63,6 @@ public final class TextFileUtil {
 
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
-  /**
-   * @param content
-   * @param rootDirForIncludes
-   */
   public static String processIncludeDirectives(String content, ITextFileLoader loader) throws IOException {
     StringBuilder buf = new StringBuilder();
     Matcher mat = INCLUDE_PAT.matcher(content);
