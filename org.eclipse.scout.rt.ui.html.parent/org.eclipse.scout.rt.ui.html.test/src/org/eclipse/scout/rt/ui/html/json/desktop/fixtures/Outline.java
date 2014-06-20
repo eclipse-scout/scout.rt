@@ -27,7 +27,7 @@ public class Outline extends AbstractOutline {
   }
 
   @Override
-  protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
     for (IPage page : m_pages) {
       pageList.add(page);
     }
