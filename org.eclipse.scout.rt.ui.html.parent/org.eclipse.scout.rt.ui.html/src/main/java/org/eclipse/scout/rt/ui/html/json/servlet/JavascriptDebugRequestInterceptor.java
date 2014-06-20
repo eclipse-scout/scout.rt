@@ -55,10 +55,10 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     if (mat.matches()) {
       //is there a template for this script?
       String name = extractName(mat);
-      String bundlePath = "src/main/js/" + name + "-template" + mat.group(5); // path in development mode
+      String bundlePath = name + "-template" + mat.group(5);
       URL url = findBundleResource(bundlePath);
       if (url == null) {
-        bundlePath = name + "-template" + mat.group(5); // path in deployed mode
+        bundlePath = "src/main/js/" + name + "-template" + mat.group(5); // path in development mode
         url = findBundleResource(bundlePath);
       }
       if (url != null) {
@@ -126,13 +126,20 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
   }
 
   protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final URL url, String bundlePath) throws IOException, ServletException {
+    final String basePath;
+    if (bundlePath.lastIndexOf('/') < 0) {
+      basePath = "";
+    }
+    else {
+      basePath = bundlePath.substring(0, bundlePath.lastIndexOf('/') + 1);
+    }
     String input = TextFileUtil.readUTF8(url);
     ScriptProcessor processor = new ScriptProcessor();
     processor.setInput(bundlePath, input);
     processor.setIncludeFileLoader(new ITextFileLoader() {
       @Override
       public String read(String path) throws IOException {
-        URL includeUrl = findBundleResource(path);
+        URL includeUrl = findBundleResource(basePath + path);
         if (includeUrl == null) {
           throw new FileNotFoundException(path);
         }
