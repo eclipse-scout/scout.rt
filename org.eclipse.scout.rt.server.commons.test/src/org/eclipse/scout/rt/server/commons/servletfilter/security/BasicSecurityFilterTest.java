@@ -10,21 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servletfilter.security;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
+import org.eclipse.scout.rt.server.commons.internal.Activator;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.service.IService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link BasicSecurityFilter}
@@ -34,6 +49,8 @@ public class BasicSecurityFilterTest {
   private HttpServletResponse m_responseMock;
   private PrincipalHolder m_testPrincipalHolder;
   private BasicSecurityFilter m_filter;
+  private List<ServiceRegistration> m_registeredServices = new ArrayList<ServiceRegistration>();
+  private FilterConfig m_testFilterConfig;
 
   @Before
   public void setup() {
@@ -41,7 +58,15 @@ public class BasicSecurityFilterTest {
     m_responseMock = mock(HttpServletResponse.class);
     m_testPrincipalHolder = new PrincipalHolder();
     when(m_requestMock.getSession(true)).thenReturn(new TestHttpSession());
+    when(m_requestMock.getSession()).thenReturn(new TestHttpSession());
     m_filter = new BasicSecurityFilter();
+    m_testFilterConfig = mock(FilterConfig.class);
+    when(m_testFilterConfig.getInitParameter("users")).thenReturn("admin=secret");
+  }
+
+  @After
+  public void tearDown() {
+    TestingUtility.unregisterServices(m_registeredServices);
   }
 
   @Test
@@ -60,5 +85,45 @@ public class BasicSecurityFilterTest {
     for (int i = 0; i < n; i++) {
       m_filter.negotiate(m_requestMock, m_responseMock, m_testPrincipalHolder);
     }
+  }
+
+  @Test
+  public void testFilterNotAuthenticated() throws IOException, ServletException {
+    IHttpSessionCacheService cacheService = mock(IHttpSessionCacheService.class);
+    registerTestService(cacheService);
+
+    BasicSecurityFilter f = new BasicSecurityFilter();
+    f.init(m_testFilterConfig);
+    f.doFilter(m_requestMock, m_responseMock, null);
+
+    verify(cacheService, times(0)).put(subjectProperty(), anyObject(), any(HttpServletRequest.class), any(HttpServletResponse.class));
+    verify(cacheService, times(0)).put(subjectProperty(), anyObject(), any(HttpServletRequest.class), any(HttpServletResponse.class), anyLong());
+  }
+
+  @Test
+  public void testFilterAuthenticated() throws IOException, ServletException {
+    IHttpSessionCacheService cacheService = mock(IHttpSessionCacheService.class);
+    registerTestService(cacheService);
+
+    BasicSecurityFilter f = new BasicSecurityFilter();
+    f.init(m_testFilterConfig);
+    final String validAutHeader = "Basic YWRtaW46c2VjcmV0";
+    when(m_requestMock.getHeader(anyString())).thenReturn(validAutHeader);
+    f.doFilter(m_requestMock, m_responseMock, mock(FilterChain.class));
+    verify(cacheService).put(subjectProperty(), anyObject(), any(HttpServletRequest.class), any(HttpServletResponse.class));
+  }
+
+  private void registerTestService(IService service) {
+    m_registeredServices.addAll(TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, service));
+  }
+
+  private String subjectProperty() {
+    return argThat(new ArgumentMatcher<String>() {
+
+      @Override
+      public boolean matches(Object item) {
+        return BasicSecurityFilter.PROP_SUBJECT.equals(item);
+      }
+    });
   }
 }

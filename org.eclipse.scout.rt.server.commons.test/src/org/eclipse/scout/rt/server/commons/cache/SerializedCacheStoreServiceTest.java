@@ -22,10 +22,10 @@ public class SerializedCacheStoreServiceTest extends AbstractHttpSessionCacheSer
 
   @Test
   public void testTouchAttribute() throws ProcessingException {
-    CacheEntry cacheElemSpy = new CacheEntry<Object>(m_testValue, testExpiration, -1);
+    CacheEntry cacheElemSpy = new CacheEntry<Object>(TEST_VALUE, TEST_EXPIRATION, -1);
     assertEquals(-1, cacheElemSpy.getCreationTime());
-    m_testSession.setAttribute(m_testKey, m_cacheService.serializedString(cacheElemSpy));
-    m_cacheService.touch(m_testKey, m_requestMock, m_responseMock);
+    m_testSession.setAttribute(TEST_KEY, m_cacheService.serializedString(cacheElemSpy));
+    m_cacheService.touch(TEST_KEY, m_requestMock, m_responseMock);
     assertEquals(-1, cacheElemSpy.getCreationTime());
   }
 

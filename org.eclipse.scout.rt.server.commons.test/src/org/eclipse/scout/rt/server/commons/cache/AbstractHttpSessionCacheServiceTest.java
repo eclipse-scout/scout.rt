@@ -29,9 +29,9 @@ import org.junit.Test;
 public abstract class AbstractHttpSessionCacheServiceTest {
   protected HttpServletResponse m_responseMock;
   protected HttpServletRequest m_requestMock;
-  protected final String m_testValue = "testValue";
-  protected final Integer testExpiration = Integer.valueOf(10000);
-  protected String m_testKey = "testKey";
+  protected static final String TEST_VALUE = "testValue";
+  protected static final Integer TEST_EXPIRATION = Integer.valueOf(10000);
+  protected static final String TEST_KEY = "testKey";
   protected TestHttpSession m_testSession;
   protected AbstractHttpSessionCacheService m_cacheService;
 
@@ -48,22 +48,22 @@ public abstract class AbstractHttpSessionCacheServiceTest {
 
   @Test
   public void testGetExpired() {
-    m_cacheService.put(m_testKey, m_testValue, m_requestMock, m_responseMock, 0L);
-    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
-    assertNull(m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
+    m_cacheService.put(TEST_KEY, TEST_VALUE, m_requestMock, m_responseMock, 0L);
+    m_cacheService.get(TEST_KEY, m_requestMock, m_responseMock);
+    assertNull(m_cacheService.get(TEST_KEY, m_requestMock, m_responseMock));
     assertFalse(m_testSession.getAttributeNames().hasMoreElements());
   }
 
   @Test
   public void testGetUnknown() {
-    m_cacheService.get(m_testKey, m_requestMock, m_responseMock);
-    assertNull(m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
+    m_cacheService.get(TEST_KEY, m_requestMock, m_responseMock);
+    assertNull(m_cacheService.get(TEST_KEY, m_requestMock, m_responseMock));
   }
 
   @Test
   public void testPut() {
-    m_cacheService.put(m_testKey, m_testValue, m_requestMock, m_responseMock);
-    assertEquals(m_testValue, m_cacheService.get(m_testKey, m_requestMock, m_responseMock));
+    m_cacheService.put(TEST_KEY, TEST_VALUE, m_requestMock, m_responseMock);
+    assertEquals(TEST_VALUE, m_cacheService.get(TEST_KEY, m_requestMock, m_responseMock));
     assertTrue(m_testSession.getAttributeNames().hasMoreElements());
   }
 

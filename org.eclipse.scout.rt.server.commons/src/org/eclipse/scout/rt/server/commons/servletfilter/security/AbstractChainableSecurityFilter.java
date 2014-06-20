@@ -30,7 +30,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set
@@ -110,10 +112,8 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     //touch the session so it is effectively used
     req.getSession();
     // check subject on session
-    Subject subject = null;
-    synchronized (req.getSession()) {
-      subject = findSubjectOnSession(req, res);
-    }
+    Subject subject = findSubject(req, res);
+
     if (subject == null || subject.getPrincipals().size() == 0) {
       //try negotiate
       PrincipalHolder pHolder = new PrincipalHolder();
@@ -135,9 +135,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
           }
           subject.getPrincipals().add(pHolder.getPrincipal());
           subject.setReadOnly();
-          synchronized (req.getSession()) {
-            req.getSession().setAttribute(PROP_SUBJECT, subject);
-          }
+          cacheSubject(req, res, subject);
           break;
       }
     }
@@ -175,37 +173,55 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     }
   }
 
-  private Subject findSubjectOnSession(HttpServletRequest req, HttpServletResponse resp) {
-    Object o = null;
-    Subject subject = null;
-    o = req.getSession().getAttribute(PROP_SUBJECT);
-
-    if (o instanceof Subject) {
-      subject = (Subject) o;
-    }
-    //check if we are already authenticated
-    if (subject == null) {
-      subject = Subject.getSubject(AccessController.getContext());
-    }
-
-    //    Subject subject=Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      Principal principal = req.getUserPrincipal();
-      if (principal == null || !StringUtility.hasText(principal.getName())) {
-        principal = null;
-        String name = req.getRemoteUser();
-        if (StringUtility.hasText(name)) {
-          principal = new SimplePrincipal(name);
+  /**
+   * Find already existing subject
+   */
+  protected Subject findSubject(final HttpServletRequest req, final HttpServletResponse res) {
+    synchronized (req.getSession()) {
+      Subject subject = getCachedSubject(req, res);
+      //check if we are already authenticated
+      if (subject == null) {
+        subject = Subject.getSubject(AccessController.getContext());
+      }
+      if (subject == null) {
+        Principal principal = req.getUserPrincipal();
+        if (principal == null || !StringUtility.hasText(principal.getName())) {
+          principal = null;
+          String name = req.getRemoteUser();
+          if (StringUtility.hasText(name)) {
+            principal = new SimplePrincipal(name);
+          }
+        }
+        if (principal != null) {
+          subject = createSubject(principal);
+          cacheSubject(req, res, subject);
         }
       }
-      if (principal != null) {
-        subject = new Subject();
-        subject.getPrincipals().add(principal);
-        subject.setReadOnly();
-        req.getSession().setAttribute(PROP_SUBJECT, subject);
-      }
+      return subject;
     }
-    return subject;
+  }
+
+  protected void cacheSubject(final HttpServletRequest req, final HttpServletResponse res, Subject subject) {
+    synchronized (req.getSession()) {
+      SERVICES.getService(IHttpSessionCacheService.class).put(PROP_SUBJECT, subject, req, res);
+    }
+  }
+
+  protected Subject getCachedSubject(final HttpServletRequest req, final HttpServletResponse res) {
+    synchronized (req.getSession()) {
+      Object s = SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(PROP_SUBJECT, req, res);
+      if (s instanceof Subject) {
+        return (Subject) s;
+      }
+      return null;
+    }
+  }
+
+  protected Subject createSubject(Principal principal) {
+    Subject s = new Subject();
+    s.getPrincipals().add(principal);
+    s.setReadOnly();
+    return s;
   }
 
   /**
