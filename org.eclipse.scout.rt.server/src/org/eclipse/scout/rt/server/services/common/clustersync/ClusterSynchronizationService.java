@@ -48,33 +48,35 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private String m_nodeId;
   private boolean m_enabled;
   private IServerSession m_session;
+  private Subject m_subject;
 
   @Override
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
     m_pubSubMessageService = SERVICES.getService(IPubSubMessageService.class);
     m_nodeId = UUID.randomUUID().toString();
+    m_subject = createBackendSubject();
     m_session = createBackendSession();
     enable();
+  }
+
+  private Subject createBackendSubject() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("server"));
+    return subject;
   }
 
   protected IServerSession createBackendSession() {
     Class<? extends IServerSession> sessionClazz = ServerSessionClassFinder.find();
     IServerSession serverSession = null;
     try {
-      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, getBackendSubject());
+      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, m_subject);
       serverSession.setIdInternal(UUID.randomUUID().toString());
     }
     catch (ProcessingException e) {
-      LOG.error("Error creating backend session for cluster synchronization", e);
+      LOG.error("Error creating backend session for cluster synchronization.", e);
     }
     return serverSession;
-  }
-
-  private Subject getBackendSubject() {
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("server"));
-    return subject;
   }
 
   @Override
@@ -137,8 +139,15 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   /**
    * @return {@link IServerSession} used to handle incoming notification messages
    */
-  protected IServerSession getBackendSession() {
+  public IServerSession getBackendSession() {
     return m_session;
+  }
+
+  /**
+   * @return {@link Subject} used to handle incoming notification messages
+   */
+  public Subject getBackendSubject() {
+    return m_subject;
   }
 
   protected void notifyListeners(IClusterNotificationMessage message) {
@@ -152,8 +161,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     private final IClusterNotificationMessage m_distributedNotification;
     private final List<IClusterNotificationListener> m_listeners;
 
-    public P_NotificationProcessingJob(String name, IServerSession serverSession, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
-      super(name, serverSession);
+    public P_NotificationProcessingJob(String name, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
+      super(name, getBackendSession(), getBackendSubject());
       m_distributedNotification = notification;
       m_listeners = listener;
     }
@@ -190,7 +199,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     String originNode = message.getProperties().getOriginNode();
     if (!m_nodeId.equals(originNode)) {
       Activator.getDefault().getClusterSynchronizationInfo().updateReceiveStatus(message);
-      P_NotificationProcessingJob j = new P_NotificationProcessingJob("NotificationProcessingJob", getBackendSession(), message, m_listeners);
+      P_NotificationProcessingJob j = new P_NotificationProcessingJob("NotificationProcessingJob", message, m_listeners);
       j.runNow(new NullProgressMonitor());
     }
   }
