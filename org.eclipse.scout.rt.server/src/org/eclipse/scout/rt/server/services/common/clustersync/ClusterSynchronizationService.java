@@ -14,18 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
+import org.eclipse.scout.rt.server.services.common.clustersync.internal.ServerSessionClassFinder;
+import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
@@ -53,10 +58,23 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     enable();
   }
 
-  private AbstractServerSession createBackendSession() {
-    return new AbstractServerSession(true) {
-      private static final long serialVersionUID = 1L;
-    };
+  protected IServerSession createBackendSession() {
+    Class<? extends IServerSession> sessionClazz = ServerSessionClassFinder.find();
+    IServerSession serverSession = null;
+    try {
+      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, getBackendSubject());
+      serverSession.setIdInternal(UUID.randomUUID().toString());
+    }
+    catch (ProcessingException e) {
+      LOG.error("Error creating backend session for cluster synchronization", e);
+    }
+    return serverSession;
+  }
+
+  private Subject getBackendSubject() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("server"));
+    return subject;
   }
 
   @Override
@@ -123,10 +141,16 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return m_session;
   }
 
+  protected void notifyListeners(IClusterNotificationMessage message) {
+    for (IClusterNotificationListener listener : getListeners()) {
+      listener.onNotification(message);
+    }
+  }
+
   private class P_NotificationProcessingJob extends ServerJob {
 
-    IClusterNotificationMessage m_distributedNotification;
-    List<IClusterNotificationListener> m_listeners;
+    private final IClusterNotificationMessage m_distributedNotification;
+    private final List<IClusterNotificationListener> m_listeners;
 
     public P_NotificationProcessingJob(String name, IServerSession serverSession, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
       super(name, serverSession);
@@ -136,9 +160,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      for (IClusterNotificationListener listener : m_listeners) {
-        listener.onNotification(m_distributedNotification);
-      }
+      notifyListeners(m_distributedNotification);
       return Status.OK_STATUS;
     }
   }
@@ -151,6 +173,10 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   @Override
   public void removeListener(IClusterNotificationListener listener) {
     m_listeners.remove(listener);
+  }
+
+  protected List<IClusterNotificationListener> getListeners() {
+    return m_listeners;
   }
 
   @Override
