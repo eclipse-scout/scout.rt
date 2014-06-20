@@ -19,9 +19,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.ITextFileLoader;
 import org.eclipse.scout.rt.ui.html.ScriptProcessor;
 import org.eclipse.scout.rt.ui.html.TextFileUtil;
-import org.eclipse.scout.rt.ui.html.json.Activator;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * intercept scout-4.0.0.min.css and scout-4.0.0.min.js and replace by processing the source scout-4.0.0.css and
@@ -56,20 +55,24 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     if (mat.matches()) {
       //is there a template for this script?
       String name = extractName(mat);
-      String bundlePath = "src/main/js/" + name + "-template" + mat.group(5);
-      Bundle handler = findBundleContaining(bundlePath);
-      if (handler != null) {
+      String bundlePath = "src/main/js/" + name + "-template" + mat.group(5); // path in development mode
+      URL url = findBundleResource(bundlePath);
+      if (url == null) {
+        bundlePath = name + "-template" + mat.group(5); // path in deployed mode
+        url = findBundleResource(bundlePath);
+      }
+      if (url != null) {
         LOG.info("replacing " + pathInfo + " by live processing /" + bundlePath);
-        handleScriptTemplate(req, resp, handler, bundlePath);
+        handleScriptTemplate(req, resp, url, bundlePath);
         return true;
       }
 
       //is there a uncompressed library version of this script?
       bundlePath = "libjs/" + mat.group(3) + mat.group(5);
-      handler = findBundleContaining(bundlePath);
-      if (handler != null) {
+      url = findBundleResource(bundlePath);
+      if (url != null) {
         LOG.info("replacing " + pathInfo + " by the uncompressed /" + bundlePath);
-        handleScriptLibrary(req, resp, handler, bundlePath);
+        handleScriptLibrary(req, resp, url, bundlePath);
         return true;
       }
     }
@@ -112,26 +115,24 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     return false;
   }
 
-  protected Bundle findBundleContaining(String bundlePath) throws IOException, ServletException {
-    //delegate to static resources
-    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
-      if (bundle.getEntry(bundlePath) != null) {
-        return bundle;
+  protected URL findBundleResource(String bundlePath) {
+    for (IServletResourceProvider provider : SERVICES.getServices(IServletResourceProvider.class)) {
+      URL url = provider.resolveBundleResource(bundlePath);
+      if (url != null) {
+        return url;
       }
     }
     return null;
   }
 
-  protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final Bundle handler, String bundlePath) throws IOException, ServletException {
-    URL url = handler.getEntry(bundlePath);
-    //process
+  protected void handleScriptTemplate(HttpServletRequest req, HttpServletResponse resp, final URL url, String bundlePath) throws IOException, ServletException {
     String input = TextFileUtil.readUTF8(url);
     ScriptProcessor processor = new ScriptProcessor();
     processor.setInput(bundlePath, input);
     processor.setIncludeFileLoader(new ITextFileLoader() {
       @Override
       public String read(String path) throws IOException {
-        URL includeUrl = handler.getEntry(path);
+        URL includeUrl = findBundleResource(path);
         if (includeUrl == null) {
           throw new FileNotFoundException(path);
         }
@@ -152,8 +153,7 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
     resp.getOutputStream().write(outputBytes);
   }
 
-  protected void handleScriptLibrary(HttpServletRequest req, HttpServletResponse resp, final Bundle handler, String bundlePath) throws IOException, ServletException {
-    URL url = handler.getEntry(bundlePath);
+  protected void handleScriptLibrary(HttpServletRequest req, HttpServletResponse resp, URL url, String bundlePath) throws IOException, ServletException {
     String input = TextFileUtil.readUTF8(url);
     byte[] outputBytes = input.getBytes("UTF-8");
     int dot = bundlePath.lastIndexOf('.');

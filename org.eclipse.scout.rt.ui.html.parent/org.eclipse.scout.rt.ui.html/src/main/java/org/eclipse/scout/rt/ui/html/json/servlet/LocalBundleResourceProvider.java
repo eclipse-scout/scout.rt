@@ -110,17 +110,15 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
     if (pathInfo.equals("/")) {
       pathInfo = getIndexResolver().resolve(req);
     }
-    return pathInfo;
+    return getBundleWebContentFolder() + pathInfo;
   }
 
-  /**
-   * resolve a web path /res/scout.css to a bundle resource WebContent/res/scout.css
-   */
-  protected URL resolveBundleResource(String pathInfo) {
-    if (pathInfo == null) {
+  @Override
+  public URL resolveBundleResource(String resourceName) {
+    if (resourceName == null) {
       return null;
     }
-    return getBundle().getEntry(getBundleWebContentFolder() + pathInfo);
+    return getBundle().getEntry(resourceName);
   }
 
   /**
