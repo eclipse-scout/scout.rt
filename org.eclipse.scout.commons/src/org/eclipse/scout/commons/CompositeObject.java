@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * used in sorted maps and sets when dealing with composite sorting criteria
@@ -18,6 +19,12 @@ import java.io.Serializable;
 public class CompositeObject implements Comparable<CompositeObject>, Serializable {
   private static final long serialVersionUID = 0L;
   private Object[] m_value;
+
+  public CompositeObject(Collection<?> col) {
+    if (col != null) {
+      m_value = col.toArray();
+    }
+  }
 
   public CompositeObject(Object... a) {
     m_value = a;
