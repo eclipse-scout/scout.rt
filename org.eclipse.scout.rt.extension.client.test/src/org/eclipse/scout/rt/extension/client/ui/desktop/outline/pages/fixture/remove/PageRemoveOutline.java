@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.remove;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensib
 public class PageRemoveOutline extends AbstractExtensibleOutline {
 
   @Override
-  protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
     pageList.add(new ARemovePageWithNodes());
     pageList.add(new BRemovePageWithNodes());
     pageList.add(new C1RemovePageWithNodes());

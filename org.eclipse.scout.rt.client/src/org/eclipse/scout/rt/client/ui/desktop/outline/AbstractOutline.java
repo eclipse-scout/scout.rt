@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -131,10 +130,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
     execCreateChildPages(pageList);
   }
 
@@ -609,7 +608,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private class InvisibleRootPage extends AbstractPageWithNodes {
     @Override
-    protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       AbstractOutline.this.createChildPagesInternal(pageList);
     }
   }

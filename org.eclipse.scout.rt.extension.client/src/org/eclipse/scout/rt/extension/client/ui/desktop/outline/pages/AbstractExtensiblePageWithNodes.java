@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -71,7 +70,7 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   }
 
   @Override
-  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
     PageExtensionUtility.adaptPageWithNodes(this, pageList);
   }

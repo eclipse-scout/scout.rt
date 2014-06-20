@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -210,7 +209,7 @@ public interface IDesktopExtension {
    * @param outlines
    *          a live list to which the contributed outlines are added
    */
-  void contributeOutlines(Collection<IOutline> outlines);
+  void contributeOutlines(List<IOutline> outlines);
 
   /**
    * Adds the actions configured with this extension to the {@code actions} collection. This is a live list of
@@ -222,6 +221,6 @@ public interface IDesktopExtension {
    * @param actions
    *          a live list to which the contributed actions are added
    */
-  void contributeActions(Collection<IAction> actions);
+  void contributeActions(List<IAction> actions);
 
 }

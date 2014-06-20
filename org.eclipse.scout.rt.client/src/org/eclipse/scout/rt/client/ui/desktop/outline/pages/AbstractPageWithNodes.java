@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -109,10 +108,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
     execCreateChildPages(pageList);
   }
 
@@ -194,7 +193,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    */
   @Override
   public void loadChildren() throws ProcessingException {
-    ArrayList<IPage> pageList = new ArrayList<IPage>();
+    List<IPage> pageList = new ArrayList<IPage>();
     createChildPagesInternal(pageList);
     // load tree
     ITree tree = getTree();

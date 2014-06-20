@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -108,7 +107,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public void contributeOutlines(Collection<IOutline> outlines) {
+  public void contributeOutlines(List<IOutline> outlines) {
     List<Class<? extends IOutline>> contributedOutlines = getConfiguredOutlines();
     if (contributedOutlines == null) {
       return;
@@ -125,7 +124,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public void contributeActions(Collection<IAction> actions) {
+  public void contributeActions(List<IAction> actions) {
     for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
       try {
         actions.add(ConfigurationUtility.newInnerInstance(this, actionClazz));

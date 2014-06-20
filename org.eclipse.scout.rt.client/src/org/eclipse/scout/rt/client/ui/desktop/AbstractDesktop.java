@@ -1715,7 +1715,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void contributeOutlines(Collection<IOutline> outlines) {
+    public void contributeOutlines(List<IOutline> outlines) {
       List<Class<? extends IOutline>> configuredOutlines = getConfiguredOutlines();
       if (configuredOutlines != null) {
         for (Class<?> element : configuredOutlines) {
@@ -1731,7 +1731,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void contributeActions(Collection<IAction> actions) {
+    public void contributeActions(List<IAction> actions) {
       for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
         try {
           actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));

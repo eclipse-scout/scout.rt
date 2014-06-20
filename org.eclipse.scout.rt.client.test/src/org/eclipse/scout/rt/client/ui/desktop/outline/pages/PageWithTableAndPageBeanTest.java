@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -97,7 +97,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     @Override
-    protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       pageList.add(new PageWithTable(m_invokeSuperExecLoadData));
     }
   }
