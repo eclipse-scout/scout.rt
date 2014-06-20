@@ -99,7 +99,7 @@
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-${scout.script.version}.css</argument>
               <argument>--root</argument>
-              <argument>${project.basedir}</argument>
+              <argument>${project.basedir}/src/main/js</argument>
             </arguments>
             <classpathScope>compile</classpathScope>
           </configuration>
@@ -118,7 +118,7 @@
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.css</argument>
               <argument>--root</argument>
-              <argument>${project.basedir}</argument>
+              <argument>${project.basedir}/src/main/js</argument>
             </arguments>
             <classpathScope>compile</classpathScope>
           </configuration>
@@ -137,7 +137,7 @@
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-${scout.script.version}.js</argument>
               <argument>--root</argument>
-              <argument>${project.basedir}</argument>
+              <argument>${project.basedir}/src/main/js</argument>
             </arguments>
             <classpathScope>compile</classpathScope>
           </configuration>
@@ -156,7 +156,7 @@
               <argument>--o</argument>
               <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.js</argument>
               <argument>--root</argument>
-              <argument>${project.basedir}</argument>
+              <argument>${project.basedir}/src/main/js</argument>
             </arguments>
             <classpathScope>compile</classpathScope>
           </configuration>

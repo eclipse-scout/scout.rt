@@ -8,6 +8,7 @@ import java.io.IOException;
  * <code>/WebContent/res/scout-4.0.0.js</code>
  */
 public class ScriptProcessor {
+
   public static void main(String[] args) throws IOException {
     File outputFile = null;
     ScriptProcessor processor = new ScriptProcessor();
@@ -60,11 +61,6 @@ public class ScriptProcessor {
   private ITextFileLoader m_includeFileLoader;
   private boolean m_showLineNumbers = false;
 
-  /**
-   * @param input
-   * @param inputType
-   *          js or css
-   */
   public void setInput(String path, String content) {
     int dot = path.lastIndexOf('.');
     m_inputType = path.substring(dot + 1);
