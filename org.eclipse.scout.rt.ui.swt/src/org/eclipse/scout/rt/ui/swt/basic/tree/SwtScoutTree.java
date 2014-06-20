@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -767,17 +766,24 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       if (getScoutObject() == null || !isEnabledFromScout()) {
         return;
       }
+      final IActionFilter filter;
+      if ((getSwtField().getContextItem() == null)) {
+        filter = ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace);
+      }
+      else {
+        filter = getScoutObject().getContextMenu().getActiveFilter();
+      }
 
-      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+//      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
       Runnable t = new Runnable() {
-        @SuppressWarnings("deprecation")
         @Override
         public void run() {
           IContextMenu contextMenu = getScoutObject().getContextMenu();
-          // manually call about to show
-          contextMenu.aboutToShow();
-          contextMenu.prepareAction();
-          scoutMenusRef.set(contextMenu);
+          contextMenu.callAboutToShow(filter);
+//          // manually call about to show
+//          contextMenu.aboutToShow();
+//          contextMenu.prepareAction();
+//          scoutMenusRef.set(contextMenu);
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);
@@ -787,16 +793,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       catch (InterruptedException ex) {
         //nop
       }
-      if (scoutMenusRef.get() != null) {
-        IActionFilter filter = null;
-        if ((getSwtField().getContextItem() == null)) {
-          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TreeMenuType.EmptySpace);
-        }
-        else {
-          filter = getScoutObject().getContextMenu().getActiveFilter();
-        }
-        SwtMenuUtility.fillMenu(m_contextMenu, scoutMenusRef.get().getChildActions(), filter, getEnvironment());
-      }
+      IActionFilter visibleFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), filter);
+      SwtMenuUtility.fillMenu(m_contextMenu, getScoutObject().getContextMenu().getChildActions(), visibleFilter, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {

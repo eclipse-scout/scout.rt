@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -1325,16 +1324,19 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
-      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
+
+      final IActionFilter filter;
+      if (m_header) {
+        filter = ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header);
+      }
+      else {
+        filter = getScoutObject().getContextMenu().getActiveFilter();
+      }
       Runnable t = new Runnable() {
-        @SuppressWarnings("deprecation")
         @Override
         public void run() {
           IContextMenu contextMenu = getScoutObject().getContextMenu();
-          // manually call about to show
-          contextMenu.aboutToShow();
-          contextMenu.prepareAction();
-          scoutMenusRef.set(contextMenu);
+          contextMenu.callAboutToShow(filter);
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -1344,17 +1346,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       catch (InterruptedException ex) {
         //nop
       }
-      IContextMenu contextMenu = scoutMenusRef.get();
-      if (contextMenu != null) {
-        IActionFilter filter = null;
-        if (m_header) {
-          filter = ActionUtility.createMenuFilterVisibleAndMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header);
-        }
-        else {
-          filter = contextMenu.getActiveFilter();
-        }
-        RwtMenuUtility.fillMenu((Menu) e.getSource(), contextMenu.getChildActions(), filter, getUiEnvironment());
-      }
+      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), filter);
+      RwtMenuUtility.fillMenu((Menu) e.getSource(), getScoutObject().getContextMenu().getChildActions(), displayFilter, getUiEnvironment());
     }
   }
 

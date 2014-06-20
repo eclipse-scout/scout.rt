@@ -49,7 +49,7 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     super.initConfig();
     getOwner().addTreeListener(new P_OwnerTreeListener());
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterVisibleForTreeSelection(getOwner().getSelectedNodes()));
+    setActiveFilter(ActionUtility.createMenuFilterForTreeSelection(getOwner().getSelectedNodes()));
     calculateLocalVisibility();
   }
 
@@ -108,7 +108,7 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterVisibleForTreeSelection(ownerSelection));
+      setActiveFilter(ActionUtility.createMenuFilterForTreeSelection(ownerSelection));
       calculateLocalVisibility();
     }
   }

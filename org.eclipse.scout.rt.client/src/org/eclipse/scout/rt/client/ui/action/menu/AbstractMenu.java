@@ -154,10 +154,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     try {
       aboutToShowInternal();
       execAboutToShow();
-      // children
-      for (IMenu m : getChildActions()) {
-        m.aboutToShow();
-      }
     }
     catch (Throwable t) {
       LOG.warn("Action " + getClass().getName(), t);

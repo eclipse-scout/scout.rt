@@ -180,7 +180,7 @@ public final class ActionUtility {
     }
   }
 
-  public static IActionFilter createMenuFilterVisibleForTableSelection(List<? extends ITableRow> selection) {
+  public static IActionFilter createMenuFilterForTableSelection(List<? extends ITableRow> selection) {
     boolean allEnabled = true;
     if (!CollectionUtility.isEmpty(selection)) {
       allEnabled = true;
@@ -202,14 +202,14 @@ public final class ActionUtility {
       else {
         menuType = TableMenuType.MultiSelection;
       }
-      return createMenuFilterVisibleAndMenuTypes(CollectionUtility.hashSet(menuType));
+      return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuType));
     }
     else {
       return FALSE_FILTER;
     }
   }
 
-  public static IActionFilter createMenuFilterVisibleForValueFieldValue(Object value) {
+  public static IActionFilter createMenuFilterForValueFieldValue(Object value) {
     final ValueFieldMenuType menuType;
     if (value == null) {
       menuType = ValueFieldMenuType.Null;
@@ -217,7 +217,7 @@ public final class ActionUtility {
     else {
       menuType = ValueFieldMenuType.NotNull;
     }
-    return createMenuFilterVisibleAndMenuTypes(menuType);
+    return createMenuFilterMenuTypes(menuType);
   }
 
   public static IActionFilter createVisibleFilter() {
@@ -230,7 +230,7 @@ public final class ActionUtility {
     };
   }
 
-  public static IActionFilter createMenuFilterVisibleForTreeSelection(Set<? extends ITreeNode> selection) {
+  public static IActionFilter createMenuFilterForTreeSelection(Set<? extends ITreeNode> selection) {
     boolean allEnabled = true;
     if (!CollectionUtility.isEmpty(selection)) {
       allEnabled = true;
@@ -252,7 +252,7 @@ public final class ActionUtility {
       else {
         menuType = TreeMenuType.MultiSelection;
       }
-      return createMenuFilterVisibleAndMenuTypes(CollectionUtility.hashSet(menuType));
+      return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuType));
     }
     else {
       return FALSE_FILTER;
@@ -302,6 +302,24 @@ public final class ActionUtility {
         return false;
       }
     };
+  }
+
+  public static IActionFilter createCombinedFilter(final IActionFilter... actionFilters) {
+    if (actionFilters != null) {
+      return new IActionFilter() {
+
+        @Override
+        public boolean accept(IAction action) {
+          for (IActionFilter f : actionFilters) {
+            if (!f.accept(action)) {
+              return false;
+            }
+          }
+          return true;
+        }
+      };
+    }
+    return TRUE_FILTER;
   }
 
 }

@@ -944,7 +944,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         public void run() {
           // call swing menu
           new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(),
-              ActionUtility.createMenuFilterVisibleAndMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header), false).enqueue();
+              ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header), false).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);

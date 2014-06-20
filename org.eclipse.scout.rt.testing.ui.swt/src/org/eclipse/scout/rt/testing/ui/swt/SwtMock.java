@@ -496,7 +496,7 @@ public class SwtMock extends AbstractGuiMock {
 
   @Override
   public void contextMenu(final String... names) {
-    final ArrayList<Integer> indexOfList = new ArrayList<Integer>();
+    final List<Integer> indexOfList = new ArrayList<Integer>();
     final MenuItem mi = waitForMenuItem(names[0]);
     syncExec(new WaitCondition<Boolean>() {
       @Override
