@@ -20,14 +20,13 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
   private static final long serialVersionUID = 0L;
   private Object[] m_value;
 
-  public CompositeObject(Collection<?> col) {
-    if (col != null) {
-      m_value = col.toArray();
-    }
-  }
-
   public CompositeObject(Object... a) {
-    m_value = a;
+    if (a != null && a.length == 1 && a[0] instanceof Collection<?>) {
+      m_value = ((Collection) a[0]).toArray();
+    }
+    else {
+      m_value = a;
+    }
   }
 
   @Override
