@@ -13,9 +13,12 @@ scout.Button.SYSTEM_TYPE = {
 };
 
 scout.Button.prototype._render = function($parent) {
+  var label = '';
   this.$container = $parent;
   this.$container.attr('id', 'Button-' + this.id);
-  var label = this.label.replace('&', '');
+  if (this.label) {
+    label = this.label.replace('&', '');
+  }
   this._$button = $('<button>' + label + '</button>');
   this._$button.appendTo(this.$container);
   this._$button.on('click', function() {

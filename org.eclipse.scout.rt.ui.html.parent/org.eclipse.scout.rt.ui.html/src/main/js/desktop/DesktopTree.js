@@ -181,7 +181,6 @@ scout.DesktopTree.prototype._setNodeSelected = function($node) {
     this._table.render($('#DesktopBench'));
   }
 
-  //FIXME create superclass to handle update generally? or set flag on session and ignore EVERY event? probably not
   if (!this.session.processingEvents) {
     this.session.send('nodesSelected', this.id, {
       "nodeIds": [node.id]

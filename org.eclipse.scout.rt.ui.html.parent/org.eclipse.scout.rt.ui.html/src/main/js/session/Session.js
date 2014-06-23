@@ -119,34 +119,38 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     url: 'json',
     data: JSON.stringify(request),
     success: function(message) {
-      that._requestsPendingCounter--;
-
-      if (message.errorMessage) {
-        that.$entryPoint.html('');
-        that.$entryPoint.text(message.errorMessage);
-        return;
-      }
-
-      this.processingEvents = true;
-      try {
-        that._processEvents(message.events);
-      } finally {
-        this.processingEvents = false;
-      }
-
-      if (that._deferred) {
-        for (var i = 0; i < message.events.length; i++) {
-          that._deferredEventTypes.push(message.events[i].type_);
-        }
-
-        if (that._requestsPendingCounter === 0) {
-          that._deferred.resolve(that._deferredEventTypes);
-          that._deferred = null;
-          that._deferredEventTypes = null;
-        }
-      }
+      that._processResponse(message);
     }
   });
+};
+
+scout.Session.prototype._processResponse = function(message) {
+  this._requestsPendingCounter--;
+
+  if (message.errorMessage) {
+    this.$entryPoint.html('');
+    this.$entryPoint.text(message.errorMessage);
+    return;
+  }
+
+  this.processingEvents = true;
+  try {
+    this._processEvents(message.events);
+  } finally {
+    this.processingEvents = false;
+  }
+
+  if (this._deferred) {
+    for (var i = 0; i < message.events.length; i++) {
+      this._deferredEventTypes.push(message.events[i].type_);
+    }
+
+    if (this._requestsPendingCounter === 0) {
+      this._deferred.resolve(this._deferredEventTypes);
+      this._deferred = null;
+      this._deferredEventTypes = null;
+    }
+  }
 };
 
 scout.Session.prototype.listen = function() {

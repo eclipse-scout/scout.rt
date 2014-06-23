@@ -77,5 +77,25 @@ describe("DesktopTree", function() {
     });
   });
 
+  describe("_setNodeSelected", function() {
+    it("does not send events if called when processing response", function() {
+      var model = createModel();
+      model.nodes = [createModelNode(1)];
+      var desktopTree = createDesktopTree(model);
+      desktopTree.render(session.$entryPoint);
+
+      var message = {
+        events: [{
+          id: model.id,
+          nodeIds: [model.nodes[0].id],
+          type_: 'nodesSelected'
+        }]
+      };
+      session._processResponse(message);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+  });
 
 });

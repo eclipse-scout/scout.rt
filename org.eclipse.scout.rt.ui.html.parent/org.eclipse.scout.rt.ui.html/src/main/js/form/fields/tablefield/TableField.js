@@ -36,6 +36,6 @@ scout.TableField.prototype.onModelPropertyChange = function(event) {
     if (this.table) {
       this.table.remove();
     }
-    this._setTable(event.table);
+    scout.TableField.parent.prototype.onModelPropertyChange.call(this);
   }
 };

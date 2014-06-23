@@ -26,7 +26,10 @@ function sendQueuedAjaxCalls(response) {
     };
   }
 
-  jasmine.Ajax.requests.mostRecent().response(response);
+  var request = jasmine.Ajax.requests.mostRecent();
+  if (request) {
+    request.response(response);
+  }
 }
 
 var jasmineScoutMatchers = {

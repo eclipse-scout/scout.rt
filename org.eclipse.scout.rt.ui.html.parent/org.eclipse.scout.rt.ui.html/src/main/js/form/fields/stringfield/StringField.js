@@ -29,3 +29,12 @@ scout.StringField.prototype._setValue = function(value) {
   this._$inputText.attr('value', value);
 };
 
+//FIXME CGU move to FormField.js
+scout.StringField.prototype._setVisible = function(visible) {
+  if (visible) {
+    this.$container.show();
+  } else {
+    this.$container.hide();
+  }
+};
+
