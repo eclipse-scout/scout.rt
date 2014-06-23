@@ -22,7 +22,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
 
   public CompositeObject(Object... a) {
     if (a != null && a.length == 1 && a[0] instanceof Collection<?>) {
-      m_value = ((Collection) a[0]).toArray();
+      m_value = ((Collection<?>) a[0]).toArray();
     }
     else {
       m_value = a;
