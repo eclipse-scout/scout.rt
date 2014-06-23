@@ -41,7 +41,7 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.info("GET request started.");
+    LOG.info("GET request started: " + req.getRequestURI());
 
     //The servlet is registered at '/'. To make relative urls work we need to make sure the request url has a trailing '/'.
     //It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
@@ -60,16 +60,16 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
 
     }
     catch (Exception e) {
-      LOG.error("Exception while processing get request", e);
+      LOG.error("Exception while processing GET request: " + req.getRequestURI(), e);
     }
     finally {
-      LOG.info("GET request finished.");
+      LOG.info("GET request finished: " + req.getRequestURI());
     }
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.info("POST request started.");
+    LOG.info("POST request started: " + req.getRequestURI());
     try {
       for (IServletRequestInterceptor service : SERVICES.getServices(IServletRequestInterceptor.class)) {
         if (service.interceptPost(this, req, resp)) {
@@ -78,10 +78,10 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
       }
     }
     catch (Exception e) {
-      LOG.error("Exception while processing post request", e);
+      LOG.error("Exception while processing POST request: " + req.getRequestURI(), e);
     }
     finally {
-      LOG.info("POST request finished.");
+      LOG.info("POST request finished: " + req.getRequestURI());
     }
   }
 
