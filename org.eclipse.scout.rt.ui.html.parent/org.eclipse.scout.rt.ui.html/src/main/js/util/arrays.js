@@ -49,6 +49,6 @@ scout.arrays = {
       arr2Length = arr2.length;
     }
     return arrLength > arr2Length;
-  },
+  }
 
 };

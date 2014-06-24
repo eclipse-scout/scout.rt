@@ -6,6 +6,7 @@ scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
 scout.AnalysisTableControl.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('', 'analysis-container'); //FIXME CGU maybe not necessary
+  $.log(this);
 
   var $commandContainer = this.$container.appendDiv('', 'command-container');
 
@@ -72,9 +73,8 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     // draw datamodel
     $.log(this.dataModel);
 
-
-
     addNodes(this.dataModel, 0);
+    scrollbar.initThumb();
 
     function addNodes (model, level) {
       if (model) {
@@ -82,17 +82,16 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
         for (var i = 0; i < model.attributes.length; i++) {
           var d = model.attributes[i];
-          $criteriaScroll.appendDiv(d.id, 'criteria-item', d.text).data('type', d.type).css('padding-left', (level + 1) * 30);
-          scrollbar.initThumb();
+          //$criteriaScroll.appendDiv(d.id, 'criteria-item', d.text).data('type', d.type).css('padding-left', (level + 1) * 30);
         }
 
-        if (model.manyToOne) {
-          for (var j = 0; j < model.manyToOne.length; k++) {
+        if (model.manyToOne && level < 6) {
+          for (var j = 0; j < model.manyToOne.length; j++) {
             addNodes(model.manyToOne[j], level + 1);
           }
         }
 
-        if (model.oneToMany) {
+        if (model.oneToMany && level < 6) {
           for (var k = 0; k < model.oneToMany.length; k++) {
             addNodes(model.oneToMany[k], level + 1);
           }

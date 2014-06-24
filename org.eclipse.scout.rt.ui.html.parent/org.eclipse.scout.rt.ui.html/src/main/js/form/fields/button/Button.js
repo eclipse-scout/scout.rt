@@ -9,7 +9,7 @@ scout.Button.SYSTEM_TYPE = {
   NONE : 0,
   CANCEL : 1,
   CLOSE : 2,
-  OK : 3,
+  OK : 3
 };
 
 scout.Button.prototype._render = function($parent) {
