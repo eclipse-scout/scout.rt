@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Event;
 /**
  * This class is responsible for handling the focus lost, pop-up and traverse events occuring in
  * {@link RwtScoutTableCellEditor}.
- * 
+ *
  * @since 3.10.0-M5
  */
 public class RwtScoutTableCellEditorEventHandler {
@@ -251,9 +251,11 @@ public class RwtScoutTableCellEditorEventHandler {
 
     private void notifyFocusLostOnLastFocusControl() {
       Control focusControl = m_focusLostListener.getFocusControl();
-      Event focusEvent = new Event();
-      focusEvent.widget = focusControl;
-      focusControl.notifyListeners(SWT.FocusOut, focusEvent);
+      if (!focusControl.isDisposed()) {
+        Event focusEvent = new Event();
+        focusEvent.widget = focusControl;
+        focusControl.notifyListeners(SWT.FocusOut, focusEvent);
+      }
     }
 
     private void handleTraverseTabKey() {
