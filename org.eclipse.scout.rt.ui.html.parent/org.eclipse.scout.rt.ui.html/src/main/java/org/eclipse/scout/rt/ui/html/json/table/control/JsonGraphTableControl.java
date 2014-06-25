@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.table.control;
 import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -39,7 +38,7 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
       "                           {\"source\": 6, \"target\": 8, \"label\": \"Mitarbeiter\"}," +
       "                           {\"source\": 7, \"target\": 8, \"label\": \"Mitarbeiter\"}]}";
 
-  public JsonGraphTableControl(ITableControl model, IJsonSession jsonSession, String id) {
+  public JsonGraphTableControl(IGraphTableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

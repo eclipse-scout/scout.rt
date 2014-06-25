@@ -1,5 +1,7 @@
 scout.AnalysisTableControl = function() {
   scout.AnalysisTableControl.parent.call(this);
+
+  this._addAdapterProperties('dataModel');
 };
 
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
@@ -54,6 +56,9 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
   // open
   this.addCriteria = addCriteria;
+  if (this.rootEntity) {
+    this.addCriteria();
+  }
 
   function addCriteria() {
     // reset count
@@ -71,12 +76,13 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     }
 
     // draw datamodel
-    $.log(this.dataModel);
+    $.log(this.rootEntity);
 
-    addNodes(this.dataModel, 0);
+    addNodes(this.rootEntity, 0);
     scrollbar.initThumb();
 
     function addNodes (model, level) {
+      var subEntity;
       if (model) {
         $criteriaScroll.appendDiv(model.id, 'criteria-node', model.text).css('padding-left', level * 30);
 
@@ -85,15 +91,17 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
           //$criteriaScroll.appendDiv(d.id, 'criteria-item', d.text).data('type', d.type).css('padding-left', (level + 1) * 30);
         }
 
-        if (model.manyToOne && level < 6) {
-          for (var j = 0; j < model.manyToOne.length; j++) {
-            addNodes(model.manyToOne[j], level + 1);
+        for (var j = 0; j < model.entities.length; j++) {
+          subEntity = model.entities[j];
+          if (subEntity.manyToOne && level < 3) {
+            addNodes(subEntity, level + 1);
           }
         }
 
-        if (model.oneToMany && level < 6) {
-          for (var k = 0; k < model.oneToMany.length; k++) {
-            addNodes(model.oneToMany[k], level + 1);
+        for (var k = 0; k < model.entities.length; k++) {
+          subEntity = model.entities[k];
+          if (subEntity.oneToMany && level < 3) {
+            addNodes(subEntity, level + 1);
           }
         }
       }
@@ -570,6 +578,13 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 };
 
 scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
-  this.dataModel = dataModel;
-  this.addCriteria();
+  // FIXME CGU How to handle data model updates
+};
+
+scout.AnalysisTableControl.prototype._setRootEntityRef = function(rootEntityRef) {
+  this.rootEntity = this.dataModel[rootEntityRef];
+
+  if (this.isRendered()) {
+    this.addCriteria();
+  }
 };

@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
@@ -146,6 +147,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof IClientSession) {
       return new JsonClientSession((IClientSession) model, session, id);
+    }
+    else if (model instanceof IDataModel) {
+      return new JsonDataModel((IDataModel) model, session, id);
     }
     else if (model instanceof IBreadCrumbsNavigation) {
       return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id);

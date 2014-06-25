@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
+import org.eclipse.scout.rt.shared.data.model.IDataModel;
+
 public class AnalysisTableControl extends AbstractTableControl implements IAnalysisTableControl {
 
   public AnalysisTableControl() {
@@ -25,5 +27,14 @@ public class AnalysisTableControl extends AbstractTableControl implements IAnaly
     setLabel("Analyse");
     setCssClass("control-analysis");
     setGroup("Suche");
+  }
+
+  @Override
+  public IDataModel getDataModel() {
+    return (IDataModel) propertySupport.getProperty(PROP_DATA_MODEL);
+  }
+
+  public void setDataModel(IDataModel dataModel) {
+    propertySupport.setProperty(PROP_DATA_MODEL, dataModel);
   }
 }

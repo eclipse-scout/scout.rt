@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
-public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserver<ITableControl> {
+public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserver<T> {
 
-  public JsonTableControl(ITableControl model, IJsonSession jsonSession, String id) {
+  public JsonTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
 
     putJsonProperty(new JsonProperty<ITableControl, String>(ITableControl.PROP_LABEL, model) {

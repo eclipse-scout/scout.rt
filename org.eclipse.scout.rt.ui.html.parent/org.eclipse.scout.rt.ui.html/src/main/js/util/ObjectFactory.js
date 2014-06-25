@@ -79,6 +79,11 @@ scout.defaultObjectFactories = [{
     return new scout.ToolButton();
   }
 }, {
+  objectType: 'DataModel',
+  create: function() {
+    return new scout.DataModel();
+  }
+},{
   objectType: 'ChartTableControl',
   create: function() {
     return new scout.ChartTableControl();
