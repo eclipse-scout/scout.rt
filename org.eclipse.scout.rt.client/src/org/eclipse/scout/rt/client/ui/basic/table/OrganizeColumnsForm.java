@@ -317,7 +317,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execDrop(ITableRow row, TransferObject transfer) throws ProcessingException {
-            if (transfer != null && transfer instanceof JavaTransferObject) {
+            if (row != null && transfer != null && transfer instanceof JavaTransferObject) {
               List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
               if (CollectionUtility.hasElements(draggedRows)) {
                 ITableRow draggedRow = CollectionUtility.firstElement(draggedRows);
