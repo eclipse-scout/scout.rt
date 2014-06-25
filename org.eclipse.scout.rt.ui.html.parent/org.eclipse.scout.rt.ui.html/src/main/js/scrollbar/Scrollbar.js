@@ -26,8 +26,9 @@ scout.Scrollbar = function($parent, axis) {
 
   function scrollWheel(event) {
     event = event.originalEvent || window.event.originalEvent;
-    var w = event.wheelDelta ? -event.wheelDelta / 8 : event.detail * 15;
-    that._setThumb(w);
+    var w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60,
+      d = that._scroll / that._offset;
+    that._setThumb(w / d);
     return false;
   }
 
