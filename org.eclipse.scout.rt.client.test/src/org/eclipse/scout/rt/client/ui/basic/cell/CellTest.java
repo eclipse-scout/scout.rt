@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.easymock.EasyMock;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -24,12 +23,10 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * JUnit tests for {@link Cell}
- */
-/**
- *
  */
 public class CellTest {
 
@@ -57,8 +54,7 @@ public class CellTest {
     String bgColor = "eeeeee";
     String fgColor = "ff0000";
     FontSpec font = FontSpec.parse("Arial-bold-italic-16");
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
 
     Cell c = new Cell();
     c.setValue(value);
@@ -83,13 +79,12 @@ public class CellTest {
     assertEquals(font.toPattern(), c.getFont().toPattern());
     assertTrue(c.isEnabled());
     assertSame(observer, c.getObserver());
-    EasyMock.verify(observer);
+    Mockito.verifyZeroInteractions(observer);
   }
 
   @Test
   public void testConstructor_cellObserver() {
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
 
     Cell c = new Cell(observer);
     assertNull(c.getValue());
@@ -102,7 +97,7 @@ public class CellTest {
     assertNull(c.getFont());
     assertTrue(c.isEnabled());
     assertSame(observer, c.getObserver());
-    EasyMock.verify(observer);
+    Mockito.verifyZeroInteractions(observer);
   }
 
   @Test
@@ -110,16 +105,15 @@ public class CellTest {
     Cell c = new Cell();
     Object value = new Object();
 
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    observer.cellChanged(c, ICell.VALUE_BIT);
-    EasyMock.expectLastCall();
-    EasyMock.expect(observer.validateValue(c, value)).andReturn(value);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
+    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
+
     c.setObserver(observer);
 
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
+    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
   }
 
   @Test
@@ -127,11 +121,9 @@ public class CellTest {
     Cell c = new Cell();
     Object value = new Object();
 
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    observer.cellChanged(c, ICell.VALUE_BIT);
-    EasyMock.expectLastCall();
-    EasyMock.expect(observer.validateValue(c, value)).andReturn(value).times(2);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
+    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
+
     c.setObserver(observer);
 
     boolean changed = c.setValue(value);
@@ -140,39 +132,39 @@ public class CellTest {
     changed = c.setValue(value);
     assertFalse(changed);
     assertSame(value, c.getValue());
-    EasyMock.verify(observer);
+
+    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
+    Mockito.verify(observer, Mockito.times(2)).validateValue(c, value);
   }
 
   @Test
   public void testSetValue_validateValidValue() throws Exception {
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);
     Object value = new Object();
 
-    observer.cellChanged(c, ICell.VALUE_BIT);
-    EasyMock.expectLastCall();
-    EasyMock.expect(observer.validateValue(c, value)).andReturn(value);
-    EasyMock.replay(observer);
+    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
 
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
-    EasyMock.verify(observer);
+
+    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
+    Mockito.verify(observer).validateValue(c, value);
   }
 
   @Test(expected = ProcessingException.class)
   public void testSetValue_validateInalidValue() throws Exception {
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);
     Object value = new Object();
 
-    EasyMock.expect(observer.validateValue(c, value)).andThrow(new ProcessingException());
-    EasyMock.replay(observer);
+    Mockito.when(observer.validateValue(c, value)).thenThrow(new ProcessingException());
 
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
-    EasyMock.verify(observer);
+    Mockito.verifyZeroInteractions(observer);
   }
 
   @Test
@@ -182,7 +174,7 @@ public class CellTest {
     String text = "text";
     c.setText(text);
     assertEquals(text, c.getText());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.TEXT_BIT);
   }
 
   @Test
@@ -192,7 +184,7 @@ public class CellTest {
     String iconId = "iconId";
     c.setIconId(iconId);
     assertEquals(iconId, c.getIconId());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.ICON_ID_BIT);
   }
 
   @Test
@@ -202,18 +194,17 @@ public class CellTest {
     String tooltip = "tooltip";
     c.setTooltipText(tooltip);
     assertEquals(tooltip, c.getTooltipText());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.TOOLTIP_BIT);
   }
 
   @Test
   public void testSetTooltipText_null() {
     Cell c = new Cell();
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     c.setTooltipText(null);
     assertNull(c.getTooltipText());
-    EasyMock.verify(observer);
+    Mockito.verifyZeroInteractions(observer);
   }
 
   @Test
@@ -223,7 +214,7 @@ public class CellTest {
     int hAlignment = 100;
     c.setHorizontalAlignment(hAlignment);
     assertEquals(hAlignment, c.getHorizontalAlignment());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.H_ALIGN_BIT);
   }
 
   @Test
@@ -233,7 +224,7 @@ public class CellTest {
     String bgColor = "eeeeee";
     c.setBackgroundColor(bgColor);
     assertEquals(bgColor, c.getBackgroundColor());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.BG_COLOR_BIT);
   }
 
   @Test
@@ -243,7 +234,7 @@ public class CellTest {
     String fgColor = "ff0000";
     c.setForegroundColor(fgColor);
     assertEquals(fgColor, c.getForegroundColor());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.FG_COLOR_BIT);
   }
 
   @Test
@@ -253,16 +244,13 @@ public class CellTest {
     FontSpec font = FontSpec.parse("Arial-bold-italic-13");
     c.setFont(font);
     assertEquals(font.toPattern(), c.getFont().toPattern());
-    EasyMock.verify(observer);
+    Mockito.verify(observer).cellChanged(c, ICell.FONT_BIT);
   }
 
   @Test
   public void testSetEnabled() {
     Cell c = new Cell();
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    observer.cellChanged(c, ICell.ENABLED_BIT);
-    EasyMock.expectLastCall().times(2);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     c.setEnabled(true);
     assertTrue(c.isEnabled());
@@ -270,24 +258,20 @@ public class CellTest {
     assertFalse(c.isEnabled());
     c.setEnabled(true);
     assertTrue(c.isEnabled());
-    EasyMock.verify(observer);
+    Mockito.verify(observer, Mockito.times(2)).cellChanged(c, ICell.ENABLED_BIT);
   }
 
   @Test
   public void testSetObserver() {
     Cell c = new Cell();
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     assertSame(observer, c.getObserver());
-    EasyMock.verify(observer);
+    Mockito.verifyZeroInteractions(observer);
   }
 
   private ICellObserver installMockObserver(Cell c, int changedBit) {
-    ICellObserver observer = EasyMock.createMock(ICellObserver.class);
-    observer.cellChanged(c, changedBit);
-    EasyMock.expectLastCall();
-    EasyMock.replay(observer);
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     return observer;
   }
