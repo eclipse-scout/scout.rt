@@ -486,6 +486,9 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     else if (name.equals(IForm.PROP_MAXIMIZED)) {
       setMaximizedFromScout(((Boolean) newValue).booleanValue());
     }
+    else if (name.equals(IForm.PROP_SAVE_NEEDED)) {
+      firePropertyChange(PROP_DIRTY);
+    }
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {

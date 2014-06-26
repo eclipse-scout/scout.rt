@@ -15,11 +15,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
-import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
-import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
+import org.eclipse.scout.rt.ui.swt.test.SwtTestingUtility;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Widget;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,20 +60,11 @@ public class SWTScoutLabelFieldUiTest {
   class TestSwtScoutLabelField extends SwtScoutLabelField {
 
     public void setScoutObjectAndSwtEnvironment() {
-      super.setScoutObjectAndSwtEnvironment(createTestScoutField(), createTestSwtEnvironment());
+      super.setScoutObjectAndSwtEnvironment(createTestScoutField(), SwtTestingUtility.createTestSwtEnvironment());
     }
 
     private AbstractLabelField createTestScoutField() {
       return new AbstractLabelField() {
-      };
-    }
-
-    private AbstractSwtEnvironment createTestSwtEnvironment() {
-      return new AbstractSwtEnvironment(null, null, null) {
-        @Override
-        public void addKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter) {
-          //ignore key strokes in test
-        }
       };
     }
   }
