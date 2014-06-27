@@ -86,11 +86,6 @@ scout.Form.prototype.disable = function() {
     css('left', this.$container.position().left);
 };
 
-scout.Form.prototype.destroy = function() {
-  scout.Form.parent.prototype.destroy.call(this);
-  this.remove();
-};
-
 scout.Form.prototype.onModelCreate = function() {};
 
 scout.Form.prototype.onModelAction = function(event) {
@@ -99,9 +94,4 @@ scout.Form.prototype.onModelAction = function(event) {
   } else {
     $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
   }
-};
-
-scout.Form.prototype.dispose = function() {
-  scout.Form.parent.prototype.dispose.call(this);
-  this.rootGroupBox.dispose();
 };

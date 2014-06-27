@@ -44,17 +44,6 @@ scout.DesktopTree.prototype._render = function($parent) {
   }
 };
 
-/**
- * @override
- */
-scout.DesktopTree.prototype.remove = function() {
-  scout.DesktopTree.parent.prototype.remove.call(this);
-
-  if (this._table) {
-    this._table.remove();
-  }
-};
-
 scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
   var $node = this._findNodeById(nodeId);
   this._setNodeExpanded($node, expanded);

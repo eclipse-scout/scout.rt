@@ -13,13 +13,9 @@ scout.Button.SYSTEM_TYPE = {
 };
 
 scout.Button.prototype._render = function($parent) {
-  var label = '';
   this.$container = $parent;
   this.$container.attr('id', 'Button-' + this.id);
-  if (this.label) {
-    label = this.label.replace('&', '');
-  }
-  this._$button = $('<button>' + label + '</button>');
+  this._$button = $('<button>');
   this._$button.appendTo(this.$container);
   this._$button.on('click', function() {
     this.session.send('click', this.id);
@@ -42,3 +38,12 @@ scout.Button.prototype._setVisible = function(visible) {
   }
 };
 
+scout.Button.prototype._setLabel = function(label) {
+  if (!label) {
+    label = '';
+  }
+  else {
+    label = label.replace('&', '');
+  }
+  this._$button.text(label);
+};

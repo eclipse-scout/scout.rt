@@ -218,7 +218,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
   }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px">';
   for (var c = 0; c < row.cells.length; c++) {
-    var column = table.columns[c],
+    var column = this.columns[c],
       width = column.width,
       style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
       allign = (column.type == 'number') ? 'text-align: right; ' : '',
@@ -397,7 +397,6 @@ scout.Table.prototype.getText = function(col, row) {
 
 scout.Table.prototype._group = function() {
   var that = this,
-    table = this.model,
     all,
     groupIndex,
     $group = $('.group-sort', this.$container);
@@ -428,7 +427,7 @@ scout.Table.prototype._group = function() {
       var index = $cols.eq(c).data('index'),
         value = this.getValue(index, row);
 
-      if (table.columns[index].type == 'number') {
+      if (this.columns[index].type == 'number') {
         sum[c] = (sum[c] || 0) + value;
       }
     }
@@ -544,11 +543,10 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
 scout.Table.prototype.insertRows = function(rows) {
   //always insert new rows at the end
-  var table = this;  // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
-  if (table.rows) {
-    table.rows.push.apply(table.rows, rows);
+  if (this.rows) {
+    this.rows.push.apply(this.rows, rows);
   } else {
-    table.rows = rows;
+    this.rows = rows;
   }
   if (this.$container) {
     this.drawData();

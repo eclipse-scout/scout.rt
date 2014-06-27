@@ -24,12 +24,6 @@ scout.TableField.prototype._setTable = function(table) {
   }
 };
 
-scout.TableField.prototype.dispose = function() {
-  if (this.table) {
-    this.table.dispose();
-  }
-};
-
 scout.TableField.prototype.onModelPropertyChange = function(event) {
   if (event.table !== undefined) {
     //FIXME CGU verify with AWE: dieses verhalten müsste vom neuen konzept noch berücksichtigt werden

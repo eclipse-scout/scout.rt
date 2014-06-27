@@ -28,6 +28,7 @@ scout.FormField.prototype._callSetters = function() {
   this._setVisible(this.visible);
   this._setErrorStatus(this.errorStatus);
   this._setLabel(this.label);
+  this._setLabelVisible(this.labelVisible);
 };
 
 
@@ -53,8 +54,25 @@ scout.FormField.prototype._setVisible = function(visible) {
 };
 
 scout.FormField.prototype._setLabel = function(label) {
+  if(!label) {
+    label = '';
+  }
+
   if (this.$label) {
     this.$label.html(label);
+  }
+};
+
+scout.FormField.prototype._setLabelVisible = function(visible) {
+  if (!this.$label) {
+    return;
+  }
+
+  if (visible) {
+    this.$label.show();
+  }
+  else {
+    this.$label.hide();
   }
 };
 

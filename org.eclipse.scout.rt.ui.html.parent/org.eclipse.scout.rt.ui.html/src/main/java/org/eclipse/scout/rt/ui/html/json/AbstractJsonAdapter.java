@@ -89,8 +89,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected JSONObject newJsonObjectForModel(String propertyName, Object model) {
-    return JsonObjectUtility.newJsonObjectForModel(getJsonSession(), propertyName, model);
+  protected JSONObject modelToJson(String propertyName, Object model) {
+    return JsonObjectUtility.modelToJson(getJsonSession(), propertyName, model);
   }
 
   protected final JSONObject modelToJson(Object model) {

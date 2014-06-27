@@ -170,22 +170,27 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     if (isFormBased()) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), newJsonObjectForModel(PROP_OUTLINE, outline));
+    getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), modelToJson(PROP_OUTLINE, outline));
   }
 
   protected void handleModelFormAdded(IForm form) {
     if (isFormBlocked(form)) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), newJsonObjectForModel(PROP_FORM, form));
+    getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), modelToJson(PROP_FORM, form));
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), newJsonObjectForModel(PROP_FORM, form));
+    if (getJsonSession().getJsonAdapter(form) == null) {
+//    JsonForm gets disposed on form close so we do not want the create a new JsonForm if the form is closed before getting removed from the desktop
+      return;
+    }
+
+    getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), modelToJson(PROP_FORM, form));
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
-    getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), newJsonObjectForModel(PROP_FORM, form));
+    getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), modelToJson(PROP_FORM, form));
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {

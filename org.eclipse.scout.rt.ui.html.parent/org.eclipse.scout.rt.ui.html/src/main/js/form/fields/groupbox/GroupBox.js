@@ -73,14 +73,3 @@ scout.GroupBox.prototype._isSystemButton = function(formField) {
 scout.GroupBox.prototype._setBorderVisible = function(borderVisible) {
   // NOP
 };
-
-scout.GroupBox.prototype.dispose = function() {
-  scout.GroupBox.parent.prototype.dispose.call(this);
-  var i, formField;
-  for (i = 0; i < this.formFields.length; i++) {
-    formField = this.session.getModelAdapter(this.formFields[i].id);
-    if (formField) {
-      formField.dispose();
-    }
-  }
-};

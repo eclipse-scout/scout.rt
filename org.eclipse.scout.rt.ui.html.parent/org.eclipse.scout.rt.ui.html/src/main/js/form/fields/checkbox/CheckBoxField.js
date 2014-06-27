@@ -8,6 +8,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container.attr('id', 'CheckBoxField-' + this.id);
 
+  //FIXME checkbox should be on the left of the label like the other ui's. resp. should consider label position property
   this.$label = $('<label>' + this.label + '</label>');
   this.$container.append(this.$label);
 
@@ -45,3 +46,6 @@ scout.CheckBoxField.prototype._setValue = function(value) {
   }
 };
 
+scout.CheckBoxField.prototype._setLabelVisible = function(visible) {
+  //FIXME label visible logic in scout for checkboxes is strange. LabelVisible removes not the label but instead the empty space before the checkbox
+};

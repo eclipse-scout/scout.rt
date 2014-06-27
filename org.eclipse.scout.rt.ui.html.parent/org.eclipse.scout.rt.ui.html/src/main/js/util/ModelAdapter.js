@@ -71,8 +71,15 @@ scout.ModelAdapter.prototype._callSetters = function() {
   // NOP
 };
 
-scout.ModelAdapter.prototype.remove = function() {
+scout.ModelAdapter.prototype.remove = function(lazy) {
+  var i, child;
+
   if (this.isRendered()) {
+    for (i = 0; i < this.children.length; i++) {
+      child = this.children[i];
+      child.remove();
+    }
+
     this.$container.remove();
     this.$container = null;
   }
@@ -84,11 +91,22 @@ scout.ModelAdapter.prototype.dispose = function() {
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
-  this.session.unregisterModelAdapter(this);
+  this.remove();
+
+  //Disconnect from parent
+  if (this.parent) {
+    this.parent.removeChild(this);
+  }
+
+  this.session.unregisterModelAdapter(this); //FIXME CGU unregister children?
 };
 
 scout.ModelAdapter.prototype.addChild = function(childAdapter) {
-  this.children.push(childAdapter); // FIXME CGU when to remove child?
+  this.children.push(childAdapter);
+};
+
+scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
+  scout.arrays.remove(this.children, childAdapter);
 };
 
 scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, parent) {

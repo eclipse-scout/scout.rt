@@ -36,6 +36,8 @@ Datenübertragung
   -> [09.05.2014, awe, cgu]: Wir schicken einen Empty-String, auf dem Client kann dann mittels !value darauf geprüft werden.
 - Wenn das GUI mit einem Wert kommt (z.B. selected=true bei CheckBox), dann muss der Server nicht mit selected=true darauf antworten.
   -> Der Property-Change Event vom Modell muss ignoriert werden -> PropertyChangeFilter bzw. Table oder TreeEventFilter
+- Wenn ein neues Objekt an den Client geschickt werden soll und an diesem Objekt während dem Server-Cycle noch Änderungen vorgenommen werden, dann sind eigentlich die ersten Informationen obsolet. Wie wollen wir damit umgehen?
+  Beispiel: Form wird dem Desktop hinzugefügt bewirkt ein toJson. Danach werden die Felder verändert.
 
 Naming
 - Events und Properties sollten wie im Modell benannt werden. Z.B: beim Menu: "text" statt "label", weil es IMenu.getText(); heisst

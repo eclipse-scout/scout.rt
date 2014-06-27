@@ -117,8 +117,10 @@ public final class JsonObjectUtility {
   }
 
   /**
-   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> and returns <code>toJson()</code>. //FIXME CGU adjust
-   * javadoc
+   * If there already is a {@link IJsonAdapter} for the given model, a json object containing the id of the adapter is
+   * returned.<br>
+   * If there is none, a new json adapter is created and its json representation returned (using
+   * {@link IJsonAdapter#toJson()}).
    */
   public static final JSONObject modelToJson(IJsonSession session, Object model) {
     if (model == null) {
@@ -140,7 +142,7 @@ public final class JsonObjectUtility {
   /**
    * Creates a new json object and puts the model into it.
    */
-  public static JSONObject newJsonObjectForModel(IJsonSession session, String propertyName, Object model) {
+  public static JSONObject modelToJson(IJsonSession session, String propertyName, Object model) {
     return putProperty(new JSONObject(), propertyName, modelToJson(session, model));
   }
 
