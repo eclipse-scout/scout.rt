@@ -226,7 +226,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
   for (var c = 0; c < row.cells.length; c++) {
     var column = this.columns[c],
       width = column.width,
-      style = (width === 0) ? 'display: none; ' : 'width: ' + width + 'px; ',
+      style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ',
       allign = (column.type == 'number') ? 'text-align: right; ' : '',
       value = this.getText(c, index);
 

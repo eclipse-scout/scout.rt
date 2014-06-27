@@ -11,7 +11,8 @@ scout.TableHeader = function(table, $tableHeader, session) {
   for (var i = 0; i < columns.length; i++) {
     var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('index', i)
-      .css('width', columns[i].width - 17)
+      .css('min-width', columns[i].width - 17 + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
+      .css('max-width', columns[i].width - 17 + 'px')
       .on('click', '', clickHeader)
       .on('mousedown', '', dragHeader);
 
@@ -69,10 +70,12 @@ scout.TableHeader = function(table, $tableHeader, session) {
       var diff = event.pageX - startX;
 
       if (headerWidth + diff > 80) {
-        $header.css('width', headerWidth + diff);
-        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('width', headerWidth + 17 + diff);
-        $('.table-row, .table-row-sum').width(totalWidth + diff);
-
+        var wHeader = headerWidth + diff + 'px';
+        var wCell = headerWidth + 17 + diff + 'px'; // 17 is width of header-resize handle, see table.css (.header-resize)
+        var wSummary = totalWidth + diff + 'px';
+        $header.css('min-width', wHeader).css('max-width', wHeader);
+        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wCell).css('max-width', wCell);
+        $('.table-row, .table-row-sum').css('min-width', wSummary).css('max-width', wSummary);
       }
     }
 

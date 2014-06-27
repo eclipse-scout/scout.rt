@@ -12,7 +12,7 @@ cursor: pointer;
 padding-top: 0px;
 padding-bottom: 0px;
 padding-left: 28px;
-border: 2px solid #fff;
+border: 2px solid transparent;
 transition: height 0.2s;
 transition: padding 0.2s;}
 
@@ -51,7 +51,7 @@ border: 2px solid #0082a1;
 border-radius: 7px;
 }
 
-.tree-item.expanded > .tree-item-control:hover:before, 
+.tree-item.expanded > .tree-item-control:hover:before,
 .tree-item.selected > .tree-item-control:hover:before{
 color:#FE9915 !important;
 }

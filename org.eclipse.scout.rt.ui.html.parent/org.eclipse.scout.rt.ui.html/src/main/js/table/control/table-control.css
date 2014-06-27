@@ -90,9 +90,9 @@ width: 100%;
 left: 0px;
 height: 21px;
 background-color: #CCC;
-border-top: 10px solid #FFF;
-border-bottom: 10px solid #FFF;
-border-right: 10px solid #FFF;
+padding-top: 10px;
+padding-bottom: 10px;
+background-clip: content-box;
 }
 
 .resize-on #ControlResizeTop, .resize-on #ControlResizeBottom{

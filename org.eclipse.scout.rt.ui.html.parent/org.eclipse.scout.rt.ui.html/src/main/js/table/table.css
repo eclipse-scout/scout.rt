@@ -12,9 +12,8 @@ padding-top: 12px;
 .table-header {
 position: relative;
 border-bottom: 1px solid #EEE;
-border-left: 2px solid #FFF;
 white-space: nowrap;
-padding: 0px 0px 0px 10px;
+padding: 0px 0px 0px 12px; /* 12px = (4px left-pad .table-data) + (2px left-pad .table-row) + 6px left-pad table cells) */
 }
 
 
@@ -48,9 +47,10 @@ top: 0px;
 cursor: col-resize;
 height: 25px;
 width: 17px;
-background-color: #FFF;
-border-left: 8px solid #FFF;
-border-right: 8px solid #FFF;
+background-color: transparent;
+padding-left: 8px;
+padding-right: 8px;
+background-clip: content-box;
 }
 
 .header-item:hover + .header-resize, .header-resize:hover {
@@ -58,7 +58,7 @@ background-color: #EEE;
 }
 
 .header-item.header-move + .header-resize{
-background-color: #FFF ! important;
+background-color: transparent;
 }
 
 
@@ -108,26 +108,26 @@ height: 100%;
 width: calc(100% - 11px);
 }
 
+/* table rows */
 
 .table-row, .table-row-sum {
 position:relative;
 overflow: hidden;
-border-right: 2px solid #FFF;
-border-left: 2px solid #FFF;
 line-height: 26px;
-padding: 2px 0px 2px 0px;
+padding: 2px;
 margin-bottom: -2px;
 }
 
 .table-row > div, .table-row-sum > div {
-display: inline-block;
+display: table-cell;
 padding: 3px 6px 0px 6px;
-background-color: #FFF;
+background-color: transparent;
 white-space: nowrap;
 border-bottom: 1px solid #EEE;
 overflow: hidden;
 text-overflow: ellipsis;
 vertical-align: top;
+line-height: 26px;
 }
 
 .table-row-sum > div {
@@ -138,8 +138,12 @@ font-weight: bold;
 border-bottom: none;
 }
 
+/* Selected rows: Replace 2px padding by 2px border(s) */
+
 .table-row.select-top {
-padding: 0px 0px 2px 0px !important;
+padding-top: 0px;
+padding-left: 0px;
+padding-right: 0px;
 border-top: 2px solid #0082a1;
 border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
@@ -148,12 +152,16 @@ border-top-right-radius: 7px;
 }
 
 .table-row.select-middle {
+padding-left: 0px;
+padding-right: 0px;
 border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
 }
 
 .table-row.select-bottom {
-padding: 2px 0px 0px 0px !important;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 0px;
 border-bottom: 2px solid #0082a1;
 border-left: 2px solid #0082a1;
 border-right: 2px solid #0082a1;
@@ -162,7 +170,10 @@ border-bottom-right-radius: 7px;
 }
 
 .table-row.select-single {
-padding: 0px 0px 0px 0px !important;
+padding-top: 0px;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 0px;
 border-top: 2px solid #0082a1;
 border-bottom: 2px solid #0082a1;
 border-left: 2px solid #0082a1;
@@ -170,13 +181,10 @@ border-right: 2px solid #0082a1;
 border-radius: 7px;
 }
 
-.table-row.row-selected > div{
-border-bottom: 1px solid #EEE;
+.table-row.select-single > div, .table-row.select-bottom > div{
+border-bottom: 1px solid transparent;
 }
 
-.table-row.select-single > div, .table-row.select-bottom > div{
-border-bottom: 1px solid #FFF;
-}
 
 .table .key-box{
 right: 24px;

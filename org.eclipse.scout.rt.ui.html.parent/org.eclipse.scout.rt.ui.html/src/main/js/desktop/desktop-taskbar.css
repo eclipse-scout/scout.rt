@@ -5,7 +5,6 @@ z-index: 10;
 height: calc(100% - 100px);
 width: 100px;
 border-left: 1px solid #CCC;
-background-color: #FFF;
 overflow: hidden;
 }
 
@@ -40,7 +39,7 @@ color:#CCC;
 content: "\f00d" '\A';
 }
 
-//FIXME CGU this would be the real disabled state, not the modal dialog disable
+/* FIXME CGU this would be the real disabled state, not the modal dialog disable */
 .tool-item.disabled:hover, .tool-item.disabled:before{
 cursor: default;
 }
@@ -55,7 +54,7 @@ top: 8px;
 width: 22px;
 }
 
-//FIXME CGU this would be the real disabled state, not the modal dialog disable
+/* FIXME CGU this would be the real disabled state, not the modal dialog disable */
 .tool-item.disabled .key-box{
 background-color:#CCC;
 }
