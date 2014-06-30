@@ -160,3 +160,26 @@ Styling / Farben
   Problem dabei: Die verwendeten Farben müssen zum aktuellen Scout-CSS passen.
   -> Das CRM darf keine fixen Farben verwenden, weil wenn das Projekt ein eigenes CSS hat diese Farben nicht mehr passen.
   Besser wäre es vermutlich, eine Farb-Palette zu definieren. Das CRM könnte dann Konstanten aus dieser Palette verwenden.
+
+
+Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
+Beispiel:
+<code>
+  ScoutTextField.js
+#package/namespace "Scout"
+#require ScoutFormField.js
+
+
+
+scout.js
+(function(scout, $, undefined) {
+  #include("Scout")
+}(window.scout = window.scout || {}, jQuery));
+
+
+gothaer.js
+#require scout.js
+(function(scout, $, undefined) {
+  #include("Gothaer")
+}(window.scout = window.scout || {}, jQuery));
+</code>
