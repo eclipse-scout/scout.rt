@@ -311,7 +311,7 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
   }
 
   protected boolean isDateChooserEnabled() {
-    return getSwingDateField() != null && getSwingDateField().isEnabled();
+    return getSwingDateField() != null && getSwingDateField().isEditable();
   }
 
   protected void handleSwingDateChooserAction() {

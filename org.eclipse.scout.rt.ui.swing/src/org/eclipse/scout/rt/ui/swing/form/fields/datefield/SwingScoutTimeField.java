@@ -323,7 +323,7 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
   }
 
   protected boolean isTimeChooserEnabled() {
-    return getSwingTimeField() != null && getSwingTimeField().isEnabled();
+    return getSwingTimeField() != null && getSwingTimeField().isEditable();
   }
 
   protected void handleSwingTimeChooserAction() {
