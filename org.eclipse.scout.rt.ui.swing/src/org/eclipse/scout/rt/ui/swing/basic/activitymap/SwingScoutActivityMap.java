@@ -24,7 +24,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.menu.ActivityMapMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapListener;
@@ -402,15 +405,16 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return;
     }
+
     //
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        @SuppressWarnings("unchecked")
-        List<IMenu> scoutMenus = getScoutActivityMap().getUIFacade().fireNewActivityPopupFromUI();
+        IContextMenu contextMenu = getScoutObject().getContextMenu();
+        IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(ActivityMapMenuType.Null);
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, filter, false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -426,10 +430,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        @SuppressWarnings("unchecked")
-        List<IMenu> scoutMenus = getScoutActivityMap().getUIFacade().fireEditActivityPopupFromUI();
+        IContextMenu contextMenu = getScoutObject().getContextMenu();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
+        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, contextMenu.getActiveFilter(), false).enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);

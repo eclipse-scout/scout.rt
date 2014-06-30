@@ -46,16 +46,6 @@ public class ActivityMapEvent extends java.util.EventObject {
    * firstActivity, lastActivity
    */
   public static final int TYPE_ALL_ACTIVITIES_DELETED = 105;
-  /**
-   * Broadcast request to add actions for activities popup valid properties:
-   * activities, firstActivity, lastActivity add actions to: popupActions
-   */
-  public static final int TYPE_EDIT_ACTIVITY_POPUP = 700;
-  /**
-   * Broadcast request to add actions for "new" popup valid properties: add
-   * actions to: popupActions
-   */
-  public static final int TYPE_NEW_ACTIVITY_POPUP = 701;
 
   private int m_type;
   private List<? extends ActivityCell> m_activities = CollectionUtility.emptyArrayList();

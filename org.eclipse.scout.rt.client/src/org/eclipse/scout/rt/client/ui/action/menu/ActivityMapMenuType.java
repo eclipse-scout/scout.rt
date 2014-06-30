@@ -8,24 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.activitymap;
+package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.Date;
-import java.util.List;
-
-public interface IActivityMapUIFacade<RI, AI> {
-
-  void setDaysFromUI(Date[] days);
-
-  void setSelectedActivityCellFromUI(ActivityCell<RI, AI> cell);
-
-  void setSelectionFromUI(List<? extends RI> resourceIds, double[] normalizedRange);
-
-  /**
-   * Action on a empty cell or activity cell
-   * 
-   * @param activityCell
-   *          may be null
-   */
-  void fireCellActionFromUI(RI resourceId, double[] normalizedRange, ActivityCell<RI, AI> activityCell);
+/**
+ * All possible menus types of a activity map menu. This menu types are used of
+ * {@link AbstractMenu#getConfiguredMenuTypes()} method.
+ */
+public enum ActivityMapMenuType implements IMenuType {
+  Null,
+  NotNull
 }
