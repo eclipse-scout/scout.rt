@@ -8,15 +8,6 @@ scout.ModelAdapter = function() {
 scout.ModelAdapter.prototype.init = function(model, session) {
   this.session = session;
 
-  //FIXME CGU default values?
-//  for(var i=0;i<this._adapterProperties.length; i++) {
-//    var adapterProperty = this._adapterProperties[i];
-//
-//    if(!model.hasOwnProperty(adapterProperty)) {
-//      model[adapterProperty] = undefined;
-//    }
-//  }
-
   // copy all properties from model to this adapter instance
   this._eachProperty(model, function(propertyName, value) {
     this[propertyName] = value;
@@ -24,7 +15,6 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
   this.session.registerModelAdapter(this);
 };
-
 
 // TODO AWE: underscore bei setter-func names entfernen
 
@@ -71,7 +61,7 @@ scout.ModelAdapter.prototype._callSetters = function() {
   // NOP
 };
 
-scout.ModelAdapter.prototype.remove = function(lazy) {
+scout.ModelAdapter.prototype.remove = function() {
   var i, child;
 
   if (this.isRendered()) {
@@ -87,7 +77,7 @@ scout.ModelAdapter.prototype.remove = function(lazy) {
 };
 
 scout.ModelAdapter.prototype.dispose = function() {
-  // NOP
+  // NOP implement to free resources
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
@@ -165,7 +155,35 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   this._eachProperty(event, function(propertyName, value) {
     var setterFuncName = '_set' + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
     console.debug('call ' + setterFuncName + '(' + value + ')');
-    this[setterFuncName](value);
-  }.bind(this), ignore);
-};  // TODO AWE: (form) jasmine-test this!
 
+    //If the property is an adapter, remove the existing adapter first
+    if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
+      this.onChildAdapterChange(propertyName);
+    }
+
+    this[setterFuncName](value);
+
+  }.bind(this), ignore);
+}; // TODO AWE: (form) jasmine-test this!
+
+/**
+ * Removes the existing adapter for the given propertyName.<br>
+ * To prevent it just implement the method _unsetPropertyName (e.g _unsetTable)
+ */
+scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName) {
+  var propertyValue = this[propertyName];
+  var unsetFuncName = '_unset' + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+  var i;
+
+  if (!this[unsetFuncName]) {
+    if (Array.isArray(propertyValue)) {
+      for (i = 0; i < propertyValue.length; i++) {
+        propertyValue[i].remove();
+      }
+    } else {
+      propertyValue.remove();
+    }
+  } else {
+    this[unsetFuncName]();
+  }
+};

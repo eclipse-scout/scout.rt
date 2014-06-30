@@ -135,6 +135,9 @@ scout.MapTableControl.prototype.dispose = function() {
 };
 
 scout.MapTableControl.prototype._setMap = function(map) {
-  // NOP
+  this.renderContent();
 };
 
+scout.MapTableControl.prototype.isContentAvailable = function() {
+  return this.map;
+};

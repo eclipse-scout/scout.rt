@@ -12,24 +12,11 @@ scout.TableField.prototype._render = function($parent) {
   if (this.label) {
     this.$label = this.$container.appendDiv(undefined, 'label');
   }
-  if (this.table) {
-    this.table.render(this.$container);
-  }
+  this._setTable(this.table);
 };
 
 scout.TableField.prototype._setTable = function(table) {
-  this.table = table;
   if (this.isRendered() && table) {
-    table.render(this.$container.parent());
-  }
-};
-
-scout.TableField.prototype.onModelPropertyChange = function(event) {
-  if (event.table !== undefined) {
-    //FIXME CGU verify with AWE: dieses verhalten müsste vom neuen konzept noch berücksichtigt werden
-    if (this.table) {
-      this.table.remove();
-    }
-    scout.TableField.parent.prototype.onModelPropertyChange.call(this);
+    table.render(this.$container);
   }
 };

@@ -698,3 +698,7 @@ scout.ChartTableControl.FILTER_KEY = 'CHART';
 scout.ChartTableControl.prototype.dispose = function() {
   this.table.events.removeListener(this._filterResetListener);
 };
+
+scout.ChartTableControl.prototype.isContentAvailable = function() {
+  return true;
+};

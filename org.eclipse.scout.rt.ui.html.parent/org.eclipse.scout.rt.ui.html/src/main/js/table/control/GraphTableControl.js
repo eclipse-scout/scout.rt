@@ -238,5 +238,9 @@ scout.GraphTableControl.prototype._render = function($parent) {
 };
 
 scout.GraphTableControl.prototype._setGraph = function(graph) {
-  // NOP
+  this.renderContent();
+};
+
+scout.GraphTableControl.prototype.isContentAvailable = function() {
+  return this.graph;
 };

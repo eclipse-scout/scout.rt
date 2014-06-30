@@ -175,6 +175,8 @@ scout.TableFooter.prototype.openTableControl = function() {
   this._$controlResizeTop.on('mousedown', '', resizeControl);
   this._$controlResizeBottom.on('mousedown', '', resizeControl);
 
+  this.open = true;
+
   var that = this;
 
   function resizeControl(event) {
@@ -235,4 +237,5 @@ scout.TableFooter.prototype.closeTableControl = function(control) {
   this._$tableControl.promise().done(function() {
     control.remove();
   });
+  this.open = false;
 };

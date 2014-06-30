@@ -752,9 +752,14 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 };
 
 scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
-  // FIXME CGU How to handle data model updates
+  this.renderContent();
 };
 
 scout.AnalysisTableControl.prototype._setRootEntityRef = function(rootEntityRef) {
   this.rootEntity = this.dataModel[rootEntityRef];
+  this.renderContent();
+};
+
+scout.AnalysisTableControl.prototype.isContentAvailable = function() {
+  return this.dataModel && this.rootEntity;
 };
