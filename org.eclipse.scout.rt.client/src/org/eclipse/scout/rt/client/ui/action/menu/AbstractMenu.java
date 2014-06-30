@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
+import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -54,21 +55,22 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   /**
    * All menu types this menu should be showed with. For menus which are used in different contexts (Table, Tree,
-   * ValueField) a combination of several menu type definitions can be returned.
+   * ValueField, ActivityMap) a combination of several menu type definitions can be returned.
    * In case the menu is added on any other component (different from {@link ITable}, {@link ITree}, {@link IValueField}
-   * )
+   * , {@link IActivityMap} )
    * the menu type does not have any affect.
    * 
    * @see TableMenuType
    * @see TreeMenuType
    * @see ValueFieldMenuType
+   * @see ActivityMapMenuType
    */
   @Order(55)
   @ConfigProperty(ConfigProperty.MENU_TYPE)
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
     return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
         TreeMenuType.SingleSelection,
-        ValueFieldMenuType.NotNull);
+        ValueFieldMenuType.NotNull, ActivityMapMenuType.NotNull);
   }
 
   /**

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -41,6 +42,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ActivityMapContextMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -51,12 +54,11 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   private EventListenerList m_listenerList;
   private IActivityMapUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
-  private HashMap<RI/* resourceId */, List<ActivityCell<RI, AI>>> m_resourceIdToActivities;
-  private HashMap<CompositeObject/* resourceId,activityId */, ActivityCell<RI, AI>> m_activities;
-  private HashSet<RI/* resourceId */> m_selectedResourceIds;
+  private Map<RI/* resourceId */, List<ActivityCell<RI, AI>>> m_resourceIdToActivities;
+  private Map<CompositeObject/* resourceId,activityId */, ActivityCell<RI, AI>> m_activities;
+  private Set<RI/* resourceId */> m_selectedResourceIds;
   private int m_tableChanging;
-  private ArrayList<ActivityMapEvent> m_eventBuffer = new ArrayList<ActivityMapEvent>();
-  private List<IMenu> m_menus;
+  private List<ActivityMapEvent> m_eventBuffer = new ArrayList<ActivityMapEvent>();
   private IActivityCellObserver<RI, AI> m_cellObserver;
   private boolean m_timeScaleValid;
 
@@ -256,7 +258,9 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList;
+    IActivityMapContextMenu contextMenu = new ActivityMapContextMenu(this, menuList);
+    setContextMenu(contextMenu);
+
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -619,58 +623,29 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   @Override
+  public void setMenus(List<? extends IMenu> menus) {
+    getContextMenu().setChildActions(menus);
+  }
+
+  @Override
+  public void addMenu(IMenu menu) {
+    List<IMenu> menus = getMenus();
+    menus.add(menu);
+    setMenus(menus);
+  }
+
+  protected void setContextMenu(IActivityMapContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
+  }
+
+  @Override
+  public IActivityMapContextMenu getContextMenu() {
+    return (IActivityMapContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
   public List<IMenu> getMenus() {
-    return CollectionUtility.arrayList(m_menus);
-  }
-
-  private List<IMenu> fireEditActivityPopup(ActivityCell<RI, AI> cell) {
-    if (cell != null) {
-      ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_EDIT_ACTIVITY_POPUP, cell);
-      // single observer for declared menus
-      addEditActivityPopupMenus(e);
-      fireActivityMapEventInternal(e);
-      return e.getPopupMenus();
-    }
-    else {
-      return CollectionUtility.emptyArrayList();
-    }
-  }
-
-  private void addEditActivityPopupMenus(ActivityMapEvent e) {
-    for (IMenu menu : getMenus()) {
-      if (menu.isSingleSelectionAction()) {
-        menu.prepareAction();
-        if (menu.isVisible()) {
-          e.addPopupMenu(menu);
-        }
-      }
-    }
-  }
-
-  private List<IMenu> fireNewActivityPopup() {
-    ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_NEW_ACTIVITY_POPUP);
-    // single observer for declared menus
-    addNewActivityPopupMenus(e);
-    fireActivityMapEventInternal(e);
-    return e.getPopupMenus();
-  }
-
-  private void addNewActivityPopupMenus(ActivityMapEvent e) {
-    for (IMenu menu : getMenus()) {
-      // pass 1
-      if (menu.isSingleSelectionAction()) {
-        // ignore
-      }
-      else if (menu.isMultiSelectionAction()) {
-        // ignore
-      }
-      else {
-        menu.prepareAction();
-        if (menu.isVisible()) {
-          e.addPopupMenu(menu);
-        }
-      }
-    }
+    return getContextMenu().getChildActions();
   }
 
   private void fireCellAction(RI resourceId, MinorTimeColumn column, ActivityCell<RI, AI> activityCell) {
@@ -749,7 +724,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
      * coalesce all events of same type and sort according to their type,
      * eventually merge
      */
-    ArrayList<ActivityMapEvent> list = m_eventBuffer;
+    List<ActivityMapEvent> list = m_eventBuffer;
     m_eventBuffer = new ArrayList<ActivityMapEvent>();
     if (list.size() > 0) {
       HashMap<Integer, List<ActivityMapEvent>> coalesceMap = new HashMap<Integer, List<ActivityMapEvent>>();
@@ -785,14 +760,6 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
           }
           case ActivityMapEvent.TYPE_CELL_ACTION: {
             sortedCoalescedMap.put(50, subList.get(lastIndex));// use last
-            break;
-          }
-          case ActivityMapEvent.TYPE_EDIT_ACTIVITY_POPUP: {
-            sortedCoalescedMap.put(70, subList.get(lastIndex));// use last
-            break;
-          }
-          case ActivityMapEvent.TYPE_NEW_ACTIVITY_POPUP: {
-            sortedCoalescedMap.put(80, subList.get(lastIndex));// use last
             break;
           }
           default: {
@@ -1304,16 +1271,6 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       finally {
         setActivityMapChanging(false);
       }
-    }
-
-    @Override
-    public List<IMenu> fireEditActivityPopupFromUI() {
-      return fireEditActivityPopup(getSelectedActivityCell());
-    }
-
-    @Override
-    public List<IMenu> fireNewActivityPopupFromUI() {
-      return fireNewActivityPopup();
     }
 
     @Override

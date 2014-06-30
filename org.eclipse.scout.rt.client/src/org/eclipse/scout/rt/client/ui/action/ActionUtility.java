@@ -18,12 +18,14 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.rt.client.ui.action.menu.ActivityMapMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
@@ -178,6 +180,18 @@ public final class ActionUtility {
         throw m_firstEx;
       }
     }
+  }
+
+  public static IActionFilter createMenuFilterForActivityMapSelection(ActivityCell<?, ?> selectedCell) {
+    final ActivityMapMenuType menuType;
+    if (selectedCell == null) {
+      menuType = ActivityMapMenuType.Null;
+    }
+    else {
+      menuType = ActivityMapMenuType.NotNull;
+    }
+    return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuType));
+
   }
 
   public static IActionFilter createMenuFilterForTableSelection(List<? extends ITableRow> selection) {

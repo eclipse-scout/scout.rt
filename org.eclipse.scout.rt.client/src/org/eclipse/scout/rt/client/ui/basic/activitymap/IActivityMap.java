@@ -16,6 +16,8 @@ import java.util.List;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 
 /**
@@ -85,6 +87,10 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
+  /**
+   * @since 4.0.0 {@link IContextMenu}
+   */
+  String PROP_CONTEXT_MENU = "contextMenus";
 
   int PLANNING_MODE_INTRADAY = 0;
   int PLANNING_MODE_DAY = 1;
@@ -330,7 +336,26 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    */
   Object getContainer();
 
+  /**
+   * @param menus
+   */
+  void setMenus(List<? extends IMenu> menus);
+
+  /**
+   * @param menu
+   */
+  void addMenu(IMenu menu);
+
+  /**
+   * @return the child list of {@link #getContextMenu()}
+   */
   List<IMenu> getMenus();
+
+  /**
+   * @return the invisible root menu container of all menus.
+   */
+
+  IActivityMapContextMenu getContextMenu();
 
   IActivityMapUIFacade getUIFacade();
 
