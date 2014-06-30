@@ -1,31 +1,47 @@
 scout.TableKeystrokeAdapter = function(table) {
+  var that = this;
+
+  this.$target = undefined; // set by KeystrokeManager
+  this.controller = undefined; // set by KeystrokeManager
   this.handlers = [];
   this._table = table;
 
-  var that=this;
   //table filter
-  var handler = {
-    keycodeRangeStart: 65,
-    keycodeRangeEnd: 90,
-    handle: function() {
+  this.handlers.push({
+    accept: function(event) {
+      if (event && event.which >= 65 && event.which <= 90 && // a-z
+        !event.ctrlKey && !event.altKey && !event.metaKey) {
+        return true;
+      }
+      return false;
+    },
+    handle: function(event) {
       that._table.$container.find('#HeaderOrganize').click();
 
       // set focus
-      var $input = $('#FilterInput'),
-        length = $input.val().length;
+      var $input = $('#FilterInput');
+      var length = $input.val().length;
 
       $input.focus();
       $input[0].setSelectionRange(length, length);
-    }
-  };
-  this.handlers.push(handler);
 
-  handler = {
-    keycodes: [38, 40, 36, 35, 33, 34],
-    handle: function(keycode) {
-      var $rowsAll = that._table.findRows(),
-        $rowsSelected = that._table.findSelectedRows(),
-        $newRowSelection;
+      return false;
+    }
+  });
+
+  this.handlers.push({
+    accept: function(event) {
+      if (event && $.inArray(event.which, [38, 40, 36, 35, 33, 34]) >= 0 && // up, down, home, end, pgup, pgdown
+        !event.ctrlKey && !event.altKey && !event.metaKey) {
+        return true;
+      }
+      return false;
+    },
+    handle: function(event) {
+      var $newRowSelection, $prev, i, rowIds;
+      var keycode = event.which;
+      var $rowsAll = that._table.findRows();
+      var $rowsSelected = that._table.findSelectedRows();
 
       // up: move up
       if (keycode == 38) {
@@ -56,7 +72,6 @@ scout.TableKeystrokeAdapter = function(table) {
       }
 
       // pgup: jump up
-      var $prev;
       if (keycode == 33) {
         if ($rowsSelected.length > 0) {
           $prev = $rowsSelected.first().prevAll();
@@ -84,9 +99,17 @@ scout.TableKeystrokeAdapter = function(table) {
         }
       }
 
-      // TODO cru: handling of shift key
+      // apply selection
       if ($newRowSelection.length > 0) {
-        that._table.selectRowsByIds($newRowSelection.attr('id'));
+        rowIds = [];
+        // FIXME Handling of shift key not perfect, yet... (must remember first selected row)
+        if (event.shiftKey) {
+          $newRowSelection = $rowsSelected.add($newRowSelection);
+        }
+        for (i = 0; typeof($newRowSelection[i]) != 'undefined'; i++) {
+          rowIds.push($newRowSelection[i].getAttribute('id'));
+        }
+        that._table.selectRowsByIds(rowIds);
       }
 
       //FIXME If selection is not visible we need to scroll
@@ -94,8 +117,7 @@ scout.TableKeystrokeAdapter = function(table) {
 
       return false;
     }
-  };
-  this.handlers.push(handler);
+  });
 };
 
 scout.TableKeystrokeAdapter.prototype.drawKeyBox = function() {

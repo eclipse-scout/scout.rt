@@ -49,7 +49,14 @@ scout.Desktop.prototype._render = function($parent) {
   this.layout.layout();
 
   if (viewbar || this.taskbar || this.tree) {
-    scout.keystrokeManager.addAdapter(new scout.DesktopKeystrokeAdapter(viewbar, this.taskbar, this.tree));
+    $parent.attr('tabIndex', 0);
+    $parent.css('outline', 'none');
+    scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(viewbar, this.taskbar, this.tree));
+    // Input focus is initially outside $parent, therefore keystrokes would not  work until
+    // the user clicks $parent with the mouse. Therefore we set the focus manually.
+    // FIXME BSH portlets?
+    // FIXME BSH When closing a form, the focus gets lost - why? And how to fix that?
+    $parent.focus();
   }
 
   scout.Desktop.parent.prototype._render.call(this, $parent);

@@ -1,12 +1,13 @@
 scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
+  var that = this;
+
+  this.$target = undefined; // set by KeystrokeManager
+  this.controller = undefined; // set by KeystrokeManager
   this.handlers = [];
   this._viewButtonBar = viewButtonBar;
   this._tree = tree;
   this._taskbar = taskbar;
 
-  var handler;
-
-  var that = this;
   //FIXME read keycodes from model
   if (taskbar) {
     $('.taskbar-item', taskbar.$div).each(function(i, element) {
@@ -14,58 +15,130 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
       if (keystroke) {
         keystroke = keystroke.toUpperCase();
         var shortcut = parseInt(keystroke.replace('F', ''), 10) + 111;
-        handler = {
-          keycodes: shortcut,
+        that.handlers.push({
           $element: $(element),
-          handle: function() {
+          accept: function(event) {
+            if (event && event.which == shortcut && event.ctrlKey) {
+              return true;
+            }
+            return false;
+          },
+          handle: function(event) {
             this.$element.click();
 
             return false;
           }
-        };
-        that.handlers.push(handler);
+        });
       }
     });
 
   }
 
   //FIXME read keycodes from model
+  //FIXME Keypad?
   if (viewButtonBar) {
-    handler = {
-      keycodeRangeStart: 49,
-      keycodeRangeEnd: 57,
-      handle: function(keycode) {
+    that.handlers.push({
+      accept: function(event) {
+        if (event && event.which >= 49 && event.which <= 57 && // 1-9
+          !event.ctrlKey && !event.altKey && !event.metaKey) {
+          return true;
+        }
+        return false;
+      },
+      handle: function(event) {
+        var keycode = event.which;
+
         $('.view-item', viewButtonBar.$div).eq(keycode - 49).click();
 
         return false;
       }
-    };
-    that.handlers.push(handler);
+    });
   }
 
   if (tree) {
-    handler = {
-      keycodes: [37, 39, 107, 109],
+    that.handlers.push({
       removeKeyBox: true,
-      handle: function(keycode) {
+      accept: function(event) {
+        if (event && $.inArray(event.which, [37, 39, 107, 109]) >= 0 && // left, right, keypad_plus, keypad_minus
+          !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+          return true;
+        }
+        return false;
+      },
+      handle: function(event) {
+        var keycode = event.which;
+        var $currentNode = $('.selected', that._tree.$div);
+        var $targetNode;
+
         // left: up in tree
         if (keycode == 37) {
-          $('.selected', that._tree.$div).prev('.tree-item').click();
+          if ($currentNode.hasClass('expanded')) {
+            $currentNode.children('.tree-item-control').click();
+          } else {
+            $targetNode = $currentNode.prevAll('.tree-item[data-level=' + (+$currentNode.attr('data-level') - 1) + ']');
+            if ($targetNode.attr('id')) {
+              // FIXME BSH "scroll into view"
+              that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+            }
+          }
         }
         // right: down in tree
         else if (keycode == 39) {
-          $('.selected', that._tree.$div).next('.tree-item').click();
+          if (!$currentNode.hasClass('expanded')) {
+            $currentNode.children('.tree-item-control').click();
+          } else {
+            $targetNode = $currentNode.next('.tree-item[data-level=' + (+$currentNode.attr('data-level') + 1) + ']');
+            if ($targetNode.attr('id')) {
+              // FIXME BSH "scroll into view"
+              that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+            }
+          }
         }
         // +/-: open and close tree
         else if (keycode == 109 || keycode == 107) {
-          $('.selected', that._tree.$div).children('.tree-item-control').click();
+          if ((!$currentNode.hasClass('expanded') && keycode == 107) || ($currentNode.hasClass('expanded') && keycode == 109)) {
+            $currentNode.children('.tree-item-control').click();
+          }
         }
 
         return false;
       }
-    };
-    this.handlers.push(handler);
+    });
 
+    that.handlers.push({
+      removeKeyBox: true,
+      accept: function(event) {
+        if (event && $.inArray(event.which, [38, 40]) >= 0 && // up, down
+          event.ctrlKey) {
+          return true;
+        }
+        return false;
+      },
+      handle: function(event) {
+        var keycode = event.which;
+        var $currentNode = $('.selected', that._tree.$div);
+        var $targetNode;
+
+        // ctrl-up: go up (same level)
+        if (keycode == 38) {
+          $targetNode = $currentNode.prevAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
+          if ($targetNode.attr('id')) {
+            // FIXME BSH "scroll into view"
+            that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+          }
+        }
+        // ctrl-down: go down (same level)
+        else if (keycode == 40) {
+          $targetNode = $currentNode.nextAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
+          if ($targetNode.attr('id')) {
+            // FIXME BSH "scroll into view"
+            that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+          }
+        }
+
+        return false;
+      }
+    });
   }
 };
 

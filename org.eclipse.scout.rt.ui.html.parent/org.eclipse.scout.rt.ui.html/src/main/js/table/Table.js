@@ -10,6 +10,7 @@ scout.Table = function() {
   this._header;
   this.scrollbar;
   this.selectionHandler;
+  this._keystrokeAdapter;
   this._addAdapterProperties(['controls', 'menus']);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -52,6 +53,16 @@ scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
 
   this.$container = this._$parent.appendDiv(this.id, 'table');
+  if ($parent && $parent.parent() && $parent.parent().attr('id') === 'Desktop') {
+    // desktop table (no input focus required to trigger table keystrokes)
+    scout.keystrokeManager.installAdapter($parent.parent(), this._keystrokeAdapter);
+  }
+  else {
+    // independent table, i.e. inside form (input focus required to trigger table keystrokes)
+    this.$container.attr('tabIndex', 0);
+    this.$container.css('outline', 'none');
+    scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
+  }
 
   this._$header = this.$container.appendDiv(this.id + '_header', 'table-header');
   if (!this.headerVisible) {
@@ -75,7 +86,6 @@ scout.Table.prototype._render = function($parent) {
   if (this.configurator && this.configurator.render) {
     this.configurator.render();
   }
-  scout.keystrokeManager.addAdapter(this._keystrokeAdapter);
 
   // load data and create rows
   this.drawData();
@@ -83,7 +93,7 @@ scout.Table.prototype._render = function($parent) {
 };
 
 scout.Table.prototype.dispose = function() {
-  scout.keystrokeManager.removeAdapter(this._keystrokeAdapter);
+  scout.keystrokeManager.uninstallAdapter(this._keystrokeAdapter);
 };
 
 scout.Table.prototype.clearSelection = function() {
@@ -696,6 +706,7 @@ scout.Table.prototype.showRow = function($row) {
   var that = this;
 
   if ($row.is(':hidden')) {
+    // FIXME BSH Setting height/padding here jumbles the css, when the row is selected later (see also hideRow())
     $row.show()
       .stop()
       .animate({
