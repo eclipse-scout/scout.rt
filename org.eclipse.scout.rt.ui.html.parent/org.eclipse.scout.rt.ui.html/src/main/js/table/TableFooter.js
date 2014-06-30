@@ -182,7 +182,7 @@ scout.TableFooter.prototype.openTableControl = function() {
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
 
-    var offset = (this.id == 'ControlResizeTop') ? 58 : 108;
+    var offset = (this.id == 'ControlResizeTop') ? 102 : 152;
 
     function resizeMove(event) {
       var h = that._table.$container.outerHeight() - event.pageY + offset;

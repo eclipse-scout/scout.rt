@@ -8,8 +8,18 @@ scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
 scout.AnalysisTableControl.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('', 'analysis-container'); //FIXME CGU maybe not necessary
-  $.log(this);
 
+  // svg container for venn
+  var $vennContainer = this.$container
+    .appendSVG('svg', '', 'venn-container')
+    .attrSVG('viewBox', '0 0 500 340')
+    .attrSVG('preserveAspectRatio', 'xMinYMin')
+    .on('click', clickCriteria)
+    .on('contextmenu', clickSet);
+  var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
+  appendRect($vennContainer, 'venn-all');
+
+  // commands
   var $commandContainer = this.$container.appendDiv('', 'command-container');
 
   $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
@@ -23,23 +33,14 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
   $commandContainer.appendDiv('', 'separator', 'Eine beliebige Menge kann mit Hilfer der rechten Maustaste gesetzt werden');
   $commandContainer.appendDiv('', 'command union', 'Simulator').click(simulateServer);
 
-  // svg container
-  var $vennContainer = this.$container
-    .appendSVG('svg', '', 'venn-container')
-    .attrSVG('viewBox', '0 0 500 340')
-    .attrSVG('preserveAspectRatio', 'xMinYMin')
-    .on('click', clickCriteria)
-    .on('contextmenu', clickSet);
-  var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
-  appendRect($vennContainer, 'venn-all');
-
   // criteria container
-  var $criteriaContainer = this.$container.appendDiv('', 'criteria-container'),
-    $criteriaList = $criteriaContainer.appendDiv('', 'criteria-list'),
-    $criteriaScroll = $criteriaList.appendDiv('', 'criteria-scroll'),
-    scrollbar = new scout.Scrollbar($criteriaScroll , 'y');
+  var $criteriaNavigation = this.$container.appendDiv('', 'criteria-navigation').click(closeMap);
+  var $criteriaSearch = this.$container.append('<input class="criteria-search"></input>');
+  var $criteriaContainer = this.$container.appendDiv('', 'criteria-container');
+  var containerWidth = parseFloat($criteriaContainer.css('width')),
+    containerHeight = parseFloat($criteriaContainer.css('height'));
 
-  scrollbar.initThumb();
+
 
   // $criteria = circle per criteria; count calculated by server
   var $criteria = [],
@@ -56,6 +57,8 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
   // open
   this.addCriteria = addCriteria;
+  var that = this;
+
   if (this.rootEntity) {
     this.addCriteria();
   }
@@ -72,39 +75,8 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
       updateCriteria();
       selectCriteria($div);
+      drawVenn();
       drawCriteria();
-    }
-
-    // draw datamodel
-    $.log(this.rootEntity);
-
-    addNodes(this.rootEntity, 0);
-    scrollbar.initThumb();
-
-    function addNodes (model, level) {
-      var subEntity;
-      if (model) {
-        $criteriaScroll.appendDiv(model.id, 'criteria-node', model.text).css('padding-left', level * 30);
-
-        for (var i = 0; i < model.attributes.length; i++) {
-          var d = model.attributes[i];
-          //$criteriaScroll.appendDiv(d.id, 'criteria-item', d.text).data('type', d.type).css('padding-left', (level + 1) * 30);
-        }
-
-        for (var j = 0; j < model.entities.length; j++) {
-          subEntity = model.entities[j];
-          if (subEntity.manyToOne && level < 3) {
-            addNodes(subEntity, level + 1);
-          }
-        }
-
-        for (var k = 0; k < model.entities.length; k++) {
-          subEntity = model.entities[k];
-          if (subEntity.oneToMany && level < 3) {
-            addNodes(subEntity, level + 1);
-          }
-        }
-      }
     }
   }
 
@@ -126,7 +98,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     if ($criteria.length) {
       updateCriteria();
       selectCriteria($criteria[$criteria.length - 1]);
-      drawCriteria();
+      drawVenn();
     }
   }
 
@@ -141,12 +113,214 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     $criteria.addClassSVG('selected');
   }
 
-  function switchShow() {
-    show = !show;
-    drawCriteria();
+  function drawCriteria() {
+    var model = that.rootEntity;
+    initIteration($criteriaContainer, that.rootEntity);
   }
 
-  function drawCriteria() {
+  function initIteration ($container, model) {
+
+    // find sizes of elements of tree map and sort elements
+    var map = [{size: model.attributes.length * 12, text: '', attributes: model.attributes, entity: null }],
+      mapTotal = map[0].size,
+      subEntity, s;
+
+    for (var j = 0; j < model.entities.length; j++) {
+      subEntity = model.entities[j];
+      s = Math.min(60, Math.max(20, subEntity.attributes.length + subEntity.entities.length));
+      map.push({size: s, text: subEntity.text, entity: subEntity});
+      mapTotal += map[map.length - 1].size;
+    }
+
+    // TODO cru: correct for umlaut
+    map.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
+
+    oneIteration($container, map, 0, 0, 1, 1);
+  }
+  //
+
+  function oneIteration ($container, list, top, left, height, width) {
+    if (list.length === 0) {
+      return;
+    } else if (list.length === 1) {
+      var $div = $container.appendDiv('', 'criteria-entity')
+        .css('top', top * 100 + '%')
+        .css('left', left * 100 + '%')
+        .css('height', height * 100 + '%')
+        .css('width', width * 100 + '%')
+        .data('entity', list[0].entity)
+        .click(openMap);
+
+      var $span = $('<span>' + list[0].text + '</span>').appendTo($div);
+
+      /*if ($span.width() > $div.width() && $div.height() > $div.width())  {
+        $span.css('display', 'block');
+        $span.css('transform', 'rotate(90deg)');
+        $span.css('transform-origin', 'left top ');
+        $span.css('width', $div.height());
+        $span.css('height', $div.width());
+        $span.css('left', $div.width() / 2 + 7);
+        $span.css('top', 5);
+      }*/
+      $span.css('word-wrap', 'break-word');
+
+      if (list[0].attributes) {
+        $div.css('border', '0');
+        // draw attributes
+        var attributes = list[0].attributes,
+          x = Math.ceil(Math.sqrt(attributes.length)),
+          y = Math.ceil(attributes.length / x);
+
+        attributes.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
+
+        for (var b = 0; b < y; b++) {
+          for (var a = 0; a < x; a++) {
+            if ((a + b * x) < attributes.length - 1) {
+              var $a = $div.appendDiv('', 'criteria-attribute', attributes[a + b * x].text)
+                .css('top', (top + b * (1 / y)) * 100 + '%')
+                .css('left', (left + a * (1/ x)) * 100 + '%')
+                .css('height', (1 / y) * 100 + '%')
+                .css('width', (1 / x) * 100 + '%');
+            }
+          }
+        }
+
+        $a.css('width', (x * y - attributes.length + 2) * (1 / x) * 100 + '%');
+      }
+
+    } else {
+      var horizontal = (height * containerHeight <= width * containerWidth),
+        //p = Math.floor((list.length - 1 )/ 2),
+        p = maxList(list),
+        l1 = list.slice(0, p),
+        lp = list.slice(p, p + 1),
+        sum1 = sumList(l1),
+        sump = sumList(lp),
+        sum2, sum3,
+        cand, best = {ratio: 0};
+
+      // make candidates
+      for (var i = list.length + 1; i > p; i--) {
+        cand = {};
+
+        cand.l2 = list.slice(p + 1, i);
+        cand.l3 = list.slice(i);
+
+        // ignore some l3s?
+        if (cand.l3.length != -1) {
+          // build sum
+          sum2 = sumList(cand.l2);
+          sum3 = sumList(cand.l3);
+
+          // calc r1 and rp
+          if (horizontal) {
+            cand.h1 = height;
+            cand.w1 = sum1 / (sum1 + sump + sum2 + sum3) * width;
+            cand.hp =  sump / (sump + sum2) * height;
+            cand.wp = (sump + sum2) / (sump + sum2 + sum3) * (width - cand.w1);
+          } else {
+            cand.h1 = sum1 / (sum1 + sump + sum2 + sum3) * height;
+            cand.w1 = width;
+            cand.hp = (sump + sum2) / (sump + sum2 + sum3) * (height - cand.h1);
+            cand.wp =  sump / (sump + sum2) * width;
+          }
+
+          cand.ratio =  (cand.hp * containerHeight) / (cand.wp * containerWidth) / 0.5 ;
+          if (cand.ratio > 1) {
+            cand.ratio = 1 / cand.ratio;
+          }
+
+          if (cand.ratio > best.ratio) {
+            best = cand;
+          }
+
+        }
+      }
+
+      // find best ration
+
+      // iterate
+      if (horizontal) {
+        oneIteration($container, l1, top, left, best.h1, best.w1);
+        oneIteration($container, lp, top, left + best.w1, best.hp, best.wp);
+        oneIteration($container, best.l2, top + best.hp, left + best.w1, height - best.hp, best.wp);
+        oneIteration($container, best.l3, top, left + best.w1 + best.wp, height, width - best.w1 - best.wp);
+      } else {
+        oneIteration($container, l1, top, left, best.h1, best.w1);
+        oneIteration($container, lp, top + best.h1, left, best.hp, best.wp);
+        oneIteration($container, best.l2, top + best.h1, left + best.wp, best.hp, width - best.wp);
+        oneIteration($container, best.l3, top + best.h1 + best.hp, left, height - best.h1 - best.hp, width);
+      }
+    }
+  }
+
+  function sumList (list) {
+    var total = 0;
+    for (var i = 0; i < list.length; i++) {
+      total += list[i].size;
+    }
+    return total;
+  }
+
+  function maxList (list) {
+    var cand,
+      max = 0;
+
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].size > max) {
+        max = list[i];
+        cand = i;
+      }
+    }
+
+    return cand;
+  }
+
+  function openMap (list) {
+    var $clicked = $(this);
+
+    $clicked
+    .data('old-top', $clicked.css('top'))
+      .data('old-left', $clicked.css('left'))
+      .data('old-height', $clicked.css('height'))
+      .data('old-width', $clicked.css('width'));
+
+
+
+    $clicked
+      .css ('z-index', '1')
+      .css('color', 'black')
+      .animateAVCSD('top', '0%')
+      .animateAVCSD('left', '0%')
+      .animateAVCSD('height', '100%')
+      .animateAVCSD('width', '100%');
+
+    $criteriaNavigation.text($clicked.text());
+    initIteration($clicked, $clicked.data('entity'));
+    $criteriaNavigation.data('open-map', $clicked);
+
+    $clicked.children('div').css('opacity', 0).animateAVCSD('opacity', 1);
+  }
+
+  function closeMap (list) {
+    var $open = $criteriaNavigation.data('open-map');
+
+    $open
+      .animateAVCSD('top', $open.data('old-top'))
+      .animateAVCSD('left', $open.data('old-left'))
+      .animateAVCSD('height', $open.data('old-height'))
+      .animateAVCSD('width', $open.data('old-width'), function() {$open.css ('z-index', ''); });
+
+    $open.children('div').animateAVCSD('opacity', 0, $.removeThis);
+  }
+
+
+  function switchShow() {
+    show = !show;
+    drawVenn();
+  }
+
+  function drawVenn() {
     // remove all text
     $('text', $vennContainer)
       .animateSVG('opacity', 0, 100, $.removeThis);
@@ -572,7 +746,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       }
     }
 
-    drawCriteria();
+    drawVenn();
   }
 
 };
@@ -583,8 +757,4 @@ scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
 
 scout.AnalysisTableControl.prototype._setRootEntityRef = function(rootEntityRef) {
   this.rootEntity = this.dataModel[rootEntityRef];
-
-  if (this.isRendered()) {
-    this.addCriteria();
-  }
 };
