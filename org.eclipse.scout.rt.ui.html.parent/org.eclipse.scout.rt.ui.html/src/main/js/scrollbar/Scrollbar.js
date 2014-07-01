@@ -7,6 +7,7 @@ scout.Scrollbar = function($parent, axis) {
   this._thumbRange;
   this._scroll;
   this._offset;
+  this._initThumbPending = false;
 
   // create scrollbar
   this.axis = axis;
@@ -57,6 +58,25 @@ scout.Scrollbar = function($parent, axis) {
  * Use this function (from outside) if size of tree content changes
  */
 scout.Scrollbar.prototype.initThumb = function() {
+  // Thumb is (re)initialized, but only after the current thread has finished.
+  // Additionally, the call is scheduled at most once. This prevents unnecessary
+  // executions of the same code while the UI is updated.
+  if (this._initThumbPending) {
+    return;
+  }
+  var that = this;
+  setTimeout(function() {
+    that._initThumbImpl();
+    that._initThumbPending = false;
+  }, 0);
+  this._initThumbPending = true;
+};
+
+
+/**
+ * do not use this internal method
+ */
+scout.Scrollbar.prototype._initThumbImpl = function() {
   this._offset = this._$parent[0]["offset" + this._dim];
   this._scroll = this._$parent[0]["scroll" + this._dim];
 
