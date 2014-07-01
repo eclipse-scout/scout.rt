@@ -72,7 +72,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       if (jsonSession == null) {
         if (!uiReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to session timeout.");
-          writeResponse(resp, createSessionTimeoutJsonResponse());
+          writeError(resp, createSessionTimeoutJsonResponse());
           return true;
         }
 
@@ -96,7 +96,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
   protected JsonResponse createSessionTimeoutJsonResponse() {
     JsonResponse uiResp = new JsonResponse();
     uiResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    uiResp.setErrorMessage("Session has expired, please reload the page"); //FIXME use TEXTS
+    uiResp.setErrorMessage("The session has expired, please reload the page."); //FIXME use TEXTS
     return uiResp;
   }
 
@@ -109,6 +109,11 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     resp.getOutputStream().write(data);
 
     LOG.debug("Returned: " + jsonText);
+  }
+
+  protected void writeError(HttpServletResponse resp, JsonResponse uiRes) throws IOException {
+    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    writeResponse(resp, uiRes);
   }
 
   protected JSONObject toJSON(HttpServletRequest req) {

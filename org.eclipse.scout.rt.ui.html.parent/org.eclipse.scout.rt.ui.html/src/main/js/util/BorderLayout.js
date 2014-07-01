@@ -1,6 +1,5 @@
 scout.BorderLayout = function(marginTop, marginRight, cssClassPrefix) {
   this.marginTop = marginTop;
-  this.marginRight = marginRight;
   this.cssClassPrefix = cssClassPrefix;
   this.$fixedElements = [];
   this.$dynamicElements = [];
@@ -39,8 +38,6 @@ scout.BorderLayout.prototype.layoutElement = function($element) {
   if (position === 'W' || position === 'C' || position === 'E') {
     $element.attr('data-row', 1);
 
-    $element.css('top', this.marginTop);
-
     if (this.marginTop > 0) {
       $element.height('calc(100% - ' + this.marginTop + 'px)');
     } else {
@@ -61,7 +58,7 @@ scout.BorderLayout.prototype.layoutElement = function($element) {
 
     $element.css('left', leftWidth);
 
-    siblingWidth = leftWidth + rightWidth + this.marginRight;
+    siblingWidth = leftWidth + rightWidth;
     if (siblingWidth > 0) {
       $element.width('calc(100% - ' + siblingWidth + 'px)');
     } else {

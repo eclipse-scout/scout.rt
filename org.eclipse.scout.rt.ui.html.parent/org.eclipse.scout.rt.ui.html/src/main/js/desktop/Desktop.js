@@ -26,12 +26,6 @@ scout.Desktop.prototype._render = function($parent) {
   marginTop += this.menu.$container.outerHeight();
 
 
-  if (this.toolButtons) {
-    this.taskbar = new scout.DesktopTaskbar(this);
-    this.taskbar.render($parent);
-    marginRight = this.taskbar.$div.outerWidth();
-  }
-
   this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.outline) {
     this.tree = new scout.DesktopTreeContainer($parent, this.outline, this.session);
@@ -41,6 +35,12 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.bench = new scout.DesktopBench($parent, this.session);
   this.layout.register(this.bench.$container, 'C');
+
+  if (this.toolButtons) {
+    this.taskbar = new scout.DesktopTaskbar(this);
+    this.taskbar.render($parent);
+    this.layout.register(this.taskbar.$div, 'E');
+  }
 
   if (this.tree) {
     this.tree.renderTree();

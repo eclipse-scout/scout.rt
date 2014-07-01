@@ -22,6 +22,7 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
   // FIXME maybe better separate session object from event processing, create
   // ClientSession.js?
   this.modelAdapterRegistry[sessionPartId] = this;
+  this.desktop;
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
@@ -117,21 +118,23 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     dataType: "json",
     cache: false,
     url: 'json',
-    data: JSON.stringify(request),
-    success: function(message) {
-      that._processResponse(message);
-    }
+    data: JSON.stringify(request)
+  })
+  .done(function(data) {
+    that._processSuccessResponse(data);
+  })
+  .fail(function(jqXHR, textStatus, errorThrown) {
+    that._processErrorResponse(jqXHR, textStatus, errorThrown);
   });
+
 };
 
-scout.Session.prototype._processResponse = function(message) {
-  this._requestsPendingCounter--;
-
-  if (message.errorMessage) {
-    this.$entryPoint.html('');
-    this.$entryPoint.text(message.errorMessage);
-    return;
+scout.Session.prototype._processSuccessResponse = function(message) {
+  if (this.offline) {
+    this.goOnline();
   }
+
+  this._requestsPendingCounter--;
 
   this.processingEvents = true;
   try {
@@ -151,6 +154,50 @@ scout.Session.prototype._processResponse = function(message) {
       this._deferredEventTypes = null;
     }
   }
+};
+
+/**
+ *
+ * @param textStatus timeout, abort, error or parseerror
+ */
+scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown) {
+  console.log(jqXHR.status);
+  console.log(textStatus);
+  console.log(errorThrown);
+
+  //Status code = 0 -> no connection
+  //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
+  if (!jqXHR.status || jqXHR.status >= 12000) {
+    this.goOffline();
+    return;
+  }
+
+  var jsonResponse = jqXHR.responseJSON;
+  if (jsonResponse && jsonResponse.errorMessage) {
+    this.$entryPoint.html('');
+    if (this.desktop) {
+      this.desktop.showMessage(jsonResponse.errorMessage, 'timeout');
+    }
+    else {
+      this.$entryPoint.text(jsonResponse.errorMessage);
+    }
+    return;
+  }
+
+  if (errorThrown) {
+    throw errorThrown;
+  }
+  throw 'Error while processing request. ' + textStatus;
+};
+
+scout.Session.prototype.goOffline = function() {
+  this.offline = true;
+  this.desktop.goOffline();
+};
+
+scout.Session.prototype.goOnline = function() {
+  this.offline = false;
+  this.desktop.goOnline();
 };
 
 scout.Session.prototype.listen = function() {
@@ -204,8 +251,8 @@ scout.Session.prototype.init = function() {
 
 scout.Session.prototype.onModelCreate = function(event) {
   this.locale = new scout.Locale(event.locale);
-  var desktop = this.objectFactory.create(event.desktop);
-  desktop.render(this.$entryPoint);
+  this.desktop = this.objectFactory.create(event.desktop);
+  this.desktop.render(this.$entryPoint);
 };
 
 scout.Session.prototype.onModelAction = function(event) {

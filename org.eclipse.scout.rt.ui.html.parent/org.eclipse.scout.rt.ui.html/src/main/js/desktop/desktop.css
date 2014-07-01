@@ -9,11 +9,25 @@ width: 300px;
 
 .desktop-area-C {
 left: 300px;
-top: 114px;
-height: calc(100% - 114px);
 overflow:hidden;}
 
 .desktop-area-E {
 width: 600px;
 right: 0px;
+}
+
+.offline-message {
+border: 1px solid #0082a1;
+background-color: #eee;
+margin: 5px 10px;
+padding: 2px 5px;
+}
+
+.timeout-message {
+border: 1px solid red;
+background-color: rgb(255, 200, 200);
+padding: 5px;
+color: rgb(150,0,0);
+max-width: 300px;
+margin: 20px auto;
 }

@@ -1,7 +1,6 @@
 .desktop-taskbar{
 position: absolute;
 right: 0px;
-top: 100px;
 z-index: 10;
 height: calc(100% - 100px);
 width: 100px;

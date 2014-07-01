@@ -228,7 +228,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       m_jsonEventProcessor.processEvents(jsonRequest, jsonResponse);
       return jsonResponse;
     }
-    finally {
+    finally { //FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
       m_currentJsonResponse = new JsonResponse();
     }

@@ -21,6 +21,39 @@ scout.BaseDesktop.prototype._render = function($parent) {
   }
 };
 
+scout.BaseDesktop.prototype.showMessage = function(message, type) {
+  if (!type) {
+    type = 'info';
+  }
+  if (!this.$message) {
+    this.$message = this.$parent.prependDiv('', type + '-message');
+  }
+  this.$message.text(message);
+};
+
+scout.BaseDesktop.prototype.goOffline = function() {
+  var message = 'Die Netzwerkverbindung ist unterbrochen.';
+
+  if (this.$offline) {
+    return;
+  }
+
+  this.$offline = this.$parent.prependDiv('', 'offline-message');
+  this.layout.marginTop += this.$offline.outerHeight(true);
+  this.layout.layout();
+  this.$offline.text(message);
+};
+
+scout.BaseDesktop.prototype.goOnline = function() {
+  if (!this.$offline) {
+    return;
+  }
+
+  this.$offline.remove();
+  this.layout.marginTop -= this.$offline.outerHeight(true);
+  this.layout.layout();
+};
+
 scout.BaseDesktop.prototype._addForm = function(form) {
   if (form.displayHint == "view") {
     form.attach(this._resolveViewContainer(form));
