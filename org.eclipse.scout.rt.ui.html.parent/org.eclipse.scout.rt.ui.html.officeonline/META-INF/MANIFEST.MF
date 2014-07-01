@@ -2,17 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.eclipse.scout.rt.ui.html.officeonline
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.officeonline;singleton:=true
-Bundle-Version: 4.0.0.qualifier
+Bundle-Version: 4.1.0.qualifier
 Bundle-ClassPath: .
 Export-Package: org.eclipse.scout.rt.ui.html.officeonline,
  org.eclipse.scout.rt.ui.html.officeonline.internal,
  org.eclipse.scout.rt.ui.html.officeonline.wopi
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.http.registry,
- org.eclipse.scout.commons;bundle-version="4.0.0";visibility:=reexport,
- org.eclipse.scout.service;bundle-version="4.0.0";visibility:=reexport,
- org.json;bundle-version="1.0.0",
- org.eclipse.scout.rt.ui.html;bundle-version="4.0.0";visibility:=reexport
+ org.eclipse.scout.commons;visibility:=reexport,
+ org.eclipse.scout.service;visibility:=reexport,
+ org.json,
+ org.eclipse.scout.rt.ui.html;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.scout.rt.ui.html.officeonline.internal.Activator
