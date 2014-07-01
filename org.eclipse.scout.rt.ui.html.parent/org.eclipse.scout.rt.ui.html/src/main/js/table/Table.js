@@ -611,6 +611,7 @@ scout.Table.prototype.filter = function() {
   that.clearSelection();
   $('.table-row-sum', this.$dataScroll).hide();
 
+  // FIXME BSH !!! This implementation is super slow with many rows (1000) !!!
   $allRows.each(function() {
     var $row = $(this),
       rowText = $row.text().toLowerCase(),
@@ -706,18 +707,11 @@ scout.Table.prototype.showRow = function($row) {
   var that = this;
 
   if ($row.is(':hidden')) {
-    // FIXME BSH Setting height/padding here jumbles the css, when the row is selected later (see also hideRow())
-    $row.show()
-      .stop()
-      .animate({
-        'height': '34',
-        'padding-top': '2',
-        'padding-bottom': '2'
-      }, {
-        complete: function() {
-          that.updateScrollbar();
-        }
-      });
+    $row.stop().slideDown({
+      complete: function() {
+        that.updateScrollbar();
+      }
+    });
   }
 };
 
@@ -725,18 +719,11 @@ scout.Table.prototype.hideRow = function($row) {
   var that = this;
 
   if ($row.is(':visible')) {
-    $row
-      .stop()
-      .animate({
-        'height': '0',
-        'padding-top': '0',
-        'padding-bottom': '0'
-      }, {
-        complete: function() {
-          $(this).hide();
-          that.updateScrollbar();
-        }
-      });
+    $row.stop().slideUp({
+      complete: function() {
+        that.updateScrollbar();
+      }
+    });
   }
 };
 

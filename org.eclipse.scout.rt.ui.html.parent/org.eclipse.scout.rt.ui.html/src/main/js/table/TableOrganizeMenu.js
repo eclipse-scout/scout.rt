@@ -102,8 +102,8 @@ scout.TableOrganizeMenu = function(table, x, y) {
 
   $('<input id="FilterInput"></input>')
     .appendTo($commandFilter)
-    .on('keydown', '', filterKey)
-    .on('input paste', '', filterEnter)
+    .on('keydown', '', scout.debounce(filterKey))
+    .on('input paste', '', scout.debounce(filterEnter))
     .val(filterText);
 
   // name all label elements
@@ -148,7 +148,7 @@ scout.TableOrganizeMenu = function(table, x, y) {
   }
 
   function filterKey(event) {
-    if (event.which == 27) {
+    if (event.which == 27) { // escape
       $menuTable.animateAVCSD('height', 0, function() {
         $menuTableTitle.remove();
         $menuTable.remove();
@@ -160,7 +160,7 @@ scout.TableOrganizeMenu = function(table, x, y) {
     event.stopPropagation();
   }
 
-  function filterEnter() {
+  function filterEnter(event) {
     var $input = $(this);
     $input.val($input.val().toLowerCase());
 
