@@ -611,7 +611,6 @@ scout.Table.prototype.filter = function() {
   that.clearSelection();
   $('.table-row-sum', this.$dataScroll).hide();
 
-  // FIXME BSH !!! This implementation is super slow with many rows (1000) !!!
   $allRows.each(function() {
     var $row = $(this),
       rowText = $row.text().toLowerCase(),
@@ -706,25 +705,33 @@ scout.Table.prototype.unregisterFilter = function(key) {
 scout.Table.prototype.showRow = function($row) {
   var that = this;
 
-  if ($row.is(':hidden')) {
-    $row.stop().slideDown({
-      complete: function() {
-        that.updateScrollbar();
-      }
-    });
-  }
+  // FIXME is(), slideDown() and the complete callback are very slow, which blocks
+  //       the UI when filtering many rows (1000+). Therefore we use no animation.
+  //       Could this be optimized, maybe depending on the number for rows?
+  $row.show();
+  that.updateScrollbar();
+//  if ($row.is(':hidden')) {
+//    $row.stop().slideDown({
+//      complete: function() {
+//        that.updateScrollbar();
+//      }
+//    });
+//  }
 };
 
 scout.Table.prototype.hideRow = function($row) {
   var that = this;
 
-  if ($row.is(':visible')) {
-    $row.stop().slideUp({
-      complete: function() {
-        that.updateScrollbar();
-      }
-    });
-  }
+  // FIXME Same issue as in showRow()
+  $row.hide();
+  that.updateScrollbar();
+//  if ($row.is(':visible')) {
+//    $row.stop().slideUp({
+//      complete: function() {
+//        that.updateScrollbar();
+//      }
+//    });
+//  }
 };
 
 // move column
