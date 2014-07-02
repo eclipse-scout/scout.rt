@@ -113,22 +113,31 @@ scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, par
  * _adapterProperties array.
  */
 scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
-  for (var propertyName in model) {
-    if (ignore === undefined || ignore.indexOf(propertyName) == -1) {
-      var value;
-      if (this._adapterProperties.indexOf(propertyName) > -1) {
-        if (Array.isArray(model[propertyName])) {
-          // TODO AWE: (ask C.GU) evtl. könnten wir die -s methode auch löschen und den isArray check
-          // in der createModelAdapter methode selber machen?
-          value = this.session.getOrCreateModelAdapters(model[propertyName], this);
-        } else {
-          value = this.session.getOrCreateModelAdapter(model[propertyName], this);
-        }
-      } else {
-        value = model[propertyName];
-      }
-      func(propertyName, value);
+  var propertyName, value, i, adapter, adapters;
+
+  for (propertyName in model) {
+    if (ignore !== undefined && ignore.indexOf(propertyName) >= 0) {
+      continue;
     }
+
+    value = model[propertyName];
+
+    if (this._adapterProperties.indexOf(propertyName) > -1) {
+      if (Array.isArray(value)) {
+        adapters = [];
+        for (i = 0; i < value.length; i++) {
+          adapter = this.session.getOrCreateModelAdapter(value[i], this);
+          this.onChildAdapterCreated(propertyName, adapter);
+          adapters.push(adapter);
+        }
+        value = adapters;
+      } else {
+        value = this.session.getOrCreateModelAdapter(value, this);
+        this.onChildAdapterCreated(propertyName, value);
+      }
+    }
+
+    func(propertyName, value);
   }
 };
 
@@ -186,4 +195,11 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName) {
   } else {
     this[unsetFuncName]();
   }
+};
+
+/**
+ * Maybe overridden to influence creation. Default is emtpy.
+ */
+scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
+
 };

@@ -36,7 +36,7 @@ scout.TableControl.prototype.isContentAvailable = function() {
 };
 
 scout.TableControl.prototype.renderContent = function(form) {
-  if (!this.isContentAvailable()) {
+  if (!this.isContentAvailable() || !this.table.isRendered()) {
     return;
   }
 

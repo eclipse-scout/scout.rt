@@ -37,6 +37,13 @@ scout.Table.prototype.init = function(model, session) {
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 };
 
+scout.Table.prototype.onChildAdapterCreated = function(propertyName, adapter) {
+  //Link with table
+  if (propertyName === 'controls') {
+    adapter.table = this;
+  }
+};
+
 scout.Table.prototype._createTableConfigurator = function() {
   return new scout.TableConfigurator(this);
 };
@@ -61,7 +68,6 @@ scout.Table.prototype._render = function($parent) {
   if (this.controls) {
     for (var i = 0; i < this.controls.length; i++) {
       var control = this.controls[i];
-      control.table = this;
       this.footer.addControl(control);
     }
   }
