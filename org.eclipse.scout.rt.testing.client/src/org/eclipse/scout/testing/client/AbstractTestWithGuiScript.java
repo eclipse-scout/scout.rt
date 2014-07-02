@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -28,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.service.SERVICES;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -42,6 +47,8 @@ public abstract class AbstractTestWithGuiScript {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTestWithGuiScript.class);
 
   private boolean m_testActive;
+  private PrintStream m_originalSystemErrStream = null;
+  private ByteArrayOutputStream m_monitoringSystemErrStream = null;
 
   protected IClientSession m_clientSession;
 
@@ -136,7 +143,9 @@ public abstract class AbstractTestWithGuiScript {
     final IGuiMock gui = guiMockService.createMock(m_clientSession);
     gui.beforeTest();
     try {
-      //
+      if (failWhenSystemErrIsNotEmpty()) {
+        startMonitoringSystemErr();
+      }
       final ClientSyncJob runModelJob = new ClientSyncJob("Run", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor m) throws Throwable {
@@ -198,7 +207,36 @@ public abstract class AbstractTestWithGuiScript {
     }
     finally {
       gui.afterTest();
+      if (failWhenSystemErrIsNotEmpty()) {
+        String errText = stopMonitoringSystemErr();
+        Assert.assertTrue("System.err is not empty!: " + errText, StringUtility.isNullOrEmpty(errText));
+      }
     }
+  }
+
+  /**
+   * Redirects System.err for monitoring purpose
+   *
+   * @since 4.1.0
+   */
+  protected void startMonitoringSystemErr() {
+    m_originalSystemErrStream = System.err;
+    m_monitoringSystemErrStream = new ByteArrayOutputStream();
+    System.setErr(new PrintStream(m_monitoringSystemErrStream, true));
+  }
+
+  /**
+   * Stops the monitoring of System.err and sets the original System.err stream. {@link #startMonitoringSystemErr()}
+   * needs to be called before.
+   * The method returns the content of System.err
+   *
+   * @since 4.1.0
+   */
+  protected String stopMonitoringSystemErr() {
+    System.setErr(m_originalSystemErrStream);
+    String errText = new String(m_monitoringSystemErrStream.toByteArray());
+    m_monitoringSystemErrStream = null;
+    return errText;
   }
 
   /**
@@ -207,6 +245,16 @@ public abstract class AbstractTestWithGuiScript {
    */
   public boolean isTestActive() {
     return m_testActive;
+  }
+
+  /**
+   * Configures whether System.err should be monitored or not.
+   * If it is set to <code>true</code> the test will fail if System.err contains some content.
+   * If it is set to <code>false</code> System.err is not monitored and ignored.
+   * Override this method in your test if you want to have monitoring.
+   */
+  protected boolean failWhenSystemErrIsNotEmpty() {
+    return false;
   }
 
 }
