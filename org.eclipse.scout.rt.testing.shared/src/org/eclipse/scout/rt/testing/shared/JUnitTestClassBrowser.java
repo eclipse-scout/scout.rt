@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.testing.shared;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -139,15 +141,33 @@ public class JUnitTestClassBrowser {
       }
     }
     if (!devClasses.isEmpty()) {
+      sortTestClasses(devClasses);
       return devClasses;
     }
+    sortTestClasses(junitTestClasses);
     return junitTestClasses;
+  }
+
+  /**
+   * Sorts a list of classes. The default implementation sorts the classes in alphabetical order by their
+   * {@link Class#getSimpleName()}.
+   *
+   * @since 4.1.0
+   */
+  protected void sortTestClasses(List<Class<?>> testClasses) {
+    Collections.sort(testClasses, new Comparator<Class<?>>() {
+
+      @Override
+      public int compare(Class<?> clazz1, Class<?> clazz2) {
+        return clazz1.getSimpleName().compareTo(clazz2.getSimpleName());
+      }
+    });
   }
 
   /**
    * The default implementation checks that the given bundle's name is included in the list of bundle name include
    * patterns and that its name is not excluded by the bundle name exclude patterns.
-   * 
+   *
    * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for JUnit tests.
    *         <code>false</code> otherwise.
    * @see #setBundleNameIncludePatterns(Pattern[])
@@ -161,7 +181,7 @@ public class JUnitTestClassBrowser {
   /**
    * The default implementation checks that the given class's name is included in the list of class name include
    * patterns and that its name is not excluded by the class name exclude patterns.
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param className
@@ -177,7 +197,7 @@ public class JUnitTestClassBrowser {
   /**
    * This default implementation checks that the given class is not abstract and that it has either a {@link RunWith}
    * class-level annotation or at least one of its methods is annotated with {@link Test}.
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param c
@@ -214,7 +234,7 @@ public class JUnitTestClassBrowser {
    * Checks if the given string is included in the list of include patterns and that it is not excluded by the list of
    * exclude patterns. If the include or exclude pattern list is null or empty, the string is assumed to be included and
    * not excluded, respectively.
-   * 
+   *
    * @param s
    * @param includePatterns
    * @param excludePatterns
@@ -249,7 +269,7 @@ public class JUnitTestClassBrowser {
   /**
    * Parses a comma-separated list of filter patterns. A filter pattern is either a wildcard pattern or a regular
    * expression. Latter must be prefixed by <em>regex:</em>
-   * 
+   *
    * @param filter
    * @return
    */
@@ -280,7 +300,7 @@ public class JUnitTestClassBrowser {
   /**
    * Transforms the given string into a regular expression pattern. The string is assumed to be a wildcard pattern or
    * already a regular expression pattern. The latter must be prefixed by <em>regex:</em>.
-   * 
+   *
    * @param s
    * @return
    */

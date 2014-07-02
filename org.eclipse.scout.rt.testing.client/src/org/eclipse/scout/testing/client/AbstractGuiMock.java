@@ -30,14 +30,14 @@ public abstract class AbstractGuiMock implements IGuiMock {
 
   @Override
   public <T> T invokeScoutAndWait(final WaitCondition<T> r, long startTimeout, long runTimeout) throws Throwable {
-    final long deadLine = startTimeout > 0 ? System.currentTimeMillis() + startTimeout : -1;
+    final long deadLine = startTimeout > 0 ? System.nanoTime() + startTimeout : -1;
     final AtomicReference<T> ret = new AtomicReference<T>(null);
     final AtomicReference<Throwable> throwables = new AtomicReference<Throwable>(null);
 
     ClientSyncJob eclipseJob = new ClientSyncJob(r.toString(), getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) {
-        if (deadLine < 0 || deadLine > System.currentTimeMillis()) {
+        if (deadLine < 0 || deadLine > System.nanoTime()) {
           try {
             ret.set(r.run());
           }
