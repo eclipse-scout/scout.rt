@@ -32,7 +32,7 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
 };
 
 scout.BaseDesktop.prototype.goOffline = function() {
-  var message = 'Die Netzwerkverbindung ist unterbrochen.';
+  var message = 'Die Netzwerkverbindung ist unterbrochen.'; //FIXME CGU translate
 
   if (this.$offline) {
     return;
@@ -42,6 +42,7 @@ scout.BaseDesktop.prototype.goOffline = function() {
   this.layout.marginTop += this.$offline.outerHeight(true);
   this.layout.layout();
   this.$offline.text(message);
+  this.$offline.appendDiv('', 'reconnect').text('Reconnecting').hide();
 };
 
 scout.BaseDesktop.prototype.goOnline = function() {
@@ -52,6 +53,14 @@ scout.BaseDesktop.prototype.goOnline = function() {
   this.$offline.remove();
   this.layout.marginTop -= this.$offline.outerHeight(true);
   this.layout.layout();
+};
+
+scout.BaseDesktop.prototype.onReconnecting = function() {
+  if (!this.$offline) {
+    return;
+  }
+
+  this.$offline.find('.reconnect').show();
 };
 
 scout.BaseDesktop.prototype._addForm = function(form) {

@@ -6,7 +6,7 @@ scout.DesktopTaskbar = function(desktop) {
   this.$div;
   this.$formThumbs;
   this.formThumbsMap = {};
-  this.toolButtons = desktop.session.getOrCreateModelAdapters(desktop.toolButtons, this);
+  this.toolButtons = desktop.session.getOrCreateModelAdapters(desktop.toolButtons, this); //FIXME CGU move to desktop which extends ModelAdapter?
 };
 
 scout.DesktopTaskbar.prototype.render = function($desktop) {

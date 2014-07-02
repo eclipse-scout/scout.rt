@@ -61,8 +61,13 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       return true;
     }
 
-    JsonRequest uiReq = new JsonRequest(toJSON(req));
-    String sessionAttributeName = "JsonUi#" + uiReq.getSessionPartId();
+    JsonRequest jsonReq = new JsonRequest(toJSON(req));
+    if (jsonReq.isPingRequest()) {
+      writeResponse(resp, createPingJsonResponse());
+      return true;
+    }
+
+    String sessionAttributeName = "JsonUi#" + jsonReq.getSessionPartId();
     HttpSession httpSession = req.getSession();
 
     //FIXME really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession?
@@ -70,7 +75,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     synchronized (this) {
       jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
       if (jsonSession == null) {
-        if (!uiReq.isStartupRequest()) {
+        if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to session timeout.");
           writeError(resp, createSessionTimeoutJsonResponse());
           return true;
@@ -80,28 +85,32 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
 
         //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
         jsonSession = servlet.createJsonSession();
-        jsonSession.init(req, uiReq);
+        jsonSession.init(req, jsonReq);
         httpSession.setAttribute(sessionAttributeName, jsonSession);
       }
     }
 
     //GUI requests for the same session must be processed consecutively
     synchronized (jsonSession) {
-      JsonResponse uiRes = jsonSession.processRequest(req, uiReq);
-      writeResponse(resp, uiRes);
+      JsonResponse jsonResp = jsonSession.processRequest(req, jsonReq);
+      writeResponse(resp, jsonResp);
     }
     return true;
   }
 
   protected JsonResponse createSessionTimeoutJsonResponse() {
-    JsonResponse uiResp = new JsonResponse();
-    uiResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    uiResp.setErrorMessage("The session has expired, please reload the page."); //FIXME use TEXTS
-    return uiResp;
+    JsonResponse jsonResp = new JsonResponse();
+    jsonResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
+    jsonResp.setErrorMessage("The session has expired, please reload the page."); //FIXME use TEXTS
+    return jsonResp;
   }
 
-  protected void writeResponse(HttpServletResponse resp, JsonResponse uiRes) throws IOException {
-    String jsonText = uiRes.toJson().toString();
+  protected JsonResponse createPingJsonResponse() {
+    return new JsonResponse();
+  }
+
+  protected void writeResponse(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
+    String jsonText = jsonResp.toJson().toString();
     byte[] data = jsonText.getBytes("UTF-8");
     resp.setContentLength(data.length);
     resp.setContentType("application/json");
@@ -111,9 +120,9 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     LOG.debug("Returned: " + jsonText);
   }
 
-  protected void writeError(HttpServletResponse resp, JsonResponse uiRes) throws IOException {
+  protected void writeError(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    writeResponse(resp, uiRes);
+    writeResponse(resp, jsonResp);
   }
 
   protected JSONObject toJSON(HttpServletRequest req) {

@@ -10,7 +10,9 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
   this._sessionPartId = sessionPartId;
   this._deferred;
   this._startup;
+  this.desktop;
   this.userAgent = userAgent;
+  this.url = 'json';
   if (!userAgent) {
     this.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   }
@@ -22,7 +24,6 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
   // FIXME maybe better separate session object from event processing, create
   // ClientSession.js?
   this.modelAdapterRegistry[sessionPartId] = this;
-  this.desktop;
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
@@ -117,14 +118,16 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     type: "POST",
     dataType: "json",
     cache: false,
-    url: 'json',
-    data: JSON.stringify(request)
+    url: this.url,
+    data: JSON.stringify(request),
+    context: request
   })
   .done(function(data) {
     that._processSuccessResponse(data);
   })
   .fail(function(jqXHR, textStatus, errorThrown) {
-    that._processErrorResponse(jqXHR, textStatus, errorThrown);
+    var request = this;
+    that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
   });
 
 };
@@ -160,7 +163,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
  *
  * @param textStatus timeout, abort, error or parseerror
  */
-scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown) {
+scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
   console.log(jqXHR.status);
   console.log(textStatus);
   console.log(errorThrown);
@@ -193,11 +196,20 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
 scout.Session.prototype.goOffline = function() {
   this.offline = true;
   this.desktop.goOffline();
+
+  if (!this.reconnector) {
+    this.reconnector = new scout.Reconnector(this);
+  }
+  this.reconnector.start();
 };
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
   this.desktop.goOnline();
+};
+
+scout.Session.prototype.onReconnecting = function() {
+  this.desktop.onReconnecting();
 };
 
 scout.Session.prototype.listen = function() {

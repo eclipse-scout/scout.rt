@@ -19,6 +19,7 @@ import org.json.JSONObject;
 public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
+  public static final String PROP_PING = "ping";
   public static final String PROP_SESSION_PART_ID = "sessionPartId";
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_EVENTS = "events";
@@ -51,6 +52,10 @@ public class JsonRequest {
 
   public boolean isStartupRequest() {
     return Boolean.TRUE.equals(m_request.opt(PROP_STARTUP));
+  }
+
+  public boolean isPingRequest() {
+    return Boolean.TRUE.equals(m_request.opt(PROP_PING));
   }
 
   /**

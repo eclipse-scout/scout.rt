@@ -19,6 +19,7 @@
 //@include("session/Event.js");
 //@include("session/Locale.js");
 //@include("session/UserAgent.js");
+//@include("session/Reconnector.js");
 //@include("datamodel/DataModel.js");
 //@include("layout/GridLayout.js");
 //@include("layout/TableLayout.js");
