@@ -127,11 +127,11 @@ public class ScriptProcessor {
                 append((insideBlockComment ? "//" : "*/")).append(" ").
                 append(line).
                 append("\n");
-            if (lineIsBeginOfMultilineBlockComment(line)) {
+            if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
               //also if line is endMLBC AND beginMLBC
               insideBlockComment = true;
             }
-            else if (lineIsEndOfMultilineBlockComment(line)) {
+            else if (lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
               insideBlockComment = false;
             }
             lineNo++;
@@ -148,15 +148,17 @@ public class ScriptProcessor {
     return content;
   }
 
-  protected boolean lineIsBeginOfMultilineBlockComment(String line) {
+  protected boolean lineIsBeginOfMultilineBlockComment(String line, boolean insideBlockComment) {
     int a = line.lastIndexOf("/*");
     int b = line.lastIndexOf("*/");
-    return a >= 0 && (b < 0 || b < a);
+    int c = line.lastIndexOf("/*/");
+    return a >= 0 && (b < 0 || b < a || (c == a)) && !insideBlockComment;
   }
 
-  protected boolean lineIsEndOfMultilineBlockComment(String line) {
+  protected boolean lineIsEndOfMultilineBlockComment(String line, boolean insideBlockComment) {
     int a = line.indexOf("/*");
     int b = line.indexOf("*/");
-    return b >= 0 && (a < 0 || a > b);
+    int c = line.lastIndexOf("/*/");
+    return b >= 0 && (a < 0 || a < b || (c == a)) && insideBlockComment;
   }
 }
