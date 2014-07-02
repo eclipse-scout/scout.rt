@@ -91,7 +91,7 @@ describe("DesktopTree", function() {
           type_: 'nodesSelected'
         }]
       };
-      session._processResponse(message);
+      session._processSuccessResponse(message);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
