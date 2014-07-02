@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
  * <td>Not to use in the code.</td>
  * </tr>
  * <tr>
- * <td rowspan="4" vAlign="top"><code>defaultSubtypeSdkCommand</code></td>
+ * <td rowspan="3" vAlign="top"><code>defaultSubtypeSdkCommand</code></td>
  * <td> {@link DefaultSubtypeSdkCommand#CREATE}</td>
  * <td>All subtypes will be included in the formdata.</td>
  * </tr>
@@ -63,62 +63,78 @@ import java.lang.annotation.Target;
  * <td> {@link DefaultSubtypeSdkCommand#DEFAULT}</td>
  * <td>Not to use in the code.</td>
  * </tr>
+ * <tr>
+ * <td>genericOrdinal</td>
+ * <td>int >= 0</td>
+ * <td>Since Scout 4.1.<br>
+ * If the class referenced in <code>value</code> has a type parameter and the annotation owner has type parameters as
+ * well, the ordinal describes the zero-based index of the type parameter of the annotation owner that should be
+ * transfered to the type parameter of the <code>value</code> class.</td>
+ * </tr>
+ * <tr>
+ * <td>interfaces</td>
+ * <td>Class[]</td>
+ * <td>Since Scout 4.1.<br>
+ * An array of interface classes that the formdata class referenced in <code>value</code> should implement. There is no
+ * check done that the resulting formdata fulfills the interfaces provided in this array. They are just added to the
+ * generated formdata class.</td>
+ * </tr>
  * </table>
  * <h3>Examples</h3>
  * <h4>Ignore on form fields</h4> <blockquote>
- * 
+ *
  * <pre>
  * &#64FormData(sdkCommand=SdkCommand.IGNORE)
  * public class NameField extends AbstractStringField{...
- *</pre>
- * 
+ * </pre>
+ *
  * </blockquote> The NameField will not be considered in the form data. The NameField is an inner type in a
  * form.</blockquote>
  * <h4>Ignore on abstract form fields</h4> <blockquote>
- * 
+ *
  * <pre>
  * &#64FormData(defaultSubtypeSdkCommand=DefaultSubtypeSdkCommand.IGNORE)
  * public abstract class AbstractNameField extends AbstractStringField{...
- *</pre>
- * 
+ * </pre>
+ *
  * </blockquote> Any subtype of AbstractFormField will be ignored in its form data. The AbstractNameField is a primary
  * type.
  * <h4>Template Groupbox</h4> <blockquote>
- * 
+ *
  * <pre>
  * &#64FormData(value=AbstractTemplateGroupBoxData, defaultSubtypeSdkCommand=DefaultSubtypeSdkCommand.CREATE, sdkCommand=SdkCommand.CREATE)
  * public abstract class AbstractTemplateGroupBox extends AbstractGroupBox{...
- *</pre>
- * 
+ * </pre>
+ *
  * </blockquote> The <code>DefaultSubtypeSdkCommand.CREATE</code> ensures the creation of a FormData class for every
  * subclass of this groupbox. The value <code>AbstractTemplateGroupBoxData</code> ensures every
  * <h3>Existing Annotations</h3>
- * 
+ *
  * <pre>
  * &#64FormData(AbstractFormData.class)
  * public abstract class <b>AbstractForm</b> extends AbstractPropertyObserver implements IForm { ...
  * </pre>
- * 
+ *
  * <pre>
  * &#64FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
  * public abstract class <b>AbstractFormField</b> extends AbstractPropertyObserver implements IFormField {...
  * </pre>
- * 
+ *
  * <pre>
  * &#64FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
  * public abstract class <b>AbstractValueField<T></b> extends AbstractFormField implements IValueField<T> { ...
  * </pre>
- * 
+ *
  * <pre>
  * &#64FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
  * public abstract class <b>AbstractComposerField</b> extends AbstractFormField implements IComposerField { ...
  * </pre>
- * 
+ *
  * <pre>
  * &#64FormData(value = AbstractUTCFieldData.class, sdkCommand = SdkCommand.USE)
  * public abstract class <b>AbstractUTCDateField</b> extends AbstractDateField implements IUTCDateField { ...
  * </pre>
- * 
+ *
  * <pre>
  * &#64FormData(value = AbstractTableFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
  * public abstract class <b>AbstractTableField<T extends ITable></b> extends AbstractFormField implements ITableField<T> { ...
@@ -135,6 +151,8 @@ public @interface FormData {
   DefaultSubtypeSdkCommand defaultSubtypeSdkCommand() default DefaultSubtypeSdkCommand.DEFAULT;
 
   int genericOrdinal() default -1;
+
+  Class[] interfaces() default {};
 
   public static enum SdkCommand {
     CREATE, USE, IGNORE, DEFAULT
