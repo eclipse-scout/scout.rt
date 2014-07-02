@@ -26,6 +26,9 @@ scout.Scrollbar = function($parent, axis) {
   $(window).on('load resize', this.initThumb.bind(this));
 
   function scrollWheel(event) {
+    if (event.ctrlKey) {
+      return true; // allow ctrl+mousewheel to zoom the page
+    }
     event = event.originalEvent || window.event.originalEvent;
     var w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60,
       d = that._scroll / that._offset;
