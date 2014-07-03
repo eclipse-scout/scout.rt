@@ -135,25 +135,25 @@ public class ReplaceTableTest {
 
     // Form.MainBox.TabBox.FirstGroupBox.<AbstractTemplateTableField>
     assertEquals(9, form.getTableField1().getTable().getMenus().size());
-    assertEquals(9, form.getFirstGroupBoxEx().getTableFieldEx1().getTable().getMenus().size());
+    assertEquals(9, form.getTableFieldEx1().getTable().getMenus().size());
 
     assertSame(form.getTableField1().getTable().getFirstMenu(), form.getTableField1().getTable().getMenus().get(0));
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getThirdMenu1(), form.getTableField1().getTable().getMenus().get(1));
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenus().get(2));
+    assertSame(form.getTableFieldEx1().getTableEx1().getThirdMenu1(), form.getTableField1().getTable().getMenus().get(1));
+    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenus().get(2));
 
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu.class));
-    assertSame(form.getFirstGroupBoxEx().getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(ExtendedFormUsingTemplates.FirstGroupBoxEx.TableFieldEx1.TableEx1.SecondMenuEx1.class));
+    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu.class));
+    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(ExtendedFormUsingTemplates.TableFieldEx1.TableEx1.SecondMenuEx1.class));
 
     // Form.MainBox.TabBox.<AbstractTableBox>.<AbstractTemplateTableField>
     assertEquals(9, form.getSecondGroupBox().getInnerTableField().getTable().getMenus().size());
-    assertEquals(9, form.getSecondGroupBoxEx().getInnerTableFieldEx1().getTable().getMenus().size());
+    assertEquals(9, form.getInnerTableFieldEx1().getTable().getMenus().size());
 
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(0));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(0));
     assertSame(form.getSecondGroupBox().getInnerTableField().getTable().getFirstMenu(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(1));
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(2));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(2));
 
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
-    assertSame(form.getSecondGroupBoxEx().getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(ExtendedFormUsingTemplates.SecondGroupBoxEx.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(ExtendedFormUsingTemplates.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));
   }
 
   @Test
@@ -490,110 +490,86 @@ public class ReplaceTableTest {
     public ExtendedFormUsingTemplates() throws ProcessingException {
     }
 
-    public FirstGroupBoxEx getFirstGroupBoxEx() {
-      return getFieldByClass(FirstGroupBoxEx.class);
+    public TableFieldEx1 getTableFieldEx1() {
+      return getFieldByClass(TableFieldEx1.class);
     }
 
-    public SecondGroupBoxEx getSecondGroupBoxEx() {
-      return getFieldByClass(SecondGroupBoxEx.class);
+    public InnerTableFieldEx1 getInnerTableFieldEx1() {
+      return getFieldByClass(InnerTableFieldEx1.class);
     }
 
     @Replace
-    public class FirstGroupBoxEx extends MainBox.TabBox.FirstGroupBox {
+    public class TableFieldEx1 extends MainBox.TabBox.FirstGroupBox.TableField1 {
 
-      public FirstGroupBoxEx(MainBox.TabBox container) {
+      public TableFieldEx1(MainBox.TabBox.FirstGroupBox container) {
         container.super();
       }
 
-      public TableFieldEx1 getTableFieldEx1() {
-        return getFieldByClass(TableFieldEx1.class);
+      public TableEx1 getTableEx1() {
+        return (TableEx1) getTable();
       }
 
       @Replace
-      public class TableFieldEx1 extends MainBox.TabBox.FirstGroupBox.TableField1 {
+      public class TableEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1 {
 
-        public TableFieldEx1(MainBox.TabBox.FirstGroupBox container) {
-          container.super();
+        public SecondMenuEx1 getSecondMenuEx1() throws ProcessingException {
+          return getMenu(SecondMenuEx1.class);
         }
 
-        public TableEx1 getTableEx1() {
-          return (TableEx1) getTable();
+        public ThirdMenu1 getThirdMenu1() throws ProcessingException {
+          return getMenu(ThirdMenu1.class);
         }
 
+        @Order(160)
         @Replace
-        public class TableEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1 {
+        public class SecondMenuEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu {
 
-          public SecondMenuEx1 getSecondMenuEx1() throws ProcessingException {
-            return getMenu(SecondMenuEx1.class);
+          @Override
+          protected String getConfiguredText() {
+            return "SecondMenuEx1";
           }
+        }
 
-          public ThirdMenu1 getThirdMenu1() throws ProcessingException {
-            return getMenu(ThirdMenu1.class);
-          }
-
-          @Order(160)
-          @Replace
-          public class SecondMenuEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu {
-
-            @Override
-            protected String getConfiguredText() {
-              return "SecondMenuEx1";
-            }
-          }
-
-          @Order(30)
-          public class ThirdMenu1 extends AbstractMenu {
-          }
+        @Order(30)
+        public class ThirdMenu1 extends AbstractMenu {
         }
       }
     }
 
     @Replace
-    public class SecondGroupBoxEx extends MainBox.TabBox.SecondGroupBox {
+    public class InnerTableFieldEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField {
 
-      public SecondGroupBoxEx(MainBox.TabBox container) {
+      public InnerTableFieldEx1(MainBox.TabBox.SecondGroupBox container) {
         container.super();
       }
 
-      public InnerTableFieldEx1 getInnerTableFieldEx1() {
-        return getFieldByClass(InnerTableFieldEx1.class);
+      public InnerTableEx1 getInnerTableEx1() {
+        return (InnerTableEx1) getTable();
       }
 
       @Replace
-      public class InnerTableFieldEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField {
+      public class InnerTableEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable {
 
-        public InnerTableFieldEx1(MainBox.TabBox.SecondGroupBox container) {
-          container.super();
+        public SecondMenuEx2 getSecondMenuEx2() throws ProcessingException {
+          return getMenu(SecondMenuEx2.class);
         }
 
-        public InnerTableEx1 getInnerTableEx1() {
-          return (InnerTableEx1) getTable();
+        public ThirdMenu2 getThirdMenu2() throws ProcessingException {
+          return getMenu(ThirdMenu2.class);
         }
 
+        @Order(1)
         @Replace
-        public class InnerTableEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable {
+        public class SecondMenuEx2 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu {
 
-          public SecondMenuEx2 getSecondMenuEx2() throws ProcessingException {
-            return getMenu(SecondMenuEx2.class);
+          @Override
+          protected String getConfiguredText() {
+            return "SecondMenuEx2";
           }
+        }
 
-          public ThirdMenu2 getThirdMenu2() throws ProcessingException {
-            return getMenu(ThirdMenu2.class);
-          }
-
-          @Order(1)
-          @Replace
-          public class SecondMenuEx2 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu {
-
-            @Override
-            protected String getConfiguredText() {
-              return "SecondMenuEx2";
-            }
-          }
-
-          @Order(30)
-          public class ThirdMenu2 extends AbstractMenu {
-          }
+        @Order(30)
+        public class ThirdMenu2 extends AbstractMenu {
         }
       }
     }

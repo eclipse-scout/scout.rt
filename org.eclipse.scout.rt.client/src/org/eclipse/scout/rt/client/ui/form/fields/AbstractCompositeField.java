@@ -150,9 +150,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void setFormInternal(IForm form) {
     super.setFormInternal(form);
-    if (form instanceof AbstractForm) {
-      ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
-    }
     for (IFormField field : m_fields) {
       field.setFormInternal(form);
     }
@@ -229,6 +226,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * @since 3.8.2
    */
   private <T extends IFormField> Class<? extends T> getReplacingFieldClass(Class<T> c) {
+    // 1. check local replacements
+    if (m_formFieldReplacements != null) {
+      @SuppressWarnings("unchecked")
+      Class<? extends T> replacementFieldClass = (Class<? extends T>) m_formFieldReplacements.get(c);
+      if (replacementFieldClass != null) {
+        return replacementFieldClass;
+      }
+    }
+    // 2. check global replacements
     IForm form = getForm();
     if (form instanceof AbstractForm) {
       Map<Class<?>, Class<? extends IFormField>> mapping = ((AbstractForm) form).getFormFieldReplacementsInternal();
@@ -240,6 +246,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         }
       }
     }
+    // 3. field is not replaced
     return c;
   }
 
