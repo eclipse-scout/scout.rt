@@ -83,7 +83,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
     rowClass += 'row-selected ';
   }
 
-  return $.makeDiv(row.id, rowClass, cellContent);
+  return '<div id="' + row.id + '" class="' + rowClass + '">' + cellContent + '</div>';
 };
 
 scout.MobileTable.prototype._computeHeaderColumns = function() {
