@@ -177,7 +177,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -400,34 +400,32 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
             LOG.error(null, e);
           }
         }
-        if (!m_result.isEmpty()) {
-          ClientSyncJob setItemsJob = new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems", ClientSyncJob.getCurrentSession()) {
-            @Override
-            protected void runVoid(IProgressMonitor monitor2) throws Throwable {
-              synchronized (AbstractCalendarItemProvider.this) {
-                if (!monitor.isCanceled()) {
-                  setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
-                  reschedule(monitor);
-                }
+        ClientSyncJob setItemsJob = new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems", ClientSyncJob.getCurrentSession()) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor2) throws Throwable {
+            synchronized (AbstractCalendarItemProvider.this) {
+              if (!monitor.isCanceled()) {
+                setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
+                reschedule(monitor);
               }
             }
+          }
 
-            private void reschedule(final IProgressMonitor monitor2) {
-              long n = getRefreshIntervalMillis();
-              if (n > 0 && !monitor2.isCanceled()) {
-                //-> Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items
-                //    AND loading dates are still consistent with ui (If they are not consistent, monitor is cancled during setItemsInternal(...))
-                loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_loadingMinDate, m_loadingMaxDate, n);
-              }
+          private void reschedule(final IProgressMonitor monitor2) {
+            long n = getRefreshIntervalMillis();
+            if (n > 0 && !monitor2.isCanceled()) {
+              //-> Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items
+              //    AND loading dates are still consistent with ui (If they are not consistent, monitor is cancled during setItemsInternal(...))
+              loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_loadingMinDate, m_loadingMaxDate, n);
             }
-          };
-          setItemsJob.schedule();
-          try {
-            setItemsJob.join();
           }
-          catch (InterruptedException e) {
-            // nop
-          }
+        };
+        setItemsJob.schedule();
+        try {
+          setItemsJob.join();
+        }
+        catch (InterruptedException e) {
+          // nop
         }
         setLoadInProgressInSyncJob(false);
       }
