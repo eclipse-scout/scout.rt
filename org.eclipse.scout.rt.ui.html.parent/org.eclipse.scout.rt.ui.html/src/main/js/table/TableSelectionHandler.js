@@ -63,11 +63,11 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     // action for all affected rows
     function selectData(event) {
       // affected rows between $row and Target
-      var firstIndex = first || $row.index(),
-        lastIndex = $(event.delegateTarget).index();
+      var firstIndex = (typeof first !== 'undefined' ? first : $row.index());
+      var lastIndex = $(event.delegateTarget).index();
 
-      var startIndex = Math.min(firstIndex, lastIndex),
-        endIndex = Math.max(firstIndex, lastIndex) + 1;
+      var startIndex = Math.min(firstIndex, lastIndex);
+      var endIndex = Math.max(firstIndex, lastIndex) + 1;
 
       var $actionRow = $('.table-row', that.table.$data).slice(startIndex, endIndex);
 
@@ -137,8 +137,8 @@ scout.TableSelectionHandler.prototype.dataDrawn = function() {
  */
 scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedRows) {
   $selectedRows.each(function() {
-    var hasPrev = $(this).prevAll(':visible:first').hasClass('row-selected'),
-      hasNext = $(this).nextAll(':visible:first').hasClass('row-selected');
+    var hasPrev = $(this).prevAll('div:not(.invisible):first').hasClass('row-selected');
+    var hasNext = $(this).nextAll('div:not(.invisible):first').hasClass('row-selected');
 
     if (hasPrev && hasNext) $(this).addClass('select-middle');
     if (!hasPrev && hasNext) $(this).addClass('select-top');

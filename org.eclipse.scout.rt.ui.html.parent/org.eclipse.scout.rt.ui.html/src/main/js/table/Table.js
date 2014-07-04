@@ -709,6 +709,7 @@ scout.Table.prototype.showRow = function($row) {
   //       the UI when filtering many rows (1000+). Therefore we use no animation.
   //       Could this be optimized, maybe depending on the number for rows?
   $row.show();
+  $row.removeClass('invisible');
   that.updateScrollbar();
 //  if ($row.is(':hidden')) {
 //    $row.stop().slideDown({
@@ -724,6 +725,7 @@ scout.Table.prototype.hideRow = function($row) {
 
   // FIXME Same issue as in showRow()
   $row.hide();
+  $row.addClass('invisible');
   that.updateScrollbar();
 //  if ($row.is(':visible')) {
 //    $row.stop().slideUp({
