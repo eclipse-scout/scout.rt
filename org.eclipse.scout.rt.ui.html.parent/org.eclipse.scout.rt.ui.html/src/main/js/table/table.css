@@ -115,7 +115,7 @@ border-radius: 0px;
 margin-bottom: -2px;
 }
 
-.table-row > div, .table-row-sum > div {
+.table-row .table-cell, .table-row-sum .table-cell {
 display: table-cell;
 padding: 3px 6px 0px 6px;
 background-color: transparent;
@@ -127,11 +127,11 @@ vertical-align: top;
 line-height: 26px;
 }
 
-.table-row-sum > div {
+.table-row-sum .table-cell {
 font-weight: bold;
 }
 
-.table-row-sum:last-child > div {
+.table-row-sum:last-child .table-cell {
 border-bottom: none;
 }
 
@@ -148,6 +148,11 @@ border-top-right-radius: 7px;
 .table-row.select-middle {
 border-left-color: #0082a1;
 border-right-color: #0082a1;
+border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+}
+
+.table-row.select-middle .table-cell {
+border-top: 2px solid transparent;
 }
 
 .table-row.select-bottom {
@@ -156,18 +161,20 @@ border-left-color: #0082a1;
 border-right-color: #0082a1;
 border-bottom-left-radius: 7px;
 border-bottom-right-radius: 7px;
+border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+}
+
+.table-row.select-bottom .table-cell {
+border-top: 2px solid transparent;
 }
 
 .table-row.select-single {
-border-top-color: #0082a1;
-border-bottom-color: #0082a1;
-border-left-color: #0082a1;
-border-right-color: #0082a1;
+border: 2px solid #0082a1;
 border-radius: 7px;
 }
 
-.table-row.select-single > div, .table-row.select-bottom > div{
-border-bottom: 1px solid transparent;
+.table-row.select-single .table-cell, .table-row.select-bottom .table-cell {
+border-bottom-color: transparent;
 }
 
 /* Key box */

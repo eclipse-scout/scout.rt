@@ -240,7 +240,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
       allign = (column.type == 'number') ? 'text-align: right; ' : '',
       value = this.getText(c, index);
 
-    rowDiv += '<div style="' + style + allign + '">' + value + '</div>';
+    rowDiv += '<div class="table-cell" style="' + style + allign + '">' + value + '</div>';
   }
   rowDiv += '</div>';
 
