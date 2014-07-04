@@ -4,7 +4,11 @@
  */
 scout.Device = function(userAgent) {
   this.userAgent = userAgent;
+  this.system;
+  this.features = {};
 };
+
+scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
 scout.Device.prototype.isIos = function() {
   return this.getSystem() === scout.Device.SYSTEM_IOS;
@@ -12,6 +16,29 @@ scout.Device.prototype.isIos = function() {
 
 scout.Device.prototype.supportsTouch = function() {
   // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
+};
+
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_CSS_animations/Detecting_CSS_animation_support
+ */
+scout.Device.prototype.supportsCssAnimation = function() {
+  if (this.features.cssAnimation === undefined) {
+    this.features.cssAnimation = check();
+  }
+  return this.features.cssAnimation;
+
+  function check() {
+    var i, element = document.createElement("div");
+    if (element.style.animation !== undefined) {
+      return true;
+    }
+
+    for (i = 0; i < scout.Device.vendorPrefixes.length; i++) {
+      if (element.style[scout.Device.vendorPrefixes[i] + 'Animation'] !== undefined) {
+        return true;
+      }
+    }
+  }
 };
 
 scout.Device.prototype.getSystem = function() {

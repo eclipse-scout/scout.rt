@@ -32,27 +32,42 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
 };
 
 scout.BaseDesktop.prototype.goOffline = function() {
-  var message = 'Die Netzwerkverbindung ist unterbrochen.'; //FIXME CGU translate
+  var message = 'Die Netzwerkverbindung ist unterbrochen.',
+    $reconnect;//FIXME CGU translate
 
   if (this.$offline) {
     return;
   }
 
   this.$offline = this.$parent.prependDiv('', 'offline-message');
+  this.$offline.text(message);
+  $reconnect = this.$offline.appendDiv('', 'reconnect');
+  $reconnect
+    .text('Reconnecting...')
+    .hide();
+  if (scout.device.supportsCssAnimation()) {
+    $reconnect.addClass('reconnect-animated');
+  }
   this.layout.marginTop += this.$offline.outerHeight(true);
   this.layout.layout();
-  this.$offline.text(message);
-  this.$offline.appendDiv('', 'reconnect').text('Reconnecting').hide();
 };
 
 scout.BaseDesktop.prototype.goOnline = function() {
+  if (!this.hideOfflineMessagePending) {
+    this.hideOfflineMessage();
+  }
+};
+
+scout.BaseDesktop.prototype.hideOfflineMessage = function() {
   if (!this.$offline) {
     return;
   }
 
-  this.$offline.remove();
   this.layout.marginTop -= this.$offline.outerHeight(true);
+  this.$offline.remove();
   this.layout.layout();
+  this.hideOfflineMessagePending = false;
+  this.$offline = null;
 };
 
 scout.BaseDesktop.prototype.onReconnecting = function() {
@@ -61,6 +76,27 @@ scout.BaseDesktop.prototype.onReconnecting = function() {
   }
 
   this.$offline.find('.reconnect').show();
+};
+
+scout.BaseDesktop.prototype.onReconnectingSucceeded = function() {
+  var message = 'Die Verbindung wurde wieder hergestellt.';  //FIXME CGU translate
+  if (!this.$offline) {
+    return;
+  }
+
+  this.$offline.find('.reconnect').hide();
+  this.$offline.text(message);
+  this.$offline.addClass('reconnect-successful');
+  this.hideOfflineMessagePending = true;
+  setTimeout(this.hideOfflineMessage.bind(this), 3000);
+};
+
+scout.BaseDesktop.prototype.onReconnectingFailed = function() {
+  if (!this.$offline) {
+    return;
+  }
+
+  this.$offline.find('.reconnect').hide();
 };
 
 scout.BaseDesktop.prototype._addForm = function(form) {

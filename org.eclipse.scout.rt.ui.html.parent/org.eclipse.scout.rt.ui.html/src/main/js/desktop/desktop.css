@@ -16,13 +16,6 @@ width: 600px;
 right: 0px;
 }
 
-.offline-message {
-border: 1px solid #0082a1;
-background-color: #eee;
-margin: 5px 10px;
-padding: 2px 5px;
-}
-
 .timeout-message {
 border: 1px solid red;
 background-color: rgb(255, 200, 200);
@@ -32,32 +25,63 @@ max-width: 300px;
 margin: 20px auto;
 }
 
-.reconnect {
-display: inline-block;
-text-align: right;
+.offline-message {
+border: 1px solid #0082a1;
+background-color: #eee;
+margin: 5px 10px;
+padding: 6px 5px;
 }
 
-.reconnect:before {
-  -webkit-animation: offline-rotation 0.7s linear infinite;
-  -moz-animation: offline-rotation 0.7s linear infinite;
-  -ms-animation: offline-rotation 0.7s linear infinite;
-  -o-animation: offline-rotation 0.7s linear infinite;
-  animation: offline-rotation 0.7s linear infinite;
-  -webkit-backface-visibility: hidden;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
-  border-radius: 50%;
+.offline-message.reconnect-successful {
+border: 1px solid #00A507;
+background-color: #E1FDE3;
+}
+
+.reconnect {
+display: inline-block;
+float: right;
+}
+
+/* FIXME CGU create mixin when using less/sass */
+@-webkit-keyframes reconnect-rotation {
+  0% {
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+  }
+}
+
+@keyframes reconnect-rotation {
+  0% {
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+  }
+}
+
+.reconnect-animated:before {
+  -webkit-animation: reconnect-rotation 0.9s linear infinite;
+  animation: reconnect-rotation 0.9s linear infinite;
   content: " ";
   display: inline-block;
-  bottom: 0;
-  margin: 0 5px;
-  height: 1em;
-  width: 1em;
-  border: 2px solid rgba(0, 0, 0, 0);
-  border-top-color: #7c6d1f;
-  border-left-color: #7c6d1f;
-  opacity: 0.7;
   vertical-align: middle;
+  margin-right: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-top-color: #0082a1;
+  border-left-color: #0082a1;
+  width: 14px;
+  height: 14px;
 }

@@ -44,9 +44,10 @@ scout.Reconnector.prototype.ping = function() {
 };
 
 scout.Reconnector.prototype._onSuccess = function() {
-  this.session.goOnline();
+  this.session.onReconnectingSucceeded();
 };
 
 scout.Reconnector.prototype._onFailure = function() {
+  this.session.onReconnectingFailed();
   this._schedulePing();
 };

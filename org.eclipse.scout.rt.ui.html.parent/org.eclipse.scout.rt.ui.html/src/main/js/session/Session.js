@@ -212,6 +212,15 @@ scout.Session.prototype.onReconnecting = function() {
   this.desktop.onReconnecting();
 };
 
+scout.Session.prototype.onReconnectingSucceeded = function() {
+  this.desktop.onReconnectingSucceeded();
+  this.goOnline();
+};
+
+scout.Session.prototype.onReconnectingFailed = function() {
+  this.desktop.onReconnectingFailed();
+};
+
 scout.Session.prototype.listen = function() {
   if (!this._deferred) {
     this._deferred = $.Deferred();
