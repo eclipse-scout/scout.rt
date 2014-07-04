@@ -23,6 +23,10 @@ scout.Button.prototype._render = function($parent) {
 };
 
 scout.Button.prototype._setEnabled = function(enabled) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (enabled) {
     this._$button.removeAttr('disabled');
   } else {

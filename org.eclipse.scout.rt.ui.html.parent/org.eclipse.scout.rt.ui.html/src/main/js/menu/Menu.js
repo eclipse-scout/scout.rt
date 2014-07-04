@@ -22,3 +22,13 @@ scout.Menu.prototype._setVisible = function(visible) {
 scout.Menu.prototype._setEnabled = function(enabled) {
   // TODO CGU implement
 };
+
+scout.Menu.prototype.goOffline = function() {
+  scout.Menu.parent.prototype.goOffline.call(this);
+  this._setEnabled(false);
+};
+
+scout.Menu.prototype.goOnline = function() {
+  scout.Menu.parent.prototype.goOnline.call(this);
+  this._setEnabled(true);
+};

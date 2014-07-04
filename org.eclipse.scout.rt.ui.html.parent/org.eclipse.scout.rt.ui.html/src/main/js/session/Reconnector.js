@@ -11,8 +11,14 @@ scout.Reconnector.prototype.start = function() {
 };
 
 scout.Reconnector.prototype._schedulePing = function() {
+  if (this.pingScheduled) {
+    return;
+  }
+
+  this.pingScheduled = true;
   setTimeout(function() {
     this.ping();
+    this.pingScheduled = false;
   }.bind(this), this.interval);
 };
 

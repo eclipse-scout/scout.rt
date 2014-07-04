@@ -19,6 +19,10 @@ scout.NumberField.prototype._render = function($parent) {
 };
 
 scout.NumberField.prototype._setEnabled = function(enabled) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (enabled) {
     this._$inputText.removeAttr('disabled');
   } else {

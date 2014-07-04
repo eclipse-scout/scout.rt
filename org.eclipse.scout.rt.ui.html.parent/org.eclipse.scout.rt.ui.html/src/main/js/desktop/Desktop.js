@@ -3,8 +3,21 @@
 
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
+  this._addAdapterProperties('viewButtons');
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
+
+scout.Desktop.prototype.init = function(model, session) {
+  scout.Desktop.parent.prototype.init.call(this, model, session);
+  this.outline = session.getOrCreateModelAdapter(model.outline, this);
+};
+
+scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) {
+  //Link with desktop
+  if (propertyName === 'viewButtons') {
+    adapter.desktop = this;
+  }
+};
 
 /**
  * @override
@@ -18,7 +31,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   // create all 4 containers
   if (this.viewButtons) {
-    viewbar = new scout.DesktopViewButtonBar($parent, this.viewButtons, this.session);
+    viewbar = new scout.DesktopViewButtonBar(this, $parent, this.viewButtons);
     marginTop = viewbar.$div.outerHeight();
   }
 
@@ -28,7 +41,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.outline) {
-    this.tree = new scout.DesktopTreeContainer($parent, this.outline, this.session);
+    this.tree = new scout.DesktopTreeContainer(this, $parent, this.outline);
     this.layout.register(this.tree.$div, 'W');
     this.showOrHideDesktopTree(); //FIXME CGU maybe refactor, don't create desktoptree container if not necessary
   }
@@ -94,13 +107,29 @@ scout.Desktop.prototype.showOrHideDesktopTree = function() {
   }
 };
 
+scout.Desktop.prototype.linkOutlineAndViewButton = function() {
+  //Link button with outline (same done in desktopViewButton.js). Redundancy necessary because event order is not reliable (of button selection and outlineChanged events)
+  //Only necessary due to separation of view buttons and outlines in scout model...
+  //FXME CGU find better way for scout model
+  for (var i = 0; i < this.viewButtons.length; i++) {
+    if (this.viewButtons[i].selected) {
+      this.viewButtons[i].outline = this.outline;
+    }
+  }
+};
+
+scout.Desktop.prototype.changeOutline = function(outline) {
+  this.outline = outline;
+  this.tree.onOutlineChanged(this.outline);
+  this.showOrHideDesktopTree();
+};
+
 /**
  * @override
  */
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type_ == 'outlineChanged') {
-    this.tree.onOutlineChanged(event.outline);
-    this.showOrHideDesktopTree();
+    this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

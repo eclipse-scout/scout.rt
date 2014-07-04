@@ -3,13 +3,22 @@ JsonAdapter / JavaScript Model [03.06.2014 cgu, awe]
   immer einmal ohne Argumente aufgerufen, man müsste darum im Ctor 'if (model && session)' verwenden um Exceptions zu vermeiden.
   Darum wird neu anstatt dem Ctor eine init Methode mit den beiden Argumenten model, session verwendet.
 - Server-seitig schicken wir nur beim ersten Mal das komplette Model als JSON-string. Der Client erzeugt aus diesem JSON-string
-  eine ModelAdapter Instanz und speichert diese in der modelAdapterMap. Wird die gleiche Instanz ein zweites Mal benötigt, schickt
+  eine ModelAdapter Instanz und speichert diese in der modelAdapterRegistry. Wird die gleiche Instanz ein zweites Mal benötigt, schickt
   der Server nur noch die ID dieser Instanz im JSON-string, der Client liefert dann die bereits vorhandene Instanz aus der model-
-  AdapterMap zurück.
+  AdapterRegistry zurück.
 - Wird eine (Scout-)Model Instanz abgeräumt (z.B. eine Form Instanz) muss die serverseitige JsonAdapter Implementierung dafür sorgen,
   dass alle Kinder (z.B. FormFields) aus der modelAdapterRegistry entfernt werden. Der genau gleiche Clean-up muss auf Clientseite
-  erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterMap gelöscht werden.
+  erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterRegistry gelöscht werden (ModelAdapter.destroy())
 
+ModelAdapter Property Changes
+- Bei einem property change event werden die Werte der Properties auf den ModelAdapter übertragen. Danach werden die setter aufgerufen (z.B. setEnabled()).
+- Im Setter wird der Status gerendert werden
+- Manchmal muss jedoch im Setter auch der Property-Wert gesetzt werden, da der Server nicht mit einem property change event antwortet, wenn der Wert dem Client bereits bekannt ist (siehe PropertyFilter).
+  Betrifft z.B. Checkbox.setSelected(). Oder auch StringField.setDisplayText.
+  An anderen Orten möchte man aber explizit den Model-State nicht verändern, sondern nur das GUI. Z.B. goOffline/goOnline, damit man später das GUI auf den alten State zurücksetzen kann.
+  Lösung? Eventuell die setter in render umbenennen und den Model-State strikt ausserhalb setzen (z.B. im Checkbox Klick-Listener.
+- Weiterer offener Punkt: Die Render-Methoden dürfen eigentlich nur aufgerufen werden, wenn der Adapter dargestellt ist (isRendered). Ansonsten knallt es.
+  Lösung? Gar nicht erst aufrufen, in der Methode auf isRendered prüfen. Oder sogar model von GUI trennen wie im Scout-Client?
 
 Aufteilung zwischen GUI-Elementen und Server / Model-Interaktion?
 - z.B. Table schickt Server Event im Selektions-Code. Alternative wäre ein Listener, welcher auf Selektion hört und dort den Event schickt.

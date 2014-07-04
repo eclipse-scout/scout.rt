@@ -32,6 +32,8 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
 };
 
 scout.BaseDesktop.prototype.goOffline = function() {
+  scout.BaseDesktop.parent.prototype.goOffline.call(this);
+
   var message = 'Die Netzwerkverbindung ist unterbrochen.',
     $reconnect;//FIXME CGU translate
 
@@ -53,6 +55,8 @@ scout.BaseDesktop.prototype.goOffline = function() {
 };
 
 scout.BaseDesktop.prototype.goOnline = function() {
+  scout.BaseDesktop.parent.prototype.goOnline.call(this);
+
   if (!this.hideOfflineMessagePending) {
     this.hideOfflineMessage();
   }

@@ -232,7 +232,6 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     // Create tables for table pages
     //FIXME really always create table (no gui is created)
     if (node.table) {
-      //TODO cgu: performance issue:
       this.session.getOrCreateModelAdapter(node.table, this);
     }
 

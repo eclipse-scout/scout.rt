@@ -30,6 +30,12 @@ public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
         return button.isSelected();
       }
     });
+    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_ENABLED, model) {
+      @Override
+      protected Boolean getValueImpl(IViewButton button) {
+        return button.isEnabled();
+      }
+    });
   }
 
   @Override

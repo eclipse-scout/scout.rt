@@ -1,6 +1,7 @@
-scout.DesktopTreeContainer = function($parent, model, session) {
-  this.session = session;
-  this.desktopTree = session.getOrCreateModelAdapter(model, this);
+scout.DesktopTreeContainer = function(desktop, $parent, outline) {
+  this.desktop = desktop;
+  this.session = desktop.session;
+  this.desktopTree = outline;
 
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
@@ -12,8 +13,8 @@ scout.DesktopTreeContainer.prototype.renderTree = function() {
 };
 
 scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outline) {
-  this.desktopTree.remove(); //FIXME CGU refactor to ModelAdapter.updateModelAdapterAndRender, but DesktopTreecontainer does not extend ModelAdapter
-  this.desktopTree = this.session.getOrCreateModelAdapter(outline, this); //FIXME CGU actually this.desktop
+  this.desktopTree.remove();
+  this.desktopTree = outline;
   this.desktopTree.render(this._$desktopTree);
   if (this._$splitter) {
     this._$splitter.appendTo(this._$desktopTree); //move after tree, otherwise tree overlays splitter after outline change

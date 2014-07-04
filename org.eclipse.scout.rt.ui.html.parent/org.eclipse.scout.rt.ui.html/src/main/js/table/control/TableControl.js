@@ -87,5 +87,49 @@ scout.TableControl.prototype._setSelected = function(selected) {
 };
 
 scout.TableControl.prototype._setEnabled = function(enabled) {
-  this.table.footer.setControlEnabled(this);
+  if (!this.table.isRendered()) {
+    return;
+  }
+
+  var $control = this.$controlButton,
+    that = this;
+
+  if (enabled) {
+    $control.data('label', that.label)
+      .removeClass('disabled')
+      .hover(onControlHoverIn, onControlHoverOut)
+      .click(onControlClicked);
+  } else {
+    $control.addClass('disabled')
+      .off('mouseenter mouseleave')
+      .off('click');
+  }
+
+  function onControlHoverIn(event) {
+    that.table.footer._updateControlLabel($(event.target));
+  }
+
+  function onControlHoverOut(event) {
+    that.table.footer._resetControlLabel($(event.target));
+  }
+
+  function onControlClicked(event) {
+    that.toggle();
+  }
+};
+
+scout.TableControl.prototype.goOffline = function() {
+  scout.TableControl.parent.prototype.goOffline.call(this);
+
+  if (!this.isContentAvailable()) {
+    this._setEnabled(false);
+  }
+};
+
+scout.TableControl.prototype.goOnline = function() {
+  scout.TableControl.parent.prototype.goOnline.call(this);
+
+  if (!this.isContentAvailable() && this.enabled) {
+    this._setEnabled(true);
+  }
 };

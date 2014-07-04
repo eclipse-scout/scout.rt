@@ -19,15 +19,6 @@ scout.DesktopTaskbar.prototype.render = function($desktop) {
   this.$formThumbs = this.$div.appendDiv(undefined, 'form-thumbnails');
 };
 
-scout.DesktopTaskbar.prototype.open = function($tool) {
-  $('.tool-open').animateAVCSD('width', 0, $.removeThis, null, 500);
-
-  if (!$tool.hasClass("selected")) {
-    $('.desktop-taskbar').beforeDiv('', 'tool-open')
-      .animateAVCSD('width', 300, null, null, 500);
-  }
-};
-
 scout.DesktopTaskbar.prototype.getToolButtonForForm = function(form) {
   for (var i = 0; i < this.toolButtons.length; i++) {
     if (this.toolButtons[i].form === form) {

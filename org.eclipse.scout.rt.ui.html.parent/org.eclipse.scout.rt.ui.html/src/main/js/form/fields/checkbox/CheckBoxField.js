@@ -31,6 +31,10 @@ scout.CheckBoxField.prototype._render = function($parent) {
 };
 
 scout.CheckBoxField.prototype._setEnabled = function(enabled) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (enabled) {
     this._$checkBox.removeAttr('disabled');
   } else {

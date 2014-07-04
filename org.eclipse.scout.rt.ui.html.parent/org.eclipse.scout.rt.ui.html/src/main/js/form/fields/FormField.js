@@ -101,3 +101,16 @@ scout.FormField.prototype._updateStatusLabel = function() {
     }
   }
 };
+
+scout.FormField.prototype.goOffline = function() {
+  scout.FormField.parent.prototype.goOffline.call(this);
+  this._setEnabled(false);
+};
+
+scout.FormField.prototype.goOnline = function() {
+  scout.FormField.parent.prototype.goOnline.call(this);
+
+  if (this.enabled) {
+    this._setEnabled(true);
+  }
+};

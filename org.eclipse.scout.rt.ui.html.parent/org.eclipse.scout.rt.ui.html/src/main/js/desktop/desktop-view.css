@@ -25,6 +25,12 @@ color: #595959;
 border-bottom: 2px solid #595959;
 }
 
+.view-item[disabled]:hover{
+color: #9C9C9C;
+border-bottom: 0;
+cursor: default;
+}
+
 .view-item.selected {
 color: #FE9915 !important;
 border-bottom: 2px solid #FE9915;

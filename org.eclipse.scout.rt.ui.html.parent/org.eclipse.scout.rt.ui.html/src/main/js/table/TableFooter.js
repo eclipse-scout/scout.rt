@@ -120,38 +120,7 @@ scout.TableFooter.prototype.addControl = function(control) {
   //Link button with scout.TableControl
   control.$controlButton = $control;
 
-  this.setControlEnabled(control);
-};
-
-scout.TableFooter.prototype.setControlEnabled = function(control) {
-  var $control = control.$controlButton,
-    that = this;
-
-  if (control.enabled) {
-    $control.data('label', control.label)
-      .removeClass('disabled')
-      .hover(onControlHoverIn, onControlHoverOut)
-      .click(onControlClicked);
-  } else {
-    $control.addClass('disabled')
-      .off('mouseenter mouseleave')
-      .off('click');
-  }
-
-  function onControlHoverIn(event) {
-    that._updateControlLabel($(event.target));
-  }
-
-  function onControlHoverOut(event) {
-    that._resetControlLabel($(event.target));
-  }
-
-  function onControlClicked(event) {
-    var $clicked = $(this);
-    var control = $clicked.data('control');
-
-    control.toggle();
-  }
+  control._setEnabled(control.enabled);
 };
 
 scout.TableFooter.prototype.openTableControl = function() {

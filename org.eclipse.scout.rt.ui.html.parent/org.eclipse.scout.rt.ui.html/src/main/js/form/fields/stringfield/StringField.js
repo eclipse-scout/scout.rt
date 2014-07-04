@@ -18,6 +18,10 @@ scout.StringField.prototype._render = function($parent) {
 };
 
 scout.StringField.prototype._setEnabled = function(enabled) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (enabled) {
     this._$inputText.removeAttr('disabled');
   } else {

@@ -203,3 +203,17 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName) {
 scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
 
 };
+
+scout.ModelAdapter.prototype.goOffline = function() {
+  var i;
+  for (i = 0; i < this.children.length; i++) {
+    this.children[i].goOffline();
+  }
+};
+
+scout.ModelAdapter.prototype.goOnline = function() {
+  var i;
+  for (i = 0; i < this.children.length; i++) {
+    this.children[i].goOnline();
+  }
+};
