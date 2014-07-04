@@ -105,7 +105,7 @@ scout.menus = {
     }
 
     // wrap icon menus
-    $('.menu-button', $menuContainer).wrapAll('<div class="menu-buttons"></div>');
+    $('.menu-button', $menuContainer).wrapAll($.makeDiv('', 'menu-buttons', ''));
     var $menuButtons = $('.menu-buttons', $menuContainer);
     $menuButtons.appendDiv('', 'menu-buttons-label');
     $menuContainer.append($menuButtons);

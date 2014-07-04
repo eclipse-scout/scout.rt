@@ -225,22 +225,24 @@ scout.Table.prototype.drawData = function() {
 };
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
-  var rowClass = 'table-row ',
-    table = this,  // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
-    rowWidth = this._header.totalWidth + 4;
-
-  if (table.selectedRowIds && table.selectedRowIds.indexOf(row.id) > -1) {
+  var column, width, style, align, value;
+  var rowWidth = this._header.totalWidth + 4;
+  var rowClass = 'table-row ';
+  if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'row-selected ';
   }
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px">';
-  for (var c = 0; c < row.cells.length; c++) {
-    var column = this.columns[c],
-      width = column.width,
-      style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ',
-      allign = (column.type == 'number') ? 'text-align: right; ' : '',
-      value = this.getText(c, index);
+  // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
+  var unselectable = (scout.device.supportsCssProperty('user-select') ? '' : ' unselectable="on"'); // workaround for IE 9
 
-    rowDiv += '<div class="table-cell" style="' + style + allign + '">' + value + '</div>';
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px"' + unselectable + '>';
+  for (var c = 0; c < row.cells.length; c++) {
+    column = this.columns[c];
+    width = column.width;
+    style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
+    align = (column.type == 'number') ? 'text-align: right; ' : '';
+    value = this.getText(c, index);
+
+    rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
   }
   rowDiv += '</div>';
 

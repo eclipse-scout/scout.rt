@@ -6,6 +6,9 @@ scout.Device = function(userAgent) {
   this.userAgent = userAgent;
   this.system;
   this.features = {};
+  this.device;
+  this._userAgentParsed = false;
+  this._propertySupportedMap =  {};
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
@@ -62,6 +65,16 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
   }
 
   this._userAgentParsed = true;
+};
+
+scout.Device.prototype.supportsCssProperty = function(property) {
+  var supported = this._propertySupportedMap[property];
+  if (typeof supported !== 'undefined') {
+    return supported; // cached
+  }
+  supported = (property in document.body.style);
+  this._propertySupportedMap[property] = supported;
+  return supported;
 };
 
 scout.Device.SYSTEM_IOS = 'IOS';

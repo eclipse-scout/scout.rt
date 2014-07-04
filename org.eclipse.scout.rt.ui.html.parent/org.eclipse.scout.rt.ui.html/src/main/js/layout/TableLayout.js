@@ -10,6 +10,7 @@ scout.TableLayout = function() {
 scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
   var cssClass = 'cols-' + groupBox.gridColumnCount;
   var id = 'GroupBox' + groupBox.id;
+  // FIXME Use $.makeDiv
   var html = '<div id="' + id + '" class="group-box">' +
              '  <div class="group-box-title">Groupbox 1</div>' +
              '  <table class="form-grid ' + cssClass + '">' +

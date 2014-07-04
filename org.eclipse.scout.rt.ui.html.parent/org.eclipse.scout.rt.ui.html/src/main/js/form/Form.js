@@ -38,7 +38,7 @@ scout.Form.prototype._render = function($parent) {
   var systemButtons = this.rootGroupBox.getSystemButtons();
   if (systemButtons) {
     // TODO AWE: CSS for button-bar / position / visible
-    var $buttonBar = $('<div class="button-bar"></div>');
+    var $buttonBar = $.makeDiv('', 'button-bar', '');
     var i, button;
     for (i=0; i<systemButtons.length; i++) {
       button = systemButtons[i];
@@ -54,7 +54,7 @@ scout.Form.prototype._render = function($parent) {
 
   if (this.displayHint == 'dialog') {
     // TODO AWE: append form title section (including ! ? and progress indicator)
-    var $dialogBar = $('<div class="dialog-bar"></div>');
+    var $dialogBar = $.makeDiv('', 'dialog-bar', '');
     var $dialogTitle = $('<span class="dialog-title">' + this.title + '</span>');
     $dialogBar.append($dialogTitle);
     if (closeable) {

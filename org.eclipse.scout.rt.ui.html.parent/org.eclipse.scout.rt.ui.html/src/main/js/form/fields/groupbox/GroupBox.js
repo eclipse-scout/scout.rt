@@ -15,7 +15,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this.$container.attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
-    var $title = $('<div class="group-box-title"></div>');
+    var $title = $.makeDiv('', 'group-box-title', '');
     this.$label = $('<span>' + this.label + '</span>');
     $title.append(this.$label);
     this.$container.append($title);
