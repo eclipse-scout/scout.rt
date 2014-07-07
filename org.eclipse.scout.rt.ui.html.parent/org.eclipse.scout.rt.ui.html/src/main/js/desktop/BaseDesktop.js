@@ -17,7 +17,7 @@ scout.BaseDesktop.prototype._render = function($parent) {
 
   var i, form;
   for (i = 0; i < this.forms.length; i++) {
-    this._addForm(this.forms[i]);
+    this.addForm(this.forms[i]);
   }
 };
 
@@ -103,7 +103,7 @@ scout.BaseDesktop.prototype.onReconnectingFailed = function() {
   this.$offline.find('.reconnect').hide();
 };
 
-scout.BaseDesktop.prototype._addForm = function(form) {
+scout.BaseDesktop.prototype.addForm = function(form) {
   if (form.displayHint == "view") {
     form.attach(this._resolveViewContainer(form));
   } else if (form.displayHint == "dialog") {
@@ -130,7 +130,7 @@ scout.BaseDesktop.prototype._addForm = function(form) {
   }
 };
 
-scout.BaseDesktop.prototype._removeForm = function(form) {
+scout.BaseDesktop.prototype.removeForm = function(form) {
   if (!form) {
     return;
   }
@@ -214,16 +214,13 @@ scout.BaseDesktop.prototype.onModelAction = function(event) {
 
   if (event.type_ == 'formAdded') {
     form = this.updateModelAdapters(this.forms, event.form, this);
-    this._addForm(form);
+    this.addForm(form);
   } else if (event.type_ == 'formRemoved') {
     form = this.updateModelAdapters(this.forms, event.form, this);
-    this._removeForm(form);
+    this.removeForm(form);
   } else if (event.type_ == 'formEnsureVisible') {
     form = this.updateModelAdapters(this.forms, event.form, this);
     this.activateForm(form);
-  } else if (event.type_ == 'formRemoved') {
-    form = this.updateModelAdapters(this.forms, event.form, this);
-    this._removeForm(form);
   } else {
     $.log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");
   }

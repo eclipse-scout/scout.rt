@@ -44,6 +44,7 @@ scout.TableControl.prototype.renderContent = function(form) {
     this.render(this.table.footer.$controlContainer);
   }
 
+  //FIXME CGU opening should be controllable. Check current implementation of table page: is search form always opened automatically on activation?
   if (!this.table.footer.open) {
     this.table.footer.openTableControl();
   }

@@ -25,6 +25,19 @@ Aufteilung zwischen GUI-Elementen und Server / Model-Interaktion?
 - Vorteil des Listeners: Saubere Trennung, Komponenten könnten einfacher ersetzt werden?
 - Nachteil: Eventuell unnötiger Zusatzaufwand
 
+Offline
+- 2 Use Cases: Tunnel und Aktenkoffer
+- Tunnel:
+  Applikation soll bedienbar bleiben, auch wenn temporär kein Netz da ist. Die Elemente werden readonly, ausser vielleicht Textfelder, damit der Benutzer weiter tippen kann.
+  Baum, Tabelle, TableControls sollen weiterhin bedienbar sein. PROBLEM: Page-DetailForms müssten auf dem GUI als solche erkannt werden, damit sie ein/ausgeblendet werden können.
+    -> Die DetailForms (und SearchForms) dürfen nicht auf den Desktop gelegt werden (mittels addForm) aus dem Model, das GUI soll sich darum kümmern. siehe auch FIXME in MiniCrmOutline
+  Benutzer sieht, dass zur Zeit keine Verbindung hergestellt ist. Die Seite versucht automatisch, die Verbindung wieder herzustellen.
+  Die Events werden aufgeonmmen und sobald der Server wieder erreichbar ist abgeschickt.
+- Aktenkoffer:
+  Der Benutzer kann Objekte auswählen, die Offline verfübar sein sollen.
+  Die Objekte werden in einer Offline-Sicht dargestellt.
+  Die Offline-Sicht ist ähnlich zur Such-Sicht.
+
 Session.js vs. ClientSession.js.
 - Dasselbe oder aufteilen? Auf dem Server gibt es heute JsonSession und JsonClientSession
 

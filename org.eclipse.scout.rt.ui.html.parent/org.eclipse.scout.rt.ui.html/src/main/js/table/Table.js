@@ -566,7 +566,7 @@ scout.Table.prototype.insertRows = function(rows) {
   } else {
     this.rows = rows;
   }
-  if (this.$container) {
+  if (this.isRendered()) {
     this.drawData();
   }
 };

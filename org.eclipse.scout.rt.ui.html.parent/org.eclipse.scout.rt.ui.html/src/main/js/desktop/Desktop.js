@@ -119,6 +119,10 @@ scout.Desktop.prototype.linkOutlineAndViewButton = function() {
 };
 
 scout.Desktop.prototype.changeOutline = function(outline) {
+  if (this.outline === outline) {
+    return;
+  }
+
   this.outline = outline;
   this.tree.onOutlineChanged(this.outline);
   this.showOrHideDesktopTree();

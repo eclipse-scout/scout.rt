@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -188,6 +189,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
   }
 
+  protected void handleModelDetailFormChanged(IForm detailForm) {
+    JSONObject jsonEvent = new JSONObject();
+    ITreeNode selectedNode = getModel().getSelectedNode();
+    putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(selectedNode));
+    putProperty(jsonEvent, "detailForm", modelToJson(detailForm));
+    getJsonSession().currentJsonResponse().addActionEvent("detailFormChanged", getId(), jsonEvent);
+  }
+
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
@@ -233,6 +242,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       }
     }
     putProperty(json, "childNodes", jsonChildPages);
+    putProperty(json, "detailForm", modelToJson(page.getDetailForm()));
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
@@ -340,6 +350,15 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     @Override
     public void treeChangedBatch(List<? extends TreeEvent> events) {
       handleModelTreeEventBatch(events);
+    }
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+    if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
+      handleModelDetailFormChanged((IForm) newValue);
+    } else {
+      super.handleModelPropertyChange(propertyName, newValue);
     }
   }
 
