@@ -1329,6 +1329,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       m_searchFilter.setCompleted(true);
       getHandler().onStore();
       execStored();
+      if (!m_formStored) {
+        //the form was marked as not stored in AbstractFormHandler#execStore() or AbstractForm#execStored().
+        ProcessingException e = new ProcessingException("Form was marked as not stored.");
+        e.consume();
+        throw e;
+      }
     }
     catch (ProcessingException e) {
       // clear search

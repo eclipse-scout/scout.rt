@@ -19,7 +19,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Unit test for {@link AbstractForm} with different implementation of {@link AbstractFormHandler#execStore()}.
+ * Unit test for {@link AbstractForm} with different implementation of {@link AbstractFormHandler#execStore()} and/or of
+ * {@link AbstractForm#execStored()}.
  * 
  * @since 4.1.0
  */
@@ -55,6 +56,142 @@ public class FormStoredTest {
     assertEquals("isFormStored", false, f.isFormStored());
     assertEquals("isSaveNeeded", false, f.isSaveNeeded());
     assertEquals("isFormClosed", true, f.isFormClosed()); //form closed
+  }
+
+  @Test
+  public void testMarkStoredHandlerSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertSaveSuccessful();
+  }
+
+  @Test
+  public void testMarkStoredHandlerOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertOkSuccessful();
+  }
+
+  @Test
+  public void testMarkStoredFormSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoredImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertSaveSuccessful();
+  }
+
+  @Test
+  public void testMarkStoredFormOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoredImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertOkSuccessful();
+  }
+
+  @Test
+  public void testMarkStoredCombinationSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED); //no effect because of execStored in the form
+    f.setExecStoredImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertSaveSuccessful();
+  }
+
+  @Test
+  public void testMarkStoredCombinationOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED); //no effect because of execStored in the form
+    f.setExecStoredImplementation(MethodImplementation.MARK_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertOkSuccessful();
+  }
+
+  @Test
+  public void testMarkNotStoredHandlerSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertStoreInterrupted();
+  }
+
+  @Test
+  public void testMarkNotStoredHandlerOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertStoreInterrupted();
+  }
+
+  @Test
+  public void testMarkNotStoredFormSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertStoreInterrupted();
+  }
+
+  @Test
+  public void testMarkNotStoredFormOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertStoreInterrupted();
+  }
+
+  @Test
+  public void testMarkNotStoredCombinationSave() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
+    f.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickSave();
+    f.assertStoreInterrupted();
+  }
+
+  @Test
+  public void testMarkNotStoredCombinationOk() throws Exception {
+    FormToStore f = new FormToStore();
+    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
+    f.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
+    f.startModify();
+    f.touch();
+    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    f.clickOk();
+    f.assertStoreInterrupted();
   }
 
   @Test

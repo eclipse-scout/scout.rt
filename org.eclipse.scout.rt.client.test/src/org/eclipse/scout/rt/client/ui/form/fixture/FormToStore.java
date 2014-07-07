@@ -33,10 +33,16 @@ import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MainBox.SaveButto
  * @since 4.1.0
  */
 public class FormToStore extends AbstractForm {
+  public static final String VETO_EXCEPTION_TEXT = "Implementation throws a VetoException";
   private MethodImplementation m_execStoreHandlerImplementation = MethodImplementation.DO_NOTHING;
+  private MethodImplementation m_execStoredImplementation = MethodImplementation.DO_NOTHING;
 
   public void setExecStoreHandlerImplementation(MethodImplementation execStoreHandlerImplementation) {
     m_execStoreHandlerImplementation = execStoreHandlerImplementation;
+  }
+
+  public void setExecStoredImplementation(MethodImplementation execStoredImplementation) {
+    m_execStoredImplementation = execStoredImplementation;
   }
 
   /**
@@ -51,6 +57,11 @@ public class FormToStore extends AbstractForm {
    */
   public void startModify() throws ProcessingException {
     startInternal(new ModifyHandler());
+  }
+
+  @Override
+  protected void execStored() throws ProcessingException {
+    doIt(m_execStoredImplementation);
   }
 
   @Order(10.0)
@@ -79,6 +90,14 @@ public class FormToStore extends AbstractForm {
 
   private void doIt(MethodImplementation implementation) throws ProcessingException {
     switch (implementation) {
+      case MARK_NOT_STORED:
+        setFormStored(false);
+        break;
+      case MARK_STORED:
+        setFormStored(true);
+        break;
+      case VETO_EXCEPTION:
+        throw new VetoException(VETO_EXCEPTION_TEXT);
       case CONSUMED_VETO_EXCEPTION:
         VetoException vetoException = new VetoException("Implementation throws a consumed VetoException");
         vetoException.consume();
@@ -119,6 +138,9 @@ public class FormToStore extends AbstractForm {
 
   public static enum MethodImplementation {
     DO_NOTHING,
+    MARK_STORED,
+    MARK_NOT_STORED,
+    VETO_EXCEPTION,
     CONSUMED_VETO_EXCEPTION
   }
 
