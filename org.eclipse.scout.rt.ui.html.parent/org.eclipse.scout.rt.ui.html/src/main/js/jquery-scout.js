@@ -7,12 +7,15 @@
   //== $ extensions
   $.log = console.log.bind(console);
 
-  // session uses only divs...
-  $.makeDiv = function(i, c, h) {
-    i = i ? ' id="' + i + '"' : '';
-    c = c ? ' class="' + c + '"' : '';
-    h = h || '';
-    return $('<div ' + i + c + '>' + h + '</div>');
+  $.makeDiv = function(id, cssClass, htmlContent) {
+    return $('<div' +
+      (id ? ' id="' + id + '"' : '') +
+      (cssClass ? ' class="' + cssClass + '"' : '') +
+      (scout.device.supportsCssProperty('user-select') ? '' : ' unselectable="on"') + // workaround for IE 9
+      '>' +
+      (htmlContent || '') +
+      '</div>'
+    );
   };
 
   // used by some animate functions
@@ -46,66 +49,72 @@
   //== $.prototype extensions
 
   // prepend - and return new div for chaining
-  $.fn.prependDiv = function(i, c, h) {
-    return $.makeDiv(i, c, h).prependTo(this);
+  $.fn.prependDiv = function(id, cssClass, htmlContent) {
+    return $.makeDiv(id, cssClass, htmlContent).prependTo(this);
   };
 
   // append - and return new div for chaining
-  $.fn.appendDiv = function(i, c, h) {
-    return $.makeDiv(i, c, h).appendTo(this);
+  $.fn.appendDiv = function(id, cssClass, htmlContent) {
+    return $.makeDiv(id, cssClass, htmlContent).appendTo(this);
   };
 
   // insert after - and return new div for chaining
-  $.fn.afterDiv = function(i, c, h) {
-    return $.makeDiv(i, c, h).insertAfter(this);
+  $.fn.afterDiv = function(id, cssClass, htmlContent) {
+    return $.makeDiv(id, cssClass, htmlContent).insertAfter(this);
   };
 
   // insert before - and return new div for chaining
-  $.fn.beforeDiv = function(i, c, h) {
-    return $.makeDiv(i, c, h).insertBefore(this);
+  $.fn.beforeDiv = function(id, cssClass, htmlContent) {
+    return $.makeDiv(id, cssClass, htmlContent).insertBefore(this);
   };
 
   // append svg
-  $.fn.appendSVG = function(t, i, c, h) {
-    var $svgElement = $(document.createElementNS("http://www.w3.org/2000/svg", t));
-    if (i) $svgElement.attr('id', i);
-    if (c) $svgElement.attr('class', c);
-    if (h) $svgElement.html(h);
+  $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
+    var $svgElement = $(document.createElementNS("http://www.w3.org/2000/svg", type));
+    if (id) {
+      $svgElement.attr('id', id);
+    }
+    if (cssClass) {
+      $svgElement.attr('class', cssClass);
+    }
+    if (htmlContent) {
+      $svgElement.html(htmlContent);
+    }
     return $svgElement.appendTo(this);
   };
 
   // attr and class handling for svg
-  $.fn.attrSVG = function(a, v) {
+  $.fn.attrSVG = function(attributeName, value) {
     return this.each(function() {
-      this.setAttribute(a, v);
+      this.setAttribute(attributeName, value);
     });
   };
 
-  $.fn.attrXLINK = function(a, v) {
+  $.fn.attrXLINK = function(attributeName, value) {
     return this.each(function() {
-      this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + a, v);
+      this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
     });
   };
 
-  $.fn.addClassSVG = function(c) {
+  $.fn.addClassSVG = function(cssClass) {
     return this.each(function() {
-      if (!$(this).hasClassSVG(c)) {
+      if (!$(this).hasClassSVG(cssClass)) {
         var old = this.getAttribute('class');
-        this.setAttribute('class', old + ' ' + c);
+        this.setAttribute('class', old + ' ' + cssClass);
       }
     });
   };
 
-  $.fn.removeClassSVG = function(c) {
+  $.fn.removeClassSVG = function(cssClass) {
     return this.each(function() {
       var old = ' ' + this.getAttribute('class') + ' ';
-      this.setAttribute('class', old.replace(' ' + c + ' ', ' '));
+      this.setAttribute('class', old.replace(' ' + cssClass + ' ', ' '));
     });
   };
 
-  $.fn.hasClassSVG = function(c) {
+  $.fn.hasClassSVG = function(cssClass) {
     var old = ' ' + this.attr('class') + ' ';
-    return old.indexOf(' ' + c + ' ') > -1;
+    return old.indexOf(' ' + cssClass + ' ') > -1;
   };
 
   // select one and deselect siblings
@@ -121,7 +130,6 @@
     } else {
       this.removeClass('selected');
     }
-
     return this;
   };
 
@@ -131,13 +139,19 @@
 
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
-    var properties = {},
-      options = {};
+    var properties = {};
+    var options = {};
 
     properties[attr] = value;
-    if (complete) options.complete = complete;
-    if (step) options.step = step;
-    if (duration) options.duration = duration;
+    if (complete) {
+      options.complete = complete;
+    }
+    if (step) {
+      options.step = step;
+    }
+    if (duration) {
+      options.duration = duration;
+    }
     options.queue = false;
 
     this.animate(properties, options);
@@ -204,6 +218,5 @@
 
     return newH;
   };
-
 
 }(jQuery));
