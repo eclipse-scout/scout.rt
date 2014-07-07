@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +28,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,64 +50,59 @@ public class AbstractRadioButtonGroupTest {
 
   @Test
   public void testInitialized() {
-    Assert.assertEquals("RadioButtonGroup", m_group.getLabel());
-    Assert.assertEquals(4, m_group.getFieldCount());
-    Assert.assertEquals(3, m_group.getButtons().size());
-    Assert.assertNull(m_group.getSelectedButton());
-    Assert.assertNull(m_group.getSelectedKey());
+    assertEquals("RadioButtonGroup", m_group.getLabel());
+    assertEquals(4, m_group.getFieldCount());
+    assertEquals(3, m_group.getButtons().size());
+    assertNull(m_group.getSelectedButton());
+    assertNull(m_group.getSelectedKey());
 
-    Assert.assertEquals(m_group.getRadioButton1(), m_group.getButtonFor(1L));
-    Assert.assertEquals(m_group.getRadioButton2(), m_group.getButtonFor(2L));
-    Assert.assertEquals(m_group.getRadioButton3(), m_group.getButtonFor(3L));
-    Assert.assertNull(m_group.getButtonFor(4L));
+    assertEquals(m_group.getRadioButton1(), m_group.getButtonFor(1L));
+    assertEquals(m_group.getRadioButton2(), m_group.getButtonFor(2L));
+    assertEquals(m_group.getRadioButton3(), m_group.getButtonFor(3L));
+    assertNull(m_group.getButtonFor(4L));
 
-    Assert.assertNull(m_group.getErrorStatus());
+    assertNull(m_group.getErrorStatus());
 
-    Assert.assertEquals(Long.valueOf(1L), m_group.getRadioButton1().getRadioValue());
-    Assert.assertEquals(Long.valueOf(2L), m_group.getRadioButton2().getRadioValue());
-    Assert.assertEquals(Long.valueOf(3L), m_group.getRadioButton3().getRadioValue());
+    assertEquals(Long.valueOf(1L), m_group.getRadioButton1().getRadioValue());
+    assertEquals(Long.valueOf(2L), m_group.getRadioButton2().getRadioValue());
+    assertEquals(Long.valueOf(3L), m_group.getRadioButton3().getRadioValue());
   }
 
   @Test
   public void testSelectionViaButton() {
     m_group.selectButton(m_group.getRadioButton2());
-    Assert.assertEquals(m_group.getSelectedButton(), m_group.getRadioButton2());
+    assertEquals(m_group.getSelectedButton(), m_group.getRadioButton2());
 
     m_group.selectButton(m_group.getRadioButton3());
-    Assert.assertEquals(m_group.getSelectedButton(), m_group.getRadioButton3());
+    assertEquals(m_group.getSelectedButton(), m_group.getRadioButton3());
   }
 
   @Test
   public void testInvalidSelectionViaButton() {
     m_group.selectButton(new AbstractRadioButton<Long>() {
     });
-    Assert.assertNull(m_group.getSelectedButton());
+    assertNull(m_group.getSelectedButton());
   }
 
   @Test
   public void testSelectionViaKey() {
     m_group.selectKey(Long.valueOf(1L));
-    Assert.assertEquals(Long.valueOf(1L), m_group.getSelectedKey());
+    assertEquals(Long.valueOf(1L), m_group.getSelectedKey());
     m_group.selectKey(Long.valueOf(3L));
-    Assert.assertEquals(Long.valueOf(3L), m_group.getSelectedKey());
+    assertEquals(Long.valueOf(3L), m_group.getSelectedKey());
     m_group.selectKey(Long.valueOf(2L));
-    Assert.assertEquals(Long.valueOf(2L), m_group.getSelectedKey());
+    assertEquals(Long.valueOf(2L), m_group.getSelectedKey());
   }
 
   @Test
   public void testInvalidSelectionViaKey() {
-    try {
-      m_group.selectKey(Long.valueOf(4L));
-    }
-    catch (Exception e) {
-      Assert.assertNotNull(m_group.getErrorStatus());
+    //set an invalid value: ()
+    m_group.selectKey(Long.valueOf(4L));
+    assertNotNull(m_group.getErrorStatus());
 
-      //select valid value again
-      m_group.selectKey(1L);
-      Assert.assertNull(m_group.getErrorStatus());
-      return;
-    }
-    Assert.fail("ProcessingException was not thrown!");
+    //select valid value again
+    m_group.selectKey(1L);
+    assertNull(m_group.getErrorStatus());
   }
 
   @Test
@@ -111,7 +110,7 @@ public class AbstractRadioButtonGroupTest {
     assertAllButtonsEnabled(true, m_group);
 
     m_group.getRadioButton2().setEnabled(false);
-    Assert.assertTrue(!m_group.getRadioButton2().isEnabled());
+    assertTrue(!m_group.getRadioButton2().isEnabled());
 
     m_group.setEnabled(false);
     assertAllButtonsEnabled(false, m_group);
@@ -122,42 +121,42 @@ public class AbstractRadioButtonGroupTest {
 
   @Test
   public void testGetFieldById() {
-    Assert.assertEquals(m_group.getRadioButton1(), m_group.getFieldById(m_group.getRadioButton1().getClass().getSimpleName()));
-    Assert.assertNull(m_group.getFieldById("nonExisting"));
+    assertEquals(m_group.getRadioButton1(), m_group.getFieldById(m_group.getRadioButton1().getClass().getSimpleName()));
+    assertNull(m_group.getFieldById("nonExisting"));
   }
 
   @Test
   public void testGetFieldIndex() {
-    Assert.assertNotNull(m_group.getFieldIndex(m_group.getRadioButton2()));
-    Assert.assertEquals(-1, m_group.getFieldIndex(new AbstractRadioButton<Integer>() {
+    assertNotNull(m_group.getFieldIndex(m_group.getRadioButton2()));
+    assertEquals(-1, m_group.getFieldIndex(new AbstractRadioButton<Integer>() {
     }));
   }
 
   @Test
   public void testGetButtons() {
-    Assert.assertEquals(3, m_group.getButtons().size());
+    assertEquals(3, m_group.getButtons().size());
 
     AbstractRadioButtonGroup<Integer> emptyGroup = new AbstractRadioButtonGroup<Integer>() {
     };
-    Assert.assertEquals(0, emptyGroup.getButtons().size());
+    assertEquals(0, emptyGroup.getButtons().size());
   }
 
   @Test
   public void testLookupCall() {
     AbstractRadioButtonGroup<Long> lookupGroup = new P_RadioButtonGroupWithLookupCall();
     lookupGroup.initConfig();
-    Assert.assertEquals(new P_CompanyLookupCall(), lookupGroup.getLookupCall());
-    Assert.assertEquals(3, lookupGroup.getButtons().size());
-    Assert.assertNull(lookupGroup.getSelectedButton());
+    assertEquals(new P_CompanyLookupCall(), lookupGroup.getLookupCall());
+    assertEquals(3, lookupGroup.getButtons().size());
+    assertNull(lookupGroup.getSelectedButton());
   }
 
   private void assertAllButtonsEnabled(boolean enabled, IRadioButtonGroup<?> group) {
     for (IRadioButton<?> btn : m_group.getButtons()) {
       if (enabled) {
-        Assert.assertTrue(btn.isEnabled());
+        assertTrue(btn.isEnabled());
       }
       else {
-        Assert.assertTrue(!btn.isEnabled());
+        assertTrue(!btn.isEnabled());
       }
     }
   }
