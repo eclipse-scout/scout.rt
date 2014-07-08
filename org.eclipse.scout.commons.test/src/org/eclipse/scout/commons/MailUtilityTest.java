@@ -10,12 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
@@ -64,4 +72,21 @@ public class MailUtilityTest {
     return MailUtility.wordPatternItem.matcher(fileName).matches() || MailUtility.wordPatternProps.matcher(fileName).matches();
   }
 
+  @Test
+  public void testDataSourceWithoutFileExtension() throws ProcessingException, IOException, MessagingException {
+    final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
+    final String fileName = "test.file";
+
+    DataSource ds = MailUtility.createDataSource(new ByteArrayInputStream(sampleData), fileName, null);
+    assertNotNull(ds);
+    assertEquals(fileName, ds.getName());
+    assertTrue(ds instanceof ByteArrayDataSource);
+    ByteArrayDataSource bds = (ByteArrayDataSource) ds;
+    assertEquals("application/octet-stream", bds.getContentType());
+    byte[] data = IOUtility.getContent(bds.getInputStream());
+    assertArrayEquals(sampleData, data);
+
+    MimeMessage message = MailUtility.createMimeMessage("test", null, new DataSource[]{ds});
+    message.writeTo(new ByteArrayOutputStream());
+  }
 }
