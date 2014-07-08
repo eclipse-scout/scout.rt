@@ -111,32 +111,37 @@ scout.Session.prototype._sendNow = function(events, deferred) {
     }
   }
 
-  var that = this;
-  this._requestsPendingCounter++;
-  $.ajax({
-    async: true,
-    type: "POST",
-    dataType: "json",
-    cache: false,
-    url: this.url,
-    data: JSON.stringify(request),
-    context: request
-  })
-  .done(function(data) {
-    that._processSuccessResponse(data);
-  })
-  .fail(function(jqXHR, textStatus, errorThrown) {
-    var request = this;
-    that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-  });
+  this._sendRequest(request);
+};
 
+scout.Session.prototype._sendRequest = function(request) {
+ if (this.offline) {
+   this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+   return;
+ }
+
+ var that = this;
+ this._requestsPendingCounter++;
+ $.ajax({
+   async: true,
+   type: "POST",
+   dataType: "json",
+   cache: false,
+   url: this.url,
+   data: JSON.stringify(request),
+   context: request
+ })
+ .done(function(data) {
+   that._processSuccessResponse(data);
+ })
+ .fail(function(jqXHR, textStatus, errorThrown) {
+   var request = this;
+   that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+ });
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
-  if (this.offline) {
-    this.goOnline();
-  }
-
+  this._queuedRequest = null;
   this._requestsPendingCounter--;
 
   this.processingEvents = true;
@@ -172,6 +177,9 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
   if (!jqXHR.status || jqXHR.status >= 12000) {
     this.goOffline();
+    if (!this._queuedRequest) {
+      this._queuedRequest = request;
+    }
     return;
   }
 
@@ -205,6 +213,7 @@ scout.Session.prototype.goOffline = function() {
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
+  this._sendRequest(this._queuedRequest);
   this.desktop.goOnline();
 };
 

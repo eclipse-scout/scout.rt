@@ -3,29 +3,10 @@ scout.Form = function() {
   this._$title;
   this._$parent;
   this.rootGroupBox;
-  this._addAdapterProperties(['rootGroupBox']);
+  this._addAdapterProperties('rootGroupBox');
+  this._locked;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
-
-scout.Form.prototype.attach = function($parent) {
-  if (!this.$container) {
-    this.render($parent);
-  } else {
-    this.$container.appendTo($parent);
-    if (this.$glasspane) {
-      this.$glasspane.appendTo($parent);
-    }
-  }
-};
-
-scout.Form.prototype.detach= function() {
-  if (this.isRendered()) {
-    this.$container.detach();
-  }
-  if (this.$glasspane) {
-    this.$glasspane.detach();
-  }
-};
 
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
@@ -67,6 +48,25 @@ scout.Form.prototype._render = function($parent) {
     }
     this.$container.addClass('dialog-form');
     this.$container.prepend($dialogBar);
+  }
+
+  if (this._locked) {
+    this.disable();
+  }
+};
+
+scout.Form.prototype._remove= function() {
+  scout.Form.parent.prototype._remove.call(this);
+
+  if (this.$glasspane) {
+    this.$glasspane.remove();
+  }
+};
+
+scout.Form.prototype.appendTo = function($parent) {
+  this.$container.appendTo($parent);
+  if (this.$glasspane) {
+    this.$glasspane.appendTo($parent);
   }
 };
 

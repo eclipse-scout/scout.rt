@@ -35,6 +35,10 @@ scout.Button.prototype._setEnabled = function(enabled) {
 };
 
 scout.Button.prototype._setVisible = function(visible) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (visible) {
     this._$button.css('display', 'inline');
   } else {
@@ -43,6 +47,10 @@ scout.Button.prototype._setVisible = function(visible) {
 };
 
 scout.Button.prototype._setLabel = function(label) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (!label) {
     label = '';
   }

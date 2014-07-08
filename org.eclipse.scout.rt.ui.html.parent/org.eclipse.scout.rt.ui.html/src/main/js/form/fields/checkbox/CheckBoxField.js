@@ -43,6 +43,10 @@ scout.CheckBoxField.prototype._setEnabled = function(enabled) {
 };
 
 scout.CheckBoxField.prototype._setValue = function(value) {
+  if (!this.isRendered()) {
+    return;
+  }
+
   if (value) {
     this._$checkBox.attr('checked', 'checked');
   } else {

@@ -72,6 +72,16 @@ scout.Desktop.prototype._render = function($parent) {
     $parent.focus();
   }
 
+  //FIXME CGU remove, just simulating offline
+  $('#ViewLogo').on('click', function(){
+    if(this.session.url==='json') {
+      this.session.url='http://localhost:123';
+    }
+    else {
+      this.session.url='json';
+    }
+  }.bind(this));
+
   scout.Desktop.parent.prototype._render.call(this, $parent);
 };
 

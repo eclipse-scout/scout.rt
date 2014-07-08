@@ -22,8 +22,14 @@ scout.ModelAdapter.prototype.render = function($parent) {
   if (this.isRendered()) {
     throw "Already rendered";
   }
+  if (this.destroyed) {
+    throw "Object is destroyed";
+  }
   this._render($parent);
   this._callSetters();
+  if (this.session.offline) {
+    this.goOffline();
+  }
 };
 
 scout.ModelAdapter.prototype.isRendered = function() {
@@ -70,10 +76,14 @@ scout.ModelAdapter.prototype.remove = function() {
       child.remove();
     }
 
-    this.$container.remove();
-    this.$container = null;
+    this._remove();
   }
   this.dispose();
+};
+
+scout.ModelAdapter.prototype._remove = function() {
+  this.$container.remove();
+  this.$container = null;
 };
 
 scout.ModelAdapter.prototype.dispose = function() {
@@ -86,9 +96,11 @@ scout.ModelAdapter.prototype.destroy = function() {
   //Disconnect from parent
   if (this.parent) {
     this.parent.removeChild(this);
+    this.parent = null;
   }
 
   this.session.unregisterModelAdapter(this); //FIXME CGU unregister children?
+  this.destroyed = true;
 };
 
 scout.ModelAdapter.prototype.addChild = function(childAdapter) {

@@ -9,6 +9,21 @@ JsonAdapter / JavaScript Model [03.06.2014 cgu, awe]
 - Wird eine (Scout-)Model Instanz abgeräumt (z.B. eine Form Instanz) muss die serverseitige JsonAdapter Implementierung dafür sorgen,
   dass alle Kinder (z.B. FormFields) aus der modelAdapterRegistry entfernt werden. Der genau gleiche Clean-up muss auf Clientseite
   erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterRegistry gelöscht werden (ModelAdapter.destroy())
+- PROBLEME:
+  - UseCase: Modell wird initial per Property Change geschickt (z.B. TableField.setTable(X)). Noch während der Server am drehen ist, wechselt die Table von X auf Y. Table X wird nun NIE geschickt, im Server ist sie aber in der Registry vorhanden.
+    Passiert in der Widgets App wenn man auf Page & Search Forms, Page with nodes und dann Page with table klickt (Exception auf Client bei Menus)
+  - UseCase2: Modell wird initial als Property geschickt (z.B: Form.RootGroupBox). Noch während der Server am drehen ist, gibt es Property-Change-Events auf die RootGroupBox. Diese PropertyChange Events müssten eigentlich nicht separat, sondern könnten als Teil des initialen Loads geschickt werden -> Spart Datenübertragung.
+    Problem ist, dass man nicht weiss, welche Properties solche initialen Loads beinhalten.
+    Passiert in der Widget APP z.B. in der ButtonsForm (Buttons werden erst nacht dem Laden dekoriert).
+  Lösung? Alle Create Events vorher schicken? Beispiel: Page schickt DetailForm. DetailForm ist neu, gibt ein CreateEvent. FormFields darauf sind auch neu -> Create events.
+  Auf dem Client müssten alle Create events zuerst behandelt werden, eigentlich auch in umgekehrter Reihenfolge. FormField zuerst erstellen, da Form sonst nicht initialisiert werden kann. Könnte aber trotzdem noch Abhängigkeitsprobleme geben.
+  Eventuell alle erstellen und danach alle initialisieren?
+  Parent/Child Abhängigkeit müsste bei der Initialisierung gesetzt werden.
+  -> LÖSUNG: Server merkt sich modelAdapter und macht nicht direkt toJson. Er ignoriert dann alle Property-Change-Events für Objekte, die noch nicht an den Client geschickt wurden.
+  JsonAdapter implementiert das Interface toJsonString, welches toJson().toString() macht.
+  Insert und DeleteRows könnten auch ignoriert werden. Dann müsste es aber auch ein coalesce für selection event geben. UseCase: insert 5. select 5. Delete 5 -> 5 wird nicht geschickt, exception.
+  Auf dem Client braucht es auch ein coalesce für Offline-Fall. Wenn auf einer Tabelle rumgeklickt wird, müssen nicht alle Selection-Events geschickt werden, sondern nur der letzte.
+  TODO: Prüfen ob Parent/Child-Abhängigkeit überhaupt "verhebt". Beispiel: Menus, einmal als ContextMenü und einmal als Action-Bar. 2 GUIS mit einem Model.
 
 ModelAdapter Property Changes
 - Bei einem property change event werden die Werte der Properties auf den ModelAdapter übertragen. Danach werden die setter aufgerufen (z.B. setEnabled()).

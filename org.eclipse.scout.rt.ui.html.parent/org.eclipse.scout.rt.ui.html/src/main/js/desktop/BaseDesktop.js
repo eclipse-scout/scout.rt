@@ -105,7 +105,7 @@ scout.BaseDesktop.prototype.onReconnectingFailed = function() {
 
 scout.BaseDesktop.prototype.addForm = function(form) {
   if (form.displayHint == "view") {
-    form.attach(this._resolveViewContainer(form));
+    form.render(this._resolveViewContainer(form));
   } else if (form.displayHint == "dialog") {
     var previousModalForm;
     if (form.modal) {
@@ -116,7 +116,7 @@ scout.BaseDesktop.prototype.addForm = function(form) {
       this.modalDialogStack.push(form);
     }
 
-    form.attach(this.$parent);
+    form.render(this.$parent);
     this.focusedDialog = form;
 
     if (this.taskbar) {
@@ -135,7 +135,7 @@ scout.BaseDesktop.prototype.removeForm = function(form) {
     return;
   }
 
-  form.detach();
+  form.remove();
 
   if (form.displayHint === "dialog") {
     var previousModalForm;
@@ -168,8 +168,12 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
   }
 
   if (form.displayHint === "dialog") {
+    if (!form.isRendered()) {
+      form.render(this.$parent);
+    }
+
     //re attach it at the end
-    form.attach(this.$parent);
+    form.appendTo(this.$parent);
     this.focusedDialog = form;
 
     if (this.taskbar) {
@@ -185,7 +189,7 @@ scout.BaseDesktop.prototype.minimizeForm = function(form) {
   }
 
   form.minized = true;
-  form.detach();
+  form.remove();
   if (form === this.focusedDialog) {
     this.focusedDialog = null;
     this.activateTopDialog();
@@ -206,7 +210,7 @@ scout.BaseDesktop.prototype.maximizeForm = function(form) {
   }
 
   form.minized = false;
-  form.attach(this.$parent);
+  form.render(this.$parent);
 };
 
 scout.BaseDesktop.prototype.onModelAction = function(event) {

@@ -77,25 +77,32 @@ scout.DesktopTree.prototype.setNodeDetailFormChanged = function(nodeId, detailFo
   node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
 
   if (this._selectedNodes.indexOf(node) >= 0) {
-    this.changeDetailForm(node.detailForm);
+    this.showNodeDetailForm(node);
   }
 };
 
-scout.DesktopTree.prototype.changeDetailForm = function(detailForm) {
-  if (this._detailForm && this._detailForm !== detailForm) {
+scout.DesktopTree.prototype.showNodeDetailForm = function(node) {
+  //unlink detail form if it was closed
+  if (node.detailForm && node.detailForm.destroyed) {
+    node.detailForm = null;
+  }
+
+  if (this._detailForm && this._detailForm !== node.detailForm) {
     this.session.desktop.removeForm(this._detailForm);
     this._detailForm = null;
   }
 
-  if (detailForm) {
-    this._detailForm = detailForm;
+  if (node.detailForm) {
+    this._detailForm = node.detailForm;
     if (!this._detailForm.isRendered()) {
       this.session.desktop.addForm(this._detailForm);
     }
   }
 };
 
-scout.DesktopTree.prototype.changeDetailTable = function(detailTable) {
+scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
+  var detailTable = node.detailTable;
+
   if (this._detailTable && this._detailTable !== detailTable) {
     this._detailTable.remove();
     this._detailTable = null;
@@ -234,8 +241,8 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
 
   $node.selectOne();
 
-  this.changeDetailTable(node.table);
-  this.changeDetailForm(node.detailForm);
+  this.showNodeDetailTable(node);
+  this.showNodeDetailForm(node);
 
   if (!this.session.processingEvents) {
     this.session.send('nodesSelected', this.id, {
