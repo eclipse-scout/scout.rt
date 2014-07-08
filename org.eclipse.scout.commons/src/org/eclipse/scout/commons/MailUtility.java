@@ -262,7 +262,11 @@ public final class MailUtility {
    */
   private DataSource createDataSourceImpl(InputStream inStream, String fileName, String fileExtension) throws ProcessingException {
     try {
-      ByteArrayDataSource item = new ByteArrayDataSource(inStream, getContentTypeForExtension(fileExtension));
+      String mimeType = getContentTypeForExtension(fileExtension);
+      if (mimeType == null) {
+        mimeType = "application/octet-stream";
+      }
+      ByteArrayDataSource item = new ByteArrayDataSource(inStream, mimeType);
       item.setName(fileName);
       return item;
     }
