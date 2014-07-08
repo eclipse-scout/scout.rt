@@ -122,7 +122,7 @@ public class JsonDesktopTreeTest {
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonDesktopTree.init();
+    jsonDesktopTree.attach();
 
     // init treeNode map
     jsonDesktopTree.toJson();

@@ -13,10 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -60,15 +63,13 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   @Override
-  protected void attachModel() {
-    if (!getModel().isOpened()) {
-      getModel().getUIFacade().fireDesktopOpenedFromUI();
-    }
-    if (!getModel().isGuiAvailable()) {
-      getModel().getUIFacade().fireGuiAttached();
-    }
+  public void startup() {
+    super.startup();
 
-    //FIXME add listener afterwards -> don't handle events, refactor
+  }
+
+  @Override
+  protected void attachModel() {
     super.attachModel();
 
     if (m_desktopListener == null) {
@@ -80,6 +81,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   @Override
   protected void detachModel() {
     super.detachModel();
+
     if (m_desktopListener != null) {
       getModel().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
@@ -91,24 +93,30 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     JSONObject json = super.toJson();
 
     List<IForm> modelForms = getForms();
-    putProperty(json, "forms", modelsToJson(modelForms));
-    putProperty(json, "toolButtons", modelsToJson(getModel().getToolButtons()));
+    putProperty(json, "forms", getOrCreateJsonAdapters(modelForms));
+    putProperty(json, "toolButtons", getOrCreateJsonAdapters(getModel().getToolButtons()));
 
     boolean formBased = isFormBased();
     if (!formBased) {
       //FIXME view and tool buttons should be removed from desktop by device transformer
-      putProperty(json, "viewButtons", modelsToJson(getModel().getViewButtons()));
-      putProperty(json, "outline", modelToJson(getModel().getOutline()));
+      putProperty(json, "viewButtons", getOrCreateJsonAdapters(getModel().getViewButtons()));
+      putProperty(json, "outline", getOrCreateJsonAdapter(getModel().getOutline()));
     }
 
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
-    IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
-    if (service != null) {
-      breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
-    }
+    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", getJsonSession().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
+        if (service != null) {
+          breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
+        }
+      }
+    };
     if (breadCrumbsNavigation.getValue() != null) {
-      putProperty(json, "breadCrumbNavigation", modelToJson(breadCrumbsNavigation.getValue()));
+      putProperty(json, "breadCrumbNavigation", getOrCreateJsonAdapter(breadCrumbsNavigation.getValue()));
     }
+    job.runNow(new NullProgressMonitor());
     return json;
   }
 
@@ -170,14 +178,14 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     if (isFormBased()) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), modelToJson(PROP_OUTLINE, outline));
+    getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), putAdapterProperty(new JSONObject(), PROP_OUTLINE, outline));
   }
 
   protected void handleModelFormAdded(IForm form) {
     if (isFormBlocked(form)) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), modelToJson(PROP_FORM, form));
+    getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
   }
 
   protected void handleModelFormRemoved(IForm form) {
@@ -186,11 +194,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       return;
     }
 
-    getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), modelToJson(PROP_FORM, form));
+    getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
-    getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), modelToJson(PROP_FORM, form));
+    getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {

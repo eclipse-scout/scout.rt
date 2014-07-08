@@ -250,23 +250,15 @@ scout.Session.prototype._processEvents = function(events) {
   // TODO AWE: convert plain JS event object in Event class
   var session = this;
   for (var i = 0; i < events.length; i++) {
-    var event = events[i],
-      widgetId;
+    var event = events[i];
 
-    if (event.type_ == 'create') {
-      widgetId = event.parentId;
-    } else {
-      widgetId = event.id;
-    }
 
-    var widget = session.modelAdapterRegistry[widgetId];
+    var widget = session.modelAdapterRegistry[event.id];
     if (!widget) {
-      throw "No widget found for id " + widgetId;
+      throw "No widget found for id " + event.id;
     }
 
-    if (event.type_ == 'create') {
-      widget.onModelCreate(event);
-    } else if (event.type_ == 'property') {
+    if (event.type_ == 'property') {
       widget.onModelPropertyChange(event);
     } else {
       widget.onModelAction(event);
@@ -279,15 +271,13 @@ scout.Session.prototype.init = function() {
   this._sendNow();
 };
 
-scout.Session.prototype.onModelCreate = function(event) {
-  this.locale = new scout.Locale(event.locale);
-  this.desktop = this.objectFactory.create(event.desktop);
-  this.desktop.render(this.$entryPoint);
-};
-
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type_ == 'localeChanged') {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
+  } else if (event.type_ == 'initialized') {
+    this.locale = new scout.Locale(event.clientSession.locale);
+    this.desktop = this.objectFactory.create(event.clientSession.desktop);
+    this.desktop.render(this.$entryPoint);
   }
 };

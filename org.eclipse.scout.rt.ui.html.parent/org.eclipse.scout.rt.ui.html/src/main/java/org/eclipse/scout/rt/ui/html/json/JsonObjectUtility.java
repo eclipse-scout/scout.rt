@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Collection;
-import java.util.List;
 
-import org.eclipse.scout.rt.ui.html.json.JsonAdapterFactory.NullAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,49 +114,8 @@ public final class JsonObjectUtility {
     }
   }
 
-  /**
-   * If there already is a {@link IJsonAdapter} for the given model, a json object containing the id of the adapter is
-   * returned.<br>
-   * If there is none, a new json adapter is created and its json representation returned (using
-   * {@link IJsonAdapter#toJson()}).
-   */
-  public static final JSONObject modelToJson(IJsonSession session, Object model) {
-    if (model == null) {
-      return null;
-    }
-    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(model);
-    if (jsonAdapter == null) {
-      jsonAdapter = (IJsonAdapter<?>) session.createJsonAdapter(model);
-      if (jsonAdapter instanceof NullAdapter) {
-        return null;
-      }
-      return jsonAdapter.toJson();
-    }
-    else {
-      return putProperty(new JSONObject(), "id", jsonAdapter.getId());
-    }
-  }
-
-  /**
-   * Creates a new json object and puts the model into it.
-   */
-  public static JSONObject modelToJson(IJsonSession session, String propertyName, Object model) {
-    return putProperty(new JSONObject(), propertyName, modelToJson(session, model));
-  }
-
-  /**
-   * Calls <code>jsonSession.getOrCreateJsonAdapter(Object)</code> for each object in the model objects List and adds
-   * the return values of <code>toJson()</code> to the JSONArray.
-   */
-  public static JSONArray modelsToJson(IJsonSession session, List<?> models) {
-    JSONArray array = new JSONArray();
-    for (Object model : models) {
-      JSONObject object = modelToJson(session, model);
-      if (object != null) {
-        array.put(object);
-      }
-    }
-    return array;
+  public static JSONObject putAdapterProperty(JSONObject object, IJsonSession session, String propertyName, Object model) {
+    return putProperty(object, propertyName, session.getOrCreateJsonAdapter(model));
   }
 
   public static void disposeJsonAdapters(IJsonSession session, Collection<? extends Object> models) {

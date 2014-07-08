@@ -50,7 +50,10 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   }
 
   @Override
-  protected void attachModel() {
+  public void startup() {
+    super.startup();
+
+    //Same as in attachModel. Necessary for locale workaround. Find better solution in scout model
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
       getModel().addLocaleListener(m_localeListener);
@@ -67,6 +70,31 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
       job.runNow(new NullProgressMonitor());
     }
+
+    if (!getModel().getDesktop().isOpened()) {
+      getModel().getDesktop().getUIFacade().fireDesktopOpenedFromUI();
+    }
+    if (!getModel().getDesktop().isGuiAvailable()) {
+      getModel().getDesktop().getUIFacade().fireGuiAttached();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+
+    if (m_localeListener != null) {
+      getModel().removeLocaleListener(m_localeListener);
+      m_localeListener = null;
+    }
+  }
+
+  @Override
+  protected void attachModel() {
+    if (m_localeListener == null) {
+      m_localeListener = new P_LocaleListener();
+      getModel().addLocaleListener(m_localeListener);
+    }
   }
 
   @Override
@@ -80,7 +108,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, "desktop", modelToJson(getModel().getDesktop()));
+    putProperty(json, "desktop", getOrCreateJsonAdapter(getModel().getDesktop()));
     putProperty(json, "locale", localeToJson(getModel().getLocale()));
     return json;
   }
@@ -160,7 +188,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       final Locale locale = event.getLocale();
       if (!CompareUtility.equals(getJsonSession().currentHttpRequest().getLocale(), locale)) {
         m_localeManagedByModel = true;
-        if (isInitialized()) {//If Locale changes during session startup (execLoadSession) it is not necessary to notify the gui
+        if (isAttached()) {//If Locale changes during session startup (execLoadSession) it is not necessary to notify the gui
           getJsonSession().currentJsonResponse().addActionEvent("localeChanged", getId(), localeToJson(locale));
         }
       }

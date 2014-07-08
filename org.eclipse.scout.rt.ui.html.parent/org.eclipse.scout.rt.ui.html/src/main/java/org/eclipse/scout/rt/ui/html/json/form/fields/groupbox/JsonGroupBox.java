@@ -52,7 +52,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), "formFields", modelsToJson(getModel().getFields()));
+    return putProperty(super.toJson(), "formFields", getOrCreateJsonAdapters(getModel().getFields()));
   }
 
   @Override

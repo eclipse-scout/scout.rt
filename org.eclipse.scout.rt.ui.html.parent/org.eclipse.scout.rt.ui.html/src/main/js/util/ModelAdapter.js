@@ -125,28 +125,40 @@ scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, par
  * _adapterProperties array.
  */
 scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
-  var propertyName, value, i, adapter, adapters;
+  var propertyName, value, i, j, adapter, adapters;
 
+  //Loop through primitive properties
   for (propertyName in model) {
     if (ignore !== undefined && ignore.indexOf(propertyName) >= 0) {
       continue;
     }
+    if (this._adapterProperties.indexOf(propertyName) > -1) {
+      continue;
+    }
 
     value = model[propertyName];
+    func(propertyName, value);
+  }
 
-    if (this._adapterProperties.indexOf(propertyName) > -1) {
-      if (Array.isArray(value)) {
-        adapters = [];
-        for (i = 0; i < value.length; i++) {
-          adapter = this.session.getOrCreateModelAdapter(value[i], this);
-          this.onChildAdapterCreated(propertyName, adapter);
-          adapters.push(adapter);
-        }
-        value = adapters;
-      } else {
-        value = this.session.getOrCreateModelAdapter(value, this);
-        this.onChildAdapterCreated(propertyName, value);
+  //Loop through adapter properties in the order specified by the list _adapterProperties
+  //Important: The server resolves the model adapters in alphabetic order. Current we need to define the order by ourself. Maybe we should change to alphabetical order as well.
+  for (i = 0; i < this._adapterProperties.length; i++) {
+    propertyName = this._adapterProperties[i];
+    value = model[propertyName];
+    if (!value) {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      adapters = [];
+      for (j = 0; j < value.length; j++) {
+        adapter = this.session.getOrCreateModelAdapter(value[j], this);
+        this.onChildAdapterCreated(propertyName, adapter);
+        adapters.push(adapter);
       }
+      value = adapters;
+    } else {
+      value = this.session.getOrCreateModelAdapter(value, this);
+      this.onChildAdapterCreated(propertyName, value);
     }
 
     func(propertyName, value);

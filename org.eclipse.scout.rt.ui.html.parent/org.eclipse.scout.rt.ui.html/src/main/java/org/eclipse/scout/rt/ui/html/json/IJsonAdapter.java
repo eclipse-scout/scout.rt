@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
+import org.json.JSONObject;
+
 /**
  * Creates JSON output for a Scout model object.
  * 
@@ -25,10 +27,18 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
    */
   T getModel();
 
-  void init();
+  void startup();
+
+  void attach();
+
+  boolean isAttached();
 
   void dispose();
 
   void handleUiEvent(JsonEvent event, JsonResponse res);
 
+  /**
+   * If the adapter is attached the id is returned instead of the whole object. Otherwise {@link #toJson()}() is called.
+   */
+  JSONObject write();
 }

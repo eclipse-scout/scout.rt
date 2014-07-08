@@ -129,7 +129,7 @@ public class JsonDesktopTest {
   public static JsonDesktop createJsonDesktopWithMocks(IDesktop desktop) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonDesktop.init();
+    jsonDesktop.attach();
     return jsonDesktop;
   }
 }

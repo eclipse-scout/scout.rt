@@ -39,7 +39,7 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
 
       if (!getModel().isSelected()) {
         //Lazy loading on selection
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, modelToJson(getModel().getDataModel()));
+        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
         getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "rootEntityRef", "e140"); //FIXME CGU
       }
 
@@ -50,7 +50,7 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (IAnalysisTableControl.PROP_DATA_MODEL.equals(propertyName)) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, modelToJson(getModel().getDataModel()));
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
     }
     else {
       super.handleModelPropertyChange(propertyName, newValue);

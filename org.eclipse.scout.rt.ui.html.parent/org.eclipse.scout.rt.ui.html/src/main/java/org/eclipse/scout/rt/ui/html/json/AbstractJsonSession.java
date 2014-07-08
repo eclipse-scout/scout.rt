@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -34,6 +33,7 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterFactory.NullAdapter;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
@@ -67,27 +67,31 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
+
     // FIXME AWE/CGU: use sessionId or use createUniqueIdFor? duplicates possible?
     // was <<jsonReq.getSessionPartId()>> before, now createUniqueIdFor is used again
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
+    initJsonSession(clientSession);
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
     }
-    JSONObject json = initJsonSession(clientSession);
-    m_currentJsonResponse.addCreateEvent(jsonReq.getSessionPartId(), json);
+
+    JSONObject json = new JSONObject();
+    JsonObjectUtility.putProperty(json, "clientSession", m_jsonClientSession);
+    m_currentJsonResponse.addActionEvent("initialized", jsonReq.getSessionPartId(), json);
+
     LOG.info("JsonSession initialized");
   }
 
   /**
    * This call runs in a Scout job and creates the initial JSON session object with the Desktop.
    */
-  private JSONObject initJsonSession(IClientSession clientSession) {
-    final Holder<JSONObject> jsonHolder = new Holder<>(JSONObject.class);
+  private void initJsonSession(IClientSession clientSession) {
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        jsonHolder.setValue(m_jsonClientSession.toJson());
+        m_jsonClientSession.startup();
       }
     };
     job.runNow(new NullProgressMonitor());
@@ -97,7 +101,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
-    return jsonHolder.getValue();
   }
 
   protected UserAgent createUserAgent(JsonRequest jsonReq) {
@@ -157,6 +160,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   public void dispose() {
     m_jsonAdapterRegistry.dispose();
+    m_currentJsonResponse = null;
   }
 
   @Override
@@ -177,15 +181,17 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return jsonAdapter;
     }
     jsonAdapter = createJsonAdapter(model);
+    //FIXME CGU see FIXME in Adapter Factory
+    if (jsonAdapter instanceof NullAdapter) {
+      return null;
+    }
     return jsonAdapter;
   }
 
   @Override
   public IJsonAdapter<?> createJsonAdapter(Object model) {
     String id = createUniqueIdFor(null); //FIXME cgu
-    IJsonAdapter<?> jsonAdapter = m_jsonAdapterFactory.createJsonAdapter(model, this, id);
-    jsonAdapter.init();
-    return jsonAdapter;
+    return m_jsonAdapterFactory.createJsonAdapter(model, this, id);
   }
 
   @Override

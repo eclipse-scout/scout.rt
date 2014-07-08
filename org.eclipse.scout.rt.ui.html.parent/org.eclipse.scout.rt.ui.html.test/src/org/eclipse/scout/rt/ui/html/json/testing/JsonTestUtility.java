@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.testing;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -60,13 +61,18 @@ public class JsonTestUtility {
     return new JsonEvent(jsonObject);
   }
 
+  public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
+    return extractEventsFromResponse(response, eventType, true);
+  }
+
   /**
    * @return all events of the given type. Never null.
    */
-  public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
+  public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType, boolean flush) throws JSONException {
     List<JSONObject> list = new LinkedList<>();
     for (JSONObject responseEvent : response.getEventList()) {
       if (eventType.equals(responseEvent.getString(JsonEvent.TYPE))) {
+        responseEvent = JsonTestUtility.resolveJsonObject(responseEvent);
         list.add(responseEvent);
       }
     }
@@ -89,6 +95,18 @@ public class JsonTestUtility {
     }
 
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
+  }
+
+  public static JSONObject resolveJsonObject(JSONObject object) throws JSONException {
+    return JsonResponse.resolveJsonAdapter(object);
+  }
+
+  public static List<JSONObject> resolveJsonAdapters(List<JSONObject> objects) throws JSONException {
+    List<JSONObject> result = new ArrayList<>(objects.size());
+    for (JSONObject obj : objects) {
+      result.add(resolveJsonObject(obj));
+    }
+    return result;
   }
 
 }

@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -67,6 +68,9 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       m_modelTreeListener = new P_ModelTreeListener();
       getModel().addUITreeListener(m_modelTreeListener);
     }
+
+    IJsonAdapter<?> jsonAdapter = getOrCreateJsonAdapter(getModel().getContextMenu());
+    jsonAdapter.attach();
   }
 
   @Override
@@ -105,10 +109,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     putProperty(json, PROP_NODES, jsonPages);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
 
-    putProperty(json, PROP_MENUS, modelsToJson(getModel().getMenus()));
+    putProperty(json, PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
 
-    //FIXME cgu refactor
-    modelToJson(getModel().getContextMenu());
     return json;
   }
 
@@ -193,7 +195,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     JSONObject jsonEvent = new JSONObject();
     ITreeNode selectedNode = getModel().getSelectedNode();
     putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(selectedNode));
-    putProperty(jsonEvent, "detailForm", modelToJson(detailForm));
+    putProperty(jsonEvent, "detailForm", getOrCreateJsonAdapter(detailForm));
     getJsonSession().currentJsonResponse().addActionEvent("detailFormChanged", getId(), jsonEvent);
   }
 
@@ -213,7 +215,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   @Override
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, modelsToJson(getModel().getMenus()));
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
   }
 
   protected String getOrCreatedNodeId(ITreeNode node) {
@@ -242,14 +244,14 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       }
     }
     putProperty(json, "childNodes", jsonChildPages);
-    putProperty(json, "detailForm", modelToJson(page.getDetailForm()));
+    putProperty(json, "detailForm", getOrCreateJsonAdapter(page.getDetailForm()));
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
       pageType = "table";
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       ITable table = pageWithTable.getTable();
-      putProperty(json, "table", modelToJson(table));
+      putProperty(json, "table", getOrCreateJsonAdapter(table));
     }
     else {
       pageType = "node";
@@ -357,7 +359,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
       handleModelDetailFormChanged((IForm) newValue);
-    } else {
+    }
+    else {
       super.handleModelPropertyChange(propertyName, newValue);
     }
   }

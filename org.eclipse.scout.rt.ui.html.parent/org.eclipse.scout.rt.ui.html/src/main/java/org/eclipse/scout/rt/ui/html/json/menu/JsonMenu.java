@@ -80,7 +80,7 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_CHILD_MENUS, modelsToJson(getModel().getChildActions()));
+    putProperty(json, PROP_CHILD_MENUS, getOrCreateJsonAdapters(getModel().getChildActions()));
     return json;
   }
 

@@ -88,7 +88,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, "rootGroupBox", modelToJson(model.getRootGroupBox()));
+    putProperty(json, "rootGroupBox", getOrCreateJsonAdapter(model.getRootGroupBox()));
     // TODO AWE: return other props
     return json;
   }

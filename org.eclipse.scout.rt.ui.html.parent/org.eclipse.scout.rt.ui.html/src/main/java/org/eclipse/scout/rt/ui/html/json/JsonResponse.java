@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.putProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,30 +40,6 @@ public class JsonResponse {
   }
 
   /**
-   * @param parentId
-   * @param json
-   *          must have an 'id' and a 'objectType'
-   */
-  public void addCreateEvent(String parentId, JSONObject json) {
-    if (json == null) {
-      return;
-    }
-    String id = json.optString("id", null);
-    if (id == null) {
-      throw new JsonException("id is null");
-    }
-    String objectType = json.optString("objectType", null);
-    if (objectType == null) {
-      throw new JsonException("objectType is null");
-    }
-    putProperty(json, "type_", "create");
-    if (parentId != null) {
-      putProperty(json, "parentId", parentId);
-    }
-    m_eventList.add(json);
-  }
-
-  /**
    * event must have an 'id'
    */
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
@@ -76,6 +53,7 @@ public class JsonResponse {
     }
     //coalesce
     JSONObject event = m_idToPropertyChangeEventMap.get(id);
+
     if (event == null) {
       event = new JSONObject();
       putProperty(event, "id", id);
@@ -99,16 +77,56 @@ public class JsonResponse {
     m_eventList.add(event);
   }
 
+  //FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
   public JSONObject toJson() {
     JSONObject response = new JSONObject();
     JSONArray eventArray = new JSONArray();
     for (JSONObject e : m_eventList) {
-      eventArray.put(e);
+      eventArray.put(resolveJsonAdapter(e));
     }
     putProperty(response, "events", eventArray);
     putProperty(response, "errorCode", m_errorCode);
     putProperty(response, "errorMessage", m_errorMessage);
     return response;
+  }
+
+  public static JSONObject resolveJsonAdapter(JSONObject object) {
+    long resolveTime = System.currentTimeMillis();
+    JSONObject resolvedObject = (JSONObject) resolveJsonAdapterInternal(object);
+    LOG.debug("Time to resolve adapters: " + (System.currentTimeMillis() - resolveTime) + "ms");
+
+    return resolvedObject;
+  }
+
+  private static Object resolveJsonAdapterInternal(Object object) {
+    if (object instanceof IJsonAdapter<?>) {
+      IJsonAdapter<?> adapter = ((IJsonAdapter) object);
+      JSONObject json = adapter.write();
+      if (!adapter.isAttached()) {
+        adapter.attach();
+      }
+      return resolveJsonAdapterInternal(json);
+    }
+    else if (object instanceof JSONObject) {
+      JSONObject jsonObject = (JSONObject) object;
+      Iterator keys = jsonObject.sortedKeys();
+      do {
+        String key = (String) keys.next();
+        Object value = jsonObject.opt(key);
+        JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value));
+      }
+      while (keys.hasNext());
+    }
+    else if (object instanceof JSONArray) {
+      JSONArray arr = (JSONArray) object;
+      JSONArray arr2 = new JSONArray();
+
+      for (int i = 0; i < arr.length(); i++) {
+        arr2.put(resolveJsonAdapterInternal(arr.opt(i)));
+      }
+      return arr2;
+    }
+    return object;
   }
 
   public List<JSONObject> getEventList() {

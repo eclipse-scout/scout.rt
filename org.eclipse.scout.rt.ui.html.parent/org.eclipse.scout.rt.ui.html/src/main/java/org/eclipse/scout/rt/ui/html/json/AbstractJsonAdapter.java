@@ -21,7 +21,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private final IJsonSession m_jsonSession;
   private final T m_model;
   private final String m_id;
-  private boolean m_initialized;
+  private boolean m_attached;
 
   public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id) {
     if (model == null) {
@@ -31,6 +31,10 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     m_jsonSession = jsonSession;
     m_id = id;
     m_jsonSession.registerJsonAdapter(this);
+  }
+
+  @Override
+  public void startup() {
   }
 
   @Override
@@ -48,9 +52,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public final void init() {
+  public final void attach() {
     attachModel();
-    m_initialized = true;
+    m_attached = true;
   }
 
   /**
@@ -63,18 +67,18 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public void dispose() {
-    if (!m_initialized) {
-      return; // TODO AWE: (ask C.GU) das wäre auch eher IllegalState, nicht?
+    if (m_attached) {
+      detachModel();
     }
-    detachModel();
     m_jsonSession.unregisterJsonAdapter(m_id);
   }
 
   protected void detachModel() {
   }
 
-  public boolean isInitialized() {
-    return m_initialized;
+  @Override
+  public boolean isAttached() {
+    return m_attached;
   }
 
   @Override
@@ -89,16 +93,26 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected JSONObject modelToJson(String propertyName, Object model) {
-    return JsonObjectUtility.modelToJson(getJsonSession(), propertyName, model);
+  protected JSONObject putAdapterProperty(JSONObject object, String propertyName, Object model) {
+    return JsonObjectUtility.putAdapterProperty(object, getJsonSession(), propertyName, model);
   }
 
-  protected final JSONObject modelToJson(Object model) {
-    return JsonObjectUtility.modelToJson(getJsonSession(), model);
+  protected final IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
+    if (model == null) {
+      return null;
+    }
+    return getJsonSession().getOrCreateJsonAdapter(model);
   }
 
-  protected final JSONArray modelsToJson(List<?> models) {
-    return JsonObjectUtility.modelsToJson(getJsonSession(), models);
+  protected final JSONArray getOrCreateJsonAdapters(List<?> models) {
+    JSONArray array = new JSONArray();
+    for (Object model : models) {
+      IJsonAdapter<?> object = getOrCreateJsonAdapter(model);
+      if (object != null) {
+        array.put(object);
+      }
+    }
+    return array;
   }
 
   protected void disposeJsonAdapters(Collection<? extends Object> models) {
@@ -109,4 +123,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JsonObjectUtility.disposeJsonAdapter(getJsonSession(), model);
   }
 
+  @Override
+  public JSONObject write() {
+    if (isAttached()) {
+      return putProperty(new JSONObject(), "id", getId());
+    }
+
+    return toJson();
+  }
 }

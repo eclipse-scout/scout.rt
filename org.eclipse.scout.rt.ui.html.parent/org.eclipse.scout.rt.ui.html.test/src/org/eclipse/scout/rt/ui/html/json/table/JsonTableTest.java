@@ -123,7 +123,7 @@ public class JsonTableTest {
     JsonSessionMock jsonSession = new JsonSessionMock();
 
     JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonTable.init();
+    jsonTable.attach();
 
     //init treeNode map
     jsonTable.toJson();

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -40,16 +41,18 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
+public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements IContextMenuOwner {
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
@@ -169,7 +172,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
       public Object valueToJson(Object value) {
         @SuppressWarnings("unchecked")
         List<IKeyStroke> keyStrokes = (List<IKeyStroke>) value;
-        return modelsToJson(keyStrokes);
+        return getOrCreateJsonAdapters(keyStrokes);
       }
     });
     putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_SCROLL_TO_SELECTION, model) {
@@ -216,6 +219,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
       m_modelTableListener = new P_ModelTableListener();
       getModel().addUITableListener(m_modelTableListener);
     }
+
+    IJsonAdapter<?> jsonAdapter = getOrCreateJsonAdapter(getModel().getContextMenu());
+    jsonAdapter.attach();
   }
 
   @Override
@@ -247,9 +253,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
       jsonRows.put(jsonRow);
     }
     putProperty(json, "rows", jsonRows);
-    putProperty(json, PROP_MENUS, modelsToJson(getModel().getMenus()));
+    putProperty(json, PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
     if (getModel() instanceof ITable5) {
-      putProperty(json, "controls", modelsToJson(((ITable5) getModel()).getControls()));
+      putProperty(json, "controls", getOrCreateJsonAdapters(((ITable5) getModel()).getControls()));
     }
 
     return json;
@@ -504,6 +510,11 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> {
       jsonRowIds.put(rowId);
     }
     getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(ContextMenuEvent event) {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
   }
 
   private class P_ModelTableListener implements TableListener {
