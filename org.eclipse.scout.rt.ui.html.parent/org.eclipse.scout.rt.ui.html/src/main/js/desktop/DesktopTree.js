@@ -101,7 +101,7 @@ scout.DesktopTree.prototype.showNodeDetailForm = function(node) {
 };
 
 scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
-  var detailTable = node.detailTable;
+  var detailTable = node.table;
 
   if (this._detailTable && this._detailTable !== detailTable) {
     this._detailTable.remove();
