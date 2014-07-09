@@ -1,15 +1,16 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Session = function($entryPoint, sessionPartId, userAgent) {
+scout.Session = function($entryPoint, jsonSessionId, userAgent) {
   this.modelAdapterRegistry = {};
   this.locale;
   this.$entryPoint = $entryPoint;
   this._asyncEvents = [];
   this._asyncRequestQueued;
-  this._sessionPartId = sessionPartId;
+  this._jsonSessionId = jsonSessionId;
   this._deferred;
   this._startup;
+  this._unload;
   this.desktop;
   this.userAgent = userAgent;
   this.url = 'json';
@@ -18,12 +19,26 @@ scout.Session = function($entryPoint, sessionPartId, userAgent) {
   }
   this.objectFactory = new scout.ObjectFactory(this);
 
+  // Determine clientSessionId
+  var url = new scout.URL();
+  this._clientSessionId = url.getParameter('clientSessionId') || 1;
+  var maxClientSessionId = localStorage.getItem('scout:maxClientSessionId'); // FIXME BSH Namespaces?
+  if (typeof url.getParameter('newSession') !== 'undefined') {
+    // Assign new clientSessionId
+    this._clientSessionId = +(maxClientSessionId || this._clientSessionId) + 1;
+    // Update URL in address bar (HTML 5 history)
+    url.removeParameter('newSession').removeParameter('clientSessionId');
+    url.addParameter('clientSessionId', this._clientSessionId);
+    history.replaceState({}, '', url.toString());
+  }
+  localStorage.setItem('scout:maxClientSessionId', Math.max(maxClientSessionId, this._clientSessionId));
+
   // FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
 
   // FIXME maybe better separate session object from event processing, create
   // ClientSession.js?
-  this.modelAdapterRegistry[sessionPartId] = this;
+  this.modelAdapterRegistry[jsonSessionId] = this;
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
@@ -66,7 +81,8 @@ scout.Session.prototype.getOrCreateModelAdapters = function(modelArray, parent) 
     return [];
   }
 
-  var adapters = [], i;
+  var adapters = [];
+  var i;
   for (i = 0; i < modelArray.length; i++) {
     adapters[i] = this.getOrCreateModelAdapter(modelArray[i], parent);
   }
@@ -98,11 +114,12 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
+    jsonSessionId: this._jsonSessionId,
     events: events,
-    sessionPartId: this._sessionPartId
   };
 
   if (this._startup) {
+    request.clientSessionId = this._clientSessionId;
     request.startup = true;
     this._startup = false;
 
@@ -110,34 +127,38 @@ scout.Session.prototype._sendNow = function(events, deferred) {
       request.userAgent = this.userAgent;
     }
   }
+  if (this._unload) {
+    request.unload = true;
+  }
 
   this._sendRequest(request);
 };
 
 scout.Session.prototype._sendRequest = function(request) {
- if (this.offline) {
-   this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
-   return;
- }
+  if (this.offline) {
+    this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+    return;
+  }
 
- var that = this;
- this._requestsPendingCounter++;
- $.ajax({
-   async: true,
-   type: "POST",
-   dataType: "json",
-   cache: false,
-   url: this.url,
-   data: JSON.stringify(request),
-   context: request
- })
- .done(function(data) {
-   that._processSuccessResponse(data);
- })
- .fail(function(jqXHR, textStatus, errorThrown) {
-   var request = this;
-   that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
- });
+  var that = this;
+  this._requestsPendingCounter++;
+  $.ajax({
+    async: true,
+    type: "POST",
+    dataType: "json",
+    contentType: "application/json",
+    cache: false,
+    url: this.url,
+    data: JSON.stringify(request),
+    context: request
+  })
+    .done(function(data) {
+      that._processSuccessResponse(data);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      var request = this;
+      that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+    });
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -169,9 +190,8 @@ scout.Session.prototype._processSuccessResponse = function(message) {
  * @param textStatus timeout, abort, error or parseerror
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
-  console.log(jqXHR.status);
-  console.log(textStatus);
-  console.log(errorThrown);
+  // FIXME AWE Remove when not needed anymore
+  $.log('ERROR: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
   //Status code = 0 -> no connection
   //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
@@ -188,8 +208,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     this.$entryPoint.html('');
     if (this.desktop) {
       this.desktop.showMessage(jsonResponse.errorMessage, 'timeout');
-    }
-    else {
+    } else {
       this.$entryPoint.text(jsonResponse.errorMessage);
     }
     return;
@@ -269,6 +288,11 @@ scout.Session.prototype._processEvents = function(events) {
 scout.Session.prototype.init = function() {
   this._startup = true;
   this._sendNow();
+  // Destroy json session on server when page is closed or reloaded
+  $(window).on('unload', function() {
+    this._unload = true;
+    this._sendNow();
+  }.bind(this));
 };
 
 scout.Session.prototype.onModelAction = function(event) {

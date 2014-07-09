@@ -1,0 +1,137 @@
+/**
+ * Input is expected to be encoded. Output (toString()) is also encoded.
+ * If no URL is passed, 'window.location.href' is used as input.
+ */
+scout.URL = function(url) {
+  if (typeof url === 'undefined') {
+    url = window.location.href;
+  }
+  var a = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
+  // encoded
+  this._baseUrlRaw = a[1];
+  this._queryPartRaw = a[2];
+  this._hashPartRaw = a[3];
+  // un-encoded (!)
+  this._queryMap = scout.URL._parse(this._queryPartRaw);
+};
+
+// Helper function to sort arrays alphabetically, nulls in front
+scout.URL._sorter = function(a, b) {
+  return a === null ? -1 : b === null ? 1 : a.toString().localeCompare(b);
+};
+
+// Helper function to build a query parameter with value
+scout.URL._formatQueryParam = function(key, value) {
+  var s = encodeURIComponent(key);
+  if (typeof value !== 'undefined' && value !== null) {
+    s += '=' + encodeURIComponent(value);
+  }
+  return s;
+};
+
+// Helper function to add an key-value pair to a map. If the key is added multiple
+// times, the value is converted to an array.
+scout.URL._addToMap = function(map, key, value) {
+  if (typeof map === 'undefined') {
+    throw 'Argument "map" must not be null';
+  }
+  if (typeof key === 'undefined') {
+    throw 'Argument "key" must not be null';
+  }
+  if (key in map) {
+    var oldValue = map[key];
+    if (Array.isArray(oldValue)) {
+      oldValue.push(value);
+    } else {
+      map[key] = [oldValue, value];
+    }
+  } else {
+    map[key] = value;
+  }
+};
+
+// Helper function to parse the given (encoded) query string and return
+// it as (un-encoded) map of key-value pairs.
+scout.URL._parse = function(queryPart) {
+  var queryString = (queryPart || '').replace(/\+/g, ' ');
+  var pattern = /([^&=]+)(=?)([^&]*)/g;
+  var map = {};
+  var m, key, value;
+  while ((m = pattern.exec(queryString))) {
+    key = decodeURIComponent(m[1]);
+    value = decodeURIComponent(m[3]);
+    if (value === '' && m[2] !== '=') {
+      value = null;
+    }
+    scout.URL._addToMap(map, key, value);
+  }
+  return map;
+};
+
+scout.URL.prototype.getParameter = function(param) {
+  if (typeof param !== 'string') {
+    throw 'Illegal argument type: ' + param;
+  }
+  var value = this._queryMap[param];
+  if (Array.isArray(value)) {
+    return value.sort(scout.URL._sorter);
+  }
+  return value;
+};
+
+scout.URL.prototype.removeParameter = function(param) {
+  if (typeof param !== 'string') {
+    throw 'Illegal argument type: ' + param;
+  }
+  delete this._queryMap[param];
+  return this;
+};
+
+scout.URL.prototype.setParameter = function(param, value) {
+  if (typeof param !== 'string') {
+    throw 'Illegal argument type: ' + param;
+  }
+  if (param === null || param === '') { // ignore empty keys
+    return;
+  }
+  this._queryMap[param] = value;
+  return this;
+};
+
+scout.URL.prototype.addParameter = function(param, value) {
+  if (typeof param !== 'string') {
+    throw 'Illegal argument type: ' + param;
+  }
+  if (param === null || param === '') { // ignore empty keys
+    return;
+  }
+  scout.URL._addToMap(this._queryMap, param, value);
+  return this;
+};
+
+scout.URL.prototype.toString = function() {
+  var result = this._baseUrlRaw;
+
+  if (Object.keys(this._queryMap).length) {
+    // Built a sorted string of all formatted _queryMap entries
+    var reconstructedQueryPart = Object.keys(this._queryMap).sort(scout.URL._sorter).map(function(key) {
+      var value = this.getParameter(key);
+      // For multiple values, generate a parameter string for each value
+      if (Array.isArray(value)) {
+        return value.map(
+          function(innerKey, innerIndex) {
+            return scout.URL._formatQueryParam(key, value[innerIndex]);
+          }
+        ).join('&');
+      }
+      return scout.URL._formatQueryParam(key, value);
+    }.bind(this)).join('&');
+    result += '?' + reconstructedQueryPart;
+  }
+
+  if (this._hashPartRaw) {
+    result += '#' + this._hashPartRaw;
+  }
+
+  return result;
+};

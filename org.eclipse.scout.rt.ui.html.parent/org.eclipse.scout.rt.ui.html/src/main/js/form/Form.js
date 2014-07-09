@@ -16,17 +16,16 @@ scout.Form.prototype._render = function($parent) {
   this.rootGroupBox.render(this.$container);
 
   var closeable = false;
+  var detachable = true; // FIXME How to determine 'detachable' property?
   var systemButtons = this.rootGroupBox.getSystemButtons();
   if (systemButtons) {
     // TODO AWE: CSS for button-bar / position / visible
     var $buttonBar = $.makeDiv('', 'button-bar', '');
     var i, button;
-    for (i=0; i<systemButtons.length; i++) {
+    for (i = 0; i < systemButtons.length; i++) {
       button = systemButtons[i];
       button.render($buttonBar);
-      if (button.visible &&
-          button.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
-          button.systemType == scout.Button.SYSTEM_TYPE.CLOSE) {
+      if (button.visible && (button.systemType == scout.Button.SYSTEM_TYPE.CANCEL || button.systemType == scout.Button.SYSTEM_TYPE.CLOSE)) {
         closeable = true;
       }
     }
@@ -46,6 +45,17 @@ scout.Form.prototype._render = function($parent) {
         that.session.send('formClosing', that.id);
       });
     }
+    if (detachable) {
+      var $detachButton = $('<button title="Detach form">D</button>');
+      $dialogBar.append($detachButton);
+      $detachButton.on('click', function() {
+        // FIXME BSH Set correct url or write content
+        //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
+        //        w.document.close(); //finish "loading" the page
+        var w = scout.openWindow(window.location.href, 'scout:form:' + that.id, 800, 600);
+        w.parentScout = window.scout;
+      });
+    }
     this.$container.addClass('dialog-form');
     this.$container.prepend($dialogBar);
   }
@@ -55,7 +65,7 @@ scout.Form.prototype._render = function($parent) {
   }
 };
 
-scout.Form.prototype._remove= function() {
+scout.Form.prototype._remove = function() {
   scout.Form.parent.prototype._remove.call(this);
 
   if (this.$glasspane) {
@@ -79,11 +89,11 @@ scout.Form.prototype.enable = function() {
 scout.Form.prototype.disable = function() {
   this.$glasspane = this._$parent.appendDiv(undefined, 'glasspane'); // FIXME CGU how to do this properly? disable every mouse and keyevent?
   // FIXME CGU adjust values on resize
-  this.$glasspane.
-    width(this.$container.width()).
-    height(this.$container.height()).
-    css('top', this.$container.position().top).
-    css('left', this.$container.position().left);
+  this.$glasspane
+    .width(this.$container.width())
+    .height(this.$container.height())
+    .css('top', this.$container.position().top)
+    .css('left', this.$container.position().left);
 };
 
 scout.Form.prototype.onModelCreate = function() {};

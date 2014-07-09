@@ -11,11 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
@@ -39,6 +42,7 @@ import org.json.JSONObject;
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
+  private static final String SESSION_ATTR_CLIENT_SESSION_MAP = IClientSession.class.getName() + "-Map";
 
   private JsonClientSession m_jsonClientSession;
 
@@ -47,8 +51,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
 
+  private String m_jsonSessionId;
   private long m_jsonAdapterSeq;
   private JsonResponse m_currentJsonResponse;
+  private JsonRequest m_currentJsonRequest;
   private HttpServletRequest m_currentHttpRequest;
   private JsonEventProcessor m_jsonEventProcessor;
 
@@ -61,33 +67,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public void init(HttpServletRequest request, JsonRequest jsonReq) {
     m_currentHttpRequest = request;
-    UserAgent userAgent = createUserAgent(jsonReq);
+    m_currentJsonRequest = jsonReq;
+    m_jsonSessionId = jsonReq.getJsonSessionId();
+    UserAgent userAgent = createUserAgent();
     Subject subject = initSubject();
     if (subject == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
+
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
 
     // FIXME AWE/CGU: use sessionId or use createUniqueIdFor? duplicates possible?
     // was <<jsonReq.getSessionPartId()>> before, now createUniqueIdFor is used again
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
-    initJsonSession(clientSession);
-    if (!clientSession.isActive()) {
-      throw new JsonException("ClientSession is not active, there must be a problem with loading or starting");
-    }
 
-    JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "clientSession", m_jsonClientSession);
-    m_currentJsonResponse.addActionEvent("initialized", jsonReq.getSessionPartId(), json);
-
-    LOG.info("JsonSession initialized");
-  }
-
-  /**
-   * This call runs in a Scout job and creates the initial JSON session object with the Desktop.
-   */
-  private void initJsonSession(IClientSession clientSession) {
+    // FIXME BSH Check with CGU: Why is this inside a sync job? There is a second one in startup()
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -101,13 +96,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
+    if (!clientSession.isActive()) {
+      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
+    }
+
+    JSONObject json = new JSONObject();
+    JsonObjectUtility.putProperty(json, "clientSession", m_jsonClientSession);
+    m_currentJsonResponse.addActionEvent("initialized", m_jsonSessionId, json);
+
+    LOG.info("JsonSession initialized");
   }
 
-  protected UserAgent createUserAgent(JsonRequest jsonReq) {
+  protected UserAgent createUserAgent() {
     IUiLayer uiLayer = UiLayer2.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = m_currentHttpRequest.getHeader("User-Agent");
-    JSONObject userAgent = jsonReq.getUserAgent();
+    JSONObject userAgent = m_currentJsonRequest.getUserAgent();
     if (userAgent != null) {
       // FIXME CGU it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
@@ -129,14 +133,39 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   protected abstract Class<? extends IClientSession> clientSessionClass();
 
   protected IClientSession createClientSession(UserAgent userAgent, Subject subject, Locale locale) {
-    LocaleThreadLocal.set(locale);
-    try {
-      return createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
-      //FIXME CGU session must be started later, see JsonClientSession
-      //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-    }
-    finally {
-      LocaleThreadLocal.set(null);
+    synchronized (this) {
+      HttpSession httpSession = m_currentHttpRequest.getSession();
+      // Get map of client sessions from HTTP session
+      @SuppressWarnings("unchecked")
+      Map<String, IClientSession> clientSessionMap = (Map<String, IClientSession>) httpSession.getAttribute(SESSION_ATTR_CLIENT_SESSION_MAP);
+      if (clientSessionMap == null) {
+        clientSessionMap = new HashMap<String, IClientSession>();
+        httpSession.setAttribute(SESSION_ATTR_CLIENT_SESSION_MAP, clientSessionMap);
+      }
+      // Lookup the requested client session
+      String clientSessionId = m_currentJsonRequest.getClientSessionId();
+      if (clientSessionId == null) {
+        throw new IllegalStateException("Missing clientSessionId in JSON request");
+      }
+      IClientSession clientSession = clientSessionMap.get(clientSessionId);
+      if (clientSession != null) {
+        // Found existing client session
+        LOG.info("Using cached client session [clientSessionId=" + clientSessionId + "]");
+        return clientSession;
+      }
+      // No client session for the requested ID was found, so create one and store it in the map
+      LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
+      LocaleThreadLocal.set(locale);
+      try {
+        clientSession = createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
+        //FIXME CGU session must be started later, see JsonClientSession
+        //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+        clientSessionMap.put(clientSessionId, clientSession);
+        return clientSession;
+      }
+      finally {
+        LocaleThreadLocal.set(null);
+      }
     }
   }
 
@@ -158,6 +187,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return clientSession;
   }
 
+  @Override
   public void dispose() {
     m_jsonAdapterRegistry.dispose();
     m_currentJsonResponse = null;
@@ -228,10 +258,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public JsonResponse processRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
     try {
       m_currentHttpRequest = httpRequest;
+      m_currentJsonRequest = jsonRequest;
       // FIXME CGU should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
       m_jsonClientSession.processRequestLocale(httpRequest.getLocale());
       JsonResponse jsonResponse = currentJsonResponse();
-      m_jsonEventProcessor.processEvents(jsonRequest, jsonResponse);
+      m_jsonEventProcessor.processEvents(m_currentJsonRequest, jsonResponse);
       return jsonResponse;
     }
     finally { //FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
@@ -242,12 +273,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void valueBound(HttpSessionBindingEvent event) {
-
   }
 
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
-    LOG.info("Terminating json session " + event.getName() + "...");
+    LOG.info("Terminating JSON session with ID " + m_jsonSessionId + "...");
 
     //Detach from model
     dispose();
@@ -265,7 +295,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
       }
     }.runNow(new NullProgressMonitor());
-    LOG.info("Session " + event.getName() + " terminated.");
-  }
 
+    LOG.info("JSON session with ID " + m_jsonSessionId + " terminated.");
+  }
 }

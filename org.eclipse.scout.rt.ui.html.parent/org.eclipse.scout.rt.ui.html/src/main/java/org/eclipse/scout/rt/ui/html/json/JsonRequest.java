@@ -14,13 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
+  public static final String PROP_UNLOAD = "unload";
   public static final String PROP_PING = "ping";
-  public static final String PROP_SESSION_PART_ID = "sessionPartId";
+  public static final String PROP_JSON_SESSION_ID = "jsonSessionId";
+  public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_EVENTS = "events";
 
@@ -30,8 +33,12 @@ public class JsonRequest {
     m_request = request;
   }
 
-  public String getSessionPartId() {
-    return JsonObjectUtility.getString(m_request, PROP_SESSION_PART_ID);
+  public String getJsonSessionId() {
+    return JsonObjectUtility.getString(m_request, PROP_JSON_SESSION_ID);
+  }
+
+  public String getClientSessionId() {
+    return m_request.optString(PROP_CLIENT_SESSION_ID);
   }
 
   public List<JsonEvent> getEvents() {
@@ -51,11 +58,15 @@ public class JsonRequest {
   }
 
   public boolean isStartupRequest() {
-    return Boolean.TRUE.equals(m_request.opt(PROP_STARTUP));
+    return m_request.optBoolean(PROP_STARTUP);
+  }
+
+  public boolean isUnloadRequest() {
+    return m_request.optBoolean(PROP_UNLOAD);
   }
 
   public boolean isPingRequest() {
-    return Boolean.TRUE.equals(m_request.opt(PROP_PING));
+    return m_request.optBoolean(PROP_PING);
   }
 
   /**
@@ -63,5 +74,18 @@ public class JsonRequest {
    */
   public JSONObject getUserAgent() {
     return m_request.optJSONObject(PROP_USER_AGENT);
+  }
+
+  @Override
+  public String toString() {
+    if (m_request == null) {
+      return "null";
+    }
+    try {
+      return m_request.toString(2);
+    }
+    catch (JSONException e) {
+      return m_request.toString();
+    }
   }
 }

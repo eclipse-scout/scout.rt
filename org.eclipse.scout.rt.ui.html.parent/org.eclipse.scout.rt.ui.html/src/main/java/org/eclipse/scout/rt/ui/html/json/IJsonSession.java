@@ -18,6 +18,8 @@ public interface IJsonSession {
 
   void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException;
 
+  void dispose();
+
   IClientSession getClientSession();
 
   String createUniqueIdFor(IJsonAdapter<?> adapter);
@@ -55,5 +57,4 @@ public interface IJsonSession {
   HttpServletRequest currentHttpRequest();
 
   JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException;
-
 }

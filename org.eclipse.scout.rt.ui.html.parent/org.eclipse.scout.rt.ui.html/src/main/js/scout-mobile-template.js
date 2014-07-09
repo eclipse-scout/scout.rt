@@ -15,6 +15,7 @@
 //@include("util/ObjectFactory.js");
 //@include("util/BorderLayout.js");
 //@include("util/Device.js");
+//@include("util/URL.js");
 //@include("session/Session.js");
 //@include("session/Event.js");
 //@include("session/Locale.js");

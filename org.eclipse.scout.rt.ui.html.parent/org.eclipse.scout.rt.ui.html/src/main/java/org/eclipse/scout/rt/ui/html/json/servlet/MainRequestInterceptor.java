@@ -68,26 +68,37 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       return true;
     }
 
-    String sessionAttributeName = "JsonUi#" + jsonReq.getSessionPartId();
+    String jsonSessionAttributeName = "JsonUi#" + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
     //FIXME really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession?
     IJsonSession jsonSession = null;
-    synchronized (this) {
-      jsonSession = (IJsonSession) httpSession.getAttribute(sessionAttributeName);
+    synchronized (httpSession) {
+      jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
+
+      if (jsonReq.isUnloadRequest()) {
+        LOG.info("Unload request for JSON session with ID " + jsonReq.getJsonSessionId());
+        if (jsonSession != null) {
+          jsonSession.dispose();
+          // FIXME BSH Check with CGU -> This does not work, calls AbstractJsonSession.valueUnbound...
+//          httpSession.removeAttribute(jsonSessionAttributeName);
+        }
+        return true;
+      }
+
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
-          LOG.info("Request cannot be processed due to session timeout.");
+          LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
           writeError(resp, createSessionTimeoutJsonResponse());
           return true;
         }
-
-        LOG.info("Creating new json session " + sessionAttributeName + "...");
-
-        //FIXME reload must NOT create a new session, maybe we need to store sessionpartId in cookie or local http cache??
+        LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
         jsonSession = servlet.createJsonSession();
         jsonSession.init(req, jsonReq);
-        httpSession.setAttribute(sessionAttributeName, jsonSession);
+        httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
+      }
+      else if (jsonReq.isStartupRequest()) {
+        throw new IllegalStateException("Startup requested for existing JSON session with ID " + jsonReq.getJsonSessionId());
       }
     }
 
@@ -117,8 +128,9 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
     resp.getOutputStream().write(data);
-
-    LOG.debug("Returned: " + jsonText);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Returned: " + jsonText);
+    }
   }
 
   protected void writeError(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
@@ -129,8 +141,9 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
   protected JSONObject toJSON(HttpServletRequest req) {
     try {
       String jsonData = IOUtility.getContent(req.getReader());
-      LOG.debug("Received: " + jsonData);
-
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Received: " + jsonData);
+      }
       if (StringUtility.isNullOrEmpty(jsonData)) {
         jsonData = "{}"; // FIXME
       }
@@ -140,5 +153,4 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       throw new JsonException(e.getMessage(), e);
     }
   }
-
 }
