@@ -60,6 +60,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_MENUS = "menus";
   public static final String PROP_CONTROLS = "controls";
+  public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
   private P_ModelTableListener m_modelTableListener;
   private Map<String, ITableRow> m_tableRows;
@@ -257,6 +258,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     if (getModel() instanceof ITable5) {
       putProperty(json, "controls", getOrCreateJsonAdapters(((ITable5) getModel()).getControls()));
     }
+    putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
 
     return json;
   }
