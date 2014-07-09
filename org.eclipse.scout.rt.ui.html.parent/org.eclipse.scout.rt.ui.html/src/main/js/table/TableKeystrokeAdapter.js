@@ -7,6 +7,7 @@ scout.TableKeystrokeAdapter = function(table) {
   this._table = table;
 
   //table filter
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
   this.handlers.push({
     accept: function(event) {
       if (event && event.which >= 65 && event.which <= 90 && // a-z
@@ -16,6 +17,13 @@ scout.TableKeystrokeAdapter = function(table) {
       return false;
     },
     handle: function(event) {
+=======
+  // TODO cru: collides with search...
+/*var handler = {
+    keycodeRangeStart: 65,
+    keycodeRangeEnd: 90,
+    handle: function() {
+>>>>>>> a25fc78 html ui: next iteration data model picker
       that._table.$container.find('#HeaderOrganize').click();
 
       // set focus
@@ -24,7 +32,14 @@ scout.TableKeystrokeAdapter = function(table) {
 
       $input.focus();
       $input[0].setSelectionRange(length, length);
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
+=======
+    }
+  };
+  this.handlers.push(handler);*/
+>>>>>>> a25fc78 html ui: next iteration data model picker
 
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
       return false;
     }
   });
@@ -42,6 +57,14 @@ scout.TableKeystrokeAdapter = function(table) {
       var keycode = event.which;
       var $rowsAll = that._table.findRows();
       var $rowsSelected = that._table.findSelectedRows();
+=======
+  var handler = {
+    keycodes: [38, 40, 36, 35, 33, 34],
+    handle: function(keycode) {
+      var $rowsAll = that._table.findRows(),
+        $rowsSelected = that._table.findSelectedRows(),
+        $newRowSelection;
+>>>>>>> a25fc78 html ui: next iteration data model picker
 
       // up: move up
       if (keycode == 38) {

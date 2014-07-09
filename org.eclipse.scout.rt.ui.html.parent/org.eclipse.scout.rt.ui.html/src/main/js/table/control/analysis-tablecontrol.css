@@ -100,6 +100,40 @@ width: 30%;
 left: 55%;
 }
 
+.criteria-navigation-item {
+float: left;
+padding-right: 20px;
+color: #0082a1;
+cursor: pointer;
+}
+
+.criteria-navigation-item:hover {
+text-decoration: underline;
+}
+
+.criteria-navigation-item:last-child {
+color: #FE9915;
+cursor: default;
+}
+
+.criteria-navigation-item:last-child:hover {
+text-decoration: none;
+}
+
+.criteria-navigation-item:after{
+font-family: fontAwesome;
+content:  "\f105";
+position: relative;
+left: 10px;
+display: inline-block;
+}
+
+.criteria-navigation-item:last-child:after{
+font-family: fontAwesome;
+content:  "";
+left: 0px;
+}
+
 .criteria-search {
 position: absolute;
 top: 0px;
@@ -107,7 +141,6 @@ height: 20px;
 width: 10%;
 left: 90%;
 }
-
 
 .criteria-container {
 position: absolute;
@@ -121,10 +154,15 @@ left: 55%;
 position: absolute;
 background-color: #e2e2e2;
 border: 1px solid white;
-padding: 3px;
+padding: 2px 4px 2px 4px;
 font-size:12px;
 white-space: normal;
 cursor: pointer;
+word-wrap: break-word;
+}
+
+.criteria-attribute-container {
+border: 0;	
 }
 
 .criteria-attribute{
@@ -132,15 +170,10 @@ background-color: #f2f2f2;
 color: #f2f2f2;
 }
 
-.criteria-entity:hover > .criteria-attribute {
+.criteria-attribute:hover {
 background-color: #ccc;
-color: #ccc;} 
-
-
-.criteria-entity span{
-white-space: normal;
-position: relative;
-}
+color: #ccc;
+} 
 
 .criteria-entity:hover{
 background-color: #ccc;

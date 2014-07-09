@@ -34,13 +34,11 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
   $commandContainer.appendDiv('', 'command union', 'Simulator').click(simulateServer);
 
   // criteria container
-  var $criteriaNavigation = this.$container.appendDiv('', 'criteria-navigation').click(closeMap);
-  var $criteriaSearch = this.$container.append('<input class="criteria-search"></input>');
+  var $criteriaNavigation = this.$container.appendDiv('', 'criteria-navigation');
+  var $criteriaSearch = this.$container.append('<input class="criteria-search"></input>').keyup(searchMap);
   var $criteriaContainer = this.$container.appendDiv('', 'criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));
-
-
 
   // $criteria = circle per criteria; count calculated by server
   var $criteria = [],
@@ -56,11 +54,10 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     MAX_R = 120;
 
   // open
-  this.addCriteria = addCriteria;
   var that = this;
 
   if (this.rootEntity) {
-    this.addCriteria();
+    addCriteria();
   }
 
   function addCriteria() {
@@ -76,7 +73,8 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       updateCriteria();
       selectCriteria($div);
       drawVenn();
-      drawCriteria();
+      drawCriteria($criteriaContainer, that.rootEntity);
+      appendMap($criteriaContainer, that.rootEntity.text);
     }
   }
 
@@ -113,37 +111,49 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     $criteria.addClassSVG('selected');
   }
 
-  function drawCriteria() {
-    var model = that.rootEntity;
-    initIteration($criteriaContainer, that.rootEntity);
-  }
+  function drawCriteria ($container, model, filter) {
+    // set default for filter
+    filter = (filter || '').toLowerCase();
 
-  function initIteration ($container, model) {
+    // find sizes of boxes on tree map
+    var map = [{size: 0, text: '', attributes: [], entity: null }],
+      attribute, subEntity, s;
 
-    // find sizes of elements of tree map and sort elements
-    var map = [{size: model.attributes.length * 12, text: '', attributes: model.attributes, entity: null }],
-      mapTotal = map[0].size,
-      subEntity, s;
+    for (var i = 0; i < model.attributes.length; i++) {
+      attribute = model.attributes[i];
+      if (attribute.text.toLowerCase().indexOf(filter) > -1) {
+        map[0].size += 12;
+        map[0].attributes.push(attribute);
+      }
+    }
+
 
     for (var j = 0; j < model.entities.length; j++) {
       subEntity = model.entities[j];
-      s = Math.min(60, Math.max(20, subEntity.attributes.length + subEntity.entities.length));
-      map.push({size: s, text: subEntity.text, entity: subEntity});
-      mapTotal += map[map.length - 1].size;
+      if (subEntity.text.toLowerCase().indexOf(filter) > -1) {
+        s = Math.min(60, Math.max(20, subEntity.attributes.length + subEntity.entities.length));
+        map.push({size: s, text: subEntity.text, entity: subEntity});
+      }
     }
 
     // TODO cru: correct for umlaut
     map.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
 
+    // draw boxes
     oneIteration($container, map, 0, 0, 1, 1);
+
+    // in not too much boxes: show attributes!
+    if (map.length < 7) showAttribute($container.children());
   }
-  //
 
   function oneIteration ($container, list, top, left, height, width) {
     if (list.length === 0) {
+      // finish iteration
       return;
+
     } else if (list.length === 1) {
-      var $div = $container.appendDiv('', 'criteria-entity')
+      // draw rect
+      var $div = $container.appendDiv('', 'criteria-entity', list[0].text)
         .css('top', top * 100 + '%')
         .css('left', left * 100 + '%')
         .css('height', height * 100 + '%')
@@ -151,32 +161,24 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
         .data('entity', list[0].entity)
         .click(openMap);
 
-      var $span = $('<span>' + list[0].text + '</span>').appendTo($div);
-
-      /*if ($span.width() > $div.width() && $div.height() > $div.width())  {
-        $span.css('display', 'block');
-        $span.css('transform', 'rotate(90deg)');
-        $span.css('transform-origin', 'left top ');
-        $span.css('width', $div.height());
-        $span.css('height', $div.width());
-        $span.css('left', $div.width() / 2 + 7);
-        $span.css('top', 5);
-      }*/
-      $span.css('word-wrap', 'break-word');
-
+      // in case of attributes, draw attributes themself
       if (list[0].attributes) {
-        $div.css('border', '0');
-        // draw attributes
+        // add class to container
+        $div.addClass('criteria-attribute-container');
+
+        // find dimansions
         var attributes = list[0].attributes,
           x = Math.ceil(Math.sqrt(attributes.length)),
           y = Math.ceil(attributes.length / x);
 
+        // sort attributes
         attributes.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
 
+        // draw boxes
         for (var b = 0; b < y; b++) {
           for (var a = 0; a < x; a++) {
-            if ((a + b * x) < attributes.length - 1) {
-              var $a = $div.appendDiv('', 'criteria-attribute', attributes[a + b * x].text)
+            if ((a + b * x) < attributes.length) {
+              $div.appendDiv('', 'criteria-attribute', attributes[a + b * x].text)
                 .css('top', (top + b * (1 / y)) * 100 + '%')
                 .css('left', (left + a * (1/ x)) * 100 + '%')
                 .css('height', (1 / y) * 100 + '%')
@@ -185,71 +187,59 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
           }
         }
 
-        $a.css('width', (x * y - attributes.length + 2) * (1 / x) * 100 + '%');
+        // adjust size of last attribute
+        $('.criteria-attribute:last-child', $div)
+          .css('width', (x * y - attributes.length + 2) * (1 / x) * 100 + '%');
       }
 
     } else {
+      // chris' algorithm ;)
       var horizontal = (height * containerHeight <= width * containerWidth),
-        //p = Math.floor((list.length - 1 )/ 2),
-        p = maxList(list),
-        l1 = list.slice(0, p),
-        lp = list.slice(p, p + 1),
-        sum1 = sumList(l1),
-        sump = sumList(lp),
-        sum2, sum3,
+        lp = list.slice(0, 1),
+        sump = sumList(lp), sum1, sum2,
         cand, best = {ratio: 0};
 
       // make candidates
-      for (var i = list.length + 1; i > p; i--) {
+      for (var i = list.length + 1; i > 0; i--) {
         cand = {};
 
-        cand.l2 = list.slice(p + 1, i);
-        cand.l3 = list.slice(i);
+        cand.l1 = list.slice(1, i);
+        cand.l2 = list.slice(i);
 
-        // ignore some l3s?
-        if (cand.l3.length != -1) {
-          // build sum
-          sum2 = sumList(cand.l2);
-          sum3 = sumList(cand.l3);
+        // build sum
+        sum1 = sumList(cand.l1);
+        sum2 = sumList(cand.l2);
 
-          // calc r1 and rp
-          if (horizontal) {
-            cand.h1 = height;
-            cand.w1 = sum1 / (sum1 + sump + sum2 + sum3) * width;
-            cand.hp =  sump / (sump + sum2) * height;
-            cand.wp = (sump + sum2) / (sump + sum2 + sum3) * (width - cand.w1);
-          } else {
-            cand.h1 = sum1 / (sum1 + sump + sum2 + sum3) * height;
-            cand.w1 = width;
-            cand.hp = (sump + sum2) / (sump + sum2 + sum3) * (height - cand.h1);
-            cand.wp =  sump / (sump + sum2) * width;
-          }
+        // calc r1 and rp
+        if (horizontal) {
+          cand.hp =  sump / (sump + sum1) * height;
+          cand.wp = (sump + sum1) / (sump + sum1 + sum2) * width;
+        } else {
+          cand.hp = (sump + sum1) / (sump + sum1 + sum2) * height;
+          cand.wp =  sump / (sump + sum1) * width;
+        }
 
-          cand.ratio =  (cand.hp * containerHeight) / (cand.wp * containerWidth) / 0.5 ;
-          if (cand.ratio > 1) {
-            cand.ratio = 1 / cand.ratio;
-          }
+        // calc ratio
+        cand.ratio =  (cand.hp * containerHeight) / (cand.wp * containerWidth) / 0.5 ;
+        if (cand.ratio > 1) {
+          cand.ratio = 1 / cand.ratio;
+        }
 
-          if (cand.ratio > best.ratio) {
-            best = cand;
-          }
-
+        // pick best ratio
+        if (cand.ratio > best.ratio) {
+          best = cand;
         }
       }
 
-      // find best ration
-
       // iterate
       if (horizontal) {
-        oneIteration($container, l1, top, left, best.h1, best.w1);
-        oneIteration($container, lp, top, left + best.w1, best.hp, best.wp);
-        oneIteration($container, best.l2, top + best.hp, left + best.w1, height - best.hp, best.wp);
-        oneIteration($container, best.l3, top, left + best.w1 + best.wp, height, width - best.w1 - best.wp);
+        oneIteration($container, lp, top, left, best.hp, best.wp);
+        oneIteration($container, best.l1, top + best.hp, left, height - best.hp, best.wp);
+        oneIteration($container, best.l2, top, left + best.wp, height, width - best.wp);
       } else {
-        oneIteration($container, l1, top, left, best.h1, best.w1);
-        oneIteration($container, lp, top + best.h1, left, best.hp, best.wp);
-        oneIteration($container, best.l2, top + best.h1, left + best.wp, best.hp, width - best.wp);
-        oneIteration($container, best.l3, top + best.h1 + best.hp, left, height - best.h1 - best.hp, width);
+        oneIteration($container, lp, top, left, best.hp, best.wp);
+        oneIteration($container, best.l1, top, left + best.wp, best.hp, width - best.wp);
+        oneIteration($container, best.l2, top + best.hp, left, height - best.hp, width);
       }
     }
   }
@@ -262,56 +252,124 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     return total;
   }
 
-  function maxList (list) {
-    var cand,
-      max = 0;
 
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].size > max) {
-        max = list[i];
-        cand = i;
+  function showAttribute ($container) {
+    $container
+      .children()
+      .css('color', '#000')
+      .click(openMap);
+  }
+
+  function hideAttribute ($container) {
+    $container
+      .children()
+      .css('color', '')
+      .off('click');
+  }
+
+  function appendMap ($container, text) {
+    $criteriaNavigation
+      .appendDiv('', 'criteria-navigation-item', text)
+      .data('open-map', $container)
+      .click(closeMap);
+  }
+
+  function searchMap (event) {
+    var $criteriaContainerTest = that.$container.appendDiv('', 'criteria-container');
+    drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
+
+    var $oldBoxes = $criteriaContainer.children(),
+      $newBoxes = $criteriaContainerTest.children(),
+      $newB, $oldB;
+
+    for (var n = 0;  n < $newBoxes.length; n++) {
+      $newB = $newBoxes.eq(n);
+
+      for (var o = 0;  o < $oldBoxes.length; o++) {
+        $oldB = $oldBoxes.eq(o);
+        $.log($oldB, $newB);
+        if (($oldB.text() === $newB.text()) ||
+            ($oldB.hasClass('criteria-attribute-container') && $newB.hasClass('criteria-attribute-container'))) {
+          break;
+        }
       }
+
+      // filter: animate removed elements to 0
+      var top = $newB[0].style.top,
+        left = $newB[0].style.left,
+        height = $newB[0].style.height,
+        width = $newB[0].style.width;
+
+      $newB
+        .css('top', $oldB[0].style.top)
+        .css('left', $oldB[0].style.left)
+        .css('height', $oldB[0].style.height)
+        .css('width', $oldB[0].style.width)
+        .animateAVCSD('top', top)
+        .animateAVCSD('left', left)
+        .animateAVCSD('height', height)
+        .animateAVCSD('width', width);
     }
 
-    return cand;
+    $criteriaContainer.remove();
+    $criteriaContainer = $criteriaContainerTest;
   }
+
 
   function openMap (list) {
     var $clicked = $(this);
 
+    // zoom container
+    if ($clicked.hasClass('criteria-attribute-container')) {
+      showAttribute($clicked);
+      appendMap($clicked, 'Attribute');
+    } else if ($clicked.hasClass('criteria-attribute')) {
+      appendMap($clicked, $clicked.text());
+    } else {
+      drawCriteria($clicked, $clicked.data('entity'));
+      appendMap($clicked, $clicked.data('entity').text);
+      $clicked.children('div').css('opacity', 0).animateAVCSD('opacity', 1);
+    }
+
     $clicked
-    .data('old-top', $clicked.css('top'))
-      .data('old-left', $clicked.css('left'))
-      .data('old-height', $clicked.css('height'))
-      .data('old-width', $clicked.css('width'));
-
-
-
-    $clicked
+      .data('old-top', $clicked[0].style.top)
+      .data('old-left', $clicked[0].style.left)
+      .data('old-height', $clicked[0].style.height)
+      .data('old-width', $clicked[0].style.width)
       .css ('z-index', '1')
-      .css('color', 'black')
       .animateAVCSD('top', '0%')
       .animateAVCSD('left', '0%')
       .animateAVCSD('height', '100%')
       .animateAVCSD('width', '100%');
 
-    $criteriaNavigation.text($clicked.text());
-    initIteration($clicked, $clicked.data('entity'));
-    $criteriaNavigation.data('open-map', $clicked);
-
-    $clicked.children('div').css('opacity', 0).animateAVCSD('opacity', 1);
+    return false;
   }
 
   function closeMap (list) {
-    var $open = $criteriaNavigation.data('open-map');
+    var $children = $(this).nextAll(),
+      endFunc = function() {$(this).css('z-index', ''); };
 
-    $open
-      .animateAVCSD('top', $open.data('old-top'))
-      .animateAVCSD('left', $open.data('old-left'))
-      .animateAVCSD('height', $open.data('old-height'))
-      .animateAVCSD('width', $open.data('old-width'), function() {$open.css ('z-index', ''); });
+    // closed every element left of clicked bread crumb
+    for (var i = $children.length - 1; i >= 0; i--) {
+      var $close = $children.eq(i).data('open-map');
 
-    $open.children('div').animateAVCSD('opacity', 0, $.removeThis);
+      // shrink container
+      $close
+        .animateAVCSD('top', $close.data('old-top'))
+        .animateAVCSD('left', $close.data('old-left'))
+        .animateAVCSD('height', $close.data('old-height'))
+        .animateAVCSD('width', $close.data('old-width'), endFunc);
+
+        if ($close.hasClass('criteria-attribute-container')) {
+          hideAttribute($close);
+        } else if ($close.hasClass('criteria-attribute')) {
+        } else {
+          $close.children('div').animateAVCSD('opacity', 0, $.removeThis);
+        }
+    }
+
+    // remove elements in bread crumb
+    $children.remove();
   }
 
 
