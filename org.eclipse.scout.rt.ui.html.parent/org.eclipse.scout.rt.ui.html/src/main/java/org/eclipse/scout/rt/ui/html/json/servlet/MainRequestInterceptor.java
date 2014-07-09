@@ -49,6 +49,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     }
     LOG.error("Requested file not found: " + req.getPathInfo());
     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    resp.getOutputStream().print("Not Found: " + req.getPathInfo());
     return true;
   }
 
