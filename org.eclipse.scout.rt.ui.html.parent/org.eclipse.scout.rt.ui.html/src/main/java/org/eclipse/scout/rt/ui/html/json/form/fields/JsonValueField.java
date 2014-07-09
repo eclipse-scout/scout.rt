@@ -24,18 +24,19 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
 
   public JsonValueField(T model, IJsonSession session, String id) {
     super(model, session, id);
-    putJsonProperty(new JsonProperty<T, String>(IValueField.PROP_DISPLAY_TEXT, model) {
+
+    putJsonProperty(new JsonProperty<T>(IValueField.PROP_DISPLAY_TEXT, model) {
       @Override
-      protected String getValueImpl(T field) {
-        return field.getDisplayText();
+      protected String modelValue() {
+        return getModel().getDisplayText();
       }
     });
     // TODO AWE: vermutlich sollten wir den value nicht schicken, für text-felder wird immer der display-text
     // benötigt. Für checkbox / radio könnten wir eine eigene implementierung für value machen
-    putJsonProperty(new JsonProperty<T, Object>(IValueField.PROP_VALUE, model) {
+    putJsonProperty(new JsonProperty<T>(IValueField.PROP_VALUE, model) {
       @Override
-      protected Object getValueImpl(T field) {
-        return field.getValue();
+      protected Object modelValue() {
+        return getModel().getValue();
       }
     });
   }

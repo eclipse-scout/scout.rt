@@ -12,28 +12,28 @@ public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
 
   public JsonViewButton(IViewButton model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
-    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_TEXT, model) {
+    putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_TEXT, model) {
       @Override
-      protected String getValueImpl(IViewButton button) {
-        return button.getText();
+      protected String modelValue() {
+        return getModel().getText();
       }
     });
-    putJsonProperty(new JsonProperty<IViewButton, String>(IViewButton.PROP_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_ICON_ID, model) {
       @Override
-      protected String getValueImpl(IViewButton button) {
-        return button.getIconId();
+      protected String modelValue() {
+        return getModel().getIconId();
       }
     });
-    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_SELECTED, model) {
+    putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_SELECTED, model) {
       @Override
-      protected Boolean getValueImpl(IViewButton button) {
-        return button.isSelected();
+      protected Boolean modelValue() {
+        return getModel().isSelected();
       }
     });
-    putJsonProperty(new JsonProperty<IViewButton, Boolean>(IViewButton.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(IViewButton button) {
-        return button.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
   }

@@ -34,42 +34,42 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   public JsonMenu(IMenu model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
 
-    putJsonProperty(new JsonProperty<IMenu, String>(IMenu.PROP_TEXT, model) {
+    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_TEXT, model) {
       @Override
-      protected String getValueImpl(IMenu menu) {
-        return menu.getText();
+      protected String modelValue() {
+        return getModel().getText();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu, String>(IMenu.PROP_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_ICON_ID, model) {
       @Override
-      protected String getValueImpl(IMenu menu) {
-        return menu.getIconId();//FIXME CGU how to handle resources?
+      protected String modelValue() {
+        return getModel().getIconId();//FIXME CGU how to handle resources?
       }
     });
 
-    putJsonProperty(new JsonProperty<IMenu, Boolean>(IMenu.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(IMenu menu) {
-        return menu.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu, Boolean>(IFormField.PROP_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<IMenu>(IFormField.PROP_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(IMenu menu) {
-        return menu.isVisible();
+      protected Boolean modelValue() {
+        return getModel().isVisible();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu, Boolean>(PROP_SEPARATOR, model) {
+    putJsonProperty(new JsonProperty<IMenu>(PROP_SEPARATOR, model) {
       @Override
-      protected Boolean getValueImpl(IMenu menu) {
-        return menu.isSeparator();
+      protected Boolean modelValue() {
+        return getModel().isSeparator();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu, Set<String>>(PROP_MENU_TYPES, model) {
+    putJsonProperty(new JsonProperty<IMenu>(PROP_MENU_TYPES, model) {
       @Override
-      protected Set<String> getValueImpl(IMenu menu) {
+      protected Set<String> modelValue() {
         Set<String> menuTypes = new HashSet<>();
-        for (IMenuType type : menu.getMenuTypes()) {
+        for (IMenuType type : getModel().getMenuTypes()) {
           menuTypes.add(type.toString());
         }
         return menuTypes;

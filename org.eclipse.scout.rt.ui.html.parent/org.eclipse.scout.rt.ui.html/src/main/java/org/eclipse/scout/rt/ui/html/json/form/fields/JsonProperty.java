@@ -16,10 +16,8 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
  * 
  * @param <T>
  *          Type of model object
- * @param <V>
- *          Type of value
  */
-public abstract class JsonProperty<T, V> {
+public abstract class JsonProperty<T> {
 
   private final String m_propertyName;
 
@@ -34,14 +32,14 @@ public abstract class JsonProperty<T, V> {
     return m_propertyName;
   }
 
-  abstract protected V getValueImpl(T model);
+  abstract protected Object modelValue();
 
-  public Object valueToJson(Object value) {
+  public Object prepareValueForToJson(Object value) {
     return value;
   }
 
-  public Object getValueAsJson() {
-    return valueToJson(getValueImpl(m_model));
+  public Object valueToJson() {
+    return prepareValueForToJson(modelValue());
   }
 
   @Override

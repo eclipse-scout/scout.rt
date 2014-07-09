@@ -72,8 +72,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    for (JsonProperty<?, ?> prop : m_jsonProperties.values()) {
-      putProperty(json, prop.getPropertyName(), prop.getValueAsJson());
+    for (JsonProperty<?> prop : m_jsonProperties.values()) {
+      putProperty(json, prop.getPropertyName(), prop.valueToJson());
     }
     return json;
   }
@@ -81,7 +81,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, jsonProperty.valueToJson(newValue));
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, jsonProperty.prepareValueForToJson(newValue));
       LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId());
     }
   }

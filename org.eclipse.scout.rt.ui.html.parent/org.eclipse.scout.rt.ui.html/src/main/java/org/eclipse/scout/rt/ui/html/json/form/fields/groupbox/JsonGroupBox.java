@@ -25,22 +25,22 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
   public JsonGroupBox(IGroupBox aGroupBox, IJsonSession session, String id) {
     super(aGroupBox, session, id);
-    putJsonProperty(new JsonProperty<IGroupBox, String>(IGroupBox.PROP_BORDER_DECORATION, aGroupBox) {
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, aGroupBox) {
       @Override
-      protected String getValueImpl(IGroupBox groupBox) {
-        return groupBox.getBorderDecoration();
+      protected String modelValue() {
+        return getModel().getBorderDecoration();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox, Boolean>(IGroupBox.PROP_BORDER_VISIBLE, aGroupBox) {
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_VISIBLE, aGroupBox) {
       @Override
-      protected Boolean getValueImpl(IGroupBox groupBox) {
-        return groupBox.isBorderVisible();
+      protected Boolean modelValue() {
+        return getModel().isBorderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox, Integer>(PROP_GRID_COLUMN_COUNT, aGroupBox) {
+    putJsonProperty(new JsonProperty<IGroupBox>(PROP_GRID_COLUMN_COUNT, aGroupBox) {
       @Override
-      protected Integer getValueImpl(IGroupBox groupBox) {
-        return groupBox.getGridColumnCount();
+      protected Integer modelValue() {
+        return getModel().getGridColumnCount();
       }
     });
   }

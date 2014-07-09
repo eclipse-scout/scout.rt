@@ -29,45 +29,45 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
   public JsonFormToolButton(IFormToolButton5 model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
 
-    putJsonProperty(new JsonProperty<IFormToolButton5, String>(IFormToolButton5.PROP_TEXT, model) {
+    putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_TEXT, model) {
       @Override
-      protected String getValueImpl(IFormToolButton5 tableControl) {
-        return tableControl.getText();
+      protected String modelValue() {
+        return getModel().getText();
       }
     });
 
-    putJsonProperty(new JsonProperty<IFormToolButton5, String>(IFormToolButton5.PROP_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_ICON_ID, model) {
       @Override
-      protected String getValueImpl(IFormToolButton5 tableControl) {
-        return tableControl.getIconId();
+      protected String modelValue() {
+        return getModel().getIconId();
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<IFormToolButton5, IForm>(IFormToolButton5.PROP_FORM, model, jsonSession) {
+    putJsonProperty(new JsonAdapterProperty<IFormToolButton5>(IFormToolButton5.PROP_FORM, model, jsonSession) {
       @Override
-      protected IForm getValueImpl(IFormToolButton5 button) {
-        return button.getForm();
+      protected IForm modelValue() {
+        return getModel().getForm();
       }
     });
 
-    putJsonProperty(new JsonProperty<IFormToolButton5, Boolean>(IFormToolButton5.PROP_SELECTED, model) {
+    putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_SELECTED, model) {
       @Override
-      protected Boolean getValueImpl(IFormToolButton5 tableControl) {
-        return tableControl.isSelected();
+      protected Boolean modelValue() {
+        return getModel().isSelected();
       }
     });
 
-    putJsonProperty(new JsonProperty<IFormToolButton5, Boolean>(IFormToolButton5.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(IFormToolButton5 tableControl) {
-        return tableControl.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
 
-    putJsonProperty(new JsonProperty<IFormToolButton5, String>(IFormToolButton5.PROP_KEYSTROKE, model) {
+    putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_KEYSTROKE, model) {
       @Override
-      protected String getValueImpl(IFormToolButton5 tableControl) {
-        return tableControl.getKeyStroke();
+      protected String modelValue() {
+        return getModel().getKeyStroke();
       }
     });
 

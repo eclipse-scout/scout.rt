@@ -90,6 +90,14 @@ public class JsonResponse {
     return response;
   }
 
+  /**
+   * Loops through all the objects and their properties to check whether there are {@link IJsonAdapter}s. If there are,
+   * the adapters get replaced with the actual json representation of the adapter ({@link IJsonAdapter#toJson()}) resp.
+   * the ID of the adapter in case the adapter is already attached (and therefore sent to client). If the found adapter
+   * has not been attached yet, it gets attached. From now on the adapter listens to model change events. The attaching
+   * is done at the end of the request to prevent unnecessary model change events sent to the client. Additionally it
+   * prevents conflicts with the coalescing of the property change events (for details see JsonResponseTest).
+   */
   public static JSONObject resolveJsonAdapter(JSONObject object) {
     long resolveTime = System.currentTimeMillis();
     JSONObject resolvedObject = (JSONObject) resolveJsonAdapterInternal(object);

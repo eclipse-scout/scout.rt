@@ -24,45 +24,45 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   public JsonTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
 
-    putJsonProperty(new JsonProperty<ITableControl, String>(ITableControl.PROP_LABEL, model) {
+    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_LABEL, model) {
       @Override
-      protected String getValueImpl(ITableControl tableControl) {
-        return tableControl.getLabel();
+      protected String modelValue() {
+        return getModel().getLabel();
       }
     });
 
-    putJsonProperty(new JsonProperty<ITableControl, String>("cssClass", model) {
+    putJsonProperty(new JsonProperty<ITableControl>("cssClass", model) {
       @Override
-      protected String getValueImpl(ITableControl tableControl) {
-        return tableControl.getCssClass();
+      protected String modelValue() {
+        return getModel().getCssClass();
       }
     });
 
-    putJsonProperty(new JsonProperty<ITableControl, String>("group", model) {
+    putJsonProperty(new JsonProperty<ITableControl>("group", model) {
       @Override
-      protected String getValueImpl(ITableControl tableControl) {
-        return tableControl.getGroup();
+      protected String modelValue() {
+        return getModel().getGroup();
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<ITableControl, IForm>(ITableControl.PROP_FORM, model, jsonSession) {
+    putJsonProperty(new JsonAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, jsonSession) {
       @Override
-      protected IForm getValueImpl(ITableControl tableControl) {
-        return tableControl.getForm();
+      protected IForm modelValue() {
+        return getModel().getForm();
       }
     });
 
-    putJsonProperty(new JsonProperty<ITableControl, Boolean>(ITableControl.PROP_SELECTED, model) {
+    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_SELECTED, model) {
       @Override
-      protected Boolean getValueImpl(ITableControl tableControl) {
-        return tableControl.isSelected();
+      protected Boolean modelValue() {
+        return getModel().isSelected();
       }
     });
 
-    putJsonProperty(new JsonProperty<ITableControl, Boolean>(ITableControl.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(ITableControl tableControl) {
-        return tableControl.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
 

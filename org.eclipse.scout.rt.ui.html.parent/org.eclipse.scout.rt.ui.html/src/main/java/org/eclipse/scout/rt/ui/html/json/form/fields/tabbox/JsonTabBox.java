@@ -22,18 +22,19 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
 
   public JsonTabBox(ITabBox model, IJsonSession session, String id) {
     super(model, session, id);
-    putJsonProperty(new JsonAdapterProperty<ITabBox, IGroupBox>(ITabBox.PROP_SELECTED_TAB, model, session) {
+
+    putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, session) {
       @Override
-      protected IGroupBox getValueImpl(ITabBox tabBox) {
-        return tabBox.getSelectedTab();
+      protected IGroupBox modelValue() {
+        return getModel().getSelectedTab();
       }
     });
 
     //FIXME CGU really needed?
-    putJsonProperty(new JsonProperty<ITabBox, Integer>(ITabBox.PROP_MARK_STRATEGY, model) {
+    putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_MARK_STRATEGY, model) {
       @Override
-      protected Integer getValueImpl(ITabBox tabBox) {
-        return tabBox.getMarkStrategy();
+      protected Integer modelValue() {
+        return getModel().getMarkStrategy();
       }
 
     });

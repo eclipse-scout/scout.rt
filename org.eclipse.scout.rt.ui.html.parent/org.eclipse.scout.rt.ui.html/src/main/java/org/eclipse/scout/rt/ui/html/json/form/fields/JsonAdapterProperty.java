@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 
-public abstract class JsonAdapterProperty<T, V> extends JsonProperty<T, V> {
+public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   private IJsonSession m_jsonSession;
 
   public JsonAdapterProperty(String propertyName, T model, IJsonSession session) {
@@ -25,7 +25,7 @@ public abstract class JsonAdapterProperty<T, V> extends JsonProperty<T, V> {
   }
 
   @Override
-  public Object valueToJson(Object value) {
+  public Object prepareValueForToJson(Object value) {
     if (value == null) {
       return null;
     }

@@ -25,44 +25,44 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
   public JsonFormField(T model, IJsonSession session, String id) {
     super(model, session, id);
-    putJsonProperty(new JsonProperty<T, String>(IFormField.PROP_LABEL, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL, model) {
       @Override
-      protected String getValueImpl(T field) {
-        return field.getLabel();
+      protected String modelValue() {
+        return getModel().getLabel();
       }
     });
-    putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_LABEL_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(T field) {
-        return field.isLabelVisible();
+      protected Boolean modelValue() {
+        return getModel().isLabelVisible();
       }
     });
-    putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(T field) {
-        return field.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(T field) {
-        return field.isVisible();
+      protected Boolean modelValue() {
+        return getModel().isVisible();
       }
     });
-    putJsonProperty(new JsonProperty<T, Boolean>(IFormField.PROP_MANDATORY, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_MANDATORY, model) {
       @Override
-      protected Boolean getValueImpl(T field) {
-        return field.isMandatory();
+      protected Boolean modelValue() {
+        return getModel().isMandatory();
       }
     });
-    putJsonProperty(new JsonProperty<T, IProcessingStatus>(IFormField.PROP_ERROR_STATUS, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
-      protected IProcessingStatus getValueImpl(T field) {
-        return field.getErrorStatus();
+      protected IProcessingStatus modelValue() {
+        return getModel().getErrorStatus();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         if (value == null) {
           return "";
         }
@@ -71,14 +71,14 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         }
       }
     });
-    putJsonProperty(new JsonProperty<T, GridData>(IJsonFormField.PROP_GRID_DATA, model) {
+    putJsonProperty(new JsonProperty<T>(IJsonFormField.PROP_GRID_DATA, model) {
       @Override
-      protected GridData getValueImpl(T field) {
-        return field.getGridData();
+      protected GridData modelValue() {
+        return getModel().getGridData();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         return new JsonGridData((GridData) value).toJson();
       }
     });

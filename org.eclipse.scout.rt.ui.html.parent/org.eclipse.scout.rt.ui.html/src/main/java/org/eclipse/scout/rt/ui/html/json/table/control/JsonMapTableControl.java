@@ -29,16 +29,16 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
 
   public JsonMapTableControl(IMapTableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
-    putJsonProperty(new JsonProperty<IMapTableControl, List<? extends IColumn<?>>>("columnIds", model) {
+    putJsonProperty(new JsonProperty<IMapTableControl>("columnIds", model) {
 
       @Override
-      protected List<? extends IColumn<?>> getValueImpl(IMapTableControl tableControl) {
-        return tableControl.getColumns();
+      protected List<? extends IColumn<?>> modelValue() {
+        return getModel().getColumns();
       }
 
       @SuppressWarnings("unchecked")
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         JSONArray columnIds = new JSONArray();
         for (IColumn column : (List<IColumn>) value) {
           columnIds.put(column.getColumnId());

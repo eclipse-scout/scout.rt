@@ -72,119 +72,119 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(model);
 
-    putJsonProperty(new JsonProperty<ITable, String>(ITable.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TITLE, model) {
       @Override
-      protected String getValueImpl(ITable table) {
-        return table.getTitle();
+      protected String modelValue() {
+        return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, String>(ITable.PROP_DEFAULT_ICON, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_DEFAULT_ICON, model) {
       @Override
-      protected String getValueImpl(ITable table) {
-        return table.getDefaultIconId();
+      protected String modelValue() {
+        return getModel().getDefaultIconId();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_MULTI_SELECT, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTI_SELECT, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isMultiSelect();
+      protected Boolean modelValue() {
+        return getModel().isMultiSelect();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_MULTI_CHECK, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTI_CHECK, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isMultiCheck();
+      protected Boolean modelValue() {
+        return getModel().isMultiCheck();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_MULTILINE_TEXT, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTILINE_TEXT, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isMultilineText();
+      protected Boolean modelValue() {
+        return getModel().isMultilineText();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Integer>(ITable.PROP_ROW_HEIGHT_HINT, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROW_HEIGHT_HINT, model) {
       @Override
-      protected Integer getValueImpl(ITable table) {
-        return table.getRowHeightHint();
+      protected Integer modelValue() {
+        return getModel().getRowHeightHint();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_CHECKABLE, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CHECKABLE, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isCheckable();
+      protected Boolean modelValue() {
+        return getModel().isCheckable();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_HEADER_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_VISIBLE, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isHeaderVisible();
+      protected Boolean modelValue() {
+        return getModel().isHeaderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_KEYBOARD_NAVIGATION, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEYBOARD_NAVIGATION, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.hasKeyboardNavigation();
+      protected Boolean modelValue() {
+        return getModel().hasKeyboardNavigation();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_AUTO_RESIZE_COLUMNS, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_AUTO_RESIZE_COLUMNS, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isAutoResizeColumns();
+      protected Boolean modelValue() {
+        return getModel().isAutoResizeColumns();
       }
     });
-    putJsonProperty(new JsonProperty<ITable, IColumn<?>>(ITable.PROP_CONTEXT_COLUMN, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_COLUMN, model) {
       @Override
-      protected IColumn<?> getValueImpl(ITable table) {
-        return table.getContextColumn();
+      protected IColumn<?> modelValue() {
+        return getModel().getContextColumn();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         // XXX BSH Convert to JSON (or remove property entirely)
         return null;
       }
     });
-    putJsonProperty(new JsonProperty<ITable, ITableColumnFilterManager>(ITable.PROP_COLUMN_FILTER_MANAGER, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_COLUMN_FILTER_MANAGER, model) {
       @Override
-      protected ITableColumnFilterManager getValueImpl(ITable table) {
-        return table.getColumnFilterManager();
+      protected ITableColumnFilterManager modelValue() {
+        return getModel().getColumnFilterManager();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         // XXX BSH Convert to JSON (or remove property entirely)
         return null;
       }
     });
-    putJsonProperty(new JsonProperty<ITable, List<IKeyStroke>>(ITable.PROP_KEY_STROKES, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEY_STROKES, model) {
       @Override
-      protected List<IKeyStroke> getValueImpl(ITable table) {
-        return table.getKeyStrokes();
+      protected List<IKeyStroke> modelValue() {
+        return getModel().getKeyStrokes();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         @SuppressWarnings("unchecked")
         List<IKeyStroke> keyStrokes = (List<IKeyStroke>) value;
         return getOrCreateJsonAdapters(keyStrokes);
       }
     });
-    putJsonProperty(new JsonProperty<ITable, Boolean>(ITable.PROP_SCROLL_TO_SELECTION, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SCROLL_TO_SELECTION, model) {
       @Override
-      protected Boolean getValueImpl(ITable table) {
-        return table.isScrollToSelection();
+      protected Boolean modelValue() {
+        return getModel().isScrollToSelection();
       }
     });
 //    putJsonProperty(new JsonProperty<ITable, ITypeWithClassId>(ITable.PROP_CONTAINER, model) { //FIXME BSH CGU: only send properties when needed, do we need this one?
 //      @Override
-//      protected ITypeWithClassId getValueImpl(ITable table) {
-//        return table.getContainer();
+//      protected ITypeWithClassId getValueImpl() {
+//        return getModel().getContainer();
 //      }
 //
 //      @Override
@@ -193,14 +193,14 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 //        return null;
 //      }
 //    });
-    putJsonProperty(new JsonProperty<ITable, ITableContextMenu>(ITable.PROP_CONTEXT_MENU, model) {
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_MENU, model) {
       @Override
-      protected ITableContextMenu getValueImpl(ITable table) {
-        return table.getContextMenu();
+      protected ITableContextMenu modelValue() {
+        return getModel().getContextMenu();
       }
 
       @Override
-      public Object valueToJson(Object value) {
+      public Object prepareValueForToJson(Object value) {
         // XXX BSH Convert to JSON (or remove property entirely)
         return null;
       }

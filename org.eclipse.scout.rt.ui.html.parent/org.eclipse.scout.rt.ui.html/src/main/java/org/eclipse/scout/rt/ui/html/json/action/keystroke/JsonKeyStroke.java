@@ -25,16 +25,16 @@ public class JsonKeyStroke extends AbstractJsonPropertyObserver<IKeyStroke> {
   public JsonKeyStroke(IKeyStroke model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
 
-    putJsonProperty(new JsonProperty<IKeyStroke, Boolean>(IKeyStroke.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IKeyStroke>(IKeyStroke.PROP_ENABLED, model) {
       @Override
-      protected Boolean getValueImpl(IKeyStroke keystroke) {
-        return keystroke.isEnabled();
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<IKeyStroke, String>(IKeyStroke.PROP_KEYSTROKE, model) {
+    putJsonProperty(new JsonProperty<IKeyStroke>(IKeyStroke.PROP_KEYSTROKE, model) {
       @Override
-      protected String getValueImpl(IKeyStroke keystroke) {
-        return keystroke.getKeyStroke();
+      protected String modelValue() {
+        return getModel().getKeyStroke();
       }
     });
   }

@@ -54,6 +54,10 @@ public class JsonResponseTest {
     Assert.assertEquals(menu.getText(), menuObj.get("text"));
   }
 
+  /**
+   * Executes ITable setMenus two times. Due to the coalescing only one property change event is sent. This property
+   * change event must contain the complete menu objects, not only the id.
+   */
   @Test
   public void testJsonAdapterPropertyChangeAgain() throws JSONException {
     JsonSessionMock jsonSession = new JsonSessionMock();
