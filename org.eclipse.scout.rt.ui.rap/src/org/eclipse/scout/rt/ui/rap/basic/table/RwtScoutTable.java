@@ -97,7 +97,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by rwt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- * 
+ *
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
@@ -160,13 +160,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     m_uiCellEditorComposite = new RwtScoutTableCellEditor(this);
 
     table.addMenuDetectListener(new P_RwtHeaderMenuDetectListener());
-
-    //columns
-    initializeUiColumns();
-
-    RwtScoutTableModel tableModel = createUiTableModel();
-    viewer.setContentProvider(tableModel);
-    viewer.setInput(tableModel);
 
     // ui listeners
     viewer.addSelectionChangedListener(new P_RwtSelectionChangedListener());
@@ -297,6 +290,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       m_scoutTableListener = new P_ScoutTableListener();
       getScoutObject().addUITableListener(m_scoutTableListener);
     }
+    //columns
+    initializeUiColumns();
+
+    RwtScoutTableModel tableModel = createUiTableModel();
+    getUiTableViewer().setContentProvider(tableModel);
+    getUiTableViewer().setInput(tableModel);
+
     setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
     setSelectionFromScout(getScoutObject().getSelectedRows());
     setKeyStrokeFormScout();
@@ -869,7 +869,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     if (getUiField().getVerticalBar() != null && getUiField().getVerticalBar().getVisible()) {
       totalWidth -= getUiField().getVerticalBar().getSize().x;
     }
-    */
+     */
     if (totalWidth < 32) {
       //either not showing or not yet layouted
       return;

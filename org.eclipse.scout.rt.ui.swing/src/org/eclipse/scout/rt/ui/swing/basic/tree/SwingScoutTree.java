@@ -99,10 +99,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     // swing properties
     tree.setDragEnabled(true);
     // models
-    tree.setModel(new SwingTreeModel(this));
     tree.setSelectionModel(new DefaultTreeSelectionModel());
-    // renderers
-    tree.setCellRenderer(new SwingTreeCellRenderer(getSwingEnvironment(), tree.getCellRenderer(), this));
     // listeners
     tree.addMouseMotionListener(new SwingLinkDetectorMouseMotionListener<JTree>(new TreeHtmlLinkDetector()));
     tree.addMouseListener(new P_SwingMouseListener());
@@ -212,6 +209,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       m_scoutTreeListener = new P_ScoutTreeListener();
       getScoutObject().addUITreeListener(m_scoutTreeListener);
     }
+
+    getSwingTree().setModel(new SwingTreeModel(this));
+    getSwingTree().setCellRenderer(new SwingTreeCellRenderer(getSwingEnvironment(), getSwingTree().getCellRenderer(), this));
+
     setMultiSelectFromScout(getScoutObject().isMultiSelect());
     setRootNodeVisibleFromScout();
     setRootHandlesVisibleFromScout();
@@ -722,7 +723,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * update the given node
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -893,7 +894,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   * 
+   *
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -1097,7 +1098,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {

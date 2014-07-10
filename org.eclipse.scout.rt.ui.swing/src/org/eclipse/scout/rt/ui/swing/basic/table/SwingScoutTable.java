@@ -157,18 +157,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     // swing properties
     table.setAutoCreateColumnsFromModel(false);
     m_swingTableHeader.setReorderingAllowed(true);
-    // header renderer must be set before models
-    m_swingTableHeader.setDefaultRenderer(new SwingTableHeaderCellRenderer(m_swingTableHeader.getDefaultRenderer(), this));
     // models
     table.setAutoCreateColumnsFromModel(false);
-    table.setColumnModel(new SwingTableColumnModel(getSwingEnvironment(), this));
-    table.setModel(new SwingTableModel(getSwingEnvironment(), this));
     m_editor = new SwingScoutTableCellEditor(this);
     m_editor.initialize();
     //disable auto-start editing
     table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
     table.setSelectionModel(new DefaultListSelectionModel());
-    table.getSelectionModel().setAnchorSelectionIndex(0);
     // listeners
     table.getSelectionModel().addListSelectionListener(new P_SwingSelectionListener());
     // re-attach observer when selection model changes
@@ -308,6 +303,14 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       m_scoutTableListener = new P_ScoutTableListener();
       getScoutObject().addUITableListener(m_scoutTableListener);
     }
+
+    // header renderer must be set before models
+    m_swingTableHeader.setDefaultRenderer(new SwingTableHeaderCellRenderer(m_swingTableHeader.getDefaultRenderer(), this));
+
+    getSwingTable().setColumnModel(new SwingTableColumnModel(getSwingEnvironment(), this));
+    getSwingTable().setModel(new SwingTableModel(getSwingEnvironment(), this));
+    getSwingTable().getSelectionModel().setAnchorSelectionIndex(0);
+
     setMultiSelectFromScout(getScoutObject().isMultiSelect());
     setMultilineTextFromScout(getScoutObject().isMultilineText());
     setKeyboardNavigationFromScout();
@@ -1652,7 +1655,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

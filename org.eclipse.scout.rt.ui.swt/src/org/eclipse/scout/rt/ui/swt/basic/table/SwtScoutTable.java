@@ -105,7 +105,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by swt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- * 
+ *
  * @since 1.0.0 28.03.2008
  */
 public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScoutTable {
@@ -169,14 +169,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     // header menu
     m_headerMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
     table.addMenuDetectListener(new P_SwtHeaderMenuDetectListener());
-
-    //columns
-    initializeColumns();
-
-    SwtScoutTableModel tableModel = createTableModel();
-    viewer.setContentProvider(tableModel);
-    viewer.setLabelProvider(tableModel);
-    viewer.setInput(tableModel);
 
     // ui listeners
     viewer.addSelectionChangedListener(new P_SwtSelectionListener());
@@ -252,6 +244,13 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     return getSwtField() == null || getSwtField().isDisposed();
   }
 
+  private void initializeTableModel() {
+    SwtScoutTableModel model = createTableModel();
+    getSwtTableViewer().setContentProvider(model);
+    getSwtTableViewer().setLabelProvider(model);
+    getSwtTableViewer().setInput(model);
+  }
+
   protected SwtScoutTableModel createTableModel() {
     return new SwtScoutTableModel(getScoutObject(), this, getEnvironment(), m_columnManager);
   }
@@ -325,10 +324,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (getScoutObject() == null) {
       return;
     }
+
+    //table listener
     if (m_scoutTableListener == null) {
       m_scoutTableListener = new P_ScoutTableListener();
       getScoutObject().addUITableListener(m_scoutTableListener);
     }
+    initializeColumns();
+    initializeTableModel();
     setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
     setSelectionFromScout(getScoutObject().getSelectedRows());
     updateKeyStrokeFormScout();
