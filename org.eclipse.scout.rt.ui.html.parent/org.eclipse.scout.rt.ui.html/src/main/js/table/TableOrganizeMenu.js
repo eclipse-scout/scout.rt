@@ -225,6 +225,9 @@ scout.TableOrganizeMenu = function(table, x, y) {
 
     // open excel
     template = template.replace('{worksheet}', name).replace('{table}', html);
+    // FIXME BSH Replace deprecated call to unescape!
+    // Seems not to be that easy... http://stackoverflow.com/questions/246801/how-can-you-encode-a-string-to-base64-in-javascript/247261#247261
+    // ==> Solution of user850789 seems to work best! (Also for Mozilla's example)
     template = window.btoa(unescape(encodeURIComponent(template)));
     window.location.href = uri + template;
   }
