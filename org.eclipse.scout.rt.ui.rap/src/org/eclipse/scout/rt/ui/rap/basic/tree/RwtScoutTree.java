@@ -100,7 +100,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     setUiField(viewer.getTree());
 
     initNodeHeight();
-    initializeTreeModel();
 
     viewer.getTree().setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     viewer.getTree().setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
@@ -142,7 +141,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   }
 
   protected void initializeTreeModel() {
-    // model
     RwtScoutTreeModel model = createTreeModel();
     getUiTreeViewer().setContentProvider(model);
     getUiTreeViewer().setLabelProvider(model);
@@ -201,6 +199,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       m_scoutTreeListener = new P_ScoutTreeListener();
       getScoutObject().addUITreeListener(m_scoutTreeListener);
     }
+    initializeTreeModel();
+
     if (getScoutObject().isRootNodeVisible()) {
       setExpansionFromScout(getScoutObject().getRootNode());
     }
@@ -387,7 +387,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
 
   /**
    * Update the given node.
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {

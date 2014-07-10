@@ -72,7 +72,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * <h3>SwtScoutTree</h3> ...
- * 
+ *
  * @since 1.0.0 23.07.2008
  * @author Andreas Hoegger
  */
@@ -96,7 +96,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     TreeViewer viewer = createSwtTree(parent);
     setSwtTreeViewer(viewer);
 
-    initializeSwtTreeModel();
     setSwtField(viewer.getTree());
     // listeners
     viewer.addSelectionChangedListener(new P_SwtSelectionListener());
@@ -132,7 +131,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   protected void initializeSwtTreeModel() {
-    // model
     SwtScoutTreeModel model = createTreeModel();
     getSwtTreeViewer().setContentProvider(model);
     getSwtTreeViewer().setLabelProvider(model);
@@ -184,6 +182,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       m_scoutTreeListener = new P_ScoutTreeListener();
       getScoutObject().addUITreeListener(m_scoutTreeListener);
     }
+    initializeSwtTreeModel();
     if (getScoutObject().isRootNodeVisible()) {
       setExpansionFromScout(getScoutObject().getRootNode());
     }
