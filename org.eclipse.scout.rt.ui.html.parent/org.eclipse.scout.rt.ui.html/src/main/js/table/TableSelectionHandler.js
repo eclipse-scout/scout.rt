@@ -42,6 +42,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       if (!$row.hasClass('row-selected') ||
           ($selectedRows.length > 1 && event.which != 3)) {
         $selectedRows.removeClass('row-selected');
+        that._clearSelectionBorder($selectedRows);
       }
     }
 
@@ -76,10 +77,11 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
         $actionRow.addClass('row-selected');
       } else {
         $actionRow.removeClass('row-selected');
+        that._clearSelectionBorder($selectedRows);
       }
 
       $selectedRows = that.table.findSelectedRows();
-      that._clearSelectionBorder();
+      that._clearSelectionBorder($selectedRows);
       that._drawSelectionBorder($selectedRows);
       that.table.triggerRowsSelected($selectedRows);
 
@@ -90,7 +92,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     function onMouseUp(event) {
       $(".table-row").off(".selectionHandler");
 
-      that.table.sendRowsSelected();
+      that.table.onRowsSelected($selectedRows);
     }
 
   }
@@ -110,26 +112,26 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
   var $selectedRows = $(selectedRows);
   this._drawSelectionBorder($selectedRows);
 
-  this.table.triggerRowsSelected($selectedRows);
+  this.table.onRowsSelected($selectedRows);
 };
 
 
 scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
-  this.table.findSelectedRows().removeClass('row-selected');
-  this._clearSelectionBorder();
+  var $selectedRows = this.table.findSelectedRows();
+  $selectedRows.removeClass('row-selected');
+  this._clearSelectionBorder($selectedRows);
 
   if (!dontFire) {
-    this.table.triggerRowsSelected();
-    this.table.sendRowsSelected();
+    this.table.onRowsSelected();
   }
 };
 
 scout.TableSelectionHandler.prototype.dataDrawn = function() {
   var $selectedRows = this.table.findSelectedRows();
 
-  this._clearSelectionBorder();
+  this._clearSelectionBorder($selectedRows);
   this._drawSelectionBorder($selectedRows);
-  this.table.triggerRowsSelected($selectedRows);
+  this.table.onRowsSelected($selectedRows);
 };
 
 /**
@@ -147,9 +149,8 @@ scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedR
   });
 };
 
-scout.TableSelectionHandler.prototype._clearSelectionBorder = function() {
-  $('.select-middle, .select-top, .select-bottom, .select-single')
-  .removeClass('select-middle select-top select-bottom select-single');
+scout.TableSelectionHandler.prototype._clearSelectionBorder = function($selectedRows) {
+  $selectedRows.removeClass('select-middle select-top select-bottom select-single');
 };
 
 scout.TableSelectionHandler.prototype.selectAll = function() {
@@ -159,9 +160,7 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
   $rows.addClass('row-selected');
 
   this._drawSelectionBorder($rows);
-
-  this.table.triggerRowsSelected($rows);
-  this.table.sendRowsSelected();
+  this.table.onRowsSelected($rows);
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {

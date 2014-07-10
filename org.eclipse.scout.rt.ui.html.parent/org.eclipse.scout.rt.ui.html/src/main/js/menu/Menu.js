@@ -15,12 +15,73 @@ scout.Menu.prototype.sendMenuAction = function(event) {
   this.session.send(scout.Menu.EVENT_MENU_ACTION, this.id);
 };
 
-scout.Menu.prototype._setVisible = function(visible) {
-  // TODO CGU implement
+scout.Menu.prototype._render = function($parent) {
+  this.$container = $parent
+    .appendDiv('', 'menu-item')
+    .on('click', '', onClicked.bind(this));
+
+  function onClicked() {
+    if (this.$container.isEnabled()) {
+      return;
+    }
+
+    this.sendMenuAction();
+  }
+};
+
+scout.Menu.prototype._callSetters = function() {
+  this._setText(this.text);
+  this._setIconId(this.iconId);
+  this._setEnabled(this.enabled);
+  this._setVisible(this.visible);
+};
+
+scout.Menu.prototype._setText = function(text) {
+  if (!this.isRendered()) {
+    return;
+  }
+
+  if (!text) {
+    text = '';
+  }
+  this.$container.text(text);
+};
+
+
+scout.Menu.prototype._setIconId = function(iconId) {
+  if (!this.isRendered()) {
+    return;
+  }
+
+  if (iconId) {
+    this.$container.attr('data-icon', iconId);
+  } else {
+    this.$container.removeAttr('data-icon');
+  }
 };
 
 scout.Menu.prototype._setEnabled = function(enabled) {
-  // TODO CGU implement
+  if (!this.isRendered()) {
+    return;
+  }
+
+  if (enabled) {
+    this.$container.removeAttr('disabled');
+  } else {
+    this.$container.attr('disabled', 'disabled');
+  }
+};
+
+scout.Menu.prototype._setVisible = function(visible) {
+  if (!this.isRendered()) {
+    return;
+  }
+
+  if (visible) {
+    this.$container.show();
+  } else {
+    this.$container.hide();
+  }
 };
 
 scout.Menu.prototype.goOffline = function() {

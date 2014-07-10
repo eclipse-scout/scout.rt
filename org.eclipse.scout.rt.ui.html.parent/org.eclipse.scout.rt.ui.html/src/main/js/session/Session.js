@@ -190,6 +190,8 @@ scout.Session.prototype._processSuccessResponse = function(message) {
  * @param textStatus timeout, abort, error or parseerror
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
+  this._requestsPendingCounter--;
+
   // FIXME AWE Remove when not needed anymore
   $.log('ERROR: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 

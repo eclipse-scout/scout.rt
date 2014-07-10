@@ -12,6 +12,9 @@ scout.Table = function() {
   this.selectionHandler;
   this._keystrokeAdapter;
   this._addAdapterProperties(['controls', 'menus']);
+  this.events = new scout.EventSupport();
+  this._filterMap = {};
+  this.desktopMenuContributor;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -27,9 +30,6 @@ scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
-
-  this.events = new scout.EventSupport();
-  this._filterMap = {};
 
   this.configurator = this._createTableConfigurator();
   if (this.configurator) {
@@ -56,8 +56,7 @@ scout.Table.prototype._render = function($parent) {
   if ($parent && $parent.parent() && $parent.parent().attr('id') === 'Desktop') {
     // desktop table (no input focus required to trigger table keystrokes)
     scout.keystrokeManager.installAdapter($parent.parent(), this._keystrokeAdapter);
-  }
-  else {
+  } else {
     // independent table, i.e. inside form (input focus required to trigger table keystrokes)
     this.$container.attr('tabIndex', 0);
     this.$container.css('outline', 'none');
@@ -89,7 +88,6 @@ scout.Table.prototype._render = function($parent) {
 
   // load data and create rows
   this.drawData();
-  this._drawMenu(this.findSelectedRows());
 };
 
 scout.Table.prototype.dispose = function() {
@@ -219,7 +217,7 @@ scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
 scout.Table.prototype.drawData = function() {
   this.findRows().remove();
   this._drawData(0);
-  if(this.selectionHandler) {
+  if (this.selectionHandler) {
     this.selectionHandler.dataDrawn();
   }
 };
@@ -333,50 +331,55 @@ scout.Table.prototype._drawData = function(startRow) {
 
 };
 
-scout.Table.prototype._drawMenu = function($selectedRows) {
-  // FIXME cgu: nicer?
-  var menus = this._getRowMenus($selectedRows);
-
-  var desktopMenu = $('.desktop-menu').data('this');
-  if (desktopMenu) {
-    desktopMenu.addItems(menus, false);
-  }
-};
-
 scout.Table.prototype._getRowMenus = function($selectedRows) {
   var menus;
-
-  if ($selectedRows.length == 1) {
-    menus = scout.menus.filter(this.menus, ['SingleSelection']);
-  } else if ($selectedRows.length > 1) {
-    menus = scout.menus.filter(this.menus, ['MultiSelection']);
-  } else {
-    menus = [];
+  if ($selectedRows) {
+    if ($selectedRows.length == 1) {
+      menus = scout.menus.filter(this.menus, ['SingleSelection']);
+    } else if ($selectedRows.length > 1) {
+      menus = scout.menus.filter(this.menus, ['MultiSelection']);
+    } else {
+      menus = [];
+    }
   }
 
   return menus;
 };
 
-scout.Table.prototype.sendRowsSelected = function() {
-  var rowIds = [],
-    $selectedRows = this.findSelectedRows();
+scout.Table.prototype._setMenus = function(menus) {
+  var $selectedRows = this.findSelectedRows();
+  this._renderMenus($selectedRows);
+};
 
-  //FIXME CGU Should be done by a listener in DesktopMenu
-  this._drawMenu($selectedRows);
+scout.Table.prototype._renderMenus = function($selectedRows) {
+  var menus = this._getRowMenus($selectedRows);
+  this._selectedRowMenus = menus;
 
-  $selectedRows.each(function() {
-    rowIds.push($(this).attr('id'));
-  });
+  if (this.desktopMenuContributor && this.session.desktop) {
+    this.session.desktop.onMenusUpdated('table', this._selectedRowMenus);
+  }
+};
 
-  if (scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
-    return;
+scout.Table.prototype.onRowsSelected = function($selectedRows) {
+  var rowIds = [];
+
+  this.triggerRowsSelected($selectedRows);
+  this._renderMenus($selectedRows);
+
+  if ($selectedRows) {
+    $selectedRows.each(function() {
+      rowIds.push($(this).attr('id'));
+    });
   }
 
-  this.selectedRowIds = rowIds;
-  if (this.selectedRowIds) {
-    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
-      "rowIds": rowIds
-    });
+  if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
+    this.selectedRowIds = rowIds;
+
+    if (!this.session.processingEvents) {
+      this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
+        "rowIds": rowIds
+      });
+    }
   }
 };
 
@@ -583,7 +586,6 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   }
 
   if (!this.session.processingEvents) {
-    //not necessary for now since selectRowsByIds is only called by onModelAction, but does no harm either
     this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
       "rowIds": rowIds
     });
@@ -713,13 +715,13 @@ scout.Table.prototype.showRow = function($row) {
   $row.show();
   $row.removeClass('invisible');
   that.updateScrollbar();
-//  if ($row.is(':hidden')) {
-//    $row.stop().slideDown({
-//      complete: function() {
-//        that.updateScrollbar();
-//      }
-//    });
-//  }
+  //  if ($row.is(':hidden')) {
+  //    $row.stop().slideDown({
+  //      complete: function() {
+  //        that.updateScrollbar();
+  //      }
+  //    });
+  //  }
 };
 
 scout.Table.prototype.hideRow = function($row) {
@@ -729,13 +731,13 @@ scout.Table.prototype.hideRow = function($row) {
   $row.hide();
   $row.addClass('invisible');
   that.updateScrollbar();
-//  if ($row.is(':visible')) {
-//    $row.stop().slideUp({
-//      complete: function() {
-//        that.updateScrollbar();
-//      }
-//    });
-//  }
+  //  if ($row.is(':visible')) {
+  //    $row.stop().slideUp({
+  //      complete: function() {
+  //        that.updateScrollbar();
+  //      }
+  //    });
+  //  }
 };
 
 // move column
@@ -798,12 +800,13 @@ scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
 };
 
 scout.Table.prototype.triggerRowsSelected = function($rows) {
-  var rowCount = 0, allSelected = false;
+  var rowCount = 0,
+    allSelected = false;
   if (this.rows) {
     rowCount = this.rows.length;
   }
 
-  if($rows) {
+  if ($rows) {
     allSelected = $rows.length == rowCount;
   }
 
@@ -824,7 +827,7 @@ scout.Table.prototype._triggerRowsFiltered = function(numRows, filterName) {
   this.events.trigger(type, event);
 };
 
-scout.Table.prototype._triggerFilterResetted = function(numRows, filterName) {
+scout.Table.prototype._triggerFilterResetted = function() {
   var type = scout.Table.GUI_EVENT_FILTER_RESETTED;
   this.events.trigger(type);
 };

@@ -54,7 +54,7 @@ scout.DesktopTree.prototype._render = function($parent) {
     selectedNode = this._selectedNodes[0];
     this.setNodeSelectedById(selectedNode.id);
 
-    this._showOrHideMenus(this._findNodeById(selectedNode.id));
+    this._renderMenus(this._findNodeById(selectedNode.id));
   }
 
   // home node for bread crumb
@@ -66,7 +66,7 @@ scout.DesktopTree.prototype._render = function($parent) {
 
   function onHomeClick(event) {
     $(this).selectOne();
-    that._showOrHideMenus();
+    that._renderMenus();
     that._updateBreadCrumb();
     that.scrollbar.initThumb();
   }
@@ -105,11 +105,13 @@ scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
 
   if (this._detailTable && this._detailTable !== detailTable) {
     this._detailTable.remove();
+    this._detailTable.desktopMenuContributor = false;
     this._detailTable = null;
   }
 
   if (detailTable) {
     this._detailTable = detailTable;
+    this._detailTable.desktopMenuContributor = true;
     if (!this._detailTable.isRendered()) {
       this._detailTable.render($('#DesktopBench'));
     }
@@ -426,14 +428,13 @@ scout.DesktopTree.prototype._findSelectedNodes = function() {
 scout.DesktopTree.prototype._setMenus = function(menus) {
   if (this._selectedNodes.length > 0) {
     var $node = this._findNodeById(this._selectedNodes[0].id);
-    this._showOrHideMenus($node);
+    this._renderMenus($node);
   }
 };
 
-scout.DesktopTree.prototype._showOrHideMenus = function($node) {
-  var desktopMenu = $('.desktop-menu').data('this'); //FIXME CGU should be done in desktop menu with a listener
-  if (desktopMenu) {
-    desktopMenu.addItems(scout.menus.filter(this.menus), true);
+scout.DesktopTree.prototype._renderMenus = function($node) {
+  if (this.session.desktop) {
+    this.session.desktop.onMenusUpdated('tree', scout.menus.filter(this.menus));
   }
 };
 

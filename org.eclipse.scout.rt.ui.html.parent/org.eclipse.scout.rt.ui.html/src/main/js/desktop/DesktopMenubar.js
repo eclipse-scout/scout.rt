@@ -1,4 +1,4 @@
-scout.DesktopMenu = function($parent, session) {
+scout.DesktopMenubar = function($parent, session) {
   this.session = session;
 
   //create container
@@ -7,38 +7,38 @@ scout.DesktopMenu = function($parent, session) {
   this.$table = this.$container.appendDiv('', 'desktop-menu-table');
 };
 
-scout.DesktopMenu.prototype.addItems = function(menus, tree, selection) {
-  var $div;
+scout.DesktopMenubar.prototype.updateItems = function(group, menus) {
+  var $div, i, existingMenus;
 
-  if (tree) {
+  if (group === 'tree') {
     $div = this.$tree;
   } else {
     $div = this.$table;
   }
 
-  $div.empty();
+  existingMenus = $div.data('menus');
+  if (scout.arrays.equals(existingMenus, menus)) {
+    return;
+  }
+
+  if (existingMenus) {
+    for (i = 0; i < existingMenus.length; i++) {
+      existingMenus[i].remove();
+    }
+  }
+  $div.data('menus', []);
 
   if (menus && menus.length > 0) {
-    for (var i = 0; i < menus.length; i++) {
+    for (i = 0; i < menus.length; i++) {
       if (menus[i].separator) {
         continue;
       }
-      $div.appendDiv('', 'menu-item', menus[i].text)
-        .attr('data-icon', menus[i].iconId)
-        .data('menu', menus[i])
-        .on('click', '', onMenuItemClicked);
+      menus[i].render($div);
+      $div.data('menus').push(menus[i]);
     }
-
   }
 
   //TODO cru: border is visible even if there are no tree menus
   // size menu
   $div.widthToContent(150);
-
-  var that = this;
-
-  function onMenuItemClicked() {
-    var menu = $(this).data('menu');
-    menu.sendMenuAction();
-  }
 };

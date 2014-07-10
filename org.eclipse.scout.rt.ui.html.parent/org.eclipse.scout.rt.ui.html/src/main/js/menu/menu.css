@@ -4,7 +4,6 @@ vertical-align: bottom;
 padding-left: 10px;
 }
 
-
 .menu-item {
 color: #0082A1;
 overflow: hidden;
@@ -36,6 +35,15 @@ text-decoration: underline;
 color: #FE9915;
 }
 
+.menu-item[disabled],
+.menu-item[disabled]:before {
+color: #9C9C9C;
+}
+
+.menu-item[disabled]:hover{
+cursor: default;
+text-decoration: none;
+}
 
 .menu-container{
 position: absolute;

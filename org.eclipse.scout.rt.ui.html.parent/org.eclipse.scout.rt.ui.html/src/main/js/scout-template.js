@@ -41,7 +41,7 @@
 //@include("desktop/BaseDesktop.js");
 //@include("desktop/MobileDesktop.js");
 //@include("desktop/Desktop.js");
-//@include("desktop/DesktopMenu.js");
+//@include("desktop/DesktopMenubar.js");
 //@include("desktop/DesktopBench.js");
 //@include("desktop/DesktopKeystrokeAdapter.js");
 //@include("desktop/DesktopTaskbar.js");

@@ -159,6 +159,11 @@ scout.menus = {
    * menus may change at any time -> wait for server response before showing any menus
    */
   showContextMenuWithWait: function(session, func) {
+    if (session.offline) {
+      //Do not show context menus in offline mode, they won't work
+      return;
+    }
+
     if (session.areRequestsPending() || session.areEventsQueued()) {
       session.listen().done(onEventsProcessed);
     } else {

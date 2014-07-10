@@ -137,6 +137,10 @@
     return this.hasClass('selected');
   };
 
+  $.fn.isEnabled = function() {
+    return this.attr('disabled');
+  };
+
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
     var properties = {};

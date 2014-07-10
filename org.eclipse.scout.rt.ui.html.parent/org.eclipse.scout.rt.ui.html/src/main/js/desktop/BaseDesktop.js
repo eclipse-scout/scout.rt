@@ -103,6 +103,10 @@ scout.BaseDesktop.prototype.onReconnectingFailed = function() {
   this.$offline.find('.reconnect').hide();
 };
 
+scout.BaseDesktop.prototype.onMenusUpdated = function(group, menus) {
+  //may be implemented by subclasses
+};
+
 scout.BaseDesktop.prototype.addForm = function(form) {
   if (form.displayHint == "view") {
     form.render(this._resolveViewContainer(form));

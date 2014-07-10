@@ -3,6 +3,11 @@
 
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
+  this.menubar;
+  this.taskbar;
+  this.tree;
+  this.bench;
+  this.layout;
   this._addAdapterProperties('viewButtons');
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
@@ -35,9 +40,8 @@ scout.Desktop.prototype._render = function($parent) {
     marginTop = viewbar.$div.outerHeight();
   }
 
-  this.menu = new scout.DesktopMenu($parent, this.session);
-  marginTop += this.menu.$container.outerHeight();
-
+  this.menubar = new scout.DesktopMenubar($parent, this.session);
+  marginTop += this.menubar.$container.outerHeight();
 
   this.layout = new scout.BorderLayout(marginTop, marginRight, 'desktop-area');
   if (this.outline) {
@@ -83,6 +87,13 @@ scout.Desktop.prototype._render = function($parent) {
   }.bind(this));
 
   scout.Desktop.parent.prototype._render.call(this, $parent);
+};
+
+/**
+ * @override
+ */
+scout.Desktop.prototype.onMenusUpdated = function(group, menus) {
+  this.menubar.updateItems(group, menus);
 };
 
 /**

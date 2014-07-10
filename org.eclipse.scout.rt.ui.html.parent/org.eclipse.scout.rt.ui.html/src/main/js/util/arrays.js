@@ -32,12 +32,32 @@ scout.arrays = {
   equalsIgnoreOrder: function(arr, arr2) {
     if (arr === arr2) {
       return true;
+    } else if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
+      return true;
     } else if (!arr || !arr2) {
       return false;
     } else if (arr.length != arr2.length) {
       return false;
     }
     return scout.arrays.containsAll(arr, arr2);
+  },
+  equals: function(arr, arr2) {
+    if (arr === arr2) {
+      return true;
+    } else if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
+      return true;
+    } else if (!arr || !arr2) {
+      return false;
+    } else if (arr.length != arr2.length) {
+      return false;
+    }
+
+    for (var i = 0; i < arr.length; i++) {
+      if(arr[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return true;
   },
   greater: function(arr, arr2) {
     var arrLength = 0,

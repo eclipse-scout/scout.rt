@@ -15,7 +15,7 @@ scout.DesktopViewButton.prototype._render = function($parent) {
 
   var that = this;
   this._$viewButton.on('click', '', function() {
-    if (that._$viewButton.attr('disabled')) {
+    if (that._$viewButton.isEnabled()) {
       return;
     }
 
