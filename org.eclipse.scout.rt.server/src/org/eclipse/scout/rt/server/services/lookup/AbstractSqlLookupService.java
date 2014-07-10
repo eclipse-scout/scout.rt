@@ -47,7 +47,7 @@ import org.eclipse.scout.service.SERVICES;
  * <li>String font
  * <li>Boolean enabled
  * <li>Object parentKey used in hierarchical structures to point to the parents primary key
- * <li>{@link TriState} active (0,1,null,...) see {@link TriState#parseTriState(Object)}
+ * <li>{@link TriState} active (0,1,null,...) see {@link TriState#parse(Object)}
  * </ul>
  * <p>
  * Valid bind names are: Object key, String text, String all, Object rec, {@link TriState} active<br>

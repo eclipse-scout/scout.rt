@@ -1762,43 +1762,43 @@ public final class TypeCastUtility {
   }
 
   private TriState txByteToTriState(byte o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txCharToTriState(char o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txDoubleToTriState(double o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txFloatToTriState(float o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txIntToTriState(int o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txLongToTriState(long o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txShortToTriState(short o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txStringToTriState(String o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txBigIntegerToTriState(BigInteger o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private TriState txBigDecimalToTriState(BigDecimal o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private BigDecimal txTriStateToBigDecimal(TriState o) {
@@ -1826,7 +1826,7 @@ public final class TypeCastUtility {
   }
 
   private TriState txBooleanToTriState(boolean o) {
-    return TriState.parseTriState(o);
+    return TriState.parse(o);
   }
 
   private boolean txTriStateToBoolean(TriState o) {

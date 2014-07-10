@@ -4,154 +4,135 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
 /**
- * A TriState is a Boolean value with three states: {@value TriState#TRUE}, {@value TriState#FALSE} and
- * {@value TriState#UNDEFINED} The value is
- * internally represented as {@value Boolean#TRUE}, {@value Boolean#FALSE} and
- * null
+ * A Boolean with three states: {@value TriState#TRUE}, {@value TriState#FALSE} and {@value TriState#UNDEFINED}
+ * <p>
+ * The value is internally represented as {@value Boolean#TRUE}, {@value Boolean#FALSE} and null
+ * <p>
+ * Comparison using '==' is supported since the three states are singleton states.
  */
-public final class TriState implements java.io.Serializable, Comparable<TriState> {
-  /**
-   * The <code>Boolean</code> object corresponding to the value <code>true</code>.
-   */
-  public static final TriState TRUE = new TriState(Boolean.TRUE);
+public enum TriState {
 
-  /**
-   * The <code>Boolean</code> object corresponding to the value <code>false</code>.
-   */
-  public static final TriState FALSE = new TriState(Boolean.FALSE);
+  FALSE(Boolean.FALSE),
+  TRUE(Boolean.TRUE),
+  UNDEFINED(null);
 
-  /**
-   * The <code>Boolean</code> object corresponding to the value <code>null</code>.
-   */
-  public static final TriState UNDEFINED = new TriState(null);
+  private final Boolean m_value;
 
-  private final Boolean value;
-
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Boolean: true -> true false -> false null -> null Number: 1 -> true 0 ->
-   * false null -> null other-> null String: "true" -> true "false" -> false "1"
-   * -> true "0" -> false null -> null other -> null
-   */
-  public static TriState parseTriState(Object value) {
-    if (value == null) {
-      return UNDEFINED;
-    }
-    else if (value instanceof Boolean) {
-      if ((Boolean) value) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    else if (value instanceof Number) {
-      int i = ((Number) value).intValue();
-      switch (i) {
-        case 0: {
-          return FALSE;
-        }
-        case 1: {
-          return TRUE;
-        }
-        default: {
-          return UNDEFINED;
-        }
-      }
-    }
-    else if (value instanceof String) {
-      if (value.equals("true")) {
-        return TRUE;
-      }
-      else if (value.equals("false")) {
-        return FALSE;
-      }
-      else if (value.equals("0")) {
-        return FALSE;
-      }
-      else if (value.equals("1")) {
-        return TRUE;
-      }
-      else {
-        return UNDEFINED;
-      }
-    }
-    else {
-      throw new IllegalArgumentException("value of unknown type " + value + " [" + value.getClass() + "]");
-    }
-  }
-
-  /**
-   * see {@link #parseTriState(Object)}
-   */
   private TriState(Boolean value) {
-    this.value = value;
+    this.m_value = value;
   }
 
   /**
    * @return true, false or null
    */
   public Boolean getBooleanValue() {
-    return value;
+    return m_value;
   }
 
   /**
    * @return 1, 0 or null
    */
   public Integer getIntegerValue() {
-    return (value != null ? (value ? 1 : 0) : null);
+    return (m_value != null ? (m_value ? 1 : 0) : null);
+  }
+
+  public boolean isTrue() {
+    return m_value != null && m_value.booleanValue();
+  }
+
+  public boolean isFalse() {
+    return m_value != null && !m_value.booleanValue();
   }
 
   public boolean isUndefined() {
-    return value == null;
+    return m_value == null;
   }
 
-  @Override
-  public String toString() {
-    if (value != null) {
-      return value ? "true" : "false";
+  /**
+   * Boolean: true -&gt; true false -&gt; false null -&gt; null
+   * <p>
+   * Number: 1 -&gt; true 0 -&gt; false null -&gt; null other-&gt; null
+   * <p>
+   * String: "true" -&gt; true "false" -&gt; false "1" -&gt; true "0" -&gt; false null -&gt; null other -&gt; null
+   */
+  public static TriState parse(Object value) {
+    if (value == null) {
+      return UNDEFINED;
+    }
+    else if (value instanceof TriState) {
+      return (TriState) value;
+    }
+    else if (value instanceof Boolean) {
+      return parseBoolean((Boolean) value);
+    }
+    else if (value instanceof Number) {
+      return parseInt(((Number) value).intValue());
+    }
+    else if (value instanceof String) {
+      return parseString((String) value);
     }
     else {
-      return null;
+      throw new IllegalArgumentException("value of unknown type " + value + " [" + value.getClass() + "]");
     }
   }
 
-  @Override
-  public int hashCode() {
-    if (value != null) {
-      return value ? 1 : 0;
+  private static TriState parseBoolean(Boolean value) {
+    if (value) {
+      return TRUE;
     }
     else {
-      return 2;
+      return FALSE;
     }
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (value == obj) {
-      return true;
+  private static TriState parseInt(int i) {
+    switch (i) {
+      case 0:
+        return FALSE;
+      case 1:
+        return TRUE;
+      default:
+        return UNDEFINED;
     }
-    else if (obj instanceof TriState) {
-      TriState t = (TriState) obj;
-      int a = (value != null ? (value ? 1 : 0) : 2);
-      int b = (t.value != null ? (t.value ? 1 : 0) : 2);
-      return a == b;
-    }
-    return false;
   }
 
-  @Override
-  public int compareTo(TriState t) {
-    Integer a = (value != null ? (value ? 1 : 0) : 2);
-    Integer b = (t.value != null ? (t.value ? 1 : 0) : 2);
-    return a.compareTo(b);
+  private static TriState parseString(String value) {
+    if ("true".equals(value)) {
+      return TRUE;
+    }
+    else if ("false".equals(value)) {
+      return FALSE;
+    }
+    else if ("0".equals(value)) {
+      return FALSE;
+    }
+    else if ("1".equals(value)) {
+      return TRUE;
+    }
+    else {
+      return UNDEFINED;
+    }
   }
+
+  /**
+   * Boolean: true -&gt; true false -&gt; false null -&gt; null
+   * <p>
+   * Number: 1 -&gt; true 0 -&gt; false null -&gt; null other-&gt; null
+   * <p>
+   * String: "true" -&gt; true "false" -&gt; false "1" -&gt; true "0" -&gt; false null -&gt; null other -&gt; null
+   *
+   * @deprecated use {@link #parse(Object)}.
+   */
+  @Deprecated
+  public static TriState parseTriState(Object value) {
+    return parse(value);
+  }
+
 }

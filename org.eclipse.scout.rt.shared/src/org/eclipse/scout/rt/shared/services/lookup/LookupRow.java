@@ -101,7 +101,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * Creates a new lookup row with the given cells as data.
-   * 
+   *
    * @param cells
    *          array containing the following values:<br>
    *          Object key (use keyClass to specify the type of the key) <br>
@@ -114,7 +114,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
    *          Boolean enabled <br>
    *          Object parentKey used in hierarchical structures to point to the parents
    *          primary key <br>
-   *          Boolean active (0,1) see {@link TriState#parseTriState(Object)}
+   *          Boolean active (0,1) see {@link TriState#parse(Object)}
    * @param maxColumnIndex
    *          index describing the last column in cells that should be evaluated
    * @param keyClass
@@ -330,7 +330,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * Convenience helper for transforming Object[][] data into CodeRow[] <br>
-   * 
+   *
    * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class<?> keyClass)} instead.
    */
   @Deprecated
