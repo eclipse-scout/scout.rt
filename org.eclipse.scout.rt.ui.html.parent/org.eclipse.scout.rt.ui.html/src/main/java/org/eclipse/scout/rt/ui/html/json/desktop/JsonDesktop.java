@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
@@ -117,6 +119,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       putProperty(json, "breadCrumbNavigation", getOrCreateJsonAdapter(breadCrumbsNavigation.getValue()));
     }
     job.runNow(new NullProgressMonitor());
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
     return json;
   }
 
@@ -208,7 +216,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   protected void handleModelDesktopClosed() {
-    LOG.info("Desktop closed");
     dispose();
     //FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done for all, logout is done for all as well, gmail does the same).
     //Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
@@ -224,7 +231,5 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     public void desktopChanged(DesktopEvent e) {
       handleModelDesktopEvent(e);
     }
-
   }
-
 }

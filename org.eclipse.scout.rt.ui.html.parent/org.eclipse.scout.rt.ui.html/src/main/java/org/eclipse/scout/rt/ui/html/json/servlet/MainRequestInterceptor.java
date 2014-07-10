@@ -68,7 +68,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       return true;
     }
 
-    String jsonSessionAttributeName = "JsonUi#" + jsonReq.getJsonSessionId();
+    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
     //FIXME really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession?
@@ -77,11 +77,10 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
 
       if (jsonReq.isUnloadRequest()) {
-        LOG.info("Unload request for JSON session with ID " + jsonReq.getJsonSessionId());
+        LOG.info("Unloading JSON session with ID " + jsonReq.getJsonSessionId() + " (requested by UI)");
         if (jsonSession != null) {
           jsonSession.dispose();
-          // FIXME BSH Check with CGU -> This does not work, calls AbstractJsonSession.valueUnbound...
-//          httpSession.removeAttribute(jsonSessionAttributeName);
+          httpSession.removeAttribute(jsonSessionAttributeName);
         }
         return true;
       }

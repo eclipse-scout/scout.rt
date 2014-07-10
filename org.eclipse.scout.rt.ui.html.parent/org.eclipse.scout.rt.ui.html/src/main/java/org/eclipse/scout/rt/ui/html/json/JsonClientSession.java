@@ -25,8 +25,10 @@ import java.util.Locale;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
@@ -62,14 +64,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
     if (!getModel().isActive()) {
       //FIXME copied from session service. Moved here to be able to attach locale listener first
-      ClientSyncJob job = new ClientSyncJob("Session startup", getModel()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getCurrentSession().startSession(Activator.getDefault().getBundle());
-        }
-      };
-      //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
-      job.runNow(new NullProgressMonitor());
+      getModel().startSession(Activator.getDefault().getBundle());
     }
 
     if (!getModel().getDesktop().isOpened()) {
@@ -122,14 +117,21 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     if (m_localeManagedByModel) {
       return;
     }
-    new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
+    ClientJob job = new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         if (!getModel().getLocale().equals(locale)) {
           getModel().setLocale(locale);
         }
       }
-    }.runNow(new NullProgressMonitor());
+    };
+    job.runNow(new NullProgressMonitor());
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
   }
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {

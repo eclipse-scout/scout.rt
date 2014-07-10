@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -28,6 +26,7 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
@@ -40,13 +39,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonAdapterFactory.NullAdapter;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
-  private static final String SESSION_ATTR_CLIENT_SESSION_MAP = IClientSession.class.getName() + "-Map";
 
   private JsonClientSession m_jsonClientSession;
 
   // TODO AWE: JsonAdapterFactory überschreibbar machen, via Scout-service
+  // FIXME BSH Allgemein Thema Erweiterbarkeit: es fehlen protected Getter/Setter fuer private Felder, finale Objekte in Konstruktor koennen nicht customized werden
   private final JsonAdapterFactory m_jsonAdapterFactory;
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
@@ -82,7 +80,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
 
-    // FIXME BSH Check with CGU: Why is this inside a sync job? There is a second one in startup()
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
@@ -96,6 +93,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
+
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
     }
@@ -104,7 +102,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     JsonObjectUtility.putProperty(json, "clientSession", m_jsonClientSession);
     m_currentJsonResponse.addActionEvent("initialized", m_jsonSessionId, json);
 
-    LOG.info("JsonSession initialized");
+    LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
 
   protected UserAgent createUserAgent() {
@@ -135,19 +133,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   protected IClientSession createClientSession(UserAgent userAgent, Subject subject, Locale locale) {
     synchronized (this) {
       HttpSession httpSession = m_currentHttpRequest.getSession();
-      // Get map of client sessions from HTTP session
-      @SuppressWarnings("unchecked")
-      Map<String, IClientSession> clientSessionMap = (Map<String, IClientSession>) httpSession.getAttribute(SESSION_ATTR_CLIENT_SESSION_MAP);
-      if (clientSessionMap == null) {
-        clientSessionMap = new HashMap<String, IClientSession>();
-        httpSession.setAttribute(SESSION_ATTR_CLIENT_SESSION_MAP, clientSessionMap);
-      }
       // Lookup the requested client session
       String clientSessionId = m_currentJsonRequest.getClientSessionId();
       if (clientSessionId == null) {
         throw new IllegalStateException("Missing clientSessionId in JSON request");
       }
-      IClientSession clientSession = clientSessionMap.get(clientSessionId);
+      String clientSessionAttributeName = "scout.htmlui.session.client." + clientSessionId;
+      IClientSession clientSession = (IClientSession) httpSession.getAttribute(clientSessionAttributeName);
       if (clientSession != null) {
         // Found existing client session
         LOG.info("Using cached client session [clientSessionId=" + clientSessionId + "]");
@@ -160,7 +152,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         clientSession = createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
         //FIXME CGU session must be started later, see JsonClientSession
         //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-        clientSessionMap.put(clientSessionId, clientSession);
+        httpSession.setAttribute(clientSessionAttributeName, clientSession);
+        httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
         return clientSession;
       }
       finally {
@@ -191,6 +184,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public void dispose() {
     m_jsonAdapterRegistry.dispose();
     m_currentJsonResponse = null;
+  }
+
+  @Override
+  public String getJsonSessionId() {
+    return m_jsonSessionId;
   }
 
   @Override
@@ -277,25 +275,51 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
-    LOG.info("Terminating JSON session with ID " + m_jsonSessionId + "...");
-
-    //Detach from model
     dispose();
+    LOG.info("JSON session with ID " + m_jsonSessionId + " unbound from HTTP session.");
+  }
 
-    //Dispose model
-    final IClientSession clientSession = getClientSession();
-    if (!clientSession.isActive()) {
-      //client session was probably already stopped by the model itself
-      return;
+  /**
+   * An instance of this class should be added to the HTTP session for each
+   * client session. If the HTTP session is invalidated, this listener is
+   * called and can shutdown the client session model.
+   */
+  private static class P_ClientSessionCleanupHandler implements HttpSessionBindingListener {
+
+    private final String m_clientSessionId;
+    private final IClientSession m_clientSession;
+
+    public P_ClientSessionCleanupHandler(String clientSessionId, IClientSession clientSession) {
+      m_clientSessionId = clientSessionId;
+      m_clientSession = clientSession;
     }
 
-    new ClientSyncJob("Disposing client session", clientSession) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
-      }
-    }.runNow(new NullProgressMonitor());
+    @Override
+    public void valueBound(HttpSessionBindingEvent event) {
+    }
 
-    LOG.info("JSON session with ID " + m_jsonSessionId + " terminated.");
+    @Override
+    public void valueUnbound(HttpSessionBindingEvent event) {
+      LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session...");
+
+      // Dispose model (if session was not already stopped earlier by itself)
+      if (m_clientSession.isActive()) {
+        ClientJob job = new ClientSyncJob("Disposing client session", m_clientSession) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+            m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
+          }
+        };
+        job.runNow(new NullProgressMonitor());
+        try {
+          job.throwOnError();
+        }
+        catch (ProcessingException e) {
+          throw new JsonException(e);
+        }
+      }
+
+      LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
+    }
   }
 }

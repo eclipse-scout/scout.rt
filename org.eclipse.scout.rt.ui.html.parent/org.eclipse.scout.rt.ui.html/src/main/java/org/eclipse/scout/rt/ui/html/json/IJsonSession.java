@@ -20,6 +20,8 @@ public interface IJsonSession {
 
   void dispose();
 
+  String getJsonSessionId();
+
   IClientSession getClientSession();
 
   String createUniqueIdFor(IJsonAdapter<?> adapter);
