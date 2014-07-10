@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import java.util.Date;
-import java.util.List;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 public interface ICalendarUIFacade {
 
@@ -23,10 +21,6 @@ public interface ICalendarUIFacade {
   void fireComponentActionFromUI();
 
   void fireComponentMovedFromUI(CalendarComponent comp, Date newDate);
-
-  List<IMenu> fireComponentPopupFromUI();
-
-  List<IMenu> fireNewPopupFromUI();
 
   void fireReloadFromUI();
 

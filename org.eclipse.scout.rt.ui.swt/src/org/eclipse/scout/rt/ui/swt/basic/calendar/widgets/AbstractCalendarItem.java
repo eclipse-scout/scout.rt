@@ -140,7 +140,7 @@ public abstract class AbstractCalendarItem extends Composite implements PaintLis
           disposeMenuItem(item);
         }
       }
-      m_cell.getCalendar().showItemContextMenu(m_contextMenu, m_item.getItem());
+      m_cell.getCalendar().showContextMenu(m_contextMenu);
 
     }
 

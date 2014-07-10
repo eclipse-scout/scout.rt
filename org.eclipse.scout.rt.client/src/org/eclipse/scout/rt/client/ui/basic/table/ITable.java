@@ -907,6 +907,5 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * @return the invisible root menu container of all table menus.
    */
-
   ITableContextMenu getContextMenu();
 }

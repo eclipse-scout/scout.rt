@@ -78,7 +78,7 @@ public class PageWithTable6Test {
 
   private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
     List<String> actualMenus = new ArrayList<String>();
-    for (IMenu m : ActionUtility.visibleNormalizedActions(table.getContextMenu().getChildActions(), table.getContextMenu().getActiveFilter())) {
+    for (IMenu m : ActionUtility.normalizedActions(table.getContextMenu().getChildActions(), table.getContextMenu().getActiveFilter())) {
       if (m.isEnabled()) {
         actualMenus.add(m.getText());
       }

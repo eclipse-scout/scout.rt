@@ -412,7 +412,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       @Override
       public void run() {
         IContextMenu contextMenu = getScoutObject().getContextMenu();
-        IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(ActivityMapMenuType.Null);
+        IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(ActivityMapMenuType.Selection);
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, filter, false).enqueue();
       }

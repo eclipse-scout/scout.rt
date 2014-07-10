@@ -84,9 +84,11 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     }
   }
 
-  /**
-  *
-  */
+  @Override
+  public void callOwnerValueChanged() {
+    handleOwnerValueChanged();
+  }
+
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
       final List<ITableRow> ownerValue = getOwner().getSelectedRows();

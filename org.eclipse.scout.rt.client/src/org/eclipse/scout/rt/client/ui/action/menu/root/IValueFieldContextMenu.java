@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  *
  */
-public interface IActivityMapContextMenu extends IContextMenu {
+public interface IValueFieldContextMenu extends IFormFieldContextMenu {
 
   @Override
-  IActivityMap<?, ?> getOwner();
+  public IValueField<?> getOwner();
 
   void callOwnerValueChanged();
 }

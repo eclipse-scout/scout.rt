@@ -15,6 +15,6 @@ package org.eclipse.scout.rt.client.ui.action.menu;
  * {@link AbstractMenu#getConfiguredMenuTypes()} method.
  */
 public enum ActivityMapMenuType implements IMenuType {
-  Null,
-  NotNull
+  Selection,
+  Activity
 }

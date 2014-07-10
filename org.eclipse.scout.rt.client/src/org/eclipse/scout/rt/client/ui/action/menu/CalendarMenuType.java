@@ -8,17 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu.root;
-
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
+package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- *
+ * All possible menus types of a activity map menu. This menu types are used of
+ * {@link AbstractMenu#getConfiguredMenuTypes()} method.
  */
-public interface IActivityMapContextMenu extends IContextMenu {
-
-  @Override
-  IActivityMap<?, ?> getOwner();
-
-  void callOwnerValueChanged();
+public enum CalendarMenuType implements IMenuType {
+  EmptySpace,
+  CalendarComponent
 }

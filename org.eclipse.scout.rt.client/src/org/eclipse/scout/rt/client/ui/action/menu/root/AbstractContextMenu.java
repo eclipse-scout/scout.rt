@@ -149,7 +149,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
       @SuppressWarnings("deprecation")
       @Override
       public int visit(IAction action) {
-        if (filter.accept(action) && action instanceof IMenu) {
+        if (action instanceof IMenu && (filter == null || filter.accept(action))) {
           IMenu menu = (IMenu) action;
           menu.aboutToShow();
           menu.prepareAction();

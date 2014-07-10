@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 
 /**
  * Basic interface for all user fields where user inputs a value

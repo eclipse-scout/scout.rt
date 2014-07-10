@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
@@ -101,6 +103,11 @@ public interface ICalendar extends IPropertyObserver {
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
+
+  /**
+   * @since 4.0.0 {@link IContextMenu}
+   */
+  String PROP_CONTEXT_MENU = "contextMenus";
 
   void initCalendar() throws ProcessingException;
 
@@ -276,4 +283,9 @@ public interface ICalendar extends IPropertyObserver {
    * @return An unmodifiable list of all {@link ICalendarItemProvider}s defined for this calendar.
    */
   List<ICalendarItemProvider> getCalendarItemProviders();
+
+  /**
+   * @return the invisible root menu container of all table menus.
+   */
+  ICalendarContextMenu getContextMenu();
 }

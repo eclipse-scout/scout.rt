@@ -10,16 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -72,7 +69,7 @@ public final class SwtMenuUtility {
   }
 
   public static void fillMenu(Menu menu, List<IMenu> childActions, IActionFilter filter, ISwtEnvironment environment, boolean separatorFirstIfHasMenus) {
-    List<IMenu> visibleNormalizedActions = ActionUtility.visibleNormalizedActions(childActions, filter);
+    List<IMenu> visibleNormalizedActions = ActionUtility.normalizedActions(childActions, filter);
     if (separatorFirstIfHasMenus && visibleNormalizedActions.size() > 0) {
       new MenuItem(menu, SWT.SEPARATOR);
     }
@@ -80,39 +77,5 @@ public final class SwtMenuUtility {
       environment.createMenuItem(menu, childMenu, filter);
     }
 
-  }
-
-
-  public static List<IMenu> collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, ISwtEnvironment swtEnvironment) {
-    final List<IMenu> menuList = new LinkedList<IMenu>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        if (emptySpaceActions) {
-          menuList.addAll(calendar.getUIFacade().fireNewPopupFromUI());
-        }
-        if (componentActions) {
-          menuList.addAll(calendar.getUIFacade().fireComponentPopupFromUI());
-        }
-      }
-    };
-
-    JobEx job = swtEnvironment.invokeScoutLater(t, 5000);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      LOG.warn("Exception occured while collecting menus.", ex);
-    }
-
-    return menuList;
-  }
-
-  public static List<IMenu> collectComponentMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
-    return collectMenus(calendar, false, true, swtEnvironment);
-  }
-
-  public static List<IMenu> collectEmptySpaceMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
-    return collectMenus(calendar, true, false, swtEnvironment);
   }
 }

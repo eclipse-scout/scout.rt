@@ -151,7 +151,7 @@ public class SwingPopupWorker implements Runnable {
     }
     IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), m_actionFilter);
 
-    List<? extends IMenu> normalizedMenus = ActionUtility.visibleNormalizedActions(m_scoutMenus, displayFilter);
+    List<? extends IMenu> normalizedMenus = ActionUtility.normalizedActions(m_scoutMenus, displayFilter);
     if (!CollectionUtility.hasElements(normalizedMenus) && m_systemMenuOwner == null) {
       return;
     }
