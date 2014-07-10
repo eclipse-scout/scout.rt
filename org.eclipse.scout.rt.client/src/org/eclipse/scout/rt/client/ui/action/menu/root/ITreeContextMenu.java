@@ -19,4 +19,6 @@ public interface ITreeContextMenu extends IContextMenu {
 
   @Override
   public ITree getOwner();
+
+  void callOwnerValueChanged();
 }

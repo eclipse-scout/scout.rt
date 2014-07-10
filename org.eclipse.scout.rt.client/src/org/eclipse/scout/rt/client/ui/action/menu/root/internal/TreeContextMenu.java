@@ -86,9 +86,11 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     }
   }
 
-  /**
-  *
-  */
+  @Override
+  public void callOwnerValueChanged() {
+    handleOwnerValueChanged();
+  }
+
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
       final Set<ITreeNode> ownerSelection = getOwner().getSelectedNodes();

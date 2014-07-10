@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.client.ui.action.menu.ActivityMapMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
@@ -54,10 +56,10 @@ public final class ActionUtility {
    * @since 3.8.1
    */
   public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes) {
-    return visibleNormalizedActions(actionNodes, createVisibleFilter());
+    return normalizedActions(actionNodes, createVisibleFilter());
   }
 
-  public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes, IActionFilter filter) {
+  public static <T extends IAction> List<T> normalizedActions(List<T> actionNodes, IActionFilter filter) {
     if (actionNodes == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -185,10 +187,22 @@ public final class ActionUtility {
   public static IActionFilter createMenuFilterForActivityMapSelection(ActivityCell<?, ?> selectedCell) {
     final ActivityMapMenuType menuType;
     if (selectedCell == null) {
-      menuType = ActivityMapMenuType.Null;
+      menuType = ActivityMapMenuType.Selection;
     }
     else {
-      menuType = ActivityMapMenuType.NotNull;
+      menuType = ActivityMapMenuType.Activity;
+    }
+    return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuType));
+
+  }
+
+  public static IActionFilter createMenuFilterForCalendarSelection(CalendarComponent selectedComponent) {
+    final CalendarMenuType menuType;
+    if (selectedComponent == null) {
+      menuType = CalendarMenuType.EmptySpace;
+    }
+    else {
+      menuType = CalendarMenuType.CalendarComponent;
     }
     return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuType));
 

@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IValueFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -53,6 +53,11 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
     super.afterChildMenusRemove(childMenusToRemove);
     handleOwnerEnabledChanged();
+  }
+
+  @Override
+  public void callOwnerValueChanged() {
+    handleOwnerValueChanged();
   }
 
   protected void handleOwnerValueChanged() {

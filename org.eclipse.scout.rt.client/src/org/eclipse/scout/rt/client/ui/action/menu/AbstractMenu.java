@@ -70,7 +70,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
     return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
         TreeMenuType.SingleSelection,
-        ValueFieldMenuType.NotNull, ActivityMapMenuType.NotNull);
+        ValueFieldMenuType.NotNull, ActivityMapMenuType.Activity);
   }
 
   /**
@@ -233,16 +233,22 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         menuTypes.add(TableMenuType.SingleSelection);
         menuTypes.add(TreeMenuType.SingleSelection);
         menuTypes.add(ValueFieldMenuType.NotNull);
+        menuTypes.add(ActivityMapMenuType.Activity);
+        menuTypes.add(CalendarMenuType.CalendarComponent);
       }
       if (isMultiSelectionAction()) {
         menuTypes.add(TableMenuType.MultiSelection);
         menuTypes.add(TreeMenuType.MultiSelection);
         menuTypes.add(ValueFieldMenuType.NotNull);
+        menuTypes.add(ActivityMapMenuType.Activity);
+        menuTypes.add(CalendarMenuType.CalendarComponent);
       }
       if (isEmptySpaceAction()) {
         menuTypes.add(TableMenuType.EmptySpace);
         menuTypes.add(TreeMenuType.EmptySpace);
         menuTypes.add(ValueFieldMenuType.Null);
+        menuTypes.add(ActivityMapMenuType.Selection);
+        menuTypes.add(CalendarMenuType.EmptySpace);
       }
       setMenuTypes(menuTypes);
     }

@@ -539,7 +539,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
           disposeMenuItem(item);
         }
       }
-      m_calendar.showGeneralContextMenu(m_contextMenu);
+      m_calendar.showContextMenu(m_contextMenu);
 
     }
 

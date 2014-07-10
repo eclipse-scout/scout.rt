@@ -36,7 +36,7 @@ public class AppendActionsInjector {
 
   @SuppressWarnings("unchecked")
   public void inject(ISwingEnvironment env, JComponent parent, List<? extends IAction> actions, IActionFilter filter) {
-    List<? extends IAction> normalizedActions = ActionUtility.visibleNormalizedActions(actions, filter);
+    List<? extends IAction> normalizedActions = ActionUtility.normalizedActions(actions, filter);
     for (IAction a : normalizedActions) {
       if (a.isSeparator()) {
         if (parent instanceof JPopupMenu) {

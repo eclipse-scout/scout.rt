@@ -63,7 +63,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
 
-//  // internal usage of menus temporarily added to the tree.
+  // internal usage of menus temporarily added to the tree.
   private List<IMenu> m_inheritedMenusOfPage;
 
   public AbstractOutline() {

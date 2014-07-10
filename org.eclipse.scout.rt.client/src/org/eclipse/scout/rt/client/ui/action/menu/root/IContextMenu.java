@@ -41,4 +41,5 @@ public interface IContextMenu extends IMenu {
   void removeContextMenuListener(ContextMenuListener listener);
 
   void callAboutToShow(IActionFilter filter);
+
 }

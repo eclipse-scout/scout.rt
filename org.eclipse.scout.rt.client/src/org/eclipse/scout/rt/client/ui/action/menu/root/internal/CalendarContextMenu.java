@@ -21,22 +21,22 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * The invisible root menu node of any activity map. (internal usage only)
+ * The invisible root menu node of any calendar. (internal usage only)
  */
-public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<IActivityMap<?, ?>> implements IActivityMapContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActivityMapContextMenu.class);
+public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICalendar> implements ICalendarContextMenu {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CalendarContextMenu.class);
 
   /**
    * @param owner
    */
-  public ActivityMapContextMenu(IActivityMap<?, ?> owner, List<? extends IMenu> initialChildMenus) {
+  public CalendarContextMenu(ICalendar owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
 
@@ -44,7 +44,7 @@ public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForActivityMapSelection(getOwner().getSelectedActivityCell()));
+    setActiveFilter(ActionUtility.createMenuFilterForCalendarSelection(getOwner().getSelectedComponent()));
     calculateLocalVisibility();
   }
 
@@ -53,9 +53,12 @@ public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<
     handleOwnerValueChanged();
   }
 
+  /**
+  *
+  */
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
-      final ActivityCell<?, ?> ownerValue = getOwner().getSelectedActivityCell();
+      final CalendarComponent ownerValue = getOwner().getSelectedComponent();
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {
@@ -72,20 +75,16 @@ public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForActivityMapSelection(ownerValue));
+      setActiveFilter(ActionUtility.createMenuFilterForCalendarSelection(ownerValue));
       calculateLocalVisibility();
     }
   }
 
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    if (IActivityMap.PROP_SELECTED_ACTIVITY_CELL.equals(evt.getPropertyName())) {
+    if (ICalendar.PROP_SELECTED_COMPONENT.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
-    else if (IActivityMap.PROP_SELECTED_RESOURCE_IDS.equals(evt.getPropertyName())) {
-      handleOwnerValueChanged();
-    }
-
   }
 
 }

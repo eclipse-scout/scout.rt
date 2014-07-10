@@ -414,15 +414,9 @@ public class SwtCalendar extends Composite implements PaintListener {
    * do nothing in the JCalendar version, needs to be overriden to do smth
    * e.g. in SWTScoutCalendar
    */
-  public void showGeneralContextMenu(Menu manager) {
+  public void showContextMenu(Menu manager) {
   }
 
-  /**
-   * do nothing in the JCalendar version, needs to be overriden to do smth
-   * e.g. in SWTScoutCalendar
-   */
-  public void showItemContextMenu(Menu manager, Object item) {
-  }
 
   @Override
   public void paintControl(PaintEvent e) {

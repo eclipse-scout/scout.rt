@@ -39,13 +39,13 @@ public class ViewAreaLayout extends Layout {
   private EventListenerList m_eventListeners;
   private int m_sashWidth;
 
+  public ViewAreaLayout() {
+    this(3);
+  }
+
   public ViewAreaLayout(int sashWidth) {
     m_eventListeners = new EventListenerList();
     m_sashWidth = sashWidth;
-  }
-
-  public ViewAreaLayout() {
-    this(3);
   }
 
   public void addLayoutListener(ILayoutListener listener) {

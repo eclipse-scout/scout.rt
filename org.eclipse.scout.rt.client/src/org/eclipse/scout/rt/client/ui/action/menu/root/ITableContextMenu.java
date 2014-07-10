@@ -19,4 +19,6 @@ public interface ITableContextMenu extends IContextMenu {
 
   @Override
   public ITable getOwner();
+
+  void callOwnerValueChanged();
 }

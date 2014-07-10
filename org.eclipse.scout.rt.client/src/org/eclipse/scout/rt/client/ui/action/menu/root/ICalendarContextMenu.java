@@ -8,16 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 
 /**
- *
+ * The table menu container is the invisible root container for all context menus on a table.
  */
-public interface IValueFieldContextMenu extends IFormFieldContextMenu {
+public interface ICalendarContextMenu extends IContextMenu {
 
   @Override
-  public IValueField<?> getOwner();
+  public ICalendar getOwner();
+
+  void callOwnerValueChanged();
 }
