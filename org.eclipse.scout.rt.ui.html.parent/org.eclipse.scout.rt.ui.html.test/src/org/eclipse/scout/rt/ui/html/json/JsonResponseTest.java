@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.jsonn;
+package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.List;
 

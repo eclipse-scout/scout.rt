@@ -284,7 +284,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * client session. If the HTTP session is invalidated, this listener is
    * called and can shutdown the client session model.
    */
-  private static class P_ClientSessionCleanupHandler implements HttpSessionBindingListener {
+  protected static class P_ClientSessionCleanupHandler implements HttpSessionBindingListener {
 
     private final String m_clientSessionId;
     private final IClientSession m_clientSession;
