@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.eclipse.scout.rt.ui.html.Activator;
 import org.json.JSONObject;
 
 public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {

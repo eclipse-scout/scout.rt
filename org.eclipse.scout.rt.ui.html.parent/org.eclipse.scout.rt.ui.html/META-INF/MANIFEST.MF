@@ -33,4 +33,4 @@ Export-Package: org.eclipse.scout.rt.ui.html,
  org.eclipse.scout.rt.ui.html.json.table,
  org.eclipse.scout.rt.ui.html.json.table.control,
  org.eclipse.scout.rt.ui.html.json.tree
-Bundle-Activator: org.eclipse.scout.rt.ui.html.json.Activator
+Bundle-Activator: org.eclipse.scout.rt.ui.html.Activator

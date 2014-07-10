@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
+import org.eclipse.scout.rt.ui.html.Activator;
 import org.json.JSONException;
 import org.json.JSONObject;
 

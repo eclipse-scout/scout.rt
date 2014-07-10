@@ -1,22 +1,16 @@
-package org.eclipse.scout.rt.ui.html.json;
+package org.eclipse.scout.rt.ui.html;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-/**
- * The activator class controls the plug-in life cycle
- */
 public class Activator extends Plugin {
 
   // The plug-in ID
-  public static final String PLUGIN_ID = "com.bsiag.widgets.client";
+  public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.html";
 
   // The shared instance
   private static Activator plugin;
 
-  /**
-   * The constructor
-   */
   public Activator() {
   }
 
@@ -48,5 +42,4 @@ public class Activator extends Plugin {
   public static Activator getDefault() {
     return plugin;
   }
-
 }
