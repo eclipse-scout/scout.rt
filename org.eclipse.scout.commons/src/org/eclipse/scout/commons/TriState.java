@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons;
+
+import java.io.ObjectStreamException;
 
 /**
  * A TriState is a Boolean value with three states: {@value TriState#TRUE}, {@value TriState#FALSE} and
@@ -44,6 +46,9 @@ public final class TriState implements java.io.Serializable, Comparable<TriState
   public static TriState parseTriState(Object value) {
     if (value == null) {
       return UNDEFINED;
+    }
+    else if (value instanceof TriState) {
+      return (TriState) value;
     }
     else if (value instanceof Boolean) {
       if ((Boolean) value) {
@@ -110,6 +115,14 @@ public final class TriState implements java.io.Serializable, Comparable<TriState
     return (value != null ? (value ? 1 : 0) : null);
   }
 
+  public boolean isTrue() {
+    return value != null && value.booleanValue();
+  }
+
+  public boolean isFalse() {
+    return value != null && !value.booleanValue();
+  }
+
   public boolean isUndefined() {
     return value == null;
   }
@@ -154,4 +167,15 @@ public final class TriState implements java.io.Serializable, Comparable<TriState
     Integer b = (t.value != null ? (t.value ? 1 : 0) : 2);
     return a.compareTo(b);
   }
+
+  private Object readResolve() throws ObjectStreamException {
+    if (value == null) {
+      return UNDEFINED;
+    }
+    if (value.booleanValue()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
