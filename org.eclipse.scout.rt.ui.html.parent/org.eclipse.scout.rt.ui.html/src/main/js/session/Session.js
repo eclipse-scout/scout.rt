@@ -21,17 +21,12 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
 
   // Determine clientSessionId
   var url = new scout.URL();
-  this._clientSessionId = url.getParameter('clientSessionId') || 1;
-  var maxClientSessionId = localStorage.getItem('scout:maxClientSessionId'); // FIXME BSH Namespaces?
-  if (typeof url.getParameter('newSession') !== 'undefined') {
-    // Assign new clientSessionId
-    this._clientSessionId = +(maxClientSessionId || this._clientSessionId) + 1;
-    // Update URL in address bar (HTML 5 history)
-    url.removeParameter('newSession').removeParameter('clientSessionId');
-    url.addParameter('clientSessionId', this._clientSessionId);
-    history.replaceState({}, '', url.toString());
+  var clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+  if (!clientSessionId) {
+    clientSessionId = scout.numberToBase62(scout.getTimestamp());
+    sessionStorage.setItem('scout:clientSessionId', clientSessionId);
   }
-  localStorage.setItem('scout:maxClientSessionId', Math.max(maxClientSessionId, this._clientSessionId));
+  this._clientSessionId = clientSessionId;
 
   // FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
