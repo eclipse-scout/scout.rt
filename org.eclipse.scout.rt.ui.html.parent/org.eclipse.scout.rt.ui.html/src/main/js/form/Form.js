@@ -17,6 +17,14 @@ scout.Form.prototype._render = function($parent) {
 
   var closeable = false;
   var detachable = true; // FIXME How to determine 'detachable' property?
+  if (window.scout.sessions.length > 1 || this.session.parentJsonSession) {
+    // Cannot detach if...
+    // 1. there is more than one session inside the window (portlets), because
+    //    we would not know which session to attach to.
+    // 2. the window is already a child window (cannot detatch further).
+    detachable = false;
+  }
+
   var systemButtons = this.rootGroupBox.getSystemButtons();
   if (systemButtons) {
     // TODO AWE: CSS for button-bar / position / visible
@@ -52,8 +60,14 @@ scout.Form.prototype._render = function($parent) {
         // FIXME BSH Set correct url or write content
         //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
         //        w.document.close(); //finish "loading" the page
-        var w = scout.openWindow(window.location.href, 'scout:form:' + that.id, 800, 600);
-        w.parentScout = window.scout;
+        var childWindow = scout.openWindow(window.location.href, 'scout:form:' + that.id, 800, 600);
+        $(childWindow).one('load', function() {
+          // Cannot call this directly, because we get an unload event right after that (and
+          // would therefore unregister the window again). This is because the browser starts
+          // with the 'about:blank' page. Opening the desired URL causes the blank page to unload.
+          // Therefore, we wait until the target page was loaded.
+          that.session.registerChildWindow(childWindow);
+        });
       });
     }
     this.$container.addClass('dialog-form');

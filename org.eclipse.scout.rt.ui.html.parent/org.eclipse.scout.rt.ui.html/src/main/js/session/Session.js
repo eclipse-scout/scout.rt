@@ -7,7 +7,9 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
   this.$entryPoint = $entryPoint;
   this._asyncEvents = [];
   this._asyncRequestQueued;
-  this._jsonSessionId = jsonSessionId;
+  this.jsonSessionId = jsonSessionId;
+  this.parentJsonSession; // FIXME BSH Improve this
+  this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
   this._unload;
@@ -26,6 +28,19 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
     sessionStorage.setItem('scout:clientSessionId', clientSessionId);
   }
   this._clientSessionId = clientSessionId;
+
+  // FIXME BSH Improve this
+  // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
+  if (window.opener && window.opener.scout && window.opener.scout.sessions) {
+    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
+    if (window.opener.scout.sessions.length > 1) {
+      window.close();
+      throw 'Too many scout sessions';
+    }
+    var parentJsonSession = window.opener.scout.sessions[0];
+    parentJsonSession.registerChildWindow(window);
+    this.parentJsonSession = parentJsonSession;
+  }
 
   // FIXME do we really want to have multiple requests pending?
   this._requestsPendingCounter = 0;
@@ -108,7 +123,7 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
-    jsonSessionId: this._jsonSessionId,
+    jsonSessionId: this.jsonSessionId,
     events: events,
   };
 
@@ -123,6 +138,9 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   }
   if (this._unload) {
     request.unload = true;
+  }
+  if (this.parentJsonSession) {
+    request.parentJsonSessionId = this.parentJsonSession.jsonSessionId;
   }
 
   this._sendRequest(request);
@@ -284,10 +302,21 @@ scout.Session.prototype._processEvents = function(events) {
 scout.Session.prototype.init = function() {
   this._startup = true;
   this._sendNow();
+  // Ask if child windows should be closed as well
+  $(window).on('beforeunload', function() {
+    if (this._childWindows.length > 0) {
+      return 'There are windows in DETACHED state.'; // FIXME BSH Text
+    }
+  }.bind(this));
   // Destroy json session on server when page is closed or reloaded
   $(window).on('unload', function() {
+    // Destroy JSON session on server
     this._unload = true;
     this._sendNow();
+    // If child windows are open, they have to be closed as well
+    this._childWindows.forEach(function(childWindow) {
+      childWindow.close();
+    });
   }.bind(this));
 };
 
@@ -300,4 +329,21 @@ scout.Session.prototype.onModelAction = function(event) {
     this.desktop = this.objectFactory.create(event.clientSession.desktop);
     this.desktop.render(this.$entryPoint);
   }
+};
+
+scout.Session.prototype.registerChildWindow = function(childWindow) {
+  if (!childWindow) {
+    throw 'Missing argument "childWindow"';
+  }
+
+  // Add to list of open child windows
+  this._childWindows.push(childWindow);
+
+  // When the child window is closed, remove it again from the list
+  $(childWindow).on('unload', function() {
+    var i = this._childWindows.indexOf(childWindow);
+    if (i > -1) {
+      this._childWindows.splice(i, 1);
+    }
+  }.bind(this));
 };

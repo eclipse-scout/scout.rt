@@ -1,5 +1,6 @@
 scout.init = function(userAgent, objectFactories) {
   var tabId = '' + new Date().getTime();
+  window.scout.sessions = []; // FIXME BSH Needed for detaching windows, but can we do this better???
   $('.scout').each(function() {
     var portletPartId = $(this).data('partid') || '0';
     var jsonSessionId = [portletPartId, tabId].join(':');
@@ -9,6 +10,7 @@ scout.init = function(userAgent, objectFactories) {
       objectFactories = scout.defaultObjectFactories;
     }
     session.objectFactory.register(objectFactories);
+    window.scout.sessions.push(session);
   });
 };
 
