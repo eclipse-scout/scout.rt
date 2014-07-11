@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
-import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 
-public class JsonChartTableControl extends JsonTableControl {
+public class JsonChartTableControl extends JsonTableControl<IChartTableControl> {
 
-  public JsonChartTableControl(ITableControl model, IJsonSession jsonSession, String id) {
+  public JsonChartTableControl(IChartTableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
@@ -23,5 +23,4 @@ public class JsonChartTableControl extends JsonTableControl {
   public String getObjectType() {
     return "ChartTableControl";
   }
-
 }
