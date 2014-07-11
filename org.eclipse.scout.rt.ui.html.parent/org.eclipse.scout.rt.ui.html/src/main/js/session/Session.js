@@ -20,7 +20,6 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
   this.objectFactory = new scout.ObjectFactory(this);
 
   // Determine clientSessionId
-  var url = new scout.URL();
   var clientSessionId = sessionStorage.getItem('scout:clientSessionId');
   if (!clientSessionId) {
     clientSessionId = scout.numberToBase62(scout.getTimestamp());
