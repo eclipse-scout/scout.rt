@@ -108,9 +108,9 @@ scout.BaseDesktop.prototype.onMenusUpdated = function(group, menus) {
 };
 
 scout.BaseDesktop.prototype.addForm = function(form) {
-  if (form.displayHint == "view") {
+  if (form.displayHint == 'view') {
     form.render(this._resolveViewContainer(form));
-  } else if (form.displayHint == "dialog") {
+  } else if (form.displayHint == 'dialog') {
     var previousModalForm;
     if (form.modal) {
       if (this.modalDialogStack.length > 0) {
@@ -130,7 +130,7 @@ scout.BaseDesktop.prototype.addForm = function(form) {
       this.taskbar.formAdded(form);
     }
   } else {
-    $.log("Form displayHint not handled: '" + form.displayHint + "'.");
+    $.log('Form displayHint not handled: ' + form.displayHint + '.');
   }
 };
 
@@ -141,7 +141,7 @@ scout.BaseDesktop.prototype.removeForm = function(form) {
 
   form.remove();
 
-  if (form.displayHint === "dialog") {
+  if (form.displayHint === 'dialog') {
     var previousModalForm;
     if (form.modal) {
       scout.arrays.remove(this.modalDialogStack, form);
@@ -171,7 +171,7 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
     return;
   }
 
-  if (form.displayHint === "dialog") {
+  if (form.displayHint === 'dialog') {
     if (!form.isRendered()) {
       form.render(this.$parent);
     }
@@ -188,7 +188,7 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
 
 scout.BaseDesktop.prototype.minimizeForm = function(form) {
   //FIXME CGU minimize maximize sind properties auf form, können auch vom modell gesteuert werden -> Steuerung eher über form.setMaximized
-  if (form.displayHint !== "dialog") {
+  if (form.displayHint !== 'dialog') {
     return;
   }
 
@@ -209,7 +209,7 @@ scout.BaseDesktop.prototype.activateTopDialog = function() {
 };
 
 scout.BaseDesktop.prototype.maximizeForm = function(form) {
-  if (form.displayHint !== "dialog") {
+  if (form.displayHint !== 'dialog') {
     return;
   }
 
@@ -230,6 +230,6 @@ scout.BaseDesktop.prototype.onModelAction = function(event) {
     form = this.updateModelAdapters(this.forms, event.form, this);
     this.activateForm(form);
   } else {
-    $.log("Model event not handled. Widget: Desktop. Event: " + event.type_ + ".");
+    $.log('Model event not handled. Widget: Desktop. Event: ' + event.type_ + '.');
   }
 };

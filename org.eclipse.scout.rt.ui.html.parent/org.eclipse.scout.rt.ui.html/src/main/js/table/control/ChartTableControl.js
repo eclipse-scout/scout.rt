@@ -460,7 +460,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
     // circle for surrounding text, hehe: svg ;)
     $chartMain.appendSVG('path', 'ArcAxis', 'main-axis')
       .attr('fill', 'none')
-      .attr("d", "M 450 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220");
+      .attr('d', 'M 450 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220');
 
     var startAngle = 0,
       endAngle;

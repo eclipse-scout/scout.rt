@@ -1,6 +1,6 @@
 scout.UserAgent = function(deviceType) {
   if (!deviceType) {
-    throw "deviceType needs to be defined";
+    throw 'deviceType needs to be defined';
   }
   this.deviceType = deviceType;
 };

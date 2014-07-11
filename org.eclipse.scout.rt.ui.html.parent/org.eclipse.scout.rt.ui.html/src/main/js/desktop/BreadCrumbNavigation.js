@@ -59,7 +59,7 @@ scout.BreadCrumbNavigation.prototype._addBreadCrumbForm = function(form) {
   function onClick() {
     var formId = $(this).data('formId');
     that.session.send('activate', that.id, {
-      "formId": formId
+      'formId': formId
     });
   }
 };
@@ -72,6 +72,6 @@ scout.BreadCrumbNavigation.prototype.onModelAction = function(event) {
     this.$scrollContainer.empty();
     this._renderBreadCrumbs();
   } else {
-    $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
+    $.log('Model event not handled. Widget: Form. Event: ' + event.type_ + '.');
   }
 };

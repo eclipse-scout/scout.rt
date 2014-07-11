@@ -66,7 +66,7 @@ var jasmineScoutMatchers = {
         }
 
         if (!result.pass) {
-          result.message = "Expected actual events " + actualEvents + " to be equal to " + expected;
+          result.message = 'Expected actual events ' + actualEvents + ' to be equal to ' + expected;
         }
         return result;
       }
@@ -97,7 +97,7 @@ var jasmineScoutMatchers = {
         result.pass = util.equals(actualEventTypes, expected, customEqualityTesters);
 
         if (!result.pass) {
-          result.message = "Expected actual event types " + actualEventTypes + " to be equal to " + expected;
+          result.message = 'Expected actual event types ' + actualEventTypes + ' to be equal to ' + expected;
         }
         return result;
       }

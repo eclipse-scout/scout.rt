@@ -53,11 +53,11 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 
     if (that.mouseMoveSelectionEnabled) {
       // ...or movement with held mouse button
-      $(".table-row").one("mousemove.selectionHandler", function(event) {
+      $('.table-row').one('mousemove.selectionHandler', function(event) {
         selectData(event);
       });
     }
-    $(".table-row").one("mouseup.selectionHandler", function(event) {
+    $('.table-row').one('mouseup.selectionHandler', function(event) {
       onMouseUp(event);
     });
 
@@ -90,7 +90,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     }
 
     function onMouseUp(event) {
-      $(".table-row").off(".selectionHandler");
+      $('.table-row').off('.selectionHandler');
 
       that.table.onRowsSelected($selectedRows);
     }

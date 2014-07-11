@@ -33,8 +33,9 @@ scout.Reconnector.prototype.ping = function() {
 
   $.ajax({
     async: true,
-    type: "POST",
-    dataType: "json",
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json',
     cache: false,
     url: this.session.url,
     data: JSON.stringify(request),

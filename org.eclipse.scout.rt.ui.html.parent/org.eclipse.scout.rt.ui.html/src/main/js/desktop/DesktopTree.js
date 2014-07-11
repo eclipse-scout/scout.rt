@@ -131,7 +131,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
     return;
   }
   if ($node.length === 0) {
-    throw "$node must be set.";
+    throw '$node must be set.';
   }
   if (!$node.hasClass('can-expand') || $node.data('expanding') || expanded == $node.hasClass('expanded')) {
     return true;
@@ -139,8 +139,8 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
 
   if (!this.session.processingEvents) {
     this.session.send('nodeExpanded', this.id, {
-      "nodeId": node.id,
-      "expanded": expanded
+      'nodeId': node.id,
+      'expanded': expanded
     });
   }
 
@@ -166,7 +166,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
     if ($node.hasClass('can-expand') && !$node.hasClass('expanded')) {
       var $newNodes = $node.nextUntil(
         function() {
-          return $(this).attr("data-level") <= level;
+          return $(this).attr('data-level') <= level;
         }
       );
       if ($newNodes.length) {
@@ -200,7 +200,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
 
     // animated closing ;)
     $node.nextUntil(function() {
-      return $(this).attr("data-level") <= level;
+      return $(this).attr('data-level') <= level;
     })
       .wrapAll('<div id="TreeItemAnimate"></div>)');
     $('#TreeItemAnimate').animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar), 200);
@@ -219,7 +219,7 @@ scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
     $node = this._findNodeById(nodeId);
     node = this._nodeMap[nodeId];
     if (node === undefined) {
-      throw "No node found for id " + nodeId;
+      throw 'No node found for id ' + nodeId;
     }
   }
 
@@ -234,7 +234,7 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
     return;
   }
   if ($node.length === 0) {
-    throw "$node must be set.";
+    throw '$node must be set.';
   }
   this._selectedNodes = [node];
   if ($node.isSelected()) {
@@ -248,7 +248,7 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
 
   if (!this.session.processingEvents) {
     this.session.send('nodesSelected', this.id, {
-      "nodeIds": [node.id]
+      'nodeIds': [node.id]
     });
   }
 };
@@ -264,7 +264,7 @@ scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
   parentNode = this._nodeMap[parentNodeId];
   if (parentNode === undefined) {
-    throw "No parentNode found for id " + parentNodeId;
+    throw 'No parentNode found for id ' + parentNodeId;
   }
 
   //update parent with new child nodes
@@ -334,7 +334,7 @@ scout.DesktopTree.prototype._onNodeClicked = function(event) {
     node = this._nodeMap[nodeId];
 
   this.session.send('nodeClicked', this.id, {
-    "nodeId": nodeId
+    'nodeId': nodeId
   });
 
   this._setNodeSelected(node, $clicked);
@@ -384,7 +384,7 @@ scout.DesktopTree.prototype._updateBreadCrumb = function() {
   // find all parents
   var $start = $selected.next();
   while ($start.length > 0) {
-    var l = parseFloat($start.attr("data-level"));
+    var l = parseFloat($start.attr('data-level'));
     if (l === level + 1) {
       $start.addClass('bread-children');
     } else if (l === level) {
@@ -396,7 +396,7 @@ scout.DesktopTree.prototype._updateBreadCrumb = function() {
   // find direct children
   $start = $selected.prev();
   while ($start.length > 0) {
-    var k = $start.attr("data-level");
+    var k = $start.attr('data-level');
     if (k < level) {
       $start.addClass('bread-parent');
       level = k;
@@ -452,7 +452,7 @@ scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeDetailFormChanged(event.nodeId, event.detailForm);
   }
   else {
-    $.log("Model event not handled. Widget: DesktopTree. Event: " + event.type_ + ".");
+    $.log('Model event not handled. Widget: DesktopTree. Event: ' + event.type_ + '.');
   }
 };
 

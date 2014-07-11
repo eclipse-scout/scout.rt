@@ -39,18 +39,18 @@ scout.MobileTable.prototype._drawData = function(startRow) {
  */
 scout.MobileTable.prototype._buildRowDiv = function(row, index) {
   var rowClass,
-    cellContent = "",
+    cellContent = '',
     columns = this.columns,
     numColumnsUsed = 0,
     table = this.model,
-    column, value, headerText = "";
+    column, value, headerText = '';
 
   for (var c = 0; c < row.cells.length; c++) {
     column = this.columns[c];
     value = this.getText(c, index);
 
     if (c === 0) {
-      cellContent += "<p>";
+      cellContent += '<p>';
     }
 
     if (this._headerColumns.indexOf(column) >= 0) {
@@ -58,7 +58,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
       numColumnsUsed++;
     } else {
       if (this._isColumnNameNecessary(columns[c])) {
-        cellContent += columns[c].text + ": ";
+        cellContent += columns[c].text + ': ';
       }
       cellContent += value;
       numColumnsUsed++;
@@ -68,7 +68,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
     }
 
     if (c === row.cells.length - 1) {
-      cellContent += "</p>";
+      cellContent += '</p>';
     }
   }
   if (headerText) {

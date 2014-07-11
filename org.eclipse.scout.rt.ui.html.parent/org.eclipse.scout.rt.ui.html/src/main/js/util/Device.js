@@ -31,7 +31,8 @@ scout.Device.prototype.supportsCssAnimation = function() {
   return this.features.cssAnimation;
 
   function check() {
-    var i, element = document.createElement("div");
+    var i;
+    var element = document.createElement('div');
     if (element.style.animation !== undefined) {
       return true;
     }

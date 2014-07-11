@@ -102,6 +102,6 @@ scout.Form.prototype.onModelAction = function(event) {
   if (event.type_ == 'formClosed') {
     this.destroy();
   } else {
-    $.log("Model event not handled. Widget: Form. Event: " + event.type_ + ".");
+    $.log('Model event not handled. Widget: Form. Event: ' + event.type_ + '.');
   }
 };

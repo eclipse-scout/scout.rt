@@ -143,7 +143,7 @@ scout.getTimestamp = function() {
     if ((s + '').length >= padding) {
       return s;
     }
-    var z = new Array(padding + 1).join("0") + s;
+    var z = new Array(padding + 1).join('0') + s;
     return z.slice(-padding);
   };
   var date = new Date();

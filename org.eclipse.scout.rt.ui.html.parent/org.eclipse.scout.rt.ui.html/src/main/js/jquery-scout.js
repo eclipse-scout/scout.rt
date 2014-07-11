@@ -36,13 +36,11 @@
    * from http://api.jquery.com/jquery.getscript/
    */
   $.getCachedScript = function(url, options) {
-
     options = $.extend(options || {}, {
-      dataType: "script",
+      dataType: 'script',
       cache: true,
       url: url
     });
-
     return jQuery.ajax(options);
   };
 
@@ -70,7 +68,7 @@
 
   // append svg
   $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
-    var $svgElement = $(document.createElementNS("http://www.w3.org/2000/svg", type));
+    var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
     if (id) {
       $svgElement.attr('id', id);
     }

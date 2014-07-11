@@ -20,10 +20,10 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
 scout.ModelAdapter.prototype.render = function($parent) {
   if (this.isRendered()) {
-    throw "Already rendered";
+    throw 'Already rendered';
   }
   if (this.destroyed) {
-    throw "Object is destroyed";
+    throw 'Object is destroyed';
   }
   this._render($parent);
   this._callSetters();

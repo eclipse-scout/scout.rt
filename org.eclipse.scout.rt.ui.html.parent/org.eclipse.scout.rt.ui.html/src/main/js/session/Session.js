@@ -53,7 +53,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
     return;
   }
   if (!parent) {
-    throw "parent needs to be set";
+    throw 'parent needs to be set';
   }
 
   var adapter = this.modelAdapterRegistry[model.id];
@@ -139,9 +139,9 @@ scout.Session.prototype._sendRequest = function(request) {
   this._requestsPendingCounter++;
   $.ajax({
     async: true,
-    type: "POST",
-    dataType: "json",
-    contentType: "application/json",
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json',
     cache: false,
     url: this.url,
     data: JSON.stringify(request),
@@ -271,7 +271,7 @@ scout.Session.prototype._processEvents = function(events) {
 
     var widget = session.modelAdapterRegistry[event.id];
     if (!widget) {
-      throw "No widget found for id " + event.id;
+      throw 'No widget found for id ' + event.id;
     }
 
     if (event.type_ == 'property') {

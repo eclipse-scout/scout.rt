@@ -13,8 +13,8 @@ scout.Scrollbar = function($parent, axis) {
   this.axis = axis;
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
-  this._dim = (axis === "x" ? "Width" : "Height");
-  this._dir = (axis === "x" ? "left" : "top");
+  this._dim = (axis === 'x' ? 'Width' : 'Height');
+  this._dir = (axis === 'x' ? 'left' : 'top');
 
   var begin = 0,
     that = this;
@@ -37,7 +37,7 @@ scout.Scrollbar = function($parent, axis) {
   }
 
   function scrollStart(event) {
-    begin = (axis === "x" ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    begin = (axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._$thumb.addClass('scrollbar-thumb-move');
     $(document).on('mousemove', scrollEnd)
       .one('mouseup', scrollExit);
@@ -46,13 +46,13 @@ scout.Scrollbar = function($parent, axis) {
 
   function scrollEnd(event) {
     begin = begin === 0 ? that._beginDefault : begin;
-    var end = (axis === "x" ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    var end = (axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._setThumb(end - begin);
   }
 
   function scrollExit() {
     that._$thumb.removeClass('scrollbar-thumb-move');
-    $(document).off("mousemove");
+    $(document).off('mousemove');
     return false;
   }
 };
@@ -80,8 +80,8 @@ scout.Scrollbar.prototype.initThumb = function() {
  * do not use this internal method
  */
 scout.Scrollbar.prototype._initThumbImpl = function() {
-  this._offset = this._$parent[0]["offset" + this._dim];
-  this._scroll = this._$parent[0]["scroll" + this._dim];
+  this._offset = this._$parent[0]['offset' + this._dim];
+  this._scroll = this._$parent[0]['scroll' + this._dim];
 
   var margin = parseFloat(this._$scrollbar.css('margin-top')),
     topContainer = parseFloat(this._$parent.css(this._dir));

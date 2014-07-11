@@ -45,12 +45,12 @@ scout.TableFooter = function(table, $parent, session) {
   });
 
   // control buttons have mouse over effects
-  $("body").on("mouseenter", "#control_graph, #control_chart, #control_map",
+  $('body').on('mouseenter', '#control_graph, #control_chart, #control_map',
     function() {
       $('#control_label').text($(this).data('label'));
     });
 
-  $("body").on("mouseleave", "#control_graph, #control_chart, #control_map",
+  $('body').on('mouseleave', '#control_graph, #control_chart, #control_map',
     function() {
       $('#control_label').text('');
     });

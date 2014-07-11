@@ -320,7 +320,7 @@ scout.Table.prototype._drawData = function(startRow) {
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
     that.session.send(scout.Table.EVENT_ROW_CLICKED, that.id, {
-      "rowId": $row.attr('id')
+      'rowId': $row.attr('id')
     });
   }
 
@@ -377,7 +377,7 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 
     if (!this.session.processingEvents) {
       this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
-        "rowIds": rowIds
+        'rowIds': rowIds
       });
     }
   }
@@ -385,7 +385,7 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 
 scout.Table.prototype.sendRowAction = function($row) {
   this.session.send(scout.Table.EVENT_ROW_ACTION, this.id, {
-    "rowId": $row.attr('id')
+    'rowId': $row.attr('id')
   });
 };
 
@@ -587,7 +587,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 
   if (!this.session.processingEvents) {
     this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
-      "rowIds": rowIds
+      'rowIds': rowIds
     });
   }
 };
@@ -852,7 +852,7 @@ scout.Table.prototype.onModelAction = function(event) {
   } else if (event.type_ == scout.Table.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
   } else {
-    $.log("Model event not handled. Widget: scout.Table. Event: " + event.type_ + ".");
+    $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type_ + '.');
   }
 };
 

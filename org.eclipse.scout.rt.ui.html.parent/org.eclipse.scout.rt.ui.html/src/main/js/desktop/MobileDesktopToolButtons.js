@@ -40,8 +40,8 @@ scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
 scout.MobileDesktopToolButtons.prototype.open = function($tool) {
   $('.tool-open').animateAVCSD('height', 0, $.removeThis, null, 500);
 
-  if ($tool.hasClass("selected")) {
-    $tool.removeClass("selected");
+  if ($tool.hasClass('selected')) {
+    $tool.removeClass('selected');
   } else {
     $tool.selectOne();
     $('#DesktopTools').beforeDiv('', 'tool-open')

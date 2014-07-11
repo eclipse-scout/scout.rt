@@ -26,8 +26,8 @@ scout.DesktopViewButtonBar = function(desktop, $parent, viewButtons) {
     var c = name.length > 1 ? parseInt(name[1], 0) + 1 : 2;
     //TODO widget id?
     var dummyModel = {
-      "id": 'ownView' + c,
-      "text": name[0] + ' (' + c + ')'
+      'id': 'ownView' + c,
+      'text': name[0] + ' (' + c + ')'
     }, buttonOwn;
     buttonOwn = new scout.DesktopViewButtonOwn($desktopView);
     buttonOwn.init(dummyModel, that.session);
