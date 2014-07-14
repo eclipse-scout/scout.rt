@@ -145,6 +145,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   protected void initializeSwing() {
     m_htmlViewCache = new HtmlViewCache();
     JTableEx table = new P_SwingTable();
+    table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     m_swingScrollPane = new JScrollPaneEx(table);
     m_swingScrollPane.setBackground(table.getBackground());
     setSwingField(table);
@@ -1660,7 +1661,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

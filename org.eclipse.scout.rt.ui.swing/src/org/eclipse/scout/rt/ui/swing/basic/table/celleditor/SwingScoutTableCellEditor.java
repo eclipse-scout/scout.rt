@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010, 2014 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,18 +12,16 @@ package org.eclipse.scout.rt.ui.swing.basic.table.celleditor;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.DefaultFocusTraversalPolicy;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,13 +64,12 @@ public class SwingScoutTableCellEditor {
    */
   public static final String TABLE_CELL_INSETS = SwingScoutTableCellEditor.class.getName() + "#insets";
 
-  private ISwingScoutTable m_tableComposite;
-  private FocusTraversalPolicy m_focusTraversalPolicy;
-  private TableCellEditor m_cellEditor;
+  private final ISwingScoutTable m_tableComposite;
+  private final FocusTraversalPolicy m_focusTraversalPolicy;
+  private final TableCellEditor m_cellEditor;
 
-  private boolean m_tableIsEditingAndContainsFocus;
+  private final CellEditorListener m_cellEditorListener;
   private ISwingScoutComposite<? extends IFormField> m_cachedSwingEditor;
-  private CellEditorListener m_cellEditorListener;
   private P_SwingInputVerifyListener m_verifyListener;
 
   public SwingScoutTableCellEditor(ISwingScoutTable tableComposite) {
@@ -337,7 +334,6 @@ public class SwingScoutTableCellEditor {
   }
 
   protected synchronized void saveEditorFromSwing() {
-    m_tableIsEditingAndContainsFocus = false;
     if (m_cachedSwingEditor != null) {
       clearCachedSwingEditor();
       Runnable t = new Runnable() {
@@ -364,7 +360,6 @@ public class SwingScoutTableCellEditor {
   }
 
   protected synchronized void cancelEditorFromSwing() {
-    m_tableIsEditingAndContainsFocus = false;
     if (m_cachedSwingEditor != null) {
       clearCachedSwingEditor();
       Runnable t = new Runnable() {
@@ -398,26 +393,6 @@ public class SwingScoutTableCellEditor {
     }, 0L);
   }
 
-  protected void permanentFocusOwnerChanged(PropertyChangeEvent e) {
-    Component c = (Component) e.getNewValue();
-    if (c == null) {
-      return;
-    }
-    Window w1 = SwingUtilities.getWindowAncestor(c);
-    Window w2 = SwingUtilities.getWindowAncestor(m_tableComposite.getSwingContainer());
-    if (w1 == null || w2 == null || w1 != w2 && SwingUtilities.isDescendingFrom(w1, w2)) {
-      return;
-    }
-    boolean oldValue = m_tableIsEditingAndContainsFocus;
-    boolean newValue = (SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingTable()) && c != m_tableComposite.getSwingTable());
-    m_tableIsEditingAndContainsFocus = newValue;
-    if (oldValue && !newValue) {
-      if (m_cellEditor != null) {
-        m_cellEditor.stopCellEditing();
-      }
-    }
-  }
-
   private final class P_SwingInputVerifyListener implements ISwingInputVerifyListener {
     @Override
     public void verify(JComponent input) {
@@ -434,10 +409,12 @@ public class SwingScoutTableCellEditor {
      * will not initiate until a click occurs.
      */
     private int m_clickCountToStart = 1;
-    private JPanelEx m_container;
+    private final JPanelEx m_container;
 
     public P_SwingCellEditor() {
       m_container = new JPanelEx(new SingleLayout());
+      SwingUtility.installFocusCycleRoot(m_container, createEditorTraversalPolicy());
+
       m_container.setOpaque(false);
       m_container.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("ESCAPE"), "cancel");
       m_container.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("ENTER"), "enter");
@@ -457,8 +434,29 @@ public class SwingScoutTableCellEditor {
           m_cellEditor.stopCellEditing();
         }
       });
-      //add a hysteresis listener that commits the cell editor when the table has first received focus and then lost it
-      KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("permanentFocusOwner", new GlobalFocusListener(SwingScoutTableCellEditor.this));
+    }
+
+    /**
+     * Creates a different focus traversal policy that makes sure that the focus is not set outside the table, after an
+     * editor is removed. Verify input after the focus is lost. {@link SwingScoutFocusTraversalPolicy}
+     */
+    private DefaultFocusTraversalPolicy createEditorTraversalPolicy() {
+      DefaultFocusTraversalPolicy policy = new DefaultFocusTraversalPolicy() {
+        private static final long serialVersionUID = -8422385781848194341L;
+
+        @Override
+        public Component getComponentAfter(Container focusCycleRoot, Component aComponent) {
+          if (aComponent != null) {
+            boolean accept = SwingUtility.runInputVerifier(aComponent);
+            if (!accept) {
+              return aComponent;
+            }
+          }
+          return super.getComponentAfter(focusCycleRoot, aComponent);
+        }
+
+      };
+      return policy;
     }
 
     public void setClickCountToStart(int count) {
@@ -494,25 +492,6 @@ public class SwingScoutTableCellEditor {
         m_container.add(c);
       }
       return m_container;
-    }
-  }
-
-  private static class GlobalFocusListener implements PropertyChangeListener {
-    private WeakReference<SwingScoutTableCellEditor> m_editorRef;
-
-    public GlobalFocusListener(SwingScoutTableCellEditor editor) {
-      m_editorRef = new WeakReference<SwingScoutTableCellEditor>(editor);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      SwingScoutTableCellEditor editor = m_editorRef.get();
-      if (editor == null) {
-        //auto-detach
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("permanentFocusOwner", this);
-        return;
-      }
-      editor.permanentFocusOwnerChanged(e);
     }
   }
 
