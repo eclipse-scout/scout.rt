@@ -160,7 +160,9 @@ public class JInternalFrameEx extends JInternalFrame {
     if (!m_selectedEnabled) {
       return;
     }
-    super.setSelected(selected);
+    if (selected != isSelected) {
+      super.setSelected(selected);
+    }
   }
 
   /**
