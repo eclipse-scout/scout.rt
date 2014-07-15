@@ -3,6 +3,8 @@ scout.ModelAdapter = function() {
   this.parent;
   this.children = [];
   this._adapterProperties = [];
+  this.rendered = false;
+  this.destroyed = false;  
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
@@ -16,10 +18,10 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   this.session.registerModelAdapter(this);
 };
 
-// TODO AWE: underscore bei setter-func names entfernen
+// TODO AWE: underscore bei setter-func names entfernen, oder eventuell auf _render umbenennen?
 
 scout.ModelAdapter.prototype.render = function($parent) {
-  if (this.isRendered()) {
+  if (this.rendered) {
     throw 'Already rendered';
   }
   if (this.destroyed) {
@@ -27,13 +29,10 @@ scout.ModelAdapter.prototype.render = function($parent) {
   }
   this._render($parent);
   this._callSetters();
+  this.rendered = true;
   if (this.session.offline) {
     this.goOffline();
   }
-};
-
-scout.ModelAdapter.prototype.isRendered = function() {
-  return this.$container && this.$container.parent().length > 0; //FIXME CGU maybe better to remove every child? currently, parent is set to null, $container of children still set
 };
 
 /**
@@ -70,20 +69,23 @@ scout.ModelAdapter.prototype._callSetters = function() {
 scout.ModelAdapter.prototype.remove = function() {
   var i, child;
 
-  if (this.isRendered()) {
+  if (this.rendered) {
     for (i = 0; i < this.children.length; i++) {
       child = this.children[i];
       child.remove();
     }
 
     this._remove();
+    this.rendered = false;
   }
   this.dispose();
 };
 
 scout.ModelAdapter.prototype._remove = function() {
-  this.$container.remove();
-  this.$container = null;
+  if (this.$container) {
+    this.$container.remove();
+    this.$container = null;
+  }
 };
 
 scout.ModelAdapter.prototype.dispose = function() {
@@ -111,14 +113,6 @@ scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
   scout.arrays.remove(this.children, childAdapter);
 };
 
-scout.ModelAdapter.prototype.updateModelAdapters = function(adapters, model, parent) {
-  var adapter = this.session.getOrCreateModelAdapter(model, parent);
-  if (adapters.indexOf(adapter) < 0) {
-    adapters.push(adapter);
-  }
-  return adapter;
-};
-
 /**
  * Loops through all properties of the given model (optional ignores the given properties).
  * Creates an ModelAdapter instance for the given property when the propertyName is in the
@@ -141,7 +135,7 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
   }
 
   //Loop through adapter properties in the order specified by the list _adapterProperties
-  //Important: The server resolves the model adapters in alphabetic order. Current we need to define the order by ourself. Maybe we should change to alphabetical order as well.
+  //Important: The server resolves the model adapters in alphabetic order. Currently we need to define the order by ourself. Maybe we should change to alphabetical order as well.
   for (i = 0; i < this._adapterProperties.length; i++) {
     propertyName = this._adapterProperties[i];
     value = model[propertyName];
@@ -171,53 +165,82 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
  * must exist (property-name 'myValue', function-name 'setMyValue').
  *
  * This happes in two steps:
- * 1.) Apply properties on adapter
- * 2.) Call setter function to update UI
+ * 1.) Synchronizing: Apply properties on adapter
+ * 2.) Rendering: Call setter function to update UI
  *
  * You can always rely that these two steps are processed in that order, but you cannot rely that
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var ignore = ['id', 'type_'];
-  // step 1 - apply properties on adapter
-  this._eachProperty(event, function(propertyName, value) {
-    this[propertyName] = value;
-  }.bind(this), ignore);
+  var ignore = ['id', 'type_', 'containsNewAdapters'];
+  var oldValues = {};
 
-  // step 2 - call setter methods to update UI
+  // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
   this._eachProperty(event, function(propertyName, value) {
-    var setterFuncName = '_set' + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-    console.debug('call ' + setterFuncName + '(' + value + ')');
+    var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+    oldValues[propertyName] = value;
 
-    //If the property is an adapter, remove the existing adapter first
-    if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
-      this.onChildAdapterChange(propertyName);
+    if (this[onFuncName]) {
+      this[onFuncName](value);
+    } else {
+      this[propertyName] = value;
     }
-
-    this[setterFuncName](value);
-
   }.bind(this), ignore);
+
+  // step 2 rendering - call setter methods to update UI, but only if it is displayed (rendered)
+  if (this.rendered) {
+    this._eachProperty(event, function(propertyName, value) {
+      var setterFuncName = '_set' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+      $.log('call ' + setterFuncName + '(' + value + ')');
+
+      if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
+        this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
+      }
+      else {
+        //Call the setter for regular properties, for adapters see onChildAdapterChange
+        this[setterFuncName](value);
+      }
+
+    }.bind(this), ignore);
+  }
 }; // TODO AWE: (form) jasmine-test this!
 
+scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {
+  return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+};
+
 /**
- * Removes the existing adapter for the given propertyName.<br>
- * To prevent it just implement the method _unsetPropertyName (e.g _unsetTable)
+ * Removes the existing adapter specified by oldValue. Renders the new adapters if this.$container is set.<br>
+ * To prevent this behavior just implement the method _setPropertyName or _unsetPropertyName (e.g _unsetTable).
  */
-scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName) {
-  var propertyValue = this[propertyName];
-  var unsetFuncName = '_unset' + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
+  var funcName = scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+  var setFuncName = '_set' + funcName;
+  var unsetFuncName = '_unset' + funcName;
   var i;
 
   if (!this[unsetFuncName]) {
-    if (Array.isArray(propertyValue)) {
-      for (i = 0; i < propertyValue.length; i++) {
-        propertyValue[i].remove();
+    if (Array.isArray(oldValue)) {
+      for (i = 0; i < oldValue.length; i++) {
+        oldValue[i].remove();
       }
     } else {
-      propertyValue.remove();
+      oldValue.remove();
     }
   } else {
     this[unsetFuncName]();
+  }
+
+  if (!this[setFuncName] && this.$container) {
+    if (Array.isArray(oldValue)) {
+      for (i = 0; i < oldValue.length; i++) {
+        newValue[i].render(this.$container);
+      }
+    } else {
+      newValue.render(this.$container);
+    }
+  } else {
+    this[setFuncName](newValue);
   }
 };
 
@@ -231,6 +254,10 @@ scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
 scout.ModelAdapter.prototype.goOffline = function() {
   var i;
   for (i = 0; i < this.children.length; i++) {
+    if (!this.children[i].rendered) {
+      //going offline must not modify model state -> only necessary to inform rendered objects
+      continue;
+    }
     this.children[i].goOffline();
   }
 };
@@ -238,6 +265,10 @@ scout.ModelAdapter.prototype.goOffline = function() {
 scout.ModelAdapter.prototype.goOnline = function() {
   var i;
   for (i = 0; i < this.children.length; i++) {
+    if (!this.children[i].rendered) {
+      //going offline must not modify model state -> only necessary to inform rendered objects
+      continue;
+    }
     this.children[i].goOnline();
   }
 };

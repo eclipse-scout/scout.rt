@@ -37,10 +37,6 @@ scout.Menu.prototype._callSetters = function() {
 };
 
 scout.Menu.prototype._setText = function(text) {
-  if (!this.isRendered()) {
-    return;
-  }
-
   if (!text) {
     text = '';
   }
@@ -49,10 +45,6 @@ scout.Menu.prototype._setText = function(text) {
 
 
 scout.Menu.prototype._setIconId = function(iconId) {
-  if (!this.isRendered()) {
-    return;
-  }
-
   if (iconId) {
     this.$container.attr('data-icon', iconId);
   } else {
@@ -61,10 +53,6 @@ scout.Menu.prototype._setIconId = function(iconId) {
 };
 
 scout.Menu.prototype._setEnabled = function(enabled) {
-  if (!this.isRendered()) {
-    return;
-  }
-
   if (enabled) {
     this.$container.removeAttr('disabled');
   } else {
@@ -73,10 +61,6 @@ scout.Menu.prototype._setEnabled = function(enabled) {
 };
 
 scout.Menu.prototype._setVisible = function(visible) {
-  if (!this.isRendered()) {
-    return;
-  }
-
   if (visible) {
     this.$container.show();
   } else {

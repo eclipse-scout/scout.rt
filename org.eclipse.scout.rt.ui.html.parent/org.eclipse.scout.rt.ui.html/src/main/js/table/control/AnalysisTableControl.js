@@ -809,12 +809,27 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
 };
 
+scout.AnalysisTableControl.prototype._initRootEntity = function() {
+  if (this.dataModel && this.rootEntityRef) {
+    this.rootEntity = this.dataModel[this.rootEntityRef];
+  }
+};
+
+scout.AnalysisTableControl.prototype._syncDataModel = function(dataModel) {
+  this.dataModel = dataModel;
+  this._initRootEntity();
+};
+
 scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
   this.renderContent();
 };
 
+scout.AnalysisTableControl.prototype._syncRootEntityRef = function(rootEntityRef) {
+  this.rootEntityRef = rootEntityRef;
+  this._initRootEntity();
+};
+
 scout.AnalysisTableControl.prototype._setRootEntityRef = function(rootEntityRef) {
-  this.rootEntity = this.dataModel[rootEntityRef];
   this.renderContent();
 };
 

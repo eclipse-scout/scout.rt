@@ -94,7 +94,7 @@ scout.DesktopTree.prototype.showNodeDetailForm = function(node) {
 
   if (node.detailForm) {
     this._detailForm = node.detailForm;
-    if (!this._detailForm.isRendered()) {
+    if (!this._detailForm.rendered) {
       this.session.desktop.addForm(this._detailForm);
     }
   }
@@ -112,7 +112,7 @@ scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
   if (detailTable) {
     this._detailTable = detailTable;
     this._detailTable.desktopMenuContributor = true;
-    if (!this._detailTable.isRendered()) {
+    if (!this._detailTable.rendered) {
       this._detailTable.render($('#DesktopBench'));
     }
   }
@@ -127,7 +127,7 @@ scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
 scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
   node.expanded = expanded;
 
-  if (!this.isRendered()) {
+  if (!this.rendered) {
     return;
   }
   if ($node.length === 0) {

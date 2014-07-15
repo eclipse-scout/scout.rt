@@ -43,32 +43,31 @@ scout.Form.prototype._render = function($parent) {
   if (this.displayHint == 'dialog') {
     // TODO AWE: append form title section (including ! ? and progress indicator)
     var $dialogBar = $.makeDiv('', 'dialog-bar', '');
-    var $dialogTitle = $('<span class="dialog-title">' + this.title + '</span>');
+    var $dialogTitle = $('<span>').addClass('dialog-title').text(this.title);
     $dialogBar.append($dialogTitle);
     if (closeable) {
-      var $closeButton = $('<button>X</button>');
+      var $closeButton = $('<button>').text('X');
       $dialogBar.append($closeButton);
-      var that = this;
       $closeButton.on('click', function() {
-        that.session.send('formClosing', that.id);
-      });
+        this.session.send('formClosing', this.id);
+      }.bind(this));
     }
     if (detachable) {
-      var $detachButton = $('<button title="Detach form">D</button>');
+      var $detachButton = $('<button>').text('D').attr('title', "Detach form");
       $dialogBar.append($detachButton);
       $detachButton.on('click', function() {
         // FIXME BSH Set correct url or write content
         //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
         //        w.document.close(); //finish "loading" the page
-        var childWindow = scout.openWindow(window.location.href, 'scout:form:' + that.id, 800, 600);
+        var childWindow = scout.openWindow(window.location.href, 'scout:form:' + this.id, 800, 600);
         $(childWindow).one('load', function() {
           // Cannot call this directly, because we get an unload event right after that (and
           // would therefore unregister the window again). This is because the browser starts
           // with the 'about:blank' page. Opening the desired URL causes the blank page to unload.
           // Therefore, we wait until the target page was loaded.
-          that.session.registerChildWindow(childWindow);
-        });
-      });
+          this.session.registerChildWindow(childWindow);
+        }.bind(this));
+      }.bind(this));
     }
     this.$container.addClass('dialog-form');
     this.$container.prepend($dialogBar);

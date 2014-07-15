@@ -1,18 +1,19 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTaskbar = function(desktop) {
+scout.DesktopTaskbar = function(desktop, toolButtons) {
   this.desktop = desktop;
   this.$div;
   this.$formThumbs;
   this.formThumbsMap = {};
-  this.toolButtons = desktop.session.getOrCreateModelAdapters(desktop.toolButtons, this); //FIXME CGU move to desktop which extends ModelAdapter?
+  this.toolButtons = toolButtons;
 };
 
 scout.DesktopTaskbar.prototype.render = function($desktop) {
   this.$div = $desktop.appendDiv(undefined, 'desktop-taskbar');
 
   for (var i = 0; i < this.toolButtons.length; i++) {
+    this.toolButtons[i].desktopTaskBar = this;
     this.toolButtons[i].render(this.$div);
   }
 

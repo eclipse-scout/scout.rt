@@ -1,6 +1,7 @@
 scout.FormField = function() {
   scout.FormField.parent.call(this);
   this.$label;
+  this.$field;
 
   /**
    * The status label is used for error-status and mandatory info.
@@ -31,7 +32,6 @@ scout.FormField.prototype._callSetters = function() {
   this._setLabelVisible(this.labelVisible);
 };
 
-
 scout.FormField.prototype._setEnabled = function(enabled) {
   // NOP
 };
@@ -44,7 +44,6 @@ scout.FormField.prototype._setMandatory = function(mandatory) {
   this._updateStatusLabel();
 };
 
-
 scout.FormField.prototype._setErrorStatus = function(errorStatus) {
   this._updateStatusLabel();
 };
@@ -54,7 +53,7 @@ scout.FormField.prototype._setVisible = function(visible) {
 };
 
 scout.FormField.prototype._setLabel = function(label) {
-  if(!label) {
+  if (!label) {
     label = '';
   }
 
@@ -68,37 +67,50 @@ scout.FormField.prototype._setLabelVisible = function(visible) {
     return;
   }
 
-  if (visible) {
-    this.$label.show();
-  }
-  else {
-    this.$label.hide();
-  }
+  this.$label.setVisible(visible);
 };
 
-scout.FormField.prototype._setDisplayText = function(label) {
+scout.FormField.prototype._setDisplayText = function(label) {//FIXME CGU/AWE move to ValueField.js
   // NOP
 };
 
-scout.FormField.prototype._updateStatusLabel = function() {
-  if (this.$status) {
-    // errorStatus has higher priority than mandatory
-    var title, icon = ' ';
-    if (this.errorStatus) {
-      title = this.errorStatus.message;
-      icon = '!';
-    } else if (this.mandatory === true) {
-      icon = '*';
-    }
+scout.FormField.prototype._setEnabled = function(enabled) {
+  if (!this.$field) {
+    return;
+  }
 
-    this.$status.html(icon);
-    if (title) {
-      this.$status.attr('title', title);
-      this.$status.addClass('error-status');
-    } else {
-      this.$status.removeAttr('title');
-      this.$status.removeClass('error-status');
-    }
+  this.$field.setEnabled(enabled);
+};
+
+scout.FormField.prototype._setVisible = function(visible) {
+  if (!this.$field) {
+    return;
+  }
+
+  this.$field.setVisible(visible);
+};
+
+scout.FormField.prototype._updateStatusLabel = function() {
+  if (!this.$status) {
+    return;
+  }
+
+  // errorStatus has higher priority than mandatory
+  var title, icon = ' ';
+  if (this.errorStatus) {
+    title = this.errorStatus.message;
+    icon = '!';
+  } else if (this.mandatory === true) {
+    icon = '*';
+  }
+
+  this.$status.html(icon);
+  if (title) {
+    this.$status.attr('title', title);
+    this.$status.addClass('error-status');
+  } else {
+    this.$status.removeAttr('title');
+    this.$status.removeClass('error-status');
   }
 };
 

@@ -8,7 +8,7 @@ scout.Desktop = function() {
   this.tree;
   this.bench;
   this.layout;
-  this._addAdapterProperties('viewButtons');
+  this._addAdapterProperties(['viewButtons', 'toolButtons']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -54,7 +54,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.layout.register(this.bench.$container, 'C');
 
   if (this.toolButtons) {
-    this.taskbar = new scout.DesktopTaskbar(this);
+    this.taskbar = new scout.DesktopTaskbar(this, this.toolButtons);
     this.taskbar.render($parent);
     this.layout.register(this.taskbar.$div, 'E');
   }

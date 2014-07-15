@@ -8,15 +8,11 @@ scout.TableField = function() {
 scout.inherits(scout.TableField, scout.ModelAdapter);
 
 scout.TableField.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(undefined, 'table-field');
+  this.$container = $parent.appendDiv('', 'table-field');
   if (this.label) {
-    this.$label = this.$container.appendDiv(undefined, 'label');
+    this.$label = this.$container.appendDiv('', 'label');
   }
-  this._setTable(this.table);
-};
-
-scout.TableField.prototype._setTable = function(table) {
-  if (this.isRendered() && table) {
-    table.render(this.$container);
+  if (this.table) {
+    this.table.render(this.$container);
   }
 };

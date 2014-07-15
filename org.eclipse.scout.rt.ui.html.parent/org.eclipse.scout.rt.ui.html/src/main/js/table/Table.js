@@ -11,6 +11,8 @@ scout.Table = function() {
   this.scrollbar;
   this.selectionHandler;
   this._keystrokeAdapter;
+  this.controls = [];
+  this.menus = [];
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
   this._filterMap = {};
@@ -36,13 +38,6 @@ scout.Table.prototype.init = function(model, session) {
     this.configurator.configure(this);
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
-};
-
-scout.Table.prototype.onChildAdapterCreated = function(propertyName, adapter) {
-  //Link with table
-  if (propertyName === 'controls') {
-    adapter.table = this;
-  }
 };
 
 scout.Table.prototype._createTableConfigurator = function() {
@@ -74,13 +69,6 @@ scout.Table.prototype._render = function($parent) {
 
   this._$footer = this.$container.appendDiv(this.id + '_footer');
   this.footer = new scout.TableFooter(this, this._$footer, this.session);
-
-  if (this.controls) {
-    for (var i = 0; i < this.controls.length; i++) {
-      var control = this.controls[i];
-      this.footer.addControl(control);
-    }
-  }
 
   if (this.configurator && this.configurator.render) {
     this.configurator.render();
@@ -569,7 +557,7 @@ scout.Table.prototype.insertRows = function(rows) {
   } else {
     this.rows = rows;
   }
-  if (this.isRendered()) {
+  if (this.rendered) {
     this.drawData();
   }
 };

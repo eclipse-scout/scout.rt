@@ -7,6 +7,7 @@ scout.BaseDesktop = function() {
   this.modalDialogStack = [];
   this.focusedDialog;
   this._addAdapterProperties(['forms']);
+  this.rendered;
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
@@ -17,7 +18,10 @@ scout.BaseDesktop.prototype._render = function($parent) {
 
   var i, form;
   for (i = 0; i < this.forms.length; i++) {
-    this.addForm(this.forms[i]);
+    form = this.forms[i];
+    if (!form.minimized) {
+      this.addForm(form);
+    }
   }
 };
 
@@ -172,7 +176,7 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
   }
 
   if (form.displayHint === 'dialog') {
-    if (!form.isRendered()) {
+    if (!form.rendered) {
       form.render(this.$parent);
     }
 
@@ -220,14 +224,16 @@ scout.BaseDesktop.prototype.maximizeForm = function(form) {
 scout.BaseDesktop.prototype.onModelAction = function(event) {
   var form;
 
-  if (event.type_ == 'formAdded') {
-    form = this.updateModelAdapters(this.forms, event.form, this);
+  if (event.type_ === 'formAdded') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    this.forms.push(form);
     this.addForm(form);
-  } else if (event.type_ == 'formRemoved') {
-    form = this.updateModelAdapters(this.forms, event.form, this);
+  } else if (event.type_ === 'formRemoved') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    scout.arrays.remove(this.forms, form);
     this.removeForm(form);
-  } else if (event.type_ == 'formEnsureVisible') {
-    form = this.updateModelAdapters(this.forms, event.form, this);
+  } else if (event.type_ === 'formEnsureVisible') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
     this.activateForm(form);
   } else {
     $.log('Model event not handled. Widget: Desktop. Event: ' + event.type_ + '.');

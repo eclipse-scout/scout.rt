@@ -135,8 +135,26 @@
     return this.hasClass('selected');
   };
 
+  $.fn.setEnabled = function(enabled) {
+    if (enabled) {
+      this.removeAttr('disabled');
+    } else {
+      this.attr('disabled', 'disabled');
+    }
+    return this;
+  };
+
   $.fn.isEnabled = function() {
     return this.attr('disabled');
+  };
+
+  $.fn.setVisible = function(visible) {
+    if (visible) {
+      this.show();
+    } else {
+      this.hide();
+    }
+    return this;
   };
 
   // most used animate

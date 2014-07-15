@@ -1,6 +1,7 @@
 //FIXME maybe rename to FormToolButton or DesktopToolButton, or rename DesktopViewButton
 scout.ToolButton = function() {
   scout.ToolButton.parent.call(this);
+  this.desktopTaskBar;
   this._addAdapterProperties('form');
 };
 scout.inherits(scout.ToolButton, scout.ModelAdapter);
@@ -21,9 +22,9 @@ scout.ToolButton.prototype._render = function($parent) {
   var that = this;
 
   function onClick() {
-    that.parent.formOfClickedButton = that.form;
+    that.desktopTaskBar.formOfClickedButton = that.form;
     that._setSelected(!that.selected);
-    that.parent.formOfClickedButton = null;
+    that.desktopTaskBar.formOfClickedButton = null;
   }
 };
 
@@ -39,7 +40,7 @@ scout.ToolButton.prototype._setSelected = function(selected) {
 
   this.selected = selected;
   this.$container.select(selected);
-  this.parent.toolButtonSelected(this, selected);
+  this.desktopTaskBar.toolButtonSelected(this, selected);
 
   if (!this.session.processingEvents) {
     this.session.send('selected', this.id, {
