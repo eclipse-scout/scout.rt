@@ -7,8 +7,10 @@ scout.ChartTableControl = function() {
 
 scout.inherits(scout.ChartTableControl, scout.TableControl);
 
-scout.ChartTableControl.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(); //FIXME CGU maybe not necessary
+scout.ChartTableControl.FILTER_KEY = 'CHART';
+
+scout.ChartTableControl.prototype._renderContent = function($parent) {
+  this.$parent = $parent;
 
   // group functions for dates
   // todo
@@ -31,7 +33,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
   });
 
   // create container
-  var $chartSelect = this.$container.appendDiv('ChartSelect');
+  var $chartSelect = $parent.appendDiv('ChartSelect');
 
   // create chart types for selection
   addSelectBar($chartSelect);
@@ -56,8 +58,8 @@ scout.ChartTableControl.prototype._render = function($parent) {
   $('svg.select-chart').first().addClassSVG('selected');
 
   // create container for x/y-axis
-  var $xAxisSelect = this.$container.appendDiv('XAxisSelect'),
-    $yAxisSelect = this.$container.appendDiv('YAxisSelect');
+  var $xAxisSelect = $parent.appendDiv('XAxisSelect'),
+    $yAxisSelect = $parent.appendDiv('YAxisSelect');
 
   // all x/y-axis for selection
   for (var c1 = 0; c1 < columns.length; c1++) {
@@ -100,7 +102,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
   });
 
   // create container for data
-  var $dataSelect = this.$container.appendDiv('DataSelect');
+  var $dataSelect = $parent.appendDiv('DataSelect');
   $dataSelect.appendDiv('', 'select-data data-count', countDesc)
     .data('column', -1);
 
@@ -123,7 +125,7 @@ scout.ChartTableControl.prototype._render = function($parent) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = this.$container.appendSVG('svg', 'ChartMain')
+  var $chartMain = $parent.appendSVG('svg', 'ChartMain')
     .attrSVG('viewBox', '0 0 1000 320')
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
@@ -693,7 +695,9 @@ scout.ChartTableControl.prototype._render = function($parent) {
   }
 };
 
-scout.ChartTableControl.FILTER_KEY = 'CHART';
+scout.ChartTableControl.prototype._removeContent = function() {
+  this.$parent.empty();
+};
 
 scout.ChartTableControl.prototype.dispose = function() {
   this.table.events.removeListener(this._filterResetListener);

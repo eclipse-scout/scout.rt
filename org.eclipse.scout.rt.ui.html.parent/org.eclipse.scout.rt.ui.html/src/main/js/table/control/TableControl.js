@@ -2,26 +2,72 @@ scout.TableControl = function() {
   scout.TableControl.parent.call(this);
   this.table;
   this.form;
-  this.$controlButton;
+  this.$control;
   this._addAdapterProperties('form');
+  this.contentRendered = false;
 };
 
 scout.inherits(scout.TableControl, scout.ModelAdapter);
 
-/**
- * This function actually renders the content of the control, not the control (icon) itself.
- */
 scout.TableControl.prototype._render = function($parent) {
-  this.form.render($parent);
-  //Set container to make it removed by ModelAdapter.remove()
-  this.$container = this.form.$container;
+  var classes = 'control ';
+  if (this.cssClass) {
+    classes += this.cssClass;
+  }
+
+  this.$control = $parent.appendDiv('', classes)
+    .data('control', this);
+
+  this._setEnabled(this.enabled);
+  this._setSelected(this.selected);
 };
 
-/**
- * api for table footer
- */
-scout.TableControl.prototype.toggle = function() {
-  this._setSelected(!this.$controlButton.isSelected());
+scout.TableControl.prototype.remove = function() {
+  this.removeContent();
+
+  scout.TableControl.parent.prototype.remove.call(this);
+};
+
+scout.TableControl.prototype._renderContent = function($parent) {
+  this.form.render($parent);
+};
+
+scout.TableControl.prototype._removeContent = function() {
+  this.form.remove();
+};
+
+scout.TableControl.prototype.removeContent = function() {
+  if (this.contentRendered) {
+    this._removeContent();
+    this.contentRendered = false;
+  }
+};
+
+scout.TableControl.prototype.renderContent = function() {
+  if (this.contentRendered) {
+    throw "Already rendered";
+  }
+
+  if (!this.isContentAvailable()) {
+    return;
+  }
+
+  this._renderContent(this.tableFooter.$controlContainer);
+
+  //FIXME CGU opening should be controllable. Check current implementation of table page: is search form always opened automatically on activation?
+  if (!this.tableFooter.open) {
+    this.tableFooter.openTableControl();
+  }
+
+  this.contentRendered = true;
+};
+
+scout.TableControl.prototype.onClosed = function() {
+  this.removeContent();
+};
+
+scout.TableControl.prototype._unsetForm = function() {
+  this.removeContent();
 };
 
 scout.TableControl.prototype._setForm = function(form) {
@@ -35,87 +81,67 @@ scout.TableControl.prototype.isContentAvailable = function() {
   return this.form;
 };
 
-scout.TableControl.prototype.renderContent = function(form) {
-  if (!this.isContentAvailable() || !this.table.isRendered()) {
-    return;
-  }
-
-  if (!this.isRendered()) {
-    this.render(this.table.footer.$controlContainer);
-  }
-
-  //FIXME CGU opening should be controllable. Check current implementation of table page: is search form always opened automatically on activation?
-  if (!this.table.footer.open) {
-    this.table.footer.openTableControl();
-  }
+scout.TableControl.prototype._setSelectedAndSend = function(selected) {
+  this._setSelected(selected);
+  this.session.send('selected', this.id);
 };
 
 scout.TableControl.prototype._setSelected = function(selected) {
-  if (selected == this.$controlButton.isSelected()) {
+  if (selected == this.$control.isSelected()) {
     return;
   }
-
-  var previouslySelectedControl = this.table.footer.selectedControl;
+  var previouslySelectedControl = this.tableFooter.selectedControl;
   if (selected) {
-    this.table.footer.selectedControl = this;
+    this.tableFooter.selectedControl = this;
 
-    if (!this.$controlButton.isSelected()) {
-      this.$controlButton.select(true);
+    if (!this.$control.isSelected()) {
+      this.$control.select(true);
     }
 
     if (previouslySelectedControl) {
-      previouslySelectedControl._setSelected(false);
+      previouslySelectedControl._setSelectedAndSend(false);
     }
 
     this.renderContent();
 
   } else {
-    this.$controlButton.select(false);
+    this.$control.select(false);
 
     //When clicking on the already selected control, close the pane
     if (previouslySelectedControl === this) {
       //The control gets removed after the close operation
-      this.table.footer.closeTableControl(this);
-      this.table.footer.selectedControl = null;
+      this.tableFooter.closeTableControl(this);
+      this.tableFooter.selectedControl = null;
     } else {
-      this.remove();
+      this.removeContent();
     }
-  }
-
-  if (!this.session.processingEvents) {
-    this.session.send('selected', this.id);
   }
 };
 
 scout.TableControl.prototype._setEnabled = function(enabled) {
-  if (!this.table.isRendered()) {
-    return;
-  }
-
-  var $control = this.$controlButton,
-    that = this;
+  var that = this;
 
   if (enabled) {
-    $control.data('label', that.label)
+    this.$control.data('label', this.label)
       .removeClass('disabled')
       .hover(onControlHoverIn, onControlHoverOut)
       .click(onControlClicked);
   } else {
-    $control.addClass('disabled')
+    this.$control.addClass('disabled')
       .off('mouseenter mouseleave')
       .off('click');
   }
 
   function onControlHoverIn(event) {
-    that.table.footer._updateControlLabel($(event.target));
+    that.tableFooter._updateControlLabel($(event.target));
   }
 
   function onControlHoverOut(event) {
-    that.table.footer._resetControlLabel($(event.target));
+    that.tableFooter._resetControlLabel($(event.target));
   }
 
   function onControlClicked(event) {
-    that.toggle();
+    that._setSelectedAndSend(!that.$control.isSelected());
   }
 };
 

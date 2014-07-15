@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table.control;
+package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.beans.PropertyChangeEvent;
 

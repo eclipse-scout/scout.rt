@@ -5,8 +5,10 @@ scout.MapTableControl = function() {
 };
 scout.inherits(scout.MapTableControl, scout.TableControl);
 
-scout.MapTableControl.prototype._render = function($parent) {
-  this.$container = $parent.empty()
+scout.MapTableControl.FILTER_KEY = 'MAP';
+
+scout.MapTableControl.prototype._renderContent = function($parent) {
+  this.$container = $parent
     .appendSVG('svg', 'MapContainer')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
@@ -128,10 +130,18 @@ scout.MapTableControl.prototype._render = function($parent) {
   }
 };
 
-scout.MapTableControl.FILTER_KEY = 'MAP';
+scout.MapTableControl.prototype._removeContent = function() {
+  if (this.$container) {
+    this.$container.remove();
+  }
+};
 
 scout.MapTableControl.prototype.dispose = function() {
   this.table.events.removeListener(this._filterResetListener);
+};
+
+scout.MapTableControl.prototype._unsetMap = function() {
+  this.removeContent();
 };
 
 scout.MapTableControl.prototype._setMap = function(map) {

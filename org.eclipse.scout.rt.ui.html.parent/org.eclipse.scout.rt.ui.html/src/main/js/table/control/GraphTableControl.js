@@ -6,7 +6,7 @@ scout.GraphTableControl = function() {
 };
 scout.inherits(scout.GraphTableControl, scout.TableControl);
 
-scout.GraphTableControl.prototype._render = function($parent) {
+scout.GraphTableControl.prototype._renderContent = function($parent) {
   this.$container = $parent.appendSVG('svg', 'GraphContainer');
 
   // some basics
@@ -235,6 +235,10 @@ scout.GraphTableControl.prototype._render = function($parent) {
     return parseFloat(e.$div.attr(d));
   }
 
+};
+
+scout.GraphTableControl.prototype._removeContent = function() {
+  this.$container.remove();
 };
 
 scout.GraphTableControl.prototype._setGraph = function(graph) {

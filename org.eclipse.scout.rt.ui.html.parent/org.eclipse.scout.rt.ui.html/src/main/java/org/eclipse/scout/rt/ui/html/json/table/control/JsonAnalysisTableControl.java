@@ -12,20 +12,23 @@ package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.json.JSONObject;
 
 public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableControl> {
 
   public JsonAnalysisTableControl(IAnalysisTableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
 
-//    putJsonProperty(new JsonAdapterProperty<IAnalysisTableControl, IDataModel>(IAnalysisTableControl.PROP_DATA_MODEL, model, jsonSession) {
-//      @Override
-//      protected IDataModel getValueImpl(IAnalysisTableControl tableControl) {
-//        return tableControl.getDataModel();
-//      }
-//    });
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    if (getModel().isSelected()) {
+      putProperty(json, "rootEntityRef", "e140"); //FIXME CGU
+      putProperty(json, IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
+      m_contentLoaded = true;
+    }
+    return json;
   }
 
   @Override
@@ -34,22 +37,14 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("selected".equals(event.getType())) {
-
-      if (!getModel().isSelected()) {
-        //Lazy loading on selection
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "rootEntityRef", "e140"); //FIXME CGU
-      }
-
-      getModel().fireActivatedFromUI();
-    }
+  protected void handleUiLoadContent() {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "rootEntityRef", "e140"); //FIXME CGU
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
-    if (IAnalysisTableControl.PROP_DATA_MODEL.equals(propertyName)) {
+    if (IAnalysisTableControl.PROP_DATA_MODEL.equals(propertyName) && m_contentLoaded) {
       getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
     }
     else {

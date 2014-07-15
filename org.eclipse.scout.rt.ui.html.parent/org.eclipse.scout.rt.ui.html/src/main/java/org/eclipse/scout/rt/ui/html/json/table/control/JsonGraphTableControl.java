@@ -14,8 +14,7 @@ import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.json.JSONObject;
 
 public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> {
 
@@ -48,15 +47,18 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("selected".equals(event.getType())) {
-      if (!getModel().isSelected()) {
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
-      }
-
-      getModel().fireActivatedFromUI();
-
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    if (getModel().isSelected()) {
+      putProperty(json, "graph", newJSONObject(GRAPH));
+      m_contentLoaded = true;
     }
+    return json;
+  }
+
+  @Override
+  protected void handleUiLoadContent() {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
   }
 
 }

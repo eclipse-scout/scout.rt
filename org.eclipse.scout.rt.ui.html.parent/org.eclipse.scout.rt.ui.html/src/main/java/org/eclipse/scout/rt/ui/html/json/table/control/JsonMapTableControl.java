@@ -17,10 +17,9 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
 
@@ -55,12 +54,18 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("selected".equals(event.getType())) {
-      if (!getModel().isSelected()) {
-        getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", newJSONObject(MAP));
-      }
-      getModel().fireActivatedFromUI();
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    if (getModel().isSelected()) {
+      putProperty(json, "map", newJSONObject(MAP));
+      m_contentLoaded = true;
     }
+    return json;
   }
+
+  @Override
+  protected void handleUiLoadContent() {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", newJSONObject(MAP));
+  }
+
 }

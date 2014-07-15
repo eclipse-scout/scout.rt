@@ -4,7 +4,7 @@ scout.ModelAdapter = function() {
   this.children = [];
   this._adapterProperties = [];
   this.rendered = false;
-  this.destroyed = false;  
+  this.destroyed = false;
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
@@ -172,11 +172,20 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var ignore = ['id', 'type_', 'containsNewAdapters'];
+  var ignore = ['id', 'type_'];
   var oldValues = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._eachProperty(event, function(propertyName, value) {
+  this._syncProperties(oldValues, event, ignore);
+
+  // step 2 rendering - call setter methods to update UI, but only if it is displayed (rendered)
+  if (this.rendered) {
+    this._renderProperties(oldValues, event, ignore);
+  }
+}; // TODO AWE: (form) jasmine-test this!
+
+scout.ModelAdapter.prototype._syncProperties = function(oldValues, newValues, ignore) {
+  this._eachProperty(newValues, function(propertyName, value) {
     var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
     oldValues[propertyName] = value;
 
@@ -186,24 +195,23 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
       this[propertyName] = value;
     }
   }.bind(this), ignore);
+};
 
-  // step 2 rendering - call setter methods to update UI, but only if it is displayed (rendered)
-  if (this.rendered) {
-    this._eachProperty(event, function(propertyName, value) {
-      var setterFuncName = '_set' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
-      $.log('call ' + setterFuncName + '(' + value + ')');
+scout.ModelAdapter.prototype._renderProperties = function(oldValues, newValues, ignore) {
+  this._eachProperty(newValues, function(propertyName, value) {
+    var setterFuncName = '_set' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+    $.log('call ' + setterFuncName + '(' + value + ')');
 
-      if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
-        this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
-      }
-      else {
-        //Call the setter for regular properties, for adapters see onChildAdapterChange
-        this[setterFuncName](value);
-      }
+    if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
+      this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
+    }
+    else {
+      //Call the setter for regular properties, for adapters see onChildAdapterChange
+      this[setterFuncName](value);
+    }
 
-    }.bind(this), ignore);
-  }
-}; // TODO AWE: (form) jasmine-test this!
+  }.bind(this), ignore);
+};
 
 scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {
   return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);

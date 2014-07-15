@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
+import org.json.JSONObject;
 
 public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserver<T> {
+  protected boolean m_contentLoaded = false;
 
   public JsonTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -45,13 +45,6 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, jsonSession) {
-      @Override
-      protected IForm modelValue() {
-        return getModel().getForm();
-      }
-    });
-
     putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_SELECTED, model) {
       @Override
       protected Boolean modelValue() {
@@ -74,9 +67,39 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    if (getModel().isSelected()) {
+      putProperty(json, ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+      m_contentLoaded = true;
+    }
+    return json;
+  }
+
+  @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
+
+      //Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
+      if (!getModel().isSelected() && !m_contentLoaded) {
+        handleUiLoadContent();
+        m_contentLoaded = true;
+      }
       getModel().fireActivatedFromUI();
+    }
+  }
+
+  protected void handleUiLoadContent() {
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+    if (ITableControl.PROP_FORM.equals(propertyName) && m_contentLoaded) {
+      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+    }
+    else {
+      super.handleModelPropertyChange(propertyName, newValue);
     }
   }
 

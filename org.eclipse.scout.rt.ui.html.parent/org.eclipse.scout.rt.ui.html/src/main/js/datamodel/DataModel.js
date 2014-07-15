@@ -1,4 +1,4 @@
-scout.DataModel = function(model) {
+scout.DataModel = function() {
   scout.DataModel.parent.call(this);
   this.entities = [];
 };
@@ -8,9 +8,11 @@ scout.DataModel.prototype.init = function(model, session) {
   scout.DataModel.parent.prototype.init.call(this, model, session);
 
   var i, entity;
-  for (i = 0; i < model.rootEntities.length; i++) {
-    entity = scout.DataModel.resolveEntity(model, model.rootEntities[i]);
-    this.entities.push(entity);
+  if (model.rootEntities) {
+    for (i = 0; i < model.rootEntities.length; i++) {
+      entity = scout.DataModel.resolveEntity(model, model.rootEntities[i]);
+      this.entities.push(entity);
+    }
   }
 
 };

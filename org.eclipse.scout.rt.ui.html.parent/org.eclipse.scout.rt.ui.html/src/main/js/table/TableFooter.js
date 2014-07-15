@@ -1,4 +1,6 @@
 scout.TableFooter = function(table, $parent, session) {
+  var that = this, i, control, $group;
+
   this._table = table;
 
   this._$tableControl = $parent.appendDiv('TableControl');
@@ -7,9 +9,21 @@ scout.TableFooter = function(table, $parent, session) {
   this._$controlResizeTop = this._$tableControl.appendDiv('ControlResizeTop');
   this._$controlResizeBottom = this._$tableControl.appendDiv('ControlResizeBottom');
 
-  var that = this;
+
   this._$controlLabel = this._$tableControl.appendDiv(undefined, 'control-label');
   this._controlGroups = {};
+
+  for (i = 0; i < this._table.controls.length; i++) {
+    control = this._table.controls[i];
+
+    $group = this._controlGroups[control.group];
+    if (!$group) {
+      $group = this._addGroup(control.group);
+    }
+    control.tableFooter = this;
+    control.table = this._table;
+    control.render($group);
+  }
 
   this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
   this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
@@ -96,31 +110,11 @@ scout.TableFooter.prototype._resetControlLabel = function() {
 /**
  * @param control object with label and action().
  */
-scout.TableFooter.prototype.addGroup = function(title) {
+scout.TableFooter.prototype._addGroup = function(title) {
   var $group = $.makeDiv(undefined, 'control-group').attr('data-title', title);
   this._$controlLabel.before($group);
   this._controlGroups[title] = $group;
   return $group;
-};
-
-scout.TableFooter.prototype.addControl = function(control) {
-  var classes = 'control ';
-  if (control.cssClass) {
-    classes += control.cssClass;
-  }
-
-  var $group = this._controlGroups[control.group];
-  if (!$group) {
-    $group = this.addGroup(control.group);
-  }
-
-  var $control = $group.appendDiv(undefined, classes)
-    .data('control', control);
-
-  //Link button with scout.TableControl
-  control.$controlButton = $control;
-
-  control._setEnabled(control.enabled);
 };
 
 scout.TableFooter.prototype.openTableControl = function() {
@@ -204,7 +198,7 @@ scout.TableFooter.prototype.closeTableControl = function(control) {
   this._$tableControl.animateAVCSD('height', 50, null, null, 500);
 
   this._$tableControl.promise().done(function() {
-    control.remove();
+    control.onClosed();
   });
   this.open = false;
 };

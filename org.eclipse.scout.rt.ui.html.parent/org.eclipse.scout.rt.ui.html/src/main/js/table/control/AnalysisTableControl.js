@@ -6,21 +6,28 @@ scout.AnalysisTableControl = function() {
 
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
-scout.AnalysisTableControl.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('', 'analysis-container'); //FIXME CGU maybe not necessary
+scout.AnalysisTableControl.prototype.init = function(model, session) {
+  scout.AnalysisTableControl.parent.prototype.init.call(this, model, session);
+
+  this._initRootEntity();
+};
+
+scout.AnalysisTableControl.prototype._renderContent = function($parent) {
+  this.$parent = $parent;
 
   // svg container for venn
-  var $vennContainer = this.$container
+  var $vennContainer = $parent
     .appendSVG('svg', '', 'venn-container')
     .attrSVG('viewBox', '0 0 500 340')
     .attrSVG('preserveAspectRatio', 'xMinYMin')
     .on('click', clickCriteria)
     .on('contextmenu', clickSet);
+
   var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
   appendRect($vennContainer, 'venn-all');
 
   // commands
-  var $commandContainer = this.$container.appendDiv('', 'command-container');
+  var $commandContainer = $parent.appendDiv('', 'command-container');
 
   $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
   $commandContainer.appendDiv('', 'separator', '');
@@ -34,9 +41,9 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
   $commandContainer.appendDiv('', 'command union', 'Simulator').click(simulateServer);
 
   // criteria container
-  var $criteriaNavigation = this.$container.appendDiv('', 'criteria-navigation');
-  var $criteriaSearch = this.$container.append('<input class="criteria-search"></input>').keyup(searchMap);
-  var $criteriaContainer = this.$container.appendDiv('', 'criteria-container');
+  var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
+  var $criteriaSearch = $parent.append('<input class="criteria-search"></input>').keyup(searchMap);
+  var $criteriaContainer = $parent.appendDiv('', 'criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));
 
@@ -111,12 +118,17 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     $criteria.addClassSVG('selected');
   }
 
-  function drawCriteria ($container, model, filter) {
+  function drawCriteria($container, model, filter) {
     // set default for filter
     filter = (filter || '').toLowerCase();
 
     // find sizes of boxes on tree map
-    var map = [{size: 0, text: '', attributes: [], entity: null }],
+    var map = [{
+      size: 0,
+      text: '',
+      attributes: [],
+      entity: null
+    }],
       attribute, subEntity, s;
 
     for (var i = 0; i < model.attributes.length; i++) {
@@ -127,17 +139,22 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       }
     }
 
-
     for (var j = 0; j < model.entities.length; j++) {
       subEntity = model.entities[j];
       if (subEntity.text.toLowerCase().indexOf(filter) > -1) {
         s = Math.min(60, Math.max(20, subEntity.attributes.length + subEntity.entities.length));
-        map.push({size: s, text: subEntity.text, entity: subEntity});
+        map.push({
+          size: s,
+          text: subEntity.text,
+          entity: subEntity
+        });
       }
     }
 
     // TODO cru: correct for umlaut
-    map.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
+    map.sort(function(a, b) {
+      return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1));
+    });
 
     // draw boxes
     oneIteration($container, map, 0, 0, 1, 1);
@@ -146,7 +163,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     if (map.length < 7) showAttribute($container.children());
   }
 
-  function oneIteration ($container, list, top, left, height, width) {
+  function oneIteration($container, list, top, left, height, width) {
     if (list.length === 0) {
       // finish iteration
       return;
@@ -172,7 +189,9 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
           y = Math.ceil(attributes.length / x);
 
         // sort attributes
-        attributes.sort(function(a, b) { return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1)); });
+        attributes.sort(function(a, b) {
+          return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1));
+        });
 
         // draw boxes
         for (var b = 0; b < y; b++) {
@@ -180,7 +199,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
             if ((a + b * x) < attributes.length) {
               $div.appendDiv('', 'criteria-attribute', attributes[a + b * x].text)
                 .css('top', (top + b * (1 / y)) * 100 + '%')
-                .css('left', (left + a * (1/ x)) * 100 + '%')
+                .css('left', (left + a * (1 / x)) * 100 + '%')
                 .css('height', (1 / y) * 100 + '%')
                 .css('width', (1 / x) * 100 + '%');
             }
@@ -196,8 +215,11 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       // chris' algorithm ;)
       var horizontal = (height * containerHeight <= width * containerWidth),
         lp = list.slice(0, 1),
-        sump = sumList(lp), sum1, sum2,
-        cand, best = {ratio: 0};
+        sump = sumList(lp),
+        sum1, sum2,
+        cand, best = {
+          ratio: 0
+        };
 
       // make candidates
       for (var i = list.length + 1; i > 0; i--) {
@@ -212,15 +234,15 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
 
         // calc r1 and rp
         if (horizontal) {
-          cand.hp =  sump / (sump + sum1) * height;
+          cand.hp = sump / (sump + sum1) * height;
           cand.wp = (sump + sum1) / (sump + sum1 + sum2) * width;
         } else {
           cand.hp = (sump + sum1) / (sump + sum1 + sum2) * height;
-          cand.wp =  sump / (sump + sum1) * width;
+          cand.wp = sump / (sump + sum1) * width;
         }
 
         // calc ratio
-        cand.ratio =  (cand.hp * containerHeight) / (cand.wp * containerWidth) / 0.5 ;
+        cand.ratio = (cand.hp * containerHeight) / (cand.wp * containerWidth) / 0.5;
         if (cand.ratio > 1) {
           cand.ratio = 1 / cand.ratio;
         }
@@ -244,7 +266,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     }
   }
 
-  function sumList (list) {
+  function sumList(list) {
     var total = 0;
     for (var i = 0; i < list.length; i++) {
       total += list[i].size;
@@ -252,29 +274,28 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     return total;
   }
 
-
-  function showAttribute ($container) {
+  function showAttribute($container) {
     $container
       .children()
       .css('color', '#000')
       .click(openMap);
   }
 
-  function hideAttribute ($container) {
+  function hideAttribute($container) {
     $container
       .children()
       .css('color', '')
       .off('click');
   }
 
-  function appendMap ($container, text) {
+  function appendMap($container, text) {
     $criteriaNavigation
       .appendDiv('', 'criteria-navigation-item', text)
       .data('open-map', $container)
       .click(closeMap);
   }
 
-  function searchMap (event) {
+  function searchMap(event) {
     var $criteriaContainerTest = that.$container.appendDiv('', 'criteria-container');
     drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
 
@@ -282,14 +303,14 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       $newBoxes = $criteriaContainerTest.children(),
       $newB, $oldB;
 
-    for (var n = 0;  n < $newBoxes.length; n++) {
+    for (var n = 0; n < $newBoxes.length; n++) {
       $newB = $newBoxes.eq(n);
 
-      for (var o = 0;  o < $oldBoxes.length; o++) {
+      for (var o = 0; o < $oldBoxes.length; o++) {
         $oldB = $oldBoxes.eq(o);
         $.log($oldB, $newB);
         if (($oldB.text() === $newB.text()) ||
-            ($oldB.hasClass('criteria-attribute-container') && $newB.hasClass('criteria-attribute-container'))) {
+          ($oldB.hasClass('criteria-attribute-container') && $newB.hasClass('criteria-attribute-container'))) {
           break;
         }
       }
@@ -315,8 +336,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     $criteriaContainer = $criteriaContainerTest;
   }
 
-
-  function openMap (list) {
+  function openMap(list) {
     var $clicked = $(this);
 
     // zoom container
@@ -336,7 +356,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
       .data('old-left', $clicked[0].style.left)
       .data('old-height', $clicked[0].style.height)
       .data('old-width', $clicked[0].style.width)
-      .css ('z-index', '1')
+      .css('z-index', '1')
       .animateAVCSD('top', '0%')
       .animateAVCSD('left', '0%')
       .animateAVCSD('height', '100%')
@@ -345,9 +365,11 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
     return false;
   }
 
-  function closeMap (list) {
+  function closeMap(list) {
     var $children = $(this).nextAll(),
-      endFunc = function() {$(this).css('z-index', ''); };
+      endFunc = function() {
+        $(this).css('z-index', '');
+      };
 
     // closed every element left of clicked bread crumb
     for (var i = $children.length - 1; i >= 0; i--) {
@@ -360,18 +382,16 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
         .animateAVCSD('height', $close.data('old-height'))
         .animateAVCSD('width', $close.data('old-width'), endFunc);
 
-        if ($close.hasClass('criteria-attribute-container')) {
-          hideAttribute($close);
-        } else if ($close.hasClass('criteria-attribute')) {
-        } else {
-          $close.children('div').animateAVCSD('opacity', 0, $.removeThis);
-        }
+      if ($close.hasClass('criteria-attribute-container')) {
+        hideAttribute($close);
+      } else if ($close.hasClass('criteria-attribute')) {} else {
+        $close.children('div').animateAVCSD('opacity', 0, $.removeThis);
+      }
     }
 
     // remove elements in bread crumb
     $children.remove();
   }
-
 
   function switchShow() {
     show = !show;
@@ -428,7 +448,7 @@ scout.AnalysisTableControl.prototype._render = function($parent) {
         x1 = d01 / ((r1 * r1) / (r0 * r0) + 1);
         x0 = x1 - d01;
       } else {
-        r0 = r1 =  MAX_R * 0.9;
+        r0 = r1 = MAX_R * 0.9;
         x0 = -MAX_R * 0.6;
         x1 = MAX_R * 0.6;
       }
@@ -815,13 +835,13 @@ scout.AnalysisTableControl.prototype._initRootEntity = function() {
   }
 };
 
+scout.AnalysisTableControl.prototype._removeContent = function() {
+  this.$parent.empty();
+};
+
 scout.AnalysisTableControl.prototype._syncDataModel = function(dataModel) {
   this.dataModel = dataModel;
   this._initRootEntity();
-};
-
-scout.AnalysisTableControl.prototype._setDataModel = function(dataModel) {
-  this.renderContent();
 };
 
 scout.AnalysisTableControl.prototype._syncRootEntityRef = function(rootEntityRef) {
@@ -829,8 +849,17 @@ scout.AnalysisTableControl.prototype._syncRootEntityRef = function(rootEntityRef
   this._initRootEntity();
 };
 
-scout.AnalysisTableControl.prototype._setRootEntityRef = function(rootEntityRef) {
-  this.renderContent();
+scout.AnalysisTableControl.prototype._renderProperties = function(oldValues, newValues, ignore) {
+  var render = false;
+  if (newValues.dataModel !== undefined && newValues.dataModel !== oldValues.dataModel) {
+    render = true;
+  } else if (newValues.rootEntityRef !== undefined && newValues.rootEntityRef !== oldValues.rootEntityRef) {
+    render = true;
+  }
+  if (render) {
+    this.removeContent();
+    this.renderContent();
+  }
 };
 
 scout.AnalysisTableControl.prototype.isContentAvailable = function() {
