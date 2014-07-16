@@ -240,7 +240,8 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
 
   private List<IMenu> getContextMenusFromScout() {
     ICalendarContextMenu contextMenu = getScoutObject().getCalendar().getContextMenu();
-    List<IMenu> normalizedActions = ActionUtility.normalizedActions(contextMenu.getChildActions(), ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), contextMenu.getActiveFilter()));
+    IActionFilter actionFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> normalizedActions = ActionUtility.normalizedActions(contextMenu.getChildActions(), actionFilter);
     return normalizedActions;
   }
 
@@ -285,11 +286,10 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       super.menuShown(e);
       Menu menu = ((Menu) e.getSource());
       final ICalendarContextMenu contextMenu = getScoutObject().getCalendar().getContextMenu();
-      final IActionFilter menuFilter = contextMenu.getActiveFilter();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          contextMenu.callAboutToShow(menuFilter);
+          contextMenu.callAboutToShow(ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), false));
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -299,7 +299,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       catch (InterruptedException ex) {
         //nop
       }
-      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), menuFilter);
+      IActionFilter displayFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
       RwtMenuUtility.fillMenu(menu, contextMenu.getChildActions(), displayFilter, RwtScoutCalendarField.this.getUiEnvironment());
     }
   } // end class P_ContextMenuListener

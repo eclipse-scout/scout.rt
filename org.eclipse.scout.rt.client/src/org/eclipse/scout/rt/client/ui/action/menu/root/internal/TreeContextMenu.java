@@ -17,10 +17,10 @@ import java.util.Set;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -48,8 +48,8 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   protected void initConfig() {
     super.initConfig();
     getOwner().addTreeListener(new P_OwnerTreeListener());
-    // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForTreeSelection(getOwner().getSelectedNodes()));
+    // init current menu types
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getOwner().getSelectedNodes()));
     calculateLocalVisibility();
   }
 
@@ -109,8 +109,8 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
           return CONTINUE;
         }
       });
-      // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForTreeSelection(ownerSelection));
+      // update menu types
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
       calculateLocalVisibility();
     }
   }

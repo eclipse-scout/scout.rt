@@ -110,7 +110,7 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
         item.dispose();
       }
     }
-    IActionFilter filter = ActionUtility.createCombinedFilter(getScoutContextMenu().getActiveFilter(), ActionUtility.createVisibleFilter());
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(getScoutContextMenu().getCurrentMenuTypes(), true);
     SwtMenuUtility.fillMenu(getSwtMenu(), getScoutContextMenu().getChildActions(), filter, getEnvironment(), getSwtMenu().getItemCount() > 0);
   }
 
@@ -147,12 +147,9 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
   protected void handleSwtMenuShow() {
 
     Runnable t = new Runnable() {
-//      @SuppressWarnings("deprecation")
       @Override
       public void run() {
-        getScoutContextMenu().callAboutToShow(getScoutContextMenu().getActiveFilter());
-//        getScoutContextMenu().prepareAction();
-//        getScoutContextMenu().aboutToShow();
+        getScoutContextMenu().callAboutToShow(ActionUtility.createMenuFilterMenuTypes(getScoutContextMenu().getCurrentMenuTypes(), false));
       }
     };
     JobEx prepareJob = getEnvironment().invokeScoutLater(t, 0);

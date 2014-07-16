@@ -387,7 +387,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
 
   /**
    * Update the given node.
-   *
+   * 
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -856,17 +856,17 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       }
 
       ITreeContextMenu contextMenu = getScoutObject().getContextMenu();
-      final IActionFilter menuFilter;
+      final IActionFilter aboutToShowFilter;
       if ((getUiField().getContextItem() == null)) {
-        menuFilter = ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace);
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.EmptySpace), false);
       }
       else {
-        menuFilter = contextMenu.getActiveFilter();
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), false);
       }
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          getScoutObject().getContextMenu().callAboutToShow(menuFilter);
+          getScoutObject().getContextMenu().callAboutToShow(aboutToShowFilter);
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -876,7 +876,14 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       catch (InterruptedException ex) {
         //nop
       }
-      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), menuFilter);
+      final IActionFilter displayFilter;
+      if ((getUiField().getContextItem() == null)) {
+        displayFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.EmptySpace), true);
+      }
+      else {
+        displayFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+      }
+
       RwtMenuUtility.fillMenu(((Menu) e.getSource()), contextMenu.getChildActions(), displayFilter, getUiEnvironment());
     }
 

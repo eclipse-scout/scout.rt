@@ -16,10 +16,10 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -47,7 +47,7 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     super.initConfig();
     getOwner().addTableListener(new P_OwnerTableListener());
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForTableSelection(getOwner().getSelectedRows()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(getOwner().getSelectedRows()));
     calculateLocalVisibility();
   }
 
@@ -107,8 +107,8 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
           return CONTINUE;
         }
       });
-      // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForTableSelection(ownerValue));
+      // set current menu types
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(ownerValue));
       calculateLocalVisibility();
     }
   }

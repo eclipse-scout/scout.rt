@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
 /**
  *
@@ -53,7 +55,6 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   @Override
   protected void initConfig() {
     super.initConfig();
-    setActiveFilter(ActionUtility.TRUE_FILTER);
     calculateLocalVisibility();
   }
 
@@ -62,14 +63,16 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     return m_owner;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public IActionFilter getActiveFilter() {
-    return (IActionFilter) propertySupport.getProperty(PROP_ACTIVE_FILTER);
+  public Set<? extends IMenuType> getCurrentMenuTypes() {
+    return (Set<? extends IMenuType>) propertySupport.getProperty(PROP_CURRENT_MENU_TYPES);
   }
 
-  public void setActiveFilter(IActionFilter filter) {
-    propertySupport.setProperty(PROP_ACTIVE_FILTER, filter);
+  protected void setCurrentMenuTypes(Set<? extends IMenuType> menuTypes) {
+    propertySupport.setProperty(PROP_CURRENT_MENU_TYPES, menuTypes);
   }
+
 
   @Override
   public void addContextMenuListener(ContextMenuListener listener) {
@@ -161,7 +164,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
 
   protected void calculateLocalVisibility() {
 
-    final IActionFilter activeFilter = getActiveFilter();
+    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);
     if (activeFilter != null) {
       final BooleanHolder visibleHolder = new BooleanHolder(false);
       acceptVisitor(new IActionVisitor() {

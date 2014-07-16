@@ -413,25 +413,39 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     IPage activePage = getActivePage();
     if (activePage != null && m_contextPage != activePage) {
       m_contextPage = activePage;
-      activePage.pageActivatedNotify();
       addMenusOfActivePageToContextMenu(activePage);
+      activePage.pageActivatedNotify();
     }
   }
 
-  protected void addMenusOfActivePageToContextMenu(IPage activePage) {
-    List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+  @Override
+  public List<IMenu> getMenusForPage(IPage page) {
+    List<IMenu> result = new ArrayList<IMenu>();
+    for (IMenu m : getContextMenu().getChildActions()) {
+      if (!m_inheritedMenusOfPage.contains(m)) {
+        result.add(m);
+      }
+    }
+    result.addAll(computeInheritedMenusOfPage(page));
+    return result;
+  }
 
+  /**
+   * @see IOutline#getMenusForPage(IPage)
+   */
+  protected List<IMenu> computeInheritedMenusOfPage(IPage activePage) {
+    List<IMenu> menus = new ArrayList<IMenu>();
     if (activePage instanceof IPageWithTable<?>) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
       if (pageWithTable.isShowEmptySpaceMenus()) {
         ITable table = pageWithTable.getTable();
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-            ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace));
+            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
         if (emptySpaceMenus.size() > 0) {
-          wrappedMenus.add(new MenuSeparator());
+          menus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
-            wrappedMenus.add(new TablePageTreeMenuWrapper(menu, TreeMenuType.SingleSelection));
+            menus.add(menu);
           }
         }
       }
@@ -445,13 +459,26 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       ITable table = pageWithTable.getTable();
       if (row != null) {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-        List<IMenu> menus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(TableMenuType.SingleSelection));
-        if (menus.size() > 0) {
-          wrappedMenus.add(new MenuSeparator());
-          for (IMenu menu : menus) {
-            wrappedMenus.add(new TablePageTreeMenuWrapper(menu, TreeMenuType.SingleSelection));
+        List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
+        if (parentTableMenus.size() > 0) {
+          menus.add(new MenuSeparator());
+          for (IMenu menu : parentTableMenus) {
+            menus.add(menu);
           }
         }
+      }
+    }
+    return menus;
+  }
+
+  protected void addMenusOfActivePageToContextMenu(IPage activePage) {
+    List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+    for (IMenu m : computeInheritedMenusOfPage(activePage)) {
+      if (m.isSeparator()) {
+        wrappedMenus.add(m);
+      }
+      else {
+        wrappedMenus.add(new TablePageTreeMenuWrapper(m, TreeMenuType.SingleSelection));
       }
     }
     m_inheritedMenusOfPage = wrappedMenus;

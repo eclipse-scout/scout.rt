@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -72,7 +72,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * <h3>SwtScoutTree</h3> ...
- *
+ * 
  * @since 1.0.0 23.07.2008
  * @author Andreas Hoegger
  */
@@ -765,24 +765,19 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       if (getScoutObject() == null || !isEnabledFromScout()) {
         return;
       }
-      final IActionFilter filter;
+      final IActionFilter aboutToShowFilter;
+      final ITreeContextMenu contextMenu = getScoutObject().getContextMenu();
       if ((getSwtField().getContextItem() == null)) {
-        filter = ActionUtility.createMenuFilterMenuTypes(TreeMenuType.EmptySpace);
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.EmptySpace), false);
       }
       else {
-        filter = getScoutObject().getContextMenu().getActiveFilter();
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), false);
       }
 
-//      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          IContextMenu contextMenu = getScoutObject().getContextMenu();
-          contextMenu.callAboutToShow(filter);
-//          // manually call about to show
-//          contextMenu.aboutToShow();
-//          contextMenu.prepareAction();
-//          scoutMenusRef.set(contextMenu);
+          contextMenu.callAboutToShow(aboutToShowFilter);
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);
@@ -792,8 +787,14 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       catch (InterruptedException ex) {
         //nop
       }
-      IActionFilter visibleFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), filter);
-      SwtMenuUtility.fillMenu(m_contextMenu, getScoutObject().getContextMenu().getChildActions(), visibleFilter, getEnvironment());
+      final IActionFilter showFilter;
+      if ((getSwtField().getContextItem() == null)) {
+        showFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.EmptySpace), true);
+      }
+      else {
+        showFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+      }
+      SwtMenuUtility.fillMenu(m_contextMenu, contextMenu.getChildActions(), showFilter, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {

@@ -155,48 +155,18 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
         // about to show
         IContextMenu contextMenu = getScoutObject().getContextMenu();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, contextMenu.getActiveFilter(), false).enqueue();
+        SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, contextMenu.getCurrentMenuTypes());
+        swingPopupWorker.setLightWeightPopup(false);
+        swingPopupWorker.enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
-//    //
-//    final CalendarComponent item = (CalendarComponent) getDateChooser().getCalendarItemFor(e);
-//    if (item != null) {
-//      // popup on item
-//      // notify Scout
-//      Runnable t = new Runnable() {
-//        @Override
-//        public void run() {
-//          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireComponentPopupFromUI();
-//          // call swing menu
-//          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
-//        }
-//      };
-//      getSwingEnvironment().invokeScoutLater(t, 5678);
-//      // end notify
-//    }
-//    else {
-//      // popup with general menu
-//      // notify Scout
-//      Runnable t = new Runnable() {
-//        @Override
-//        public void run() {
-//          List<IMenu> scoutMenus = getScoutObject().getUIFacade().fireNewPopupFromUI();
-//          // call swing menu
-//          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), scoutMenus, false).enqueue();
-//        }
-//      };
-//      getSwingEnvironment().invokeScoutLater(t, 5678);
-//      // end notify
-//    }
   }
 
   private void handleSwingCalendarItemAction(MouseEvent e) {
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return;
     }
-    //
-    // action on item
     // notify Scout
     Runnable t = new Runnable() {
       @Override

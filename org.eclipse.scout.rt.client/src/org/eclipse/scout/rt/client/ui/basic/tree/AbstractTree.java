@@ -776,7 +776,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void rebuildKeyStrokesInternal() {
 
     final List<IMenu> menus = new ArrayList<IMenu>();
-    final IActionFilter activeFilter = getContextMenu().getActiveFilter();
+    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getContextMenu().getCurrentMenuTypes(), true);
     getContextMenu().acceptVisitor(new IActionVisitor() {
       @Override
       public int visit(IAction action) {

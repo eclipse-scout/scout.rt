@@ -75,7 +75,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -239,8 +238,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             public void run() {
               // call swing menu
               IContextMenu contextMenu = getScoutObject().getContextMenu();
-              new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, contextMenu,
-                  contextMenu.getActiveFilter()).enqueue();
+              SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getSwingEnvironment(), compF, pFinal, contextMenu, contextMenu.getCurrentMenuTypes());
+              swingPopupWorker.setLightWeightPopup(true);
+              swingPopupWorker.enqueue();
             }
           };
           getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -790,7 +790,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           if (e.isPopupTrigger()) {
             // call swing menu
             IContextMenu contextMenu = getScoutObject().getContextMenu();
-            new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, contextMenu.getActiveFilter()).enqueue();
+            SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, contextMenu.getCurrentMenuTypes());
+            swingPopupWorker.setLightWeightPopup(true);
+            swingPopupWorker.enqueue();
           }
         }
       };
@@ -836,7 +838,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           // about to show
           IContextMenu contextMenu = getScoutObject().getContextMenu();
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, contextMenu.getActiveFilter(), false).enqueue();
+          SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, contextMenu.getCurrentMenuTypes());
+          swingPopupWorker.setLightWeightPopup(false);
+          swingPopupWorker.enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -946,8 +950,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         @Override
         public void run() {
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), getScoutObject().getContextMenu(),
-              ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header), false).enqueue();
+          SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), getScoutObject().getContextMenu(), CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header));
+          swingPopupWorker.setLightWeightPopup(false);
+          swingPopupWorker.enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -1655,7 +1660,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   *
+   * 
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

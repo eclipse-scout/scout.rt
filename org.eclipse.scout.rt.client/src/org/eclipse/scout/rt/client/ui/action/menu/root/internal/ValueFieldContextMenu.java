@@ -14,10 +14,10 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -38,8 +38,8 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   @Override
   protected void initConfig() {
     super.initConfig();
-    // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForValueFieldValue(getOwner().getValue()));
+    // init current menu types
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(getOwner().getValue()));
     calculateLocalVisibility();
   }
 
@@ -79,7 +79,7 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForValueFieldValue(ownerValue));
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(ownerValue));
     }
     calculateLocalVisibility();
   }
