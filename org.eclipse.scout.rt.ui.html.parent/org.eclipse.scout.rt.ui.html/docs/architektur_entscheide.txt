@@ -50,8 +50,28 @@ Offline
   Die Events werden aufgeonmmen und sobald der Server wieder erreichbar ist abgeschickt.
 - Aktenkoffer:
   Der Benutzer kann Objekte auswählen, die Offline verfübar sein sollen.
+  Werden dann alle Childpages auch geladen? Inkl. Aller Forms? ev. mittels Benutzer-Auswahl?
   Die Objekte werden in einer Offline-Sicht dargestellt.
   Die Offline-Sicht ist ähnlich zur Such-Sicht.
+  Bearbeitung im Offline-Modus: 2-Varianten:
+  1. Normale Scout-Komponenten so bearbeitbar wie möglich machen, Validierungen würden erst "zu Hause" (Online) durchgeführt.
+     Viele Komponenten gingen gar nicht (z.B. Adressen, da die Selektions-Logik im Modell liegt).
+     Auch dynamische Properties (visible, enabled). Alle Buttons und Menus. Es müsste UseCase-Buttons geben (z.B. neuer Eintrag in Tabelle hinzufügen). Man wäre dann aber sehr schnell wieder an der Grenze des Machbaren angelangt.
+     Stammdaten für Smartfields könnte man cachen, Lookup-Call-Smartfields könnten aber bereits nicht mehr genutzt werden.
+     Um überhaupt einen Dialog im Bearbeitungs-Modus öffnen zu können, braucht es intelligente Menüs bzw. Readonly und Bearbeitungs-Modus eines 360°-Dialogs, da im Offline-Fall die Menus grundsätzlich nicht funktionieren können.
+     Dialog wäre gesperrt bei Mitnahme? Ansonsten würde es ja beim Zurücksynchronisieren einfach überschreiben.
+     Ok, Abbrechen-Button müssten enabled sein. Dialog wird einfach geschlossen? Sobald online, wird ein doOk gemacht? Wie weiss man, dass OK-Button enabled sein soll?
+     Alternative: Ok immer disabled, Dialog muss minimiert werden. Manuell Dialoge durchgehen und OK klicken sobald man zurück ist. Ansonsten müsste noch geklärt werden, wie Zurücksynchronisierung ablaufen soll.
+     Oder Ansicht aller Offline-Dialoge analog Taskbar. Beim Synchronisieren nacheinander öffnen und speichern.
+     Klick auf OK macht keine Mussfeldprüfung? Theoretisch eigentlich möglich, jedoch halt nicht für dynamische Dinge (eher selten). Eigentlich wäre es nicht schlecht, wenn es macht was es kann und den Rest am Schluss beim online gehen. Vielleicht sollte man einen Hinweis einblenden, dass beim Synchronisieren nochmals eine Überprüfung stattfindet.
+  2. Man erstellt die Dialoge spezifisch für Offline
+     Im Modell oder als Javascript-Komponenten? Falls im Modell, hätte man die selben Einschränkungen wie oben -> eher nicht.
+     Falls als JS-Komonenten: Die bestehenden Komponenten (Table, SmartField etc.) sollten wiederverwendbar sein.
+     Wie kann man auf Events reagieren oder Properties setzen? Die Komponenten sind nicht dafür ausgelegt.
+     Entweder man baut setter für Properties und Event-Handling ein, also trennt GUI-Komponenten von Scout-Komponennten (analog Swing, SWT etc., siehe auch Abschnitt oben).
+     Alternative könnte sein, man verwendet die Session-Events -> Für Offline-Komonenten eine Offline-Session injecten. Selection-Listener an Table würde in Wahrheit ein Listener an die Session anhängen.
+     Setter würde es benötigen (z.B.: setSelectedRows würde model.selectedRows setzen, session.send und anschliessend renderSelectedRows aufrufen). Für Properties könnte man eventuell setter auch zur Laufzeit erzeugen, da es sie aktuell nicht gibt
+
 
 Session.js vs. ClientSession.js.
 - Dasselbe oder aufteilen? Auf dem Server gibt es heute JsonSession und JsonClientSession
@@ -113,6 +133,9 @@ Scout/Model-Anpassungen
 - ViewButtons eigentlich nicht nötig, Modell ist auf dem Desktop vorhanden
 - Editierbare-Tabellen
   Felder wären im JS bekannt, Tabelle hat aber execPrepare, execCompleteEdit etc.
+  Dynamische Cell-Editierbarkeit müsste umbedingt umgebaut werden. Zur Zeit im prepare isCellEditable (execIsEditable) aufgerufen, also zum Zeitpunkt der Darstellung.
+  Die Editierbarkeit darf nicht so berechnet werden, sondern muss über einen setter steuerbar sein, damit man 1. Veränderung der Editierbarkeit anzeigen kann und 2. vor dem Klicken schon weiss, ob man überhaupt ein Feld erzeugen muss
+  Dies würde auch der aktuellen Mobile-Lösung zu gute kommen, welche dynamische Editierbarkeit zur Zeit nicht unterstützt, weil prepareEdit null zurückliefert falls Spalte zwar editierbar, aber Feld nicht -> Es müsste jederzeit ein Feld erzeugt werden können, egal ob aktuell enabled oder nicht.
 - Filter bei Tree / Table (ITreeNodeFilter, ITableRowFilter) könnten auch vom JS übernommen werden
 - Tabellen-Organisation soll neu ein eigenes GUI-Element sein (kein Standard-Form)
 - Dynamische Outlines (Add/Remove)

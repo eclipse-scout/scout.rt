@@ -24,6 +24,8 @@ scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.EVENT_ROWS_INSERTED = 'rowsInserted';
 scout.Table.EVENT_ROW_CLICKED = 'rowClicked';
 scout.Table.EVENT_ROW_ACTION = 'rowAction';
+scout.Table.EVENT_ALL_ROWS_DELETED = 'allRowsDeleted';
+scout.Table.EVENT_RELOAD = 'reload';
 
 scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -377,6 +379,10 @@ scout.Table.prototype.sendRowAction = function($row) {
   });
 };
 
+scout.Table.prototype.sendReload = function() {
+  this.session.send(scout.Table.EVENT_RELOAD, this.id);
+};
+
 scout.Table.prototype.getValue = function(col, row) {
   var cell = this.rows[row].cells[col];
 
@@ -557,6 +563,14 @@ scout.Table.prototype.insertRows = function(rows) {
   } else {
     this.rows = rows;
   }
+  if (this.rendered) {
+    this.drawData();
+  }
+};
+
+scout.Table.prototype.deleteAllRows = function() {
+  this.rows = [];
+
   if (this.rendered) {
     this.drawData();
   }
@@ -837,6 +851,8 @@ scout.Table.prototype.onModelPropertyChange = function(event) {
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type_ == scout.Table.EVENT_ROWS_INSERTED) {
     this.insertRows(event.rows);
+  } else if (event.type_ == scout.Table.EVENT_ALL_ROWS_DELETED) {
+    this.deleteAllRows();
   } else if (event.type_ == scout.Table.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
   } else {

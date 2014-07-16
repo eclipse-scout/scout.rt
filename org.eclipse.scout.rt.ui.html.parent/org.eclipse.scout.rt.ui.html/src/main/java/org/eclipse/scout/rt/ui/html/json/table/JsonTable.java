@@ -56,6 +56,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
+  public static final String EVENT_ROWS_DELETED = "rowsDeleted";
+  public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
+  public static final String EVENT_RELOAD = "reload";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_MENUS = "menus";
@@ -274,6 +277,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     else if (EVENT_ROWS_SELECTED.equals(event.getType())) {
       handleUiRowsSelected(event, res);
     }
+    else if (EVENT_RELOAD.equals(event.getType())) {
+      handleUiReload(event, res);
+    }
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
@@ -290,6 +296,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     }
     finally {
       getTableEventFilter().removeIgnorableModelEvent(tableEvent);
+    }
+  }
+
+  protected void handleUiReload(JsonEvent event, JsonResponse res) {
+    if (getModel() instanceof ITable5) {
+      ((ITable5) getModel()).fireTableReloadFromUI();
     }
   }
 
@@ -461,6 +473,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         handleModelRowsDeleted(event.getRows());
         break;
       }
+      case TableEvent.TYPE_ALL_ROWS_DELETED: {
+        handleModelAllRowsDeleted(event.getRows());
+        break;
+      }
       case TableEvent.TYPE_ROWS_SELECTED: {
         handleModelRowsSelected(event.getRows());
         break;
@@ -494,7 +510,11 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       m_tableRowIds.remove(row);
       m_tableRows.remove(rowId);
     }
-    getJsonSession().currentJsonResponse().addActionEvent("rowsDeleted", getId(), jsonEvent);
+    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ROWS_DELETED, getId(), jsonEvent);
+  }
+
+  protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
+    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ALL_ROWS_DELETED, getId(), new JSONObject());
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {

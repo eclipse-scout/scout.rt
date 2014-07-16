@@ -27,7 +27,7 @@ scout.TableFooter = function(table, $parent, session) {
 
   this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
   this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
-  this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._table.drawData.bind(this._table));
+  this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._table.sendReload.bind(this._table));
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
     that._setInfoLoad(event.numRows);
