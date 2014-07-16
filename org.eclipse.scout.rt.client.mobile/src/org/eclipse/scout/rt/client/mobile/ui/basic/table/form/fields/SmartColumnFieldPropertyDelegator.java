@@ -25,9 +25,11 @@ public class SmartColumnFieldPropertyDelegator<T> extends ColumnFieldPropertyDel
   @Override
   public void init() {
     super.init();
-
-    getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
-    getReceiver().setLookupCall(getSender().getLookupCall());
+    // Existing lookup call of receiver has higher priority. Don't overwrite it.
+    if (getReceiver().getLookupCall() == null) {
+      getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
+      getReceiver().setLookupCall(getSender().getLookupCall());
+    }
   }
 
 }
