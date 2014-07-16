@@ -11,12 +11,15 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
 import org.eclipse.scout.rt.client.mobile.ui.form.FormHeaderActionFetcher;
 import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -40,8 +43,9 @@ public class TableRowFormHeaderActionFetcher extends FormHeaderActionFetcher {
   @Override
   public List<IMenu> fetch() {
     List<IMenu> headerActions = super.fetch();
-
-    List<IMenu> tableRowActions = ActionUtility.getActions(getTable().getMenus(), getTable().getContextMenu().getActiveFilter());
+    Set<? extends IMenuType> currentMenuTypes = getTable().getContextMenu().getCurrentMenuTypes();
+    IActionFilter actionFilter = ActionUtility.createMenuFilterMenuTypes(currentMenuTypes, true);
+    List<IMenu> tableRowActions = ActionUtility.getActions(getTable().getMenus(), actionFilter);
     for (IMenu action : tableRowActions) {
       AbstractMobileAction.setHorizontalAlignment(action, IMobileAction.HORIZONTAL_ALIGNMENT_RIGHT);
     }

@@ -97,9 +97,25 @@ public class SwtScoutCalendar extends SwtCalendar {
 
   @Override
   public void showContextMenu(Menu manager) {
-    ICalendarContextMenu contextMenu = m_scoutCalendarModel.getContextMenu();
-    IActionFilter visibleFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), contextMenu.getActiveFilter());
-    SwtMenuUtility.fillMenu(manager, contextMenu.getChildActions(), visibleFilter, m_field.getEnvironment());
+    final ICalendarContextMenu contextMenu = m_scoutCalendarModel.getContextMenu();
+
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        IActionFilter aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), false);
+        contextMenu.callAboutToShow(aboutToShowFilter);
+      }
+    };
+    JobEx job = m_field.getEnvironment().invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      //nop
+    }
+
+    IActionFilter displayFilter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    SwtMenuUtility.fillMenu(manager, contextMenu.getChildActions(), displayFilter, m_field.getEnvironment());
   }
 
   @Override

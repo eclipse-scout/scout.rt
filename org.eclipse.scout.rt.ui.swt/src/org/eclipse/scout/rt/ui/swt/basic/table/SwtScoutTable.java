@@ -105,7 +105,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by swt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- *
+ * 
  * @since 1.0.0 28.03.2008
  */
 public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScoutTable {
@@ -1298,14 +1298,12 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
       setContextColumnFromSwt(getSwtColumnAt(pTable));
-      final IActionFilter menuFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header));
       Runnable t = new Runnable() {
         @Override
         public void run() {
-
+          IActionFilter aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header), false);
           IContextMenu contextMenu = getScoutObject().getContextMenu();
-
-          contextMenu.callAboutToShow(menuFilter);
+          contextMenu.callAboutToShow(aboutToShowFilter);
         }
       };
       JobEx job = getEnvironment().invokeScoutLater(t, 1200);
@@ -1317,7 +1315,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
       // grab the actions out of the job, when the actions are providden
       // within the scheduled time the popup will be handled.
-      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), menuFilter);
+      IActionFilter displayFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header), true);
       SwtMenuUtility.fillMenu(m_headerMenu, getScoutObject().getContextMenu().getChildActions(), displayFilter, getEnvironment());
     }
 

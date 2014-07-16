@@ -24,9 +24,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.ActivityMapMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
@@ -412,9 +412,11 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       @Override
       public void run() {
         IContextMenu contextMenu = getScoutObject().getContextMenu();
-        IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(ActivityMapMenuType.Selection);
+
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, filter, false).enqueue();
+        SwingPopupWorker popupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, CollectionUtility.hashSet(ActivityMapMenuType.Selection));
+        popupWorker.setLightWeightPopup(false);
+        popupWorker.enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);
@@ -432,7 +434,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
       public void run() {
         IContextMenu contextMenu = getScoutObject().getContextMenu();
         // call swing menu
-        new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), null, e.getPoint(), contextMenu, contextMenu.getActiveFilter(), false).enqueue();
+        SwingPopupWorker popupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, MenuUtility.getMenuTypesForActivityMapSelection(getScoutActivityMap().getSelectedActivityCell()));
+        popupWorker.setLightWeightPopup(false);
+        popupWorker.enqueue();
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 5678);

@@ -24,6 +24,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 /**
  * Utility class for menus
@@ -118,4 +122,84 @@ public final class MenuUtility {
     return consolidatedMenus;
   }
 
+  public static Set<ActivityMapMenuType> getMenuTypesForActivityMapSelection(ActivityCell<?, ?> selectedCell) {
+    if (selectedCell == null) {
+      return CollectionUtility.hashSet(ActivityMapMenuType.Selection);
+    }
+    else {
+      return CollectionUtility.hashSet(ActivityMapMenuType.Activity);
+    }
+  }
+
+  public static Set<CalendarMenuType> getMenuTypesForCalendarSelection(CalendarComponent selectedComponent) {
+    if (selectedComponent == null) {
+      return CollectionUtility.hashSet(CalendarMenuType.EmptySpace);
+    }
+    else {
+      return CollectionUtility.hashSet(CalendarMenuType.CalendarComponent);
+    }
+  }
+
+  public static Set<TableMenuType> getMenuTypesForTableSelection(List<? extends ITableRow> selection) {
+    boolean allEnabled = true;
+    if (!CollectionUtility.isEmpty(selection)) {
+      allEnabled = true;
+      for (ITableRow n : selection) {
+        if (!n.isEnabled()) {
+          allEnabled = false;
+          break;
+        }
+      }
+    }
+    if (allEnabled) {
+      if (CollectionUtility.isEmpty(selection)) {
+        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+      }
+      else if (CollectionUtility.size(selection) == 1) {
+        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+      }
+      else {
+        return CollectionUtility.hashSet(TableMenuType.MultiSelection);
+      }
+    }
+    else {
+      return CollectionUtility.emptyHashSet();
+    }
+  }
+
+  public static Set<ValueFieldMenuType> getMenuTypesForValueFieldValue(Object value) {
+    if (value == null) {
+      return CollectionUtility.hashSet(ValueFieldMenuType.Null);
+    }
+    else {
+      return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
+    }
+  }
+
+  public static Set<TreeMenuType> getMenuTypesForTreeSelection(Set<? extends ITreeNode> selection) {
+    boolean allEnabled = true;
+    if (!CollectionUtility.isEmpty(selection)) {
+      allEnabled = true;
+      for (ITreeNode n : selection) {
+        if (!n.isEnabled()) {
+          allEnabled = false;
+          break;
+        }
+      }
+    }
+    if (allEnabled) {
+      if (CollectionUtility.isEmpty(selection)) {
+        return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
+      }
+      else if (CollectionUtility.size(selection) == 1) {
+        return CollectionUtility.hashSet(TreeMenuType.SingleSelection);
+      }
+      else {
+        return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
+      }
+    }
+    else {
+      return CollectionUtility.emptyHashSet();
+    }
+  }
 }

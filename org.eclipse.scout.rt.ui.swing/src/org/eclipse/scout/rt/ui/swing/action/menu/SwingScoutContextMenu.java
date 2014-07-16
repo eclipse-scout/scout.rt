@@ -123,7 +123,10 @@ public class SwingScoutContextMenu extends MouseAdapter implements FocusListener
     }
 
     comp.requestFocus();
-    new SwingPopupWorker(getEnvironment(), getTarget(), systemMenuOwner, new Point(x, y), getScoutContextMenu(), getScoutContextMenu().getActiveFilter()).run();
+    SwingPopupWorker swingPopupWorker = new SwingPopupWorker(getEnvironment(), getTarget(), new Point(x, y), getScoutContextMenu(), getScoutContextMenu().getCurrentMenuTypes());
+    swingPopupWorker.setLightWeightPopup(true);
+    swingPopupWorker.setSystemMenuOwner(systemMenuOwner);
+    swingPopupWorker.run();
   }
 
   public void addCopyPasteMenuOwner(JTextComponent target) {

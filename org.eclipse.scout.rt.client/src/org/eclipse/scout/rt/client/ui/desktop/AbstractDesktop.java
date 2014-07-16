@@ -1007,6 +1007,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void prepareMenuRec(IMenu menu) {
     menu.prepareAction();
     for (IMenu child : menu.getChildActions()) {
@@ -1467,6 +1468,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void addLocalPopupMenus(DesktopEvent event) {
     try {
       List<IMenu> list = new ArrayList<IMenu>();
@@ -1667,6 +1669,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
+  @SuppressWarnings("deprecation")
   private boolean runMenuRec(IMenu m, Class<? extends IMenu> menuType) throws ProcessingException {
     if (m.getClass() == menuType) {
       m.prepareAction();

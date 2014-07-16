@@ -97,7 +97,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by rwt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- *
+ * 
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
@@ -1325,18 +1325,18 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final IActionFilter filter;
+      final IActionFilter aboutToShowFilter;
       if (m_header) {
-        filter = ActionUtility.createMenuFilterMenuTypes(TableMenuType.EmptySpace, TableMenuType.Header);
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header), false);
       }
       else {
-        filter = getScoutObject().getContextMenu().getActiveFilter();
+        aboutToShowFilter = ActionUtility.createMenuFilterMenuTypes(getScoutObject().getContextMenu().getCurrentMenuTypes(), false);
       }
       Runnable t = new Runnable() {
         @Override
         public void run() {
           IContextMenu contextMenu = getScoutObject().getContextMenu();
-          contextMenu.callAboutToShow(filter);
+          contextMenu.callAboutToShow(aboutToShowFilter);
         }
       };
       JobEx job = getUiEnvironment().invokeScoutLater(t, 1200);
@@ -1346,7 +1346,14 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       catch (InterruptedException ex) {
         //nop
       }
-      IActionFilter displayFilter = ActionUtility.createCombinedFilter(ActionUtility.createVisibleFilter(), filter);
+
+      final IActionFilter displayFilter;
+      if (m_header) {
+        displayFilter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace, TableMenuType.Header), true);
+      }
+      else {
+        displayFilter = ActionUtility.createMenuFilterMenuTypes(getScoutObject().getContextMenu().getCurrentMenuTypes(), true);
+      }
       RwtMenuUtility.fillMenu((Menu) e.getSource(), getScoutObject().getContextMenu().getChildActions(), displayFilter, getUiEnvironment());
     }
   }

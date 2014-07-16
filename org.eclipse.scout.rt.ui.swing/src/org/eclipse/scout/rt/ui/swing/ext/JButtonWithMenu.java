@@ -11,9 +11,6 @@
 package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -21,7 +18,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -92,50 +88,6 @@ public class JButtonWithMenu extends JComponent {
   @Override
   public boolean isEnabled() {
     return m_pushButton.isEnabled();
-  }
-
-  /**
-   * An icon to draw a small downward-pointing arrow.
-   */
-  private static class SmallDownArrow implements Icon {
-
-    Color arrowColor = Color.black;
-
-    @Override
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-      g.setColor(arrowColor);
-      g.drawLine(x, y, x + 4, y);
-      g.drawLine(x + 1, y + 1, x + 3, y + 1);
-      g.drawLine(x + 2, y + 2, x + 2, y + 2);
-    }
-
-    @Override
-    public int getIconWidth() {
-      return 6;
-    }
-
-    @Override
-    public int getIconHeight() {
-      return 4;
-    }
-  }
-
-  /**
-   * An icon to draw a disabled small downward-pointing arrow.
-   */
-  private static class SmallDisabledDownArrow extends SmallDownArrow {
-
-    public SmallDisabledDownArrow() {
-      arrowColor = new Color(140, 140, 140);
-    }
-
-    @Override
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-      super.paintIcon(c, g, x, y);
-      g.setColor(Color.white);
-      g.drawLine(x + 3, y + 2, x + 4, y + 1);
-      g.drawLine(x + 3, y + 3, x + 5, y + 1);
-    }
   }
 
   @Override

@@ -16,10 +16,10 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
@@ -44,7 +44,7 @@ public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForActivityMapSelection(getOwner().getSelectedActivityCell()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForActivityMapSelection(getOwner().getSelectedActivityCell()));
     calculateLocalVisibility();
   }
 
@@ -72,7 +72,8 @@ public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForActivityMapSelection(ownerValue));
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForActivityMapSelection(ownerValue));
+
       calculateLocalVisibility();
     }
   }

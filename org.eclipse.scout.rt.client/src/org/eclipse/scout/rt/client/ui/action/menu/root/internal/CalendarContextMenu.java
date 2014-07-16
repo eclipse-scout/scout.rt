@@ -16,10 +16,10 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -44,7 +44,7 @@ public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICa
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setActiveFilter(ActionUtility.createMenuFilterForCalendarSelection(getOwner().getSelectedComponent()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(getOwner().getSelectedComponent()));
     calculateLocalVisibility();
   }
 
@@ -75,7 +75,7 @@ public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICa
         }
       });
       // set active filter
-      setActiveFilter(ActionUtility.createMenuFilterForCalendarSelection(ownerValue));
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(ownerValue));
       calculateLocalVisibility();
     }
   }

@@ -214,7 +214,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         ICalendarItemProvider provider = ConfigurationUtility.newInnerInstance(this, itemProviderClazz);
         producerList.add(provider);
         // add empty space menus to the context menu
-        menuList.addAll(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CalendarMenuType.EmptySpace)));
+        menuList.addAll(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
@@ -556,7 +556,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
     // add menus of provider
     if (provider != null) {
-      m_inheritedMenusOfSelectedProvider = ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CalendarMenuType.CalendarComponent));
+      m_inheritedMenusOfSelectedProvider = ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.CalendarComponent), false));
       getContextMenu().addChildActions(m_inheritedMenusOfSelectedProvider);
     }
   }

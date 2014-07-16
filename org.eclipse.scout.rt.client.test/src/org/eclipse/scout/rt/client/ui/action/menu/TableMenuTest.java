@@ -45,7 +45,7 @@ public class TableMenuTest {
 
     // single hugo boss
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    IActionFilter filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     Assert.assertEquals(2, visibleMenus.size());
     Assert.assertEquals("SingleSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -53,7 +53,7 @@ public class TableMenuTest {
 
     // single only meier
     t.selectRows(CollectionUtility.arrayList(t.getRow(1)), false);
-    filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
+    filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     Assert.assertEquals(1, visibleMenus.size());
     Assert.assertEquals("SingleSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -70,7 +70,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // multi selection
     t.selectRows(CollectionUtility.arrayList(t.getRow(0), t.getRow(1)), false);
-    IActionFilter filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     Assert.assertEquals(1, visibleMenus.size());
     Assert.assertEquals("MultiSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -87,7 +87,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // empty selection
     t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
-    IActionFilter filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     Assert.assertEquals(1, visibleMenus.size());
     Assert.assertEquals("EmptySpaceMenu", visibleMenus.get(0).getClass().getSimpleName());
