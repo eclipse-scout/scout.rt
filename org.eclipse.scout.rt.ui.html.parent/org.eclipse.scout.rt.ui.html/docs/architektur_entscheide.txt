@@ -141,6 +141,7 @@ Scout/Model-Anpassungen
 - Dynamische Outlines (Add/Remove)
 - IDateColumn / ITimeColumn und ev. Felder müssen das Pattern zurückgeben können, analog INumberValueContainer
 - Wie wollen wir mit den internen Tabellen bei NodePages umgehen? siehe auch FIXME in JsonDesktopTree -> vermutlich konfigurierbar machen auf nodepage
+- Handling / Caching der Detail-Forms bei Pages sollte von Scout unterstützt werden (Bei activate Öffnen des Forms falls noch nicht gemacht, bei Dispose schliessen). Das Pattern ist immer dasselbe.
 
 Scout-Pattern / Namespacing
 - Scout verwendet genau einen Namespace namens scout

@@ -55,6 +55,7 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
     });
   }
 
+  //FIXME left right needs ctrl, up down not? -> quite complicated to use. Problem when using ctrl as modifier for every tree related keystroke: ctrl-+ / ctrl-- is used to zoom the browser...
   if (tree) {
     that.handlers.push({
       removeKeyBox: true,

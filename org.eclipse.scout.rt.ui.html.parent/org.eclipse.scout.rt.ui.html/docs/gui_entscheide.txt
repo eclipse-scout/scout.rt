@@ -4,3 +4,9 @@ Baum
   Neu habe wir aber einen markanten Kreis inkl. Hover Effekt.
   Selektieren würde bedeuten, mann könnte nicht durch den Baum Browsen, ohne die Selektion zu ändern.
   Eventuell selektieren, wenn expand/collapse nicht möglich ist?
+
+Tastatur-Navigation
+  Desktop soll ohne Tab/Fokus navigierbar sein.
+  - Idee: Navigation im Baum mit Ctrl, Tabelle ohne Modifier
+  - Problem: Ctrl-+ und Ctrl-- bereits belegt vom Browser (Zoom)
+  - Lösung?: Ctrl-Alt- verwenden stattdessen? Oder effektiv wechseln zwischen Baum und Tabelle / 360°-Sicht / Such-Form erlauben mittels Tab oder Tastenkombination.
