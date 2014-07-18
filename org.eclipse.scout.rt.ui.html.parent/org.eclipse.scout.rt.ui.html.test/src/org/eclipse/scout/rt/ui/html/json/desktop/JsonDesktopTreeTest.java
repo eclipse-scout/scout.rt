@@ -11,8 +11,11 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import static org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility.extractEventsFromResponse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
@@ -117,6 +121,52 @@ public class JsonDesktopTreeTest {
     object.dispose();
     object = null;
     JsonTestUtility.assertGC(ref);
+  }
+
+  /**
+   * Tests whether a deletion event with correct node id gets sent whenever a node gets deleted.
+   */
+  @Test
+  public void testNodesDeletedEvent() throws ProcessingException, JSONException {
+    List<IPage> pages = new ArrayList<IPage>();
+    pages.add(new NodePage());
+    pages.add(new NodePage());
+    pages.add(new NodePage());
+    IOutline outline = new Outline(pages);
+    JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
+    IJsonSession session = jsonDesktopTree.getJsonSession();
+
+    String node1Id = jsonDesktopTree.getOrCreatedNodeId(pages.get(1));
+    outline.removeNode(pages.get(1));
+
+    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
+    assertTrue(responseEvents.size() == 1);
+
+    JSONObject event = responseEvents.get(0);
+    JSONArray nodeIds = event.getJSONArray("nodeIds");
+
+    assertTrue(nodeIds.length() == 1);
+    assertTrue(nodeIds.get(0).equals(node1Id));
+  }
+
+  /**
+   * Tests whether an all nodes deleted event gets sent whenever all children of a node get deleted.
+   */
+  @Test
+  public void testAllNodesDeletedEvent() throws ProcessingException, JSONException {
+    List<IPage> pages = new ArrayList<IPage>();
+    pages.add(new NodePage());
+    pages.add(new NodePage());
+    pages.add(new NodePage());
+    IOutline outline = new Outline(pages);
+    JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
+    IJsonSession session = jsonDesktopTree.getJsonSession();
+
+    outline.removeChildNodes(outline.getRootNode(), outline.getRootNode().getChildNodes());
+
+    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_ALL_NODES_DELETED);
+    JSONObject event = responseEvents.get(0);
+    assertNull(event.optJSONArray("nodeIds"));
   }
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {

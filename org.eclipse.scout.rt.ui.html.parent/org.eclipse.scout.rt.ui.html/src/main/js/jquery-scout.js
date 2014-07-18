@@ -8,6 +8,10 @@
   $.log = console.log.bind(console);
 
   $.makeDiv = function(id, cssClass, htmlContent) {
+    if (id === 0) {
+      //Allow 0 as id (!id would result in false)
+      id = '0';
+    }
     return $('<div' +
       (id ? ' id="' + id + '"' : '') +
       (cssClass ? ' class="' + cssClass + '"' : '') +

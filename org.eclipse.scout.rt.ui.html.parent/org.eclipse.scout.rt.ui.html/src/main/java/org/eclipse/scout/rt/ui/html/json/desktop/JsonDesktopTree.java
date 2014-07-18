@@ -38,8 +38,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
+  public static final String EVENT_NODES_DELETED = "nodesDeleted";
+  public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
+  public static final String PROP_COMMON_PARENT_NODE_ID = "commonParentNodeId";
   public static final String PROP_MENUS = "menus";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
@@ -125,7 +128,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
         break;
       }
       case TreeEvent.TYPE_NODES_DELETED: {
-        handleModelNodesDeleted(event.getNodes());
+        handleModelNodesDeleted(event);
         break;
       }
       case TreeEvent.TYPE_NODE_EXPANDED:
@@ -159,17 +162,26 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       jsonPages.put(jsonPage);
     }
     putProperty(jsonEvent, "nodes", jsonPages);
-    putProperty(jsonEvent, "commonParentNodeId", m_treeNodeIds.get(event.getCommonParentNode()));
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, m_treeNodeIds.get(event.getCommonParentNode()));
     getJsonSession().currentJsonResponse().addActionEvent("nodesInserted", getId(), jsonEvent);
   }
 
-  protected void handleModelNodesDeleted(Collection<ITreeNode> modelNodes) {
+  protected void handleModelNodesDeleted(TreeEvent event) {
+    Collection<ITreeNode> nodes = event.getNodes();
+
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-    JSONArray jsonNodeIds = new JSONArray();
-    for (ITreeNode node : modelNodes) {
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, m_treeNodeIds.get(event.getCommonParentNode()));
+
+    if (event.getCommonParentNode().getChildNodes().size() == 0) {
+      getJsonSession().currentJsonResponse().addActionEvent(EVENT_ALL_NODES_DELETED, getId(), jsonEvent);
+    }
+    else {
+      putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(event.getNodes()));
+      getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_DELETED, getId(), jsonEvent);
+    }
+
+    for (ITreeNode node : nodes) {
       String nodeId = m_treeNodeIds.get(node);
-      jsonNodeIds.put(nodeId);
       m_treeNodeIds.remove(node);
       m_treeNodes.remove(nodeId);
 
@@ -182,7 +194,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
         }
       }
     }
-    getJsonSession().currentJsonResponse().addActionEvent("nodesDeleted", getId(), jsonEvent);
+
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
@@ -230,10 +242,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   protected JSONObject pageToJson(IPage page) {
     String id = getOrCreatedNodeId(page);
-    String parentNodeId = getOrCreatedNodeId(page.getParentPage());
     JSONObject json = new JSONObject();
     putProperty(json, "id", id);
-    putProperty(json, "parentNodeId", parentNodeId);
     putProperty(json, "text", page.getCell().getText());
     putProperty(json, "expanded", page.isExpanded());
     putProperty(json, "leaf", page.isLeaf());
