@@ -17,18 +17,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This class catches the checked JSONException used on classes of org.json.* and converts them into
- * our JsonException runtime exception.
+ * This class catches the checked {@link JSONException} used on classes of org.json.* and converts them into
+ * our {@link JsonException} runtime exception.
  */
 public final class JsonObjectUtility {
 
   private JsonObjectUtility() {
+    // static access only
+  }
+
+  private static JsonException toRuntimeException(JSONException e) {
+    return new JsonException(e.getMessage(), e);
   }
 
   /**
    * Adds a property to the given JSON object and deals with exceptions.
    */
-  public static final JSONObject putProperty(JSONObject json, String key, Object value) {
+  public static JSONObject putProperty(JSONObject json, String key, Object value) {
     try {
       json.put(key, value);
       return json;
@@ -38,8 +43,8 @@ public final class JsonObjectUtility {
     }
   }
 
-  private static JsonException toRuntimeException(JSONException e) {
-    return new JsonException(e.getMessage(), e);
+  public static JSONObject putAdapterProperty(JSONObject object, IJsonSession session, String propertyName, Object model) {
+    return putProperty(object, propertyName, session.getOrCreateJsonAdapter(model));
   }
 
   public static String getString(JSONObject json, String key) {
@@ -78,6 +83,24 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static Object get(JSONArray json, int index) {
+    try {
+      return json.get(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static JSONObject newJSONObject(String source) {
+    try {
+      return new JSONObject(source);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static JSONArray newJSONArray(String source) {
     try {
       return new JSONArray(source);
@@ -94,28 +117,6 @@ public final class JsonObjectUtility {
     catch (JSONException e) {
       throw toRuntimeException(e);
     }
-  }
-
-  public static JSONObject newJSONObject(String source) {
-    try {
-      return new JSONObject(source);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static Object get(JSONArray json, int index) {
-    try {
-      return json.get(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONObject putAdapterProperty(JSONObject object, IJsonSession session, String propertyName, Object model) {
-    return putProperty(object, propertyName, session.getOrCreateJsonAdapter(model));
   }
 
   public static void disposeJsonAdapters(IJsonSession session, Collection<? extends Object> models) {
