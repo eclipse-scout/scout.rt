@@ -3,7 +3,6 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility.extractEventsFromResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -69,7 +68,7 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) session.getJsonAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
     assertTrue(responseEvents.size() == 1);
 
     JSONObject event = responseEvents.get(0);
@@ -82,7 +81,7 @@ public class JsonDesktopTest {
 
     desktop.removeForm(form);
 
-    responseEvents = extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
@@ -111,18 +110,18 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) session.getJsonAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
     assertTrue(responseEvents.size() == 1);
 
     form.start();
     form.doClose();
 
-    responseEvents = extractEventsFromResponse(session.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formClosed");
     assertTrue(responseEvents.size() == 1);
 
     desktop.removeForm(form);
 
-    responseEvents = extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 0);
   }
 

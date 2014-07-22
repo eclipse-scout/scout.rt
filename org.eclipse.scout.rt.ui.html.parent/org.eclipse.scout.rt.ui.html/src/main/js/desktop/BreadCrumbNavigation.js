@@ -65,13 +65,13 @@ scout.BreadCrumbNavigation.prototype._addBreadCrumbForm = function(form) {
 };
 
 scout.BreadCrumbNavigation.prototype.onModelAction = function(event) {
-  if (event.type_ == 'changed') {
+  if (event.type == 'changed') {
     this.breadcrumbs = event.breadcrumbs;
     this.currentFormId = event.currentFormId;
     this.$container.find('.breadcrumb-home').remove();
     this.$scrollContainer.empty();
     this._renderBreadCrumbs();
   } else {
-    $.log('Model event not handled. Widget: Form. Event: ' + event.type_ + '.');
+    $.log('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };

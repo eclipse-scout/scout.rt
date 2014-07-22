@@ -557,20 +557,20 @@ scout.DesktopTree.prototype._renderMenus = function($node) {
 };
 
 scout.DesktopTree.prototype.onModelAction = function(event) {
-  if (event.type_ == 'nodesInserted') {
+  if (event.type == 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
-  } else if (event.type_ == 'nodesDeleted') {
+  } else if (event.type == 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
-  } else if (event.type_ == 'allNodesDeleted') {
+  } else if (event.type == 'allNodesDeleted') {
     this._onAllNodesDeleted(event.commonParentNodeId);
-  } else if (event.type_ == 'nodesSelected') {
+  } else if (event.type == 'nodesSelected') {
     this.setNodeSelectedById(event.nodeIds[0]);
-  } else if (event.type_ == 'nodeExpanded') {
+  } else if (event.type == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
-  } else if (event.type_ == 'detailFormChanged') {
+  } else if (event.type == 'detailFormChanged') {
     this.setNodeDetailFormChanged(event.nodeId, event.detailForm);
   } else {
-    $.log('Model event not handled. Widget: DesktopTree. Event: ' + event.type_ + '.');
+    $.log('Model event not handled. Widget: DesktopTree. Event: ' + event.type + '.');
   }
 };
 

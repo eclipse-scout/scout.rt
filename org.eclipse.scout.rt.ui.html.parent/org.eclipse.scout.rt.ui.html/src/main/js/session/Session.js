@@ -186,7 +186,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 
   if (this._deferred) {
     for (var i = 0; i < message.events.length; i++) {
-      this._deferredEventTypes.push(message.events[i].type_);
+      this._deferredEventTypes.push(message.events[i].type);
     }
 
     if (this._requestsPendingCounter === 0) {
@@ -285,13 +285,12 @@ scout.Session.prototype._processEvents = function(events) {
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
 
-
     var widget = session.modelAdapterRegistry[event.id];
     if (!widget) {
       throw 'No widget found for id ' + event.id;
     }
 
-    if (event.type_ == 'property') {
+    if (event.type === 'property') { // Special handling for 'property' type
       widget.onModelPropertyChange(event);
     } else {
       widget.onModelAction(event);
@@ -321,10 +320,10 @@ scout.Session.prototype.init = function() {
 };
 
 scout.Session.prototype.onModelAction = function(event) {
-  if (event.type_ == 'localeChanged') {
+  if (event.type === 'localeChanged') {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
-  } else if (event.type_ == 'initialized') {
+  } else if (event.type === 'initialized') {
     this.locale = new scout.Locale(event.clientSession.locale);
     this.desktop = this.objectFactory.create(event.clientSession.desktop);
     this.desktop.render(this.$entryPoint);

@@ -257,9 +257,9 @@ scout.Table.prototype._drawData = function(startRow) {
     $rows = $(rowString);
     $rows.appendTo(this.$dataScroll)
       .on('mousedown', '', onMouseDown)
-      .on('mouseup', '', onMouseUp) //mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
+      .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
-      .on('contextmenu', onContextMenu);
+      .on('contextmenu', onContextMenu); //mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
   }
 
   // update info and scrollbar
@@ -834,7 +834,7 @@ scout.Table.prototype._triggerFilterResetted = function() {
   this.events.trigger(type);
 };
 
-scout.Table.prototype._handleModelHeaderVisibleChange = function(headerVisible) {
+scout.Table.prototype._setHeaderVisible = function(headerVisible) {
   if (headerVisible) {
     this._$header.show();
   } else {
@@ -842,21 +842,15 @@ scout.Table.prototype._handleModelHeaderVisibleChange = function(headerVisible) 
   }
 };
 
-scout.Table.prototype.onModelPropertyChange = function(event) {
-  if (event.hasOwnProperty('headerVisible')) {
-    this._handleModelHeaderVisibleChange(event.headerVisible);
-  }
-};
-
 scout.Table.prototype.onModelAction = function(event) {
-  if (event.type_ == scout.Table.EVENT_ROWS_INSERTED) {
+  if (event.type == scout.Table.EVENT_ROWS_INSERTED) {
     this.insertRows(event.rows);
-  } else if (event.type_ == scout.Table.EVENT_ALL_ROWS_DELETED) {
+  } else if (event.type == scout.Table.EVENT_ALL_ROWS_DELETED) {
     this.deleteAllRows();
-  } else if (event.type_ == scout.Table.EVENT_ROWS_SELECTED) {
+  } else if (event.type == scout.Table.EVENT_ROWS_SELECTED) {
     this.selectRowsByIds(event.rowIds);
   } else {
-    $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type_ + '.');
+    $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }
 };
 

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility.extractEventsFromResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -70,7 +69,7 @@ public class JsonTableTest {
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event, new JsonResponse());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -101,7 +100,7 @@ public class JsonTableTest {
     assertFalse(row2.isSelected());
     assertTrue(row4.isSelected());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 1);
 
     List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0));

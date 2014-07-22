@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.json.JSONObject;
 
 /**
- * This class is a Java wrapper around a <code>JSONObject</code> with properties 'type_' and 'id'.
+ * This class is a Java wrapper around a <code>JSONObject</code> with properties 'type' and 'id'.
  */
 public class JsonEvent {
 
-  public static final String TYPE = "type_";
+  public static final String TYPE = "type";
   public static final String ID = "id";
 
   private final JSONObject m_json;

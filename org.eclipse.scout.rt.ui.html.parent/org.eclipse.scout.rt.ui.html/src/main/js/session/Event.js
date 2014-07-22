@@ -1,5 +1,5 @@
 scout.Event = function(type, id, data) {
   $.extend(this, data);
-  this.type_ = type;
+  this.type = type;
   this.id = id;
 };

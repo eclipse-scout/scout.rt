@@ -112,9 +112,9 @@ scout.Form.prototype.disable = function() {
 scout.Form.prototype.onModelCreate = function() {};
 
 scout.Form.prototype.onModelAction = function(event) {
-  if (event.type_ == 'formClosed') {
+  if (event.type === 'formClosed') {
     this.destroy();
   } else {
-    $.log('Model event not handled. Widget: Form. Event: ' + event.type_ + '.');
+    $.log('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };

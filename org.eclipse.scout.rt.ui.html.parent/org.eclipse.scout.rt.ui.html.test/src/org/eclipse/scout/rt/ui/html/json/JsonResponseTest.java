@@ -10,20 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class JsonResponseTest {
@@ -44,14 +45,17 @@ public class JsonResponseTest {
 
     //Property change for table
     JSONObject event = eventList.get(0);
-    Assert.assertEquals(event.get("id"), jsonTable.getId());
+    assertEquals(event.get("id"), jsonTable.getId());
+    assertEquals(event.get("type"), "property");
 
     //Complete menu must be sent
     event = JsonTestUtility.resolveJsonObject(event);
-    Assert.assertEquals(1, event.getJSONArray("menus").length());
-    JSONObject menuObj = event.getJSONArray("menus").getJSONObject(0);
-    Assert.assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    Assert.assertEquals(menu.getText(), menuObj.get("text"));
+    JSONObject props = event.getJSONObject("properties");
+
+    assertEquals(1, props.getJSONArray("menus").length());
+    JSONObject menuObj = props.getJSONArray("menus").getJSONObject(0);
+    assertEquals(jsonMenu.getId(), menuObj.get("id"));
+    assertEquals(menu.getText(), menuObj.get("text"));
   }
 
   /**
@@ -65,13 +69,13 @@ public class JsonResponseTest {
     JsonTable jsonTable = createJsonTable(jsonSession);
     ITable table = jsonTable.getModel();
 
-    Assert.assertEquals(0, jsonSession.currentJsonResponse().getEventList().size());
+    assertEquals(0, jsonSession.currentJsonResponse().getEventList().size());
 
     Menu menu = new Menu();
     menu.setText("first menu");
     table.setMenus(CollectionUtility.arrayList(menu));
 
-    Assert.assertEquals(1, jsonSession.currentJsonResponse().getEventList().size());
+    assertEquals(1, jsonSession.currentJsonResponse().getEventList().size());
 
     Menu menu2 = new Menu();
     menu2.setText("second text");
@@ -82,19 +86,21 @@ public class JsonResponseTest {
     eventList = JsonTestUtility.resolveJsonAdapters(eventList);
 
     //There is still only one property change event containing the complete menus
-    Assert.assertEquals(1, eventList.size());
+    assertEquals(1, eventList.size());
     JSONObject event = eventList.get(0);
-    Assert.assertEquals(event.get("id"), jsonTable.getId());
+    assertEquals(event.get("id"), jsonTable.getId());
+    assertEquals(event.get("type"), "property");
+    JSONObject props = event.getJSONObject("properties");
 
-    Assert.assertEquals(2, event.getJSONArray("menus").length());
-    JSONObject menuObj = event.getJSONArray("menus").getJSONObject(0);
-    Assert.assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    Assert.assertEquals(menu.getText(), menuObj.get("text"));
+    assertEquals(2, props.getJSONArray("menus").length());
+    JSONObject menuObj = props.getJSONArray("menus").getJSONObject(0);
+    assertEquals(jsonMenu.getId(), menuObj.get("id"));
+    assertEquals(menu.getText(), menuObj.get("text"));
 
     jsonMenu = jsonSession.getJsonAdapter(menu2);
-    menuObj = event.getJSONArray("menus").getJSONObject(1);
-    Assert.assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    Assert.assertEquals(menu2.getText(), menuObj.get("text"));
+    menuObj = props.getJSONArray("menus").getJSONObject(1);
+    assertEquals(jsonMenu.getId(), menuObj.get("id"));
+    assertEquals(menu2.getText(), menuObj.get("text"));
   }
 
   private static JsonTable createJsonTable(IJsonSession jsonSession) {
@@ -107,5 +113,52 @@ public class JsonResponseTest {
     jsonTable.toJson();
 
     return jsonTable;
+  }
+
+  @Test
+  public void testJsonEventPropertyChangeEvent() {
+    // Check empty response
+    JsonSessionMock jsonSession = new JsonSessionMock();
+    JSONObject json = jsonSession.currentJsonResponse().toJson();
+
+    assertNotNull(json);
+    JSONArray events = json.getJSONArray("events");
+    assertEquals(0, events.length());
+
+    // Check single property change event
+    final String TEST_ID = "ID007";
+    final String TEST_PROP_NAME = "a stränge prøpertÿ name";
+    final String TEST_VALUE = "#";
+    jsonSession.currentJsonResponse().addPropertyChangeEvent(TEST_ID, TEST_PROP_NAME, TEST_VALUE);
+    json = jsonSession.currentJsonResponse().toJson();
+
+    assertNotNull(json);
+    events = json.getJSONArray("events");
+    assertEquals(1, events.length());
+
+    JSONObject event = events.getJSONObject(0);
+    assertEquals(TEST_ID, event.get("id"));
+    assertEquals("property", event.get("type"));
+    JSONObject props = event.getJSONObject("properties");
+    assertNotNull(props);
+    assertEquals(1, props.length());
+    assertEquals(TEST_PROP_NAME, props.keys().next());
+    Object value = props.get(TEST_PROP_NAME);
+    assertEquals(TEST_VALUE, value);
+  }
+
+  /**
+   * Property with the value null get converted to "" (empty string)
+   */
+  @Test
+  public void testJsonEventPropertyNullToEmptyString() {
+
+    JsonSessionMock jsonSession = new JsonSessionMock();
+    jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
+    JSONObject json = jsonSession.currentJsonResponse().toJson();
+
+    JSONArray events = json.getJSONArray("events");
+    JSONObject props = events.getJSONObject(0).getJSONObject("properties");
+    assertEquals(props.get("name"), "");
   }
 }

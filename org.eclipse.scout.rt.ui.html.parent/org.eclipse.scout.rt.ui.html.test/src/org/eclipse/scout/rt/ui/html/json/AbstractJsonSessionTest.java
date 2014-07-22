@@ -3,6 +3,8 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.junit.Assert.assertFalse;
+
 import java.lang.ref.WeakReference;
 
 import javax.servlet.http.HttpSessionBindingEvent;
@@ -11,7 +13,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -40,7 +41,7 @@ public class AbstractJsonSessionTest {
 
     jsonSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
-    Assert.assertFalse(clientSession.isActive());
+    assertFalse(clientSession.isActive());
 
     jsonSession = null;
     JsonTestUtility.assertGC(ref);

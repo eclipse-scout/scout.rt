@@ -35,11 +35,13 @@ scout.DesktopViewButtonOwn.prototype._render = function($parent) {
 };
 
 scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
-  if (event.selected !== undefined) {
-    if (event.selected) {
+  if (event.properties.selected !== undefined) {
+    if (event.properties.selected) {
       this._$viewButton.selectOne();
     }
   }
+  // FIXME BSH Do we need a "super" call? Check with CGU/AWE
+  //scout.DesktopViewButtonOwn.parent.prototype.onModelPropertyChange.call(this, event);
 };
 
 scout.DesktopViewButtonOwn.prototype.onModelAction = function() {};

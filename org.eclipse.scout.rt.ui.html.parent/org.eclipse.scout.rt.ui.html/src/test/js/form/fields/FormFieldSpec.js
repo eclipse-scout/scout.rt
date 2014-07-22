@@ -24,16 +24,19 @@ describe("FormField", function() {
     it("event should update model", function() {
       var event = {
         id:'123',
-        type_:'property',
-        errorStatus:'foo'
+        type:'property',
+        properties: {
+          errorStatus:'foo'
+        }
       };
       // required
       formField._$statusLabel = $('<div></div>');
       formField.onModelPropertyChange(event);
       expect(formField.errorStatus).toBe('foo');
-      // never apply id, type_ on model
+      // never apply id, type, properties on model
       expect(formField.hasOwnProperty('id')).toBe(false);
-      expect(formField.hasOwnProperty('type_')).toBe(false);
+      expect(formField.hasOwnProperty('type')).toBe(false);
+      expect(formField.hasOwnProperty('properties')).toBe(false);
     });
 
   });

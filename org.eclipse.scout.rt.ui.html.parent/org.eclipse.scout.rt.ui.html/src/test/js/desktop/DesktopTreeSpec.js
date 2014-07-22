@@ -130,7 +130,7 @@ describe("DesktopTree", function() {
         events: [{
           id: model.id,
           nodeIds: [model.nodes[0].id],
-          type_: 'nodesSelected'
+          type: 'nodesSelected'
         }]
       };
       session._processSuccessResponse(message);
@@ -154,7 +154,7 @@ describe("DesktopTree", function() {
           id: model.id,
           commonParentNodeId: commonParentNodeId,
           nodeIds: nodeIds,
-          type_: 'nodesDeleted'
+          type: 'nodesDeleted'
         };
       }
 
@@ -284,7 +284,7 @@ describe("DesktopTree", function() {
         return {
           id: model.id,
           commonParentNodeId: commonParentNodeId,
-          type_: 'allNodesDeleted'
+          type: 'allNodesDeleted'
         };
       }
 

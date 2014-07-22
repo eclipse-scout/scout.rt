@@ -224,18 +224,18 @@ scout.BaseDesktop.prototype.maximizeForm = function(form) {
 scout.BaseDesktop.prototype.onModelAction = function(event) {
   var form;
 
-  if (event.type_ === 'formAdded') {
+  if (event.type === 'formAdded') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this.forms.push(form);
     this.addForm(form);
-  } else if (event.type_ === 'formRemoved') {
+  } else if (event.type === 'formRemoved') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     scout.arrays.remove(this.forms, form);
     this.removeForm(form);
-  } else if (event.type_ === 'formEnsureVisible') {
+  } else if (event.type === 'formEnsureVisible') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this.activateForm(form);
   } else {
-    $.log('Model event not handled. Widget: Desktop. Event: ' + event.type_ + '.');
+    $.log('Model event not handled. Widget: Desktop. Event: ' + event.type + '.');
   }
 };

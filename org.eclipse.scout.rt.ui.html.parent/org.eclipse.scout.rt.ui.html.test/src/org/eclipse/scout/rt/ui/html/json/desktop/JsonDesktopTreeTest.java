@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility.extractEventsFromResponse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -35,7 +36,6 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,14 +49,14 @@ public class JsonDesktopTreeTest {
   public void testSelectionEvent() throws ProcessingException, JSONException {
     IOutline outline = new OutlineWithOneNode();
     ITreeNode node = outline.getRootNode().getChildNode(0);
-    Assert.assertFalse(node.isSelectedNode());
+    assertFalse(node.isSelectedNode());
 
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
 
     JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(node));
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
-    Assert.assertTrue(node.isSelectedNode());
+    assertTrue(node.isSelectedNode());
   }
 
   /**
@@ -72,8 +72,8 @@ public class JsonDesktopTreeTest {
     JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(node));
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
-    Assert.assertTrue(responseEvents.size() == 0);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
+    assertTrue(responseEvents.size() == 0);
   }
 
   /**
@@ -97,19 +97,19 @@ public class JsonDesktopTreeTest {
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
     JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(secondNode));
 
-    Assert.assertFalse(firstNode.isSelectedNode());
-    Assert.assertFalse(secondNode.isSelectedNode());
+    assertFalse(firstNode.isSelectedNode());
+    assertFalse(secondNode.isSelectedNode());
 
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
-    Assert.assertTrue(firstNode.isSelectedNode());
-    Assert.assertFalse(secondNode.isSelectedNode());
+    assertTrue(firstNode.isSelectedNode());
+    assertFalse(secondNode.isSelectedNode());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
-    Assert.assertTrue(responseEvents.size() == 1);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
+    assertTrue(responseEvents.size() == 1);
 
     List<ITreeNode> treeNodes = jsonDesktopTree.extractTreeNodes(responseEvents.get(0));
-    Assert.assertEquals(firstNode, treeNodes.get(0));
+    assertEquals(firstNode, treeNodes.get(0));
   }
 
   @Test
@@ -139,7 +139,7 @@ public class JsonDesktopTreeTest {
     String node1Id = jsonDesktopTree.getOrCreatedNodeId(pages.get(1));
     outline.removeNode(pages.get(1));
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
     assertTrue(responseEvents.size() == 1);
 
     JSONObject event = responseEvents.get(0);
@@ -164,7 +164,7 @@ public class JsonDesktopTreeTest {
 
     outline.removeChildNodes(outline.getRootNode(), outline.getRootNode().getChildNodes());
 
-    List<JSONObject> responseEvents = extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_ALL_NODES_DELETED);
+    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_ALL_NODES_DELETED);
     JSONObject event = responseEvents.get(0);
     assertNull(event.optJSONArray("nodeIds"));
   }

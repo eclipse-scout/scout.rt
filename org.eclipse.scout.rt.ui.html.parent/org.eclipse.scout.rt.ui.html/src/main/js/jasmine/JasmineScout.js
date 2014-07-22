@@ -90,7 +90,7 @@ var jasmineScoutMatchers = {
         var actualEventTypes = [];
         if (actual) {
           for (var i = 0; i < actual.events.length; i++) {
-            actualEventTypes.push(actual.events[i].type_);
+            actualEventTypes.push(actual.events[i].type);
           }
         }
 

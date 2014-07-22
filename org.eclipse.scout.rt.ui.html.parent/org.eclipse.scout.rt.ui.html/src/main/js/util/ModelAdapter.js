@@ -172,15 +172,14 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var ignore = ['id', 'type_'];
   var oldValues = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncProperties(oldValues, event, ignore);
+  this._syncProperties(oldValues, event.properties);
 
   // step 2 rendering - call setter methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {
-    this._renderProperties(oldValues, event, ignore);
+    this._renderProperties(oldValues, event.properties);
   }
 }; // TODO AWE: (form) jasmine-test this!
 

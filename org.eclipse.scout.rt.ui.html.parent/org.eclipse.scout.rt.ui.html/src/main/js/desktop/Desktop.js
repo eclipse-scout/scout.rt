@@ -153,7 +153,7 @@ scout.Desktop.prototype.changeOutline = function(outline) {
  * @override
  */
 scout.Desktop.prototype.onModelAction = function(event) {
-  if (event.type_ == 'outlineChanged') {
+  if (event.type === 'outlineChanged') {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);

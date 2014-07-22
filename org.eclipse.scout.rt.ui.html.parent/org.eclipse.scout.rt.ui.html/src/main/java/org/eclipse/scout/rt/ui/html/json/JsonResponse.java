@@ -55,11 +55,12 @@ public class JsonResponse {
     if (event == null) {
       event = new JSONObject();
       JsonObjectUtility.putProperty(event, "id", id);
-      JsonObjectUtility.putProperty(event, "type_", "property");
+      JsonObjectUtility.putProperty(event, "type", "property");
+      JsonObjectUtility.putProperty(event, "properties", new JSONObject()); // prepare empty object
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
-    JsonObjectUtility.putProperty(event, propertyName, newValue);
+    JsonObjectUtility.putProperty(event.getJSONObject("properties"), propertyName, newValue);
   }
 
   /**
@@ -71,7 +72,7 @@ public class JsonResponse {
     }
     JSONObject event = eventData != null ? eventData : new JSONObject();
     JsonObjectUtility.putProperty(event, "id", id);
-    JsonObjectUtility.putProperty(event, "type_", eventType);
+    JsonObjectUtility.putProperty(event, "type", eventType);
     m_eventList.add(event);
   }
 
@@ -115,13 +116,12 @@ public class JsonResponse {
     }
     else if (object instanceof JSONObject) {
       JSONObject jsonObject = (JSONObject) object;
-      Iterator keys = jsonObject.sortedKeys();
-      do {
+      Iterator keys = jsonObject.keys();
+      while (keys.hasNext()) {
         String key = (String) keys.next();
         Object value = jsonObject.opt(key);
         JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value));
       }
-      while (keys.hasNext());
     }
     else if (object instanceof JSONArray) {
       JSONArray arr = (JSONArray) object;
