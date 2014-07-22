@@ -23,17 +23,17 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 /**
  * Processes JSON events from the UI in a Scout client job and waits until all sync jobs have been finished.
  */
-class JsonEventProcessor {
+public class JsonEventProcessor {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonEventProcessor.class);
 
   private final JsonClientSession m_jsonSession;
 
-  JsonEventProcessor(JsonClientSession jsonSession) {
+  public JsonEventProcessor(JsonClientSession jsonSession) {
     m_jsonSession = jsonSession;
   }
 
-  void processEvents(JsonRequest request, final JsonResponse response) {
+  public void processEvents(JsonRequest request, final JsonResponse response) {
     for (final JsonEvent event : request.getEvents()) {
       // TODO AWE: (jobs) prüfen ob das hier probleme macht: dadurch läuft processEvent immer im richtigen
       // context. JsonAdapter instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
