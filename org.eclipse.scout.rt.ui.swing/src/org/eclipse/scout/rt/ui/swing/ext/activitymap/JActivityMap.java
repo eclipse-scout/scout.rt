@@ -41,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.MouseInputListener;
 
+import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
 /**
@@ -61,6 +62,7 @@ public class JActivityMap extends JComponent implements Scrollable {
   // mouse state
   private boolean m_pressedInsideMap;
   private int m_selectorResizeType = 0;
+  private IActivityMap<?, ?> m_scoutActivityMap;
 
   public JActivityMap() {
     m_header = new JActivityMapHeader(this);
@@ -843,4 +845,11 @@ public class JActivityMap extends JComponent implements Scrollable {
     return parent;
   }
 
+  public void setActivityMap(IActivityMap<?, ?> scoutObject) {
+    m_scoutActivityMap = scoutObject;
+  }
+
+  public IActivityMap<?, ?> getActivityMap() {
+    return m_scoutActivityMap;
+  }
 }
