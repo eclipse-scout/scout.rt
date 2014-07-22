@@ -33,7 +33,9 @@ public class DesktopEvent extends EventObject {
 
   public static final int TYPE_DESKTOP_CLOSED = 100;
   /**
-   * A new page is activated
+   * Event type that indicates that the active outline changes.
+   *
+   * @see IDesktop#setOutline(IOutline)
    */
   public static final int TYPE_OUTLINE_CHANGED = 200;
   public static final int TYPE_FORM_ADDED = 600;
