@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONArray;
-
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
@@ -147,10 +145,10 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
   protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
     JSONObject json = new JSONObject();
-    putProperty(json, "months", newJSONArray(symbols.getMonths()));
-    putProperty(json, "monthsShort", newJSONArray(symbols.getShortMonths()));
-    putProperty(json, "weekdays", newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
-    putProperty(json, "weekdaysShort", newJSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
+    putProperty(json, "months", JsonObjectUtility.newJSONArray(symbols.getMonths()));
+    putProperty(json, "monthsShort", JsonObjectUtility.newJSONArray(symbols.getShortMonths()));
+    putProperty(json, "weekdays", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
+    putProperty(json, "weekdaysShort", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
     putProperty(json, "am", symbols.getAmPmStrings()[Calendar.AM]);
     putProperty(json, "pm", symbols.getAmPmStrings()[Calendar.PM]);
     return json;

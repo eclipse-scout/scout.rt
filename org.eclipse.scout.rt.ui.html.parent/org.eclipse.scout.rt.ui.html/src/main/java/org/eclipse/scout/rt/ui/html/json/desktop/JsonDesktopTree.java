@@ -1,10 +1,5 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.get;
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getBoolean;
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getJSONArray;
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getString;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
@@ -292,13 +288,13 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   public List<ITreeNode> extractTreeNodes(JSONObject json) {
-    return jsonToTreeNodes(getJSONArray(json, PROP_NODE_IDS));
+    return jsonToTreeNodes(JsonObjectUtility.getJSONArray(json, PROP_NODE_IDS));
   }
 
   public List<ITreeNode> jsonToTreeNodes(JSONArray nodeIds) {
     List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
     for (int i = 0; i < nodeIds.length(); i++) {
-      nodes.add(m_treeNodes.get(get(nodeIds, i)));
+      nodes.add(m_treeNodes.get(JsonObjectUtility.get(nodeIds, i)));
     }
     return nodes;
   }
@@ -320,7 +316,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(getString(event.getJsonObject(), PROP_NODE_ID));
+    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getJsonObject(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node);
   }
 
@@ -338,8 +334,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(getString(event.getJsonObject(), PROP_NODE_ID));
-    final boolean expanded = getBoolean(event.getJsonObject(), "expanded");
+    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getJsonObject(), PROP_NODE_ID));
+    final boolean expanded = JsonObjectUtility.getBoolean(event.getJsonObject(), "expanded");
     if (node.isExpanded() == expanded) {
       return;
     }

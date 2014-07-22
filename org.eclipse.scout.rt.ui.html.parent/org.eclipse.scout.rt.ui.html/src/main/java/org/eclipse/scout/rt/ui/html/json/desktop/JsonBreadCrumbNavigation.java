@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getString;
-
 import java.util.Collection;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,6 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.json.JSONArray;
@@ -100,7 +99,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
   }
 
   public void handleUiActivate(JsonEvent event, JsonResponse res) {
-    final String formId = getString(event.getJsonObject(), JsonForm.PROP_FORM_ID);
+    final String formId = JsonObjectUtility.getString(event.getJsonObject(), JsonForm.PROP_FORM_ID);
     JsonForm jsonForm = getCurrentJsonForm();
     while (!jsonForm.getId().equals(formId) || getModel().getCurrentNavigationForm() == null) {
       try {

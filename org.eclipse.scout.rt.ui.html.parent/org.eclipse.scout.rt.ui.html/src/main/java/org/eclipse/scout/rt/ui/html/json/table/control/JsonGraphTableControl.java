@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.newJSONObject;
-
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> {
@@ -50,7 +49,7 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
-      putProperty(json, "graph", newJSONObject(GRAPH));
+      putProperty(json, "graph", JsonObjectUtility.newJSONObject(GRAPH));
       m_contentLoaded = true;
     }
     return json;
@@ -58,7 +57,7 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
 
   @Override
   protected void handleUiLoadContent() {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", newJSONObject(GRAPH));
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", JsonObjectUtility.newJSONObject(GRAPH));
   }
 
 }

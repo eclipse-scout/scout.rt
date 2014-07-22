@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.get;
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getJSONArray;
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.getString;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -45,6 +41,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
@@ -430,17 +427,17 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   public List<ITableRow> extractTableRows(JSONObject json) {
-    return jsonToTableRows(getJSONArray(json, PROP_ROW_IDS));
+    return jsonToTableRows(JsonObjectUtility.getJSONArray(json, PROP_ROW_IDS));
   }
 
   public ITableRow extractTableRow(JSONObject json) {
-    return getTableRowForRowId(getString(json, PROP_ROW_ID));
+    return getTableRowForRowId(JsonObjectUtility.getString(json, PROP_ROW_ID));
   }
 
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
-      rows.add(m_tableRows.get(get(rowIds, i)));
+      rows.add(m_tableRows.get(JsonObjectUtility.get(rowIds, i)));
     }
     return rows;
   }

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.putProperty;
-
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.json.JSONObject;
 
@@ -28,20 +26,20 @@ public class JsonGridData implements IJsonMapper {
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    putProperty(json, "fillHorizontal", m_gridData.fillHorizontal);
-    putProperty(json, "fillVertical", m_gridData.fillVertical);
-    putProperty(json, "h", m_gridData.h);
-    putProperty(json, "heightInPixel", m_gridData.heightInPixel);
-    putProperty(json, "horizontalAlignment", m_gridData.horizontalAlignment);
-    putProperty(json, "useUiHeight", m_gridData.useUiHeight);
-    putProperty(json, "useUiWidth", m_gridData.useUiWidth);
-    putProperty(json, "verticalAlignment", m_gridData.verticalAlignment);
-    putProperty(json, "w", m_gridData.w);
-    putProperty(json, "weightX", m_gridData.weightX);
-    putProperty(json, "weightY", m_gridData.weightY);
-    putProperty(json, "widthInPixel", m_gridData.widthInPixel);
-    putProperty(json, "x", m_gridData.x);
-    putProperty(json, "y", m_gridData.y);
+    JsonObjectUtility.putProperty(json, "fillHorizontal", m_gridData.fillHorizontal);
+    JsonObjectUtility.putProperty(json, "fillVertical", m_gridData.fillVertical);
+    JsonObjectUtility.putProperty(json, "h", m_gridData.h);
+    JsonObjectUtility.putProperty(json, "heightInPixel", m_gridData.heightInPixel);
+    JsonObjectUtility.putProperty(json, "horizontalAlignment", m_gridData.horizontalAlignment);
+    JsonObjectUtility.putProperty(json, "useUiHeight", m_gridData.useUiHeight);
+    JsonObjectUtility.putProperty(json, "useUiWidth", m_gridData.useUiWidth);
+    JsonObjectUtility.putProperty(json, "verticalAlignment", m_gridData.verticalAlignment);
+    JsonObjectUtility.putProperty(json, "w", m_gridData.w);
+    JsonObjectUtility.putProperty(json, "weightX", m_gridData.weightX);
+    JsonObjectUtility.putProperty(json, "weightY", m_gridData.weightY);
+    JsonObjectUtility.putProperty(json, "widthInPixel", m_gridData.widthInPixel);
+    JsonObjectUtility.putProperty(json, "x", m_gridData.x);
+    JsonObjectUtility.putProperty(json, "y", m_gridData.y);
     return json;
   }
 

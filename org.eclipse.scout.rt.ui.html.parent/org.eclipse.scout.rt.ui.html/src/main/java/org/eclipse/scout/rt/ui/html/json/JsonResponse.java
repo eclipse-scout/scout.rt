@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.putProperty;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,12 +54,12 @@ public class JsonResponse {
 
     if (event == null) {
       event = new JSONObject();
-      putProperty(event, "id", id);
-      putProperty(event, "type_", "property");
+      JsonObjectUtility.putProperty(event, "id", id);
+      JsonObjectUtility.putProperty(event, "type_", "property");
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
-    putProperty(event, propertyName, newValue);
+    JsonObjectUtility.putProperty(event, propertyName, newValue);
   }
 
   /**
@@ -72,8 +70,8 @@ public class JsonResponse {
       throw new JsonException("id is null");
     }
     JSONObject event = eventData != null ? eventData : new JSONObject();
-    putProperty(event, "id", id);
-    putProperty(event, "type_", eventType);
+    JsonObjectUtility.putProperty(event, "id", id);
+    JsonObjectUtility.putProperty(event, "type_", eventType);
     m_eventList.add(event);
   }
 
@@ -84,9 +82,9 @@ public class JsonResponse {
     for (JSONObject e : m_eventList) {
       eventArray.put(resolveJsonAdapter(e));
     }
-    putProperty(response, "events", eventArray);
-    putProperty(response, "errorCode", m_errorCode);
-    putProperty(response, "errorMessage", m_errorMessage);
+    JsonObjectUtility.putProperty(response, "events", eventArray);
+    JsonObjectUtility.putProperty(response, "errorCode", m_errorCode);
+    JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
     return response;
   }
 
