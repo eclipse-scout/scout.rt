@@ -73,9 +73,6 @@ Offline
      Setter würde es benötigen (z.B.: setSelectedRows würde model.selectedRows setzen, session.send und anschliessend renderSelectedRows aufrufen). Für Properties könnte man eventuell setter auch zur Laufzeit erzeugen, da es sie aktuell nicht gibt
 
 
-Session.js vs. ClientSession.js.
-- Dasselbe oder aufteilen? Auf dem Server gibt es heute JsonSession und JsonClientSession
-
 Attach / Detach vs. new Scout.DesktopTable()
 - Attach geht lange bei grossen Objekten (z.B. table mit 800 Rows)
 
@@ -155,19 +152,56 @@ Scout-Pattern / Namespacing
 - Das Pattern könnte sich noch ändern, abhängig von Portlets und Erweiterbarkeit (siehe unten)
 
 Session-Handling
-- JsonSession beinhaltet zustand des Scout-Clients (welche Forms offen sind etc.)
-- JsonSession muss pro div sein -> sessionPartId
-- sessionPartId besteht aus tabId und divId
-- HttpSession enthält sessionPartIds
-- tabId darf nicht beim Neuladen der Seite bzw. beim Vor/Zurück neu erstellt werden, sonst wird jedesmal eine neue JsonSession erzeugt
-- tabId muss darum in die Url geschrieben werden (?t=123)
-- Tomcat unterstützt Cookie-Persistenz (mittels maxAge) -> Cookie wird nach dem Schliessen des Browsers NICHT gelöscht
-- Damit diese Persistenz genutzt werden kann, muss tabId dieselbe sein wie beim vorherigen Besuch
-- Benutzer kann entweder tabId selber eingeben (mühsam)
-- Oder Scout fügt automatisch die letzte tabId hinzu
-- Möglichkeiten:
-  - tabId ist eine Laufnummer, wenn die tabId fehlt wird automatisch tabId = 0 hinzugefügt. Laufnummer kann im html 5 cache oder in der http session gehalten werden
-  - tabId wird im html 5 cache gespeichert, wenn die tabId fehlt wird die (letzte) tabId aus dem html 5 cache geholt
+- Es gibt verschiedene Arten von Sessions:
+
+  HTTP session:        - Java Servlet Sessions auf dem GUI-Server. Wird vom Applikationsserver nach erfolgter
+                         Authentifizierung erstellt.
+                       - Wird identifiert durch ein Session-Cookie JSESSIONID, welches der HTTP-Client bei jedem
+                         Request mitschickt. Man kann auf dem App-Server einstellen, wie lange dieses Cookie
+                         leben soll (z.B. 4h wegen iPhone-Homescreen-Verhalten, oder ohne Zeitpunkt, dann ist es
+                         kaputt, wenn der Browser zugemacht wird). Genaue Eigenschaften des Cookies (z.B. Pfad
+                         oder HTTP-only Flag) werden vom App-Server definiert.
+                       - Es gibt keine Verbindung zwischen den verschiedenen HTTP-Sessions. Jeder User hat eine
+                         eigene HTTP-Session (und auch ein einzelner User kann mehrere HTTP-Sessions haben, z.B.
+                         wenn er ein Private-Browsing-Fenster öffnet).
+                       - Layer: Appserver/HTTP
+
+  JavaScript session:  - Wird vom Browser pro Scout-Kontext (DIV) erzeugt (main.js bzw. Session.js).
+                       - Als ID dient die JsonSessionId. Diese wird immer vom Browser neu erzeugt aus dem aktuellen
+                         Timestamp und optional dem Wert des data-partid Attributs (für Portlet). Innerhalb
+                         einer HTTP-Session ist dieser Wert damit eindeutig.
+                       - Diese Session ist der Rootkontext des GUIs, alles läuft innerhalb dieser Session ab.
+                         Sie merkt sich auch alle Objekte und Mappings (Registry).
+                       - Die JavaScript session hat ein Pendant auf dem GUI-Server, die -> JsonSession.
+                       - Layer: UI/Browser (JavaScript)
+
+  JSON session:        - Unter dem Schlüssel "scout.htmlui.session.json.$JsonSessionId" werden die verschiedenen
+                         JsonSessions des Benutzers (1 pro Scout-"Fenster") in der HTTP-Session abgelegt.
+                       - Wenn noch keine JsonSession existiert, wird dynamisch eine erzeugt (nur wenn im JSON-
+                         Request "startup=true" mitgeliefert wird, ansonsten ist der Zustand ungültig). Die damit
+                         zur verknüpfende ClientSession muss ebenfalls mitgeliefert werden.
+                       - Auch auf der Serverseite enthält die JsonSession eine Registry für alle Adapter.
+                       - Die JSON session und die JavaScript session enthalten den gleichen Zustand. Dieser
+                         Zustand beschreibt den Inhalt des betreffenden Scout-"Fensters".
+                       - Layer: scout.rt.ui.html (Java, auf dem GUI-Server)
+
+  Client session:      - Scout-Modell des Clients (unabhängig vom UI, wie früher).
+                       - Die ClientSession wird ebenfalls in der HTTP-Session abgelegt (Schlüssel "scout.htmlui.
+                         session.client.$ClientSessionId"). Dadurch können mehrere JsonSessions die gleiche
+                         ClientSession verwenden (z.b. in einem Popup).
+                       - Die ClientSessionId ist eine beliebige Nummer und wird von Session.js berechnet. Danach
+                         wird sie im HTML5 "session storage" abgelegt, wodurch Sub-Fenster (Popups) den gleichen
+                         Wert erhalten, ein neues Tab jedoch einen anderen Wert. Damit ist es möglich, dass ein
+                         Benutzer mehrere "Clients" gleichzeitig im selben Browser offen haben kann. (Es ist aber
+                         nicht möglich, mehrere verschiedene Benutzer im gleichen Browser laufen zu lassen, da
+                         die HTTP-Session bzw. das Session-Cookie im ganzen Browser gilt. Falls man das möchte,
+                         müsste der Benutzername in die URL mitaufgenommen werden.)
+                       - Layer: scout.rt.client (Java, auf dem GUI-Server)
+
+  Server session       - Scout-Modell des Servers (unabhängig vom UI, wie früher).
+                       - Login des GUI-Servers auf den Backend-Server wie früher bei RAP (TODO: Wirklich???).
+                       - Layer: scout.rt.server (Java, auf dem Backend-Server)
+
 
 Portlets
 - Javascript und CSS müssen abgegrenzt werden
