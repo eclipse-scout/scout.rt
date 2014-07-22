@@ -65,6 +65,15 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static JSONObject getJSONObject(JSONObject json, String key) {
+    try {
+      return json.getJSONObject(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static JSONObject getJSONObject(JSONArray json, int index) {
     try {
       return json.getJSONObject(index);
@@ -77,6 +86,15 @@ public final class JsonObjectUtility {
   public static JSONArray getJSONArray(JSONObject json, String key) {
     try {
       return json.getJSONArray(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static Object get(JSONObject json, String key) {
+    try {
+      return json.get(key);
     }
     catch (JSONException e) {
       throw toRuntimeException(e);

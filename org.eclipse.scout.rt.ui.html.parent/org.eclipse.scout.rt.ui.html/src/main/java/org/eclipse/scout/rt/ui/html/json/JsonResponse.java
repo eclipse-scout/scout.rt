@@ -56,11 +56,15 @@ public class JsonResponse {
       event = new JSONObject();
       JsonObjectUtility.putProperty(event, "id", id);
       JsonObjectUtility.putProperty(event, "type", "property");
-      JsonObjectUtility.putProperty(event, "properties", new JSONObject()); // prepare empty object
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
-    JsonObjectUtility.putProperty(event.getJSONObject("properties"), propertyName, newValue);
+    JSONObject props = event.optJSONObject("properties");
+    if (props == null) {
+      props = new JSONObject();
+      JsonObjectUtility.putProperty(event, "properties", props);
+    }
+    JsonObjectUtility.putProperty(props, propertyName, newValue);
   }
 
   /**

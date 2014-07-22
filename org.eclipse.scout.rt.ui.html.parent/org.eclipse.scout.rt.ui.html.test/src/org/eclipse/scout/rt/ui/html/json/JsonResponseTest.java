@@ -116,7 +116,7 @@ public class JsonResponseTest {
   }
 
   @Test
-  public void testJsonEventPropertyChangeEvent() {
+  public void testJsonEventPropertyChangeEvent() throws JSONException {
     // Check empty response
     JsonSessionMock jsonSession = new JsonSessionMock();
     JSONObject json = jsonSession.currentJsonResponse().toJson();
@@ -151,7 +151,7 @@ public class JsonResponseTest {
    * Property with the value null get converted to "" (empty string)
    */
   @Test
-  public void testJsonEventPropertyNullToEmptyString() {
+  public void testJsonEventPropertyNullToEmptyString() throws JSONException {
 
     JsonSessionMock jsonSession = new JsonSessionMock();
     jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
