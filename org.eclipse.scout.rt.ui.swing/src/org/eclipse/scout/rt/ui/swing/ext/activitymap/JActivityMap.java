@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -84,9 +84,11 @@ public class JActivityMap extends JComponent implements Scrollable {
           @Override
           public void mouseReleased(MouseEvent e) {
             Component parent = getParentAt(e.getComponent(), e.getPoint());
-            parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
-            if(fix!=null) {
-              fix.mouseReleased(this, e);
+            if (parent != null) {
+              parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
+              if (fix != null) {
+                fix.mouseReleased(this, e);
+              }
             }
           }
 
@@ -107,9 +109,10 @@ public class JActivityMap extends JComponent implements Scrollable {
           @Override
           public void mouseDragged(MouseEvent e) {
             Component parent = getParentAt(e.getComponent(), e.getPoint());
-            parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
+            if (parent != null) {
+              parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
+            }
           }
-
         }
         );
     setLayout(new ActivityMapLayout());
@@ -277,7 +280,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         if (isButton1(e)) {
           dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, JActivityMap.this));
         }
-        if(fix!=null) {
+        if (fix != null) {
           fix.mouseReleased(this, e);
         }
       }
