@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -121,8 +123,13 @@ public class JsonResponse {
     else if (object instanceof JSONObject) {
       JSONObject jsonObject = (JSONObject) object;
       Iterator keys = jsonObject.keys();
+      // FIXME BSH We currently rely on alphabetic order - change that! (E.g. new TabBox: [g]roupBoxes vs. [s]electedTab) SEE ALSO: ModelAdapter.js -> _eachProperty
+      Set<String> sortedKeys = new TreeSet<String>();
       while (keys.hasNext()) {
         String key = (String) keys.next();
+        sortedKeys.add(key);
+      }
+      for (String key : sortedKeys) {
         Object value = jsonObject.opt(key);
         JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value));
       }
