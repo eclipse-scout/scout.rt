@@ -35,7 +35,7 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
     // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
     if (window.opener.scout.sessions.length > 1) {
       window.close();
-      throw 'Too many scout sessions';
+      throw new Error('Too many scout sessions');
     }
     var parentJsonSession = window.opener.scout.sessions[0];
     parentJsonSession.registerChildWindow(window);
@@ -231,7 +231,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   if (errorThrown) {
     throw errorThrown;
   }
-  throw 'Error while processing request. ' + textStatus;
+  throw new Error('Error while processing request. ' + textStatus);
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -332,7 +332,7 @@ scout.Session.prototype.onModelAction = function(event) {
 
 scout.Session.prototype.registerChildWindow = function(childWindow) {
   if (!childWindow) {
-    throw 'Missing argument "childWindow"';
+    throw new Error("Missing argument 'childWindow'");
   }
 
   // Add to list of open child windows

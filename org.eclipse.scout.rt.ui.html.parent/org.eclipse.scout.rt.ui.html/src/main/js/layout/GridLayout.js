@@ -5,7 +5,7 @@
  */
 scout.GridLayout = function($container) {
   if (!$container.data('columns')) {
-    throw 'Missing attribute data-columns, cannot layout container';
+    throw new Error('Missing attribute data-columns, cannot layout container');
   }
   this.$container = $container;
   this.columns = $container.data('columns');

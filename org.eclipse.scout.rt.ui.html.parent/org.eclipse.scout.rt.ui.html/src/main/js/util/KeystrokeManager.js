@@ -51,10 +51,10 @@ scout.KeystrokeManager = function() {
 
 scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   if (!$element) {
-    throw 'missing argument \'$element\'';
+    throw new Error("missing argument '$element'");
   }
   if (!adapter) {
-    throw 'missing argument \'adapter\'';
+    throw new Error("missing argument 'adapter'");
   }
 
   var controller = function(event) {
@@ -88,7 +88,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
 
 scout.KeystrokeManager.prototype.uninstallAdapter = function(adapter) {
   if (!adapter) {
-    throw 'missing argument \'adapter\'';
+    throw new Error("missing argument 'adapter'");
   }
 
   scout.arrays.remove(this._adapters, adapter);

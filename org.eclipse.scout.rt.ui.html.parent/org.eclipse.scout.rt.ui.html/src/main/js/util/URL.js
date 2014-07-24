@@ -33,10 +33,10 @@ scout.URL._formatQueryParam = function(key, value) {
 // times, the value is converted to an array.
 scout.URL._addToMap = function(map, key, value) {
   if (typeof map === 'undefined') {
-    throw 'Argument "map" must not be null';
+    throw new Error("Argument 'map' must not be null");
   }
   if (typeof key === 'undefined') {
-    throw 'Argument "key" must not be null';
+    throw new Error("Argument 'key' must not be null");
   }
   if (key in map) {
     var oldValue = map[key];
@@ -70,7 +70,7 @@ scout.URL._parse = function(queryPart) {
 
 scout.URL.prototype.getParameter = function(param) {
   if (typeof param !== 'string') {
-    throw 'Illegal argument type: ' + param;
+    throw new Error('Illegal argument type: ' + param);
   }
   var value = this._queryMap[param];
   if (Array.isArray(value)) {
@@ -81,7 +81,7 @@ scout.URL.prototype.getParameter = function(param) {
 
 scout.URL.prototype.removeParameter = function(param) {
   if (typeof param !== 'string') {
-    throw 'Illegal argument type: ' + param;
+    throw new Error('Illegal argument type: ' + param);
   }
   delete this._queryMap[param];
   return this;
@@ -89,7 +89,7 @@ scout.URL.prototype.removeParameter = function(param) {
 
 scout.URL.prototype.setParameter = function(param, value) {
   if (typeof param !== 'string') {
-    throw 'Illegal argument type: ' + param;
+    throw new Error('Illegal argument type: ' + param);
   }
   if (param === null || param === '') { // ignore empty keys
     return;
@@ -100,7 +100,7 @@ scout.URL.prototype.setParameter = function(param, value) {
 
 scout.URL.prototype.addParameter = function(param, value) {
   if (typeof param !== 'string') {
-    throw 'Illegal argument type: ' + param;
+    throw new Error('Illegal argument type: ' + param);
   }
   if (param === null || param === '') { // ignore empty keys
     return;

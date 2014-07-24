@@ -138,7 +138,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
     return;
   }
   if ($node.length === 0) {
-    throw '$node must be set.';
+    throw new Error('$node must be set.');
   }
   if (!$node.hasClass('can-expand') || $node.data('expanding') || expanded == $node.hasClass('expanded')) {
     return true;
@@ -228,7 +228,7 @@ scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
     $node = this._findNodeById(nodeId);
     node = this._nodeMap[nodeId];
     if (node === undefined) {
-      throw 'No node found for id ' + nodeId;
+      throw new Error('No node found for id ' + nodeId);
     }
   }
 
@@ -242,7 +242,7 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
     return;
   }
   if ($node.length === 0) {
-    throw '$node must be set.';
+    throw new Error('$node must be set.');
   }
   this._selectedNodes = [node];
   if ($node.isSelected()) {
@@ -294,7 +294,7 @@ scout.DesktopTree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   if (parentNodeId >= 0) {
     parentNode = this._nodeMap[parentNodeId];
     if (!parentNode) {
-      throw 'Parent node could not be found. Id: ' + parentNodeId;
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
 
@@ -303,7 +303,7 @@ scout.DesktopTree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
     node = this._nodeMap[nodeId];
     if (parentNode) {
       if (node.parentNode !== parentNode) {
-        throw 'Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode;
+        throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
       }
       scout.arrays.remove(parentNode.childNodes, node);
     }
@@ -340,7 +340,7 @@ scout.DesktopTree.prototype._onAllNodesDeleted = function(parentNodeId) {
   if (parentNodeId >= 0) {
     parentNode = this._nodeMap[parentNodeId];
     if (!parentNode) {
-      throw 'Parent node could not be found. Id: ' + parentNodeId;
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
   if (parentNode) {

@@ -686,7 +686,7 @@ scout.Table.prototype.resetFilter = function() {
  */
 scout.Table.prototype.registerFilter = function(key, filter) {
   if (!key) {
-    throw 'key has to be defined';
+    throw new Error('key has to be defined');
   }
 
   this._filterMap[key] = filter;
@@ -694,7 +694,7 @@ scout.Table.prototype.registerFilter = function(key, filter) {
 
 scout.Table.prototype.getFilter = function(key, filter) {
   if (!key) {
-    throw 'key has to be defined';
+    throw new Error('key has to be defined');
   }
 
   return this._filterMap[key];
@@ -702,7 +702,7 @@ scout.Table.prototype.getFilter = function(key, filter) {
 
 scout.Table.prototype.unregisterFilter = function(key) {
   if (!key) {
-    throw 'key has to be defined';
+    throw new Error('key has to be defined');
   }
 
   delete this._filterMap[key];

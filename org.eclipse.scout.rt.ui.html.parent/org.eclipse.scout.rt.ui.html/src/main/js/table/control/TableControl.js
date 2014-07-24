@@ -45,7 +45,7 @@ scout.TableControl.prototype.removeContent = function() {
 
 scout.TableControl.prototype.renderContent = function() {
   if (this.contentRendered) {
-    throw "Already rendered";
+    throw new Error('Already rendered');
   }
 
   if (!this.isContentAvailable()) {

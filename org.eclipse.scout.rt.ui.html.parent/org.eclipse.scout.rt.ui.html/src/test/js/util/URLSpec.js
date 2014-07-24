@@ -46,7 +46,7 @@ describe("scout.URL", function() {
     u.addParameter('check', 'no');
     try {
       u.addParameter();
-      throw 'addParameter() should throw an exception';
+      throw new Error('addParameter() should throw an exception');
     }
     catch (e) {
       // should throw exception
