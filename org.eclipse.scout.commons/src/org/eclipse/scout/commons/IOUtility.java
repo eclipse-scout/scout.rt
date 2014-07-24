@@ -34,6 +34,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -696,5 +697,57 @@ public final class IOUtility {
       }
     }
     return lines;
+  }
+
+  /**
+   * This method removes the Byte Order Mark (BOM) from an array of bytes. The following Byte Order Marks of the
+   * following encodings are checked and removed.
+   * <ul>
+   * <li>UTF-8
+   * <li>UTF-16BE
+   * <li>UTF-16LE
+   * <li>UTF-32BE
+   * <li>UTF-32LE
+   * </ul>
+   * 
+   * @return Returns a copy of the input array without the Byte Order Mark
+   * @since 4.1.0 (backported)
+   */
+  public static byte[] removeByteOrderMark(final byte[] input) {
+    if (input == null) {
+      return null;
+    }
+
+    int skip = 0;
+
+    // UTF-8
+    if (input.length >= 3 && (input[0] == (byte) 0xEF) && (input[1] == (byte) 0xBB) && (input[2] == (byte) 0xBF)) {
+      skip = 3;
+    }
+
+    // UTF-16BE
+    else if (input.length >= 2 && (input[0] == (byte) 0xFE) && (input[1] == (byte) 0xFF)) {
+      skip = 2;
+    }
+
+    // UTF-16LE
+    else if (input.length >= 4 && (input[0] == (byte) 0xFF) && (input[1] == (byte) 0xFE) && (input[2] != (byte) 0x00) && (input[3] != (byte) 0x00)) {
+      skip = 2;
+    }
+
+    // UTF-32BE
+    else if (input.length >= 4 && (input[0] == (byte) 0x00) && (input[1] == (byte) 0x00) && (input[2] == (byte) 0xFE) && (input[3] == (byte) 0xFF)) {
+      skip = 4;
+    }
+
+    // UTF-32LE
+    else if (input.length >= 4 && (input[0] == (byte) 0xFF) && (input[1] == (byte) 0xFE) && (input[2] == (byte) 0x00) && (input[3] == (byte) 0x00)) {
+      skip = 4;
+    }
+
+    if (skip > 0) {
+      return Arrays.copyOfRange(input, skip, input.length);
+    }
+    return input;
   }
 }

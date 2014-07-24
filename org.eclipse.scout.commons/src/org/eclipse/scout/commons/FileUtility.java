@@ -28,6 +28,8 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
  * Utility class for managing directories and files
  * 
@@ -555,6 +557,10 @@ public final class FileUtility {
         in = null;
       }
     }
+  }
+
+  public static byte[] removeByteOrderMark(File f) throws ProcessingException {
+    return IOUtility.removeByteOrderMark(IOUtility.getContent(f.getAbsolutePath()));
   }
 
 }
