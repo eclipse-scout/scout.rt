@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -33,7 +34,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link IOUtility}
- * 
+ *
  * @since 3.9.1
  */
 public class IOUtilityTest {
@@ -372,6 +373,45 @@ public class IOUtilityTest {
       }
       TestUtility.deleteTempFile(tempFile);
     }
+  }
+
+  @Test
+  public void testRemoveByteOrderMark() throws Exception {
+    final byte[] UTF8_BOM = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
+    final byte[] UTF16BE_BOM = new byte[]{(byte) 0xfe, (byte) 0xff};
+    final byte[] UTF16LE_BOM = new byte[]{(byte) 0xff, (byte) 0xfe};
+    final byte[] UTF32BE_BOM = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff};
+    final byte[] UTF32LE_BOM = new byte[]{(byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00};
+
+    List<byte[]> bomsToTest = new LinkedList<byte[]>();
+    bomsToTest.add(UTF8_BOM);
+    bomsToTest.add(UTF16BE_BOM);
+    bomsToTest.add(UTF16LE_BOM);
+    bomsToTest.add(UTF32BE_BOM);
+    bomsToTest.add(UTF32LE_BOM);
+
+    final byte[] lorem = "lorem".getBytes();
+
+    String filename = "temp.txt";
+    File file;
+
+    for (byte[] bom : bomsToTest) {
+      file = IOUtility.createTempFile(filename, mergeArrays(bom, lorem));
+      assertArrayEquals(lorem, IOUtility.removeByteOrderMark(IOUtility.getContent(file.getPath())));
+      file.delete();
+    }
+
+    assertNull(IOUtility.removeByteOrderMark(null));
+    assertArrayEquals(new byte[]{(byte) 0xef, (byte) 0xbb}, IOUtility.removeByteOrderMark(new byte[]{(byte) 0xef, (byte) 0xbb}));
+
+  }
+
+  private byte[] mergeArrays(byte[] a, byte[] b) {
+    byte[] combined = new byte[a.length + b.length];
+
+    System.arraycopy(a, 0, combined, 0, a.length);
+    System.arraycopy(b, 0, combined, a.length, b.length);
+    return combined;
   }
 
 }

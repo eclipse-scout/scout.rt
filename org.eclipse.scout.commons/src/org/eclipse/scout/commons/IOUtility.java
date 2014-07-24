@@ -35,6 +35,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -58,7 +59,7 @@ public final class IOUtility {
    * Gets the content of the given {@link InputStream} as {@link String}. The {@link Byte}s coming from the
    * {@link InputStream} are interpreted using the given charsetName.<br>
    * The {@link InputStream} is automatically closed.
-   * 
+   *
    * @param stream
    *          The stream to read from.
    * @param charsetName
@@ -78,7 +79,7 @@ public final class IOUtility {
   /**
    * Gets the content of the given {@link InputStream} as {@link String}. The content coming from the
    * {@link InputStream} must have the UTF-8 {@link Charset}.
-   * 
+   *
    * @param stream
    *          The {@link InputStream} to read from.
    * @return The content of the given {@link InputStream}.
@@ -317,7 +318,7 @@ public final class IOUtility {
   /**
    * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
    * deleted when the virtual machine terminates.
-   * 
+   *
    * @param fileName
    *          If no or an empty filename is given, a random fileName will be created.
    * @param content
@@ -360,7 +361,7 @@ public final class IOUtility {
    * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
    * deleted when the virtual machine terminates. The temporary file will look like this:
    * <i>prefix</i>2093483323922923<i>.suffix</i>
-   * 
+   *
    * @param prefix
    *          The prefix of the temporary file
    * @param suffix
@@ -386,7 +387,7 @@ public final class IOUtility {
 
   /**
    * Delete a directory and all containing files and directories
-   * 
+   *
    * @param directory
    * @return true if the directory is successfully deleted or does not exists; false otherwise
    * @throws SecurityException
@@ -577,7 +578,7 @@ public final class IOUtility {
    * A null-safe variant for calling {@link URLEncoder#encode(String, String)}. This method returns null if the given
    * <code>url</code> is null or an empty string respectively. Any leading / trailing whitespaces are omitted.
    * Furthermore, "%20" is used to represent spaces instead of "+".
-   * 
+   *
    * @param url
    *          the URL string which shall be encoded
    * @return the encoded URL string
@@ -605,7 +606,7 @@ public final class IOUtility {
   /**
    * a null-safe variant for calling {@link URLDecoder#decode(String, String)}. This method returns null if the given
    * <code>url</code> is null or an empty string respectively. Any leading / trailing whitespaces are omitted.
-   * 
+   *
    * @param encodedUrl
    *          the encoded URL string which shall be decoded
    * @return the decoded URL string
@@ -632,7 +633,7 @@ public final class IOUtility {
   /**
    * The text passed to this method is tried to wellform as an URL. If the text
    * can not be transformed into an URL the method returns null.
-   * 
+   *
    * @param urlText
    */
   public static URL urlTextToUrl(String urlText) {
@@ -665,7 +666,7 @@ public final class IOUtility {
    * <p>
    * ATTENTION: Appending a file to itself using an autoflushing PrintWriter, will lead to an endless loop. (Appending a
    * file to itself using a Printwriter without autoflushing is safe.)
-   * 
+   *
    * @param writer
    *          a PrintWriter for the destination file
    * @param file
@@ -731,5 +732,56 @@ public final class IOUtility {
       }
     }
     return lines;
+  }
+
+  /**
+   * This method removes the Byte Order Mark (BOM) from an array of bytes. The following Byte Order Marks of the
+   * following encodings are checked and removed.
+   * <ul>
+   * <li>UTF-8
+   * <li>UTF-16BE
+   * <li>UTF-16LE
+   * <li>UTF-32BE
+   * <li>UTF-32LE
+   * </ul>
+   *
+   * @return Returns a copy of the input array without the Byte Order Mark
+   */
+  public static byte[] removeByteOrderMark(final byte[] input) {
+    if (input == null) {
+      return null;
+    }
+
+    int skip = 0;
+
+    // UTF-8
+    if (input.length >= 3 && (input[0] == (byte) 0xEF) && (input[1] == (byte) 0xBB) && (input[2] == (byte) 0xBF)) {
+      skip = 3;
+    }
+
+    // UTF-16BE
+    else if (input.length >= 2 && (input[0] == (byte) 0xFE) && (input[1] == (byte) 0xFF)) {
+      skip = 2;
+    }
+
+    // UTF-16LE
+    else if (input.length >= 4 && (input[0] == (byte) 0xFF) && (input[1] == (byte) 0xFE) && (input[2] != (byte) 0x00) && (input[3] != (byte) 0x00)) {
+      skip = 2;
+    }
+
+    // UTF-32BE
+    else if (input.length >= 4 && (input[0] == (byte) 0x00) && (input[1] == (byte) 0x00) && (input[2] == (byte) 0xFE) && (input[3] == (byte) 0xFF)) {
+      skip = 4;
+    }
+
+    // UTF-32LE
+    else if (input.length >= 4 && (input[0] == (byte) 0xFF) && (input[1] == (byte) 0xFE) && (input[2] == (byte) 0x00) && (input[3] == (byte) 0x00)) {
+      skip = 4;
+    }
+
+    if (skip > 0) {
+      return Arrays.copyOfRange(input, skip, input.length);
+    }
+    return input;
   }
 }
