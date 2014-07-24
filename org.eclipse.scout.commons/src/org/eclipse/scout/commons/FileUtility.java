@@ -28,9 +28,11 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
  * Utility class for managing directories and files
- * 
+ *
  * @author BSI AG
  * @since 1.0
  */
@@ -286,7 +288,7 @@ public final class FileUtility {
   /**
    * Copies one file to another. Source must exist and be readable. Cannot copy a directory to a file. Will not copy if
    * time stamps and file size match, will overwrite otherwise.
-   * 
+   *
    * @param source
    *          the source file
    * @param dest
@@ -558,4 +560,7 @@ public final class FileUtility {
     }
   }
 
+  public static byte[] removeByteOrderMark(File f) throws ProcessingException {
+    return IOUtility.removeByteOrderMark(IOUtility.getContent(f.getAbsolutePath()));
+  }
 }
