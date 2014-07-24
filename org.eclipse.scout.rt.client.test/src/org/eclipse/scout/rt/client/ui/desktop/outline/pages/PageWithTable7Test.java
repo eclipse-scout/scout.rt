@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -26,41 +24,17 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test the reload of a page when multiple summary columns are present.
- * Should not produce an error.
+ * Test that {@link AbstractPage#execPageDataLoaded()} is called after the data has been loaded.
  */
 @RunWith(ScoutClientTestRunner.class)
-public class PageWithTable1Test {
+public class PageWithTable7Test {
 
-  @Test
-  public void testReloadPage_multipleSummaryColumns() throws Exception {
-    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-    assertNotNull(desktop);
-
-    desktop.setAvailableOutlines(new IOutline[]{new PageWithTableOutline()});
-    desktop.setOutline(PageWithTableOutline.class);
-
-    IOutline outline = desktop.getOutline();
-    assertNotNull(outline);
-    assertSame(PageWithTableOutline.class, outline.getClass());
-
-    IPage page = outline.getActivePage();
-    assertNotNull(page);
-    assertSame(PageWithTable.class, page.getClass());
-
-    page.reloadPage();
-    page.reloadPage();
-    page.reloadPage();
-  }
-
-  /**
-   * Tests that {@link AbstractPage#execPageDataLoaded()} is called correctly on a {@link AbstractTablePage}
-   */
   @Test
   public void testExecPageDataLoaded() throws ProcessingException {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
@@ -69,14 +43,21 @@ public class PageWithTable1Test {
     desktop.setOutline(PageWithTableOutline.class);
     IOutline outline = desktop.getOutline();
     PageWithTable page = (PageWithTable) outline.getActivePage();
-    assertEquals(1, page.m_execPageDataLoadedCalled);
+
+    page.m_counter = 1;
     page.reloadPage();
+
+    page.m_counter = 2;
     page.reloadPage();
+
+    page.m_counter = 3;
     page.reloadPage();
-    assertEquals(4, page.m_execPageDataLoadedCalled);
+
+    ScoutAssert.assertListEquals(new String[]{"counter: 0 value: first", "counter: 1 value: second", "counter: 2 value: third", "counter: 3 value: fourth"}, page.m_protocol);
   }
 
   public static class PageWithTableOutline extends AbstractOutline {
+
     @Override
     protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
       pageList.add(new PageWithTable());
@@ -84,18 +65,19 @@ public class PageWithTable1Test {
   }
 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
-
-    public int m_execPageDataLoadedCalled = 0;
+    public List<String> m_protocol = new ArrayList<String>();
+    public int m_counter = 0;
+    private String[] data = new String[]{"first", "second", "third", "fourth"};
 
     @Override
     protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{new Object[]{"a", "b"}};
+      return new Object[][]{new Object[]{data[m_counter]}};
     }
 
     @Override
     protected void execPageDataLoaded() throws ProcessingException {
       super.execPageDataLoaded();
-      m_execPageDataLoadedCalled++;
+      m_protocol.add("counter: " + m_counter + " value: " + getTable().getRow(0).getCell(0).getValue().toString());
     }
 
     @Override
@@ -106,18 +88,6 @@ public class PageWithTable1Test {
     public class Table extends AbstractTable {
       @Order(10)
       public class FirstColumn extends AbstractStringColumn {
-        @Override
-        protected boolean getConfiguredSummary() {
-          return true;
-        }
-      }
-
-      @Order(20)
-      public class SecondColumn extends AbstractStringColumn {
-        @Override
-        protected boolean getConfiguredSummary() {
-          return true;
-        }
       }
     }
   }
