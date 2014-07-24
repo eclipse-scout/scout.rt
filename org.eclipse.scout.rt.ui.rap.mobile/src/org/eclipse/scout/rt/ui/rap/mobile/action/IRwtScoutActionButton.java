@@ -22,12 +22,12 @@ public interface IRwtScoutActionButton extends IRwtScoutComposite<IAction> {
   /**
    * Returns either{@link SWT#DOWN} or {@link SWT#UP}.
    */
-  public int getMenuOpeningDirection();
+  int getMenuOpeningDirection();
 
   /**
    * Accepts {@link SWT#DOWN} or {@link SWT#UP}.<br/>
    * Default is {@link SWT#DOWN}
    */
-  public void setMenuOpeningDirection(int menuOpeningDirection);
+  void setMenuOpeningDirection(int menuOpeningDirection);
 
 }

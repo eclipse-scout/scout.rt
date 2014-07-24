@@ -111,10 +111,10 @@ public class ProposalFieldParseValueTest {
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
       if ("a*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1l, "aName"));
+        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "aName"));
       }
       if ("b*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1l, "aName"), new LookupRow<Long>(2l, "bName"));
+        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "aName"), new LookupRow<Long>(2L, "bName"));
       }
       return Collections.emptyList();
     }

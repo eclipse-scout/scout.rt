@@ -18,7 +18,7 @@ import java.beans.PropertyChangeListener;
 
 public interface IContentAssistFieldLookupRowFetcher<KEY_TYPE> {
 
-  static final String PROP_SEARCH_RESULT = "searchResult";
+  final String PROP_SEARCH_RESULT = "searchResult";
 
   static enum Status {
     Updating,

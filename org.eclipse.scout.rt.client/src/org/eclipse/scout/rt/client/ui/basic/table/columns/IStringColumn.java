@@ -29,7 +29,7 @@ public interface IStringColumn extends IColumn<String> {
 
   /**
    * Sets the display format of this column.
-   * 
+   *
    * @param s
    *          Either {@code null}, {@link #FORMAT_LOWER} or {@link #FORMAT_UPPER}.
    */
@@ -43,14 +43,14 @@ public interface IStringColumn extends IColumn<String> {
 
   boolean isSelectAllOnEdit();
 
-  public void setSelectAllOnEdit(boolean b);
+  void setSelectAllOnEdit(boolean b);
 
-  public void setValidateOnAnyKey(boolean b);
+  void setValidateOnAnyKey(boolean b);
 
-  public boolean isValidateOnAnyKey();
+  boolean isValidateOnAnyKey();
 
-  public void setMaxLength(int len);
+  void setMaxLength(int len);
 
-  public int getMaxLength();
+  int getMaxLength();
 
 }

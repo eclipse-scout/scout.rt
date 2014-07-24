@@ -25,7 +25,7 @@ public interface IPopupSupport {
 
   /**
    * To register a listener to receive events about the popup state
-   * 
+   *
    * @param listener
    */
   void addPopupEventListener(IPopupSupportListener listener);
@@ -37,11 +37,11 @@ public interface IPopupSupport {
     /**
      * the popup is opening but not yet open
      */
-    public static final int TYPE_OPENING = 1 << 1;
+    int TYPE_OPENING = 1 << 1;
     /**
      * the popup is closed
      */
-    public static final int TYPE_CLOSED = 1 << 2;
+    int TYPE_CLOSED = 1 << 2;
 
     void handleEvent(int eventType);
   }

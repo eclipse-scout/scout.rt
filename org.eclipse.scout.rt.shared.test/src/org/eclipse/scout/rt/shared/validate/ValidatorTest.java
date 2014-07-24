@@ -210,7 +210,7 @@ public class ValidatorTest {
     }
   }
 
-  public static interface IHelloService extends IService {
+  public interface IHelloService extends IService {
     void call1(@MaxLength(5) int[] a, @RegexMatch("[0-9]-[A-Z]-[0-9]") String s, @MaxValue(9) @MinValue(1) Long n);
 
     void call2(@MaxValue(2) Float m);

@@ -12,7 +12,7 @@ package org.eclipse.scout.commons.holders;
 
 /**
  * Holder for rows of bean based table (see {@link ITableBeanHolder}).
- * 
+ *
  * @since 3.10.0-M3
  */
 public interface ITableBeanRowHolder {
@@ -20,22 +20,22 @@ public interface ITableBeanRowHolder {
   /**
    * same value as {@link ITableHolder#STATUS_NON_CHANGED}.
    */
-  public static final int STATUS_NON_CHANGED = ITableHolder.STATUS_NON_CHANGED;
+  int STATUS_NON_CHANGED = ITableHolder.STATUS_NON_CHANGED;
 
   /**
    * same value as {@link ITableHolder#STATUS_INSERTED}.
    */
-  public static final int STATUS_INSERTED = ITableHolder.STATUS_INSERTED;
+  int STATUS_INSERTED = ITableHolder.STATUS_INSERTED;
 
   /**
    * same value as {@link ITableHolder#STATUS_UPDATED}.
    */
-  public static final int STATUS_UPDATED = ITableHolder.STATUS_UPDATED;
+  int STATUS_UPDATED = ITableHolder.STATUS_UPDATED;
 
   /**
    * same value as {@link ITableHolder#STATUS_DELETED}.
    */
-  public static final int STATUS_DELETED = ITableHolder.STATUS_DELETED;
+  int STATUS_DELETED = ITableHolder.STATUS_DELETED;
 
   /**
    * @return Returns this row's state.

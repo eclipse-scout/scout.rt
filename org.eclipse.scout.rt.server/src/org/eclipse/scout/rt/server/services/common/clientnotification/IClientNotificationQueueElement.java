@@ -19,10 +19,10 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
  */
 public interface IClientNotificationQueueElement extends Serializable {
 
-  public abstract IClientNotification getNotification();
+  IClientNotification getNotification();
 
-  public abstract IClientNotificationFilter getFilter();
+  IClientNotificationFilter getFilter();
 
-  public abstract boolean isActive();
+  boolean isActive();
 
 }

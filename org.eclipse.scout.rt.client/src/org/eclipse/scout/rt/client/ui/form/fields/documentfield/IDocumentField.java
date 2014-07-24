@@ -40,11 +40,11 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * file corresponds to the given name and txt as file extension. This file is located in the root directory of the
    * archive generated.
    * </p>
-   * 
+   *
    * @param format
    *          doc, dot, odt, html, pdf, ... or null to use the default format.
    */
-  public RemoteFile saveAs(String name, String format) throws ProcessingException;
+  RemoteFile saveAs(String name, String format) throws ProcessingException;
 
   /**
    * @see IDocumentField#saveAs(String, String).
@@ -52,9 +52,9 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * @return
    * @throws ProcessingException
    */
-  public RemoteFile saveAs(String name) throws ProcessingException;
+  RemoteFile saveAs(String name) throws ProcessingException;
 
-  public RemoteFile save() throws ProcessingException;
+  RemoteFile save() throws ProcessingException;
 
   void autoResizeDocument();
 

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext.job;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -18,7 +21,7 @@ import org.junit.Test;
 
 /**
  * Test class for {@link SwingProgressProvider}.
- * 
+ *
  * @author awe
  */
 public class SwingProgressProviderTest {
@@ -40,8 +43,7 @@ public class SwingProgressProviderTest {
         new PropertyChangeListener() {
           @Override
           public void propertyChange(PropertyChangeEvent evt) {
-            MonitorProperties props = (MonitorProperties) evt
-                .getNewValue();
+            MonitorProperties props = (MonitorProperties) evt.getNewValue();
             Assert.assertEquals(EXPECTED[count],
                 props.getTaskName());
             count++;
@@ -66,11 +68,10 @@ public class SwingProgressProviderTest {
           @Override
           public void propertyChange(PropertyChangeEvent evt) {
             if (count == 0) {
-              Assert.assertEquals("bar", ((MonitorProperties) evt
-                  .getNewValue()).getSubTaskName());
+              assertEquals("bar", ((MonitorProperties) evt.getNewValue()).getSubTaskName());
             }
             else if (count == 1) {
-              Assert.assertNull(evt.getNewValue());
+              assertNull(evt.getNewValue());
             }
             count++;
           }

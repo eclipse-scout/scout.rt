@@ -15,6 +15,6 @@ package org.eclipse.scout.rt.client;
  */
 public interface ILocaleListener {
 
-  public void localeChanged(LocaleChangeEvent event);
+  void localeChanged(LocaleChangeEvent event);
 
 }

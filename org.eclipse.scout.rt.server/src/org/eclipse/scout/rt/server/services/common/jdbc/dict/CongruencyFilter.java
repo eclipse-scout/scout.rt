@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,9 +48,9 @@ public class CongruencyFilter {
 
   public boolean isCongruent(DataDictionary o1, DataDictionary o2) {
     // don't check schema name
-    return isCongruentAndRelevant(o1.getTables(), o2.getTables()) &&
-        isCongruentAndRelevant(o1.getViews(), o2.getViews()) &&
-        isCongruentAndRelevant(o1.getSequences(), o2.getSequences());
+    return isCongruentAndRelevant(o1.getTables(), o2.getTables())
+        && isCongruentAndRelevant(o1.getViews(), o2.getViews())
+        && isCongruentAndRelevant(o1.getSequences(), o2.getSequences());
   }
 
   public boolean isCongruent(TableDesc o1, TableDesc o2) {
@@ -68,11 +68,11 @@ public class CongruencyFilter {
     if (o1 == null || o2 == null) {
       return false;
     }
-    return o1.getName().equals(o2.getName()) &&
-        isCongruent(o1.getPrimaryKey(), o2.getPrimaryKey()) &&
-        isCongruentAndRelevant(o1.getColumns(), o2.getColumns()) &&
-        isCongruentAndRelevant(o1.getIndices(), o2.getIndices()) &&
-        isCongruentAndRelevant(o1.getGrants(), o2.getGrants());
+    return o1.getName().equals(o2.getName())
+        && isCongruent(o1.getPrimaryKey(), o2.getPrimaryKey())
+        && isCongruentAndRelevant(o1.getColumns(), o2.getColumns())
+        && isCongruentAndRelevant(o1.getIndices(), o2.getIndices())
+        && isCongruentAndRelevant(o1.getGrants(), o2.getGrants());
   }
 
   public boolean isCongruent(ViewDesc o1, ViewDesc o2) {
@@ -82,9 +82,9 @@ public class CongruencyFilter {
     if (o1 == null || o2 == null) {
       return false;
     }
-    return o1.getName().equals(o2.getName()) &&
-        o1.getStatement().equals(o2.getStatement()) &&
-        isCongruentAndRelevant(o1.getGrants(), o2.getGrants());
+    return o1.getName().equals(o2.getName())
+        && o1.getStatement().equals(o2.getStatement())
+        && isCongruentAndRelevant(o1.getGrants(), o2.getGrants());
   }
 
   public boolean isCongruent(TableGrantDesc o1, TableGrantDesc o2) {
@@ -94,8 +94,8 @@ public class CongruencyFilter {
     if (o1 == null || o2 == null) {
       return false;
     }
-    return o1.getGrantee().equals(o2.getGrantee()) &&
-        o1.getType().equals(o2.getType());
+    return o1.getGrantee().equals(o2.getGrantee())
+        && o1.getType().equals(o2.getType());
   }
 
   public boolean isCongruent(ColumnDesc o1, ColumnDesc o2) {
@@ -106,9 +106,9 @@ public class CongruencyFilter {
       return false;
     }
     //
-    return o1.getName().equals(o2.getName()) &&
-        o1.isNullable() == o2.isNullable() &&
-        getCanonicalColumnType(o1).equals(getCanonicalColumnType(o2));
+    return o1.getName().equals(o2.getName())
+        && o1.isNullable() == o2.isNullable()
+        && getCanonicalColumnType(o1).equals(getCanonicalColumnType(o2));
   }
 
   public boolean isCongruent(IndexDesc o1, IndexDesc o2) {
@@ -118,8 +118,8 @@ public class CongruencyFilter {
     if (o1 == null || o2 == null) {
       return false;
     }
-    return o1.isUnique() == o2.isUnique() &&
-        o1.getColumnNames().equals(o2.getColumnNames());// equality of content
+    return o1.isUnique() == o2.isUnique()
+        && o1.getColumnNames().equals(o2.getColumnNames());// equality of content
     // AND order
   }
 
@@ -187,15 +187,16 @@ public class CongruencyFilter {
 
   public boolean isNumeric(ColumnDesc cd) {
     String type = cd.getTypeName().toUpperCase();
-    return (type.equals("INT") ||
-        type.equals("INTEGER") ||
-        type.equals("DOUBLE") ||
-        type.equals("DOUBLE PRECISION") ||
-        type.equals("REAL") ||
-        type.equals("BIGINT") ||
-        type.equals("SMALLINT") ||
-        type.equals("TINYINT") ||
-        type.equals("NUMBER") || type.equals("DECIMAL"));
+    return (type.equals("INT")
+        || type.equals("INTEGER")
+        || type.equals("DOUBLE")
+        || type.equals("DOUBLE PRECISION")
+        || type.equals("REAL")
+        || type.equals("BIGINT")
+        || type.equals("SMALLINT")
+        || type.equals("TINYINT")
+        || type.equals("NUMBER")
+        || type.equals("DECIMAL"));
   }
 
   public String getCanonicalColumnType(ColumnDesc cd) {

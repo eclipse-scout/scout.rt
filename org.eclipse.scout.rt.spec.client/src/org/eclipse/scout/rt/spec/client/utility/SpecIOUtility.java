@@ -82,7 +82,7 @@ public final class SpecIOUtility {
    * create new file
    * <p>
    * If the file already exists, it will be deleted first.
-   * 
+   *
    * @param directory
    * @param baseName
    * @param fileExtension
@@ -144,7 +144,7 @@ public final class SpecIOUtility {
    * Copies a file from a bundle with a given path inside this bundle (jar or source) to a destination file.
    * <p>
    * If destFile has a parent (directory) which does not exist, this directory will be created.
-   * 
+   *
    * @param bundle
    * @param path
    *          path within the bundle
@@ -166,7 +166,7 @@ public final class SpecIOUtility {
         sourceChannel = Channels.newChannel(stream);
         out = new FileOutputStream(destFile);
         destChannel = out.getChannel();
-        final long maxBytes = 1000000l;
+        final long maxBytes = 1000000L;
         destChannel.transferFrom(sourceChannel, 0, maxBytes);
       }
       catch (IOException e) {
@@ -247,7 +247,7 @@ public final class SpecIOUtility {
   /**
    * Interface for processing a String
    */
-  public static interface IStringProcessor {
+  public interface IStringProcessor {
     /**
      * @param input
      *          String input
@@ -261,7 +261,7 @@ public final class SpecIOUtility {
    * <p>
    * Processed lines are written in a temporary file. When all lines are processed, the temporary file is copied back to
    * the original file and the temporary file is deleted.
-   * 
+   *
    * @param file
    * @param processor
    * @throws ProcessingException
@@ -323,7 +323,7 @@ public final class SpecIOUtility {
 
   /**
    * List all files in a directory inside a bundle. Source and binary bundles are supported.
-   * 
+   *
    * @param bundle
    * @param path
    *          Relative path inside bundle. Expects {@link File#separator} as path-separator.
@@ -446,7 +446,7 @@ public final class SpecIOUtility {
   /**
    * Copy files from all source bundles. If a file exists in multiple bundles, the version from the bundle with the
    * highest priority overwrites the others.
-   * 
+   *
    * @param destDir
    * @param bundleRelativeSourceDirPath
    * @param filenameFilter

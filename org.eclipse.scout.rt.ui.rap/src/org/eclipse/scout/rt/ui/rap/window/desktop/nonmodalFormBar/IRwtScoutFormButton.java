@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Button;
 public interface IRwtScoutFormButton extends IRwtScoutComposite<IAction> {
 
   @Override
-  public Button getUiField();
+  Button getUiField();
 
   void makeButtonActive();
 

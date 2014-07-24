@@ -21,7 +21,7 @@ public class TimeLineTextComponentElementFactory extends TimeLineComponentElemen
     super(startHour, endHour);
   }
 
-  private final static float TEXT_Y_OFFSET = 4.0f; // small offset so that it looks better
+  private static final float TEXT_Y_OFFSET = 4.0f; // small offset so that it looks better
 
   @Override
   protected Element createTextElement(CalendarComponent c, Element parent, SvgRect parentDimension, Date day) {

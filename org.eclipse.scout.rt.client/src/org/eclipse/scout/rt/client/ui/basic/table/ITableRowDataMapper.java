@@ -15,38 +15,38 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 /**
  * Maps table rows from an {@link ITable} to an {@link AbstractTableRowData} and vice versa.
- * 
+ *
  * @since 3.10.0-M5
  */
 public interface ITableRowDataMapper {
 
   /**
    * Writes the data from the given {@link AbstractTableRowData} to the given {@link ITableRow}.
-   * 
+   *
    * @param row
    * @param rowData
    */
-  public abstract void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  abstract void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
 
   /**
    * Writes the data from the given {@link ITableRow} to the given {@link AbstractTableRowData}.
-   * 
+   *
    * @param row
    * @param rowData
    */
-  public abstract void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  abstract void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
 
   /**
    * Override to exclude certain rows from being exported.
    * <p>
    * As default every row is accepted.
    */
-  public abstract boolean acceptExport(ITableRow row) throws ProcessingException;
+  abstract boolean acceptExport(ITableRow row) throws ProcessingException;
 
   /**
    * Override to exclude certain rows from being imported.
    * <p>
    * As default every row is accepted.
    */
-  public abstract boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException;
+  abstract boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException;
 }

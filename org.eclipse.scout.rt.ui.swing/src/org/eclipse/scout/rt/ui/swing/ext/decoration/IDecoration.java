@@ -39,11 +39,11 @@ public interface IDecoration {
    */
   Rectangle getBounds();
 
-  public void paint(Component c, Graphics g, int x, int y);
+  void paint(Component c, Graphics g, int x, int y);
 
-  public int getWidth();
+  int getWidth();
 
-  public int getHeight();
+  int getHeight();
 
   /**
    * @param e

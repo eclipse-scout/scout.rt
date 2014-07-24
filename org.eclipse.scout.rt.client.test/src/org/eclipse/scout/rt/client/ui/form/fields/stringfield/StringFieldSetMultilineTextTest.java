@@ -43,7 +43,7 @@ public class StringFieldSetMultilineTextTest {
     }
   }
 
-  public final static class MyForm extends AbstractForm {
+  public static final class MyForm extends AbstractForm {
 
     private MyForm() throws ProcessingException {
       super();

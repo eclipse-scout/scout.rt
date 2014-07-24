@@ -23,13 +23,13 @@ public interface IServerSession extends ISession {
 
   /**
    * Set the session id. Should only be done during initialization.
-   * 
+   *
    * @param id
    */
-  public void setIdInternal(String id);
+  void setIdInternal(String id);
 
   /**
    * @return a unique id
    */
-  public String getId();
+  String getId();
 }

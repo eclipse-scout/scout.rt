@@ -86,7 +86,7 @@ public final class BundleInspector {
    * added to the end of the resulting ordered list.
    * <p>
    * <b>Example</b>
-   * 
+   *
    * <pre>
    *                      a.bundle1
    *                          |
@@ -100,7 +100,7 @@ public final class BundleInspector {
    *                                 |             |
    *                             b.bundle2     c.bundle2
    * </pre>
-   * 
+   *
    * The invocation <code>getOrderedBundleList("c", "b")</code> returns one of the following two resulting lists:
    * <table>
    * <tr>
@@ -140,7 +140,7 @@ public final class BundleInspector {
    * <td>a.bundle1</td>
    * </tr>
    * </table>
-   * 
+   *
    * @param prefixList
    *          list of bundle name prefixes that are used for ordering the bundles in the resulting list.
    * @return list of all bundles, ordered according to the dependency tree and the list of prefixes; all remaining are
@@ -251,7 +251,7 @@ public final class BundleInspector {
 
   /**
    * Resolves the given bundle's host or returns itself, if it is not a fragment bundle.
-   * 
+   *
    * @param bundle
    *          <code>null</code> or an arbitrary bundle.
    * @return Returns <code>null</code> if the given bundle is <code>null</code>, the given bundle itself if its not a
@@ -280,7 +280,7 @@ public final class BundleInspector {
    * Filters all Plug-in bundles. Fragment bundles are replaced by their corresponding host bundle. Every bundle is
    * contained at most one time in the resulting bundle list, at its first position it occurred in the original
    * original bundle list.
-   * 
+   *
    * @return Returns never <code>null</code>.
    * @since 3.8.2
    */
@@ -377,13 +377,13 @@ public final class BundleInspector {
   /**
    * Interface for filtering classes
    */
-  public static interface IClassFilter {
+  public interface IClassFilter {
     boolean accept(Class<?> c);
   }
 
   /**
    * get all loadable classes from all available bundles
-   * 
+   *
    * @param filter
    * @return a modifiable set
    * @throws ProcessingException

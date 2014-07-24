@@ -36,16 +36,16 @@ import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
  * Example:<br>
  * <code>org.eclipse.scout.rt.ui.rap.servletfilter.LogoutFilter#redirectUrl=res/logout.html</code>
  * <p>
- * 
+ *
  * @since 3.8.2
  */
 public class LogoutFilter implements Filter {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogoutFilter.class);
   private static final String DOIT_PARAM = "doit";
-  public final static String LOGOUT_PARAM = "doLogout";
-  public final static String REDIRECT_PARAM = "redirectUrl";
-  public final static String RELOAD_ON_SESSION_TIMEOUT_PARAM = "reloadOnSessionTimeout";
+  public static final String LOGOUT_PARAM = "doLogout";
+  public static final String REDIRECT_PARAM = "redirectUrl";
+  public static final String RELOAD_ON_SESSION_TIMEOUT_PARAM = "reloadOnSessionTimeout";
 
   private FilterConfigInjection m_injection;
 

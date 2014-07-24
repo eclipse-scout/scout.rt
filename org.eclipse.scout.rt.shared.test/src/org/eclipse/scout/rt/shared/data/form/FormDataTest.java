@@ -34,7 +34,7 @@ public class FormDataTest {
     assertNotNull(formData.getPublicBoxData().getTestProperty());
   }
 
-  public static abstract class AbstractTestBoxData extends AbstractFormFieldData {
+  public abstract static class AbstractTestBoxData extends AbstractFormFieldData {
     private static final long serialVersionUID = 1L;
 
     public AbstractTestBoxData() {

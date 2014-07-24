@@ -18,5 +18,5 @@ import java.util.zip.Adler32;
  */
 public @interface FormDataChecksum {
 
-  long value() default 0l;
+  long value() default 0L;
 }

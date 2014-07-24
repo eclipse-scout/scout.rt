@@ -298,13 +298,13 @@ public final class TableUtility {
     return a;
   }
 
-  public static interface ITableCellEditorFilter {
+  public interface ITableCellEditorFilter {
     boolean accept(ITableRow row, IColumn<?> col);
   }
 
   /**
    * based on row and column, find the next visible cell and start editing
-   * 
+   *
    * @param table
    * @param row
    * @param col

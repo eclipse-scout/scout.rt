@@ -14,5 +14,5 @@ import java.util.EventListener;
 
 public interface ILayoutListener extends EventListener {
 
-  public void handleCompositeLayouted();
+  void handleCompositeLayouted();
 }

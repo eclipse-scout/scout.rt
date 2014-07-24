@@ -42,7 +42,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
   private final List<IClusterNotificationListener> m_listeners = new ArrayList<IClusterNotificationListener>();
-  private final static String QUEUE_NAME = "scoutNotificationQueue";
+  private static final String QUEUE_NAME = "scoutNotificationQueue";
 
   private IPubSubMessageService m_pubSubMessageService;
   private String m_nodeId;

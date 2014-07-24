@@ -149,7 +149,7 @@ public class DataModelUtilityTest {
     }
   }
 
-  private static interface IDataModelVisitor {
+  private interface IDataModelVisitor {
     void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf);
   }
 }

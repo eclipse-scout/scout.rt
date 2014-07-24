@@ -118,10 +118,10 @@ public class SmartFieldParseValueTest {
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
       if ("a*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1l, "AName"));
+        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "AName"));
       }
       if ("b*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1l, "AName"), new LookupRow<Long>(2l, "bName"));
+        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "AName"), new LookupRow<Long>(2L, "bName"));
       }
       return Collections.emptyList();
     }

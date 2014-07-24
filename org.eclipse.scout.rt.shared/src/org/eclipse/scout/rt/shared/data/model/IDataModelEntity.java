@@ -49,7 +49,7 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   List<IDataModelAttribute> getAttributes();
 
-  public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz);
+  IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz);
 
   List<IDataModelEntity> getEntities();
 
@@ -58,7 +58,7 @@ public interface IDataModelEntity extends IPropertyObserver {
   /**
    * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure.
    * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
-   * 
+   *
    * @deprecated Will be removed in the 5.0 Release.
    */
   @Deprecated
@@ -67,7 +67,7 @@ public interface IDataModelEntity extends IPropertyObserver {
   /**
    * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
    * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
-   * 
+   *
    * @deprecated Will be removed in the 5.0 Release.
    */
   @Deprecated
@@ -76,7 +76,7 @@ public interface IDataModelEntity extends IPropertyObserver {
   /**
    * In order to avoid loop cycles, this initializer is called by the composer field to load the child entity graph,
    * that may have cycles
-   * 
+   *
    * @param instanceMap
    *          map containing all previously created entities, there should be only one entity per type
    */
@@ -102,7 +102,7 @@ public interface IDataModelEntity extends IPropertyObserver {
    * <em>PersonEntity</em> contains a <em>PersonMotherEntity</em>, a <em>PersonFatherEntity</em> and a
    * <em>PersonFriendEntity</em>. Both, the mother and father entities' {@link IDataModelEntity#isOneToMany()} return
    * <code>false</code>. However the one of the friend entity return <code>true</code>.
-   * 
+   *
    * @return Returns <code>true</code> (default) if this entity can occur multiple times in the context of its parent
    *         entity. Otherwise the entity is considered many-to-one, i.e. this entity can occur at most one time within
    *         the context of its parent entity.
@@ -112,7 +112,7 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   /**
    * Controls the multiplicity of this entity in the context of its parent entity.
-   * 
+   *
    * @param b
    *          <code>true</code> if this entity is referenced at most one time by its parent entity.
    * @see #isOneToMany()

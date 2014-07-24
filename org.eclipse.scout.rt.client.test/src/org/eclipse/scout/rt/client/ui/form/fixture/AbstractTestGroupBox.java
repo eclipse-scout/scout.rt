@@ -60,7 +60,7 @@ public abstract class AbstractTestGroupBox extends AbstractGroupBox {
 
   }
 
-  protected static abstract class AbstractInnerTestGroupBox extends AbstractGroupBox {
+  protected abstract static class AbstractInnerTestGroupBox extends AbstractGroupBox {
 
     public InnerText1Field getInnerText1Field() {
       return getFieldByClass(InnerText1Field.class);

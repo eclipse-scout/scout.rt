@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,7 +46,7 @@ public final class FixResizeCursorSupport implements AWTEventListener {
   }
 
   @Override
-  public final void eventDispatched(AWTEvent event) {
+  public void eventDispatched(AWTEvent event) {
     if (event.getID() == MouseEvent.MOUSE_PRESSED) {
       for (Window w : Window.getWindows()) {
         if (!w.isVisible()) {

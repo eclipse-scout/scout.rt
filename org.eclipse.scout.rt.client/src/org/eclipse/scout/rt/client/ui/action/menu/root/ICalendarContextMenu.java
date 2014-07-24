@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 public interface ICalendarContextMenu extends IContextMenu {
 
   @Override
-  public ICalendar getOwner();
+  ICalendar getOwner();
 
   void callOwnerValueChanged();
 }

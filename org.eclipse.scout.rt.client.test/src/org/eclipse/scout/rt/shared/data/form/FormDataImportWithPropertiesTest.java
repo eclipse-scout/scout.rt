@@ -91,7 +91,7 @@ public class FormDataImportWithPropertiesTest {
     }
   }
 
-  public final static class DynamicFormWithProperties extends DynamicForm {
+  public static final class DynamicFormWithProperties extends DynamicForm {
     private boolean m_primitiveBoolean;
     private int m_primitiveInteger;
     private String m_text;
@@ -131,7 +131,7 @@ public class FormDataImportWithPropertiesTest {
     }
   }
 
-  public final static class DynamicFormDataWithProperties extends AbstractFormData {
+  public static final class DynamicFormDataWithProperties extends AbstractFormData {
     private static final long serialVersionUID = 1L;
 
     public class PrimitiveBooleanProperty extends AbstractPropertyData<Boolean> {

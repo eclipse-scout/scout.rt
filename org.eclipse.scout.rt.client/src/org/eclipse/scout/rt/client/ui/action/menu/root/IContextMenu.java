@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
  */
 public interface IContextMenu extends IMenu {
 
-  public static final String PROP_CURRENT_MENU_TYPES = "currentMenuTypes";
+  final String PROP_CURRENT_MENU_TYPES = "currentMenuTypes";
 
   /**
    * @return the owner field, table, tree of the context menu

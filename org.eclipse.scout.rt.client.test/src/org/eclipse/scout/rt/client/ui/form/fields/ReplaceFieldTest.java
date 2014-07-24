@@ -243,7 +243,7 @@ public class ReplaceFieldTest {
     }
   }
 
-  public static abstract class AbstractTemplateBox extends AbstractGroupBox {
+  public abstract static class AbstractTemplateBox extends AbstractGroupBox {
 
     public FirstTemplateField getFirstTemplateField() {
       return getFieldByClass(FirstTemplateField.class);

@@ -62,8 +62,8 @@ public class AbstractLongFieldTest extends AbstractLongField {
     assertEquals("expect default for maxValue=Long.MAX_VALUE", Long.valueOf(Long.MAX_VALUE), getMaxValue());
     assertEquals("expect default for minValue=Long.MIN_VALUE", Long.valueOf(Long.MIN_VALUE), getMinValue());
 
-    setMaxValue(99l);
-    setMinValue(-99l);
+    setMaxValue(99L);
+    setMinValue(-99L);
     assertEquals("maxValue not as set above", Long.valueOf(99), getMaxValue());
     assertEquals("minValue not as set above", Long.valueOf(-99), getMinValue());
 
@@ -81,8 +81,8 @@ public class AbstractLongFieldTest extends AbstractLongField {
     assertEquals("parsing failed", Long.valueOf(Long.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MAX_VALUE).toPlainString()));
     assertEquals("parsing failed", Long.valueOf(Long.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MIN_VALUE).toPlainString()));
 
-    setMaxValue(99l);
-    setMinValue(-99l);
+    setMaxValue(99L);
+    setMinValue(-99L);
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "100");
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-100");
     assertEquals("parsing failed", Long.valueOf(99), parseValueInternal("99"));

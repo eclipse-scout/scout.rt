@@ -282,12 +282,12 @@ public class PrintApplicationAction extends AbstractAction {
     }
   } // end class P_FormListener
 
-  private static interface ITask {
+  private interface ITask {
     void run() throws ProcessingException;
   }
 
-  public static interface IFormFilter {
-    public boolean acceptForm(IForm form);
+  public interface IFormFilter {
+    boolean acceptForm(IForm form);
   }
 
 }

@@ -383,7 +383,7 @@ public class ReplaceTableTest {
   public static class ExtendedTestColumnWithCustomColumnId extends TestColumnWithCustomColumnId {
   }
 
-  public static abstract class AbstractTemplateTableField<TABLE extends AbstractTemplateTableField<TABLE>.Table> extends AbstractTableField<TABLE> {
+  public abstract static class AbstractTemplateTableField<TABLE extends AbstractTemplateTableField<TABLE>.Table> extends AbstractTableField<TABLE> {
 
     @Order(10.0f)
     public class Table extends AbstractTable {
@@ -426,7 +426,7 @@ public class ReplaceTableTest {
     }
   }
 
-  public static abstract class AbstractTableBox extends AbstractGroupBox {
+  public abstract static class AbstractTableBox extends AbstractGroupBox {
 
     public InnerTableField getInnerTableField() {
       return getFieldByClass(InnerTableField.class);
@@ -649,7 +649,7 @@ public class ReplaceTableTest {
     }
   }
 
-  public static abstract class AbstractTemplateTablePage extends AbstractPageWithTable<AbstractTemplateTablePage.Table> {
+  public abstract static class AbstractTemplateTablePage extends AbstractPageWithTable<AbstractTemplateTablePage.Table> {
     public class Table extends AbstractTable {
 
       public FirstColumn getFirstColumn() {

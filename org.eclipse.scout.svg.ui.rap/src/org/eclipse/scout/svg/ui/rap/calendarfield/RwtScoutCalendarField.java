@@ -252,9 +252,9 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
       if (isIgnoredScoutEvent(PropertyChangeEvent.class, e.getPropertyName())) {
         return;
       }
-      if (isHandleScoutPropertyChange(e.getPropertyName(), e.getNewValue()) &&
-          getUiEnvironment().getDisplay() != null &&
-          !getUiEnvironment().getDisplay().isDisposed()) {
+      if (isHandleScoutPropertyChange(e.getPropertyName(), e.getNewValue())
+          && getUiEnvironment().getDisplay() != null
+          && !getUiEnvironment().getDisplay().isDisposed()) {
         Runnable t = new Runnable() {
           @Override
           public void run() {

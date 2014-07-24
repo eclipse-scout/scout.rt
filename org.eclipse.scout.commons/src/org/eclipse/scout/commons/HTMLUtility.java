@@ -74,7 +74,7 @@ public final class HTMLUtility {
    * as {@link DocumentParser} does not allow to specify the charset in HTML text. Due to failsafe, all other
    * &lt;meta&gt; tags are removed as well as just informative anyway.
    * </p>
-   * 
+   *
    * @param htmlText
    * @return
    */
@@ -152,7 +152,7 @@ public final class HTMLUtility {
    * <p>
    * Applies some intelligence to the HTML document to ensure a valid HTML document.
    * </p>
-   * 
+   *
    * @param rawHtml
    *          the raw HTML document
    * @param ensureContentType
@@ -262,7 +262,7 @@ public final class HTMLUtility {
    * called.
    * <p>
    * If none of the conditions hold, the HTML source is not changed.
-   * 
+   *
    * @return the adjusted HTML source according to the description above.
    */
   private static String adjustCssIfNeeded(String rawHtml, boolean cleanupCss, DefaultFont defaultFont, Color defaultHyperlinkColor) {
@@ -524,12 +524,12 @@ public final class HTMLUtility {
    * @return simple and quick conversion of html text to plain text without parsing and building of a html model
    *         <p>
    *         Rule based conversion:
-   * 
+   *
    *         <pre>
    * <xmp>
    * <br>|<br/>
    * |
-   * 
+   *
    *         </p>
    *         |
    *         <p/>
@@ -564,7 +564,7 @@ public final class HTMLUtility {
    * <li>p tags in table cells will be ignored</li>
    * <li>table columns are rendered with a pipe character (|)</li>
    * </ul>
-   * 
+   *
    * @param html
    *          input HTML code as string.
    * @return plain text as string
@@ -681,7 +681,7 @@ public final class HTMLUtility {
    * <p>
    * Precondition: &lt;head&gt; section must be contained in the given HTML text
    * </p>
-   * 
+   *
    * @param httpEquiv
    *          the content type
    * @param content
@@ -714,7 +714,7 @@ public final class HTMLUtility {
    * <p>
    * This is important as document cannot be loaded by @{DocumentParser} otherwise.
    * </p>
-   * 
+   *
    * @param rawHtml
    * @param singleStyleQuote
    *          the quote character for the style attribte
@@ -756,7 +756,7 @@ public final class HTMLUtility {
   /**
    * Create a {@link Matcher} for the given tag. Please note that the tag is not considered to be an empty tag, e.g.
    * <code>&lt;br/&gt;</code>
-   * 
+   *
    * @param rawHtml
    * @param tag
    *          the tag the matcher should be created for
@@ -771,7 +771,7 @@ public final class HTMLUtility {
 
   /**
    * Eliminates the vertical scrollbar by setting overflow:auto in body style attribute.
-   * 
+   *
    * @param rawHtml
    * @return
    */
@@ -823,7 +823,7 @@ public final class HTMLUtility {
 
   /**
    * To ensure default font settings set in CSS body style
-   * 
+   *
    * @param rawHtml
    * @param defaultFont
    * @return
@@ -958,7 +958,7 @@ public final class HTMLUtility {
     }
   }
 
-  private static interface IDocumentVisitor {
+  private interface IDocumentVisitor {
     void visitElement(Element elem);
 
     void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value);

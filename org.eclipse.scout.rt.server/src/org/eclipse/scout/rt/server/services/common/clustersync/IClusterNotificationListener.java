@@ -17,9 +17,9 @@ public interface IClusterNotificationListener {
 
   /**
    * Handle the cluster notification
-   * 
+   *
    * @param notification
    */
-  public void onNotification(IClusterNotificationMessage notification);
+  void onNotification(IClusterNotificationMessage notification);
 
 }

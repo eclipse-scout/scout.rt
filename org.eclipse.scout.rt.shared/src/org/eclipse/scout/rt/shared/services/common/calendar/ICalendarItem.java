@@ -62,9 +62,9 @@ public interface ICalendarItem {
   Object getItemId();
 
   @Override
-  public boolean equals(Object obj);
+  boolean equals(Object obj);
 
   @Override
-  public int hashCode();
+  int hashCode();
 
 }

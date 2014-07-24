@@ -55,8 +55,7 @@ public class TableRowFormTest {
 
     }
     finally {
-      m_table.getString1EditableColumn().m_headerText = m_table
-          .getString1EditableColumn().getConfiguredHeaderText();
+      m_table.getString1EditableColumn().m_headerText = m_table.getString1EditableColumn().getConfiguredHeaderText();
       m_table.getString1EditableColumn().decorateHeaderCell();
     }
   }
@@ -77,8 +76,7 @@ public class TableRowFormTest {
 
     }
     finally {
-      m_table.getString1EditableColumn().m_headerText = m_table
-          .getString1EditableColumn().getConfiguredHeaderText();
+      m_table.getString1EditableColumn().m_headerText = m_table.getString1EditableColumn().getConfiguredHeaderText();
       m_table.getString1EditableColumn().decorateHeaderCell();
     }
   }

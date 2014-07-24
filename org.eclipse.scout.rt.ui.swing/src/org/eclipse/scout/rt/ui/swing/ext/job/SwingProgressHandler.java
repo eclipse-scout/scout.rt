@@ -55,16 +55,16 @@ public class SwingProgressHandler {
     Job.getJobManager().setProgressProvider(p);
     p.addPropertyChangeListener(SwingProgressProvider.PROP_MONITOR_PROPERTIES,
         new PropertyChangeListener() {
+      @Override
+      public synchronized void propertyChange(final PropertyChangeEvent evt) {
+        SwingUtilities.invokeLater(new Runnable() {
           @Override
-          public synchronized void propertyChange(final PropertyChangeEvent evt) {
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                propertyChangeInSwing((MonitorProperties) evt.getNewValue());
-              }
-            });
+          public void run() {
+            propertyChangeInSwing((MonitorProperties) evt.getNewValue());
           }
         });
+      }
+    });
   }
 
   private void dispose() {
@@ -121,7 +121,7 @@ public class SwingProgressHandler {
 
   /**
    * Returns the task name of the active job.
-   * 
+   *
    * @since 3.10.0-M3.
    *        In earlier versions this method returned {@link #getJobFullName()}. This has been changed, since in earlier
    *        versions it was not possible to access "task" and "sub task" separately.
@@ -133,7 +133,7 @@ public class SwingProgressHandler {
 
   /**
    * Returns the sub task name of the active job.
-   * 
+   *
    * @return sub task name
    */
   public String getJobSubTaskName() {
@@ -142,7 +142,7 @@ public class SwingProgressHandler {
 
   /**
    * Returns a concatenated string with "[task-name] - [subtask-name]" of the active job.
-   * 
+   *
    * @return full name
    */
   public String getJobFullName() {
@@ -173,7 +173,7 @@ public class SwingProgressHandler {
     }
   }// end class
 
-  public static interface IStateChangeListener extends EventListener {
+  public interface IStateChangeListener extends EventListener {
     /**
      * This event is sent whenever the state of the handler changes.
      * The call is always in the ui thread with {@link SwingUtilities#isEventDispatchThread()}=true

@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
  */
 public class LinearFillComponentElementFactory extends AbstractComponentElementFactory {
 
-  private final static float PADDING = 1.0f;
+  private static final float PADDING = 1.0f;
 
   @Override
   public Map<CalendarComponent, Element> create(Element container, Date day, CalendarComponent[] components) {

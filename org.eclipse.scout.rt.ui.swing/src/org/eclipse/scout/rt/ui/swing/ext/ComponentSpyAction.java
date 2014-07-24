@@ -602,7 +602,7 @@ public class ComponentSpyAction extends AbstractAction {
     }
   }
 
-  static interface ITreeVisitor {
+  interface ITreeVisitor {
     void visit(TreeNode node);
   }
 

@@ -22,7 +22,7 @@ public interface ITextProviderService extends IService {
   /**
    * Gets the text for the given key and language.<br>
    * if there are parameters in the translation, they are replaced with the given list.
-   * 
+   *
    * @param locale
    *          The locale of the text
    * @param key
@@ -39,14 +39,14 @@ public interface ITextProviderService extends IService {
    *          </ul>
    * @return
    */
-  public String getText(Locale locale, String key, String... messageArguments);
+  String getText(Locale locale, String key, String... messageArguments);
 
   /**
    * returns all key/text pairs defined for the given locale.
-   * 
+   *
    * @param locale
    *          The locale for which the map should be returned (not all locales might have all keys).
    * @return A <code>java.util.Map</code> containing the key/text pairs.
    */
-  public Map<String, String> getTextMap(Locale locale);
+  Map<String, String> getTextMap(Locale locale);
 }

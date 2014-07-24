@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Button;
 
 /**
  * <h3>IRwtScoutToolButton</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
 public interface IRwtScoutToolButton extends IRwtScoutComposite<IAction> {
 
   @Override
-  public Button getUiField();
+  Button getUiField();
 
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -16,35 +16,35 @@ import org.eclipse.scout.service.IService;
 
 public interface IWebServiceClient extends IService {
 
-  public String getUsername();
+  String getUsername();
 
-  public void setUsername(String username);
+  void setUsername(String username);
 
-  public String getPassword();
+  String getPassword();
 
-  public void setPassword(String password);
+  void setPassword(String password);
 
-  public URL getWsdlLocation();
+  URL getWsdlLocation();
 
-  public void setWsdlLocation(URL wsdlLocation);
+  void setWsdlLocation(URL wsdlLocation);
 
-  public String getTargetNamespace();
+  String getTargetNamespace();
 
-  public void setTargetNamespace(String targetNamespace);
+  void setTargetNamespace(String targetNamespace);
 
-  public String getServiceName();
+  String getServiceName();
 
-  public void setServiceName(String serviceName);
+  void setServiceName(String serviceName);
 
-  public String getUrl();
+  String getUrl();
 
-  public void setUrl(String url);
+  void setUrl(String url);
 
-  public Integer getRequestTimeout();
+  Integer getRequestTimeout();
 
-  public void setRequestTimeout(Integer requestTimeout);
+  void setRequestTimeout(Integer requestTimeout);
 
-  public Integer getConnectTimeout();
+  Integer getConnectTimeout();
 
-  public void setConnectTimeout(Integer connectTimeout);
+  void setConnectTimeout(Integer connectTimeout);
 }

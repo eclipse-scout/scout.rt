@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutTableCellEditor</h3> ...
- * 
+ *
  * @author imo
  * @since 1.0.8 30.06.2010
  */
@@ -759,15 +759,15 @@ public class SwtScoutTableCellEditor {
    * Delegate to process focus events on cell editor
    */
   private interface IFocusDelegate {
-    public void doSetFocus();
+    void doSetFocus();
   }
 
   /**
    * Listener to get notified about deactivation event
    */
   private interface IDeactivateListener {
-    public void canceled(ColumnViewerEditorDeactivationEvent event);
+    void canceled(ColumnViewerEditorDeactivationEvent event);
 
-    public void saved(ColumnViewerEditorDeactivationEvent event);
+    void saved(ColumnViewerEditorDeactivationEvent event);
   }
 }

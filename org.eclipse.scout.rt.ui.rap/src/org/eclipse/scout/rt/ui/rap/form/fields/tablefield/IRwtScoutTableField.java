@@ -19,12 +19,12 @@ public interface IRwtScoutTableField extends IRwtScoutFormField<ITableField<? ex
   /**
    * Custom variant for a table's container field when placed inside a TableField.
    */
-  static final String VARIANT_TABLE_CONTAINER = "tableField";
+  String VARIANT_TABLE_CONTAINER = "tableField";
 
   /**
    * Custom variant like {@link #VARIANT_TABLE_CONTAINER}, but for disabled state.
    * (Workaround, because RAP does not seem to apply the ":disabled" state correctly.)
    */
-  static final String VARIANT_TABLE_CONTAINER_DISABLED = "tableFieldDisabled";
+  String VARIANT_TABLE_CONTAINER_DISABLED = "tableFieldDisabled";
 
 }

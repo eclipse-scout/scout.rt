@@ -40,7 +40,7 @@ public final class StringUtility {
 
   private static final String[] EMPTY_ARRAY = new String[0];
 
-  public static interface ITagProcessor {
+  public interface ITagProcessor {
     String/* tagReplacement */processTag(String tagName, String tagContent);
   }
 
@@ -545,10 +545,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          start +
+          text.substring(a.end, b) +
+          end +
+          text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -1163,7 +1163,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-        " "
+            " "
         );
   }
 

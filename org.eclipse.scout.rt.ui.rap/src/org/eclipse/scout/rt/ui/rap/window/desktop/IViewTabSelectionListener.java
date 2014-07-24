@@ -14,11 +14,11 @@ import java.util.EventListener;
 
 /**
  * <h3>IViewTabSelectionListener</h3> ...
- * 
+ *
  * @author aho
  * @since 3.7.0 June 2011
  */
 public interface IViewTabSelectionListener extends EventListener {
 
-  public void handleEvent(ViewTabSelectionEvent event);
+  void handleEvent(ViewTabSelectionEvent event);
 }

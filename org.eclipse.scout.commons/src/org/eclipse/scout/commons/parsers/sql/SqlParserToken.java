@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 final class SqlParserToken {
   private static IScoutLogger logger = ScoutLogManager.getLogger(SqlParserToken.class);
 
-  public static interface IToken {
+  public interface IToken {
     String getText();
 
     void setText(String text);

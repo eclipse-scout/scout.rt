@@ -71,7 +71,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     checkMasterSlaveBox(innerMasterSlaveBox.getInnerMasterSlave2Box());
   }
 
-  public final static class MyForm extends AbstractForm {
+  public static final class MyForm extends AbstractForm {
 
     private MyForm() throws ProcessingException {
       super();
@@ -116,7 +116,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
   }
 
-  public static abstract class AbstractInnerGroupBox extends AbstractGroupBox {
+  public abstract static class AbstractInnerGroupBox extends AbstractGroupBox {
 
     public InnerMasterSlave1Box getInnerMasterSlave1Box() {
       return getFieldByClass(InnerMasterSlave1Box.class);
@@ -135,7 +135,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
   }
 
-  public static abstract class AbstractMasterSlaveBox extends AbstractGroupBox {
+  public abstract static class AbstractMasterSlaveBox extends AbstractGroupBox {
 
     private boolean m_masterChanged = false;
 
@@ -175,7 +175,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
   }
 
-  public final static class NonExistingMasterFieldTestForm extends AbstractForm {
+  public static final class NonExistingMasterFieldTestForm extends AbstractForm {
 
     private NonExistingMasterFieldTestForm() throws ProcessingException {
       super();

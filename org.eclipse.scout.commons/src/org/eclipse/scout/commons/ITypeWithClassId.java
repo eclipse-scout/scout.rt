@@ -19,12 +19,12 @@ package org.eclipse.scout.commons;
  * It should still be possible set this id dynamically when creating scout model entities on the fly with anonymous
  * inner classes.
  * </p>
- * 
+ *
  * @see org.eclipse.scout.commons.annotations.ClassId ClassId
  */
 public interface ITypeWithClassId {
 
-  final String ID_CONCAT_SYMBOL = "_";
+  String ID_CONCAT_SYMBOL = "_";
 
   /**
    * @return a unique id

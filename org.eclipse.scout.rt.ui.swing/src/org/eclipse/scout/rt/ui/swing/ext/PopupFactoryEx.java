@@ -69,7 +69,7 @@ public final class PopupFactoryEx extends PopupFactory {
    * <small>Counterpart of {@link PopupFactoryEx#deactivate()}.</small>
    * </p>
    */
-  public static final void activate() {
+  public static void activate() {
     if (COUNTER.incrementAndGet() == 1) {
       LOG.debug("Activate custom popup factory to ensure, all swing components are validated before displaying a popup.");
       setSharedInstance(CUSTOM_POPUP_FACTORY);
@@ -93,7 +93,7 @@ public final class PopupFactoryEx extends PopupFactory {
    * <small>Counterpart of {@link PopupFactoryEx#activate()}.</small>
    * </p>
    */
-  public static final void deactivate() {
+  public static void deactivate() {
     if (COUNTER.decrementAndGet() <= 0) {
       LOG.debug("Deactivate custom popup factory.");
       setSharedInstance(ORIGINAL_POPUP_FACTORY);
