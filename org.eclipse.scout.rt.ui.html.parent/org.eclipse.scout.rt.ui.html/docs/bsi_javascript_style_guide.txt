@@ -1,0 +1,124 @@
++---------------------------------+
+| BSI JavaScript Style Guide      |
++---------------------------------+
+
+Als Basis dient der Google JavaScript StyleGuide:
+https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+
+
+### Variablen
+
+- Variablen wenn moeglich immer am Anfang der Funktion deklarieren.
+- 1 "var ..." Anweisung pro Zeile und nur 1 Variable pro "var".
+- Ausnahme: Bei nicht initialisierte Variablen koennen auch mehrere
+  gleichzeitig deklariert werden (aber nicht mischen mit Zuweisungen).
+- Variablen am Anfang zu Deklarieren ist good practice, denn die JS-Engine macht
+  das bei der Ausfuehrung sowieo (variable hoisting).
+- 1 Variable pro Zeile macht Refactorings einfacher und ist uebersichtlicher.
+
+
+Beispiele:
+
+NOK:                           OK:
+-------------------------------------------------------------------------
+var x, y = 3;                  var x;
+                               var y = 3;
+var foo = 2,                   var bar;
+    bar, barbar = 3;           var foo = 2;
+                               var barbar = 3;
+
+Links:
+http://benalman.com/news/2012/05/multiple-var-statements-javascript/
+
+
+### Pruefen, ob eine Variable oder ein Property existiert
+
+Fuer Properties:
+
+Es gibt mehrere Varianten:
+1. if (obj.x === undefined)
+2. if (typeof obj.x === 'undefined')
+3. if (obj.hasOwnProperty('x'))
+
+Fuer Variablen gibt es auch mehrere Varianten:
+  1. if (y === undefined)
+  2. if (typeof y === 'undefined')
+
+Bewertung:
+- #1 funktioniert bei Properties, aber nicht bei Variablen. Wenn die Variable nicht
+  definiert ist, gibt es eine Exception.
+  Weiteres (theoretisches) Problem: Jemand koennte die Variable 'undefined' umdefinieren.
+- #2 funktioniert immer. Bei Properties werden auch diejenigen der Protypen
+  beruecksichtigt.
+- #3 kann sinnvoll sein, denn es schaut _nicht_ beim Prototyp nach. Allerdings scheint
+  es extrem langsam zu sein, darum besser nicht verwenden.
+
+=> Empfohlen wird darum #2.
+
+Links:
+http://stackoverflow.com/questions/4725603
+http://stackoverflow.com/questions/17150396
+http://jsperf.com/hasownproperty-vs-in/2
+
+
+### Gleichheit pruefen
+
+Empfehlung: Immer === verwenden, es sei denn, man moechte explizit Type Coercion
+verwenden bzw. unterstuetzen. Ansonsten ist es besser, dass der Code auch mit dem
+strikten Vergleich funktioniert (und nicht nur "zufaellig" wegen JS-Type-Magie).
+
+Performance scheint nur eine untergeordnete Rolle zu spielen:
+http://www.adequatelygood.com/Performance-of-vs-.html
+
+
+### Exceptions werfen
+
+Man kann in JS grundsaetzlich beliebige Objekte werfen. Es sollte aber immer ein Error-
+Objekt geworfen werden, nie nur ein String. Das Problem mit Strings ist, dass nicht
+alle "Faenger" damit umgehen konnen. Jasmine z.B. zeigt dann nur "undefined: undefined"
+als Meldung an, was ueberhaupt nicht hilfreich ist. IE hat angeblich auch Probleme damit.
+
+NOK:                           OK:
+-------------------------------------------------------------------------
+throw 'This is an error';      throw new Error('This is an error');
+
+Links:
+http://www.nczonline.net/blog/2009/03/10/the-art-of-throwing-javascript-errors-part-2/
+http://stackoverflow.com/questions/11502052/throwing-strings-instead-of-errors
+
+
+### Strings
+
+In JavaScript fuer Strings immer einheitlich ' als Begrenzer verwenden.
+
+Ausnahme: Wenn innerhalb des Strings sehr viele Apostrophe vorkommen, kann man die
+Anfuehrungszeichen umkehren, damit man sich das Escapen sparen kann.
+
+Und: In einem JSON-Objekt _muessen_ fuer Strings " verwendet werden! Aber Achtung, wenn man
+ein JS-Objekt im Code von Hand erzeugt, dann ist noch lange kein JSON! Trotzdem kann man da,
+wenn man moechte, doppelte Anfuehrungszeichen verwenden.
+
+Es gibt keinen wirklich triftigen Grund, ausser dass es besser ist, wenn nicht im ganzen
+Code beide Arten von Anfuehrungszeichen durcheinander verwendet werden. Fuer das Erzeugen
+von HTML-Code mit Attributen ist es ausserdem praktisch, wenn die doppelten
+Anfuehrungszeichen nicht escaped werden muessen.
+
+Beispiele:
+var x = 'This is a string.';
+var y = '<div id="' + model.id + '" class="row selected">That\'s it!</div>';
+var z = "That's it!";
+var obj = {
+  "id": 123;
+  'name': 'simple object';
+};
+var jsonResponse = '{ "id": 123, "name": "simple object" }';
+
+
+### Kommentare
+
+Kommentare immer so:
+  // My comment
+
+So nicht:
+  //My comment
+  /* My comment */
