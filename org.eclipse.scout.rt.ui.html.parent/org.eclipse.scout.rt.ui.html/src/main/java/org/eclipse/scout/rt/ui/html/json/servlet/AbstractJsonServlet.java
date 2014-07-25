@@ -59,8 +59,9 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
       }
 
     }
-    catch (Exception e) {
-      LOG.error("Exception while processing GET request: " + req.getRequestURI(), e);
+    catch (Throwable t) {
+      LOG.error("Exception while processing GET request: " + req.getRequestURI(), t);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
     finally {
       LOG.info("GET request finished: " + req.getRequestURI());
@@ -77,12 +78,12 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
         }
       }
     }
-    catch (Exception e) {
-      LOG.error("Exception while processing POST request: " + req.getRequestURI(), e);
+    catch (Throwable t) {
+      LOG.error("Exception while processing POST request: " + req.getRequestURI(), t);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
     finally {
       LOG.info("POST request finished: " + req.getRequestURI());
     }
   }
-
 }
