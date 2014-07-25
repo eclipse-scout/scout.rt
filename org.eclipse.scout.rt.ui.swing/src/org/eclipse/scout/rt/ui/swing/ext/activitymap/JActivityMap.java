@@ -64,6 +64,9 @@ public class JActivityMap extends JComponent implements Scrollable {
   private int m_selectorResizeType = 0;
   private IActivityMap<?, ?> m_scoutActivityMap;
 
+  private int m_rowStartedDrag;
+  private int m_currentRowDrag;
+
   public JActivityMap() {
     m_header = new JActivityMapHeader(this);
     setBackground(Color.white);
@@ -80,7 +83,9 @@ public class JActivityMap extends JComponent implements Scrollable {
             fix = new MouseClickedBugFix(e);
             Component parent = getParentAt(e.getComponent(), e.getPoint());
             e = SwingUtilities.convertMouseEvent(e.getComponent(), e, parent);
-            parent.dispatchEvent(e);
+            if (parent != null) {
+              parent.dispatchEvent(e);
+            }
           }
 
           @Override
@@ -100,7 +105,9 @@ public class JActivityMap extends JComponent implements Scrollable {
               return;
             }
             Component parent = getParentAt(e.getComponent(), e.getPoint());
-            parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
+            if (parent != null) {
+              parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
+            }
           }
         }
         );
@@ -129,6 +136,7 @@ public class JActivityMap extends JComponent implements Scrollable {
               m_pressedInsideMap = true;
               ActivityMapSelection s = new ActivityMapSelection(m_selection);
               int row = pixToRow(e.getY());
+              m_rowStartedDrag = row;
               double[] mouseRange = pixToRange(e.getX());
               if (m_selection.getRange() != null && m_selector.getCursor().getType() == Cursor.E_RESIZE_CURSOR) {
                 m_selectorResizeType = m_selector.getCursor().getType();
@@ -223,6 +231,7 @@ public class JActivityMap extends JComponent implements Scrollable {
             if (isButton1(e) && m_pressedInsideMap) {
               ActivityMapSelection s = new ActivityMapSelection(m_selection);
               int row = pixToRow(e.getY());
+              m_currentRowDrag = row;
               double[] mouseRange = pixToRange(e.getX());
               if (m_selectorResizeType == Cursor.E_RESIZE_CURSOR) {
                 s.setRange(new double[]{m_selection.getRange()[0], mouseRange[1]});
@@ -231,7 +240,13 @@ public class JActivityMap extends JComponent implements Scrollable {
                 s.setRange(new double[]{mouseRange[0], m_selection.getRange()[1]});
               }
               else {
+                s.setRange(new double[]{mouseRange[0], mouseRange[1]});
                 s.setLead(row, mouseRange);
+
+                int[] selectedRows = new int[2];
+                selectedRows[0] = m_rowStartedDrag;
+                selectedRows[1] = m_currentRowDrag;
+                s.setRows(selectedRows);
               }
               setSelectionInternal(s);
             }
