@@ -571,6 +571,9 @@ public final class HTMLUtility {
    */
   public static String toPlainTextWithTable(String html) {
     String s = html;
+    if (s == null || s.length() == 0) {
+      return s;
+    }
     //escape comments:
     s = Pattern.compile("<!\\-\\-(.*?)\\-\\->", Pattern.DOTALL).matcher(s).replaceAll("");
 

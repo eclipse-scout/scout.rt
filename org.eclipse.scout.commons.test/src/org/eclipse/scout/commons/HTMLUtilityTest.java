@@ -803,4 +803,21 @@ public class HTMLUtilityTest {
         "Sallu |";
     assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
   }
+
+  /**
+   * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}: test null and empty values.
+   */
+  @Test
+  public void testToPlainTextWithNullAndEmptyValues() throws Exception {
+    String input;
+    String expected;
+
+    input = "";
+    expected = "";
+    assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
+
+    input = null;
+    expected = null;
+    assertEquals(expected, HTMLUtility.toPlainTextWithTable(input));
+  }
 }
