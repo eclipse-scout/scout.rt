@@ -111,12 +111,24 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     return false;
   }
 
+  /**
+   * Configures the first hour of the day. A value of <code>8</code> will be considered as 8 a.m. - 9 a.m. , so that the
+   * first entry can start at 8 a.m. The very first possible value is <code>0</code> which is considered as 12 a.m.
+   * (beginning of the day)
+   *
+   * @return
+   */
   @ConfigProperty(ConfigProperty.HOUR_OF_DAY)
   @Order(110)
   protected int getConfiguredFirstHourOfDay() {
     return 8;
   }
 
+  /**
+   * Configures the last hour of the day. A value of <code>16</code> will be considered as 4 p.m. - 5 p.m. , so that the
+   * last possible entry can last to 5 p.m. The very last possible value is <code>23</code> which is considered as 11
+   * p.m. - 12 a.m. (midnight)
+   */
   @ConfigProperty(ConfigProperty.HOUR_OF_DAY)
   @Order(130)
   protected int getConfiguredLastHourOfDay() {
@@ -139,7 +151,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
    * Indicates whether this ActivityMap should draw the
    * red and green bordered rectangle sections
    * around the area selected by the mouse.
-   * 
+   *
    * @return true if the colored sections should be displayed,
    *         false if not. Default is true.
    */
@@ -313,7 +325,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
