@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -108,61 +108,61 @@ public class FormulaParser {
       String op;
       INode rightToken;
       while (parseWhitespace(0) && (op = parseOp(level + 1)) != null && parseWhitespace(0) && (rightToken = parseToken(level + 1)) != null) {
-        if (op.equals("&&")) {
+        if ("&&".equals(op)) {
           leftToken = new Op.And(leftToken, rightToken);
         }
-        else if (op.equals("||")) {
+        else if ("||".equals(op)) {
           leftToken = new Op.Or(leftToken, rightToken);// OR or CONCAT
         }
-        else if (op.equals("==")) {
+        else if ("==".equals(op)) {
           leftToken = new Op.Equal(leftToken, rightToken);
         }
-        else if (op.equals("<=")) {
+        else if ("<=".equals(op)) {
           leftToken = new Op.LessThanOrEqual(leftToken, rightToken);
         }
-        else if (op.equals(">=")) {
+        else if (">=".equals(op)) {
           leftToken = new Op.GreaterThanOrEqual(leftToken, rightToken);
         }
-        else if (op.equals("<>") || op.equals("!=")) {
+        else if ("<>".equals(op) || "!=".equals(op)) {
           leftToken = new Op.NotEqual(leftToken, rightToken);
         }
-        else if (op.equals("<")) {
+        else if ("<".equals(op)) {
           leftToken = new Op.LessThan(leftToken, rightToken);
         }
-        else if (op.equals(">")) {
+        else if (">".equals(op)) {
           leftToken = new Op.GreaterThan(leftToken, rightToken);
         }
-        else if (op.equals("+")) {
+        else if ("+".equals(op)) {
           leftToken = new Op.Add(leftToken, rightToken);
         }
-        else if (op.equals("-")) {
+        else if ("-".equals(op)) {
           leftToken = new Op.Sub(leftToken, rightToken);
         }
-        else if (op.equals("*")) {
+        else if ("*".equals(op)) {
           leftToken = new Op.Mul(leftToken, rightToken);
         }
-        else if (op.equals("/")) {
+        else if ("/".equals(op)) {
           leftToken = new Op.Div(leftToken, rightToken);
         }
-        else if (op.equals("%")) {
+        else if ("%".equals(op)) {
           leftToken = new Op.Mod(leftToken, rightToken);
         }
-        else if (op.equals("^")) {// Build 177
+        else if ("^".equals(op)) {// Build 177
           leftToken = new Op.BitXor(leftToken, rightToken);
         }
-        else if (op.equals("|")) {// Build 177
+        else if ("|".equals(op)) {// Build 177
           leftToken = new Op.BitOr(leftToken, rightToken);
         }
-        else if (op.equals("&")) {// Build 177
+        else if ("&".equals(op)) {// Build 177
           leftToken = new Op.BitAnd(leftToken, rightToken);
         }
-        else if (op.equals("<<")) {// Build 177
+        else if ("<<".equals(op)) {// Build 177
           leftToken = new Op.BitShiftLeft(leftToken, rightToken);
         }
-        else if (op.equals(">>")) {// Build 177
+        else if (">>".equals(op)) {// Build 177
           leftToken = new Op.BitShiftRight(leftToken, rightToken);
         }
-        else if (op.equals(">>>")) {// Build 206
+        else if (">>>".equals(op)) {// Build 206
           leftToken = new Op.BitShiftRightZeroExtending(leftToken, rightToken);
         }
         else {
@@ -174,7 +174,7 @@ public class FormulaParser {
       pos.setIndex(save);
       return leftToken;
     }// end if parse token of next level
-    // failed
+     // failed
     return null;
   }
 
@@ -184,10 +184,10 @@ public class FormulaParser {
       // ok,found op, valid in current level ?
       String op = str.substring(index, pos.getIndex());
       if (level == 1) {
-        if (op.equals("&&")) {
+        if ("&&".equals(op)) {
           return op;
         }
-        else if (op.equals("||")) {
+        else if ("||".equals(op)) {
           return op;
         }
         else {
@@ -195,25 +195,25 @@ public class FormulaParser {
         }
       }
       else if (level == 2) {
-        if (op.equals("==")) {
+        if ("==".equals(op)) {
           return op;
         }
-        else if (op.equals("<=")) {
+        else if ("<=".equals(op)) {
           return op;
         }
-        else if (op.equals(">=")) {
+        else if (">=".equals(op)) {
           return op;
         }
-        else if (op.equals("<>")) {
+        else if ("<>".equals(op)) {
           return op;
         }
-        else if (op.equals("!=")) {
+        else if ("!=".equals(op)) {
           return op;
         }
-        else if (op.equals("<")) {
+        else if ("<".equals(op)) {
           return op;
         }
-        else if (op.equals(">")) {
+        else if (">".equals(op)) {
           return op;
         }
         else {
@@ -221,10 +221,10 @@ public class FormulaParser {
         }
       }
       else if (level == 3) {
-        if (op.equals("+")) {
+        if ("+".equals(op)) {
           return op;
         }
-        else if (op.equals("-")) {
+        else if ("-".equals(op)) {
           return op;
         }
         else {
@@ -232,13 +232,13 @@ public class FormulaParser {
         }
       }
       else if (level == 4) {
-        if (op.equals("*")) {
+        if ("*".equals(op)) {
           return op;
         }
-        else if (op.equals("/")) {
+        else if ("/".equals(op)) {
           return op;
         }
-        else if (op.equals("%")) {
+        else if ("%".equals(op)) {
           return op;
         }
         else {
@@ -246,19 +246,19 @@ public class FormulaParser {
         }
       }
       else if (level == 5) {
-        if (op.equals("^")) {
+        if ("^".equals(op)) {
           return op;
         }
-        else if (op.equals("&")) {
+        else if ("&".equals(op)) {
           return op;
         }
-        else if (op.equals("|")) {
+        else if ("|".equals(op)) {
           return op;
         }
-        else if (op.equals("<<")) {
+        else if ("<<".equals(op)) {
           return op;
         }
-        else if (op.equals(">>")) {
+        else if (">>".equals(op)) {
           return op;
         }
         return null;

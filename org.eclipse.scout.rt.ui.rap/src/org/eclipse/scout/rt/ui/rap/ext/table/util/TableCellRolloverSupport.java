@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * <h3>TableCellRolloverSupport</h3> ...
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public class TableCellRolloverSupport {
@@ -135,10 +135,8 @@ public class TableCellRolloverSupport {
     @Override
     public void mouseExit(org.eclipse.swt.events.MouseEvent e) {
       if (m_mouseHoverItem != null && !m_mouseHoverItem.isDisposed() && m_cursorIndex > -1) {
-        m_mouseHoverItem.setBackground(m_cursorIndex, ((ITableColorProvider) getViewer().getLabelProvider()).getBackground(m_mouseHoverItem
-            .getData(), m_cursorIndex));
-        m_mouseHoverItem.setForeground(m_cursorIndex, ((ITableColorProvider) getViewer().getLabelProvider()).getForeground(m_mouseHoverItem
-            .getData(), m_cursorIndex));
+        m_mouseHoverItem.setBackground(m_cursorIndex, ((ITableColorProvider) getViewer().getLabelProvider()).getBackground(m_mouseHoverItem.getData(), m_cursorIndex));
+        m_mouseHoverItem.setForeground(m_cursorIndex, ((ITableColorProvider) getViewer().getLabelProvider()).getForeground(m_mouseHoverItem.getData(), m_cursorIndex));
         Rectangle bounds = m_mouseHoverItem.getBounds(m_cursorIndex);
         m_mouseHoverItem = null;
         m_cursorIndex = -1;

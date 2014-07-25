@@ -22,7 +22,7 @@ public final class ServletFilterDelegate extends org.eclipse.scout.rt.server.com
    *             instead. Will be removed in the M-Release.
    */
   @Deprecated
-  public static interface IServiceCallback extends org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate.IServiceCallback {
+  public interface IServiceCallback extends org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate.IServiceCallback {
   }
 
 }

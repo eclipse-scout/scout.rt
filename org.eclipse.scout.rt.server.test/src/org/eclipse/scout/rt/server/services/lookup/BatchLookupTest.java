@@ -363,7 +363,7 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
   }
 
-  public static interface IFlowerLookupCall {
+  public interface IFlowerLookupCall {
     void setKey(Object key);
 
     void setLatinId(Long id);
@@ -371,7 +371,7 @@ public class BatchLookupTest {
     Long getLatinId();
   }
 
-  public static interface IFlowerLookupService extends ILookupService {
+  public interface IFlowerLookupService extends ILookupService {
   }
 
   public static class FlowerLookupService extends AbstractLookupService implements IFlowerLookupService {

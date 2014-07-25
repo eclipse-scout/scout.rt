@@ -150,7 +150,7 @@ public class FilterConfigInjection {
      */
     public boolean isActive() {
       String activeText = getInitParameter("active");
-      return activeText == null || activeText.equals("true");
+      return activeText == null || "true".equals(activeText);
     }
 
     @Override

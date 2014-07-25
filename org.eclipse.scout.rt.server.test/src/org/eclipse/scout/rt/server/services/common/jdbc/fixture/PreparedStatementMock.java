@@ -39,7 +39,7 @@ public class PreparedStatementMock extends VerboseMock implements InvocationHand
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     String mname = method.getName();
-    if (mname.equals("executeQuery") || mname.equals("getResultSet") || mname.matches("set[a-zA-Z0-9]+")) {
+    if ("executeQuery".equals(mname) || "getResultSet".equals(mname) || mname.matches("set[a-zA-Z0-9]+")) {
       log(PreparedStatement.class, mname, args);
     }
     //generic setter

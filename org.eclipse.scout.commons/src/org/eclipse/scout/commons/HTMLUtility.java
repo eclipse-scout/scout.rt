@@ -420,7 +420,7 @@ public final class HTMLUtility {
         Object attKey = en2.nextElement();
         CSS.Attribute cssAtt = cssMap.get("" + attKey);
         String value = "" + style.getAttribute(attKey);
-        if (cssAtt != null && (!value.equals("null")) && value.length() > 0) {
+        if (cssAtt != null && (!"null".equals(value)) && value.length() > 0) {
           Matcher m = cidPattern.matcher(value);
           if (m.matches()) {
             String cid = m.group(1);

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -351,12 +351,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
        *        reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }

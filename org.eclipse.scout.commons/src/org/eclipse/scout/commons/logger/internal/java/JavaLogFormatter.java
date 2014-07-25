@@ -37,7 +37,7 @@ public class JavaLogFormatter extends Formatter {
     buf.append(TIMESTAMP_FORMAT.format(m_tmpDate));
     buf.append(" ");
     String levelText = record.getLevel().getName();
-    if (levelText.equals("SEVERE")) {
+    if ("SEVERE".equals(levelText)) {
       levelText = "ERROR";
     }
     buf.append(levelText);

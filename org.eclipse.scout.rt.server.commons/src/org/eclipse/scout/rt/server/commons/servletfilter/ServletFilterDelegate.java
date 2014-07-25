@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.server.commons.internal.ServletFilterExtensionPoint;
  */
 public class ServletFilterDelegate {
 
-  public static interface IServiceCallback {
+  public interface IServiceCallback {
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException;
 
     ServletContext getServletContext();

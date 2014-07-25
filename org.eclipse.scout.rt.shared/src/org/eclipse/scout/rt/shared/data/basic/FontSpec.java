@@ -89,13 +89,13 @@ public class FontSpec implements java.io.Serializable {
       while (tok.hasMoreTokens()) {
         String s = tok.nextToken().toUpperCase();
         // styles
-        if (s.equals("PLAIN")) {
+        if ("PLAIN".equals(s)) {
           // nop
         }
-        else if (s.equals("BOLD")) {
+        else if ("BOLD".equals(s)) {
           newStyle = newStyle | STYLE_BOLD;
         }
-        else if (s.equals("ITALIC")) {
+        else if ("ITALIC".equals(s)) {
           newStyle = newStyle | STYLE_ITALIC;
         }
         else {

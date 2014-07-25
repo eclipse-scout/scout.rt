@@ -46,7 +46,7 @@ import org.eclipse.scout.service.SERVICES;
  * <strong>Example:</strong>
  * </p>
  * <blockquote>
- * 
+ *
  * <pre>
  * //Consider a form containing a date field:
  * ...
@@ -71,13 +71,13 @@ import org.eclipse.scout.service.SERVICES;
  * }
  * //The two println statements result in the same value on server and client independent of the timezone of the client and server.
  * </pre>
- * 
+ *
  * </blockquote>
  * </p>
  * <p>
  * <strong>Default values:</strong> Default hasDate=true and hasTime=false
  * </p>
- * 
+ *
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 @ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
@@ -559,7 +559,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
     if (verboseDeltaMatcher.matches()) {
       int i = Integer.parseInt(verboseDeltaMatcher.group(2));
-      if (verboseDeltaMatcher.group(1).equals("-")) {
+      if ("-".equals(verboseDeltaMatcher.group(1))) {
         i = -i;
       }
       Calendar cal = Calendar.getInstance();
@@ -700,7 +700,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 /*
       d=parseHelper(df, text, includesTime);
       if(d!=null) return d;
-*/
+ */
   private Date parseDateTimeFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
     Date d = null;
     if (defaultFormat != null) {

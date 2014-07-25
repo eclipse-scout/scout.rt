@@ -210,7 +210,7 @@ public class BatchNormalizerTest {
     }
   }
 
-  public static interface IFruitLookupService extends ILookupService {
+  public interface IFruitLookupService extends ILookupService {
   }
 
   public static class FruitLookupService extends AbstractLookupService implements IFruitLookupService {

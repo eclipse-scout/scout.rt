@@ -323,22 +323,22 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         key = " ";
       }
       for (String s : k.trim().split("[ -]")) {
-        if (s.equals("shift")) {
+        if ("shift".equals(s)) {
           shift = true;
         }
-        else if (s.equals("control")) {
+        else if ("control".equals(s)) {
           ctrl = true;
         }
-        else if (s.equals("ctrl")) {
+        else if ("ctrl".equals(s)) {
           ctrl = true;
         }
-        else if (s.equals("strg")) {
+        else if ("strg".equals(s)) {
           ctrl = true;
         }
-        else if (s.equals("alt")) {
+        else if ("alt".equals(s)) {
           alt = true;
         }
-        else if (s.equals("alternate")) {
+        else if ("alternate".equals(s)) {
           alt = true;
         }
         else {

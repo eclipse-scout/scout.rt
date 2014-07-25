@@ -100,7 +100,7 @@ public final class FastBeanUtility {
           }
           Class<?> retType = m.getReturnType();
           //
-          if (kind.equals("get") && paramTypes.length == 0 && retType != null && retType != Void.TYPE) {
+          if ("get".equals(kind) && paramTypes.length == 0 && retType != null && retType != Void.TYPE) {
             FastPropertyDescriptor desc = contributeMap.get(name);
             if (desc == null) {
               desc = new FastPropertyDescriptor(beanClazz, name);
@@ -108,7 +108,7 @@ public final class FastBeanUtility {
             }
             desc.addReadMethod(m);
           }
-          else if (kind.equals("is") && paramTypes.length == 0 && retType != null && retType == boolean.class) {
+          else if ("is".equals(kind) && paramTypes.length == 0 && retType != null && retType == boolean.class) {
             FastPropertyDescriptor desc = contributeMap.get(name);
             if (desc == null) {
               desc = new FastPropertyDescriptor(beanClazz, name);
@@ -116,7 +116,7 @@ public final class FastBeanUtility {
             }
             desc.addReadMethod(m);
           }
-          else if (kind.equals("set") && paramTypes.length == 1 && (retType == null || retType == Void.TYPE)) {
+          else if ("set".equals(kind) && paramTypes.length == 1 && (retType == null || retType == Void.TYPE)) {
             FastPropertyDescriptor desc = contributeMap.get(name);
             if (desc == null) {
               desc = new FastPropertyDescriptor(beanClazz, name);

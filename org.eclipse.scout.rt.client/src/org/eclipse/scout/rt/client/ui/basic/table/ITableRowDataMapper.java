@@ -26,7 +26,7 @@ public interface ITableRowDataMapper {
    * @param row
    * @param rowData
    */
-  abstract void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
 
   /**
    * Writes the data from the given {@link ITableRow} to the given {@link AbstractTableRowData}.
@@ -34,19 +34,19 @@ public interface ITableRowDataMapper {
    * @param row
    * @param rowData
    */
-  abstract void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
+  void exportTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException;
 
   /**
    * Override to exclude certain rows from being exported.
    * <p>
    * As default every row is accepted.
    */
-  abstract boolean acceptExport(ITableRow row) throws ProcessingException;
+  boolean acceptExport(ITableRow row) throws ProcessingException;
 
   /**
    * Override to exclude certain rows from being imported.
    * <p>
    * As default every row is accepted.
    */
-  abstract boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException;
+  boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException;
 }

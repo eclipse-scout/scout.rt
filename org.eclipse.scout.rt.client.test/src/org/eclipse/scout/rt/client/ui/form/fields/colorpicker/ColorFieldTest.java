@@ -14,8 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -25,30 +23,27 @@ import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.Tes
 import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 @RunWith(ScoutClientTestRunner.class)
 public class ColorFieldTest {
 
-  protected TestForm form;
-  private List<ServiceRegistration> reg;
+  protected TestForm m_form;
 
   @Before
   public void setUp() throws ProcessingException {
-    form = new TestForm();
-    form.startForm();
+    m_form = new TestForm();
+    m_form.startForm();
   }
 
   @Test
   public void testParseValue() {
-    ColorField01 field = form.getColorField01();
+    ColorField01 field = m_form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
 
@@ -68,7 +63,7 @@ public class ColorFieldTest {
   @Test
   public void testParseInvalidValues() {
     // valid
-    ColorField01 field = form.getColorField01();
+    ColorField01 field = m_form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
@@ -82,7 +77,7 @@ public class ColorFieldTest {
 
   @Test
   public void testInvalidRgbValues() {
-    ColorField01 field = form.getColorField01();
+    ColorField01 field = m_form.getColorField01();
     field.getUIFacade().setTextFromUI("120 135 160", false);
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
@@ -105,15 +100,14 @@ public class ColorFieldTest {
 
   @Test
   public void testMenus() {
-    ColorField01 field = form.getColorField01();
+    ColorField01 field = m_form.getColorField01();
     assertEquals(1, field.getMenus().size());
     assertEquals(TestMenu1.class, field.getMenus().get(0).getClass());
   }
 
   @After
   public void tearDown() throws Throwable {
-    TestingUtility.unregisterServices(reg);
-    form.doClose();
+    m_form.doClose();
   }
 
   public static class TestForm extends AbstractForm {

@@ -30,35 +30,35 @@ public class OracleCongruencyFilter extends CongruencyFilter {
   public String getCanonicalColumnType(ColumnDesc cd) {
     String type = cd.getTypeName().toUpperCase();
     // bugs in oracle are corrected first
-    if (type.equals("DOUBLE")) {
+    if ("DOUBLE".equals(type)) {
       type = "DOUBLE PRECISION";
     }
     // map column type names to canonical names
-    if (type.equals("DATE") || type.equals("TIME") || type.equals("TIMESTAMP")) {
+    if ("DATE".equals(type) || "TIME".equals(type) || "TIMESTAMP".equals(type)) {
       type = "DATE";
     }
-    else if (type.equals("INT") || type.equals("INTEGER")) {
+    else if ("INT".equals(type) || "INTEGER".equals(type)) {
       type = "INT";
     }
     // do not use m_size even though oracle reports one for the following types
-    if (type.equals("BIT") ||
-        type.equals("BLOB") ||
-        type.equals("CLOB") ||
-        type.equals("DATE") ||
-        type.equals("DOUBLE PRECISION") ||
-        type.equals("LONG") ||
-        type.equals("LONG RAW") ||
-        type.equals("REAL") ||
-        type.equals("ROWID") ||
-        type.equals("INT") ||
-        type.equals("BIGINT") ||
-        type.equals("SMALLINT") ||
-        type.equals("TINYINT")) {
+    if ("BIT".equals(type) ||
+        "BLOB".equals(type) ||
+        "CLOB".equals(type) ||
+        "DATE".equals(type) ||
+        "DOUBLE PRECISION".equals(type) ||
+        "LONG".equals(type) ||
+        "LONG RAW".equals(type) ||
+        "REAL".equals(type) ||
+        "ROWID".equals(type) ||
+        "INT".equals(type) ||
+        "BIGINT".equals(type) ||
+        "SMALLINT".equals(type) ||
+        "TINYINT".equals(type)) {
       return type;
     }
     // for DECIMAL and NUMBER use only presicion and decimalDigits
-    if (type.equals("NUMBER") ||
-        type.equals("DECIMAL")) {
+    if ("NUMBER".equals(type) ||
+        "DECIMAL".equals(type)) {
       long prec = (cd.getPrecision() > 0) ? cd.getPrecision() : 38;
       if (cd.getDecimalDigits() > 0) {
         return type + "(" + prec + "," + cd.getDecimalDigits() + ")";

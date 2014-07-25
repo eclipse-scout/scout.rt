@@ -547,7 +547,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void changeVisibilityAfterOfflineSwitch() {
-    return;
   }
 
   @Override

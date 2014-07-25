@@ -209,7 +209,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
 
   private boolean isShowMenuBar() {
     String s = UIManager.getString("MenuBar.policy");
-    return s == null || s.equals("menubar");
+    return s == null || "menubar".equals(s);
   }
 
   private boolean isShowStatusBar() {

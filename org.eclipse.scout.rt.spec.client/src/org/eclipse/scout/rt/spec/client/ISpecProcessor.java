@@ -17,6 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 public interface ISpecProcessor {
 
-  public void process() throws ProcessingException;
+  void process() throws ProcessingException;
 
 }

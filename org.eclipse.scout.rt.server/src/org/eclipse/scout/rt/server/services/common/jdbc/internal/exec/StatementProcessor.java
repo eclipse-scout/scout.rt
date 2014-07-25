@@ -1466,19 +1466,19 @@ public class StatementProcessor implements IStatementProcessor {
 
   protected void processDatabaseSpecificToken(DatabaseSpecificToken t, ISqlStyle sqlStyle) {
     String name = t.getName().toLowerCase();
-    if (name.equals("sysdate")) {
+    if ("sysdate".equals(name)) {
       t.setReplaceToken(sqlStyle.getSysdateToken());
     }
-    else if (name.equals("upper")) {
+    else if ("upper".equals(name)) {
       t.setReplaceToken(sqlStyle.getUpperToken());
     }
-    else if (name.equals("lower")) {
+    else if ("lower".equals(name)) {
       t.setReplaceToken(sqlStyle.getLowerToken());
     }
-    else if (name.equals("trim")) {
+    else if ("trim".equals(name)) {
       t.setReplaceToken(sqlStyle.getTrimToken());
     }
-    else if (name.equals("nvl")) {
+    else if ("nvl".equals(name)) {
       t.setReplaceToken(sqlStyle.getNvlToken());
     }
     else {

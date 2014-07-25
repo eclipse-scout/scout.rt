@@ -245,7 +245,7 @@ public class VerticalGridMatrix implements IGridMatrix {
     return builder.toString();
   }
 
-  protected final static class Bounds {
+  protected static final class Bounds {
     public int x, y, w, h;
 
     public Bounds(int x, int y, int w, int h) {

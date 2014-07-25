@@ -620,13 +620,13 @@ public final class RwtUtility {
     if (keyText == null) {
       return null;
     }
-    if (keyText.equals("shift")) {
+    if ("shift".equals(keyText)) {
       return null;
     }
-    if (keyText.equals("ctrl")) {
+    if ("ctrl".equals(keyText)) {
       return null;
     }
-    if (keyText.equals("alt")) {
+    if ("alt".equals(keyText)) {
       return null;
     }
     StringBuffer buf = new StringBuffer();

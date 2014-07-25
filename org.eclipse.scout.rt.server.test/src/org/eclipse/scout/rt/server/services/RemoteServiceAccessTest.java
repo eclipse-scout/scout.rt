@@ -106,7 +106,7 @@ public class RemoteServiceAccessTest {
     }
   }
 
-  static interface IMockProcessService extends IService {
+  interface IMockProcessService extends IService {
     void hello();
 
     @RemoteServiceAccessDenied

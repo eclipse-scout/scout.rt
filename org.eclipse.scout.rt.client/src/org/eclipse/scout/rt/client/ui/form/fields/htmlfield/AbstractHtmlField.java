@@ -286,6 +286,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * Use null for application default.
    */
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
-    m_monitorSpelling = new Boolean(monitorSpelling);
+    m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 }

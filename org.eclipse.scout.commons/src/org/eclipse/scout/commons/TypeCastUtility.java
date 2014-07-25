@@ -1310,19 +1310,19 @@ public final class TypeCastUtility {
 
   private boolean txStringToBoolean(String o) {
     o = o.toLowerCase();
-    if (o.equals("true")) {
+    if ("true".equals(o)) {
       return true;
     }
     if (o.equals("1")) {
       return true;
     }
-    if (o.equals("yes")) {
+    if ("yes".equals(o)) {
       return true;
     }
-    if (o.equals("x")) {
+    if ("x".equals(o)) {
       return true;
     }
-    if (o.equals("on")) {
+    if ("on".equals(o)) {
       return true;
     }
     return false;

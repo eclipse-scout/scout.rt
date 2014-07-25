@@ -299,7 +299,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   @ConfigOperation
   @Order(40)
   protected Object execCustomBindFunction(String functionName, String[] args, Object[] bindBases) throws ProcessingException {
-    if (functionName.equals("level")) {
+    if ("level".equals(functionName)) {
       if (args.length != 1) {
         throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
       }
@@ -316,7 +316,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       Object ret = tryGetPermissionLevel(permissionClass, levelField, accessControlService);
       return ret != null ? ret : new LongHolder();
     }
-    else if (functionName.equals("code")) {
+    else if ("code".equals(functionName)) {
       if (args.length != 1) {
         throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
       }
@@ -333,7 +333,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         throw new ProcessingException("ID of code '" + args[0] + "'", t);
       }
     }
-    else if (functionName.equals("text")) {
+    else if ("text".equals(functionName)) {
       if (args.length < 1) {
         throw new IllegalArgumentException("expected at least 1 argument for function '" + functionName + "'");
       }

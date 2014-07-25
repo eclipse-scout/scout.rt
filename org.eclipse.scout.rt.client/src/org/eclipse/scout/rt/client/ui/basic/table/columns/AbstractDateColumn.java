@@ -35,7 +35,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private String m_format;
   private boolean m_hasTime;
   private boolean m_hasDate;
-  private DateFormat m_fmt;
   private long m_autoTimeMillis;
 
   public AbstractDateColumn() {
@@ -51,7 +50,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    * expected format.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Format of this column.
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -65,7 +64,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    * configuration has no effect.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if the value represented by this column has a date, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -79,7 +78,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
    * configuration has no effect.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the value represented by this column has a time, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -112,7 +111,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public void setFormat(String s) {
     m_format = s;
-    m_fmt = null;
     validateColumnValues();
   }
 
@@ -124,14 +122,12 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public void setHasDate(boolean b) {
     m_hasDate = b;
-    m_fmt = null;
     validateColumnValues();
   }
 
   @Override
   public void setHasTime(boolean b) {
     m_hasTime = b;
-    m_fmt = null;
     validateColumnValues();
   }
 

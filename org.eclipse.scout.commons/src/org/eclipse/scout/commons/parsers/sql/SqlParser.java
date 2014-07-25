@@ -319,28 +319,28 @@ public class SqlParser {
 
   private boolean isRootPartToken(PartToken pt) {
     String s = pt.getText();
-    if (s.equals("SELECT")) {
+    if ("SELECT".equals(s)) {
       return true;
     }
-    if (s.equals("INSERT INTO")) {
+    if ("INSERT INTO".equals(s)) {
       return true;
     }
-    if (s.equals("INSERT")) {
+    if ("INSERT".equals(s)) {
       return true;
     }
-    if (s.equals("UPDATE")) {
+    if ("UPDATE".equals(s)) {
       return true;
     }
-    if (s.equals("DELETE FROM")) {
+    if ("DELETE FROM".equals(s)) {
       return true;
     }
-    if (s.equals("DELETE")) {
+    if ("DELETE".equals(s)) {
       return true;
     }
-    if (s.equals("CASE")) {
+    if ("CASE".equals(s)) {
       return true;
     }
-    if (s.equals("WITH")) {
+    if ("WITH".equals(s)) {
       return true;
     }
     return false;

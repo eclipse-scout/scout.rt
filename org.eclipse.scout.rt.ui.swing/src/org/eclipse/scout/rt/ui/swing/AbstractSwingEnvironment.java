@@ -609,13 +609,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     if (zone == null) {
       //production
     }
-    else if (zone.equals("int") || zone.equals("integration")) {
+    else if ("int".equals(zone) || "integration".equals(zone)) {
       root.getRootPane().setBorder(new LineBorder(Color.yellow, 3));
     }
-    else if (zone.equals("test")) {
+    else if ("test".equals(zone)) {
       root.getRootPane().setBorder(new LineBorder(Color.orange, 3));
     }
-    else if (zone.equals("dev") || zone.equals("development")) {
+    else if ("dev".equals(zone) || "development".equals(zone)) {
       root.getRootPane().setBorder(new LineBorder(Color.red, 3));
     }
   }

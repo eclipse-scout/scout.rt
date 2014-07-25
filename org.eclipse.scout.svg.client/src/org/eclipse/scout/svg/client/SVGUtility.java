@@ -488,16 +488,16 @@ public final class SVGUtility {
       return f;
     }
     unit = unit.toLowerCase();
-    if (unit.equals("px")) {
+    if ("px".equals(unit)) {
       return f;
     }
-    if (unit.equals("pt")) {
+    if ("pt".equals(unit)) {
       return f * PIXEL_PER_POINT;
     }
-    if (unit.equals("mm")) {
+    if ("mm".equals(unit)) {
       return f * PIXEL_PER_MM;
     }
-    if (unit.equals("in")) {
+    if ("in".equals(unit)) {
       return f * PIXEL_PER_INCH;
     }
     return f;

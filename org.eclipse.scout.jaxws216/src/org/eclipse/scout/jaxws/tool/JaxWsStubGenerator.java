@@ -177,13 +177,13 @@ public class JaxWsStubGenerator {
 
       // omit output directories as set by args[0]
       String key = property[0].trim();
-      if (key.equals("s") ||
-          key.equals("d")) {
+      if ("s".equals(key) ||
+          "d".equals(key)) {
         continue;
       }
 
       // check for compilation
-      if (key.equals("Xnocompile")) {
+      if ("Xnocompile".equals(key)) {
         noCompile = true;
       }
 

@@ -95,7 +95,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   /**
    * It's up to the Eclipse Scout implementation to handle bookmark publishing,
    * e.g. selection of receivers of the published bookmark
-   * 
+   *
    * @param command
    *          the command to publish a bookmark
    */
@@ -107,7 +107,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * If an application needs to execute additional code when a bookmark is opened,
    * it can inject a command here.
    * Please note: The command should at least open the bookmark, by calling {@link IDesktop#activateBookmark()}
-   * 
+   *
    * @param command
    *          the command to be executed when a user opens a bookmark
    */
@@ -238,7 +238,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * The structure of the folders has changed, completely rebuild the model
-   * 
+   *
    * @throws ProcessingException
    */
   private void rebuildBookmarkModel() throws ProcessingException {
@@ -285,7 +285,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   /**
    * Only some values have changed, just save the model
-   * 
+   *
    * @throws ProcessingException
    */
   private void refreshBookmarkModel() throws ProcessingException {
@@ -668,8 +668,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     private boolean isProtected() {
       ITreeNode node = FolderNode.this;
       BookmarkFolder bmFolder = (BookmarkFolder) node.getCell().getValue();
-      if (Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle()) ||
-          Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle())) {
+      if (Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle())
+          || Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle())) {
         return true;
       }
       return false;

@@ -187,16 +187,16 @@ public class CongruencyFilter {
 
   public boolean isNumeric(ColumnDesc cd) {
     String type = cd.getTypeName().toUpperCase();
-    return (type.equals("INT")
-        || type.equals("INTEGER")
-        || type.equals("DOUBLE")
-        || type.equals("DOUBLE PRECISION")
-        || type.equals("REAL")
-        || type.equals("BIGINT")
-        || type.equals("SMALLINT")
-        || type.equals("TINYINT")
-        || type.equals("NUMBER")
-        || type.equals("DECIMAL"));
+    return ("INT".equals(type)
+        || "INTEGER".equals(type)
+        || "DOUBLE".equals(type)
+        || "DOUBLE PRECISION".equals(type)
+        || "REAL".equals(type)
+        || "BIGINT".equals(type)
+        || "SMALLINT".equals(type)
+        || "TINYINT".equals(type)
+        || "NUMBER".equals(type)
+        || "DECIMAL".equals(type));
   }
 
   public String getCanonicalColumnType(ColumnDesc cd) {

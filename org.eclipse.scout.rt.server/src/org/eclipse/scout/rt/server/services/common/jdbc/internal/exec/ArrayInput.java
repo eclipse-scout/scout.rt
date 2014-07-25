@@ -40,10 +40,10 @@ class ArrayInput implements IBindInput {
       m_target.setPlainValue(true);
       // if the op is = or <> change it to IN or NOT IN
       if (m_target.getParsedOp() != null) {
-        if (m_target.getParsedOp().equals("=")) {
+        if ("=".equals(m_target.getParsedOp())) {
           m_target.setParsedOp("IN");
         }
-        else if (m_target.getParsedOp().equals("<>")) {
+        else if ("<>".equals(m_target.getParsedOp())) {
           m_target.setParsedOp("NOT IN");
         }
       }
