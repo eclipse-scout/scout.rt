@@ -5,6 +5,10 @@ var TableSpecHelper = function(session) {
 };
 
 TableSpecHelper.prototype.createModel = function(id, columns, rows) {
+  if (id === undefined) {
+    id = createUniqueAdapterId();
+  }
+
   return {
     "id": id,
     "columns": columns,
@@ -76,12 +80,14 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table(model, this.session);
   table.init(model, this.session);
+  this.session.registerModelAdapter(table); //FIXME CGU remove after moving to constructor
   return table;
 };
 
 TableSpecHelper.prototype.createMobileTable = function(model) {
   var table = new scout.MobileTable(model, this.session);
   table.init(model, this.session);
+  this.session.registerModelAdapter(table); //FIXME CGU remove after moving to constructor
   return table;
 };
 

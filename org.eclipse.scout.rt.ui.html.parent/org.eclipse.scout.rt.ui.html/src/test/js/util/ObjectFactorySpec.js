@@ -15,12 +15,13 @@ describe("ObjectFactory", function() {
       try {
         object = factory.create();
         object.init(model, session);
+        session.registerModelAdapter(object); //FIXME CGU remove after moving to constructor
       } catch (e) {
         //Object probably not registered, check SpecRunnerMaven.html
         expect(object).toBeTruthy();
       }
 
-      modelAdapter = session.getModelAdapter(model.id);
+      modelAdapter = session.getModelAdapter(model);
       expect(modelAdapter).toBe(object);
     }
   }

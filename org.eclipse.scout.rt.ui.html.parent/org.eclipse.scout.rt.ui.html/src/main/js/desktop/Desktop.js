@@ -14,7 +14,7 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 
 scout.Desktop.prototype.init = function(model, session) {
   scout.Desktop.parent.prototype.init.call(this, model, session);
-  this.outline = session.getOrCreateModelAdapter(model.outline, this);
+  this.outline = session.getModelAdapter(model.outline);
 };
 
 scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) {
@@ -154,7 +154,7 @@ scout.Desktop.prototype.changeOutline = function(outline) {
  */
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'outlineChanged') {
-    this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+    this.changeOutline(this.session.getModelAdapter(event.outline));
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

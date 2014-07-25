@@ -55,48 +55,22 @@ scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
+  if (modelAdapter.id === undefined) {
+    throw new Error('modelAdapter.id must be defined');
+  }
   this.modelAdapterRegistry[modelAdapter.id] = modelAdapter;
 };
 
-scout.Session.prototype.getModelAdapter = function(id) {
-  return this.modelAdapterRegistry[id];
-};
-
-scout.Session.prototype.getOrCreateModelAdapter = function(model, parent) {
+scout.Session.prototype.getModelAdapter = function(model) {
   if (!model) {
     return;
   }
-  if (!parent) {
-    throw 'parent needs to be set';
-  }
 
-  var adapter = this.modelAdapterRegistry[model.id];
-  if (adapter) {
-    return adapter;
-  }
-
-  adapter = this.objectFactory.create(model);
-
-  adapter.parent = parent;
-  if (scout.ModelAdapter.prototype.isPrototypeOf(parent)) {
-    parent.addChild(adapter);
-  }
-
-  return adapter;
+  return this.getModelAdapterForId(model.id);
 };
 
-scout.Session.prototype.getOrCreateModelAdapters = function(modelArray, parent) {
-  if (!modelArray) {
-    return [];
-  }
-
-  var adapters = [];
-  var i;
-  for (i = 0; i < modelArray.length; i++) {
-    adapters[i] = this.getOrCreateModelAdapter(modelArray[i], parent);
-  }
-
-  return adapters;
+scout.Session.prototype.getModelAdapterForId = function(id) {
+  return this.modelAdapterRegistry[id];
 };
 
 /**
@@ -285,17 +259,88 @@ scout.Session.prototype._processEvents = function(events) {
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
 
-    var widget = session.modelAdapterRegistry[event.id];
-    if (!widget) {
-      throw 'No widget found for id ' + event.id;
+    var adapter = this.getModelAdapter(event);
+    if (!adapter) {
+      throw new Error('No adapter found for id ' + event.id);
     }
 
+    this._ensureAdaptersCreated(event, adapter);
+
     if (event.type === 'property') { // Special handling for 'property' type
-      widget.onModelPropertyChange(event);
+      adapter.onModelPropertyChange(event);
     } else {
-      widget.onModelAction(event);
+      adapter.onModelAction(event);
     }
   }
+};
+
+scout.Session.prototype._ensureAdaptersCreated = function(object, parent) {
+  var i, adapter, adapters;
+  var time = new Date().getTime();
+
+  if (parent === this) {
+    //Session is not a ModelAdapter and therefore does not have addChild -> Currently it is not necessary to link with session
+    parent = null;
+  }
+
+  adapters = this._ensureAdaptersCreatedRec(object, parent);
+
+  for (i=0; i<adapters.length;i++) {
+    adapter = adapters[i];
+    if (!adapter.initialized) {
+      adapter.init(adapter.model, this);
+    }
+  }
+
+  $.log('Adapter creation time: ' + (new Date().getTime() - time) + 'ms');
+};
+
+scout.Session.prototype._ensureAdaptersCreatedRec = function(object, parent) {
+  var i, adapter, propertyName;
+  var adapters = [];
+  if (!object || typeof object !== 'object') {
+    return adapters;
+  }
+
+  //Object is an array -> check if the array elements are adapters
+  if (Array.isArray(object)) {
+    for (i = 0; i < object.length; i++) {
+      adapters = adapters.concat(this._ensureAdaptersCreatedRec(object[i], parent));
+    }
+    return adapters;
+  }
+
+  //Object is an adapter -> create it
+  if (object.objectType) {
+    if (this.getModelAdapter(object)) {
+      throw new Error('object is already registred, must not happen. Id: ' + object.id);
+    }
+    adapter = this.objectFactory.create(object);
+    adapter.id = object.id;
+    //FIXME registering here but unregister at destroy, little strange. Maybe register and write properties in constructor, but link to other adapters later
+    this.registerModelAdapter(adapter);
+
+    adapter.model = object;
+    //FIXME What if the same model adapter is used by two different $parents? The link is wrong for the second $parent (e.g. TableField/Table).
+    //Main question should be: Do we want to link the models or the gui objects? maybe we need two lists. Maybe the server has to set the server so that destroy works correctly
+    if (parent) {
+      adapter.parent = parent;
+      parent.addChild(adapter);
+    }
+
+    adapters.push(adapter);
+    parent = adapter;
+  }
+
+  //check properties of the object for more adapters
+  //Only check properties if containsNewAdapters is set to true -> improves performance a little.
+  if (object.containsNewAdapters) {
+    delete object.containsNewAdapters;
+    for (propertyName in object) {
+      adapters = adapters.concat(this._ensureAdaptersCreatedRec(object[propertyName], parent));
+    }
+  }
+  return adapters;
 };
 
 scout.Session.prototype.init = function() {
@@ -325,7 +370,7 @@ scout.Session.prototype.onModelAction = function(event) {
     // FIXME inform components to reformat display text?
   } else if (event.type === 'initialized') {
     this.locale = new scout.Locale(event.clientSession.locale);
-    this.desktop = this.objectFactory.create(event.clientSession.desktop);
+    this.desktop = this.getModelAdapter(event.clientSession.desktop);
     this.desktop.render(this.$entryPoint);
   }
 };

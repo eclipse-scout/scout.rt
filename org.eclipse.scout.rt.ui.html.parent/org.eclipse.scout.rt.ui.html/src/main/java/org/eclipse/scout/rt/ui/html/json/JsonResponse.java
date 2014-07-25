@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -105,41 +105,43 @@ public class JsonResponse {
    */
   public static JSONObject resolveJsonAdapter(JSONObject object) {
     long resolveTime = System.currentTimeMillis();
-    JSONObject resolvedObject = (JSONObject) resolveJsonAdapterInternal(object);
+    JSONObject resolvedObject = (JSONObject) resolveJsonAdapterInternal(object, new JSONObject());
     LOG.debug("Time to resolve adapters: " + (System.currentTimeMillis() - resolveTime) + "ms");
 
     return resolvedObject;
   }
 
-  private static Object resolveJsonAdapterInternal(Object object) {
+  private static Object resolveJsonAdapterInternal(Object object, JSONObject parent) {
     if (object instanceof IJsonAdapter<?>) {
       IJsonAdapter<?> adapter = ((IJsonAdapter) object);
       JSONObject json = adapter.write();
       if (!adapter.isAttached()) {
         adapter.attach();
+        JsonObjectUtility.putProperty(parent, "containsNewAdapters", true);
       }
-      return resolveJsonAdapterInternal(json);
+      Object obj = resolveJsonAdapterInternal(json, json);
+      return obj;
     }
     else if (object instanceof JSONObject) {
       JSONObject jsonObject = (JSONObject) object;
-      Iterator keys = jsonObject.keys();
-      // FIXME BSH We currently rely on alphabetic order - change that! (E.g. new TabBox: [g]roupBoxes vs. [s]electedTab) SEE ALSO: ModelAdapter.js -> _eachProperty
-      Set<String> sortedKeys = new TreeSet<String>();
-      while (keys.hasNext()) {
-        String key = (String) keys.next();
-        sortedKeys.add(key);
+      Set<String> keys = new HashSet<String>();
+      for (Iterator it = jsonObject.keys(); it.hasNext();) {
+        keys.add((String) it.next()); // FIXME BSH Change to keySet() or sortedKeys() when we have decided which JSON library to use
       }
-      for (String key : sortedKeys) {
+      for (String key : keys) { // order does not matter
         Object value = jsonObject.opt(key);
-        JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value));
+        JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value, jsonObject));
+        if (jsonObject.optBoolean("containsNewAdapters")) {
+          JsonObjectUtility.putProperty(parent, "containsNewAdapters", true);
+        }
       }
+      return object;
     }
     else if (object instanceof JSONArray) {
       JSONArray arr = (JSONArray) object;
       JSONArray arr2 = new JSONArray();
-
       for (int i = 0; i < arr.length(); i++) {
-        arr2.put(resolveJsonAdapterInternal(arr.opt(i)));
+        arr2.put(resolveJsonAdapterInternal(arr.opt(i), parent));
       }
       return arr2;
     }

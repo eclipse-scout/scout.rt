@@ -14,10 +14,10 @@ scout.BreadCrumbNavigation.prototype._renderBreadCrumbs = function(removal) {
   var i, breadcrumb, form;
   for (i = 0; i < this.breadcrumbs.length; i++) {
     breadcrumb = this.breadcrumbs[i];
-    form = this.session.getModelAdapter(breadcrumb.formId);
+    form = this.session.getModelAdapterForId(breadcrumb.formId);
     this._addBreadCrumbForm(form);
   }
-  form = this.session.getModelAdapter(this.currentFormId);
+  form = this.session.getModelAdapterForId(this.currentFormId);
   this._addBreadCrumbForm(form);
 
   var scrollWidth = this.$scrollContainer[0].scrollWidth;

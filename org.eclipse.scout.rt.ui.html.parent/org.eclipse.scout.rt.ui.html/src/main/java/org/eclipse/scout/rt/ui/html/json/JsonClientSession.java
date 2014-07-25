@@ -47,7 +47,8 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
   @Override
   public String getObjectType() {
-    return "ClientSession";
+    //Currently there is no representation on client side
+    return null;
   }
 
   @Override

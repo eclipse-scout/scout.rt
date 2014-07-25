@@ -225,15 +225,15 @@ scout.BaseDesktop.prototype.onModelAction = function(event) {
   var form;
 
   if (event.type === 'formAdded') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
+    form = this.session.getModelAdapter(event.form);
     this.forms.push(form);
     this.addForm(form);
   } else if (event.type === 'formRemoved') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
+    form = this.session.getModelAdapter(event.form);
     scout.arrays.remove(this.forms, form);
     this.removeForm(form);
   } else if (event.type === 'formEnsureVisible') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
+    form = this.session.getModelAdapter(event.form);
     this.activateForm(form);
   } else {
     $.log('Model event not handled. Widget: Desktop. Event: ' + event.type + '.');

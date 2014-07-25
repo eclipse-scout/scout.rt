@@ -3,11 +3,16 @@ scout.ModelAdapter = function() {
   this.parent;
   this.children = [];
   this._adapterProperties = [];
+  this.initialized = false;
   this.rendered = false;
   this.destroyed = false;
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
+  if (this.initialized) {
+    throw new Error('Already initialized');
+  }
+
   this.session = session;
 
   // copy all properties from model to this adapter instance
@@ -15,7 +20,7 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     this[propertyName] = value;
   }.bind(this));
 
-  this.session.registerModelAdapter(this);
+  this.initialized = true;
 };
 
 // TODO AWE: underscore bei setter-func names entfernen, oder eventuell auf _render umbenennen?
@@ -123,19 +128,18 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
 
   //Loop through primitive properties
   for (propertyName in model) {
-    if (ignore !== undefined && ignore.indexOf(propertyName) >= 0) {
+    if (typeof ignore !== 'undefined' && ignore.indexOf(propertyName) >= 0) {
       continue;
     }
     if (this._adapterProperties.indexOf(propertyName) > -1) {
-      continue;
+      continue; // will be handled below
     }
 
     value = model[propertyName];
     func(propertyName, value);
   }
 
-  //Loop through adapter properties in the order specified by the list _adapterProperties
-  //Important: The server resolves the model adapters in alphabetic order. Currently we need to define the order by ourself. Maybe we should change to alphabetical order as well.
+  //Loop through adapter properties (any order will do).
   for (i = 0; i < this._adapterProperties.length; i++) {
     propertyName = this._adapterProperties[i];
     value = model[propertyName];
@@ -145,13 +149,19 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
     if (Array.isArray(value)) {
       adapters = [];
       for (j = 0; j < value.length; j++) {
-        adapter = this.session.getOrCreateModelAdapter(value[j], this);
+        adapter = this.session.getModelAdapter(value[j]);
+        if (!adapter.initialized) {  //Initialize the child adapters to make them available at initialization time of the adapter (adapter.init()). Example: AnalysisTableControl.js
+          adapter.init(adapter.model, this.session); //FIXME CGU adapter.model set by session, little ugly. Maybe move model and session back to constructor...
+        }
         this.onChildAdapterCreated(propertyName, adapter);
         adapters.push(adapter);
       }
       value = adapters;
     } else {
-      value = this.session.getOrCreateModelAdapter(value, this);
+      value = this.session.getModelAdapter(value);
+      if (!value.initialized) {
+        value.init(value.model, this.session);
+      }
       this.onChildAdapterCreated(propertyName, value);
     }
 
@@ -206,6 +216,9 @@ scout.ModelAdapter.prototype._renderProperties = function(oldValues, newValues, 
     }
     else {
       //Call the setter for regular properties, for adapters see onChildAdapterChange
+      if (!this[setterFuncName]) {
+        throw new Error('Setter function ' + setterFuncName + ' does not exist in model adapter');
+      }
       this[setterFuncName](value);
     }
 

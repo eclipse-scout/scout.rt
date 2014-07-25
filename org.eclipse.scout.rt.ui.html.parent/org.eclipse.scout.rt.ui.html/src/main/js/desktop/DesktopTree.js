@@ -81,7 +81,7 @@ scout.DesktopTree.prototype._render = function($parent) {
 
 scout.DesktopTree.prototype.setNodeDetailFormChanged = function(nodeId, detailForm) {
   var node = this._nodeMap[nodeId];
-  node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
+  node.detailForm = this.session.getModelAdapter(detailForm);
 
   if (this._selectedNodes.indexOf(node) >= 0) {
     this.showNodeDetailForm(node);
@@ -425,11 +425,11 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     }
 
     if (node.table) {
-      node.table = this.session.getOrCreateModelAdapter(node.table, this);
+      node.table = this.session.getModelAdapter(node.table);
     }
 
     if (node.detailForm) {
-      node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+      node.detailForm = this.session.getModelAdapter(node.detailForm);
     }
 
     // if model demands children, create them

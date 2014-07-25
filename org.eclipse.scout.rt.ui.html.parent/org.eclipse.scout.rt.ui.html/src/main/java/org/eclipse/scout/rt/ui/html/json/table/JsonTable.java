@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -163,19 +162,13 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         return null;
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEY_STROKES, model) {
-      @Override
-      protected List<IKeyStroke> modelValue() {
-        return getModel().getKeyStrokes();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        @SuppressWarnings("unchecked")
-        List<IKeyStroke> keyStrokes = (List<IKeyStroke>) value;
-        return getOrCreateJsonAdapters(keyStrokes);
-      }
-    });
+    //FIXME create Keystroke.js on client first
+//    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getJsonSession()) {
+//      @Override
+//      protected List<IKeyStroke> modelValue() {
+//        return getModel().getKeyStrokes();
+//      }
+//    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SCROLL_TO_SELECTION, model) {
       @Override
       protected Boolean modelValue() {
