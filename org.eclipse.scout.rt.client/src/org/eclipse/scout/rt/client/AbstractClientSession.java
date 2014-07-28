@@ -16,10 +16,15 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -83,6 +88,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private Locale m_locale;
   private UserAgent m_userAgent;
   private Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
+  private long m_maxShutdownWaitTime = 4567;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -377,10 +383,42 @@ public abstract class AbstractClientSession implements IClientSession {
     catch (Throwable t) {
       LOG.info("logout on server", t);
     }
-    setActive(false);
-    if (LOG.isInfoEnabled()) {
-      LOG.info("end session event loop");
-    }
+
+    new Job("Delay Session Inactivation") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        long maxShutdownWaitTime = getMaxShutdownWaitTime();
+        if (maxShutdownWaitTime > 0) {
+          // Wait for all client jobs to complete (max. for a short time)
+          final CountDownLatch joinLock = new CountDownLatch(1);
+          new Job("Join JobManager") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor2) {
+              try {
+                ClientJob.getJobManager().join(ClientJob.class, null);
+              }
+              catch (Throwable t) {
+                LOG.warn("Interrupted while joining JobManager", t);
+              }
+              joinLock.countDown(); // notify outer job
+              return Status.OK_STATUS;
+            }
+          }.schedule();
+          try {
+            joinLock.await(maxShutdownWaitTime, TimeUnit.MILLISECONDS);
+          }
+          catch (InterruptedException e) {
+            LOG.warn("Interrupted while waiting for finishing ClientJobs", e);
+          }
+        }
+        // Now really stop the session
+        setActive(false);
+        if (LOG.isInfoEnabled()) {
+          LOG.info("end session event loop");
+        }
+        return Status.OK_STATUS;
+      }
+    }.schedule();
   }
 
   protected boolean isStopping() {
@@ -534,5 +572,22 @@ public abstract class AbstractClientSession implements IClientSession {
       ILocaleListener listener = (ILocaleListener) it.next();
       listener.localeChanged(event);
     }
+  }
+
+  /**
+   * Sets the maximum time (in milliseconds) to wait for all client jobs to finish when stopping the session before
+   * it is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without
+   * waiting for client jobs to finish.
+   */
+  public void setMaxShutdownWaitTime(long maxShutdownWaitTime) {
+    m_maxShutdownWaitTime = maxShutdownWaitTime;
+  }
+
+  /**
+   * @return the maximum time (in milliseconds) to wait for all client jobs to finish when stopping the session before
+   *         it is set to inactive. The default value is 4567, which should be reasonable for most use cases.
+   */
+  public long getMaxShutdownWaitTime() {
+    return m_maxShutdownWaitTime;
   }
 }

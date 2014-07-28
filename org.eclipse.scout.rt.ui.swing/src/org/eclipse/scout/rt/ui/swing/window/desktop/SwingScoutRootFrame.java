@@ -372,6 +372,14 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   protected void handleSwingWindowClosing(WindowEvent e) {
+    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
+      boolean ok = ((JComponent) focusOwner).getInputVerifier().verify((JComponent) focusOwner);
+      if (!ok) {
+        return;
+      }
+    }
+
     // notify Scout
     Runnable t = new Runnable() {
       @Override
@@ -385,13 +393,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   protected void handleScoutDesktopClosedInSwing(DesktopEvent e) {
-    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-    if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
-      boolean ok = ((JComponent) focusOwner).getInputVerifier().verify((JComponent) focusOwner);
-      if (!ok) {
-        return;
-      }
-    }
     final boolean maximized = ((m_swingFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) != 0);
     Rectangle r = m_swingFrame.getBounds();
     // <bsh 2010-10-21>
@@ -468,7 +469,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
 
   /**
    * To be overwritten to install a custom header panel
-   * 
+   *
    * @return
    */
   protected SwingScoutHeaderPanel createSwingScoutHeaderPanel() {
