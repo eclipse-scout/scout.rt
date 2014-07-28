@@ -227,6 +227,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     getSwingActivityMap().setModel(new SwingActivityMapModel(getScoutActivityMap(), m_metricsTable));
     getSwingActivityMap().setColumnModel(new SwingActivityMapColumnModel(getScoutActivityMap().getTimeScale()));
     getSwingActivityMap().getSelector().setDrawSections(getScoutActivityMap().isDrawSections());
+    getSwingActivityMap().setActivityMap(getScoutActivityMap());
     setSelectionFromScout();
   }
 

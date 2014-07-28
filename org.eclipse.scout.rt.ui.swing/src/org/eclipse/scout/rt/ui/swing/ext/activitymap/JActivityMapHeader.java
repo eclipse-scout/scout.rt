@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.JActivityMapHeaderValidator.ColumnType;
 
 /**
@@ -162,20 +163,30 @@ public class JActivityMapHeader extends JComponent {
   private void paintMinorHeader(Graphics g, Object[] minorCols) {
     g.setColor(getForeground());
     g.setFont(getFont());
-    ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
+    List<Rectangle> rects = new ArrayList<Rectangle>(minorCols.length);
     for (Object o : minorCols) {
       rects.add(getMinorHeaderRect(o));
     }
 
     // determine text size
-    ArrayList<String> texts = new ArrayList<String>();
+    List<String> texts = new ArrayList<String>();
     List<Rectangle> validatedRects = m_validator.calculateTextSizeRectangles(minorCols, ColumnType.MINOR, m_map.getColumnModel(), rects, g.getFontMetrics(), texts);
+
+    //for better usability, align the text on the left hand side instead of centered, if we are in PLANNING_MODE_INTRADAY
+    final boolean hCentered = !isPlanningModeIntraDay();
 
     for (int i = 0; i < rects.size(); i++) {
       Rectangle r = validatedRects.get(i);
       String text = texts.get(i);
-      paintText(g, r, text, true, true);
+      paintText(g, r, text, hCentered, true);
     }
+  }
+
+  private boolean isPlanningModeIntraDay() {
+    if (m_map.getActivityMap() == null) {
+      return false;
+    }
+    return m_map.getActivityMap().getPlanningMode() == IActivityMap.PLANNING_MODE_INTRADAY;
   }
 
   private void paintText(Graphics g, Rectangle r, String text, boolean hcentered, boolean vcentered) {
